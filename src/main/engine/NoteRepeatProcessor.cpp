@@ -57,24 +57,26 @@ void NoteRepeatProcessor::process(
         program = sampler->getProgram(drumBus->getProgram());
     }
 
-    auto note = assign16LevelsScreen->getNote();
+    DrumNoteNumber note = assign16LevelsScreen->getNote();
 
     const auto snapshot = eventRegistry->getSnapshot();
 
     static const std::vector sourcesToExclude{Source::NoteRepeat,
                                               Source::Sequence};
 
-    for (int padIndex = 0; padIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
-         ++padIndex)
+    for (int programPadIndex = 0;
+         programPadIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
+         ++programPadIndex)
     {
-        if (!snapshot.getMostRecentProgramPadPress(padIndex, sourcesToExclude))
+        if (!snapshot.getMostRecentProgramPadPress(
+                ProgramPadIndex(programPadIndex), sourcesToExclude))
         {
             continue;
         }
 
         if (!isSixteenLevelsEnabled() && program)
         {
-            note = program->getNoteFromPad(padIndex);
+            note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }
 
         auto noteEvent = std::make_shared<sequencer::NoteOnEvent>(note);
@@ -106,11 +108,12 @@ void NoteRepeatProcessor::process(
         }
 
         const auto physicalPadPressInfo =
-            snapshot.retrievePhysicalPadPressEvent(padIndex % 16);
+            snapshot.retrievePhysicalPadPressEvent(
+                PhysicalPadIndex(programPadIndex % 16));
 
         const bool isPhysicallyPressed =
             physicalPadPressInfo.bank ==
-            controller::programPadIndexToBank(padIndex);
+            controller::programPadIndexToBank(ProgramPadIndex(programPadIndex));
 
         if (isSixteenLevelsEnabled() && isPhysicallyPressed)
         {
@@ -120,19 +123,20 @@ void NoteRepeatProcessor::process(
                 assign16LevelsScreen->getOriginalKeyPad(),
                 assign16LevelsScreen->getNote(),
                 assign16LevelsScreen->getParameter(),
-                padIndex % 16};
+                programPadIndex % 16};
 
-            noteEvent->setVelocity(127);
+            noteEvent->setVelocity(MaxVelocity);
             Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
-            note = noteEvent->getNote();
         }
         else
         {
-            const int velocityToUseIfNotFullLevel =
-                snapshot.getPressedProgramPadAfterTouchOrVelocity(padIndex);
+            const Velocity velocityToUseIfNotFullLevel =
+                snapshot.getPressedProgramPadAfterTouchOrVelocity(
+                    ProgramPadIndex(programPadIndex));
 
-            noteEvent->setVelocity(
-                isFullLevelEnabled() ? 127 : velocityToUseIfNotFullLevel);
+            noteEvent->setVelocity(isFullLevelEnabled()
+                                       ? MaxVelocity
+                                       : velocityToUseIfNotFullLevel);
         }
 
         noteEvent->setDuration(durationTicks);
@@ -143,8 +147,8 @@ void NoteRepeatProcessor::process(
         const auto velocityBeforeTrackVelocityRatioApplied =
             noteEvent->getVelocity();
 
-        noteEvent->setVelocity(noteEvent->getVelocity() *
-                               (track->getVelocityRatio() * 0.01));
+        noteEvent->setVelocity(Velocity(noteEvent->getVelocity() *
+                                        (track->getVelocityRatio() * 0.01)));
 
         const auto durationFrames = static_cast<int>(
             durationTicks == -1

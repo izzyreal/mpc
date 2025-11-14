@@ -14,7 +14,7 @@ CopySequenceScreen::CopySequenceScreen(Mpc &mpc, const int layerIndex)
 void CopySequenceScreen::open()
 {
     sq0 = sequencer->getActiveSequenceIndex();
-    sq1 = sequencer->getFirstUsedSeqUp(0, true);
+    sq1 = sequencer->getFirstUsedSeqUp(MinSequenceIndex, true);
 
     displaySq0();
     displaySq1();
@@ -36,59 +36,32 @@ void CopySequenceScreen::function(const int i)
             sequencer->setActiveSequenceIndex(sq1, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
-void CopySequenceScreen::turnWheel(const int i)
+void CopySequenceScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    if (focusedFieldName.find("0") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("0") != std::string::npos)
     {
-        setSq0(sq0 + i);
+        setSq0(sq0 + increment);
     }
     else if (focusedFieldName.find("1") != std::string::npos)
     {
-        setSq1(sq1 + i);
+        setSq1(sq1 + increment);
     }
 }
 
-void CopySequenceScreen::setSq0(int i)
+void CopySequenceScreen::setSq0(const SequenceIndex sequenceIndex)
 {
-    if (i < 0)
-    {
-        i = 0;
-    }
-    if (i > 98)
-    {
-        i = 98;
-    }
-
-    if (sq0 == i)
-    {
-        return;
-    }
-
-    sq0 = i;
+    sq0 = std::clamp(sequenceIndex, MinSequenceIndex, MaxSequenceIndex);
     displaySq0();
 }
 
-void CopySequenceScreen::setSq1(int i)
+void CopySequenceScreen::setSq1(const SequenceIndex sequenceIndex)
 {
-    if (i < 0)
-    {
-        i = 0;
-    }
-    if (i > 98)
-    {
-        i = 98;
-    }
-
-    if (sq1 == i)
-    {
-        return;
-    }
-
-    sq1 = i;
+    sq1 = std::clamp(sequenceIndex, MinSequenceIndex, MaxSequenceIndex);
     displaySq1();
 }
 

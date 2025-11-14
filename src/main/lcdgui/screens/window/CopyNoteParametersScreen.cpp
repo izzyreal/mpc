@@ -25,25 +25,24 @@ void CopyNoteParametersScreen::open()
     setNote1(mpc.clientEventController->getSelectedNote() - 35);
 }
 
-void CopyNoteParametersScreen::turnWheel(const int i)
+void CopyNoteParametersScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "prog0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "prog0")
     {
-        setProg0(prog0 + i);
+        setProg0(prog0 + increment);
     }
     else if (focusedFieldName == "note0")
     {
-        setNote0(mpc.clientEventController->getSelectedNote() + i);
+        setNote0(mpc.clientEventController->getSelectedNote() + increment);
     }
     else if (focusedFieldName == "prog1")
     {
-        setProg1(prog1 + i);
+        setProg1(prog1 + increment);
     }
     else if (focusedFieldName == "note1")
     {
-        setNote1(note1 + i);
+        setNote1(note1 + increment);
     }
 }
 
@@ -63,6 +62,7 @@ void CopyNoteParametersScreen::function(const int i)
             openScreenById(ScreenId::PgmAssignScreen);
             break;
         }
+        default:;
     }
 }
 
@@ -81,14 +81,16 @@ void CopyNoteParametersScreen::displayNote0() const
     const auto selectedNoteParameters = sourceProgram->getNoteParameters(note0);
     const auto destProgram = sampler->getProgram(prog0);
     const auto padIndex = destProgram->getPadIndexFromNote(note0);
-    const auto soundIndex =
-        note0 != -1 ? selectedNoteParameters->getSoundIndex() : -1;
-    const auto noteText = note0 == -1 ? "--" : std::to_string(note0);
+    const auto soundIndex = note0 != NoDrumNoteAssigned
+                                ? selectedNoteParameters->getSoundIndex()
+                                : -1;
+    const auto noteText =
+        note0 == NoDrumNoteAssigned ? "--" : std::to_string(note0);
     const auto padName = sampler->getPadName(padIndex);
     auto sampleName =
         soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 
-    if (note0 == -1)
+    if (note0 == NoDrumNoteAssigned)
     {
         sampleName = "";
     }
@@ -107,11 +109,14 @@ void CopyNoteParametersScreen::displayProg1() const
 void CopyNoteParametersScreen::displayNote1() const
 {
     const auto program = sampler->getProgram(prog1);
-    const auto padIndex = program->getPadIndexFromNote(note1 + 35);
+    const auto padIndex =
+        program->getPadIndexFromNote(DrumNoteNumber(note1 + MinDrumNoteNumber));
     const auto soundIndex =
-        note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex()
+        note1 != -1 ? program->getNoteParameters(note1 + MinDrumNoteNumber)
+                          ->getSoundIndex()
                     : -1;
-    const auto noteText = note1 == -1 ? "--" : std::to_string(note1 + 35);
+    const auto noteText =
+        note1 == -1 ? "--" : std::to_string(note1 + MinDrumNoteNumber);
     const auto padName = sampler->getPadName(padIndex);
     auto sampleName =
         soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
@@ -124,21 +129,22 @@ void CopyNoteParametersScreen::displayNote1() const
     findField("note1")->setText(noteText + "/" + padName + sampleName);
 }
 
-void CopyNoteParametersScreen::setProg0(const int i)
+void CopyNoteParametersScreen::setProg0(const ProgramIndex programIndex)
 {
-    prog0 = std::clamp(i, 0, sampler->getProgramCount() - 1);
+    prog0 = std::clamp(programIndex, MinProgramIndex, MaxProgramIndex);
     displayProg0();
 }
 
-void CopyNoteParametersScreen::setProg1(const int i)
+void CopyNoteParametersScreen::setProg1(const ProgramIndex programIndex)
 {
-    prog1 = std::clamp(i, 0, sampler->getProgramCount() - 1);
+    prog1 = std::clamp(programIndex, MinProgramIndex, MaxProgramIndex);
     displayProg1();
 }
 
-void CopyNoteParametersScreen::setNote0(const int i) const
+void CopyNoteParametersScreen::setNote0(
+    const DrumNoteNumber drumNoteNumber) const
 {
-    mpc.clientEventController->setSelectedNote(i);
+    mpc.clientEventController->setSelectedNote(drumNoteNumber);
     displayNote0();
 }
 

@@ -44,6 +44,7 @@ void InsertEventScreen::function(const int i)
             eventAddedBeforeLeavingTheScreen = true;
             openScreenById(ScreenId::StepEditorScreen);
             break;
+        default:;
     }
 }
 
@@ -62,8 +63,8 @@ void InsertEventScreen::insertEvent() const
         unsigned short duration =
             timingCorrectScreen->getNoteValueLengthInTicks();
         noteEvent->setDuration(duration);
-        noteEvent->setNote(60);
-        noteEvent->setVelocity(127);
+        noteEvent->setNote(NoteNumber(60));
+        noteEvent->setVelocity(MaxVelocity);
         noteEvent->setVariationType(NoteOnEvent::VARIATION_TYPE::TUNE_0);
         noteEvent->setVariationValue(64);
     }
@@ -126,9 +127,8 @@ void InsertEventScreen::insertEvent() const
 
 void InsertEventScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "eventtype")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "eventtype")
     {
         setInsertEventType(insertEventType + i);
     }

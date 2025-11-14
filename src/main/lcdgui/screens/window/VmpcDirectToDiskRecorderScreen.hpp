@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::window
                                                  WithTimesAndNotes
     {
     public:
-        VmpcDirectToDiskRecorderScreen(Mpc &mpc, int layerIndex);
+        VmpcDirectToDiskRecorderScreen(Mpc &, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;
@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 
         bool seqLoopWasEnabled = false;
         bool songLoopWasEnabled = false;
-        int sq = 0;
+        SequenceIndex sq{MinSequenceIndex};
         int song = 0;
         bool offline = false;
 
@@ -32,7 +32,7 @@ namespace mpc::lcdgui::screens::window
         bool splitStereoIntoLeftAndRightChannel = true;
         int sampleRate = 0;
         void setRecord(int i);
-        void setSq(int i);
+        void setSq(SequenceIndex);
         void setSong(int i);
         void setOffline(bool b);
         void setSplitLR(bool b);

@@ -15,26 +15,25 @@ using namespace mpc::sampler;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-Sequence::Sequence(std::function<std::string(int)> getDefaultTrackName,
-                   std::function<int64_t()> getTickPosition,
-                   std::function<std::shared_ptr<Screens>()> getScreens,
-                   std::function<bool()> isRecordingModeMulti,
-                   std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-                   std::function<int()> getAutoPunchMode,
-                   std::function<std::shared_ptr<Bus>(BusType)> getBus,
-                   std::function<bool()> isEraseButtonPressed,
-                   std::function<bool(int, ProgramIndex)> isProgramPadPressed,
-                   std::shared_ptr<Sampler> sampler,
-                   std::shared_ptr<audiomidi::EventHandler> eventHandler,
-                   std::function<bool()> isSixteenLevelsEnabled,
-                   std::function<int()> getActiveTrackIndex,
-                   std::function<bool()> isRecording,
-                   std::function<bool()> isOverdubbing,
-                   std::function<bool()> isPunchEnabled,
-                   std::function<int64_t()> getPunchInTime,
-                   std::function<int64_t()> getPunchOutTime,
-                   std::function<bool()> isSoloEnabled,
-                   std::function<int()> getCurrentBarIndex)
+Sequence::Sequence(
+    std::function<std::string(int)> getDefaultTrackName,
+    std::function<int64_t()> getTickPosition,
+    std::function<std::shared_ptr<Screens>()> getScreens,
+    std::function<bool()> isRecordingModeMulti,
+    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+    std::function<int()> getAutoPunchMode,
+    std::function<std::shared_ptr<Bus>(BusType)> getBus,
+    std::function<bool()> isEraseButtonPressed,
+    std::function<bool(ProgramPadIndex, ProgramIndex)> isProgramPadPressed,
+    std::shared_ptr<Sampler> sampler,
+    std::shared_ptr<audiomidi::EventHandler> eventHandler,
+    std::function<bool()> isSixteenLevelsEnabled,
+    std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
+    std::function<bool()> isOverdubbing, std::function<bool()> isPunchEnabled,
+    std::function<int64_t()> getPunchInTime,
+    std::function<int64_t()> getPunchOutTime,
+    std::function<bool()> isSoloEnabled,
+    std::function<int()> getCurrentBarIndex)
     : getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
 {
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
@@ -608,7 +607,7 @@ void Sequence::moveTrack(const int source, const int destination)
 
     if (source > destination)
     {
-        tracks[source]->setTrackIndex(destination);
+        tracks[source]->setTrackIndex(TrackIndex(destination));
 
         for (int i = destination; i < source; i++)
         {
@@ -619,7 +618,7 @@ void Sequence::moveTrack(const int source, const int destination)
 
     if (destination > source)
     {
-        tracks[source]->setTrackIndex(destination);
+        tracks[source]->setTrackIndex(TrackIndex(destination));
 
         for (int i = source + 1; i <= destination; i++)
         {

@@ -32,12 +32,12 @@ namespace mpc::disk
                                std::vector<std::string> &soundNames);
 
     private:
-        static void setSlider(file::pgmreader::ProgramFileReader &,
+        static void setSlider(const file::pgmreader::ProgramFileReader &,
                               const std::shared_ptr<sampler::Program> &);
         static void
-        setNoteParameters(file::pgmreader::ProgramFileReader &,
+        setNoteParameters(const file::pgmreader::ProgramFileReader &,
                           const std::shared_ptr<sampler::Program> &);
-        static void setMixer(file::pgmreader::ProgramFileReader &,
+        static void setMixer(const file::pgmreader::ProgramFileReader &,
                              const std::shared_ptr<sampler::Program> &);
     };
 } // namespace mpc::disk

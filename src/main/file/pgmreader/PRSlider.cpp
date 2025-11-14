@@ -40,7 +40,7 @@ std::vector<char> Slider::getSliderArray()
 
 int Slider::getMidiNoteAssign()
 {
-    auto midiNoteAssign = getSliderArray()[0];
+    const auto midiNoteAssign = getSliderArray()[0];
     return midiNoteAssign;
 }
 

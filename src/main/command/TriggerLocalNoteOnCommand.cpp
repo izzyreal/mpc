@@ -29,10 +29,10 @@ TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
 
 void TriggerLocalNoteOnCommand::execute()
 {
-    const auto velo = ctx->isFullLevelEnabled ? 127 : ctx->velocity;
+    const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
 
-    const auto noteOnEvent =
-        std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx->note, velo);
+    const auto noteOnEvent = std::make_shared<sequencer::NoteOnEventPlayOnly>(
+        ctx->note, Velocity(velo));
 
     if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
         ctx->sequencer->getTransport()->isPlaying())

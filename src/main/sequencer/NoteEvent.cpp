@@ -4,37 +4,49 @@
 
 using namespace mpc::sequencer;
 
-bool mpc::sequencer::isDrumNote(const int number)
+bool mpc::sequencer::isDrumNote(const NoteNumber number)
 {
     return number >= 35 && number <= 98;
 }
 
-void NoteOffEvent::setNote(const int i)
+void NoteOffEvent::setNote(const NoteNumber i)
 {
     number = i;
 }
 
-int NoteOffEvent::getNote() const
+mpc::NoteNumber NoteOffEvent::getNote() const
 {
     return number;
 }
 
-NoteOnEvent::NoteOnEvent(const int i, const int vel, const NoteEventId id)
-    : id(id)
+NoteOnEvent::NoteOnEvent(const NoteNumber noteNumber, const Velocity vel,
+                         const NoteEventId id)
+    : id(id), noteNumber(noteNumber)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
-    setNote(i);
+    setNote(noteNumber);
     setVelocity(vel);
+}
+
+NoteOnEvent::NoteOnEvent() : id(NoNoteEventId)
+{
+    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+}
+NoteOnEvent::NoteOnEvent(const DrumNoteNumber drumNoteNumber)
+    : id(NoNoteEventId), noteNumber(drumNoteNumber)
+{
+    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
 }
 
 NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
-    setNote(event.number);
+    setNote(event.noteNumber);
     setVelocity(event.velocity);
     setDuration(event.duration);
     setVariationType(event.variationType);
     setVariationValue(event.variationValue);
+    NoteOnEvent::setTrack(event.track);
 }
 
 bool NoteOnEvent::finalizeNonLive(const int newDuration)
@@ -60,10 +72,10 @@ std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const
     return noteOff;
 }
 
-void NoteOnEvent::setTrack(const int i)
+void NoteOnEvent::setTrack(const TrackIndex trackIndexToUse)
 {
-    track = i;
-    noteOff->setTrack(i);
+    track = trackIndexToUse;
+    noteOff->setTrack(trackIndexToUse);
 }
 void NoteOnEvent::setBeingRecorded(bool b)
 {
@@ -75,15 +87,15 @@ bool NoteOnEvent::isBeingRecorded() const
     return beingRecorded;
 }
 
-void NoteOnEvent::setNote(const int i)
+void NoteOnEvent::setNote(const NoteNumber n)
 {
-    number = std::clamp(i, 0, 127);
-    noteOff->setNote(number);
+    noteNumber = n;
+    noteOff->setNote(n);
 }
 
-int NoteOnEvent::getNote() const
+mpc::NoteNumber NoteOnEvent::getNote() const
 {
-    return number;
+    return noteNumber;
 }
 
 void NoteOnEvent::setDuration(const Duration d)
@@ -111,8 +123,8 @@ NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
 
 void NoteOnEvent::incrementVariationType(const int amount)
 {
-    variationType =
-        VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
+    variationType = static_cast<VARIATION_TYPE>(
+        std::clamp(static_cast<int>(variationType) + amount, 0, 3));
 }
 
 void NoteOnEvent::setVariationType(const VARIATION_TYPE type)
@@ -137,12 +149,12 @@ int NoteOnEvent::getVariationValue() const
     return variationValue;
 }
 
-void NoteOnEvent::setVelocity(const int i)
+void NoteOnEvent::setVelocity(const Velocity i)
 {
-    velocity = std::clamp(i, 1, 127);
+    velocity = i;
 }
 
-int NoteOnEvent::getVelocity() const
+mpc::Velocity NoteOnEvent::getVelocity() const
 {
     return velocity;
 }

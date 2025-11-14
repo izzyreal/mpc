@@ -1,5 +1,7 @@
 #include "sequencer/Event.hpp"
 
+#include "IntTypes.hpp"
+
 using namespace mpc::sequencer;
 
 void Event::setTick(const int relativeTick)
@@ -14,12 +16,12 @@ int Event::getTick() const
     return tick;
 }
 
-int Event::getTrack() const
+mpc::TrackIndex Event::getTrack() const
 {
     return track;
 }
 
-void Event::setTrack(const int i)
+void Event::setTrack(const TrackIndex i)
 {
     track = i;
 }
@@ -27,5 +29,5 @@ void Event::setTrack(const int i)
 Event::Event(const Event &event)
 {
     setTick(event.getTick());
-    setTrack(event.getTrack());
+    Event::setTrack(event.getTrack());
 }

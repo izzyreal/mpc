@@ -13,13 +13,12 @@ CreateNewProgramScreen::CreateNewProgramScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void CreateNewProgramScreen::turnWheel(const int i)
+void CreateNewProgramScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "midi-program-change")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "midi-program-change")
     {
-        setMidiProgramChange(midiProgramChange + i);
+        setMidiProgramChange(midiProgramChange + increment);
     }
 }
 
@@ -77,13 +76,13 @@ void CreateNewProgramScreen::function(const int i)
             newProgram->setName(newName);
             newProgram->setMidiProgramChange(midiProgramChange);
 
-            auto index = sampler->getProgramCount() - 1;
+            auto index = ProgramIndex(sampler->getProgramCount() - 1);
 
             for (int j = 0; j < sampler->getPrograms().size(); j++)
             {
                 if (sampler->getProgram(j) == newProgram)
                 {
-                    index = j;
+                    index = ProgramIndex(j);
                     break;
                 }
             }

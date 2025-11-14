@@ -3,7 +3,6 @@
 
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "Mpc.hpp"
@@ -92,15 +91,15 @@ void NextSeqPadScreen::right()
     // Block ScreenComponent::right() default action. Nothing to do.
 }
 
-void NextSeqPadScreen::function(int i)
+void NextSeqPadScreen::function(const int i)
 {
     if (i == 3 || i == 4)
     {
         const auto nextSq = sequencer->getNextSq();
-        sequencer->setNextSq(-1);
+        sequencer->setNextSq(NoSequenceIndex);
         displayNextSq();
 
-        if (i == 3 && nextSq != -1)
+        if (i == 3 && nextSq != NoSequenceIndex)
         {
             sequencer->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{nextSq});
@@ -116,7 +115,7 @@ void NextSeqPadScreen::displayNextSq() const
 {
     const auto nextSq = sequencer->getNextSq();
 
-    if (nextSq == -1)
+    if (nextSq == NoSequenceIndex)
     {
         findLabel("nextsq")->setText(" ");
         return;
@@ -154,14 +153,14 @@ void NextSeqPadScreen::displaySq() const
         "-" + sequencer->getActiveSequence()->getName());
 }
 
-void NextSeqPadScreen::displaySeq(int i) const
+void NextSeqPadScreen::displaySeq(const int i) const
 {
     findField(std::to_string(i + 1))
         ->setText(
             sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
-void NextSeqPadScreen::setSeqColor(int i) const
+void NextSeqPadScreen::setSeqColor(const int i) const
 {
     findField(std::to_string(i + 1))
         ->setInverted(i + bankOffset() == sequencer->getNextSq());

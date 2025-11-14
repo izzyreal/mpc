@@ -43,7 +43,8 @@ Track::Track(
     const std::function<int()> &getAutoPunchMode,
     const std::function<std::shared_ptr<Bus>(BusType)> &getSequencerBus,
     const std::function<bool()> &isEraseButtonPressed,
-    const std::function<bool(int, ProgramIndex)> &isProgramPadPressed,
+    const std::function<bool(ProgramPadIndex, ProgramIndex)>
+        &isProgramPadPressed,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled,
@@ -198,7 +199,7 @@ void Track::syncEventIndex(const int tick, const int oldTick)
 }
 
 std::shared_ptr<NoteOnEvent> Track::getNoteEvent(const int tick,
-                                                 const int note) const
+                                                 const NoteNumber note) const
 {
     for (auto &e : events)
     {
@@ -211,12 +212,12 @@ std::shared_ptr<NoteOnEvent> Track::getNoteEvent(const int tick,
     return {};
 }
 
-void Track::setTrackIndex(const int i)
+void Track::setTrackIndex(const TrackIndex i)
 {
     trackIndex = i;
 }
 
-int Track::getIndex() const
+mpc::TrackIndex Track::getIndex() const
 {
     return trackIndex;
 }
@@ -260,8 +261,8 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
     }
 }
 
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventLive(unsigned char note,
-                                                        unsigned char velocity)
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventLive(NoteNumber note,
+                                                        Velocity velocity)
 {
     auto noteOnEvent =
         std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
@@ -282,8 +283,9 @@ void Track::finalizeNoteEventLive(
     queuedNoteOffEvents->enqueue(offEvent);
 }
 
-std::shared_ptr<NoteOnEvent>
-Track::recordNoteEventNonLive(const int tick, int note, int velocity)
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventNonLive(const int tick,
+                                                           NoteNumber note,
+                                                           Velocity velocity)
 {
     auto onEvent = getNoteEvent(tick, note);
     if (!onEvent)
@@ -678,11 +680,13 @@ void Track::playNext()
             for (int programPadIndex = 0; programPadIndex < 64;
                  ++programPadIndex)
             {
-                if (isProgramPadPressed(programPadIndex, programIndex))
+                if (isProgramPadPressed(ProgramPadIndex(programPadIndex),
+                                        programIndex))
                 {
                     oneOrMorePadsArePressed = true;
 
-                    if (program->getNoteFromPad(programPadIndex) == noteNumber)
+                    if (program->getNoteFromPad(
+                            ProgramPadIndex(programPadIndex)) == noteNumber)
                     {
                         noteIsPressed = true;
                         break;
@@ -711,7 +715,8 @@ void Track::playNext()
                     for (int programPadIndex = 0; programPadIndex < 64;
                          ++programPadIndex)
                     {
-                        if (!isProgramPadPressed(programPadIndex, programIndex))
+                        if (!isProgramPadPressed(
+                                ProgramPadIndex(programPadIndex), programIndex))
                         {
                             continue;
                         }

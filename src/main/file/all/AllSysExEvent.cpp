@@ -54,7 +54,7 @@ AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
         sysExEvent->setTick(AllEvent::readTick(bytes));
     }
 
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
 
     return event;
 }

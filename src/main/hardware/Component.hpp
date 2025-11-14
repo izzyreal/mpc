@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ComponentId.hpp"
+#include "IntTypes.hpp"
 
 #include <optional>
 #include <utility>
@@ -133,15 +134,15 @@ namespace mpc::hardware
                       public VelocitySensitivePressable,
                       public Aftertouchable
     {
-        const int index;
+        const PhysicalPadIndex index;
 
     protected:
         void onRelease() override;
         void onPress() override;
 
     public:
-        explicit Pad(int indexToUse);
-        int getIndex() const;
+        explicit Pad(PhysicalPadIndex indexToUse);
+        PhysicalPadIndex getIndex() const;
     };
 
     class DataWheel final : public Component

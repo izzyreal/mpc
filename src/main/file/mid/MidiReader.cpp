@@ -267,9 +267,9 @@ void MidiReader::parseSequence(Mpc &mpc)
                         }
 
                         auto ne = std::make_shared<NoteOnEvent>(
-                            noteOn->getNoteValue());
+                            NoteNumber(noteOn->getNoteValue()));
                         ne->setTick(noteOn->getTick());
-                        ne->setVelocity(noteOn->getVelocity());
+                        ne->setVelocity(Velocity(noteOn->getVelocity()));
 
                         if (nVariation)
                         {
@@ -301,10 +301,10 @@ void MidiReader::parseSequence(Mpc &mpc)
                 }
                 else if (noteOn)
                 {
-                    auto mpcNoteEvent =
-                        std::make_shared<NoteOnEvent>(noteOn->getNoteValue());
+                    auto mpcNoteEvent = std::make_shared<NoteOnEvent>(
+                        NoteNumber(noteOn->getNoteValue()));
                     mpcNoteEvent->setTick(noteOn->getTick());
-                    mpcNoteEvent->setVelocity(noteOn->getVelocity());
+                    mpcNoteEvent->setVelocity(Velocity(noteOn->getVelocity()));
                     noteOns.emplace_back(mpcNoteEvent);
                 }
             }

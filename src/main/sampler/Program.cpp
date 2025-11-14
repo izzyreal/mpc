@@ -1,4 +1,6 @@
 #include "sampler/Program.hpp"
+
+#include "IntTypes.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Pad.hpp"
 
@@ -8,15 +10,11 @@
 #include "MpcSpecs.hpp"
 #include "Mpc.hpp"
 
-#include <stdexcept>
-
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Program::Program(Mpc &mpc, Sampler *samplerToUse)
+Program::Program(Mpc &mpc, Sampler *const samplerToUse) : sampler(samplerToUse)
 {
-    sampler = samplerToUse;
-
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
         auto n = new NoteParameters(i);
@@ -25,7 +23,7 @@ Program::Program(Mpc &mpc, Sampler *samplerToUse)
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto p = new Pad(mpc, i);
+        auto p = new Pad(mpc, ProgramPadIndex(i));
         pads.push_back(p);
     }
 
@@ -43,9 +41,9 @@ int Program::getNumberOfSamples() const
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto np = getNoteParameters(i + 35);
 
-        if (np->getSoundIndex() != -1)
+        if (const auto np = getNoteParameters(i + MinDrumNoteNumber);
+            np->getSoundIndex() != -1)
         {
             counter++;
         }
@@ -93,22 +91,23 @@ Program::getIndivFxMixerChannel(const int noteIndex) const
         noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
-int Program::getPadIndexFromNote(const int note) const
+mpc::ProgramPadIndex
+Program::getPadIndexFromNote(const DrumNoteNumber note) const
 {
-    if (note < 35 || note > 98)
+    if (note < MinDrumNoteNumber || note > MaxDrumNoteNumber)
     {
-        return -1;
+        return NoProgramPadIndex;
     }
 
-    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
+    for (int8_t i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
         if (pads[i]->getNote() == note)
         {
-            return i;
+            return ProgramPadIndex{i};
         }
     }
 
-    return -1;
+    return NoProgramPadIndex;
 }
 
 std::vector<NoteParameters *> Program::getNotesParameters()
@@ -121,14 +120,15 @@ PgmSlider *Program::getSlider() const
     return slider;
 }
 
-void Program::setNoteParameters(const int index, NoteParameters *nn)
+void Program::setNoteParameters(const int noteParametersIndex,
+                                NoteParameters *noteParametersToUse)
 {
-    if (noteParameters[index] != nullptr)
+    if (noteParameters[noteParametersIndex] != nullptr)
     {
-        delete noteParameters[index];
+        delete noteParameters[noteParametersIndex];
     }
 
-    noteParameters[index] = nn;
+    noteParameters[noteParametersIndex] = noteParametersToUse;
 }
 
 int Program::getMidiProgramChange() const
@@ -138,12 +138,7 @@ int Program::getMidiProgramChange() const
 
 void Program::setMidiProgramChange(const int i)
 {
-    if (i < 1 || i > 128)
-    {
-        return;
-    }
-
-    midiProgramChange = i;
+    midiProgramChange = std::clamp(i, 1, 128);
 }
 
 void Program::initPadAssign() const
@@ -154,20 +149,21 @@ void Program::initPadAssign() const
     }
 }
 
-int Program::getNoteFromPad(const int i) const
+mpc::DrumNoteNumber Program::getNoteFromPad(const ProgramPadIndex i) const
 {
     return pads[i]->getNote();
 }
 
-std::vector<int> Program::getPadIndicesFromNote(const int note) const
+std::vector<mpc::ProgramPadIndex>
+Program::getPadIndicesFromNote(const DrumNoteNumber note) const
 {
-    std::vector<int> result;
+    std::vector<ProgramPadIndex> result;
 
     for (int i = 0; i < pads.size(); i++)
     {
         if (pads[i]->getNote() == note)
         {
-            result.push_back(i);
+            result.push_back(ProgramPadIndex(i));
         }
     }
 
@@ -177,11 +173,11 @@ std::vector<int> Program::getPadIndicesFromNote(const int note) const
 Program::~Program()
 {
     delete slider;
-    for (auto &np : noteParameters)
+    for (const auto &np : noteParameters)
     {
         delete np;
     }
-    for (auto &p : pads)
+    for (const auto &p : pads)
     {
         delete p;
     }

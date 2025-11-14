@@ -35,10 +35,10 @@ using namespace mpc::engine;
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const Source source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
-    const int note, const int velocity, Track *track,
+    const NoteNumber note, const Velocity velocity, Track *track,
     const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
-    const std::optional<int> programPadIndex,
+    const ProgramPadIndex programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
@@ -72,12 +72,12 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const auto assign16LevelsScreen =
         screens->get<ScreenId::Assign16LevelsScreen>();
 
-    const std::function setSelectedNote = [controller](const int n)
+    const std::function setSelectedNote = [controller](const DrumNoteNumber n)
     {
         controller->setSelectedNote(n);
     };
 
-    const std::function setSelectedPad = [controller](const int p)
+    const std::function setSelectedPad = [controller](const ProgramPadIndex p)
     {
         controller->setSelectedPad(p);
     };
@@ -122,10 +122,10 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    const Source source, const int note,
+    const Source source, const NoteNumber note,
     const NoteEventId recordedNoteOnEventId, Track *track,
     const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
-    const std::optional<int> programPadIndex,
+    const ProgramPadIndex programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,

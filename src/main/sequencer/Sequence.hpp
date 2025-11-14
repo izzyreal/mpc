@@ -56,7 +56,7 @@ namespace mpc::sequencer
                  std::function<int()> getAutoPunchMode,
                  std::function<std::shared_ptr<Bus>(BusType)> getBus,
                  std::function<bool()> isEraseButtonPressed,
-                 std::function<bool(int programPadIndex, ProgramIndex)>
+                 std::function<bool(ProgramPadIndex, ProgramIndex)>
                      isProgramPadPressed,
                  std::shared_ptr<sampler::Sampler> sampler,
                  std::shared_ptr<audiomidi::EventHandler> eventHandler,

@@ -56,7 +56,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const auto programIndex = drumBus->getProgram();
     const auto program = sampler->getProgram(drumBus->getProgram());
     const auto note = noteOnEvent->getNote();
-    const int programPadIndex = program->getPadIndexFromNote(note);
+    const ProgramPadIndex programPadIndex =
+        program->getPadIndexFromNote(DrumNoteNumber(note));
 
     const uint64_t noteEventIdToUse = noteEventId++;
     const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(

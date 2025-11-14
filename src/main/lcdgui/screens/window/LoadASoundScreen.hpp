@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
 
     private:
-        void displayAssignToNote();
-        unsigned int assignToNote = 60;
+        void displayAssignToNote() const;
+        DrumNoteNumber assignToNote{60};
     };
 } // namespace mpc::lcdgui::screens::window

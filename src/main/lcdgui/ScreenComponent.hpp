@@ -7,6 +7,7 @@
 #include "Background.hpp"
 #include "Wave.hpp"
 #include "EnvGraph.hpp"
+#include "IntTypes.hpp"
 
 #include <memory>
 #include <string>
@@ -43,7 +44,7 @@ namespace mpc::lcdgui
         std::shared_ptr<sequencer::Bus> getBus() const;
         std::string getFocusedFieldNameOrThrow() const;
         bool isFocusedFieldName(const std::string &) const;
-        std::optional<int> getProgramIndex() const;
+        std::optional<ProgramIndex> getProgramIndex() const;
         std::shared_ptr<sampler::Program> getProgram() const;
 
     protected:

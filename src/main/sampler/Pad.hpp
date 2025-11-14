@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 
 namespace mpc
@@ -12,18 +14,18 @@ namespace mpc::sampler
     class Pad
     {
     public:
-        Pad(Mpc &mpc, int indexToUse);
+        Pad(Mpc &, ProgramPadIndex);
 
-        void setNote(int i);
-        int getNote() const;
-        int getIndex() const;
+        void setNote(DrumNoteNumber);
+        DrumNoteNumber getNote() const;
+        ProgramPadIndex getIndex() const;
 
-        static std::vector<int> &getPadNotes(const Mpc &mpc);
+        static std::vector<DrumNoteNumber> &getPadNotes(const Mpc &mpcToUse);
 
     private:
-        static std::vector<int> originalPadNotes;
+        static std::vector<DrumNoteNumber> originalPadNotes;
         Mpc &mpc;
-        int note = 0;
-        int index = 0;
+        DrumNoteNumber note = NoDrumNoteAssigned;
+        ProgramPadIndex index{0};
     };
 } // namespace mpc::sampler

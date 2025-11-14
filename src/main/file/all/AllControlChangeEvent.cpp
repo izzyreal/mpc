@@ -12,7 +12,7 @@ AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     auto event = std::make_shared<ControlChangeEvent>();
 
     event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
     event->setController(bytes[CONTROLLER_OFFSET]);
     event->setAmount(bytes[AMOUNT_OFFSET]);
 

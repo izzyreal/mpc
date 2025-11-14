@@ -189,7 +189,7 @@ bool ScreenComponent::isFocusedFieldName(const std::string &fieldName) const
 
     return f->getName() == fieldName;
 }
-std::optional<int> ScreenComponent::getProgramIndex() const
+std::optional<mpc::ProgramIndex> ScreenComponent::getProgramIndex() const
 {
     const auto bus = getBus();
     const auto drumBus = std::dynamic_pointer_cast<DrumBus>(bus);

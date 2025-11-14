@@ -147,7 +147,7 @@ bool Led::isEnabled() const
 
 Button::Button(const ComponentId id) : Component(id) {}
 
-Pad::Pad(const int indexToUse)
+Pad::Pad(const PhysicalPadIndex indexToUse)
     : Component(static_cast<ComponentId>(PAD_1_OR_AB + indexToUse)),
       index(indexToUse)
 {
@@ -165,7 +165,7 @@ void Pad::onPress()
     doPressWithVelocity(MAX_VELO);
 }
 
-int Pad::getIndex() const
+mpc::PhysicalPadIndex Pad::getIndex() const
 {
     return index;
 }
@@ -198,9 +198,9 @@ void Slider::moveToNormalizedY(const float normalizedY)
 {
     auto [min, max] = getRangeAs<float>();
     const float clampedY = std::clamp(normalizedY, 0.0f, 1.0f);
-    float value = direction == Direction::UpIncreases
-                      ? (1.0f - clampedY) * max + clampedY * min
-                      : clampedY * max + (1.0f - clampedY) * min;
+    const float value = direction == Direction::UpIncreases
+                            ? (1.0f - clampedY) * max + clampedY * min
+                            : clampedY * max + (1.0f - clampedY) * min;
     setValue(value);
 }
 

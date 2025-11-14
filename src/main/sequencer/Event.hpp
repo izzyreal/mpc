@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "Observer.hpp"
 
 namespace mpc::sequencer
@@ -11,8 +12,8 @@ namespace mpc::sequencer
 
         void setTick(int relativeTick);
         int getTick() const;
-        virtual void setTrack(int i);
-        int getTrack() const;
+        virtual void setTrack(TrackIndex);
+        TrackIndex getTrack() const;
 
         virtual std::string getTypeName() const = 0;
         Event() = default;
@@ -20,6 +21,6 @@ namespace mpc::sequencer
 
     protected:
         int tick = 0;
-        int track = 0;
+        TrackIndex track{0};
     };
 } // namespace mpc::sequencer

@@ -169,14 +169,15 @@ void EraseScreen::displayNotes()
     {
         findField("note0")->setSize(37, 9);
 
-        if (note0 == 34)
+        if (note0 == NoDrumNoteAssigned)
         {
             findField("note0")->setText("ALL");
         }
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padIndexWithBank = program->getPadIndexFromNote(note0);
+            const auto padIndexWithBank =
+                program->getPadIndexFromNote(DrumNoteNumber(note0));
             const auto padName = sampler->getPadName(padIndexWithBank);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
@@ -242,7 +243,8 @@ void EraseScreen::doErase() const
                         if (const auto noteNumber = noteEvent->getNote();
                             (midi && noteNumber >= noteA &&
                              noteNumber <= noteB) ||
-                            (!midi && (noteA <= 34 || noteA == noteNumber)))
+                            (!midi && (noteA <= NoDrumNoteAssigned ||
+                                       noteA == noteNumber)))
                         {
                             seqTrack->removeEvent(eventIndex);
                         }

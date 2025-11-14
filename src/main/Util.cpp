@@ -226,19 +226,20 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
         return;
     }
 
-    const auto _16l_type = NoteOnEvent::VARIATION_TYPE(ctx.type);
+    const auto _16l_type = static_cast<NoteOnEvent::VARIATION_TYPE>(ctx.type);
     const auto _16l_key = ctx.originalKeyPad;
     const auto _16l_note = ctx.note;
     const auto _16l_param = ctx.parameter;
 
-    event->setNote(_16l_note);
+    event->setNote(NoteNumber(_16l_note));
     event->setVariationType(_16l_type);
 
     if (_16l_param == 0 && event->getVelocity() != 0)
     {
         const auto velocity =
             static_cast<int>((ctx.padIndexWithoutBank + 1) * (127.0 / 16.0));
-        event->setVelocity(velocity);
+
+        event->setVelocity(Velocity{static_cast<int8_t>(velocity)});
     }
     else if (_16l_param == 1)
     {
@@ -269,7 +270,8 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
 std::pair<NoteOnEvent::VARIATION_TYPE, int>
 Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
 {
-    const auto variationType = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
+    const auto variationType =
+        static_cast<NoteOnEvent::VARIATION_TYPE>(ctx.sliderParameter);
     const int sliderValue = ctx.sliderValue;
 
     switch (variationType)
@@ -281,7 +283,8 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
 
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
+            auto tuneValue =
+                static_cast<int>(sliderValue * sliderRangeRatio * 0.5);
             tuneValue += (120 - rangeHigh) / 2;
             return {variationType, tuneValue};
         }
@@ -291,7 +294,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.decayHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto decayValue = (int)(sliderValue * sliderRangeRatio);
+            auto decayValue = static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, decayValue};
         }
         case 2:
@@ -300,7 +303,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.attackHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto attackValue = (int)(sliderValue * sliderRangeRatio);
+            auto attackValue = static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, attackValue};
         }
         case 3:
@@ -309,7 +312,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.filterHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto filterValue = (int)(sliderValue * sliderRangeRatio);
+            auto filterValue = static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, filterValue};
         }
     }

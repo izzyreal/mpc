@@ -13,7 +13,7 @@ AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     auto event = std::make_shared<PitchBendEvent>();
     event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
 
     auto candidate = ByteUtil::bytes2ushort(std::vector{
                          bytes[AMOUNT_OFFSET], bytes[AMOUNT_OFFSET + 1]}) -

@@ -50,7 +50,7 @@ namespace mpc::engine
             std::function<std::shared_ptr<lcdgui::Screens>()>,
             const std::function<bool()> &isNoteRepeatLockedOrPressed,
             const std::shared_ptr<NoteRepeatProcessor> &,
-            std::function<bool()> isAudioServerCurrentlyRunningOffline);
+            const std::function<bool()> &isAudioServerCurrentlyRunningOffline);
 
         void work(int nFrames) override;
 

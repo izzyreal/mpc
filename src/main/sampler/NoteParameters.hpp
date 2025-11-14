@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
@@ -16,10 +17,10 @@ namespace mpc::sampler
     public:
         int getSoundIndex() const;
         int getSoundGenerationMode() const;
-        int getOptionalNoteA() const;
-        int getOptionalNoteB() const;
-        int getMuteAssignA() const;
-        int getMuteAssignB() const;
+        DrumNoteNumber getOptionalNoteA() const;
+        DrumNoteNumber getOptionalNoteB() const;
+        DrumNoteNumber getMuteAssignA() const;
+        DrumNoteNumber getMuteAssignB() const;
         int getTune() const;
         int getVelocityToStart() const;
         int getAttack() const;
@@ -46,12 +47,12 @@ namespace mpc::sampler
         int soundIndex = -1;
         int soundGenerationMode = 0;
         int velocityRangeLower = 0;
-        int optionalNoteA = 0;
+        DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
         int velocityRangeUpper = 0;
-        int optionalNoteB = 0;
+        DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
         VoiceOverlapMode voiceOverlapMode = VoiceOverlapMode::POLY;
-        int muteAssignA = 0;
-        int muteAssignB = 0;
+        DrumNoteNumber muteAssignA{NoDrumNoteAssigned};
+        DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
         int tune = 0;
         int attack = 0;
         int decay = 0;
@@ -70,18 +71,17 @@ namespace mpc::sampler
         int index = 0;
 
     public:
-        void setSoundNumberNoLimit(int i);
         void setSoundIndex(int i);
         void setSoundGenMode(int i);
         void setVeloRangeLower(int i);
         int getVelocityRangeLower() const;
-        void setOptNoteA(int i);
+        void setOptNoteA(DrumNoteNumber);
         void setVeloRangeUpper(int i);
         int getVelocityRangeUpper() const;
-        void setOptionalNoteB(int i);
-        void setVoiceOverlapMode(const VoiceOverlapMode);
-        void setMuteAssignA(int i);
-        void setMuteAssignB(int i);
+        void setOptionalNoteB(DrumNoteNumber);
+        void setVoiceOverlapMode(VoiceOverlapMode);
+        void setMuteAssignA(DrumNoteNumber);
+        void setMuteAssignB(DrumNoteNumber);
         void setTune(int i);
         void setAttack(int i);
         void setDecay(int i);
@@ -99,9 +99,9 @@ namespace mpc::sampler
         int getSliderParameterNumber() const;
         void setVelocityToPitch(int i);
         int getVelocityToPitch() const;
-        NoteParameters *clone(const int newIndex) const;
-        int getNumber() const;
+        NoteParameters *clone(int newIndex) const;
+        DrumNoteNumber getNumber() const;
 
-        NoteParameters(int index);
+        explicit NoteParameters(int index);
     };
 } // namespace mpc::sampler

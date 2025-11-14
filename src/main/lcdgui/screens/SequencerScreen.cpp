@@ -17,7 +17,6 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
-#include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/PunchRect.hpp"
 
 #include "sequencer/SeqUtil.hpp"
@@ -301,8 +300,6 @@ void SequencerScreen::open()
 
     findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
 
-    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
-
     if (sequencer->isSecondSequenceEnabled())
     {
         findBackground()->setBackgroundName("sequencer-2nd");
@@ -544,7 +541,8 @@ void SequencerScreen::displaySq() const
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+            std::to_string(sequencer->getActiveSequenceIndex().get() + 1), "0",
+            2));
         result.append("-");
         result.append(sequencer->getActiveSequence()->getName());
         findField("sq")->setText(result);
@@ -1050,8 +1048,6 @@ void SequencerScreen::setPunchRectOn(const int i, const bool b)
 
 void SequencerScreen::displayPunchWhileRecording()
 {
-    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
-
     auto hardware = mpc.getHardware();
     auto isRecPressedOrLocked =
         hardware->getButton(hardware::ComponentId::REC)->isPressed() ||

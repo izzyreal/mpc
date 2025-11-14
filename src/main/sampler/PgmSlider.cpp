@@ -1,17 +1,20 @@
 #include "sampler/PgmSlider.hpp"
 
+#include "IntTypes.hpp"
+
 #include <algorithm>
+#include <cassert>
 
 using namespace mpc::sampler;
 
-void PgmSlider::setAssignNote(int i)
+void PgmSlider::setAssignNote(const DrumNoteNumber note)
 {
-    i = std::clamp(i, 34, 98);
-    assignNote = i;
+    assert(note >= NoDrumNoteAssigned && note <= MaxDrumNoteNumber);
+    assignNote = note;
     notifyObservers("assignnote");
 }
 
-int PgmSlider::getNote() const
+mpc::DrumNoteNumber PgmSlider::getNote() const
 {
     return assignNote;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
@@ -18,7 +19,7 @@ namespace mpc::lcdgui::screens::window
                                                  "FILTER"};
         const std::vector<std::string> paramNames{"VELOCITY", "NOTE VAR"};
 
-        int note = 35;
+        DrumNoteNumber note{MinDrumNoteNumber};
         int parameter = 0;
         int type = 0;
         int originalKeyPad = 3;
@@ -29,13 +30,13 @@ namespace mpc::lcdgui::screens::window
         void displayOriginalKeyPad() const;
 
     public:
-        void setNote(int newNote);
+        void setNote(DrumNoteNumber);
         void setParam(int i);
         void setType(int i);
         void setOriginalKeyPad(int i);
         int getOriginalKeyPad() const;
         int getType() const;
-        int getNote() const;
+        DrumNoteNumber getNote() const;
         int getParameter() const;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -145,7 +145,8 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
 
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
-            newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
+            newProgram->getPad(noteIndex)->setNote(
+                DrumNoteNumber(assignTable[noteIndex]));
 
             auto sourceStereoMixerChannel =
                 apsProgram->getStereoMixerChannel(noteIndex);
@@ -199,10 +200,14 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
             destNoteParams->setFilterFrequency(
                 srcNoteParams->getCutoffFrequency());
             destNoteParams->setFilterResonance(srcNoteParams->getResonance());
-            destNoteParams->setMuteAssignA(srcNoteParams->getMute1());
-            destNoteParams->setMuteAssignB(srcNoteParams->getMute2());
-            destNoteParams->setOptNoteA(srcNoteParams->getAlsoPlay1());
-            destNoteParams->setOptionalNoteB(srcNoteParams->getAlsoPlay2());
+            destNoteParams->setMuteAssignA(
+                DrumNoteNumber(srcNoteParams->getMute1()));
+            destNoteParams->setMuteAssignB(
+                DrumNoteNumber(srcNoteParams->getMute2()));
+            destNoteParams->setOptNoteA(
+                DrumNoteNumber(srcNoteParams->getAlsoPlay1()));
+            destNoteParams->setOptionalNoteB(
+                DrumNoteNumber(srcNoteParams->getAlsoPlay2()));
             destNoteParams->setSliderParameterNumber(
                 srcNoteParams->getSliderParameter());
             destNoteParams->setSoundGenMode(
@@ -230,7 +235,8 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
         slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
         slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
         slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
-        slider->setAssignNote(apsProgram->getSlider()->getNote());
+        slider->setAssignNote(
+            DrumNoteNumber(apsProgram->getSlider()->getNote()));
         slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
         slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
     }
@@ -238,7 +244,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
         auto m = apsParser.getDrumMixers()[i];
-        auto drum = mpc.getSequencer()->getDrumBus(i);
+        auto drum = mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
 
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
@@ -256,7 +262,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
         }
 
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
-        drum->setProgram(pgm);
+        drum->setProgram(ProgramIndex(pgm));
         drum->setReceivePgmChange(
             apsParser.getDrumConfiguration(i)->getReceivePgmChange());
         drum->setReceiveMidiVolume(

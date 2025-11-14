@@ -11,10 +11,10 @@ ApsAssignTable::ApsAssignTable(const std::vector<char> &loadBytes)
     }
 }
 
-ApsAssignTable::ApsAssignTable(const std::vector<int> &assignTable)
+ApsAssignTable::ApsAssignTable(const std::vector<DrumNoteNumber> &assignTable)
 {
-    saveBytes = std::vector<char>(64);
-    for (int i = 0; i < 64; i++)
+    saveBytes = std::vector<char>(Mpc2000XlSpecs::PROGRAM_PAD_COUNT);
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
         saveBytes[i] = assignTable[i];
     }

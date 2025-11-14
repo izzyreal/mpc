@@ -25,7 +25,7 @@ void AutoChromaticAssignmentScreen::open()
     {
         const auto letterNumber = sampler->getProgramCount() + 21;
         newName = "NewPgm-" + Mpc::akaiAscii[letterNumber];
-        originalKey = 67;
+        originalKey = DrumNoteNumber(67);
         tune = 0;
     }
 
@@ -59,12 +59,14 @@ void AutoChromaticAssignmentScreen::function(const int i)
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
 
-            for (int j = 35; j <= 98; j++)
+            for (int j = MinDrumNoteNumber; j <= MaxDrumNoteNumber; j++)
             {
-                const auto pad = newProgram->getPad(j - 35);
-                pad->setNote(j);
-                const auto noteParameters = new NoteParameters(j - 35);
-                newProgram->setNoteParameters(j - 35, noteParameters);
+                const auto pad = newProgram->getPad(j - MinDrumNoteNumber);
+                pad->setNote(DrumNoteNumber(j));
+                const auto noteParameters =
+                    new NoteParameters(j - MinDrumNoteNumber);
+                newProgram->setNoteParameters(j - MinDrumNoteNumber,
+                                              noteParameters);
                 noteParameters->setSoundIndex(sourceSoundIndex);
 
                 noteParameters->setTune((j - originalKey) * 10 + tune);
@@ -72,11 +74,11 @@ void AutoChromaticAssignmentScreen::function(const int i)
 
             const auto programs = sampler->getPrograms();
 
-            for (int j = 0; j < programs.size(); j++)
+            for (int j = MinProgramIndex; j <= MaxProgramIndex; j++)
             {
                 if (programs[j].lock() == newProgram)
                 {
-                    getActiveDrumBus()->setProgram(j);
+                    getActiveDrumBus()->setProgram(ProgramIndex(j));
                     break;
                 }
             }
@@ -141,9 +143,11 @@ void AutoChromaticAssignmentScreen::setSourceSoundIndex(const int i)
     displaySnd();
 }
 
-void AutoChromaticAssignmentScreen::setOriginalKey(const int i)
+void AutoChromaticAssignmentScreen::setOriginalKey(
+    const DrumNoteNumber drumNoteNumber)
 {
-    originalKey = std::clamp(i, 35, 98);
+    originalKey =
+        std::clamp(drumNoteNumber, MinDrumNoteNumber, MaxDrumNoteNumber);
     displayOriginalKey();
 }
 

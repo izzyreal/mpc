@@ -233,12 +233,14 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         setIntProperty("selectedNote.txt",
                        [&](const int v)
                        {
-                           mpc.clientEventController->setSelectedNote(v);
+                           mpc.clientEventController->setSelectedNote(
+                               DrumNoteNumber(v));
                        });
         setIntProperty("selectedPad.txt",
                        [&](const int v)
                        {
-                           mpc.clientEventController->setSelectedPad(v);
+                           mpc.clientEventController->setSelectedPad(
+                               ProgramPadIndex(v));
                        });
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
@@ -297,7 +299,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                     sequencer::drumBusIndexToDrumBusType(drumBusIndex));
                 !mpc.getSampler()->getProgram(d->getProgram()))
             {
-                d->setProgram(0);
+                d->setProgram(ProgramIndex{0});
             }
         }
 

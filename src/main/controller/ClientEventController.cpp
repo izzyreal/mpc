@@ -117,10 +117,11 @@ std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()
     return layeredScreen;
 }
 
-void ClientEventController::setSelectedPad(int padIndexWithBank)
+void ClientEventController::setSelectedPad(
+    const ProgramPadIndex programPadIndex)
 {
-    selectedPad = std::clamp(padIndexWithBank, 0, 63);
-
+    selectedPad =
+        std::clamp(programPadIndex, MinProgramPadIndex, MaxProgramPadIndex);
     notifyObservers(std::string("pad"));
 }
 
@@ -141,18 +142,20 @@ Bank ClientEventController::getActiveBank() const
     return activeBank;
 }
 
-void ClientEventController::setSelectedNote(const int selectedNoteToUse)
+void ClientEventController::setSelectedNote(
+    const DrumNoteNumber selectedNoteToUse)
 {
-    selectedNote = std::clamp(selectedNoteToUse, 35, 98);
+    selectedNote =
+        std::clamp(selectedNoteToUse, MinDrumNoteNumber, MaxDrumNoteNumber);
     notifyObservers(std::string("note"));
 }
 
-int ClientEventController::getSelectedNote() const
+mpc::DrumNoteNumber ClientEventController::getSelectedNote() const
 {
     return selectedNote;
 }
 
-int ClientEventController::getSelectedPad() const
+mpc::ProgramPadIndex ClientEventController::getSelectedPad() const
 {
     return selectedPad;
 }
@@ -162,7 +165,7 @@ bool ClientEventController::isAfterEnabled() const
     return afterEnabled;
 }
 
-void ClientEventController::setAfterEnabled(bool b)
+void ClientEventController::setAfterEnabled(const bool b)
 {
     afterEnabled = b;
 }
@@ -172,7 +175,7 @@ bool ClientEventController::isFullLevelEnabled() const
     return fullLevelEnabled;
 }
 
-void ClientEventController::setFullLevelEnabled(bool b)
+void ClientEventController::setFullLevelEnabled(const bool b)
 {
     fullLevelEnabled = b;
 }
@@ -182,7 +185,7 @@ bool ClientEventController::isSixteenLevelsEnabled() const
     return sixteenLevelsEnabled;
 }
 
-void ClientEventController::setSixteenLevelsEnabled(bool b)
+void ClientEventController::setSixteenLevelsEnabled(const bool b)
 {
     sixteenLevelsEnabled = b;
 }

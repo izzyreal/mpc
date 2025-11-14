@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
     public:
         ChannelSettingsScreen(Mpc &mpc, int layerIndex);
 
-        void setNote(int newNote);
+        void setNote(DrumNoteNumber);
 
         void turnWheel(int increment) override;
 
@@ -25,20 +25,20 @@ namespace mpc::lcdgui::screens::window
         void update(Observable *observable, Message message) override;
 
     private:
-        int note = 35;
+        DrumNoteNumber note = MinDrumNoteNumber;
         const std::vector<std::string> fxPathNames{"--", "M1", "M2", "R1",
                                                    "R2"};
         const std::vector<std::string> stereoNamesSlash{
             "-", "1/2", "1/2", "3/4", "3/4", "5/6", "5/6", "7/8", "7/8"};
-        void displayNoteField();
-        void displayStereoVolume();
-        void displayIndividualVolume();
-        void displayFxSendLevel();
-        void displayPanning();
-        void displayOutput();
-        void displayFxPath();
-        void displayFollowStereo();
-        void displayChannel();
+        void displayNoteField() const;
+        void displayStereoVolume() const;
+        void displayIndividualVolume() const;
+        void displayFxSendLevel() const;
+        void displayPanning() const;
+        void displayOutput() const;
+        void displayFxPath() const;
+        void displayFollowStereo() const;
+        void displayChannel() const;
 
         std::shared_ptr<engine::IndivFxMixer> getIndivFxMixerChannel() const;
         std::shared_ptr<engine::StereoMixer> getStereoMixerChannel() const;

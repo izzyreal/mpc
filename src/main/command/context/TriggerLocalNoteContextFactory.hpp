@@ -51,11 +51,11 @@ namespace mpc::command::context
     public:
         static std::shared_ptr<TriggerLocalNoteOnContext>
         buildTriggerLocalNoteOnContext(
-            eventregistry::Source, const eventregistry::NoteOnEvent &, int note,
-            int velocity, sequencer::Track *,
+            eventregistry::Source, const eventregistry::NoteOnEvent &,
+            NoteNumber note, Velocity velocity, sequencer::Track *,
             const std::shared_ptr<sequencer::Bus> &,
             const std::shared_ptr<lcdgui::ScreenComponent> &,
-            std::optional<int> programPadIndex,
+            ProgramPadIndex programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,
@@ -67,11 +67,11 @@ namespace mpc::command::context
 
         static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerLocalNoteOffContext(
-            eventregistry::Source source, int note,
+            eventregistry::Source source, NoteNumber note,
             NoteEventId recordedNoteOnEventId, sequencer::Track *,
             sequencer::BusType,
             const std::shared_ptr<lcdgui::ScreenComponent> &,
-            std::optional<int> programPadIndex,
+            ProgramPadIndex programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,

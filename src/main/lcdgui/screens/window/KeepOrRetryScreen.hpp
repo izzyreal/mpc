@@ -9,20 +9,20 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        KeepOrRetryScreen(Mpc &mpc, int layerIndex);
+        KeepOrRetryScreen(Mpc &, int layerIndex);
 
-        void update(Observable *o, Message message) override;
+        void update(Observable *, Message) override;
 
         void open() override;
         void close() override;
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void right() override;
 
     private:
         void displayNameForNewSound() const;
         void displayAssignToNote() const;
         void openNameScreen() override;
-        unsigned char assignToNote = 34;
+        DrumNoteNumber assignToNote = NoDrumNoteAssigned;
     };
 } // namespace mpc::lcdgui::screens::window

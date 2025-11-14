@@ -12,7 +12,7 @@ AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     auto event = std::make_shared<ProgramChangeEvent>();
 
     event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
     event->setProgram(bytes[PROGRAM_OFFSET] + 1);
 
     return event;

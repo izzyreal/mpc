@@ -113,6 +113,7 @@ namespace mpc::controller
 
         std::shared_ptr<Program>
         getProgramForEvent(const ClientMidiEvent &) const;
+        ProgramIndex getProgramIndexForEvent(const ClientMidiEvent &) const;
         std::optional<sequencer::BusType>
         getDrumBusTypeForEvent(const ClientMidiEvent &) const;
         std::shared_ptr<sequencer::DrumBus>

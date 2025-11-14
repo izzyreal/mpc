@@ -19,7 +19,7 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 
 NoteInputScreenUpdateCommand::NoteInputScreenUpdateCommand(
-    NoteInputScreenUpdateContext &ctxToUse, const int noteToUse)
+    NoteInputScreenUpdateContext &ctxToUse, const NoteNumber noteToUse)
     : ctx(ctxToUse), note(noteToUse)
 {
 }
@@ -37,32 +37,34 @@ void NoteInputScreenUpdateCommand::execute()
     {
         ctx.setSelectedNote(note);
     }
-    else if (auto withNotes =
+    else if (const auto withNotes =
                  std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
-             withNotes && note >= 35)
+             withNotes && note >= MinDrumNoteNumber)
     {
         withNotes->setNote0(note);
     }
-    else if (auto assign16LevelsScreen =
+    else if (const auto assign16LevelsScreen =
                  std::dynamic_pointer_cast<Assign16LevelsScreen>(
                      screenComponent);
              assign16LevelsScreen)
     {
-        assign16LevelsScreen->setNote(note);
+        assert(sequencer::isDrumNote(note));
+        assign16LevelsScreen->setNote(DrumNoteNumber(note));
     }
-    else if (auto editMultipleScreen =
+    else if (const auto editMultipleScreen =
                  std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
              editMultipleScreen)
     {
         editMultipleScreen->setChangeNoteTo(note);
     }
-    else if (auto stepEditorScreen =
+    else if (const auto stepEditorScreen =
                  std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-             stepEditorScreen && ctx.currentFieldNameIsFromNote && note > 34)
+             stepEditorScreen && ctx.currentFieldNameIsFromNote &&
+             note > NoDrumNoteAssigned && note <= MaxDrumNoteNumber)
     {
-        stepEditorScreen->setFromNote(note);
+        stepEditorScreen->setFromNote(DrumNoteNumber(note));
     }
-    else if (auto channelSettingsScreen =
+    else if (const auto channelSettingsScreen =
                  std::dynamic_pointer_cast<ChannelSettingsScreen>(
                      screenComponent);
              channelSettingsScreen)

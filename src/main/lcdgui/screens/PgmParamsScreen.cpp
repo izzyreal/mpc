@@ -39,9 +39,8 @@ void PgmParamsScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void PgmParamsScreen::function(int i)
+void PgmParamsScreen::function(const int i)
 {
-
     switch (i)
     {
         case 0:
@@ -68,19 +67,18 @@ void PgmParamsScreen::function(int i)
         }
         case 5:
             break;
+        default:;
     }
 }
 
-void PgmParamsScreen::turnWheel(int i)
+void PgmParamsScreen::turnWheel(const int i)
 {
-
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "tune")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "tune")
     {
         selectedNoteParameters->setTune(selectedNoteParameters->getTune() + i);
         displayTune();
@@ -141,9 +139,9 @@ void PgmParamsScreen::turnWheel(int i)
     else if (focusedFieldName == "pgm")
     {
         const auto pgm = getActiveDrumBus()->getProgram();
-        const auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
-        if (candidate != pgm)
+        if (const auto candidate = sampler->getUsedProgram(pgm, i > 0);
+            candidate != pgm)
         {
             getActiveDrumBus()->setProgram(candidate);
             displayPgm();
@@ -158,8 +156,9 @@ void PgmParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        const auto candidate = mpc.clientEventController->getSelectedNote() + i;
-        if (candidate > 34)
+        if (const auto candidate =
+                mpc.clientEventController->getSelectedNote() + i;
+            candidate > 34)
         {
             mpc.clientEventController->setSelectedNote(candidate);
             displayAttackDecay();
@@ -175,9 +174,8 @@ void PgmParamsScreen::turnWheel(int i)
 
 void PgmParamsScreen::openWindow()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "pgm")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "pgm")
     {
         openScreenById(ScreenId::ProgramScreen);
     }
@@ -204,11 +202,9 @@ void PgmParamsScreen::openWindow()
     }
 }
 
-void PgmParamsScreen::update(Observable *o, Message message)
+void PgmParamsScreen::update(Observable *observable, const Message message)
 {
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
+    if (const auto msg = std::get<std::string>(message); msg == "note")
     {
         displayAttackDecay();
         displayDecayMode();

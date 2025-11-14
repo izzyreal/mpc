@@ -1,9 +1,13 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 namespace mpc::sequencer
 {
     struct SequencerState
     {
+        SequenceIndex sequenceIndex{0};
+
         struct TransportState
         {
             double positionQuarterNotes = 0.0;

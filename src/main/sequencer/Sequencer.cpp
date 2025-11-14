@@ -31,6 +31,7 @@
 
 #include <chrono>
 
+using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -115,7 +116,7 @@ void Sequencer::init()
     }
 
     lastTap = currentTimeMillis();
-    nextSq = -1;
+    nextSq = NoSequenceIndex;
 
     const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
@@ -133,7 +134,7 @@ void Sequencer::init()
 
     soloEnabled = false;
 
-    activeSequenceIndex = 0;
+    activeSequenceIndex = MinSequenceIndex;
 
     purgeAllSequences();
 
@@ -148,7 +149,7 @@ void Sequencer::deleteSong(const int i)
     songs[i] = std::make_shared<Song>();
 }
 
-int Sequencer::getActiveSequenceIndex() const
+SequenceIndex Sequencer::getActiveSequenceIndex() const
 {
     return activeSequenceIndex;
 }
@@ -291,12 +292,11 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
     defaultSequenceName = s;
 }
 
-void Sequencer::setActiveSequenceIndex(const int i,
+void Sequencer::setActiveSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                        const bool shouldSetPositionTo0)
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
-    activeSequenceIndex =
-        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    activeSequenceIndex = sequenceIndexToUse;
     if (shouldSetPositionTo0)
     {
         transport->setPosition(0);
@@ -376,12 +376,13 @@ void Sequencer::undoSeq()
         ->setEnabled(undoSeqAvailable);
 }
 
-void Sequencer::setSequence(const int i, std::shared_ptr<Sequence> s)
+void Sequencer::setSequence(const SequenceIndex sequenceIndex,
+                            std::shared_ptr<Sequence> s)
 {
-    sequences[i].swap(s);
+    sequences[sequenceIndex].swap(s);
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[i]->syncTrackEventIndices(
+    sequences[sequenceIndex]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 }
 
@@ -392,7 +393,7 @@ void Sequencer::purgeAllSequences()
         purgeSequence(i);
     }
 
-    activeSequenceIndex = 0;
+    activeSequenceIndex = MinSequenceIndex;
 }
 
 std::shared_ptr<Sequence> Sequencer::makeNewSequence()
@@ -427,7 +428,8 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return isEraseButtonPressed();
         },
-        [&](const int programPadIndex, const ProgramIndex programIndex)
+        [&](const ProgramPadIndex programPadIndex,
+            const ProgramIndex programIndex)
         {
             return eventRegistry->getSnapshot().isProgramPadPressed(
                 programPadIndex, programIndex);
@@ -878,7 +880,7 @@ std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
     const auto seqIndex = getCurrentlyPlayingSequenceIndex();
 
-    if (seqIndex == -1)
+    if (seqIndex == NoSequenceIndex)
     {
         return {};
     }
@@ -891,7 +893,7 @@ void Sequencer::setActiveTrackIndex(const int i)
     activeTrackIndex = i;
 }
 
-int Sequencer::getCurrentlyPlayingSequenceIndex() const
+SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
     if (isSongModeEnabled())
     {
@@ -900,7 +902,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
 
         if (!song->isUsed())
         {
-            return -1;
+            return NoSequenceIndex;
         }
 
         const auto seqIndexShouldBeDerivedFromSongStep =
@@ -911,62 +913,64 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
                 ? song->getStep(songScreen->getOffset() + 1)
                       .lock()
                       ->getSequence()
-                : -1;
+                : NoSequenceIndex;
         return songSeqIndex;
     }
 
     return activeSequenceIndex;
 }
 
-int Sequencer::getNextSq() const
+SequenceIndex Sequencer::getNextSq() const
 {
     return nextSq;
 }
 
-int Sequencer::getFirstUsedSeqDown(const int from, const bool unused) const
+SequenceIndex Sequencer::getFirstUsedSeqDown(const SequenceIndex from,
+                                             const bool unused) const
 {
-    for (int i = from; i >= 0; i--)
+    for (int i = from; i >= MinSequenceIndex; i--)
     {
         const auto candidate =
             unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
         {
-            return i;
+            return SequenceIndex(i);
         }
     }
 
-    return -1;
+    return NoSequenceIndex;
 }
 
-int Sequencer::getFirstUsedSeqUp(const int from, const bool unused) const
+SequenceIndex Sequencer::getFirstUsedSeqUp(const SequenceIndex from,
+                                           const bool unused) const
 {
-    for (int i = from; i < 99; i++)
+    for (int i = from; i <= MaxSequenceIndex; i++)
     {
         const auto candidate =
             unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
         {
-            return i;
+            return SequenceIndex(i);
         }
     }
 
-    return -1;
+    return NoSequenceIndex;
 }
 
-void Sequencer::setNextSq(int i)
+void Sequencer::setNextSq(SequenceIndex i)
 {
-    if (i < -1)
+    if (i < NoSequenceIndex)
     {
-        i = -1;
+        i = NoSequenceIndex;
     }
-    if (i > 98)
+    if (i > MaxSequenceIndex)
     {
-        i = 98;
+        i = MaxSequenceIndex;
     }
 
-    const auto startingFromScratch = nextSq == -1;
+    const auto startingFromScratch = nextSq == NoSequenceIndex;
 
     auto up = i > nextSq;
 
@@ -975,9 +979,10 @@ void Sequencer::setNextSq(int i)
         up = i > activeTrackIndex;
     }
 
-    const auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
+    const auto candidate =
+        SequenceIndex(up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i));
 
-    if (up && candidate == -1)
+    if (up && candidate == NoSequenceIndex)
     {
         return;
     }
@@ -985,11 +990,11 @@ void Sequencer::setNextSq(int i)
     nextSq = candidate;
 }
 
-void Sequencer::setNextSqPad(const int i)
+void Sequencer::setNextSqPad(const SequenceIndex i)
 {
     if (!sequences[i]->isUsed())
     {
-        nextSq = -1;
+        nextSq = NoSequenceIndex;
         return;
     }
 
@@ -1006,7 +1011,7 @@ bool Sequencer::isSongModeEnabled() const
     return screengroups::isSongScreen(layeredScreen->getCurrentScreen());
 }
 
-int Sequencer::getSongSequenceIndex() const
+SequenceIndex Sequencer::getSongSequenceIndex() const
 {
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     const auto song = songs[songScreen->getActiveSongIndex()];
@@ -1019,7 +1024,7 @@ int Sequencer::getSongSequenceIndex() const
 
     if (step < 0)
     {
-        return -1;
+        return NoSequenceIndex;
     }
 
     return song->getStep(step).lock()->getSequence();

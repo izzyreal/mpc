@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BusType.hpp"
+#include "IntTypes.hpp"
 
 #include <map>
 #include <memory>
@@ -34,13 +35,13 @@ namespace mpc::sequencer
     class DrumBus final : public Bus
     {
     public:
-        explicit DrumBus(int drumIndex);
+        explicit DrumBus(int drumIndexToUse);
         ~DrumBus() override = default;
 
-        int getIndex() const;
+        DrumBusIndex getIndex() const;
 
-        int getProgram() const;
-        void setProgram(int programIndex);
+        ProgramIndex getProgram() const;
+        void setProgram(ProgramIndex);
 
         bool receivesPgmChange() const;
         void setReceivePgmChange(bool b);
@@ -60,8 +61,8 @@ namespace mpc::sequencer
         getIndivFxMixerChannels();
 
     private:
-        const int drumIndex;
-        int programIndex = 0;
+        const DrumBusIndex drumIndex;
+        ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;
         std::vector<std::shared_ptr<engine::IndivFxMixer>> indivFxMixerChannels;

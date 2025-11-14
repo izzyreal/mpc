@@ -12,11 +12,11 @@ namespace mpc::lcdgui::screens::window
         EditMultipleScreen(Mpc &mpc, int layerIndex);
 
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void open() override;
         void close() override;
 
-        void setChangeNoteTo(int i);
+        void setChangeNoteTo(NoteNumber);
         void setVariationType(NoteOnEvent::VARIATION_TYPE type);
         void setVariationValue(int i);
         void setEditValue(int i);
@@ -35,7 +35,7 @@ namespace mpc::lcdgui::screens::window
         std::vector<int> yPosDouble = {22, 33};
         std::vector<std::string> doubleLabels = {"Edit type:", "Value:"};
 
-        int changeNoteTo = 35;
+        NoteNumber changeNoteTo = MinDrumNoteNumber;
         NoteOnEvent::VARIATION_TYPE variationType =
             NoteOnEvent::VARIATION_TYPE::TUNE_0;
         int variationValue = 0;

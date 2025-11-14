@@ -7,18 +7,18 @@ namespace mpc::lcdgui::screens::dialog
     {
     public:
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
 
         CopyProgramScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
     private:
-        int pgm0 = 0;
-        int pgm1 = 0;
+        ProgramIndex pgm0 = MinProgramIndex;
+        ProgramIndex pgm1 = MinProgramIndex;
 
-        void setPgm0(int i);
-        void setPgm1(int i);
+        void setPgm0(ProgramIndex);
+        void setPgm1(ProgramIndex);
 
         void displayPgm0() const;
         void displayPgm1() const;

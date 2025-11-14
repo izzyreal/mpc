@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 
 namespace mpc
 {
@@ -15,19 +16,19 @@ namespace mpc::lcdgui::screens
 {
     class WithTimesAndNotes
     {
-
     protected:
         int time0 = 0;
         int time1 = 0;
-        int note0 = 34;
-        int note1 = 127;
+        NoteNumber note0{NoDrumNoteAssigned};
+        NoteNumber note1 = MaxNoteNumber;
 
     public:
+        virtual ~WithTimesAndNotes() = default;
         void setTime0(int newTime0);
         void setTime1(int newTime1);
 
-        virtual void setNote0(int note);
-        void setNote1(int note);
+        virtual void setNote0(NoteNumber);
+        void setNote1(NoteNumber);
 
     protected:
         virtual void displayNotes() = 0;
@@ -42,6 +43,6 @@ namespace mpc::lcdgui::screens
                            sequencer::Sequence *sequence = nullptr);
         bool checkAllTimesAndNotes(Mpc &mpc, int notch,
                                    sequencer::Sequence *sequence = nullptr,
-                                   sequencer::Track *track = nullptr);
+                                   const sequencer::Track *track = nullptr);
     };
 } // namespace mpc::lcdgui::screens
