@@ -323,7 +323,7 @@ void ClientMidiEventController::handleChannelAftertouch(
 {
     const auto pressure = e.getChannelPressure();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus<Bus>(track->getBusType());
+    const auto bus = sequencer->getBus(track->getBusType());
 
     for (auto &p : sampler->getPrograms())
     {
