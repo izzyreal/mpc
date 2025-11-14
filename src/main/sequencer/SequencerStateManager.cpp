@@ -58,7 +58,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
-                sequencer->setSelectedSequenceIndex(m.sequenceIndex, false);
+                activeState.selectedSequenceIndex = m.sequenceIndex;
+
                 if (m.setPositionTo0)
                 {
                     sequencer->getTransport()->setPosition(0);

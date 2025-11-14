@@ -16,12 +16,12 @@ NonRealTimeAudioServer::NonRealTimeAudioServer(
     server = std::move(serverToUse);
 }
 
-void NonRealTimeAudioServer::setSampleRate(int rate)
+void NonRealTimeAudioServer::setSampleRate(const int rate)
 {
     server->setSampleRate(rate);
 }
 
-void NonRealTimeAudioServer::setRealTime(bool rt)
+void NonRealTimeAudioServer::setRealTime(const bool rt)
 {
     if (!isRunning())
     {
@@ -113,7 +113,8 @@ void NonRealTimeAudioServer::close()
     server = nullptr;
 }
 
-void NonRealTimeAudioServer::setClient(std::shared_ptr<AudioClient> clientToUse)
+void NonRealTimeAudioServer::setClient(
+    const std::shared_ptr<AudioClient> clientToUse)
 {
     server->setClient(shared_from_this());
     client = clientToUse;
@@ -131,7 +132,7 @@ void NonRealTimeAudioServer::work(
     const std::vector<int8_t> &hostInputChannelIndices,
     const std::vector<int8_t> &hostOutputChannelIndices) const
 {
-    auto realTimeAudioServer =
+    const auto realTimeAudioServer =
         std::dynamic_pointer_cast<RealTimeAudioServer>(server);
 
     realTimeAudioServer->work(
@@ -140,7 +141,7 @@ void NonRealTimeAudioServer::work(
         hostOutputChannelIndices);
 }
 
-void NonRealTimeAudioServer::work(int nFrames)
+void NonRealTimeAudioServer::work(const int nFrames)
 {
     client->work(nFrames);
 }
@@ -156,7 +157,7 @@ void NonRealTimeAudioServer::runNonRealTime()
 }
 
 void NonRealTimeAudioServer::removeAudioBuffer(
-    std::shared_ptr<AudioBuffer> buffer)
+    const std::shared_ptr<AudioBuffer> buffer)
 {
     server->removeAudioBuffer(buffer);
 }
@@ -180,13 +181,13 @@ NonRealTimeAudioServer::openAudioInput(const std::string name)
 }
 
 void NonRealTimeAudioServer::closeAudioOutput(
-    std::shared_ptr<IOAudioProcess> output)
+    const std::shared_ptr<IOAudioProcess> output)
 {
     server->closeAudioOutput(output);
 }
 
 void NonRealTimeAudioServer::closeAudioInput(
-    std::shared_ptr<IOAudioProcess> input)
+    const std::shared_ptr<IOAudioProcess> input)
 {
     server->closeAudioInput(input);
 }
@@ -196,7 +197,7 @@ float NonRealTimeAudioServer::getSampleRate()
     return server->getSampleRate();
 }
 
-void NonRealTimeAudioServer::resizeBuffers(int newSize)
+void NonRealTimeAudioServer::resizeBuffers(const int newSize)
 {
     server->resizeBuffers(newSize);
 }

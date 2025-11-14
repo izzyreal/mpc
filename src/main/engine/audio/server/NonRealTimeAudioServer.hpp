@@ -40,7 +40,7 @@ namespace mpc::engine::audio::server
 
         void close() override;
 
-        void setClient(std::shared_ptr<AudioClient> client) override;
+        void setClient(std::shared_ptr<AudioClient> clientToUse) override;
 
         bool isRunning() override;
 
@@ -72,7 +72,7 @@ namespace mpc::engine::audio::server
                   const std::vector<int8_t> &mpcMonoOutputChannelIndices,
                   const std::vector<int8_t> &hostInputChannelIndices,
                   const std::vector<int8_t> &hostOutputChannelIndices) const;
-        NonRealTimeAudioServer(std::shared_ptr<AudioServer> server);
+        NonRealTimeAudioServer(std::shared_ptr<AudioServer> serverToUse);
         ~NonRealTimeAudioServer() override;
     };
 

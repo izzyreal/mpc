@@ -293,7 +293,6 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                          const bool shouldSetPositionTo0) const
 {
-    assert(!shouldSetPositionTo0 || !transport->isPlaying());
     stateManager->enqueue(
         SetSelectedSequenceIndex{sequenceIndexToUse, shouldSetPositionTo0});
 }

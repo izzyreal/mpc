@@ -32,9 +32,9 @@ void RealTimeAudioServer::close()
     activeOutputs.clear();
 }
 
-void RealTimeAudioServer::resizeBuffers(int newSize)
+void RealTimeAudioServer::resizeBuffers(const int newSize)
 {
-    for (auto &i : activeInputs)
+    for (const auto &i : activeInputs)
     {
         if (i->localBuffer.size() != newSize * 2)
         {
@@ -42,7 +42,7 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
         }
     }
 
-    for (auto &o : activeOutputs)
+    for (const auto &o : activeOutputs)
     {
         if (o->localBuffer.size() != newSize * 2)
         {
@@ -54,7 +54,8 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
 }
 
 void RealTimeAudioServer::work(
-    const float *const *inputBuffer, float *const *outputBuffer, int nFrames,
+    const float *const *inputBuffer, float *const *outputBuffer,
+    const int nFrames,
     const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
@@ -100,7 +101,8 @@ void RealTimeAudioServer::work(
     }
 }
 
-void RealTimeAudioServer::setClient(std::shared_ptr<AudioClient> clientToUse)
+void RealTimeAudioServer::setClient(
+    const std::shared_ptr<AudioClient> clientToUse)
 {
     client = clientToUse;
 }
@@ -120,7 +122,7 @@ RealTimeAudioServer::openAudioInput(const std::string name)
 }
 
 void RealTimeAudioServer::closeAudioOutput(
-    std::shared_ptr<IOAudioProcess> output)
+    const std::shared_ptr<IOAudioProcess> output)
 {
     if (!output)
     {
@@ -139,7 +141,8 @@ void RealTimeAudioServer::closeAudioOutput(
     }
 }
 
-void RealTimeAudioServer::closeAudioInput(std::shared_ptr<IOAudioProcess> input)
+void RealTimeAudioServer::closeAudioInput(
+    const std::shared_ptr<IOAudioProcess> input)
 {
     if (!input)
     {

@@ -21,6 +21,7 @@ namespace mpc::engine::audio::server
         std::vector<std::shared_ptr<core::AudioBuffer>> buffers;
 
     public:
+        virtual ~AudioServer() = default;
         virtual void resizeBuffers(int newSize);
         virtual std::shared_ptr<core::AudioBuffer>
         createAudioBuffer(std::string name);
