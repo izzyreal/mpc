@@ -83,26 +83,19 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
 
     if (focusedFieldName == "note0")
     {
-
         if (const auto trackToUse =
                 track != nullptr ? track
                                  : mpc.getSequencer()->getSelectedTrack().get();
             isMidiBusType(trackToUse->getBusType()))
         {
-            const auto note = note0 + notch;
-
-            if (note < 34 || note > 98)
-            {
-                return true;
-            }
-
-            note0 = note;
-
-            displayDrumNotes();
+            setNote0(note0 + notch);
         }
         else
         {
-            setNote0(note0 + notch);
+            const auto note = note0 + notch;
+
+            note0 = DrumNoteNumber(note);
+            displayDrumNotes();
         }
 
         notesHaveChanged = true;
@@ -118,7 +111,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
 
 void WithTimesAndNotes::setNote0(const NoteNumber noteNumber)
 {
-    note0 = noteNumber;
+    note0 = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
 
     if (note0 > note1)
     {

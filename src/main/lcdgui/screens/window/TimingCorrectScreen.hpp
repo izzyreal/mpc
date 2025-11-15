@@ -12,8 +12,6 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-        void setNote0(NoteNumber) override;
-
         TimingCorrectScreen(Mpc &mpc, int layerIndex);
 
         void open() override;

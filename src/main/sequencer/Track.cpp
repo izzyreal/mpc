@@ -423,9 +423,16 @@ int Track::getProgramChange() const
     return programChange;
 }
 
-void Track::setBusType(const BusType busTypeToUse)
+void Track::setBusType(BusType bt)
 {
-    busType = busTypeToUse;
+    using U = std::underlying_type_t<BusType>;
+    constexpr U MIN = static_cast<U>(BusType::MIDI);
+    constexpr U MAX = static_cast<U>(BusType::DRUM4);
+
+    const U raw = static_cast<U>(bt);
+    const U clamped = std::clamp(raw, MIN, MAX);
+
+    busType = static_cast<BusType>(clamped);
 }
 
 BusType Track::getBusType() const

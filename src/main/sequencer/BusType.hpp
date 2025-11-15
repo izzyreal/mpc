@@ -73,22 +73,44 @@ namespace mpc::sequencer
         return static_cast<BusType>(index + 1);
     }
 
-    constexpr BusType operator+(BusType lhs, const int rhs) noexcept
+    constexpr BusType operator+(BusType lhs, int rhs) noexcept
     {
-        using T = std::underlying_type_t<BusType>;
-        return static_cast<BusType>(static_cast<T>(lhs) + rhs);
+        using S = int;
+        using U = std::underlying_type_t<BusType>;
+
+        constexpr S MIN = static_cast<S>(BusType::MIDI);
+        constexpr S MAX = static_cast<S>(BusType::DRUM4);
+
+        S v = static_cast<S>(lhs) + rhs;
+        v = std::clamp(v, MIN, MAX);
+
+        return static_cast<BusType>(v);
     }
 
-    constexpr BusType operator-(BusType lhs, const int rhs) noexcept
+    constexpr BusType operator-(BusType lhs, int rhs) noexcept
     {
-        using T = std::underlying_type_t<BusType>;
-        return static_cast<BusType>(static_cast<T>(lhs) - rhs);
+        using S = int;
+        using U = std::underlying_type_t<BusType>;
+
+        constexpr S MIN = static_cast<S>(BusType::MIDI);
+        constexpr S MAX = static_cast<S>(BusType::DRUM4);
+
+        S v = static_cast<S>(lhs) - rhs;
+        v = std::clamp(v, MIN, MAX);
+
+        return static_cast<BusType>(v);
     }
 
-    constexpr BusType operator+(const int lhs, BusType rhs) noexcept
+    constexpr BusType operator+(int lhs, BusType rhs) noexcept
     {
-        using T = std::underlying_type_t<BusType>;
-        return static_cast<BusType>(lhs + static_cast<T>(rhs));
-    }
+        using S = int;
 
+        constexpr S MIN = static_cast<S>(BusType::MIDI);
+        constexpr S MAX = static_cast<S>(BusType::DRUM4);
+
+        S v = lhs + static_cast<S>(rhs);
+        v = std::clamp(v, MIN, MAX);
+
+        return static_cast<BusType>(v);
+    }
 } // namespace mpc::sequencer
