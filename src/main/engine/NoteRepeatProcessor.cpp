@@ -50,7 +50,7 @@ void NoteRepeatProcessor::process(
     auto track = sequencer->getSelectedTrack();
     auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
 
-    std::shared_ptr<Program> program;
+    std::shared_ptr<sampler::Program> program;
 
     if (drumBus)
     {

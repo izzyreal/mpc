@@ -1,39 +1,39 @@
 #pragma once
 
 #include "performance/EventTypes.hpp"
+#include "performance/Drum.hpp"
 
 #include <functional>
+#include <variant>
+
+namespace mpc::sampler
+{
+    class Program;
+}
 
 namespace mpc::performance
 {
+    struct SetDrumProgram {
+        DrumBusIndex drumBusIndex;
+        std::shared_ptr<sampler::Program> samplerProgram;
+    };
+
+    using PerformanceMessagePayload = std::variant<
+        std::monostate,
+        PhysicalPadPressEvent,
+        PhysicalPadAftertouchEvent,
+        PhysicalPadReleaseEvent,
+        ProgramPadPressEvent,
+        ProgramPadAftertouchEvent,
+        ProgramPadReleaseEvent,
+        NoteOnEvent,
+        NoteAftertouchEvent,
+        NoteOffEvent,
+        SetDrumProgram>;
+
     struct PerformanceMessage
     {
-        enum class Type
-        {
-            PhysicalPadPress,
-            PhysicalPadAftertouch,
-            PhysicalPadRelease,
-            ProgramPadPress,
-            ProgramPadAftertouch,
-            ProgramPadRelease,
-            NoteOn,
-            NoteAftertouch,
-            NoteOff,
-            Clear
-        } type;
-
-        PhysicalPadPressEvent physicalPadPress;
-        PhysicalPadAftertouchEvent physicalPadAftertouch;
-        PhysicalPadReleaseEvent physicalPadRelease;
-
-        ProgramPadPressEvent programPadPress;
-        ProgramPadAftertouchEvent programPadAftertouch;
-        ProgramPadReleaseEvent programPadRelease;
-
-        NoteOnEvent noteOnEvent;
-        NoteAftertouchEvent noteAftertouchEvent;
-        NoteOffEvent noteOffEvent;
-
+        PerformanceMessagePayload payload;
         PerformanceEventSource source;
         std::function<void(void *)> action = [](void *) {};
 
@@ -44,3 +44,4 @@ namespace mpc::performance
         PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
     };
 } // namespace mpc::performance
+

@@ -587,7 +587,7 @@ ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
     return {};
 }
 
-std::shared_ptr<Program>
+std::shared_ptr<mpc::sampler::Program>
 ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)

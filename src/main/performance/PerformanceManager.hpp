@@ -63,6 +63,8 @@ namespace mpc::performance
                              std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
 
+        void registerSetDrumProgram(SetDrumProgram);
+
         void clear() const;
 
     protected:
