@@ -180,6 +180,8 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
 
     int counter = 0;
 
+    bool cantFindFileScreenHasBeenOpened = false;
+
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -192,6 +194,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "cant-find-file")
         {
+            cantFindFileScreenHasBeenOpened = true;
             auto cantFindFileScreen =
                 mpc.screens->get<ScreenId::CantFindFileScreen>();
             cantFindFileScreen->function(1);
@@ -199,10 +202,11 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
         }
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
     loadThread.join();
 
+    mpc.getLayeredScreen()->timerCallback();
+
+    REQUIRE(cantFindFileScreenHasBeenOpened);
     assert(mpc.getLayeredScreen()->getCurrentScreenName() != "cant-find-file");
 
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
