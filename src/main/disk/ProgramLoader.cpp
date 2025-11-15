@@ -209,9 +209,11 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                 }
 
                 auto ls = mpc.getLayeredScreen();
-                ls->postToUiThread([ls]{
-                    ls->openScreenById(ScreenId::LoadScreen);
-                });
+                ls->postToUiThread(
+                    [ls]
+                    {
+                        ls->openScreenById(ScreenId::LoadScreen);
+                    });
                 return p;
             });
 }
