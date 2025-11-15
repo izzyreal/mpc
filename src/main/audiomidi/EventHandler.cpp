@@ -134,8 +134,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     if (programPadIndex != -1)
     {
         mpc.performanceManager->registerProgramPadPress(
-            performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
-            track->getIndex(), ctx.drum->busType, programPadIndex,
+            performance::PerformanceEventSource::Sequence, std::nullopt,
+            screenId, track->getIndex(), ctx.drum->busType, programPadIndex,
             noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
     }
 
@@ -145,19 +145,20 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             noteOnEvent->getTick());
 
     auto noteOffEventFn = [note = noteOnEvent->getNote(), programIndex,
-                           performanceManager = mpc.performanceManager, programPadIndex,
-                           noteOffCtx]
+                           performanceManager = mpc.performanceManager,
+                           programPadIndex, noteOffCtx]
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        performanceManager->registerNoteOff(performance::PerformanceEventSource::Sequence, note,
-                                       noMidiChannel, [](void *) {});
+        performanceManager->registerNoteOff(
+            performance::PerformanceEventSource::Sequence, note, noMidiChannel,
+            [](void *) {});
 
         if (programPadIndex != -1)
         {
             performanceManager->registerProgramPadRelease(
-                performance::PerformanceEventSource::Sequence, programPadIndex, programIndex,
-                [](void *) {});
+                performance::PerformanceEventSource::Sequence, programPadIndex,
+                programIndex, [](void *) {});
         }
 
         DrumNoteEventHandler::noteOff(noteOffCtx);

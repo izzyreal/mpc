@@ -11,7 +11,8 @@ namespace mpc::performance
     class PerformanceStateView
     {
     public:
-        explicit PerformanceStateView(std::shared_ptr<const PerformanceState> s) noexcept;
+        explicit PerformanceStateView(
+            std::shared_ptr<const PerformanceState> s) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
@@ -20,7 +21,8 @@ namespace mpc::performance
         bool isProgramPadPressed(ProgramPadIndex, ProgramIndex) const;
 
         std::optional<ProgramPadPressEvent> getMostRecentProgramPadPress(
-            ProgramPadIndex, const std::vector<PerformanceEventSource> &sourcesToExclude) const;
+            ProgramPadIndex,
+            const std::vector<PerformanceEventSource> &sourcesToExclude) const;
 
         int getTotalNoteOnCount() const;
 

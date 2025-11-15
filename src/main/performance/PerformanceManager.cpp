@@ -50,7 +50,8 @@ void PerformanceManager::registerPhysicalPadPress(
 
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
-    const PerformanceEventSource source, const std::function<void(void *)> &action) const
+    const PerformanceEventSource source,
+    const std::function<void(void *)> &action) const
 {
     const PhysicalPadAftertouchEvent e{padIndex, pressure};
     PerformanceMessage msg{PerformanceMessage::Type::PhysicalPadAftertouch};
@@ -73,7 +74,8 @@ void PerformanceManager::registerPhysicalPadRelease(
 }
 
 void PerformanceManager::registerProgramPadPress(
-    const PerformanceEventSource source, const std::optional<MidiChannel> midiInputChannel,
+    const PerformanceEventSource source,
+    const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const ProgramPadIndex padIndex,
     const Velocity velocity, const ProgramIndex program,
@@ -96,10 +98,9 @@ void PerformanceManager::registerProgramPadPress(
     enqueue(std::move(msg));
 }
 
-void PerformanceManager::registerProgramPadAftertouch(const PerformanceEventSource source,
-                                                 const ProgramPadIndex padIndex,
-                                                 const ProgramIndex program,
-                                                 const Pressure pressure) const
+void PerformanceManager::registerProgramPadAftertouch(
+    const PerformanceEventSource source, const ProgramPadIndex padIndex,
+    const ProgramIndex program, const Pressure pressure) const
 {
     const ProgramPadAftertouchEvent e{padIndex, program, pressure};
     PerformanceMessage msg{PerformanceMessage::Type::ProgramPadAftertouch};
@@ -121,7 +122,8 @@ void PerformanceManager::registerProgramPadRelease(
 }
 
 NoteOnEvent PerformanceManager::registerNoteOn(
-    const PerformanceEventSource source, const std::optional<MidiChannel> midiInputChannel,
+    const PerformanceEventSource source,
+    const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
     const Velocity velocity, const std::optional<ProgramIndex> programIndex,
@@ -145,7 +147,8 @@ NoteOnEvent PerformanceManager::registerNoteOn(
 }
 
 void PerformanceManager::registerNoteAftertouch(
-    const PerformanceEventSource source, const NoteNumber noteNumber, const Pressure pressure,
+    const PerformanceEventSource source, const NoteNumber noteNumber,
+    const Pressure pressure,
     const std::optional<MidiChannel> midiInputChannel) const
 {
     const NoteAftertouchEvent e{noteNumber, pressure,

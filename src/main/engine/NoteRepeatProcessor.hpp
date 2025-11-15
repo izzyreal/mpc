@@ -69,7 +69,8 @@ namespace mpc::engine
             assign16LevelsScreen;
         const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
             mixerSetupScreen;
-        const std::shared_ptr<performance::PerformanceManager> performanceManager;
+        const std::shared_ptr<performance::PerformanceManager>
+            performanceManager;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<Voice>> *voices;
         std::vector<MixerInterconnection *> &mixerConnections;

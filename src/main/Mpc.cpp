@@ -316,9 +316,9 @@ Mpc::~Mpc()
 
 void Mpc::panic() const
 {
-    // TODO Anything we should do in the performanceManager? Probably not, because
-    // panic is meant to help out other devices, i.e. things connected to the
-    // MPC2000XL's MIDI output.
+    // TODO Anything we should do in the performanceManager? Probably not,
+    // because panic is meant to help out other devices, i.e. things connected
+    // to the MPC2000XL's MIDI output.
     midiOutput->panic();
     eventHandler->clearTransposeCache();
 }

@@ -81,8 +81,9 @@ Sequencer::Sequencer(
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
-      isEraseButtonPressed(isEraseButtonPressed), performanceManager(performanceManager),
-      sampler(sampler), eventHandler(eventHandler),
+      isEraseButtonPressed(isEraseButtonPressed),
+      performanceManager(performanceManager), sampler(sampler),
+      eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled),
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {

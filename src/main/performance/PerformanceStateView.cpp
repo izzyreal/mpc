@@ -5,13 +5,14 @@
 using namespace mpc;
 using namespace mpc::performance;
 
-PerformanceStateView::PerformanceStateView(const std::shared_ptr<const PerformanceState> s) noexcept
+PerformanceStateView::PerformanceStateView(
+    const std::shared_ptr<const PerformanceState> s) noexcept
     : state(s)
 {
 }
 
-bool PerformanceStateView::isProgramPadPressed(const ProgramPadIndex idx,
-                                    const ProgramIndex programIndex) const
+bool PerformanceStateView::isProgramPadPressed(
+    const ProgramPadIndex idx, const ProgramIndex programIndex) const
 {
     for (auto &e : state->programPadEvents)
     {

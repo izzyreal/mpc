@@ -195,8 +195,9 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         if (programPadIndex != NoProgramIndex)
         {
             performanceManager->registerProgramPadPress(
-                PerformanceEventSource::MidiInput, std::optional<MidiChannel>(e.getChannel()),
-                screenId, track->getIndex(), screen->getBus()->busType,
+                PerformanceEventSource::MidiInput,
+                std::optional<MidiChannel>(e.getChannel()), screenId,
+                track->getIndex(), screen->getBus()->busType,
                 ProgramPadIndex(programPadIndex), Velocity(e.getVelocity()),
                 ProgramIndex(*programIndex), NoPhysicalPadIndex);
         }
@@ -211,20 +212,20 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                PerformanceEventSource::MidiInput, *registryNoteOnEvent, NoteNumber(noteNumber),
-                Velocity(velocity), track.get(), screen->getBus(), screen,
-                programPadIndex, program, sequencer, sequencerPlaybackEngine,
-                performanceManager, clientEventController, eventHandler, screens,
-                hardware);
+                PerformanceEventSource::MidiInput, *registryNoteOnEvent,
+                NoteNumber(noteNumber), Velocity(velocity), track.get(),
+                screen->getBus(), screen, programPadIndex, program, sequencer,
+                sequencerPlaybackEngine, performanceManager,
+                clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
 
     performanceManager->registerNoteOn(
-        PerformanceEventSource::MidiInput, std::optional<MidiChannel>(e.getChannel()), screenId,
-        track->getIndex(), screen->getBus()->busType,
-        NoteNumber(e.getNoteNumber()), Velocity(e.getVelocity()),
-        std::optional(programIndex), action);
+        PerformanceEventSource::MidiInput,
+        std::optional<MidiChannel>(e.getChannel()), screenId, track->getIndex(),
+        screen->getBus()->busType, NoteNumber(e.getNoteNumber()),
+        Velocity(e.getVelocity()), std::optional(programIndex), action);
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
@@ -270,8 +271,9 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             if (programPadIndex != NoProgramPadIndex)
             {
                 performanceManager->registerProgramPadRelease(
-                    PerformanceEventSource::MidiInput, ProgramPadIndex(programPadIndex),
-                    programIndex, [](void *) {});
+                    PerformanceEventSource::MidiInput,
+                    ProgramPadIndex(programPadIndex), programIndex,
+                    [](void *) {});
             }
         }
 
@@ -289,9 +291,9 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };
 
-    performanceManager->registerNoteOff(PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-                                   std::optional<MidiChannel>(midiChannel),
-                                   action);
+    performanceManager->registerNoteOff(
+        PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
+        std::optional<MidiChannel>(midiChannel), action);
 }
 
 void ClientMidiEventController::handleKeyAftertouch(
@@ -312,8 +314,8 @@ void ClientMidiEventController::handleKeyAftertouch(
             programPadIndex != -1)
         {
             performanceManager->registerProgramPadAftertouch(
-                PerformanceEventSource::MidiInput, programPadIndex, getProgramIndexForEvent(e),
-                Pressure(pressure));
+                PerformanceEventSource::MidiInput, programPadIndex,
+                getProgramIndexForEvent(e), Pressure(pressure));
         }
     }
 }
@@ -335,15 +337,17 @@ void ClientMidiEventController::handleChannelAftertouch(
                  ++programPadIndex)
             {
                 performanceManager->registerProgramPadAftertouch(
-                    PerformanceEventSource::MidiInput, ProgramPadIndex(programPadIndex),
-                    programIndex, Pressure(pressure));
+                    PerformanceEventSource::MidiInput,
+                    ProgramPadIndex(programPadIndex), programIndex,
+                    Pressure(pressure));
 
                 if (const auto note = program->getNoteFromPad(
                         ProgramPadIndex(programPadIndex));
                     note != NoDrumNoteAssigned)
                 {
                     performanceManager->registerNoteAftertouch(
-                        PerformanceEventSource::MidiInput, NoteNumber(note), Pressure(pressure),
+                        PerformanceEventSource::MidiInput, NoteNumber(note),
+                        Pressure(pressure),
                         std::optional<MidiChannel>(e.getChannel()));
                 }
             }
