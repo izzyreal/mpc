@@ -73,12 +73,6 @@ namespace mpc::sequencer
         return static_cast<BusType>(index + 1);
     }
 
-    inline BusType drumIndexToDrumBusType(const size_t index) noexcept
-    {
-        assert(index <= Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
-        return busIndexToBusType(index + 1);
-    }
-
     constexpr BusType operator+(BusType lhs, const int rhs) noexcept
     {
         using T = std::underlying_type_t<BusType>;

@@ -11,10 +11,7 @@ namespace mpc::eventregistry
     class StateView
     {
     public:
-        explicit StateView(const std::shared_ptr<const PerformanceState> s) noexcept
-            : state(s)
-        {
-        }
+        explicit StateView(const std::shared_ptr<const PerformanceState> s) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
@@ -24,8 +21,6 @@ namespace mpc::eventregistry
 
         std::optional<ProgramPadPressEvent> getMostRecentProgramPadPress(
             ProgramPadIndex, const std::vector<PerformanceEventSource> &sourcesToExclude) const;
-
-        int getTotalPressedProgramPadCount() const;
 
         int getTotalNoteOnCount() const;
 

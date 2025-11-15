@@ -5,6 +5,11 @@
 using namespace mpc;
 using namespace mpc::eventregistry;
 
+StateView::StateView(const std::shared_ptr<const PerformanceState> s) noexcept
+    : state(s)
+{
+}
+
 bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
                                     const ProgramIndex programIndex) const
 {
@@ -100,11 +105,6 @@ std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
     }
 
     return latest;
-}
-
-int StateView::getTotalPressedProgramPadCount() const
-{
-    return state->programPadEvents.size();
 }
 
 int StateView::getTotalNoteOnCount() const

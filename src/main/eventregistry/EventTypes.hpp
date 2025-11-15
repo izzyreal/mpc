@@ -93,12 +93,6 @@ namespace mpc::eventregistry
     };
 
     using PhysicalPadPressEvents = std::vector<PhysicalPadPressEvent>;
-    using PhysicalPadAftertouchEvents = std::vector<PhysicalPadAftertouchEvent>;
-    using PhysicalPadReleaseEvents = std::vector<PhysicalPadReleaseEvent>;
     using ProgramPadPressEvents = std::vector<ProgramPadPressEvent>;
-    using ProgramPadAftertouchEvents = std::vector<ProgramPadAftertouchEvent>;
-    using ProgramPadReleaseEvents = std::vector<ProgramPadReleaseEvent>;
     using NoteOnEvents = std::vector<NoteOnEvent>;
-    using NoteAftertouchEvents = std::vector<NoteAftertouchEvent>;
-    using NoteOffEvents = std::vector<NoteOffEvent>;
 } // namespace mpc::eventregistry
