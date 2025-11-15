@@ -6,7 +6,7 @@
 #include "DemoFiles.hpp"
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include "Paths.hpp"
@@ -125,7 +125,7 @@ void Mpc::init()
     eventHandler = std::make_shared<audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
 
-    eventRegistry = std::make_shared<eventregistry::EventRegistry>();
+    performanceManager = std::make_shared<eventregistry::PerformanceManager>();
 
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);
@@ -168,7 +168,7 @@ void Mpc::init()
         {
             return clientEventController->isEraseButtonPressed();
         },
-        eventRegistry, sampler, eventHandler,
+        performanceManager, sampler, eventHandler,
         [&]
         {
             return clientEventController->isSixteenLevelsEnabled();
@@ -316,7 +316,7 @@ Mpc::~Mpc()
 
 void Mpc::panic() const
 {
-    // TODO Anything we should do in the eventRegistry? Probably not, because
+    // TODO Anything we should do in the performanceManager? Probably not, because
     // panic is meant to help out other devices, i.e. things connected to the
     // MPC2000XL's MIDI output.
     midiOutput->panic();

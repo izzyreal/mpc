@@ -32,7 +32,7 @@
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
@@ -109,7 +109,7 @@ void EngineHost::start()
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
         mpc.getSequencer(), mpc.getSampler(), mixer,
         mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
-        mpc.screens->get<ScreenId::MixerSetupScreen>(), mpc.eventRegistry,
+        mpc.screens->get<ScreenId::MixerSetupScreen>(), mpc.performanceManager,
         mpc.getHardware()->getSlider(), &voices, mixerConnections,
         [controller = mpc.clientEventController]
         {
@@ -167,7 +167,7 @@ void EngineHost::start()
 void EngineHost::applyPendingStateChanges() const
 {
     mpc.getSequencer()->getStateManager()->drainQueue();
-    mpc.eventRegistry->drainQueue();
+    mpc.performanceManager->drainQueue();
 }
 
 void EngineHost::setMonitorLevel(const int level) const

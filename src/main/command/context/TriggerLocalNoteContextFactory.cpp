@@ -19,7 +19,7 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/NoteEvent.hpp"
 
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
@@ -42,7 +42,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
-    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
@@ -90,7 +90,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{
             source,
-            eventRegistry,
+            performanceManager,
             registryNoteOnEvent,
             isSequencerScreen,
             programPadIndex,
@@ -129,7 +129,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
-    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
@@ -137,7 +137,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
-    const auto registrySnapshot = eventRegistry->getSnapshot();
+    const auto registrySnapshot = performanceManager->getSnapshot();
 
     std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent;
 
@@ -179,7 +179,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     return std::make_shared<TriggerLocalNoteOffContext>(
         TriggerLocalNoteOffContext{
             source,
-            eventRegistry,
+            performanceManager,
             sequencer->getBus(busType),
             program,
             programPadIndex,

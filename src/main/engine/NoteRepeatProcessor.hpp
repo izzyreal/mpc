@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens
 }
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 namespace mpc::hardware
 {
@@ -50,7 +50,7 @@ namespace mpc::engine
             std::shared_ptr<audio::mixer::AudioMixer>,
             std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>,
             std::shared_ptr<lcdgui::screens::MixerSetupScreen>,
-            std::shared_ptr<eventregistry::EventRegistry>,
+            std::shared_ptr<eventregistry::PerformanceManager>,
             std::shared_ptr<hardware::Slider>,
             std::vector<std::shared_ptr<Voice>> *,
             std::vector<MixerInterconnection *> &,
@@ -69,7 +69,7 @@ namespace mpc::engine
             assign16LevelsScreen;
         const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
             mixerSetupScreen;
-        const std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        const std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<Voice>> *voices;
         std::vector<MixerInterconnection *> &mixerConnections;

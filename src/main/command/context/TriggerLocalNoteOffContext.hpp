@@ -1,13 +1,13 @@
 #pragma once
 
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 #include <memory>
 #include <functional>
 #include <cstdint>
 
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
     class NoteOnEvent;
 } // namespace mpc::eventregistry
 
@@ -35,7 +35,7 @@ namespace mpc::command::context
     struct TriggerLocalNoteOffContext
     {
         eventregistry::Source source;
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;

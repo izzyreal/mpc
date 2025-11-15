@@ -13,7 +13,7 @@
 
 #include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"

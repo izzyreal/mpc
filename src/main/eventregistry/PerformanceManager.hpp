@@ -14,12 +14,12 @@
 
 namespace mpc::eventregistry
 {
-    class EventRegistry final
+    class PerformanceManager final
         : public concurrency::AtomicStateExchange<State, StateView,
                                                   EventMessage>
     {
     public:
-        EventRegistry();
+        PerformanceManager();
 
         void registerPhysicalPadPress(
             Source, lcdgui::ScreenId, sequencer::BusType, PhysicalPadIndex,

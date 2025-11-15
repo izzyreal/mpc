@@ -39,7 +39,7 @@ void ClientEventController::init()
         std::make_shared<ClientHardwareEventController>(mpc);
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
-        mpc.eventRegistry, shared_from_this(), clientHardwareEventController,
+        mpc.performanceManager, shared_from_this(), clientHardwareEventController,
         screens->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(),
         mpc.getSampler(), screens->get<ScreenId::MidiInputScreen>(),
         mpc.getEventHandler(),

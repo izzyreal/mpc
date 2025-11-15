@@ -50,7 +50,7 @@ namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::sequencer
@@ -74,7 +74,7 @@ namespace mpc::sequencer
                   const std::function<void()> &stopBouncing,
                   const std::function<bool()> &isBouncing,
                   const std::function<bool()> &isEraseButtonPressed,
-                  const std::shared_ptr<eventregistry::EventRegistry> &,
+                  const std::shared_ptr<eventregistry::PerformanceManager> &,
                   const std::shared_ptr<sampler::Sampler> &,
                   const std::shared_ptr<audiomidi::EventHandler> &,
                   const std::function<bool()> &isSixteenLevelsEnabled,
@@ -109,7 +109,7 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<engine::Voice>> *voices;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;

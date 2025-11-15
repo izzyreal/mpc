@@ -19,7 +19,7 @@ namespace mpc::hardware
 
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::controller
@@ -104,7 +104,7 @@ namespace mpc
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled() const;
 
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
 
         std::shared_ptr<input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<controller::ClientEventController>

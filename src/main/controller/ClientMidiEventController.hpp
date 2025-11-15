@@ -13,7 +13,7 @@ namespace mpc::file::mid::event
 }
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::sequencer
@@ -77,7 +77,7 @@ namespace mpc::controller
 
     public:
         ClientMidiEventController(
-            const std::shared_ptr<eventregistry::EventRegistry> &,
+            const std::shared_ptr<eventregistry::PerformanceManager> &,
             const std::shared_ptr<ClientEventController> &,
             std::shared_ptr<ClientHardwareEventController>,
             std::shared_ptr<MidiSwScreen>, std::shared_ptr<Sequencer>,
@@ -122,7 +122,7 @@ namespace mpc::controller
         bool isOmniOn() const noexcept;
         bool isPolyMode() const noexcept;
 
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         std::shared_ptr<MidiInputScreen> midiInputScreen;
         std::shared_ptr<EventHandler> eventHandler;
         std::shared_ptr<Sequencer> sequencer;

@@ -1,4 +1,4 @@
-#include "EventRegistry.hpp"
+#include "PerformanceManager.hpp"
 
 #include "utils/TimeUtils.hpp"
 
@@ -7,7 +7,7 @@
 using namespace mpc::eventregistry;
 using namespace mpc::concurrency;
 
-EventRegistry::EventRegistry()
+PerformanceManager::PerformanceManager()
     : AtomicStateExchange(
           [&](State &s)
           {
@@ -16,14 +16,14 @@ EventRegistry::EventRegistry()
 {
 }
 
-void EventRegistry::reserveState(State &s) const
+void PerformanceManager::reserveState(State &s) const
 {
     s.physicalPadEvents.reserve(CAPACITY);
     s.programPadEvents.reserve(CAPACITY);
     s.noteEvents.reserve(CAPACITY);
 }
 
-void EventRegistry::registerPhysicalPadPress(
+void PerformanceManager::registerPhysicalPadPress(
     const Source source, const lcdgui::ScreenId screen,
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
@@ -48,7 +48,7 @@ void EventRegistry::registerPhysicalPadPress(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerPhysicalPadAftertouch(
+void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
     const Source source, const std::function<void(void *)> &action) const
 {
@@ -60,7 +60,7 @@ void EventRegistry::registerPhysicalPadAftertouch(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerPhysicalPadRelease(
+void PerformanceManager::registerPhysicalPadRelease(
     const PhysicalPadIndex padIndex, const Source source,
     const std::function<void(void *)> &action) const
 {
@@ -72,7 +72,7 @@ void EventRegistry::registerPhysicalPadRelease(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerProgramPadPress(
+void PerformanceManager::registerProgramPadPress(
     const Source source, const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const ProgramPadIndex padIndex,
@@ -96,7 +96,7 @@ void EventRegistry::registerProgramPadPress(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerProgramPadAftertouch(const Source source,
+void PerformanceManager::registerProgramPadAftertouch(const Source source,
                                                  const ProgramPadIndex padIndex,
                                                  const ProgramIndex program,
                                                  const Pressure pressure) const
@@ -108,7 +108,7 @@ void EventRegistry::registerProgramPadAftertouch(const Source source,
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerProgramPadRelease(
+void PerformanceManager::registerProgramPadRelease(
     const Source source, const ProgramPadIndex padIndex,
     const ProgramIndex program, const std::function<void(void *)> &action) const
 {
@@ -120,7 +120,7 @@ void EventRegistry::registerProgramPadRelease(
     enqueue(std::move(msg));
 }
 
-NoteOnEvent EventRegistry::registerNoteOn(
+NoteOnEvent PerformanceManager::registerNoteOn(
     const Source source, const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
@@ -144,7 +144,7 @@ NoteOnEvent EventRegistry::registerNoteOn(
     return e;
 }
 
-void EventRegistry::registerNoteAftertouch(
+void PerformanceManager::registerNoteAftertouch(
     const Source source, const NoteNumber noteNumber, const Pressure pressure,
     const std::optional<MidiChannel> midiInputChannel) const
 {
@@ -156,7 +156,7 @@ void EventRegistry::registerNoteAftertouch(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerNoteOff(
+void PerformanceManager::registerNoteOff(
     const Source source, const NoteNumber noteNumber,
     const std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
@@ -172,12 +172,12 @@ void EventRegistry::registerNoteOff(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::clear() const
+void PerformanceManager::clear() const
 {
     enqueue({EventMessage::Type::Clear, {}, {}, {}});
 }
 
-void EventRegistry::applyMessage(const EventMessage &msg) noexcept
+void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
 {
     switch (msg.type)
     {

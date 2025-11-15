@@ -32,7 +32,7 @@
 #include <cassert>
 #include <memory>
 
-#include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/PerformanceManager.hpp"
 #include "lcdgui/ScreenNames.hpp"
 
 using namespace mpc::audiomidi;
@@ -126,14 +126,14 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
 
-    mpc.eventRegistry->registerNoteOn(
+    mpc.performanceManager->registerNoteOn(
         eventregistry::Source::Sequence, std::nullopt, screenId,
         track->getIndex(), ctx.drum->busType, note, noteOnEvent->getVelocity(),
         programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
-        mpc.eventRegistry->registerProgramPadPress(
+        mpc.performanceManager->registerProgramPadPress(
             eventregistry::Source::Sequence, std::nullopt, screenId,
             track->getIndex(), ctx.drum->busType, programPadIndex,
             noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
@@ -145,17 +145,17 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             noteOnEvent->getTick());
 
     auto noteOffEventFn = [note = noteOnEvent->getNote(), programIndex,
-                           eventRegistry = mpc.eventRegistry, programPadIndex,
+                           performanceManager = mpc.performanceManager, programPadIndex,
                            noteOffCtx]
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        eventRegistry->registerNoteOff(eventregistry::Source::Sequence, note,
+        performanceManager->registerNoteOff(eventregistry::Source::Sequence, note,
                                        noMidiChannel, [](void *) {});
 
         if (programPadIndex != -1)
         {
-            eventRegistry->registerProgramPadRelease(
+            performanceManager->registerProgramPadRelease(
                 eventregistry::Source::Sequence, programPadIndex, programIndex,
                 [](void *) {});
         }

@@ -20,7 +20,7 @@ namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::audiomidi
@@ -59,7 +59,7 @@ namespace mpc::command::context
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,
-            const std::shared_ptr<eventregistry::EventRegistry> &,
+            const std::shared_ptr<eventregistry::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<lcdgui::Screens> &,
@@ -75,7 +75,7 @@ namespace mpc::command::context
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,
-            const std::shared_ptr<eventregistry::EventRegistry> &,
+            const std::shared_ptr<eventregistry::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
             const std::shared_ptr<lcdgui::Screens> &,

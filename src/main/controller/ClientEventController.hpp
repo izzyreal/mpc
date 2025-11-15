@@ -20,7 +20,7 @@ namespace mpc
 
 namespace mpc::eventregistry
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::sequencer
