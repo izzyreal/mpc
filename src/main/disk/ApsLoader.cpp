@@ -264,7 +264,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         }
 
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
-        drum->setProgram(ProgramIndex(pgm));
+        drum->setProgramIndex(ProgramIndex(pgm));
         drum->setReceivePgmChange(
             apsParser.getDrumConfiguration(i)->getReceivePgmChange());
         drum->setReceiveMidiVolume(

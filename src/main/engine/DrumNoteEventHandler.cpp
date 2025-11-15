@@ -65,7 +65,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         return;
     }
 
-    auto program = c.sampler->getProgram(c.drum->getProgram());
+    auto program = c.sampler->getProgram(c.drum->getProgramIndex());
     auto np = program ? program->getNoteParameters(c.note) : nullptr;
 
     if (!np)

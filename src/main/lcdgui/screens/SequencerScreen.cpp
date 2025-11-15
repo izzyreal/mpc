@@ -452,7 +452,7 @@ void SequencerScreen::displayDeviceName() const
     {
         if (track->getDeviceIndex() == 0)
         {
-            const int pgm = drumBus->getProgram();
+            const int pgm = drumBus->getProgramIndex();
             const auto p = sampler->getProgram(pgm);
             findLabel("devicename")->setText(p->getName());
         }

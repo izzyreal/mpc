@@ -65,7 +65,8 @@ void LoadAProgramScreen::function(const int i)
                 {
                     if (sampler->getProgram(pgmIndex) == newProgram)
                     {
-                        getActiveDrumBus()->setProgram(ProgramIndex(pgmIndex));
+                        getActiveDrumBus()->setProgramIndex(
+                            ProgramIndex(pgmIndex));
                         break;
                     }
                 }

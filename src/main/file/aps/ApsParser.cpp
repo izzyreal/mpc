@@ -96,7 +96,7 @@ ApsParser::ApsParser(Mpc &mpc, std::string apsNameString)
         ApsMixer mixer(drumBus->getStereoMixerChannels(),
                        drumBus->getIndivFxMixerChannels());
 
-        ApsDrumConfiguration drumConfig(drumBus->getProgram(),
+        ApsDrumConfiguration drumConfig(drumBus->getProgramIndex(),
                                         drumBus->receivesPgmChange(),
                                         drumBus->receivesMidiVolume());
 

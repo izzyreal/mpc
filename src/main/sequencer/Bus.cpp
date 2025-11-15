@@ -11,8 +11,11 @@ using namespace mpc::engine;
 
 Bus::Bus(const BusType busType) : busType(busType) {}
 
-DrumBus::DrumBus(const int drumIndexToUse)
-    : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse)
+DrumBus::DrumBus(
+    const DrumBusIndex drumIndexToUse,
+    std::function<void(const ProgramIndex)> setProgramInPerformanceState)
+    : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
+      setProgramInPerformanceState(setProgramInPerformanceState)
 {
     receivePgmChange = true;
     receiveMidiVolume = true;
@@ -29,12 +32,12 @@ mpc::DrumBusIndex DrumBus::getIndex() const
     return drumIndex;
 }
 
-void DrumBus::setProgram(const ProgramIndex programIndexToUse)
+void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
 {
     programIndex = programIndexToUse;
 }
 
-mpc::ProgramIndex DrumBus::getProgram() const
+mpc::ProgramIndex DrumBus::getProgramIndex() const
 {
     return programIndex;
 }

@@ -54,7 +54,7 @@ void NoteRepeatProcessor::process(
 
     if (drumBus)
     {
-        program = sampler->getProgram(drumBus->getProgram());
+        program = sampler->getProgram(drumBus->getProgramIndex());
     }
 
     DrumNoteNumber note = assign16LevelsScreen->getNote();

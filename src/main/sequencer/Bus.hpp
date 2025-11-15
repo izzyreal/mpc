@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <functional>
 
 namespace mpc::engine
 {
@@ -35,13 +36,13 @@ namespace mpc::sequencer
     class DrumBus final : public Bus
     {
     public:
-        explicit DrumBus(int drumIndexToUse);
+        explicit DrumBus(DrumBusIndex, std::function<void(const ProgramIndex)> setProgramInPerformanceState);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
 
-        ProgramIndex getProgram() const;
-        void setProgram(ProgramIndex);
+        ProgramIndex getProgramIndex() const;
+        void setProgramIndex(ProgramIndex);
 
         bool receivesPgmChange() const;
         void setReceivePgmChange(bool b);
@@ -62,6 +63,7 @@ namespace mpc::sequencer
 
     private:
         const DrumBusIndex drumIndex;
+        const std::function<void(const ProgramIndex)> setProgramInPerformanceState;
         ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;

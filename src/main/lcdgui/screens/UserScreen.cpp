@@ -195,7 +195,7 @@ void UserScreen::displayDeviceName()
         {
             const auto programName =
                 sampler
-                    ->getProgram(sequencer->getDrumBus(busType)->getProgram())
+                    ->getProgram(sequencer->getDrumBus(busType)->getProgramIndex())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }

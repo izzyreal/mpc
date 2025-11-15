@@ -14,7 +14,7 @@ CopyProgramScreen::CopyProgramScreen(Mpc &mpc, const int layerIndex)
 
 void CopyProgramScreen::open()
 {
-    pgm0 = getActiveDrumBus()->getProgram();
+    pgm0 = getActiveDrumBus()->getProgramIndex();
     pgm1 = pgm0;
 
     displayPgm0();
@@ -36,7 +36,7 @@ void CopyProgramScreen::function(const int i)
             }
 
             sampler->copyProgram(pgm0, pgm1);
-            getActiveDrumBus()->setProgram(pgm1);
+            getActiveDrumBus()->setProgramIndex(pgm1);
             openScreenById(ScreenId::ProgramScreen);
             break;
         default:;

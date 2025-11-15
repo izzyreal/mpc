@@ -53,8 +53,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const std::shared_ptr<DrumBus> &drumBus, const Track *track)
 {
     const auto sampler = mpc.getSampler();
-    const auto programIndex = drumBus->getProgram();
-    const auto program = sampler->getProgram(drumBus->getProgram());
+    const auto programIndex = drumBus->getProgramIndex();
+    const auto program = sampler->getProgram(drumBus->getProgramIndex());
     const auto note = noteOnEvent->getNote();
     const ProgramPadIndex programPadIndex =
         program->getPadIndexFromNote(DrumNoteNumber(note));
@@ -233,7 +233,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
 
         assert(drumBus);
 
-        const auto program = sampler->getProgram(drumBus->getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgramIndex());
 
         const auto mixerSetupScreen =
             mpc.screens->get<ScreenId::MixerSetupScreen>();
@@ -267,7 +267,7 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto drumBus = mpc.getSequencer()->getDrumBus(*drumBusType);
         assert(drumBus);
         const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgram());
+            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
         const auto note = noteOnEvent->getNote();
 
         const auto velocityWithTrackVelocityRatioApplied =
@@ -312,7 +312,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         assert(drumBus);
 
         const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgram());
+            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
         const auto note = noteOffEvent->getNote();
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(

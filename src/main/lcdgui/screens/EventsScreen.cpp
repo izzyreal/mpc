@@ -510,7 +510,7 @@ void EventsScreen::displayDrumNotes()
         const auto track = sequencer->getSelectedTrack();
         const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
         assert(drumBus);
-        const auto program = sampler->getProgram(drumBus->getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgramIndex());
 
         const auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
         const auto padName = sampler->getPadName(

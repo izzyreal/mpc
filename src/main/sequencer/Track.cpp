@@ -672,7 +672,7 @@ void Track::playNext()
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
         {
-            const auto programIndex = drumBus->getProgram();
+            const auto programIndex = drumBus->getProgramIndex();
             const auto program = sampler->getProgram(programIndex);
 
             const auto noteNumber = note->getNote();

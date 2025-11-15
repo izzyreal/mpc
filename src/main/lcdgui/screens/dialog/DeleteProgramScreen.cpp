@@ -14,10 +14,7 @@ DeleteProgramScreen::DeleteProgramScreen(Mpc &mpc, const int layerIndex)
 
 void DeleteProgramScreen::open()
 {
-    auto allPrograms = sampler->getPrograms();
-
-    pgm = getActiveDrumBus()->getProgram();
-
+    pgm = getActiveDrumBus()->getProgramIndex();
     displayPgm();
 }
 

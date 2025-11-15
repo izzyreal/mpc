@@ -199,7 +199,7 @@ std::optional<mpc::ProgramIndex> ScreenComponent::getProgramIndex() const
         return std::nullopt;
     }
 
-    return drumBus->getProgram();
+    return drumBus->getProgramIndex();
 }
 
 std::shared_ptr<Program> ScreenComponent::getProgram() const

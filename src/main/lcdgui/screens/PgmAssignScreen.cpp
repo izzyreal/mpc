@@ -106,16 +106,16 @@ void PgmAssignScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        const auto pgm = getActiveDrumBus()->getProgram();
+        const auto pgm = getActiveDrumBus()->getProgramIndex();
 
         if (const auto candidate = sampler->getUsedProgram(pgm, i > 0);
             candidate != pgm)
         {
-            getActiveDrumBus()->setProgram(candidate);
+            getActiveDrumBus()->setProgramIndex(candidate);
 
             mpc.performanceManager->registerSetDrumProgram(
                 getActiveDrumBus()->getIndex(),
-                sampler->getProgram(getActiveDrumBus()->getProgram()));
+                sampler->getProgram(getActiveDrumBus()->getProgramIndex()));
 
             displayNote();
             displayOptionalNoteA();
@@ -307,7 +307,7 @@ void PgmAssignScreen::displayPgm() const
 {
     const auto program = getProgramOrThrow();
     findField("pgm")->setText(
-        StrUtil::padLeft(std::to_string(getActiveDrumBus()->getProgram() + 1),
+        StrUtil::padLeft(std::to_string(getActiveDrumBus()->getProgramIndex() + 1),
                          " ", 2) +
         "-" + program->getName());
 }

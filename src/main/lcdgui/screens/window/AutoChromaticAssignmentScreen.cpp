@@ -78,7 +78,7 @@ void AutoChromaticAssignmentScreen::function(const int i)
             {
                 if (programs[j].lock() == newProgram)
                 {
-                    getActiveDrumBus()->setProgram(ProgramIndex(j));
+                    getActiveDrumBus()->setProgramIndex(ProgramIndex(j));
                     break;
                 }
             }
