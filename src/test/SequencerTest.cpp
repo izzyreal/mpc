@@ -249,6 +249,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
     REQUIRE(seq2->getInitialTempo() == 119);
 
     sequencer->setSelectedSequenceIndex(mpc::SequenceIndex(1), false);
+    sequencer->getStateManager()->drainQueue();
     sequencer->getTransport()->setTempo(123);
 
     REQUIRE(seq1->getInitialTempo() == 122);

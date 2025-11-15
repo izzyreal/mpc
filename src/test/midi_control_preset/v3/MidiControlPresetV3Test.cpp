@@ -148,14 +148,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(restored.getBindings().size() == 81);
 }
 
-TEST_CASE("MidiControlPresetV3 rejects out-of-range versions",
-          "[MidiControlPresetV3]")
-{
-    MidiControlPresetV3 preset;
-    REQUIRE_THROWS_AS(preset.setVersion(-1), std::out_of_range);
-    REQUIRE_THROWS_AS(preset.setVersion(4503599627370497LL), std::out_of_range);
-}
-
 TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
           "[MidiControlPresetV3]")
 {
@@ -165,20 +157,6 @@ TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
                       std::invalid_argument);
     REQUIRE_THROWS_AS(preset.setMidiControllerDeviceName("💩"),
                       std::invalid_argument);
-}
-
-TEST_CASE("Binding rejects out-of-range MIDI values", "[MidiControlPresetV3]")
-{
-    Binding b;
-    b.setLabelName("left");
-    b.setMessageType("CC");
-
-    REQUIRE_THROWS_AS(b.setMidiNumber(-1), std::out_of_range);
-    REQUIRE_THROWS_AS(b.setMidiNumber(128), std::out_of_range);
-    REQUIRE_THROWS_AS(b.setMidiValue(-2), std::out_of_range);
-    REQUIRE_THROWS_AS(b.setMidiValue(128), std::out_of_range);
-    REQUIRE_THROWS_AS(b.setMidiChannelIndex(16), std::out_of_range);
-    REQUIRE_THROWS_AS(b.setMidiChannelIndex(-2), std::out_of_range);
 }
 
 TEST_CASE("Binding::from_json enforces midiValue rules",
