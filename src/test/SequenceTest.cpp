@@ -21,8 +21,8 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
-    auto noteEvent = std::make_shared<NoteOnEvent>(35);
-    noteEvent->setVelocity(127);
+    auto noteEvent = std::make_shared<NoteOnEvent>(mpc::NoteNumber(35));
+    noteEvent->setVelocity(mpc::Velocity(127));
     noteEvent->setDuration(42);
     noteEvent->setTick(0);
     tr->insertEventWhileRetainingSort(noteEvent);

@@ -76,9 +76,9 @@ TEST_CASE("ALL file song", "[allfile]")
     song->setName("TestSong");
     song->insertStep(0);
     song->insertStep(1);
-    song->getStep(0).lock()->setSequence(0);
+    song->getStep(0).lock()->setSequence(mpc::SequenceIndex(0));
     song->getStep(0).lock()->setRepeats(1);
-    song->getStep(1).lock()->setSequence(1);
+    song->getStep(1).lock()->setSequence(mpc::SequenceIndex(1));
     song->getStep(1).lock()->setRepeats(2);
 
     auto disk = mpc.getDisk();
@@ -136,10 +136,10 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
-    auto event = tr->recordNoteEventNonLive(0, 60, 127);
-    event->setNote(0);
+    auto event = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60), mpc::Velocity(127));
+    event->setNote(mpc::NoteNumber(0));
     event->setTrack(tr->getIndex());
-    event->setVelocity(127);
+    event->setVelocity(mpc::Velocity(127));
     event->setDuration(1600);
     event->setTick(0);
     event->incrementVariationType(3);

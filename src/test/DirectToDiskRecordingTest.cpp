@@ -1,4 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
+#include "IntTypes.hpp"
+#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
@@ -43,8 +45,8 @@ TEST_CASE("Direct to disk recording does not start with silence",
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);
     seq->setInitialTempo(300);
-    auto event = seq->getTrack(0)->recordNoteEventNonLive(0, 35, 127);
-    seq->getTrack(0)->finalizeNoteEventSynced(event, 1);
+    auto event = seq->getTrack(0)->recordNoteEventNonLive(0, mpc::NoteNumber(35), mpc::Velocity(127));
+    event->finalizeNonLive(1);
 
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);

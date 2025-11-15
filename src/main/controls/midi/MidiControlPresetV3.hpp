@@ -5,11 +5,10 @@
 #include <stdexcept>
 #include <set>
 #include <nlohmann/json.hpp>
-#include "ConstrainedInt.hpp"
+#include "IntTypes.hpp"
 
 namespace mpc::controls::midi
 {
-
     inline constexpr long long CURRENT_PRESET_VERSION = 3;
 
     using json = nlohmann::json;
@@ -18,9 +17,9 @@ namespace mpc::controls::midi
     {
         std::string labelName;
         std::string messageType;
-        ConstrainedInt<int, 0, 127> midiNumber{0};
-        ConstrainedInt<int, -1, 127> midiValue{0};
-        ConstrainedInt<int, -1, 15> midiChannelIndex{0};
+        MidiNumber midiNumber{0};
+        MidiValue midiValue{0};
+        MidiChannel midiChannelIndex{0};
         bool enabled{false};
 
         Binding() = default;
@@ -48,15 +47,15 @@ namespace mpc::controls::midi
 
         void setMidiNumber(int n)
         {
-            midiNumber = {n};
+            midiNumber = MidiNumber(n);
         }
         void setMidiValue(int v)
         {
-            midiValue = {v};
+            midiValue = MidiValue(v);
         }
         void setMidiChannelIndex(int ch)
         {
-            midiChannelIndex = {ch};
+            midiChannelIndex = MidiChannel(ch);
         }
         void setEnabled(bool e)
         {
@@ -146,7 +145,7 @@ namespace mpc::controls::midi
         // --- Setters with schema validation ---
         void setVersion(long long v)
         {
-            version = {v};
+            version = ConstrainedInt<long long, 0, 4503599627370496LL>{v};
         }
 
         void setName(const std::string &n)

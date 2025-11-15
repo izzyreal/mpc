@@ -27,6 +27,9 @@ namespace mpc
     using SequenceIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::LAST_SEQUENCE_INDEX>;
 
+    using MidiNumber = ConstrainedInt<int8_t, 0, 127>;
+    using MidiValue = ConstrainedInt<int8_t, -1, 127>;
+
     using NoteEventId = uint32_t;
     constexpr NoteEventId NoNoteEventId = 0;
     constexpr NoteEventId MinNoteEventId{1};
@@ -40,6 +43,8 @@ namespace mpc
 
     using TimeInMilliseconds = int64_t;
     using TimeInNanoseconds = int64_t;
+
+    constexpr MidiValue NoMidiValue{-1};
 
     constexpr SequenceIndex NoSequenceIndex{-1};
     constexpr SequenceIndex MinSequenceIndex{0};

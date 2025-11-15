@@ -8,6 +8,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
+using namespace mpc;
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
 
@@ -19,17 +20,17 @@ TEST_CASE("timing-correct", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = tr->recordNoteEventNonLive(12, 88, 127);
-    tr->finalizeNoteEventSynced(n0, 1);
+    auto n0 = tr->recordNoteEventNonLive(12, NoteNumber(88), Velocity(127));
+    n0->finalizeNonLive(1);
 
-    auto n0a = tr->recordNoteEventNonLive(13, 89, 127);
-    tr->finalizeNoteEventSynced(n0a, 1);
+    auto n0a = tr->recordNoteEventNonLive(13, NoteNumber(89), Velocity(127));
+    n0a->finalizeNonLive(1);
 
-    auto n1 = tr->recordNoteEventNonLive(23, 90, 127);
-    tr->finalizeNoteEventSynced(n1, 1);
+    auto n1 = tr->recordNoteEventNonLive(23, NoteNumber(90), Velocity(127));
+    n1->finalizeNonLive(1);
 
-    auto event2 = tr->recordNoteEventNonLive(22, 60, 127);
-    tr->finalizeNoteEventSynced(event2, 1);
+    auto event2 = tr->recordNoteEventNonLive(22, NoteNumber(60), Velocity(127));
+    event2->finalizeNonLive(1);
 
     REQUIRE(tr->getEvent(0) == n0);
     REQUIRE(tr->getEvent(1) == n0a);
@@ -37,7 +38,7 @@ TEST_CASE("timing-correct", "[track]")
     REQUIRE(tr->getEvent(3) == n1);
 
     auto n2 = event2;
-    n2->setNote(91);
+    n2->setNote(NoteNumber(91));
     int swingPercentage = 50;
     tr->timingCorrect(0, 0, n0, 24, swingPercentage);
     tr->timingCorrect(0, 0, n0a, 24, swingPercentage);
@@ -68,11 +69,11 @@ TEST_CASE("swing1", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n1 = tr->recordNoteEventNonLive(23, 90, 127);
-    tr->finalizeNoteEventSynced(n1, 1);
+    auto n1 = tr->recordNoteEventNonLive(23, NoteNumber(90), Velocity(127));
+    n1->finalizeNonLive(1);
 
-    auto event2 = tr->recordNoteEventNonLive(22, 91, 127);
-    tr->finalizeNoteEventSynced(event2, 1);
+    auto event2 = tr->recordNoteEventNonLive(22, NoteNumber(91), Velocity(127));
+    event2->finalizeNonLive(1);
 
     REQUIRE(tr->getEvent(0) == event2);
 
@@ -103,8 +104,8 @@ TEST_CASE("quantize", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = tr->recordNoteEventNonLive(0, 60, 127);
-    tr->finalizeNoteEventSynced(n0, 1);
+    auto n0 = tr->recordNoteEventNonLive(0, NoteNumber(60), Velocity(127));
+    n0->finalizeNonLive(1);
 
     for (int i = 0; i <= 12; i++)
     {
