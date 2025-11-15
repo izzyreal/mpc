@@ -19,7 +19,7 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/NoteEvent.hpp"
 
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;

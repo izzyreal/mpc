@@ -1,12 +1,12 @@
 #pragma once
 
-#include "eventregistry/PerformanceState.hpp"
+#include "performance/PerformanceState.hpp"
 #include "concurrency/AtomicStateExchange.hpp"
 #include "IntTypes.hpp"
-#include "eventregistry/PerformanceEventSource.hpp"
-#include "eventregistry/EventTypes.hpp"
-#include "eventregistry/PerformanceMessage.hpp"
-#include "eventregistry/PerformanceStateView.hpp"
+#include "performance/PerformanceEventSource.hpp"
+#include "performance/EventTypes.hpp"
+#include "performance/PerformanceMessage.hpp"
+#include "performance/PerformanceStateView.hpp"
 #include "sequencer/BusType.hpp"
 
 #include <optional>

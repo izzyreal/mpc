@@ -32,7 +32,7 @@
 #include <cassert>
 #include <memory>
 
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "lcdgui/ScreenNames.hpp"
 
 using namespace mpc::audiomidi;

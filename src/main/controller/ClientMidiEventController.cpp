@@ -5,7 +5,7 @@
 #include "controller/ClientEventController.hpp"
 
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
-#include "eventregistry/EventTypes.hpp"
+#include "performance/EventTypes.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 

@@ -16,7 +16,7 @@
 #include "engine/Voice.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 

@@ -1,7 +1,7 @@
 #include "NoteRepeatProcessor.hpp"
 
 #include "sequencer/Transport.hpp"
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "hardware/Component.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"

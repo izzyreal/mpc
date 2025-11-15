@@ -2,7 +2,7 @@
 
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOffContext.hpp"
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"

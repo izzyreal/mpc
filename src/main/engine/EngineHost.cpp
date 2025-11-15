@@ -32,7 +32,7 @@
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"

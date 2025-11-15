@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 
 #include <memory>
 #include <functional>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/PerformanceEventSource.hpp"
+#include "performance/PerformanceEventSource.hpp"
 
 #include "IntTypes.hpp"
 #include "controller/Bank.hpp"

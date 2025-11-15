@@ -1,6 +1,6 @@
 #include "PerformanceStateView.hpp"
 
-#include "eventregistry/PerformanceState.hpp"
+#include "performance/PerformanceState.hpp"
 
 using namespace mpc;
 using namespace mpc::eventregistry;

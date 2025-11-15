@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/EventTypes.hpp"
+#include "performance/EventTypes.hpp"
 
 namespace mpc::eventregistry
 {

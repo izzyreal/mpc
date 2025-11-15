@@ -6,7 +6,7 @@
 #include "DemoFiles.hpp"
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "eventregistry/PerformanceManager.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include "Paths.hpp"
