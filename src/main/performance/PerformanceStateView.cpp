@@ -1,11 +1,16 @@
-#include "StateView.hpp"
+#include "PerformanceStateView.hpp"
 
-#include "eventregistry/State.hpp"
+#include "performance/PerformanceState.hpp"
 
 using namespace mpc;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 
-bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
+PerformanceStateView::PerformanceStateView(const std::shared_ptr<const PerformanceState> s) noexcept
+    : state(s)
+{
+}
+
+bool PerformanceStateView::isProgramPadPressed(const ProgramPadIndex idx,
                                     const ProgramIndex programIndex) const
 {
     for (auto &e : state->programPadEvents)
@@ -18,27 +23,15 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
     return false;
 }
 
-bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
-                                            const Source src) const
-{
-    for (auto &e : state->programPadEvents)
-    {
-        if (e.padIndex == idx && e.source == src)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
+VelocityOrPressure
+PerformanceStateView::getPressedProgramPadAfterTouchOrVelocity(
     const ProgramPadIndex idx) const
 {
     VelocityOrPressure result;
 
     for (const auto &e : state->programPadEvents)
     {
-        if (e.source == Source::NoteRepeat)
+        if (e.source == PerformanceEventSource::NoteRepeat)
         {
             continue;
         }
@@ -67,7 +60,7 @@ VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
         "feature.\n");
 }
 
-bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
+bool PerformanceStateView::isProgramPadPressed(const ProgramPadIndex idx) const
 {
     for (auto &e : state->programPadEvents)
     {
@@ -79,9 +72,10 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
     return false;
 }
 
-std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
+std::optional<ProgramPadPressEvent>
+PerformanceStateView::getMostRecentProgramPadPress(
     const ProgramPadIndex idx,
-    const std::vector<Source> &sourcesToExclude) const
+    const std::vector<PerformanceEventSource> &sourcesToExclude) const
 {
     std::optional<ProgramPadPressEvent> latest = std::nullopt;
 
@@ -115,12 +109,7 @@ std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
     return latest;
 }
 
-int StateView::getTotalPressedProgramPadCount() const
-{
-    return state->programPadEvents.size();
-}
-
-int StateView::getTotalNoteOnCount() const
+int PerformanceStateView::getTotalNoteOnCount() const
 {
     return state->noteEvents.size();
 }

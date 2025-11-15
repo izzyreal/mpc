@@ -12,7 +12,7 @@
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"
 #include <memory>
 #include <utility>

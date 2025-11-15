@@ -1,25 +1,25 @@
 #pragma once
 
-#include "eventregistry/EventTypes.hpp"
+#include "performance/EventTypes.hpp"
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
-    struct State
+    struct PerformanceState
     {
         PhysicalPadPressEvents physicalPadEvents;
         ProgramPadPressEvents programPadEvents;
         NoteOnEvents noteEvents;
 
-        State() = default;
+        PerformanceState() = default;
 
-        State(const State &other) noexcept
+        PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
               noteEvents(other.noteEvents)
         {
         }
 
-        State &operator=(const State &other) noexcept
+        PerformanceState &operator=(const PerformanceState &other) noexcept
         {
             physicalPadEvents = other.physicalPadEvents;
             programPadEvents = other.programPadEvents;
@@ -27,4 +27,4 @@ namespace mpc::eventregistry
             return *this;
         }
     };
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

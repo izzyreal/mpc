@@ -16,7 +16,7 @@
 #include "engine/Voice.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
@@ -38,7 +38,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
 
@@ -71,7 +71,7 @@ Sequencer::Sequencer(
     const std::function<void()> &stopBouncing,
     const std::function<bool()> &isBouncing,
     const std::function<bool()> &isEraseButtonPressed,
-    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled,
@@ -81,7 +81,7 @@ Sequencer::Sequencer(
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
-      isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
+      isEraseButtonPressed(isEraseButtonPressed), performanceManager(performanceManager),
       sampler(sampler), eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled),
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
@@ -427,7 +427,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         [&](const ProgramPadIndex programPadIndex,
             const ProgramIndex programIndex)
         {
-            return eventRegistry->getSnapshot().isProgramPadPressed(
+            return performanceManager->getSnapshot().isProgramPadPressed(
                 programPadIndex, programIndex);
         },
         sampler, eventHandler,

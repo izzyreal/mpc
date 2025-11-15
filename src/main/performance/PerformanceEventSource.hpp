@@ -1,8 +1,8 @@
 #pragma once
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
-    enum class Source
+    enum class PerformanceEventSource
     {
         VirtualMpcHardware,
         Sequence,
@@ -14,27 +14,27 @@ namespace mpc::eventregistry
     /*
     static std::string sourceToString(const Source s)
     {
-        if (s == Source::VirtualMpcHardware)
+        if (s == PerformanceEventSource::VirtualMpcHardware)
         {
             return "VirtualMpcHardware";
         }
-        if (s == Source::Sequence)
+        if (s == PerformanceEventSource::Sequence)
         {
             return "Sequence";
         }
-        if (s == Source::MidiInput)
+        if (s == PerformanceEventSource::MidiInput)
         {
             return "MidiInput";
         }
-        if (s == Source::StepEditor)
+        if (s == PerformanceEventSource::StepEditor)
         {
             return "StepEditor";
         }
-        if (s == Source::NoteRepeat)
+        if (s == PerformanceEventSource::NoteRepeat)
         {
             return "NoteRepeat";
         }
         return "Unknown";
     }
     */
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

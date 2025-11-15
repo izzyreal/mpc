@@ -18,9 +18,9 @@ namespace mpc::sequencer
     class Sequencer;
 } // namespace mpc::sequencer
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc::audiomidi
@@ -51,7 +51,7 @@ namespace mpc::command::context
     public:
         static std::shared_ptr<TriggerLocalNoteOnContext>
         buildTriggerLocalNoteOnContext(
-            eventregistry::Source, const eventregistry::NoteOnEvent &,
+            performance::PerformanceEventSource, const performance::NoteOnEvent &,
             NoteNumber note, Velocity velocity, sequencer::Track *,
             const std::shared_ptr<sequencer::Bus> &,
             const std::shared_ptr<lcdgui::ScreenComponent> &,
@@ -59,7 +59,7 @@ namespace mpc::command::context
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,
-            const std::shared_ptr<eventregistry::EventRegistry> &,
+            const std::shared_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<lcdgui::Screens> &,
@@ -67,7 +67,7 @@ namespace mpc::command::context
 
         static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerLocalNoteOffContext(
-            eventregistry::Source source, NoteNumber note,
+            performance::PerformanceEventSource source, NoteNumber note,
             NoteEventId recordedNoteOnEventId, sequencer::Track *,
             sequencer::BusType,
             const std::shared_ptr<lcdgui::ScreenComponent> &,
@@ -75,7 +75,7 @@ namespace mpc::command::context
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<engine::SequencerPlaybackEngine> &,
-            const std::shared_ptr<eventregistry::EventRegistry> &,
+            const std::shared_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
             const std::shared_ptr<lcdgui::Screens> &,

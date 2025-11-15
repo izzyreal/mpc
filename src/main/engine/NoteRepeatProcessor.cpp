@@ -1,7 +1,7 @@
 #include "NoteRepeatProcessor.hpp"
 
 #include "sequencer/Transport.hpp"
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "hardware/Component.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -22,20 +22,20 @@ using namespace mpc::sequencer;
 using namespace mpc::sampler;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::engine::audio::mixer;
 
 NoteRepeatProcessor::NoteRepeatProcessor(
     std::shared_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
     std::shared_ptr<AudioMixer> m, std::shared_ptr<Assign16LevelsScreen> a,
-    std::shared_ptr<MixerSetupScreen> ms, std::shared_ptr<EventRegistry> e,
+    std::shared_ptr<MixerSetupScreen> ms, std::shared_ptr<PerformanceManager> e,
     std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
     std::vector<MixerInterconnection *> &mi,
     const std::function<bool()> &isFullLevelEnabled,
     const std::function<bool()> &isSixteenLevelsEnabled)
     : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
       assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
-      eventRegistry(std::move(e)), hardwareSlider(std::move(h)), voices(v),
+      performanceManager(std::move(e)), hardwareSlider(std::move(h)), voices(v),
       mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
@@ -59,10 +59,10 @@ void NoteRepeatProcessor::process(
 
     DrumNoteNumber note = assign16LevelsScreen->getNote();
 
-    const auto snapshot = eventRegistry->getSnapshot();
+    const auto snapshot = performanceManager->getSnapshot();
 
-    static const std::vector sourcesToExclude{Source::NoteRepeat,
-                                              Source::Sequence};
+    static const std::vector sourcesToExclude{PerformanceEventSource::NoteRepeat,
+                                              PerformanceEventSource::Sequence};
 
     for (int programPadIndex = 0;
          programPadIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;

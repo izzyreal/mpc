@@ -19,7 +19,7 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/NoteEvent.hpp"
 
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
@@ -28,13 +28,13 @@ using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace mpc::hardware;
 using namespace mpc::sampler;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::audiomidi;
 using namespace mpc::engine;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    const Source source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
+    const PerformanceEventSource source, const performance::NoteOnEvent &registryNoteOnEvent,
     const NoteNumber note, const Velocity velocity, Track *track,
     const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
@@ -42,7 +42,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
-    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
@@ -90,7 +90,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{
             source,
-            eventRegistry,
+            performanceManager,
             registryNoteOnEvent,
             isSequencerScreen,
             programPadIndex,
@@ -122,14 +122,14 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    const Source source, const NoteNumber note,
+    const PerformanceEventSource source, const NoteNumber note,
     const NoteEventId recordedNoteOnEventId, Track *track,
     const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
-    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
@@ -137,7 +137,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
-    const auto registrySnapshot = eventRegistry->getSnapshot();
+    const auto registrySnapshot = performanceManager->getSnapshot();
 
     std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent;
 
@@ -179,7 +179,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     return std::make_shared<TriggerLocalNoteOffContext>(
         TriggerLocalNoteOffContext{
             source,
-            eventRegistry,
+            performanceManager,
             sequencer->getBus(busType),
             program,
             programPadIndex,

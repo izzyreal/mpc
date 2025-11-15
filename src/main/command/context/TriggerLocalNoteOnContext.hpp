@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 
 #include <memory>
 #include <functional>
@@ -10,9 +10,9 @@ namespace mpc::engine
     class SequencerPlaybackEngine;
 }
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
-    class EventRegistry;
+    class PerformanceManager;
 }
 
 namespace mpc ::lcdgui
@@ -48,9 +48,9 @@ namespace mpc::command::context
 {
     struct TriggerLocalNoteOnContext
     {
-        eventregistry::Source source;
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
-        eventregistry::NoteOnEvent registryNoteOnEvent;
+        performance::PerformanceEventSource source;
+        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        performance::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
         std::optional<ProgramPadIndex> programPadIndex;
         Velocity velocity;

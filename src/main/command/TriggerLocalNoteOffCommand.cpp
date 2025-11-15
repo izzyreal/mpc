@@ -2,7 +2,7 @@
 
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOffContext.hpp"
-#include "eventregistry/EventRegistry.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -49,7 +49,7 @@ void TriggerLocalNoteOffCommand::execute()
     if (ctx->recordOnEvent &&
         !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
     {
-        const auto snapshot = ctx->eventRegistry->getSnapshot();
+        const auto snapshot = ctx->performanceManager->getSnapshot();
 
         const bool thisIsTheLastActiveNoteOn =
             snapshot.getTotalNoteOnCount() == 1;

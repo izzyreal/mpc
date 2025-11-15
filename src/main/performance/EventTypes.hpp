@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/Source.hpp"
+#include "performance/PerformanceEventSource.hpp"
 
 #include "IntTypes.hpp"
 #include "controller/Bank.hpp"
@@ -10,12 +10,12 @@
 #include <vector>
 #include <cstdint>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     struct PhysicalPadPressEvent
     {
         PhysicalPadIndex padIndex;
-        Source source;
+        PerformanceEventSource source;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
         sequencer::BusType busType;
@@ -40,7 +40,7 @@ namespace mpc::eventregistry
     struct ProgramPadPressEvent
     {
         ProgramPadIndex padIndex;
-        Source source;
+        PerformanceEventSource source;
         MidiChannel midiInputChannel;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
@@ -68,7 +68,7 @@ namespace mpc::eventregistry
     struct NoteOnEvent
     {
         NoteNumber noteNumber;
-        Source source;
+        PerformanceEventSource source;
         MidiChannel midiInputChannel;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
@@ -93,12 +93,6 @@ namespace mpc::eventregistry
     };
 
     using PhysicalPadPressEvents = std::vector<PhysicalPadPressEvent>;
-    using PhysicalPadAftertouchEvents = std::vector<PhysicalPadAftertouchEvent>;
-    using PhysicalPadReleaseEvents = std::vector<PhysicalPadReleaseEvent>;
     using ProgramPadPressEvents = std::vector<ProgramPadPressEvent>;
-    using ProgramPadAftertouchEvents = std::vector<ProgramPadAftertouchEvent>;
-    using ProgramPadReleaseEvents = std::vector<ProgramPadReleaseEvent>;
     using NoteOnEvents = std::vector<NoteOnEvent>;
-    using NoteAftertouchEvents = std::vector<NoteAftertouchEvent>;
-    using NoteOffEvents = std::vector<NoteOffEvent>;
-} // namespace mpc::eventregistry
+} // namespace mpc::performance
