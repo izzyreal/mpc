@@ -8,10 +8,10 @@ namespace mpc::eventregistry
 {
     struct PerformanceState;
 
-    class StateView
+    class PerformanceStateView
     {
     public:
-        explicit StateView(std::shared_ptr<const PerformanceState> s) noexcept;
+        explicit PerformanceStateView(std::shared_ptr<const PerformanceState> s) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;

@@ -6,7 +6,7 @@
 #include "eventregistry/PerformanceEventSource.hpp"
 #include "eventregistry/EventTypes.hpp"
 #include "eventregistry/PerformanceMessage.hpp"
-#include "eventregistry/StateView.hpp"
+#include "eventregistry/PerformanceStateView.hpp"
 #include "sequencer/BusType.hpp"
 
 #include <optional>
@@ -15,7 +15,7 @@
 namespace mpc::eventregistry
 {
     class PerformanceManager final
-        : public concurrency::AtomicStateExchange<PerformanceState, StateView,
+        : public concurrency::AtomicStateExchange<PerformanceState, PerformanceStateView,
                                                   PerformanceMessage>
     {
     public:
