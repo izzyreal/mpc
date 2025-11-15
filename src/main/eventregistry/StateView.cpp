@@ -18,19 +18,6 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
     return false;
 }
 
-bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
-                                            const PerformanceEventSource src) const
-{
-    for (auto &e : state->programPadEvents)
-    {
-        if (e.padIndex == idx && e.source == src)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
     const ProgramPadIndex idx) const
 {

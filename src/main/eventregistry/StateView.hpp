@@ -16,7 +16,6 @@ namespace mpc::eventregistry
         {
         }
 
-        bool isProgramPadPressedBySource(ProgramPadIndex, PerformanceEventSource) const;
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
 
