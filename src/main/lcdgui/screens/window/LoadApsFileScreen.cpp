@@ -24,7 +24,10 @@ void LoadApsFileScreen::function(const int i)
         {
             const std::function on_success = [&]
             {
-                ls->closeRecentScreensUntilReachingLayer(0);
+                ls->postToUiThread([ls = ls]
+                {
+                    ls->closeRecentScreensUntilReachingLayer(0);
+                });
             };
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
