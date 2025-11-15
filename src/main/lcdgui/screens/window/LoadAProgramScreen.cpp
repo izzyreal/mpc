@@ -34,7 +34,6 @@ void LoadAProgramScreen::turnWheel(const int i)
 
 void LoadAProgramScreen::function(const int i)
 {
-
     const auto selectedFile =
         mpc.screens->get<ScreenId::LoadScreen>()->getSelectedFile();
 

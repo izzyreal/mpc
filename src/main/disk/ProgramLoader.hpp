@@ -30,8 +30,7 @@ namespace mpc::disk
 
     private:
         static void showLoadingSoundNamePopup(Mpc &mpc, const std::string &name,
-                                              const std::string &ext,
-                                              int sampleSize);
+                                              const std::string &ext);
         static void notFound(Mpc &, const std::string &soundFileName);
     };
 } // namespace mpc::disk

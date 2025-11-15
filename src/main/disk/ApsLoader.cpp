@@ -326,7 +326,7 @@ void ApsLoader::showPopup(Mpc &mpc, const std::string &name,
                           const std::string &ext)
 {
     const std::string msg =
-        "LOADING " +
+        "Loading " +
         StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
     auto ls = mpc.getLayeredScreen();
     ls->postToUiThread([ls, msg]
