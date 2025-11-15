@@ -34,7 +34,7 @@ using namespace mpc::engine;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    const Source source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
+    const PerformanceEventSource source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
     const NoteNumber note, const Velocity velocity, Track *track,
     const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
@@ -122,7 +122,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    const Source source, const NoteNumber note,
+    const PerformanceEventSource source, const NoteNumber note,
     const NoteEventId recordedNoteOnEventId, Track *track,
     const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,

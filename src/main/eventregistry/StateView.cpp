@@ -1,6 +1,6 @@
 #include "StateView.hpp"
 
-#include "eventregistry/State.hpp"
+#include "eventregistry/PerformanceState.hpp"
 
 using namespace mpc;
 using namespace mpc::eventregistry;
@@ -19,7 +19,7 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
 }
 
 bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
-                                            const Source src) const
+                                            const PerformanceEventSource src) const
 {
     for (auto &e : state->programPadEvents)
     {
@@ -38,7 +38,7 @@ VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
 
     for (const auto &e : state->programPadEvents)
     {
-        if (e.source == Source::NoteRepeat)
+        if (e.source == PerformanceEventSource::NoteRepeat)
         {
             continue;
         }
@@ -81,7 +81,7 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
 
 std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
     const ProgramPadIndex idx,
-    const std::vector<Source> &sourcesToExclude) const
+    const std::vector<PerformanceEventSource> &sourcesToExclude) const
 {
     std::optional<ProgramPadPressEvent> latest = std::nullopt;
 

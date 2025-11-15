@@ -6,7 +6,7 @@
 
 namespace mpc::eventregistry
 {
-    struct EventMessage
+    struct PerformanceMessage
     {
         enum class Type
         {
@@ -34,13 +34,13 @@ namespace mpc::eventregistry
         NoteAftertouchEvent noteAftertouchEvent;
         NoteOffEvent noteOffEvent;
 
-        Source source;
+        PerformanceEventSource source;
         std::function<void(void *)> action = [](void *) {};
 
-        EventMessage() = default;
-        EventMessage(const EventMessage &) = delete;
-        EventMessage &operator=(const EventMessage &) = delete;
-        EventMessage(EventMessage &&) noexcept = default;
-        EventMessage &operator=(EventMessage &&) noexcept = default;
+        PerformanceMessage() = default;
+        PerformanceMessage(const PerformanceMessage &) = delete;
+        PerformanceMessage &operator=(const PerformanceMessage &) = delete;
+        PerformanceMessage(PerformanceMessage &&) noexcept = default;
+        PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
     };
 } // namespace mpc::eventregistry

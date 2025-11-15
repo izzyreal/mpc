@@ -4,22 +4,22 @@
 
 namespace mpc::eventregistry
 {
-    struct State
+    struct PerformanceState
     {
         PhysicalPadPressEvents physicalPadEvents;
         ProgramPadPressEvents programPadEvents;
         NoteOnEvents noteEvents;
 
-        State() = default;
+        PerformanceState() = default;
 
-        State(const State &other) noexcept
+        PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
               noteEvents(other.noteEvents)
         {
         }
 
-        State &operator=(const State &other) noexcept
+        PerformanceState &operator=(const PerformanceState &other) noexcept
         {
             physicalPadEvents = other.physicalPadEvents;
             programPadEvents = other.programPadEvents;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eventregistry/Source.hpp"
+#include "eventregistry/PerformanceEventSource.hpp"
 
 #include "IntTypes.hpp"
 #include "controller/Bank.hpp"
@@ -15,7 +15,7 @@ namespace mpc::eventregistry
     struct PhysicalPadPressEvent
     {
         PhysicalPadIndex padIndex;
-        Source source;
+        PerformanceEventSource source;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
         sequencer::BusType busType;
@@ -40,7 +40,7 @@ namespace mpc::eventregistry
     struct ProgramPadPressEvent
     {
         ProgramPadIndex padIndex;
-        Source source;
+        PerformanceEventSource source;
         MidiChannel midiInputChannel;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
@@ -68,7 +68,7 @@ namespace mpc::eventregistry
     struct NoteOnEvent
     {
         NoteNumber noteNumber;
-        Source source;
+        PerformanceEventSource source;
         MidiChannel midiInputChannel;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;

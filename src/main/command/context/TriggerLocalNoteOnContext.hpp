@@ -48,7 +48,7 @@ namespace mpc::command::context
 {
     struct TriggerLocalNoteOnContext
     {
-        eventregistry::Source source;
+        eventregistry::PerformanceEventSource source;
         std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         eventregistry::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;

@@ -34,7 +34,7 @@ namespace mpc::command::context
 {
     struct TriggerLocalNoteOffContext
     {
-        eventregistry::Source source;
+        eventregistry::PerformanceEventSource source;
         std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
         std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;

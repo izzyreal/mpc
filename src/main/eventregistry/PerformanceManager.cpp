@@ -9,14 +9,14 @@ using namespace mpc::concurrency;
 
 PerformanceManager::PerformanceManager()
     : AtomicStateExchange(
-          [&](State &s)
+          [&](PerformanceState &s)
           {
               reserveState(s);
           })
 {
 }
 
-void PerformanceManager::reserveState(State &s) const
+void PerformanceManager::reserveState(PerformanceState &s) const
 {
     s.physicalPadEvents.reserve(CAPACITY);
     s.programPadEvents.reserve(CAPACITY);
@@ -24,7 +24,7 @@ void PerformanceManager::reserveState(State &s) const
 }
 
 void PerformanceManager::registerPhysicalPadPress(
-    const Source source, const lcdgui::ScreenId screen,
+    const PerformanceEventSource source, const lcdgui::ScreenId screen,
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
     const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
@@ -41,7 +41,7 @@ void PerformanceManager::registerPhysicalPadPress(
                                   programIndex.value_or(NoProgramIndex),
                                   noteNumber.value_or(NoNoteNumber),
                                   NoPressure};
-    EventMessage msg{EventMessage::Type::PhysicalPadPress};
+    PerformanceMessage msg{PerformanceMessage::Type::PhysicalPadPress};
     msg.physicalPadPress = e;
     msg.source = source;
     msg.action = action;
@@ -50,10 +50,10 @@ void PerformanceManager::registerPhysicalPadPress(
 
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
-    const Source source, const std::function<void(void *)> &action) const
+    const PerformanceEventSource source, const std::function<void(void *)> &action) const
 {
     const PhysicalPadAftertouchEvent e{padIndex, pressure};
-    EventMessage msg{EventMessage::Type::PhysicalPadAftertouch};
+    PerformanceMessage msg{PerformanceMessage::Type::PhysicalPadAftertouch};
     msg.physicalPadAftertouch = e;
     msg.source = source;
     msg.action = action;
@@ -61,11 +61,11 @@ void PerformanceManager::registerPhysicalPadAftertouch(
 }
 
 void PerformanceManager::registerPhysicalPadRelease(
-    const PhysicalPadIndex padIndex, const Source source,
+    const PhysicalPadIndex padIndex, const PerformanceEventSource source,
     const std::function<void(void *)> &action) const
 {
     const PhysicalPadReleaseEvent e{padIndex};
-    EventMessage msg{EventMessage::Type::PhysicalPadRelease};
+    PerformanceMessage msg{PerformanceMessage::Type::PhysicalPadRelease};
     msg.physicalPadRelease = e;
     msg.source = source;
     msg.action = action;
@@ -73,7 +73,7 @@ void PerformanceManager::registerPhysicalPadRelease(
 }
 
 void PerformanceManager::registerProgramPadPress(
-    const Source source, const std::optional<MidiChannel> midiInputChannel,
+    const PerformanceEventSource source, const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const ProgramPadIndex padIndex,
     const Velocity velocity, const ProgramIndex program,
@@ -90,30 +90,30 @@ void PerformanceManager::registerProgramPadPress(
                                  NoPressure,
                                  utils::nowInMilliseconds(),
                                  physicalPadIndex};
-    EventMessage msg{EventMessage::Type::ProgramPadPress};
+    PerformanceMessage msg{PerformanceMessage::Type::ProgramPadPress};
     msg.programPadPress = e;
     msg.source = source;
     enqueue(std::move(msg));
 }
 
-void PerformanceManager::registerProgramPadAftertouch(const Source source,
+void PerformanceManager::registerProgramPadAftertouch(const PerformanceEventSource source,
                                                  const ProgramPadIndex padIndex,
                                                  const ProgramIndex program,
                                                  const Pressure pressure) const
 {
     const ProgramPadAftertouchEvent e{padIndex, program, pressure};
-    EventMessage msg{EventMessage::Type::ProgramPadAftertouch};
+    PerformanceMessage msg{PerformanceMessage::Type::ProgramPadAftertouch};
     msg.programPadAftertouch = e;
     msg.source = source;
     enqueue(std::move(msg));
 }
 
 void PerformanceManager::registerProgramPadRelease(
-    const Source source, const ProgramPadIndex padIndex,
+    const PerformanceEventSource source, const ProgramPadIndex padIndex,
     const ProgramIndex program, const std::function<void(void *)> &action) const
 {
     const ProgramPadReleaseEvent e{padIndex, program};
-    EventMessage msg{EventMessage::Type::ProgramPadRelease};
+    PerformanceMessage msg{PerformanceMessage::Type::ProgramPadRelease};
     msg.programPadRelease = e;
     msg.source = source;
     msg.action = action;
@@ -121,7 +121,7 @@ void PerformanceManager::registerProgramPadRelease(
 }
 
 NoteOnEvent PerformanceManager::registerNoteOn(
-    const Source source, const std::optional<MidiChannel> midiInputChannel,
+    const PerformanceEventSource source, const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
     const Velocity velocity, const std::optional<ProgramIndex> programIndex,
@@ -136,7 +136,7 @@ NoteOnEvent PerformanceManager::registerNoteOn(
                         velocity,
                         programIndex.value_or(NoProgramIndex),
                         NoPressure};
-    EventMessage msg{EventMessage::Type::NoteOn};
+    PerformanceMessage msg{PerformanceMessage::Type::NoteOn};
     msg.noteOnEvent = e;
     msg.source = source;
     msg.action = action;
@@ -145,19 +145,19 @@ NoteOnEvent PerformanceManager::registerNoteOn(
 }
 
 void PerformanceManager::registerNoteAftertouch(
-    const Source source, const NoteNumber noteNumber, const Pressure pressure,
+    const PerformanceEventSource source, const NoteNumber noteNumber, const Pressure pressure,
     const std::optional<MidiChannel> midiInputChannel) const
 {
     const NoteAftertouchEvent e{noteNumber, pressure,
                                 midiInputChannel.value_or(NoMidiChannel)};
-    EventMessage msg{EventMessage::Type::NoteAftertouch};
+    PerformanceMessage msg{PerformanceMessage::Type::NoteAftertouch};
     msg.noteAftertouchEvent = e;
     msg.source = source;
     enqueue(std::move(msg));
 }
 
 void PerformanceManager::registerNoteOff(
-    const Source source, const NoteNumber noteNumber,
+    const PerformanceEventSource source, const NoteNumber noteNumber,
     const std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
 {
@@ -165,7 +165,7 @@ void PerformanceManager::registerNoteOff(
         noteNumber,
         midiInputChannel.value_or(NoMidiChannel),
     };
-    EventMessage msg{EventMessage::Type::NoteOff};
+    PerformanceMessage msg{PerformanceMessage::Type::NoteOff};
     msg.noteOffEvent = e;
     msg.source = source;
     msg.action = action;
@@ -174,14 +174,14 @@ void PerformanceManager::registerNoteOff(
 
 void PerformanceManager::clear() const
 {
-    enqueue({EventMessage::Type::Clear, {}, {}, {}});
+    enqueue({PerformanceMessage::Type::Clear, {}, {}, {}});
 }
 
-void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
+void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 {
     switch (msg.type)
     {
-        case EventMessage::Type::PhysicalPadPress:
+        case PerformanceMessage::Type::PhysicalPadPress:
             activeState.physicalPadEvents.push_back(msg.physicalPadPress);
             actions.push_back(
                 [a = msg.action, e = msg.physicalPadPress]() mutable
@@ -190,7 +190,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
                 });
             break;
 
-        case EventMessage::Type::PhysicalPadAftertouch:
+        case PerformanceMessage::Type::PhysicalPadAftertouch:
             for (auto &e : activeState.physicalPadEvents)
             {
                 if (e.padIndex == msg.physicalPadAftertouch.padIndex &&
@@ -206,7 +206,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             }
             break;
 
-        case EventMessage::Type::PhysicalPadRelease:
+        case PerformanceMessage::Type::PhysicalPadRelease:
         {
             auto it = std::find_if(activeState.physicalPadEvents.begin(),
                                    activeState.physicalPadEvents.end(),
@@ -233,7 +233,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             break;
         }
 
-        case EventMessage::Type::ProgramPadPress:
+        case PerformanceMessage::Type::ProgramPadPress:
             activeState.programPadEvents.push_back(msg.programPadPress);
             actions.push_back(
                 [a = msg.action, e = msg.programPadPress]() mutable
@@ -242,7 +242,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
                 });
             break;
 
-        case EventMessage::Type::ProgramPadAftertouch:
+        case PerformanceMessage::Type::ProgramPadAftertouch:
             for (auto &e : activeState.programPadEvents)
             {
                 if (e.padIndex == msg.programPadAftertouch.padIndex &&
@@ -258,7 +258,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             }
             break;
 
-        case EventMessage::Type::ProgramPadRelease:
+        case PerformanceMessage::Type::ProgramPadRelease:
         {
             auto it = std::find_if(
                 activeState.programPadEvents.begin(),
@@ -290,7 +290,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             break;
         }
 
-        case EventMessage::Type::NoteOn:
+        case PerformanceMessage::Type::NoteOn:
             activeState.noteEvents.push_back(msg.noteOnEvent);
             actions.push_back(
                 [a = msg.action, e = msg.noteOnEvent]() mutable
@@ -299,7 +299,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
                 });
             break;
 
-        case EventMessage::Type::NoteAftertouch:
+        case PerformanceMessage::Type::NoteAftertouch:
             for (auto &e : activeState.noteEvents)
             {
                 if (e.noteNumber == msg.noteAftertouchEvent.noteNumber &&
@@ -317,7 +317,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             }
             break;
 
-        case EventMessage::Type::NoteOff:
+        case PerformanceMessage::Type::NoteOff:
         {
             auto it = std::find_if(
                 activeState.noteEvents.begin(), activeState.noteEvents.end(),
@@ -325,7 +325,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
                 {
                     return n.source == msg.source &&
                            n.noteNumber == msg.noteOffEvent.noteNumber &&
-                           (n.source == Source::MidiInput
+                           (n.source == PerformanceEventSource::MidiInput
                                 ? n.midiInputChannel ==
                                       msg.noteOffEvent.midiInputChannel
                                 : true);
@@ -350,7 +350,7 @@ void PerformanceManager::applyMessage(const EventMessage &msg) noexcept
             break;
         }
 
-        case EventMessage::Type::Clear:
+        case PerformanceMessage::Type::Clear:
             activeState.physicalPadEvents.clear();
             activeState.programPadEvents.clear();
             activeState.noteEvents.clear();

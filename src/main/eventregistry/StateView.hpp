@@ -6,17 +6,17 @@
 
 namespace mpc::eventregistry
 {
-    struct State;
+    struct PerformanceState;
 
     class StateView
     {
     public:
-        explicit StateView(const std::shared_ptr<const State> s) noexcept
+        explicit StateView(const std::shared_ptr<const PerformanceState> s) noexcept
             : state(s)
         {
         }
 
-        bool isProgramPadPressedBySource(ProgramPadIndex, Source) const;
+        bool isProgramPadPressedBySource(ProgramPadIndex, PerformanceEventSource) const;
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
 
@@ -24,13 +24,13 @@ namespace mpc::eventregistry
         bool isProgramPadPressed(ProgramPadIndex, ProgramIndex) const;
 
         std::optional<ProgramPadPressEvent> getMostRecentProgramPadPress(
-            ProgramPadIndex, const std::vector<Source> &sourcesToExclude) const;
+            ProgramPadIndex, const std::vector<PerformanceEventSource> &sourcesToExclude) const;
 
         int getTotalPressedProgramPadCount() const;
 
         int getTotalNoteOnCount() const;
 
     private:
-        std::shared_ptr<const State> state;
+        std::shared_ptr<const PerformanceState> state;
     };
 } // namespace mpc::eventregistry
