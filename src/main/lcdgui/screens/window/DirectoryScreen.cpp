@@ -240,8 +240,7 @@ void DirectoryScreen::function(const int f)
                 }
 
                 const std::function startSoundPlayer =
-                    [engineHost = mpc.getEngineHost(), file = file, isSnd,
-                     layeredScreen = ls]
+                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
                 {
                     const auto audioServerSampleRate =
                         engineHost->getAudioServer()->getSampleRate();
@@ -252,19 +251,19 @@ void DirectoryScreen::function(const int f)
                               : audiomidi::SoundPlayerFileFormat::WAV,
                         audioServerSampleRate);
 
-                    layeredScreen->postToUiThread(
-                        [started, file = file, layeredScreen = layeredScreen]
+                    ls->postToUiThread(
+                        [started, file, ls]
                         {
                             const auto name = file->getNameWithoutExtension();
 
                             if (started)
                             {
-                                layeredScreen->showPopup("Playing " + name);
+                                ls->showPopup("Playing " + name);
                             }
                             else
                             {
-                                layeredScreen->showPopupAndAwaitInteraction(
-                                    "Can't play " + name);
+                                ls->showPopupAndAwaitInteraction("Can't play " +
+                                                                 name);
                             }
                         });
                 };

@@ -41,6 +41,8 @@ void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
         throw std::invalid_argument("File does not exist");
     }
 
+    const auto seqScreen = mpc.screens->get<ScreenId::DrumScreen>();
+
     const auto cantFindFileScreen =
         mpc.screens->get<ScreenId::CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;

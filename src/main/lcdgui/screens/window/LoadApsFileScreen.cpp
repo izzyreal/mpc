@@ -30,5 +30,6 @@ void LoadApsFileScreen::function(const int i)
             mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
             break;
         }
+        default:;
     }
 }

@@ -25,7 +25,7 @@ namespace mpc::lcdgui
     class Screens
     {
     public:
-        Screens(Mpc &mpc);
+        explicit Screens(Mpc &mpc);
 
         template <ScreenId ID>
         std::shared_ptr<typename ScreenTypeMap<ID>::type> get()
