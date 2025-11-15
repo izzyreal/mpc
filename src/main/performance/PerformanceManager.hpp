@@ -12,6 +12,11 @@
 #include <optional>
 #include <functional>
 
+namespace mpc::sampler
+{
+    class Program;
+}
+
 namespace mpc::performance
 {
     class PerformanceManager final
@@ -20,6 +25,8 @@ namespace mpc::performance
     {
     public:
         PerformanceManager();
+
+        void registerSetDrumProgram(DrumBusIndex, std::shared_ptr<sampler::Program>);
 
         void registerPhysicalPadPress(
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
@@ -62,8 +69,6 @@ namespace mpc::performance
         void registerNoteOff(PerformanceEventSource, NoteNumber,
                              std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
-
-        void registerSetDrumProgram(SetDrumProgram);
 
         void clear() const;
 

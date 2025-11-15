@@ -20,6 +20,7 @@ namespace mpc::performance
     };
 
     struct NoteParameters {
+        NoteNumber noteNumber;
         StereoMixer stereoMixer{};
         IndivFxMixer indivFxMixer{};
         int soundIndex = -1;
@@ -46,7 +47,6 @@ namespace mpc::performance
         int velocityToFilterFrequency = 0;
         int sliderParameterNumber = 0;
         int velocityToPitch = 0;
-        int index = 0;
     };
 
     struct Pad {

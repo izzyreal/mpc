@@ -1,7 +1,7 @@
 #include "PerformanceManager.hpp"
 
 #include "utils/TimeUtils.hpp"
-#include "sampler/Program.hpp"
+#include "performance/ProgramMapper.hpp"
 
 #include <algorithm>
 
@@ -22,6 +22,15 @@ void PerformanceManager::reserveState(PerformanceState &s) const
     s.physicalPadEvents.reserve(CAPACITY);
     s.programPadEvents.reserve(CAPACITY);
     s.noteEvents.reserve(CAPACITY);
+}
+
+void PerformanceManager::registerSetDrumProgram(const DrumBusIndex drumBusIndex, const std::shared_ptr<sampler::Program> sp)
+{
+    SetDrumProgram payload{drumBusIndex};
+    mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
+    PerformanceMessage msg;
+    msg.payload = payload;
+    enqueue(std::move(msg));
 }
 
 void PerformanceManager::registerPhysicalPadPress(
@@ -320,9 +329,3 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
     }, msg.payload);
 }
 
-void PerformanceManager::registerSetDrumProgram(SetDrumProgram setDrumProgram)
-{
-    const auto drumBusIndex = setDrumProgram.drumBusIndex;
-    const auto sp = setDrumProgram.samplerProgram;
-    performance::Program pp;
-}

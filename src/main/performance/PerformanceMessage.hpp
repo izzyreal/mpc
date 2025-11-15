@@ -6,16 +6,11 @@
 #include <functional>
 #include <variant>
 
-namespace mpc::sampler
-{
-    class Program;
-}
-
 namespace mpc::performance
 {
     struct SetDrumProgram {
         DrumBusIndex drumBusIndex;
-        std::shared_ptr<sampler::Program> samplerProgram;
+        performance::Program performanceProgram;
     };
 
     using PerformanceMessagePayload = std::variant<
