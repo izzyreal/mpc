@@ -18,7 +18,8 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     auto event = mpc.getSequencer()
                      ->getSelectedSequence()
                      ->getTrack(0)
-                     ->recordNoteEventNonLive(1, mpc::NoteNumber(60), mpc::Velocity(127));
+                     ->recordNoteEventNonLive(1, mpc::NoteNumber(60),
+                                              mpc::Velocity(127));
     event->finalizeNonLive(1);
     mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     auto controls = mpc.getScreen();

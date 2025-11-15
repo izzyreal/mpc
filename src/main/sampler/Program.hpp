@@ -51,7 +51,7 @@ namespace mpc::sampler
         std::string getName();
         Pad *getPad(int i) const;
         std::vector<NoteParameters *> getNotesParameters();
-        NoteParameters *getNoteParameters(int note) const;
+        NoteParameters *getNoteParameters(int noteNumber) const;
         PgmSlider *getSlider() const;
         void setNoteParameters(int noteParametersIndex,
                                NoteParameters *noteParametersToUse);

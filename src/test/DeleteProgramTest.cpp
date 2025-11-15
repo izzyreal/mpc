@@ -16,14 +16,24 @@ TEST_CASE("Delete program", "[program]")
     sampler->createNewProgramAddFirstAvailableSlot();
     sampler->createNewProgramAddFirstAvailableSlot();
     sampler->createNewProgramAddFirstAvailableSlot();
-    mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM1)->setProgram(ProgramIndex(0));
-    mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM2)->setProgram(ProgramIndex(1));
-    mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM3)->setProgram(ProgramIndex(2));
-    mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM4)->setProgram(ProgramIndex(3));
+    mpc.getSequencer()
+        ->getBus<DrumBus>(BusType::DRUM1)
+        ->setProgramIndex(ProgramIndex(0));
+    mpc.getSequencer()
+        ->getBus<DrumBus>(BusType::DRUM2)
+        ->setProgramIndex(ProgramIndex(1));
+    mpc.getSequencer()
+        ->getBus<DrumBus>(BusType::DRUM3)
+        ->setProgramIndex(ProgramIndex(2));
+    mpc.getSequencer()
+        ->getBus<DrumBus>(BusType::DRUM4)
+        ->setProgramIndex(ProgramIndex(3));
 
     sampler->deleteProgram(sampler->getProgram(2));
-    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM3)->getProgram() == 1);
+    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM3)->getProgram() ==
+            1);
 
     sampler->deleteProgram(sampler->getProgram(0));
-    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM1)->getProgram() == 1);
+    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM1)->getProgram() ==
+            1);
 }

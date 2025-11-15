@@ -52,8 +52,8 @@ TEST_CASE("COPY1", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -107,8 +107,8 @@ TEST_CASE("COPY2", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -167,8 +167,8 @@ TEST_CASE("COPY3", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -220,8 +220,8 @@ TEST_CASE("COPY4", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(seq->getLastTick() == 384 + 288 + 288 + 288);
     REQUIRE(seq->getBarLengthsInTicks()[0] == 384);
@@ -269,8 +269,8 @@ TEST_CASE("COPY5", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -325,8 +325,8 @@ TEST_CASE("COPY6", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart, toTrack, merge,
-                              copies, note0, note1);
+    eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
+                              toTrack, merge, copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 24);
 

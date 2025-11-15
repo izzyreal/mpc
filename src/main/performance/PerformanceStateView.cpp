@@ -114,3 +114,14 @@ int PerformanceStateView::getTotalNoteOnCount() const
 {
     return state->noteEvents.size();
 }
+
+Program PerformanceStateView::getProgram(const DrumBusIndex drumBusIndex) const
+{
+    return state->drums[drumBusIndex].program;
+}
+
+performance::Drum
+PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
+{
+    return state->drums[drumBusIndex];
+}

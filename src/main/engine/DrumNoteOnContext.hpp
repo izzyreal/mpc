@@ -2,11 +2,21 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
+
+#include "IntTypes.hpp"
+#include "performance/Drum.hpp"
 
 namespace mpc::sampler
 {
     class Sampler;
 }
+
+namespace mpc::sequencer
+{
+    class DrumBus;
+}
+
 namespace mpc::lcdgui::screens
 {
     class MixerSetupScreen;
@@ -20,9 +30,9 @@ namespace mpc::engine::audio::mixer
 {
     class AudioMixer;
 }
-namespace mpc::sequencer
+namespace mpc::performance
 {
-    class DrumBus;
+    class Drum;
 }
 
 namespace mpc::engine
@@ -35,8 +45,11 @@ namespace mpc::engine
         std::shared_ptr<lcdgui::screens::MixerSetupScreen> mixerSetupScreen;
         std::vector<std::shared_ptr<Voice>> *voices{};
         std::vector<MixerInterconnection *> *mixerConnections{};
-        std::shared_ptr<sequencer::DrumBus> drum;
-        int note{};
+        std::shared_ptr<sequencer::DrumBus> drumBus;
+        performance::Drum drum;
+        std::function<void(int, int)> setOptA;
+        std::function<void(int, int)> setOptB;
+        mpc::DrumNoteNumber note{};
         int velocity{};
         int varType{};
         int varValue{};

@@ -87,7 +87,7 @@ void CreateNewProgramScreen::function(const int i)
                 }
             }
 
-            getActiveDrumBus()->setProgram(index);
+            getActiveDrumBus()->setProgramIndex(index);
             openScreenById(ScreenId::ProgramScreen);
             break;
         }

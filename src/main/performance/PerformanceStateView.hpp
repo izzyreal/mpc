@@ -1,6 +1,7 @@
 #pragma once
 
 #include "performance/EventTypes.hpp"
+#include "performance/Drum.hpp"
 
 #include <memory>
 
@@ -25,6 +26,9 @@ namespace mpc::performance
             const std::vector<PerformanceEventSource> &sourcesToExclude) const;
 
         int getTotalNoteOnCount() const;
+
+        performance::Program getProgram(DrumBusIndex) const;
+        performance::Drum getDrum(DrumBusIndex) const;
 
     private:
         std::shared_ptr<const PerformanceState> state;

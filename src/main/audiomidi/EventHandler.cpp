@@ -53,8 +53,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const std::shared_ptr<DrumBus> &drumBus, const Track *track)
 {
     const auto sampler = mpc.getSampler();
-    const auto programIndex = drumBus->getProgram();
-    const auto program = sampler->getProgram(drumBus->getProgram());
+    const auto programIndex = drumBus->getProgramIndex();
+    const auto program = sampler->getProgram(drumBus->getProgramIndex());
     const auto note = noteOnEvent->getNote();
     const ProgramPadIndex programPadIndex =
         program->getPadIndexFromNote(DrumNoteNumber(note));
@@ -112,8 +112,11 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
         audioServer->getSampleRate());
 
+    auto performanceDrum =
+        mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
     const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-        noteEventIdToUse, drumBus, mpc.getSampler(),
+        noteEventIdToUse, performanceDrum, drumBus, mpc.getSampler(),
         mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         &mpc.getEngineHost()->getVoices(),
@@ -128,14 +131,15 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     mpc.performanceManager->registerNoteOn(
         performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
-        track->getIndex(), ctx.drum->busType, note, noteOnEvent->getVelocity(),
-        programIndex, [](void *) {});
+        track->getIndex(), drumBusIndexToDrumBusType(ctx.drum.drumBusIndex),
+        note, noteOnEvent->getVelocity(), programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
         mpc.performanceManager->registerProgramPadPress(
             performance::PerformanceEventSource::Sequence, std::nullopt,
-            screenId, track->getIndex(), ctx.drum->busType, programPadIndex,
+            screenId, track->getIndex(),
+            drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), programPadIndex,
             noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
     }
 
@@ -233,7 +237,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
 
         assert(drumBus);
 
-        const auto program = sampler->getProgram(drumBus->getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgramIndex());
 
         const auto mixerSetupScreen =
             mpc.screens->get<ScreenId::MixerSetupScreen>();
@@ -267,7 +271,7 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto drumBus = mpc.getSequencer()->getDrumBus(*drumBusType);
         assert(drumBus);
         const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgram());
+            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
         const auto note = noteOnEvent->getNote();
 
         const auto velocityWithTrackVelocityRatioApplied =
@@ -277,8 +281,12 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
+        auto performanceDrum =
+            mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-            0, drumBus, mpc.getSampler(), mpc.getEngineHost()->getMixer(),
+            0, performanceDrum, drumBus, mpc.getSampler(),
+            mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(),
             mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
@@ -312,7 +320,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         assert(drumBus);
 
         const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgram());
+            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
         const auto note = noteOffEvent->getNote();
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(

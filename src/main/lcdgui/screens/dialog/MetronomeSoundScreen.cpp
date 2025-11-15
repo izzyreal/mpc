@@ -81,7 +81,7 @@ void MetronomeSoundScreen::displayOutput() const
 void MetronomeSoundScreen::displayAccent() const
 {
     const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
-    const auto program = drumBus->getProgram();
+    const auto program = drumBus->getProgramIndex();
     const auto note =
         sampler->getProgram(program)->getPad(accentPad)->getNote();
     findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) +
@@ -91,7 +91,7 @@ void MetronomeSoundScreen::displayAccent() const
 void MetronomeSoundScreen::displayNormal() const
 {
     const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
-    const auto program = drumBus->getProgram();
+    const auto program = drumBus->getProgramIndex();
     const auto note =
         sampler->getProgram(program)->getPad(normalPad)->getNote();
     findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) +

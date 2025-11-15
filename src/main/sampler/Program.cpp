@@ -62,14 +62,14 @@ std::string Program::getName()
     return name;
 }
 
-NoteParameters *Program::getNoteParameters(const int note) const
+NoteParameters *Program::getNoteParameters(const int noteNumber) const
 {
-    if (note < 35 || note > 98)
+    if (noteNumber < MinDrumNoteNumber || noteNumber > MaxDrumNoteNumber)
     {
         return nullptr;
     }
 
-    return noteParameters[note - 35];
+    return noteParameters[noteNumber - MinDrumNoteNumber];
 }
 
 Pad *Program::getPad(const int i) const

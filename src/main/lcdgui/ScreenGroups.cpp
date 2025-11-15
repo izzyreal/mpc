@@ -123,6 +123,7 @@ namespace mpc::lcdgui::screengroups
                std::dynamic_pointer_cast<PgmAssignScreen>(s) ||
                std::dynamic_pointer_cast<PgmParamsScreen>(s) ||
                std::dynamic_pointer_cast<SelectDrumScreen>(s) ||
+               std::dynamic_pointer_cast<SelectMixerDrumScreen>(s) ||
                std::dynamic_pointer_cast<TrimScreen>(s) ||
                std::dynamic_pointer_cast<ZoneScreen>(s) ||
                std::dynamic_pointer_cast<LoadASoundScreen>(s);

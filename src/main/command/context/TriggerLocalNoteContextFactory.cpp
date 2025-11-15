@@ -27,7 +27,6 @@ using namespace mpc::controller;
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace mpc::hardware;
-using namespace mpc::sampler;
 using namespace mpc::performance;
 using namespace mpc::audiomidi;
 using namespace mpc::engine;
@@ -39,7 +38,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const Velocity velocity, Track *track, const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
-    const std::shared_ptr<Program> &program,
+    const std::shared_ptr<sampler::Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::shared_ptr<PerformanceManager> &performanceManager,
@@ -126,7 +125,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const NoteEventId recordedNoteOnEventId, Track *track,
     const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
-    const std::shared_ptr<Program> &program,
+    const std::shared_ptr<sampler::Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::shared_ptr<PerformanceManager> &performanceManager,

@@ -236,7 +236,7 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
 
     assert(drumBus);
 
-    const auto programIndex = drumBus->getProgram();
+    const auto programIndex = drumBus->getProgramIndex();
 
     const auto accent = velocity == 127;
     velocity = accent ? metronomeSoundScreen->getAccentVelo()
@@ -310,7 +310,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
                 {
                     const auto drumBus =
                         mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
-                    drumBus->setProgram(ProgramIndex(0));
+                    drumBus->setProgramIndex(ProgramIndex(0));
                 }
             }
             return p;
@@ -415,12 +415,13 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
 
 void Sampler::repairProgramReferences() const
 {
-    for (int busIndex = 1; busIndex < 5; ++busIndex)
+    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
+         ++drumBusIndex)
     {
         const auto drumBus =
-            mpc.getSequencer()->getBus<DrumBus>(busIndexToBusType(busIndex));
+            mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
 
-        if (const auto pgm = drumBus->getProgram(); !programs[pgm])
+        if (const auto pgm = drumBus->getProgramIndex(); !programs[pgm])
         {
             ProgramIndex programIndexToUse = NoProgramIndex;
             for (int programIndex = pgm - 1; programIndex > 0; programIndex--)
@@ -446,7 +447,7 @@ void Sampler::repairProgramReferences() const
                 }
             }
 
-            drumBus->setProgram(programIndexToUse);
+            drumBus->setProgramIndex(programIndexToUse);
         }
     }
 }

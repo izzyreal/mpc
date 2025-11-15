@@ -2,7 +2,6 @@
 
 #include "VoiceConstants.hpp"
 
-#include "sampler/NoteParameters.hpp"
 #include "sampler/Sound.hpp"
 
 #include "EnvelopeControls.hpp"
@@ -102,14 +101,17 @@ Voice::~Voice()
 }
 
 void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
-                 const int noteNumber, NoteParameters *noteParameters,
-                 const int varType, const int varValue, const int drumIndex,
-                 const int frameOffset, const bool enableEnvs,
-                 const int startTick, const float engineSampleRate,
-                 const uint64_t noteEventId)
+                 const int noteNumber,
+                 performance::NoteParameters noteParameters, const int varType,
+                 const int varValue, const int drumIndex, const int frameOffset,
+                 const bool enableEnvs, const int startTick,
+                 const float engineSampleRate, const uint64_t noteEventId,
+                 ProgramIndex programIndex)
 {
     VoiceState *state = getInactiveState();
 
+    state->drumBusIndex = DrumBusIndex(drumIndex);
+    state->programIndex = programIndex;
     state->finished = false;
 
     state->noteEventId = noteEventId;
@@ -136,18 +138,18 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
 
     state->tune = sound->getTune();
 
-    if (noteParameters != nullptr)
+    if (!isBasicVoice)
     {
-        state->tune += noteParameters->getTune();
-        state->veloToStart = noteParameters->getVelocityToStart();
-        state->attackValue = noteParameters->getAttack();
-        state->decayValue = noteParameters->getDecay();
-        state->veloToAttack = noteParameters->getVelocityToAttack();
-        state->decayMode = noteParameters->getDecayMode();
-        state->veloToLevel = noteParameters->getVeloToLevel();
+        state->tune += noteParameters.tune;
+        state->veloToStart = noteParameters.velocityToStart;
+        state->attackValue = noteParameters.attack;
+        state->decayValue = noteParameters.decay;
+        state->veloToAttack = noteParameters.velocityToAttack;
+        state->decayMode = noteParameters.decayMode;
+        state->veloToLevel = noteParameters.velocityToLevel;
         state->voiceOverlapMode = sound->isLoopEnabled()
                                       ? VoiceOverlapMode::NOTE_OFF
-                                      : noteParameters->getVoiceOverlapMode();
+                                      : noteParameters.voiceOverlapMode;
     }
 
     switch (state->varType)
@@ -194,9 +196,8 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
 
     if (!isBasicVoice)
     {
-        assert(noteParameters);
         ampEnv->reset();
-        state->filtParam = noteParameters->getFilterFrequency();
+        state->filtParam = noteParameters.filterFrequency;
 
         if (state->varType == 3)
         {
@@ -205,19 +206,19 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
 
         state->initialFilterValue =
             state->filtParam +
-            veloFactor * noteParameters->getVelocityToFilterFrequency();
+            veloFactor * noteParameters.velocityToFilterFrequency;
         state->initialFilterValue =
             static_cast<float>(17.0 + state->initialFilterValue * 0.75);
         filterEnv->reset();
         fattack->setValue(
-            static_cast<float>(noteParameters->getFilterAttack() * 0.002) *
+            static_cast<float>(noteParameters.filterAttack * 0.002) *
             C::MAX_ATTACK_LENGTH_SAMPLES);
         fhold->setValue(0);
         fdecay->setValue(
-            static_cast<float>(noteParameters->getFilterDecay() * 0.002) *
+            static_cast<float>(noteParameters.filterDecay * 0.002) *
             C::MAX_DECAY_LENGTH_SAMPLES);
-        reso->setValue(static_cast<float>(
-            0.0625 + noteParameters->getFilterResonance() / 26.0));
+        reso->setValue(
+            static_cast<float>(0.0625 + noteParameters.filterResonance / 26.0));
         svfLeft->update();
         svfRight->update();
     }
@@ -317,7 +318,7 @@ const std::vector<float> &Voice::getFrame()
                      state->inverseNyquist;
         const auto filterEnvFactor = static_cast<float>(
             filterEnv->getEnvelope(false) *
-            (state->noteParameters->getFilterEnvelopeAmount() * 0.01));
+            (state->noteParameters.filterEnvelopeAmount * 0.01));
         filterFreq +=
             VoiceUtil::midiFreq(144) * state->inverseNyquist * filterEnvFactor;
     }
@@ -518,8 +519,12 @@ const MuteInfo &Voice::getMuteInfo() const
     return state->muteInfo;
 }
 
-const NoteParameters *Voice::getNoteParameters() const
+bool Voice::isPlayingDrumProgramNoteCombination(
+    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
+    const DrumNoteNumber drumNoteNumber) const
 {
     const VoiceState *state = getActiveState();
-    return state->noteParameters;
+    return state->drumBusIndex == drumBusIndex &&
+           state->programIndex == programIndex &&
+           state->noteNumber == drumNoteNumber;
 }

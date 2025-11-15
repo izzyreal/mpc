@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "DrumNoteOnContext.hpp"
 #include "DrumNoteOffContext.hpp"
 
@@ -36,7 +38,8 @@ namespace mpc::engine
     {
     public:
         static DrumNoteOnContext buildDrumNoteOnContext(
-            uint64_t noteEventId, const std::shared_ptr<sequencer::DrumBus> &,
+            uint64_t noteEventId, const performance::Drum &,
+            const std::shared_ptr<sequencer::DrumBus>,
             const std::shared_ptr<sampler::Sampler> &sampler,
             const std::shared_ptr<audio::mixer::AudioMixer> &mixer,
             const std::shared_ptr<lcdgui::screens::MixerSetupScreen>

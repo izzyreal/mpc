@@ -506,7 +506,7 @@ void EventRow::setMixerEventValues() const
         return;
     }
 
-    const auto program = sampler->getProgram(drumBus->getProgram());
+    const auto program = sampler->getProgram(drumBus->getProgramIndex());
     const auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
     const auto padName = sampler->getPadName(mixerEvent->getPad());
@@ -576,7 +576,8 @@ void EventRow::setDrumNoteEventValues() const
             drumBus)
         {
             const auto sampler = mpc.getSampler();
-            const auto program = sampler->getProgram(drumBus->getProgram());
+            const auto program =
+                sampler->getProgram(drumBus->getProgramIndex());
             const auto padName = sampler->getPadName(
                 program->getPadIndexFromNote(DrumNoteNumber(ne->getNote())));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);

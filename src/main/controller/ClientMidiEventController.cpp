@@ -440,7 +440,7 @@ void ClientMidiEventController::handleProgramChange(
         {
             if (sampler->getProgram(e.getProgramNumber()))
             {
-                drumBus->setProgram(ProgramIndex(e.getProgramNumber()));
+                drumBus->setProgramIndex(ProgramIndex(e.getProgramNumber()));
             }
         }
     }
@@ -587,13 +587,13 @@ ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
     return {};
 }
 
-std::shared_ptr<Program>
+std::shared_ptr<mpc::sampler::Program>
 ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
         return sampler->getProgram(
-            sequencer->getDrumBus(*drumBusType)->getProgram());
+            sequencer->getDrumBus(*drumBusType)->getProgramIndex());
     }
 
     return {};
@@ -604,7 +604,7 @@ mpc::ProgramIndex ClientMidiEventController::getProgramIndexForEvent(
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
-        return sequencer->getDrumBus(*drumBusType)->getProgram();
+        return sequencer->getDrumBus(*drumBusType)->getProgramIndex();
     }
 
     return NoProgramIndex;

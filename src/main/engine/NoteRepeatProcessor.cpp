@@ -50,11 +50,11 @@ void NoteRepeatProcessor::process(
     auto track = sequencer->getSelectedTrack();
     auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
 
-    std::shared_ptr<Program> program;
+    std::shared_ptr<sampler::Program> program;
 
     if (drumBus)
     {
-        program = sampler->getProgram(drumBus->getProgram());
+        program = sampler->getProgram(drumBus->getProgramIndex());
     }
 
     DrumNoteNumber note = assign16LevelsScreen->getNote();
@@ -165,9 +165,12 @@ void NoteRepeatProcessor::process(
                     ? VoiceOverlapMode::NOTE_OFF
                     : noteParameters->getVoiceOverlapMode();
 
+            auto performanceDrum =
+                performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-                0, drumBus, sampler, mixer, mixerSetupScreen, voices,
-                mixerConnections, note, noteEvent->getVelocity(),
+                0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
+                voices, mixerConnections, note, noteEvent->getVelocity(),
                 noteEvent->getVariationType(), noteEvent->getVariationValue(),
                 eventFrameOffset,
                 /* firstGeneration */ true, // Always true for invokers that

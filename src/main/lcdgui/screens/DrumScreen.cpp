@@ -60,7 +60,8 @@ void DrumScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        getActiveDrumBus()->setProgram(getActiveDrumBus()->getProgram() + i);
+        getActiveDrumBus()->setProgramIndex(
+            getActiveDrumBus()->getProgramIndex() + i);
         displayPgm();
     }
     else if (focusedFieldName == "program-change")
@@ -103,7 +104,7 @@ void DrumScreen::displayPadToInternalSound() const
 
 void DrumScreen::displayPgm() const
 {
-    const auto pn = getActiveDrumBus()->getProgram();
+    const auto pn = getActiveDrumBus()->getProgramIndex();
     findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
                               "-" + sampler->getProgram(pn)->getName());
 }

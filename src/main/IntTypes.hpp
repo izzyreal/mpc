@@ -27,8 +27,21 @@ namespace mpc
     using SequenceIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::LAST_SEQUENCE_INDEX>;
 
+    using DrumMixerLevel = ConstrainedInt<int8_t, 0, 100>;
+    using DrumMixerPanning = ConstrainedInt<int8_t, 0, 100>;
+    using DrumMixerIndividualOutput = ConstrainedInt<int8_t, 0, 8>;
+    using DrumMixerIndividualFxPath = ConstrainedInt<int8_t, 0, 4>;
+
+    constexpr DrumMixerLevel MinDrumMixerLevel{0};
+    constexpr DrumMixerLevel MaxDrumMixerLevel{100};
+    constexpr DrumMixerPanning PanningCenter{50};
+    constexpr DrumMixerIndividualOutput MinDrumMixerIndividualOut{0};
+    constexpr DrumMixerIndividualFxPath MinDrumMixerFxPath{0};
+
     using MidiNumber = ConstrainedInt<int8_t, 0, 127>;
     using MidiValue = ConstrainedInt<int8_t, -1, 127>;
+
+    constexpr MidiValue MaxMidiValue{127};
 
     using NoteEventId = uint32_t;
     constexpr NoteEventId NoNoteEventId = 0;
