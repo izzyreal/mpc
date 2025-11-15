@@ -13,7 +13,7 @@ Bus::Bus(const BusType busType) : busType(busType) {}
 
 DrumBus::DrumBus(
     const DrumBusIndex drumIndexToUse,
-    std::function<void(const ProgramIndex)> setProgramInPerformanceState)
+    std::function<void(const DrumBusIndex, const ProgramIndex)> setProgramInPerformanceState)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
       setProgramInPerformanceState(setProgramInPerformanceState)
 {
@@ -35,6 +35,7 @@ mpc::DrumBusIndex DrumBus::getIndex() const
 void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
 {
     programIndex = programIndexToUse;
+    setProgramInPerformanceState(drumIndex, programIndex);
 }
 
 mpc::ProgramIndex DrumBus::getProgramIndex() const

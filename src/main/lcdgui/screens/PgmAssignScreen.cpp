@@ -4,8 +4,6 @@
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
 
-#include "performance/PerformanceManager.hpp"
-
 #include "controller/ClientEventController.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
@@ -112,10 +110,6 @@ void PgmAssignScreen::turnWheel(const int i)
             candidate != pgm)
         {
             getActiveDrumBus()->setProgramIndex(candidate);
-
-            mpc.performanceManager->registerSetDrumProgram(
-                getActiveDrumBus()->getIndex(),
-                sampler->getProgram(getActiveDrumBus()->getProgramIndex()));
 
             displayNote();
             displayOptionalNoteA();

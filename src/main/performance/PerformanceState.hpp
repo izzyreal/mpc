@@ -7,11 +7,11 @@ namespace mpc::performance
 {
     struct PerformanceState
     {
-        std::array<Drum, 4> drums;
-
         PhysicalPadPressEvents physicalPadEvents;
         ProgramPadPressEvents programPadEvents;
         NoteOnEvents noteEvents;
+
+        std::array<Drum, 4> drums;
 
         PerformanceState() = default;
 
