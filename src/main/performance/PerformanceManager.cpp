@@ -202,22 +202,22 @@ void PerformanceManager::clear() const
 
 void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 {
-    std::visit([&](auto &&ev)
+    std::visit([&](auto &&payload)
     {
-        using T = std::decay_t<decltype(ev)>;
+        using T = std::decay_t<decltype(payload)>;
 
         if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
         {
-            activeState.physicalPadEvents.push_back(ev);
-            actions.push_back([a = msg.action, ev = ev]() mutable { a(&ev); });
+            activeState.physicalPadEvents.push_back(payload);
+            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
         }
         else if constexpr (std::is_same_v<T, PhysicalPadAftertouchEvent>)
         {
             for (auto &e : activeState.physicalPadEvents)
             {
-                if (e.padIndex == ev.padIndex && e.source == msg.source)
+                if (e.padIndex == payload.padIndex && e.source == msg.source)
                 {
-                    e.pressure = ev.pressure;
+                    e.pressure = payload.pressure;
                     actions.push_back([a = msg.action, e]() mutable { a(&e); });
                 }
             }
@@ -228,7 +228,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                                    activeState.physicalPadEvents.end(),
                                    [&](const auto &e)
                                    {
-                                       return e.padIndex == ev.padIndex;
+                                       return e.padIndex == payload.padIndex;
                                    });
 
             if (it == activeState.physicalPadEvents.end())
@@ -242,16 +242,16 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         }
         else if constexpr (std::is_same_v<T, ProgramPadPressEvent>)
         {
-            activeState.programPadEvents.push_back(ev);
-            actions.push_back([a = msg.action, ev = ev]() mutable { a(&ev); });
+            activeState.programPadEvents.push_back(payload);
+            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
         }
         else if constexpr (std::is_same_v<T, ProgramPadAftertouchEvent>)
         {
             for (auto &e : activeState.programPadEvents)
             {
-                if (e.padIndex == ev.padIndex && e.source == msg.source)
+                if (e.padIndex == payload.padIndex && e.source == msg.source)
                 {
-                    e.pressure = ev.pressure;
+                    e.pressure = payload.pressure;
                     actions.push_back([a = msg.action, e]() mutable { a(&e); });
                 }
             }
@@ -262,9 +262,9 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                                    activeState.programPadEvents.end(),
                                    [&](const auto &e)
                                    {
-                                       return e.padIndex == ev.padIndex &&
+                                       return e.padIndex == payload.padIndex &&
                                               e.source == msg.source &&
-                                              e.programIndex == ev.programIndex;
+                                              e.programIndex == payload.programIndex;
                                    });
 
             if (it == activeState.programPadEvents.end())
@@ -278,18 +278,18 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         }
         else if constexpr (std::is_same_v<T, NoteOnEvent>)
         {
-            activeState.noteEvents.push_back(ev);
-            actions.push_back([a = msg.action, ev = ev]() mutable { a(&ev); });
+            activeState.noteEvents.push_back(payload);
+            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
         }
         else if constexpr (std::is_same_v<T, NoteAftertouchEvent>)
         {
             for (auto &e : activeState.noteEvents)
             {
-                if (e.noteNumber == ev.noteNumber &&
+                if (e.noteNumber == payload.noteNumber &&
                     e.source == msg.source &&
-                    e.midiInputChannel == ev.midiInputChannel)
+                    e.midiInputChannel == payload.midiInputChannel)
                 {
-                    e.pressure = ev.pressure;
+                    e.pressure = payload.pressure;
                     actions.push_back([a = msg.action, e]() mutable { a(&e); });
                 }
             }
@@ -301,9 +301,9 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 [&](const auto &n)
                 {
                     return n.source == msg.source &&
-                           n.noteNumber == ev.noteNumber &&
+                           n.noteNumber == payload.noteNumber &&
                            (n.source != PerformanceEventSource::MidiInput ||
-                            n.midiInputChannel == ev.midiInputChannel);
+                            n.midiInputChannel == payload.midiInputChannel);
                 });
 
             if (it == activeState.noteEvents.end())
@@ -317,6 +317,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         }
         else if constexpr (std::is_same_v<T, SetDrumProgram>)
         {
+            activeState.drums[payload.drumBusIndex];
 
         }
         else if constexpr (std::is_same_v<T, std::monostate>)

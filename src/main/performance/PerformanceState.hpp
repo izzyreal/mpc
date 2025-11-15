@@ -1,11 +1,14 @@
 #pragma once
 
 #include "performance/EventTypes.hpp"
+#include "performance/Drum.hpp"
 
 namespace mpc::performance
 {
     struct PerformanceState
     {
+        std::array<Drum, 4> drums;
+
         PhysicalPadPressEvents physicalPadEvents;
         ProgramPadPressEvents programPadEvents;
         NoteOnEvents noteEvents;
@@ -15,7 +18,8 @@ namespace mpc::performance
         PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
-              noteEvents(other.noteEvents)
+              noteEvents(other.noteEvents),
+              drums(other.drums)
         {
         }
 
@@ -24,6 +28,7 @@ namespace mpc::performance
             physicalPadEvents = other.physicalPadEvents;
             programPadEvents = other.programPadEvents;
             noteEvents = other.noteEvents;
+            drums = other.drums;
             return *this;
         }
     };

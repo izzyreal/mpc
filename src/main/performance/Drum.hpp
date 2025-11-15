@@ -69,16 +69,16 @@ namespace mpc::performance
     };
 
     struct Program {
-        std::array<NoteParameters, 64> noteParameters;
-        std::array<Pad, 64> pads;
+        std::array<NoteParameters, 64> noteParameters{};
+        std::array<Pad, 64> pads{};
         Slider slider{};
         int midiProgramChange = 0;
     };
 
     struct Drum {
         Program program{};
-        std::array<StereoMixer, 64> stereoMixers;
-        std::array<IndivFxMixer, 64> indivFxMixers;
+        std::array<StereoMixer, 64> stereoMixers{};
+        std::array<IndivFxMixer, 64> indivFxMixers{};
         std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64> simultaneousNotesA{
             std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}
         };
