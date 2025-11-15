@@ -84,8 +84,8 @@ void Track::purge()
     eventIndex = 0;
     device = 0;
     busType = BusType::DRUM1;
-    bulkNoteOns.reserve(20);
-    bulkNoteOffs.reserve(20);
+    bulkNoteOns.resize(20);
+    bulkNoteOffs.resize(20);
     queuedNoteOnEvents = std::make_shared<
         moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>>(20);
     queuedNoteOffEvents = std::make_shared<
@@ -104,25 +104,23 @@ Track::findRecordingNoteOnEventById(const NoteEventId id)
             return noteOnEvent;
         }
     }
+
     std::shared_ptr<NoteOnEvent> found;
     std::shared_ptr<NoteOnEvent> e;
-    bulkNoteOns.clear();
-    while (queuedNoteOnEvents->try_dequeue(e))
+
+    size_t count = 0;
+
+    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
         if (e->getId() == id)
-        {
             found = e;
-        }
-        assert(found->isBeingRecorded());
-        bulkNoteOns.push_back(e);
+
+        assert(e->isBeingRecorded());
+        bulkNoteOns[count++] = e;
     }
 
-    for (auto &e2 : bulkNoteOns)
-    {
-        queuedNoteOnEvents->enqueue(e2);
-    }
-
-    bulkNoteOns.clear();
+    for (size_t i = 0; i < count; i++)
+        queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
 
     return found;
 }
@@ -133,7 +131,8 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
     for (auto &e : events)
     {
         if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
-            noteOnEvent && noteOnEvent->isBeingRecorded() &&
+            noteOnEvent &&
+            noteOnEvent->isBeingRecorded() &&
             noteOnEvent->getNote() == noteNumber)
         {
             return noteOnEvent;
@@ -142,22 +141,19 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     std::shared_ptr<NoteOnEvent> found;
     std::shared_ptr<NoteOnEvent> e;
-    bulkNoteOns.clear();
-    while (queuedNoteOnEvents->try_dequeue(e))
+
+    size_t count = 0;
+
+    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
-        if (e->getNote() == noteNumber && e->isBeingRecorded())
-        {
+        if (e->isBeingRecorded() && e->getNote() == noteNumber)
             found = e;
-        }
-        bulkNoteOns.push_back(e);
+
+        bulkNoteOns[count++] = e;
     }
 
-    for (auto &e2 : bulkNoteOns)
-    {
-        queuedNoteOnEvents->enqueue(e2);
-    }
-
-    bulkNoteOns.clear();
+    for (size_t i = 0; i < count; i++)
+        queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
 
     return found;
 }
