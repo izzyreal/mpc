@@ -87,4 +87,4 @@ namespace mpc::performance
 
         dst.midiProgramChange = src.getMidiProgramChange();
     }
-}
+} // namespace mpc::performance

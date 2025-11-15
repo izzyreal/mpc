@@ -26,7 +26,8 @@ namespace mpc::performance
     public:
         PerformanceManager();
 
-        void registerSetDrumProgram(DrumBusIndex, std::shared_ptr<sampler::Program>);
+        void registerSetDrumProgram(DrumBusIndex,
+                                    std::shared_ptr<sampler::Program>);
 
         void registerPhysicalPadPress(
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,

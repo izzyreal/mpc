@@ -36,7 +36,10 @@ namespace mpc::sequencer
     class DrumBus final : public Bus
     {
     public:
-        explicit DrumBus(DrumBusIndex, std::function<void(const DrumBusIndex, const ProgramIndex)> setProgramInPerformanceState);
+        explicit DrumBus(
+            DrumBusIndex,
+            std::function<void(const DrumBusIndex, const ProgramIndex)>
+                setProgramInPerformanceState);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
@@ -63,7 +66,8 @@ namespace mpc::sequencer
 
     private:
         const DrumBusIndex drumIndex;
-        const std::function<void(const DrumBusIndex, const ProgramIndex)> setProgramInPerformanceState;
+        const std::function<void(const DrumBusIndex, const ProgramIndex)>
+            setProgramInPerformanceState;
         ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;

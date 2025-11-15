@@ -6,12 +6,14 @@
 
 namespace mpc::performance
 {
-    struct StereoMixer {
+    struct StereoMixer
+    {
         DrumMixerLevel level{MaxDrumMixerLevel};
         DrumMixerPanning panning{PanningCenter};
     };
 
-    struct IndivFxMixer {
+    struct IndivFxMixer
+    {
         DrumMixerLevel individualOutLevel{MaxDrumMixerLevel};
         DrumMixerLevel fxSendLevel{MinDrumMixerLevel};
         DrumMixerIndividualOutput individualOutput{MinDrumMixerIndividualOut};
@@ -19,7 +21,8 @@ namespace mpc::performance
         bool followStereo = false;
     };
 
-    struct NoteParameters {
+    struct NoteParameters
+    {
         NoteNumber noteNumber;
         StereoMixer stereoMixer{};
         IndivFxMixer indivFxMixer{};
@@ -49,12 +52,14 @@ namespace mpc::performance
         int velocityToPitch = 0;
     };
 
-    struct Pad {
+    struct Pad
+    {
         DrumNoteNumber note{NoDrumNoteAssigned};
         ProgramPadIndex index{0};
     };
 
-    struct Slider {
+    struct Slider
+    {
         DrumNoteNumber assignNote{NoDrumNoteAssigned};
         int tuneLowRange = -120;
         int tuneHighRange = 120;
@@ -68,26 +73,27 @@ namespace mpc::performance
         int parameter = 0;
     };
 
-    struct Program {
+    struct Program
+    {
         std::array<NoteParameters, 64> noteParameters{};
         std::array<Pad, 64> pads{};
         Slider slider{};
         int midiProgramChange = 0;
     };
 
-    struct Drum {
+    struct Drum
+    {
         Program program{};
         std::array<StereoMixer, 64> stereoMixers{};
         std::array<IndivFxMixer, 64> indivFxMixers{};
-        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64> simultaneousNotesA{
-            std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}
-        };
-        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64> simultaneousNotesB{
-            std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}
-        };
+        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64>
+            simultaneousNotesA{
+                std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}};
+        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64>
+            simultaneousNotesB{
+                std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}};
         bool receivePgmChange = false;
         bool receiveMidiVolume = false;
         MidiValue lastReceivedMidiVolume{MaxMidiValue};
     };
-}
-
+} // namespace mpc::performance

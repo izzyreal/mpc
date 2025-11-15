@@ -24,7 +24,8 @@ void PerformanceManager::reserveState(PerformanceState &s) const
     s.noteEvents.reserve(CAPACITY);
 }
 
-void PerformanceManager::registerSetDrumProgram(const DrumBusIndex drumBusIndex, const std::shared_ptr<sampler::Program> sp)
+void PerformanceManager::registerSetDrumProgram(
+    const DrumBusIndex drumBusIndex, const std::shared_ptr<sampler::Program> sp)
 {
     SetDrumProgram payload{drumBusIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
@@ -168,8 +169,7 @@ void PerformanceManager::registerNoteAftertouch(
     const Pressure pressure,
     const std::optional<MidiChannel> midiInputChannel) const
 {
-    NoteAftertouchEvent e{noteNumber,
-                          pressure,
+    NoteAftertouchEvent e{noteNumber, pressure,
                           midiInputChannel.value_or(NoMidiChannel)};
 
     PerformanceMessage msg;
@@ -183,8 +183,7 @@ void PerformanceManager::registerNoteOff(
     const std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
 {
-    NoteOffEvent e{noteNumber,
-                   midiInputChannel.value_or(NoMidiChannel)};
+    NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel)};
 
     PerformanceMessage msg;
     msg.payload = e;
@@ -202,131 +201,183 @@ void PerformanceManager::clear() const
 
 void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 {
-    std::visit([&](auto &&payload)
-    {
-        using T = std::decay_t<decltype(payload)>;
+    std::visit(
+        [&](auto &&payload)
+        {
+            using T = std::decay_t<decltype(payload)>;
 
-        if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
-        {
-            activeState.physicalPadEvents.push_back(payload);
-            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
-        }
-        else if constexpr (std::is_same_v<T, PhysicalPadAftertouchEvent>)
-        {
-            for (auto &e : activeState.physicalPadEvents)
+            if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
-                if (e.padIndex == payload.padIndex && e.source == msg.source)
+                activeState.physicalPadEvents.push_back(payload);
+                actions.push_back(
+                    [a = msg.action, ev = payload]() mutable
+                    {
+                        a(&ev);
+                    });
+            }
+            else if constexpr (std::is_same_v<T, PhysicalPadAftertouchEvent>)
+            {
+                for (auto &e : activeState.physicalPadEvents)
                 {
-                    e.pressure = payload.pressure;
-                    actions.push_back([a = msg.action, e]() mutable { a(&e); });
+                    if (e.padIndex == payload.padIndex &&
+                        e.source == msg.source)
+                    {
+                        e.pressure = payload.pressure;
+                        actions.push_back(
+                            [a = msg.action, e]() mutable
+                            {
+                                a(&e);
+                            });
+                    }
                 }
             }
-        }
-        else if constexpr (std::is_same_v<T, PhysicalPadReleaseEvent>)
-        {
-            auto it = std::find_if(activeState.physicalPadEvents.begin(),
-                                   activeState.physicalPadEvents.end(),
-                                   [&](const auto &e)
-                                   {
-                                       return e.padIndex == payload.padIndex;
-                                   });
-
-            if (it == activeState.physicalPadEvents.end())
+            else if constexpr (std::is_same_v<T, PhysicalPadReleaseEvent>)
             {
-                actions.push_back([a = msg.action]() mutable { a(nullptr); });
-                return;
-            }
+                auto it =
+                    std::find_if(activeState.physicalPadEvents.begin(),
+                                 activeState.physicalPadEvents.end(),
+                                 [&](const auto &e)
+                                 {
+                                     return e.padIndex == payload.padIndex;
+                                 });
 
-            actions.push_back([a = msg.action, e = *it]() mutable { a(&e); });
-            activeState.physicalPadEvents.erase(it);
-        }
-        else if constexpr (std::is_same_v<T, ProgramPadPressEvent>)
-        {
-            activeState.programPadEvents.push_back(payload);
-            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
-        }
-        else if constexpr (std::is_same_v<T, ProgramPadAftertouchEvent>)
-        {
-            for (auto &e : activeState.programPadEvents)
-            {
-                if (e.padIndex == payload.padIndex && e.source == msg.source)
+                if (it == activeState.physicalPadEvents.end())
                 {
-                    e.pressure = payload.pressure;
-                    actions.push_back([a = msg.action, e]() mutable { a(&e); });
+                    actions.push_back(
+                        [a = msg.action]() mutable
+                        {
+                            a(nullptr);
+                        });
+                    return;
+                }
+
+                actions.push_back(
+                    [a = msg.action, e = *it]() mutable
+                    {
+                        a(&e);
+                    });
+                activeState.physicalPadEvents.erase(it);
+            }
+            else if constexpr (std::is_same_v<T, ProgramPadPressEvent>)
+            {
+                activeState.programPadEvents.push_back(payload);
+                actions.push_back(
+                    [a = msg.action, ev = payload]() mutable
+                    {
+                        a(&ev);
+                    });
+            }
+            else if constexpr (std::is_same_v<T, ProgramPadAftertouchEvent>)
+            {
+                for (auto &e : activeState.programPadEvents)
+                {
+                    if (e.padIndex == payload.padIndex &&
+                        e.source == msg.source)
+                    {
+                        e.pressure = payload.pressure;
+                        actions.push_back(
+                            [a = msg.action, e]() mutable
+                            {
+                                a(&e);
+                            });
+                    }
                 }
             }
-        }
-        else if constexpr (std::is_same_v<T, ProgramPadReleaseEvent>)
-        {
-            auto it = std::find_if(activeState.programPadEvents.begin(),
-                                   activeState.programPadEvents.end(),
-                                   [&](const auto &e)
-                                   {
-                                       return e.padIndex == payload.padIndex &&
-                                              e.source == msg.source &&
-                                              e.programIndex == payload.programIndex;
-                                   });
-
-            if (it == activeState.programPadEvents.end())
+            else if constexpr (std::is_same_v<T, ProgramPadReleaseEvent>)
             {
-                actions.push_back([a = msg.action]() mutable { a(nullptr); });
-                return;
-            }
+                auto it = std::find_if(
+                    activeState.programPadEvents.begin(),
+                    activeState.programPadEvents.end(),
+                    [&](const auto &e)
+                    {
+                        return e.padIndex == payload.padIndex &&
+                               e.source == msg.source &&
+                               e.programIndex == payload.programIndex;
+                    });
 
-            actions.push_back([a = msg.action, e = *it]() mutable { a(&e); });
-            activeState.programPadEvents.erase(it);
-        }
-        else if constexpr (std::is_same_v<T, NoteOnEvent>)
-        {
-            activeState.noteEvents.push_back(payload);
-            actions.push_back([a = msg.action, ev = payload]() mutable { a(&ev); });
-        }
-        else if constexpr (std::is_same_v<T, NoteAftertouchEvent>)
-        {
-            for (auto &e : activeState.noteEvents)
-            {
-                if (e.noteNumber == payload.noteNumber &&
-                    e.source == msg.source &&
-                    e.midiInputChannel == payload.midiInputChannel)
+                if (it == activeState.programPadEvents.end())
                 {
-                    e.pressure = payload.pressure;
-                    actions.push_back([a = msg.action, e]() mutable { a(&e); });
+                    actions.push_back(
+                        [a = msg.action]() mutable
+                        {
+                            a(nullptr);
+                        });
+                    return;
+                }
+
+                actions.push_back(
+                    [a = msg.action, e = *it]() mutable
+                    {
+                        a(&e);
+                    });
+                activeState.programPadEvents.erase(it);
+            }
+            else if constexpr (std::is_same_v<T, NoteOnEvent>)
+            {
+                activeState.noteEvents.push_back(payload);
+                actions.push_back(
+                    [a = msg.action, ev = payload]() mutable
+                    {
+                        a(&ev);
+                    });
+            }
+            else if constexpr (std::is_same_v<T, NoteAftertouchEvent>)
+            {
+                for (auto &e : activeState.noteEvents)
+                {
+                    if (e.noteNumber == payload.noteNumber &&
+                        e.source == msg.source &&
+                        e.midiInputChannel == payload.midiInputChannel)
+                    {
+                        e.pressure = payload.pressure;
+                        actions.push_back(
+                            [a = msg.action, e]() mutable
+                            {
+                                a(&e);
+                            });
+                    }
                 }
             }
-        }
-        else if constexpr (std::is_same_v<T, NoteOffEvent>)
-        {
-            auto it = std::find_if(
-                activeState.noteEvents.begin(), activeState.noteEvents.end(),
-                [&](const auto &n)
-                {
-                    return n.source == msg.source &&
-                           n.noteNumber == payload.noteNumber &&
-                           (n.source != PerformanceEventSource::MidiInput ||
-                            n.midiInputChannel == payload.midiInputChannel);
-                });
-
-            if (it == activeState.noteEvents.end())
+            else if constexpr (std::is_same_v<T, NoteOffEvent>)
             {
-                actions.push_back([a = msg.action]() mutable { a(nullptr); });
-                return;
+                auto it = std::find_if(
+                    activeState.noteEvents.begin(),
+                    activeState.noteEvents.end(),
+                    [&](const auto &n)
+                    {
+                        return n.source == msg.source &&
+                               n.noteNumber == payload.noteNumber &&
+                               (n.source != PerformanceEventSource::MidiInput ||
+                                n.midiInputChannel == payload.midiInputChannel);
+                    });
+
+                if (it == activeState.noteEvents.end())
+                {
+                    actions.push_back(
+                        [a = msg.action]() mutable
+                        {
+                            a(nullptr);
+                        });
+                    return;
+                }
+
+                actions.push_back(
+                    [a = msg.action, e = *it]() mutable
+                    {
+                        a(&e);
+                    });
+                activeState.noteEvents.erase(it);
             }
-
-            actions.push_back([a = msg.action, e = *it]() mutable { a(&e); });
-            activeState.noteEvents.erase(it);
-        }
-        else if constexpr (std::is_same_v<T, SetDrumProgram>)
-        {
-            activeState.drums[payload.drumBusIndex];
-
-        }
-        else if constexpr (std::is_same_v<T, std::monostate>)
-        {
-            activeState.physicalPadEvents.clear();
-            activeState.programPadEvents.clear();
-            activeState.noteEvents.clear();
-        }
-
-    }, msg.payload);
+            else if constexpr (std::is_same_v<T, SetDrumProgram>)
+            {
+                activeState.drums[payload.drumBusIndex];
+            }
+            else if constexpr (std::is_same_v<T, std::monostate>)
+            {
+                activeState.physicalPadEvents.clear();
+                activeState.programPadEvents.clear();
+                activeState.noteEvents.clear();
+            }
+        },
+        msg.payload);
 }
-

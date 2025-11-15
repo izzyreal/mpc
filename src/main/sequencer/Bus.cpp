@@ -11,9 +11,9 @@ using namespace mpc::engine;
 
 Bus::Bus(const BusType busType) : busType(busType) {}
 
-DrumBus::DrumBus(
-    const DrumBusIndex drumIndexToUse,
-    std::function<void(const DrumBusIndex, const ProgramIndex)> setProgramInPerformanceState)
+DrumBus::DrumBus(const DrumBusIndex drumIndexToUse,
+                 std::function<void(const DrumBusIndex, const ProgramIndex)>
+                     setProgramInPerformanceState)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
       setProgramInPerformanceState(setProgramInPerformanceState)
 {

@@ -415,7 +415,8 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
 
 void Sampler::repairProgramReferences() const
 {
-    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
+    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
+         ++drumBusIndex)
     {
         const auto drumBus =
             mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));

@@ -8,23 +8,18 @@
 
 namespace mpc::performance
 {
-    struct SetDrumProgram {
+    struct SetDrumProgram
+    {
         DrumBusIndex drumBusIndex;
         performance::Program performanceProgram;
     };
 
-    using PerformanceMessagePayload = std::variant<
-        std::monostate,
-        PhysicalPadPressEvent,
-        PhysicalPadAftertouchEvent,
-        PhysicalPadReleaseEvent,
-        ProgramPadPressEvent,
-        ProgramPadAftertouchEvent,
-        ProgramPadReleaseEvent,
-        NoteOnEvent,
-        NoteAftertouchEvent,
-        NoteOffEvent,
-        SetDrumProgram>;
+    using PerformanceMessagePayload =
+        std::variant<std::monostate, PhysicalPadPressEvent,
+                     PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
+                     ProgramPadPressEvent, ProgramPadAftertouchEvent,
+                     ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
+                     NoteOffEvent, SetDrumProgram>;
 
     struct PerformanceMessage
     {
@@ -39,4 +34,3 @@ namespace mpc::performance
         PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
     };
 } // namespace mpc::performance
-

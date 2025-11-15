@@ -11,7 +11,6 @@ namespace mpc::performance
 {
     class Program;
 
-    void mapSamplerProgramToPerformanceProgram(
-            const mpc::sampler::Program&,
-            mpc::performance::Program&);
+    void mapSamplerProgramToPerformanceProgram(const mpc::sampler::Program &,
+                                               mpc::performance::Program &);
 } // namespace mpc::performance

@@ -60,8 +60,8 @@ void DrumScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        getActiveDrumBus()->setProgramIndex(getActiveDrumBus()->getProgramIndex() +
-                                            i);
+        getActiveDrumBus()->setProgramIndex(
+            getActiveDrumBus()->getProgramIndex() + i);
         displayPgm();
     }
     else if (focusedFieldName == "program-change")

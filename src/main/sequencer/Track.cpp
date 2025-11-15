@@ -113,14 +113,18 @@ Track::findRecordingNoteOnEventById(const NoteEventId id)
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
         if (e->getId() == id)
+        {
             found = e;
+        }
 
         assert(e->isBeingRecorded());
         bulkNoteOns[count++] = e;
     }
 
     for (size_t i = 0; i < count; i++)
+    {
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+    }
 
     return found;
 }
@@ -131,8 +135,7 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
     for (auto &e : events)
     {
         if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
-            noteOnEvent &&
-            noteOnEvent->isBeingRecorded() &&
+            noteOnEvent && noteOnEvent->isBeingRecorded() &&
             noteOnEvent->getNote() == noteNumber)
         {
             return noteOnEvent;
@@ -147,13 +150,17 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
         if (e->isBeingRecorded() && e->getNote() == noteNumber)
+        {
             found = e;
+        }
 
         bulkNoteOns[count++] = e;
     }
 
     for (size_t i = 0; i < count; i++)
+    {
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+    }
 
     return found;
 }
