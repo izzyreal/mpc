@@ -76,8 +76,6 @@ namespace mpc::sequencer
     constexpr BusType operator+(BusType lhs, int rhs) noexcept
     {
         using S = int;
-        using U = std::underlying_type_t<BusType>;
-
         constexpr S MIN = static_cast<S>(BusType::MIDI);
         constexpr S MAX = static_cast<S>(BusType::DRUM4);
 
@@ -90,8 +88,6 @@ namespace mpc::sequencer
     constexpr BusType operator-(BusType lhs, int rhs) noexcept
     {
         using S = int;
-        using U = std::underlying_type_t<BusType>;
-
         constexpr S MIN = static_cast<S>(BusType::MIDI);
         constexpr S MAX = static_cast<S>(BusType::DRUM4);
 

@@ -14,7 +14,7 @@ namespace mpc::performance
     {
         for (int i = 0; i < 64; ++i)
         {
-            auto *sn = src.getNoteParameters(i);
+            auto *sn = src.getNoteParameters(i + MinDrumNoteNumber);
             auto &dn = dst.noteParameters[i];
 
             dn.noteNumber = sn->getNumber();
