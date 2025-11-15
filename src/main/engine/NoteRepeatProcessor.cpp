@@ -22,7 +22,7 @@ using namespace mpc::sequencer;
 using namespace mpc::sampler;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::engine::audio::mixer;
 
 NoteRepeatProcessor::NoteRepeatProcessor(

@@ -10,7 +10,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     struct PhysicalPadPressEvent
     {
@@ -95,4 +95,4 @@ namespace mpc::eventregistry
     using PhysicalPadPressEvents = std::vector<PhysicalPadPressEvent>;
     using ProgramPadPressEvents = std::vector<ProgramPadPressEvent>;
     using NoteOnEvents = std::vector<NoteOnEvent>;
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

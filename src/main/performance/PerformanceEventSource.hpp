@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     enum class PerformanceEventSource
     {
@@ -37,4 +37,4 @@ namespace mpc::eventregistry
         return "Unknown";
     }
     */
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

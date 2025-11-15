@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     struct PerformanceState;
 
@@ -27,4 +27,4 @@ namespace mpc::eventregistry
     private:
         std::shared_ptr<const PerformanceState> state;
     };
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

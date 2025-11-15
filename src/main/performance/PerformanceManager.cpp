@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::concurrency;
 
 PerformanceManager::PerformanceManager()

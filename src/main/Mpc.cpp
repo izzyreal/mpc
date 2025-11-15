@@ -125,7 +125,7 @@ void Mpc::init()
     eventHandler = std::make_shared<audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
 
-    performanceManager = std::make_shared<eventregistry::PerformanceManager>();
+    performanceManager = std::make_shared<performance::PerformanceManager>();
 
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);

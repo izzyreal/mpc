@@ -127,14 +127,14 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
 
     mpc.performanceManager->registerNoteOn(
-        eventregistry::PerformanceEventSource::Sequence, std::nullopt, screenId,
+        performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
         track->getIndex(), ctx.drum->busType, note, noteOnEvent->getVelocity(),
         programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
         mpc.performanceManager->registerProgramPadPress(
-            eventregistry::PerformanceEventSource::Sequence, std::nullopt, screenId,
+            performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
             track->getIndex(), ctx.drum->busType, programPadIndex,
             noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
     }
@@ -150,13 +150,13 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        performanceManager->registerNoteOff(eventregistry::PerformanceEventSource::Sequence, note,
+        performanceManager->registerNoteOff(performance::PerformanceEventSource::Sequence, note,
                                        noMidiChannel, [](void *) {});
 
         if (programPadIndex != -1)
         {
             performanceManager->registerProgramPadRelease(
-                eventregistry::PerformanceEventSource::Sequence, programPadIndex, programIndex,
+                performance::PerformanceEventSource::Sequence, programPadIndex, programIndex,
                 [](void *) {});
         }
 

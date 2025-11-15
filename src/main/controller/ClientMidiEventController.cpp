@@ -20,7 +20,7 @@
 
 #include <memory>
 
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::controller;
 using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
@@ -206,8 +206,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         [noteNumber = e.getNoteNumber(), velocity = e.getVelocity(), track,
          screen, programPadIndex, program, this](void *userData)
     {
-        const eventregistry::NoteOnEvent *registryNoteOnEvent =
-            static_cast<eventregistry::NoteOnEvent *>(userData);
+        const performance::NoteOnEvent *registryNoteOnEvent =
+            static_cast<performance::NoteOnEvent *>(userData);
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
@@ -243,7 +243,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const std::function action = [this, noteNumber](void *userData)
     {
         const auto noteEventInfo =
-            static_cast<eventregistry::NoteOnEvent *>(userData);
+            static_cast<performance::NoteOnEvent *>(userData);
 
         if (!noteEventInfo)
         {

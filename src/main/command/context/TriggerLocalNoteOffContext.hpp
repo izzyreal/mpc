@@ -5,11 +5,11 @@
 #include <functional>
 #include <cstdint>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     class PerformanceManager;
     class NoteOnEvent;
-} // namespace mpc::eventregistry
+} // namespace mpc::performance
 
 namespace mpc::sampler
 {
@@ -34,8 +34,8 @@ namespace mpc::command::context
 {
     struct TriggerLocalNoteOffContext
     {
-        eventregistry::PerformanceEventSource source;
-        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
+        performance::PerformanceEventSource source;
+        std::shared_ptr<performance::PerformanceManager> performanceManager;
         std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;

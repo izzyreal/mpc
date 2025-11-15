@@ -18,7 +18,7 @@ namespace mpc
     class Mpc;
 }
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     class PerformanceManager;
 }

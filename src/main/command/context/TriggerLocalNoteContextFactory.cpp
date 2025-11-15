@@ -28,13 +28,13 @@ using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace mpc::hardware;
 using namespace mpc::sampler;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::audiomidi;
 using namespace mpc::engine;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    const PerformanceEventSource source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
+    const PerformanceEventSource source, const performance::NoteOnEvent &registryNoteOnEvent,
     const NoteNumber note, const Velocity velocity, Track *track,
     const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,

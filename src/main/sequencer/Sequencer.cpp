@@ -38,7 +38,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
 

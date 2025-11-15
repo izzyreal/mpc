@@ -3,7 +3,7 @@
 #include "performance/PerformanceState.hpp"
 
 using namespace mpc;
-using namespace mpc::eventregistry;
+using namespace mpc::performance;
 
 PerformanceStateView::PerformanceStateView(const std::shared_ptr<const PerformanceState> s) noexcept
     : state(s)

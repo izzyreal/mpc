@@ -12,7 +12,7 @@
 #include <optional>
 #include <functional>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     class PerformanceManager final
         : public concurrency::AtomicStateExchange<PerformanceState, PerformanceStateView,
@@ -70,4 +70,4 @@ namespace mpc::eventregistry
         static constexpr size_t CAPACITY = 8192;
         void reserveState(PerformanceState &) const;
     };
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

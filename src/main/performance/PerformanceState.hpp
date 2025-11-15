@@ -2,7 +2,7 @@
 
 #include "performance/EventTypes.hpp"
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     struct PerformanceState
     {
@@ -27,4 +27,4 @@ namespace mpc::eventregistry
             return *this;
         }
     };
-} // namespace mpc::eventregistry
+} // namespace mpc::performance

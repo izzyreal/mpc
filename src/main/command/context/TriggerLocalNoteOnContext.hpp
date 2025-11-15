@@ -10,7 +10,7 @@ namespace mpc::engine
     class SequencerPlaybackEngine;
 }
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     class PerformanceManager;
 }
@@ -48,9 +48,9 @@ namespace mpc::command::context
 {
     struct TriggerLocalNoteOnContext
     {
-        eventregistry::PerformanceEventSource source;
-        std::shared_ptr<eventregistry::PerformanceManager> performanceManager;
-        eventregistry::NoteOnEvent registryNoteOnEvent;
+        performance::PerformanceEventSource source;
+        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        performance::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
         std::optional<ProgramPadIndex> programPadIndex;
         Velocity velocity;

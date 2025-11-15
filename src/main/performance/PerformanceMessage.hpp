@@ -4,7 +4,7 @@
 
 #include <functional>
 
-namespace mpc::eventregistry
+namespace mpc::performance
 {
     struct PerformanceMessage
     {
@@ -43,4 +43,4 @@ namespace mpc::eventregistry
         PerformanceMessage(PerformanceMessage &&) noexcept = default;
         PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
     };
-} // namespace mpc::eventregistry
+} // namespace mpc::performance
