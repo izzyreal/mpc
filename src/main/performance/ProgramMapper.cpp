@@ -1,6 +1,8 @@
 #include "performance/ProgramMapper.hpp"
 
 #include "IntTypes.hpp"
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "performance/Drum.hpp"
@@ -19,11 +21,11 @@ namespace mpc::performance
 
             dn.noteNumber = sn->getNumber();
 
-            const auto stereo = sn->getStereoMixerChannel();
+            const auto stereo = sn->getStereoMixer();
             dn.stereoMixer.level = DrumMixerLevel(stereo->getLevel());
             dn.stereoMixer.panning = DrumMixerPanning(stereo->getPanning());
 
-            const auto fx = sn->getIndivFxMixerChannel();
+            const auto fx = sn->getIndivFxMixer();
             dn.indivFxMixer.individualOutLevel =
                 DrumMixerLevel(fx->getVolumeIndividualOut());
             dn.indivFxMixer.fxSendLevel = DrumMixerLevel(fx->getFxSendLevel());

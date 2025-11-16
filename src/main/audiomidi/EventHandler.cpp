@@ -32,6 +32,7 @@
 #include <cassert>
 #include <memory>
 
+#include "engine/StereoMixer.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "lcdgui/ScreenNames.hpp"
 
@@ -253,11 +254,11 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
 
         if (mixerEvent->getParameter() == 0)
         {
-            mixer->setLevel(mixerEvent->getValue());
+            mixer->setLevel(DrumMixerLevel(mixerEvent->getValue()));
         }
         else if (mixerEvent->getParameter() == 1)
         {
-            mixer->setPanning(mixerEvent->getValue());
+            mixer->setPanning(DrumMixerPanning(mixerEvent->getValue()));
         }
     }
 }

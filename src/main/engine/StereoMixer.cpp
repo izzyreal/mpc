@@ -1,31 +1,38 @@
 #include "StereoMixer.hpp"
 
-#include <algorithm>
-
 using namespace mpc::engine;
 
-StereoMixer::StereoMixer()
+StereoMixer::StereoMixer(
+    const std::function<performance::StereoMixer()> &getSnapshot,
+    const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    : getSnapshot(getSnapshot), dispatch(dispatch)
 {
-    panning = 50;
-    level = 100;
 }
 
-void StereoMixer::setPanning(int i)
+void StereoMixer::setPanning(const DrumMixerPanning panning) const
 {
-    panning = std::clamp(i, 0, 100);
+    auto s = getSnapshot();
+    s.panning = panning;
+    performance::PerformanceMessage msg;
+    msg.payload = performance::UpdateStereoMixer{s};
+    dispatch(msg);
 }
 
-int StereoMixer::getPanning() const
+mpc::DrumMixerPanning StereoMixer::getPanning() const
 {
-    return panning;
+    return getSnapshot().panning;
 }
 
-void StereoMixer::setLevel(int i)
+void StereoMixer::setLevel(const DrumMixerLevel level) const
 {
-    level = std::clamp(i, 0, 100);
+    auto s = getSnapshot();
+    s.level = level;
+    performance::PerformanceMessage msg;
+    msg.payload = performance::UpdateStereoMixer{s};
+    dispatch(msg);
 }
 
-int StereoMixer::getLevel() const
+mpc::DrumMixerLevel StereoMixer::getLevel() const
 {
-    return level;
+    return getSnapshot().level;
 }

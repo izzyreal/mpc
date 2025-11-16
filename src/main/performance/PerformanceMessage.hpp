@@ -22,12 +22,23 @@ namespace mpc::performance
         NoteParameters performanceNoteParameters;
     };
 
+    struct UpdateStereoMixer
+    {
+        StereoMixer stereoMixer;
+    };
+
+    struct UpdateIndivFxMixer
+    {
+        IndivFxMixer indivFxMixer;
+    };
+
     using PerformanceMessagePayload =
         std::variant<std::monostate, PhysicalPadPressEvent,
                      PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
                      ProgramPadPressEvent, ProgramPadAftertouchEvent,
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
-                     NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters>;
+                     NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
+                     UpdateIndivFxMixer, UpdateStereoMixer>;
 
     struct PerformanceMessage
     {

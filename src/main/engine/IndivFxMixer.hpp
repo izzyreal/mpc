@@ -1,38 +1,42 @@
 #pragma once
 
+#include <functional>
+
+#include "performance/Drum.hpp"
+#include "performance/PerformanceMessage.hpp"
+
 namespace mpc::engine
 {
-
     class IndivFxMixer
     {
-
-        int output{0};
-        int volumeIndividualOut{0};
-        int fxPath{0};
-        int fxSendLevel{0};
-        bool followStereo{false};
-
     public:
-        void setFollowStereo(bool b);
+        IndivFxMixer(
+            const std::function<performance::IndivFxMixer()> &getSnapshot,
+            const std::function<void(performance::PerformanceMessage &)>
+                &dispatch);
+
+        void setFollowStereo(bool b) const;
 
         bool isFollowingStereo() const;
 
-        int getOutput() const;
+        DrumMixerIndividualOutput getOutput() const;
 
-        void setOutput(int i);
+        void setOutput(DrumMixerIndividualOutput) const;
 
-        void setVolumeIndividualOut(int i);
+        void setVolumeIndividualOut(DrumMixerLevel) const;
 
-        int getVolumeIndividualOut() const;
+        DrumMixerLevel getVolumeIndividualOut() const;
 
-        void setFxPath(int i);
+        void setFxPath(DrumMixerIndividualFxPath) const;
 
-        int getFxPath() const;
+        DrumMixerIndividualFxPath getFxPath() const;
 
-        void setFxSendLevel(int i);
+        void setFxSendLevel(DrumMixerLevel) const;
 
-        int getFxSendLevel() const;
+        DrumMixerLevel getFxSendLevel() const;
 
-        IndivFxMixer();
+    private:
+        const std::function<performance::IndivFxMixer()> getSnapshot;
+        std::function<void(performance::PerformanceMessage &)> dispatch;
     };
 } // namespace mpc::engine

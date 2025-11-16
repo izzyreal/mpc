@@ -1,14 +1,17 @@
 #pragma once
 
 #include "IntTypes.hpp"
-#include "engine/StereoMixer.hpp"
-#include "engine/IndivFxMixer.hpp"
-
 #include "sampler/VoiceOverlapMode.hpp"
 #include "performance/PerformanceMessage.hpp"
 
 #include <memory>
 #include <functional>
+
+namespace mpc::engine
+{
+    class StereoMixer;
+    class IndivFxMixer;
+} // namespace mpc::engine
 
 namespace mpc::sampler
 {
@@ -123,17 +126,15 @@ namespace mpc::sampler
 
         VoiceOverlapMode getVoiceOverlapMode() const;
 
-        std::shared_ptr<engine::StereoMixer> getStereoMixerChannel();
+        std::shared_ptr<engine::StereoMixer> getStereoMixer();
 
-        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixerChannel();
+        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixer();
 
     private:
         const int index;
         const std::function<performance::NoteParameters()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &)> dispatch;
-        std::shared_ptr<engine::StereoMixer> stereoMixerChannel =
-            std::make_shared<engine::StereoMixer>();
-        std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =
-            std::make_shared<engine::IndivFxMixer>();
+        std::shared_ptr<engine::StereoMixer> stereoMixer;
+        std::shared_ptr<engine::IndivFxMixer> indivFxMixer;
     };
 } // namespace mpc::sampler

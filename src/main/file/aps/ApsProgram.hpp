@@ -63,8 +63,10 @@ namespace mpc::file::aps
         std::string getName();
 
         std::vector<char> getBytes();
-        engine::StereoMixer getStereoMixerChannel(int noteIndex) const;
-        engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex) const;
+
+        performance::StereoMixer getStereoMixerChannel(int noteIndex) const;
+
+        performance::IndivFxMixer getIndivFxMixerChannel(int noteIndex) const;
 
         ApsProgram(const std::vector<char> &loadBytes);
         ApsProgram(sampler::Program *program, int index);

@@ -27,7 +27,7 @@ void PerformanceManager::reserveState(PerformanceState &s) const
 
 void PerformanceManager::registerSetDrumProgram(
     const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
-    const std::shared_ptr<sampler::Program> sp)
+    const std::shared_ptr<sampler::Program> &sp) const
 {
     UpdateDrumProgram payload{drumBusIndex, programIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);

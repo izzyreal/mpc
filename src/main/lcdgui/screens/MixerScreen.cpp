@@ -2,6 +2,8 @@
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -91,7 +93,7 @@ MixerScreen::getStereoMixerChannel(const int index) const
 
     return stereoMixSourceIsDrum
                ? getActiveDrumBus()->getStereoMixerChannels()[note - 35]
-               : noteParameters->getStereoMixerChannel();
+               : noteParameters->getStereoMixer();
 }
 
 std::shared_ptr<IndivFxMixer>
@@ -116,7 +118,7 @@ MixerScreen::getIndivFxMixerChannel(const int index) const
 
     return indivFxSourceIsDrum
                ? getActiveDrumBus()->getIndivFxMixerChannels()[note - 35]
-               : noteParameters->getIndivFxMixerChannel();
+               : noteParameters->getIndivFxMixer();
 }
 
 void MixerScreen::displayMixerStrip(const int stripIndex)

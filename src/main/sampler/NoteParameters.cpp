@@ -1,9 +1,11 @@
-#include <algorithm>
 #include "sampler/NoteParameters.hpp"
+
 #include "IntTypes.hpp"
 
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
+
 using namespace mpc::sampler;
-using namespace mpc::engine;
 
 NoteParameters::NoteParameters(
     const int index,
@@ -11,6 +13,18 @@ NoteParameters::NoteParameters(
     const std::function<void(performance::PerformanceMessage &)> &dispatch)
     : index(index), getSnapshot(getSnapshot), dispatch(dispatch)
 {
+    stereoMixer = std::make_shared<engine::StereoMixer>(
+        [&]
+        {
+            return getSnapshot().stereoMixer;
+        },
+        dispatch);
+    indivFxMixer = std::make_shared<engine::IndivFxMixer>(
+        [&]
+        {
+            return getSnapshot().indivFxMixer;
+        },
+        dispatch);
 }
 
 NoteParameters *NoteParameters::clone(const int newIndex) const
@@ -372,12 +386,12 @@ int NoteParameters::getVelocityToPitch() const
     return getSnapshot().velocityToPitch;
 }
 
-std::shared_ptr<StereoMixer> NoteParameters::getStereoMixerChannel()
+std::shared_ptr<mpc::engine::StereoMixer> NoteParameters::getStereoMixer()
 {
-    return stereoMixerChannel;
+    return stereoMixer;
 }
 
-std::shared_ptr<IndivFxMixer> NoteParameters::getIndivFxMixerChannel()
+std::shared_ptr<mpc::engine::IndivFxMixer> NoteParameters::getIndivFxMixer()
 {
-    return indivFxMixerChannel;
+    return indivFxMixer;
 }

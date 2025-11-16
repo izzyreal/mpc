@@ -25,10 +25,33 @@ DrumBus::DrumBus(
     receivePgmChange = true;
     receiveMidiVolume = true;
 
+    auto dispatch = [performanceManager](performance::PerformanceMessage &m)
+    {
+        performanceManager->enqueue(m);
+    };
+
     for (int i = 0; i < 64; i++)
     {
-        stereoMixerChannels.emplace_back(std::make_shared<StereoMixer>());
-        indivFxMixerChannels.emplace_back(std::make_shared<IndivFxMixer>());
+        auto getStereoMixerSnapshot =
+            [performanceManager, this, drumNoteNumber = i + MinDrumNoteNumber]
+        {
+            return performanceManager->getSnapshot()
+                .getDrum(drumIndex)
+                .getStereoMixer(DrumNoteNumber(drumNoteNumber));
+        };
+
+        auto getIndivFxMixerSnapshot =
+            [performanceManager, this, drumNoteNumber = i + MinDrumNoteNumber]
+        {
+            return performanceManager->getSnapshot()
+                .getDrum(drumIndex)
+                .getIndivFxMixer(DrumNoteNumber(drumNoteNumber));
+        };
+
+        stereoMixerChannels.emplace_back(
+            std::make_shared<StereoMixer>(getStereoMixerSnapshot, dispatch));
+        indivFxMixerChannels.emplace_back(
+            std::make_shared<IndivFxMixer>(getIndivFxMixerSnapshot, dispatch));
     }
 }
 

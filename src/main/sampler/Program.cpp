@@ -89,14 +89,14 @@ std::shared_ptr<StereoMixer>
 Program::getStereoMixerChannel(const int noteIndex) const
 {
     return std::dynamic_pointer_cast<StereoMixer>(
-        noteParameters[noteIndex]->getStereoMixerChannel());
+        noteParameters[noteIndex]->getStereoMixer());
 }
 
 std::shared_ptr<IndivFxMixer>
 Program::getIndivFxMixerChannel(const int noteIndex) const
 {
     return std::dynamic_pointer_cast<IndivFxMixer>(
-        noteParameters[noteIndex]->getIndivFxMixerChannel());
+        noteParameters[noteIndex]->getIndivFxMixer());
 }
 
 mpc::ProgramPadIndex

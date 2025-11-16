@@ -1,7 +1,8 @@
 #pragma once
 
+#include "performance/Drum.hpp"
+
 #include <vector>
-#include <memory>
 
 namespace mpc::engine
 {
@@ -23,8 +24,8 @@ namespace mpc::file::aps
         std::vector<int> sendLevels = std::vector<int>(64);
         std::vector<char> saveBytes = std::vector<char>(384);
 
-        engine::StereoMixer getStereoMixerChannel(int noteIndex);
-        engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
+        performance::StereoMixer getStereoMixerChannel(int noteIndex) const;
+        performance::IndivFxMixer getIndivFxMixerChannel(int noteIndex) const;
         int getFxPath(int noteIndex) const;
         int getLevel(int noteIndex) const;
         int getPanning(int noteIndex) const;
@@ -34,7 +35,9 @@ namespace mpc::file::aps
         std::vector<char> getBytes();
 
         ApsMixer(const std::vector<char> &loadBytes);
-        ApsMixer(std::vector<std::shared_ptr<engine::StereoMixer>> &smc,
-                 std::vector<std::shared_ptr<engine::IndivFxMixer>> &ifmc);
+        ApsMixer(const std::vector<std::shared_ptr<engine::StereoMixer>>
+                     &stereoMixer,
+                 const std::vector<std::shared_ptr<engine::IndivFxMixer>>
+                     &indivFxMixer);
     };
 } // namespace mpc::file::aps
