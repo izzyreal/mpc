@@ -21,7 +21,6 @@ namespace mpc
         }
 
     public:
-        // Cross-type constrained conversion
         template <
             typename OtherInt, OtherInt OtherMin, OtherInt OtherMax,
             typename = std::enable_if_t<std::is_integral_v<OtherInt> &&
@@ -32,7 +31,6 @@ namespace mpc
         {
         }
 
-        // Construction from raw IntType
         explicit constexpr ConstrainedInt(IntType v)
             : value(std::clamp(v, Min, Max))
         {
@@ -48,8 +46,6 @@ namespace mpc
         {
             return value;
         }
-
-        // *** Corrected arithmetic (no wrap-around) ***
 
         constexpr ConstrainedInt operator+(IntType rhs) const
         {

@@ -29,7 +29,7 @@ void PerformanceManager::registerSetDrumProgram(
     const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
     const std::shared_ptr<sampler::Program> sp)
 {
-    SetDrumProgram payload{drumBusIndex};
+    SetDrumProgram payload{drumBusIndex, programIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
     PerformanceMessage msg;
     msg.payload = payload;
