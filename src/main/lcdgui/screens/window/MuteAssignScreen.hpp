@@ -5,14 +5,10 @@ namespace mpc::lcdgui::screens::window
 {
     class MuteAssignScreen final : public ScreenComponent
     {
-
     public:
-        void turnWheel(int i) override;
-
         MuteAssignScreen(Mpc &mpc, int layerIndex);
+        void turnWheel(int i) override;
         void open() override;
-        void close() override;
-        void update(Observable *o, Message message) override;
 
     private:
         void displayNote() const;

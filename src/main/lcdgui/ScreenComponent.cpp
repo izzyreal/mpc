@@ -203,7 +203,6 @@ std::optional<mpc::ProgramIndex> ScreenComponent::getProgramIndex() const
 }
 
 std::shared_ptr<Program> ScreenComponent::getProgram() const
-
 {
     const auto programIndex = getProgramIndex();
 

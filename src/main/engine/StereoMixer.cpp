@@ -1,31 +1,47 @@
 #include "StereoMixer.hpp"
 
-#include <algorithm>
-
 using namespace mpc::engine;
 
-StereoMixer::StereoMixer()
+StereoMixer::StereoMixer(
+    const std::function<performance::StereoMixer()> &getSnapshot,
+    const std::function<DrumBusIndex()> &getDrumIndex,
+    const std::function<ProgramIndex()> &getProgramIndex,
+    const std::function<DrumNoteNumber()> &getDrumNoteNumber,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : getSnapshot(getSnapshot), getDrumIndex(getDrumIndex),
+      getProgramIndex(getProgramIndex), getDrumNoteNumber(getDrumNoteNumber),
+      dispatch(dispatch)
 {
-    panning = 50;
-    level = 100;
 }
 
-void StereoMixer::setPanning(int i)
+void StereoMixer::setPanning(const DrumMixerPanning panning) const
 {
-    panning = std::clamp(i, 0, 100);
+    performance::PerformanceMessage msg;
+    performance::UpdateStereoMixer payload{getDrumIndex(), getProgramIndex(),
+                                           getDrumNoteNumber()};
+    payload.member = &performance::StereoMixer::panning;
+    payload.newValue = panning;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-int StereoMixer::getPanning() const
+mpc::DrumMixerPanning StereoMixer::getPanning() const
 {
-    return panning;
+    return getSnapshot().panning;
 }
 
-void StereoMixer::setLevel(int i)
+void StereoMixer::setLevel(const DrumMixerLevel level) const
 {
-    level = std::clamp(i, 0, 100);
+    performance::PerformanceMessage msg;
+    performance::UpdateStereoMixer payload{getDrumIndex(), getProgramIndex(),
+                                           getDrumNoteNumber()};
+    payload.member = &performance::StereoMixer::level;
+    payload.newValue = level;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-int StereoMixer::getLevel() const
+mpc::DrumMixerLevel StereoMixer::getLevel() const
 {
-    return level;
+    return getSnapshot().level;
 }

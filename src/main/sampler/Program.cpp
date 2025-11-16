@@ -13,11 +13,26 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Program::Program(Mpc &mpc, Sampler *const samplerToUse) : sampler(samplerToUse)
+Program::Program(
+    Mpc &mpc, Sampler *samplerToUse,
+    const std::function<performance::Program()> &getSnapshot,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : sampler(samplerToUse), getSnapshot(getSnapshot), dispatch(dispatch)
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto n = new NoteParameters(i);
+        auto getNoteParametersSnapshot =
+            [this, drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber)]
+        {
+            return this->getSnapshot().getNoteParameters(drumNoteNumber);
+        };
+        auto n = new NoteParameters(
+            i,
+            [this]
+            {
+                return index;
+            },
+            getNoteParametersSnapshot, dispatch);
         noteParameters.push_back(n);
     }
 
@@ -41,7 +56,6 @@ int Program::getNumberOfSamples() const
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-
         if (const auto np = getNoteParameters(i + MinDrumNoteNumber);
             np->getSoundIndex() != -1)
         {
@@ -80,15 +94,13 @@ Pad *Program::getPad(const int i) const
 std::shared_ptr<StereoMixer>
 Program::getStereoMixerChannel(const int noteIndex) const
 {
-    return std::dynamic_pointer_cast<StereoMixer>(
-        noteParameters[noteIndex]->getStereoMixerChannel());
+    return noteParameters[noteIndex]->getStereoMixer();
 }
 
 std::shared_ptr<IndivFxMixer>
 Program::getIndivFxMixerChannel(const int noteIndex) const
 {
-    return std::dynamic_pointer_cast<IndivFxMixer>(
-        noteParameters[noteIndex]->getIndivFxMixerChannel());
+    return noteParameters[noteIndex]->getIndivFxMixer();
 }
 
 mpc::ProgramPadIndex
@@ -108,6 +120,11 @@ Program::getPadIndexFromNote(const DrumNoteNumber note) const
     }
 
     return NoProgramPadIndex;
+}
+
+void Program::setIndex(const ProgramIndex programIndex)
+{
+    index = programIndex;
 }
 
 std::vector<NoteParameters *> Program::getNotesParameters()

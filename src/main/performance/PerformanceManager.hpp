@@ -26,8 +26,7 @@ namespace mpc::performance
     public:
         PerformanceManager();
 
-        void registerSetDrumProgram(DrumBusIndex, ProgramIndex,
-                                    std::shared_ptr<sampler::Program>);
+        void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex) const;
 
         void registerPhysicalPadPress(
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
@@ -78,6 +77,7 @@ namespace mpc::performance
 
     private:
         static constexpr size_t CAPACITY = 8192;
-        void reserveState(PerformanceState &) const;
+
+        static void reserveState(PerformanceState &);
     };
 } // namespace mpc::performance

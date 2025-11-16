@@ -15,11 +15,6 @@ namespace mpc::engine
     class IndivFxMixer;
 } // namespace mpc::engine
 
-namespace mpc::sampler
-{
-    class Sampler;
-}
-
 namespace mpc::performance
 {
     class PerformanceManager;
@@ -48,8 +43,8 @@ namespace mpc::sequencer
     {
     public:
         explicit DrumBus(
-            DrumBusIndex, std::shared_ptr<performance::PerformanceManager>,
-            std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn);
+            DrumBusIndex,
+            const std::shared_ptr<performance::PerformanceManager> &);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
@@ -84,7 +79,6 @@ namespace mpc::sequencer
         const DrumBusIndex drumIndex;
         const std::shared_ptr<performance::PerformanceManager>
             performanceManager;
-        std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn;
         ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;

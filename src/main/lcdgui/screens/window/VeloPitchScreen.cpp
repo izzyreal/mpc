@@ -3,6 +3,7 @@
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "sampler/NoteParameters.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
@@ -10,24 +11,69 @@
 using namespace mpc::lcdgui::screens::window;
 
 VeloPitchScreen::VeloPitchScreen(Mpc &mpc, const int layerIndex)
-    : ScreenComponent(mpc, "velo-pitch", layerIndex)
-{
+    : ScreenComponent(mpc, "velo-pitch", layerIndex) {
+    addReactiveBinding({
+        [this] {
+            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
+            return controller->getMostRecentPhysicalPadPressTime();
+        }, [this](auto) mutable {
+            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
+            setVelo(controller->getMostRecentPhysicalPadPressVelocity());
+        }
+    });
 }
 
 void VeloPitchScreen::open()
 {
+    setVelo(MaxVelocity);
+    if (isReactiveBindingsEmpty())
+    {
+        auto getSelectedNote = [this]
+        {
+            return this->mpc.clientEventController->getSelectedNote();
+        };
+
+        auto getSelectedNoteParameters = [this, getSelectedNote]
+        {
+            return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+        };
+
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [this](auto)
+                            {
+                                displayNote();
+                                displayTune();
+                                displayVelo();
+                            }});
+
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()->getTune();
+                            },
+                            [this](auto)
+                            {
+                                displayTune();
+                            }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityToPitch();
+             },
+             [this](auto)
+             {
+                 displayVeloPitch();
+             }});
+    }
+
     displayNote();
     displayTune();
     displayVeloPitch();
+
     displayVelo();
-
-    mpc.clientEventController->addObserver(
-        this); // Subscribe to "note" messages
-}
-
-void VeloPitchScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
 }
 
 void VeloPitchScreen::turnWheel(const int i)
@@ -36,25 +82,23 @@ void VeloPitchScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "tune")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow(); focusedFieldName == "tune")
     {
         selectedNoteParameters->setTune(selectedNoteParameters->getTune() + i);
-        displayTune();
     }
     else if (focusedFieldName == "velo-pitch")
     {
         selectedNoteParameters->setVelocityToPitch(
             selectedNoteParameters->getVelocityToPitch() + i);
-        displayVeloPitch();
     }
     else if (focusedFieldName == "note")
     {
         mpc.clientEventController->setSelectedNote(
             mpc.clientEventController->getSelectedNote() + i);
-        // We could call all display methods here, but we instead rely on the
-        // "note" message
+    }
+    else if (focusedFieldName == "velo")
+    {
+        setVelo(velo + i);
     }
 }
 
@@ -83,19 +127,7 @@ void VeloPitchScreen::displayVeloPitch() const
 
 void VeloPitchScreen::displayVelo() const
 {
-    findField("velo")->setText("127");
-}
-
-void VeloPitchScreen::update(Observable *observable, const Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
-    {
-        displayNote();
-        displayTune();
-        displayVeloPitch();
-    }
+    findField("velo")->setTextPadded(velo);
 }
 
 void VeloPitchScreen::displayNote() const
@@ -115,4 +147,10 @@ void VeloPitchScreen::displayNote() const
     findField("note")->setText(
         std::to_string(selectedNoteParameters->getNumber()) + "/" + padName +
         "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+}
+
+void VeloPitchScreen::setVelo(const Velocity newVelo)
+{
+    velo = std::clamp(newVelo, Velocity1, MaxVelocity);
+    displayVelo();
 }

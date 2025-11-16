@@ -38,6 +38,11 @@ namespace mpc::lcdgui
 
         void addReactiveBinding(ReactiveBinding);
 
+        bool isReactiveBindingsEmpty() const
+        {
+            return reactiveBindings.empty();
+        }
+
     public:
         virtual ~Component() = default;
         void timerCallback()

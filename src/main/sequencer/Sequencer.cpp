@@ -114,11 +114,7 @@ void Sequencer::init()
          ++drumBusIndex)
     {
         buses.emplace_back(std::make_shared<DrumBus>(DrumBusIndex(drumBusIndex),
-                                                     performanceManager,
-                                                     [&]
-                                                     {
-                                                         return sampler;
-                                                     }));
+                                                     performanceManager));
     }
 
     lastTap = currentTimeMillis();

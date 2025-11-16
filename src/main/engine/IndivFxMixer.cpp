@@ -1,69 +1,96 @@
 #include "IndivFxMixer.hpp"
 
-#include <algorithm>
-
 using namespace mpc::engine;
 
-IndivFxMixer::IndivFxMixer()
+IndivFxMixer::IndivFxMixer(
+    const std::function<performance::IndivFxMixer()> &getSnapshot,
+    const std::function<DrumBusIndex()> &getDrumIndex,
+    const std::function<ProgramIndex()> &getProgramIndex,
+    const std::function<DrumNoteNumber()> &getDrumNoteNumber,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : getSnapshot(getSnapshot), getDrumIndex(getDrumIndex),
+      getProgramIndex(getProgramIndex), getDrumNoteNumber(getDrumNoteNumber),
+      dispatch(dispatch)
 {
-    output = 0;
-    volumeIndividualOut = 100;
-    fxPath = 0;
-    fxSendLevel = 0;
-    followStereo = false;
 }
 
-void IndivFxMixer::setFollowStereo(bool b)
+void IndivFxMixer::setFollowStereo(const bool b) const
 {
-    if (followStereo == b)
-    {
-        return;
-    }
-
-    followStereo = b;
+    performance::PerformanceMessage msg;
+    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
+                                            getDrumNoteNumber()};
+    payload.followStereoMember = &performance::IndivFxMixer::followStereo;
+    payload.followStereo = b;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
 bool IndivFxMixer::isFollowingStereo() const
 {
-    return followStereo;
+    return getSnapshot().followStereo;
 }
 
-int IndivFxMixer::getOutput() const
+mpc::DrumMixerIndividualOutput IndivFxMixer::getOutput() const
 {
-    return output;
+    return getSnapshot().individualOutput;
 }
 
-void IndivFxMixer::setOutput(int i)
+void IndivFxMixer::setOutput(const DrumMixerIndividualOutput output) const
 {
-    output = std::clamp(i, 0, 8);
+    performance::PerformanceMessage msg;
+    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
+                                            getDrumNoteNumber()};
+    payload.individualOutputMember =
+        &performance::IndivFxMixer::individualOutput;
+    payload.individualOutput = output;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-void IndivFxMixer::setVolumeIndividualOut(int i)
+void IndivFxMixer::setVolumeIndividualOut(const DrumMixerLevel level) const
 {
-    volumeIndividualOut = std::clamp(i, 0, 100);
+    performance::PerformanceMessage msg;
+    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
+                                            getDrumNoteNumber()};
+    payload.value0To100Member = &performance::IndivFxMixer::individualOutLevel;
+    payload.newValue = level;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-int IndivFxMixer::getVolumeIndividualOut() const
+mpc::DrumMixerLevel IndivFxMixer::getVolumeIndividualOut() const
 {
-    return volumeIndividualOut;
+    return getSnapshot().individualOutLevel;
 }
 
-void IndivFxMixer::setFxPath(int i)
+void IndivFxMixer::setFxPath(const DrumMixerIndividualFxPath path) const
 {
-    fxPath = std::clamp(i, 0, 4);
+    performance::PerformanceMessage msg;
+    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
+                                            getDrumNoteNumber()};
+    payload.individualFxPathMember = &performance::IndivFxMixer::fxPath;
+    payload.individualFxPath = path;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-int IndivFxMixer::getFxPath() const
+mpc::DrumMixerIndividualFxPath IndivFxMixer::getFxPath() const
 {
-    return fxPath;
+    return getSnapshot().fxPath;
 }
 
-void IndivFxMixer::setFxSendLevel(int i)
+void IndivFxMixer::setFxSendLevel(const DrumMixerLevel level) const
 {
-    fxSendLevel = std::clamp(i, 0, 100);
+    performance::PerformanceMessage msg;
+    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
+                                            getDrumNoteNumber()};
+    payload.value0To100Member = &performance::IndivFxMixer::fxSendLevel;
+    payload.newValue = level;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
-int IndivFxMixer::getFxSendLevel() const
+mpc::DrumMixerLevel IndivFxMixer::getFxSendLevel() const
 {
-    return fxSendLevel;
+    return getSnapshot().fxSendLevel;
 }

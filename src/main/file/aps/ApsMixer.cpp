@@ -4,7 +4,7 @@
 #include "engine/IndivFxMixer.hpp"
 
 using namespace mpc::file::aps;
-using namespace mpc::engine;
+using namespace mpc::performance;
 
 ApsMixer::ApsMixer(const std::vector<char> &loadBytes)
 {
@@ -19,67 +19,72 @@ ApsMixer::ApsMixer(const std::vector<char> &loadBytes)
     }
 }
 
-ApsMixer::ApsMixer(std::vector<std::shared_ptr<StereoMixer>> &smcs,
-                   std::vector<std::shared_ptr<IndivFxMixer>> &ifmcs)
+ApsMixer::ApsMixer(
+    const std::vector<std::shared_ptr<engine::StereoMixer>> &stereoMixer,
+    const std::vector<std::shared_ptr<engine::IndivFxMixer>> &indivFxMixer)
 {
     for (int i = 0; i < 64; i++)
     {
-        auto mixerChannel = smcs[i];
-        auto indivFxMixerChannel = ifmcs[i];
-        saveBytes[i * 6 + 0] = (int8_t)indivFxMixerChannel->getFxPath();
-        saveBytes[i * 6 + 1] = (int8_t)mixerChannel->getLevel();
-        saveBytes[i * 6 + 2] = (int8_t)mixerChannel->getPanning();
+        const auto mixerChannel = stereoMixer[i];
+        const auto indivFxMixerChannel = indivFxMixer[i];
+        saveBytes[i * 6 + 0] =
+            static_cast<int8_t>(indivFxMixerChannel->getFxPath());
+        saveBytes[i * 6 + 1] = static_cast<int8_t>(mixerChannel->getLevel());
+        saveBytes[i * 6 + 2] = static_cast<int8_t>(mixerChannel->getPanning());
         saveBytes[i * 6 + 3] =
-            (int8_t)indivFxMixerChannel->getVolumeIndividualOut();
-        saveBytes[i * 6 + 4] = (int8_t)indivFxMixerChannel->getOutput();
-        saveBytes[i * 6 + 5] = (int8_t)indivFxMixerChannel->getFxSendLevel();
+            static_cast<int8_t>(indivFxMixerChannel->getVolumeIndividualOut());
+        saveBytes[i * 6 + 4] =
+            static_cast<int8_t>(indivFxMixerChannel->getOutput());
+        saveBytes[i * 6 + 5] =
+            static_cast<int8_t>(indivFxMixerChannel->getFxSendLevel());
     }
 }
 
-StereoMixer ApsMixer::getStereoMixerChannel(int noteIndex)
+StereoMixer ApsMixer::getStereoMixerChannel(const int noteIndex) const
 {
     StereoMixer result;
-    result.setLevel(getLevel(noteIndex));
-    result.setPanning(getPanning(noteIndex));
+    result.level = DrumMixerLevel(getLevel(noteIndex));
+    result.panning = DrumMixerPanning(getPanning(noteIndex));
     return result;
 }
 
-IndivFxMixer ApsMixer::getIndivFxMixerChannel(int noteIndex)
+IndivFxMixer ApsMixer::getIndivFxMixerChannel(const int noteIndex) const
 {
     IndivFxMixer result;
-    result.setVolumeIndividualOut(getIndividualLevel(noteIndex));
-    result.setOutput(getIndividualOutput(noteIndex));
-    result.setFxSendLevel(getSendLevel(noteIndex));
-    result.setFxPath(getFxPath(noteIndex));
+    result.individualOutLevel = DrumMixerLevel(getIndividualLevel(noteIndex));
+    result.individualOutput =
+        DrumMixerIndividualOutput(getIndividualOutput(noteIndex));
+    result.fxSendLevel = DrumMixerLevel(getSendLevel(noteIndex));
+    result.fxPath = DrumMixerIndividualFxPath(getFxPath(noteIndex));
     return result;
 }
 
-int ApsMixer::getFxPath(int noteIndex) const
+int ApsMixer::getFxPath(const int noteIndex) const
 {
     return fxPaths[noteIndex];
 }
 
-int ApsMixer::getLevel(int noteIndex) const
+int ApsMixer::getLevel(const int noteIndex) const
 {
     return levels[noteIndex];
 }
 
-int ApsMixer::getPanning(int noteIndex) const
+int ApsMixer::getPanning(const int noteIndex) const
 {
     return pannings[noteIndex];
 }
 
-int ApsMixer::getIndividualLevel(int noteIndex) const
+int ApsMixer::getIndividualLevel(const int noteIndex) const
 {
     return iLevels[noteIndex];
 }
 
-int ApsMixer::getIndividualOutput(int noteIndex) const
+int ApsMixer::getIndividualOutput(const int noteIndex) const
 {
     return iOutputs[noteIndex];
 }
 
-int ApsMixer::getSendLevel(int noteIndex) const
+int ApsMixer::getSendLevel(const int noteIndex) const
 {
     return sendLevels[noteIndex];
 }
