@@ -420,7 +420,7 @@ void Sampler::repairProgramReferences() const
     {
         const auto drumBus =
             mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
-        
+
         if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
         {
             for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0; programIndex--)
