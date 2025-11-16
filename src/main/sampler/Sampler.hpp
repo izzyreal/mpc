@@ -123,9 +123,6 @@ namespace mpc::sampler
         static void
         resample(const std::shared_ptr<const std::vector<float>> &data,
                  int sourceRate, const std::shared_ptr<Sound> &destSnd);
-        static std::vector<float>
-        resampleSingleChannel(const std::vector<float> &input, int sourceRate,
-                              int destRate);
         std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
     private:
