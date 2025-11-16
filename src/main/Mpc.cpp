@@ -111,9 +111,12 @@ void Mpc::init()
 
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
 
-    sampler = std::make_shared<Sampler>(*this, [&](mpc::performance::PerformanceMessage &m){
-                                            performanceManager->enqueue(m);
-    });
+    sampler =
+        std::make_shared<Sampler>(*this,
+                                  [&](mpc::performance::PerformanceMessage &m)
+                                  {
+                                      performanceManager->enqueue(m);
+                                  });
     MLOG("Sampler created");
 
     hardware = std::make_shared<Hardware>();

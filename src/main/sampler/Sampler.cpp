@@ -43,7 +43,7 @@ using namespace mpc::engine;
 
 Sampler::Sampler(
     Mpc &mpc,
-    const std::function<void(performance::PerformanceMessage&)> dispatch)
+    const std::function<void(performance::PerformanceMessage &)> dispatch)
     : mpc(mpc), dispatch(dispatch)
 {
 }

@@ -26,7 +26,9 @@ namespace mpc::sampler
     class Program
     {
     public:
-        Program(Mpc &mpc, Sampler *samplerToUse, std::function<void(performance::PerformanceMessage&)> dispatch);
+        Program(
+            Mpc &mpc, Sampler *samplerToUse,
+            std::function<void(performance::PerformanceMessage &)> dispatch);
         ~Program();
 
         std::shared_ptr<engine::StereoMixer>
@@ -38,7 +40,7 @@ namespace mpc::sampler
 
     private:
         Sampler *const sampler;
-        const std::function<void(performance::PerformanceMessage&)> dispatch;
+        const std::function<void(performance::PerformanceMessage &)> dispatch;
         std::string name;
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;

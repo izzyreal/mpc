@@ -17,7 +17,9 @@ namespace mpc::sampler
     class NoteParameters
     {
     public:
-        explicit NoteParameters(int index, std::function<void(performance::PerformanceMessage&)> dispatch);
+        explicit NoteParameters(
+            int index,
+            std::function<void(performance::PerformanceMessage &)> dispatch);
 
         NoteParameters *clone(int newIndex) const;
         DrumNoteNumber getNumber() const;
@@ -76,7 +78,7 @@ namespace mpc::sampler
 
     private:
         const int index;
-        const std::function<void(performance::PerformanceMessage&)> dispatch;
+        const std::function<void(performance::PerformanceMessage &)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixerChannel =
             std::make_shared<engine::StereoMixer>();
         std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =

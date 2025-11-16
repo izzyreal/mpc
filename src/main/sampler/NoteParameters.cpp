@@ -10,7 +10,7 @@ using namespace mpc::engine;
 
 NoteParameters::NoteParameters(
     const int index,
-    const std::function<void(performance::PerformanceMessage&)> dispatch)
+    const std::function<void(performance::PerformanceMessage &)> dispatch)
     : index(index), dispatch(dispatch)
 {
     decay = 5;

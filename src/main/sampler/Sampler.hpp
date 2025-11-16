@@ -24,7 +24,9 @@ namespace mpc::sampler
     class Sampler final
     {
     public:
-        explicit Sampler(Mpc &, std::function<void(performance::PerformanceMessage&)> dispatch);
+        explicit Sampler(
+            Mpc &,
+            std::function<void(performance::PerformanceMessage &)> dispatch);
 
         std::shared_ptr<Sound> getPlayXSound();
         std::shared_ptr<Sound> getClickSound();
@@ -128,7 +130,7 @@ namespace mpc::sampler
 
     private:
         Mpc &mpc;
-        const std::function<void(performance::PerformanceMessage&)> dispatch;
+        const std::function<void(performance::PerformanceMessage &)> dispatch;
         int soundIndex = 0;
         int playXMode = 0;
         std::string previousScreenName;
