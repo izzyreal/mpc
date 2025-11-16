@@ -30,10 +30,10 @@ TEST_CASE("Delete program", "[program]")
         ->setProgramIndex(ProgramIndex(3));
 
     sampler->deleteProgram(sampler->getProgram(2));
-    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM3)->getProgram() ==
+    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM3)->getProgramIndex() ==
             1);
 
     sampler->deleteProgram(sampler->getProgram(0));
-    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM1)->getProgram() ==
+    REQUIRE(mpc.getSequencer()->getBus<DrumBus>(BusType::DRUM1)->getProgramIndex() ==
             1);
 }

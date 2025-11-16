@@ -420,20 +420,19 @@ void Sampler::repairProgramReferences() const
     {
         const auto drumBus =
             mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
-
-        if (const auto pgm = drumBus->getProgramIndex(); !programs[pgm])
+        
+        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
         {
-            ProgramIndex programIndexToUse = NoProgramIndex;
-            for (int programIndex = pgm - 1; programIndex > 0; programIndex--)
+            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0; programIndex--)
             {
                 if (programs[programIndex])
                 {
-                    programIndexToUse = ProgramIndex(programIndex);
+                    pgm = programIndex;
                     break;
                 }
             }
 
-            if (!programs[programIndexToUse])
+            if (!programs[pgm])
             {
                 for (int programIndex = 0;
                      programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
@@ -441,13 +440,13 @@ void Sampler::repairProgramReferences() const
                 {
                     if (programs[programIndex])
                     {
-                        programIndexToUse = ProgramIndex(programIndex);
+                        pgm = programIndex;
                         break;
                     }
                 }
             }
 
-            drumBus->setProgramIndex(programIndexToUse);
+            drumBus->setProgramIndex(ProgramIndex(pgm));
         }
     }
 }
