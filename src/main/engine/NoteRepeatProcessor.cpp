@@ -165,9 +165,12 @@ void NoteRepeatProcessor::process(
                     ? VoiceOverlapMode::NOTE_OFF
                     : noteParameters->getVoiceOverlapMode();
 
+            auto performanceDrum =
+                performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-                0, drumBus, sampler, mixer, mixerSetupScreen, voices,
-                mixerConnections, note, noteEvent->getVelocity(),
+                0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
+                voices, mixerConnections, note, noteEvent->getVelocity(),
                 noteEvent->getVariationType(), noteEvent->getVariationValue(),
                 eventFrameOffset,
                 /* firstGeneration */ true, // Always true for invokers that

@@ -12,7 +12,8 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-    uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
+    uint64_t noteEventId, const performance::Drum &drum,
+    const std::shared_ptr<sequencer::DrumBus> drumBus,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<AudioMixer> &mixer,
     const std::shared_ptr<MixerSetupScreen> &mixerSetupScreen,
@@ -23,6 +24,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
 {
     DrumNoteOnContext ctx;
     ctx.noteEventId = noteEventId;
+    ctx.drumBus = drumBus;
     ctx.drum = drum;
     ctx.sampler = sampler;
     ctx.mixer = mixer;
@@ -37,6 +39,14 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     ctx.firstGeneration = firstGeneration;
     ctx.startTick = startTick;
     ctx.durationFrames = durationFrames;
+    ctx.setOptA = [drumBus](int n1, int n2)
+    {
+        drumBus->getSimultA()[n1] = n2;
+    };
+    ctx.setOptB = [drumBus](int n1, int n2)
+    {
+        drumBus->getSimultB()[n1] = n2;
+    };
     return ctx;
 }
 

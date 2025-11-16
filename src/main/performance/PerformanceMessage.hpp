@@ -11,6 +11,7 @@ namespace mpc::performance
     struct SetDrumProgram
     {
         DrumBusIndex drumBusIndex;
+        ProgramIndex programIndex;
         performance::Program performanceProgram;
     };
 

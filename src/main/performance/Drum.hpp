@@ -81,7 +81,7 @@ namespace mpc::performance
         std::array<Pad, 64> pads{};
         Slider slider{};
         int midiProgramChange = 0;
-        NoteParameters getNoteParameters(const DrumNoteNumber noteNumber)
+        NoteParameters getNoteParameters(const DrumNoteNumber noteNumber) const
         {
             return noteParameters[noteNumber.get() - MinDrumNoteNumber.get()];
         }
@@ -89,6 +89,8 @@ namespace mpc::performance
 
     struct Drum
     {
+        DrumBusIndex drumBusIndex;
+        ProgramIndex programIndex;
         Program program{};
         std::array<StereoMixer, 64> stereoMixers{};
         std::array<IndivFxMixer, 64> indivFxMixers{};
@@ -102,12 +104,14 @@ namespace mpc::performance
         bool receiveMidiVolume = false;
         MidiValue lastReceivedMidiVolume{MaxMidiValue};
 
-        StereoMixer getStereoMixer(const DrumNoteNumber drumNoteNumber)
+        const StereoMixer &
+        getStereoMixer(const DrumNoteNumber drumNoteNumber) const
         {
             return stereoMixers[drumNoteNumber.get() - MinDrumNoteNumber.get()];
         }
 
-        IndivFxMixer getIndivFxMixer(const DrumNoteNumber drumNoteNumber)
+        const IndivFxMixer &
+        getIndivFxMixer(const DrumNoteNumber drumNoteNumber) const
         {
             return indivFxMixers[drumNoteNumber.get() -
                                  MinDrumNoteNumber.get()];

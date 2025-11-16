@@ -112,8 +112,11 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
         audioServer->getSampleRate());
 
+    auto performanceDrum =
+        mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
     const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-        noteEventIdToUse, drumBus, mpc.getSampler(),
+        noteEventIdToUse, performanceDrum, drumBus, mpc.getSampler(),
         mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         &mpc.getEngineHost()->getVoices(),
@@ -128,14 +131,15 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     mpc.performanceManager->registerNoteOn(
         performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
-        track->getIndex(), ctx.drum->busType, note, noteOnEvent->getVelocity(),
-        programIndex, [](void *) {});
+        track->getIndex(), drumBusIndexToDrumBusType(ctx.drum.drumBusIndex),
+        note, noteOnEvent->getVelocity(), programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
         mpc.performanceManager->registerProgramPadPress(
             performance::PerformanceEventSource::Sequence, std::nullopt,
-            screenId, track->getIndex(), ctx.drum->busType, programPadIndex,
+            screenId, track->getIndex(),
+            drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), programPadIndex,
             noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
     }
 
@@ -277,8 +281,12 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
+        auto performanceDrum =
+            mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-            0, drumBus, mpc.getSampler(), mpc.getEngineHost()->getMixer(),
+            0, performanceDrum, drumBus, mpc.getSampler(),
+            mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(),
             mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,

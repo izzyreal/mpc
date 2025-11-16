@@ -61,10 +61,10 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         return;
     }
 
-    auto program = c.drum->getPerformanceProgram();
-    auto np = program.getNoteParameters(c.note);
+    const auto &program = c.drum.program;
+    const auto np = program.getNoteParameters(c.note);
 
-    handleMuteGroups(np, c.drum->getIndex(), c.voices);
+    handleMuteGroups(np, c.drum.drumBusIndex, c.voices);
 
     auto soundNumber = np.soundIndex;
 
@@ -92,11 +92,11 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
     }
 
     auto stereoMixer = c.mixerSetupScreen->isStereoMixSourceDrum()
-                           ? c.drum->getPerformanceStereoMixer(c.note)
+                           ? c.drum.getStereoMixer(c.note)
                            : program.getNoteParameters(c.note).stereoMixer;
 
     auto indivFxMixer = c.mixerSetupScreen->isStereoMixSourceDrum()
-                            ? c.drum->getPerformanceIndivFxMixer(c.note)
+                            ? c.drum.getIndivFxMixer(c.note)
                             : program.getNoteParameters(c.note).indivFxMixer;
 
     auto mixerControls = c.mixer->getMixerControls();
@@ -165,7 +165,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         for (const auto &v : *c.voices)
         {
             if (v->isPlayingDrumProgramNoteCombination(
-                    c.drum->getIndex(), c.drum->getProgramIndex(), c.note))
+                    c.drum.drumBusIndex, c.drum.programIndex, c.note))
             {
                 v->startDecay();
             }
@@ -173,9 +173,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
     }
 
     voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue,
-                c.drum->getIndex(), c.frameOffset, true, c.startTick,
+                c.drum.drumBusIndex, c.frameOffset, true, c.startTick,
                 c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId,
-                c.drum->getProgramIndex());
+                c.drum.programIndex);
 
     if (c.firstGeneration && np.soundGenerationMode == 1)
     {
@@ -185,27 +185,27 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         if (optA != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptA = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-                c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
-                c.voices, *c.mixerConnections, optA, c.velocity, c.varType,
-                c.varValue, c.frameOffset, false, c.startTick,
-                c.durationFrames);
+                c.noteEventId, c.drum, c.drumBus, c.sampler, c.mixer,
+                c.mixerSetupScreen, c.voices, *c.mixerConnections, optA,
+                c.velocity, c.varType, c.varValue, c.frameOffset, false,
+                c.startTick, c.durationFrames);
 
             noteOn(ctxOptA);
 
-            c.drum->getSimultA()[c.note] = optA;
+            c.setOptA(c.note, optA);
         }
 
         if (optB != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptB = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-                c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
-                c.voices, *c.mixerConnections, optB, c.velocity, c.varType,
-                c.varValue, c.frameOffset, false, c.startTick,
-                c.durationFrames);
+                c.noteEventId, c.drum, c.drumBus, c.sampler, c.mixer,
+                c.mixerSetupScreen, c.voices, *c.mixerConnections, optB,
+                c.velocity, c.varType, c.varValue, c.frameOffset, false,
+                c.startTick, c.durationFrames);
 
             noteOn(ctxOptB);
 
-            c.drum->getSimultB()[c.note] = optB;
+            c.setOptB(c.note, optB);
         }
     }
 }

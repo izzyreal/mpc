@@ -41,7 +41,7 @@ void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
 {
     programIndex = programIndexToUse;
     performanceManager->registerSetDrumProgram(
-        drumIndex, getSamplerFn()->getProgram(programIndex));
+        drumIndex, programIndex, getSamplerFn()->getProgram(programIndex));
 }
 
 mpc::ProgramIndex DrumBus::getProgramIndex() const

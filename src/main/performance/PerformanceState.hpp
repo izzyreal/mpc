@@ -13,7 +13,13 @@ namespace mpc::performance
 
         std::array<Drum, 4> drums;
 
-        PerformanceState() = default;
+        PerformanceState()
+        {
+            drums[0].drumBusIndex = DrumBusIndex(0);
+            drums[1].drumBusIndex = DrumBusIndex(1);
+            drums[2].drumBusIndex = DrumBusIndex(2);
+            drums[3].drumBusIndex = DrumBusIndex(3);
+        }
 
         PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),

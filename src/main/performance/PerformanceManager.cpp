@@ -26,7 +26,8 @@ void PerformanceManager::reserveState(PerformanceState &s) const
 }
 
 void PerformanceManager::registerSetDrumProgram(
-    const DrumBusIndex drumBusIndex, const std::shared_ptr<sampler::Program> sp)
+    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
+    const std::shared_ptr<sampler::Program> sp)
 {
     SetDrumProgram payload{drumBusIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
@@ -373,6 +374,8 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.drums[payload.drumBusIndex].program =
                     payload.performanceProgram;
+                activeState.drums[payload.drumBusIndex].programIndex =
+                    payload.programIndex;
             }
             else if constexpr (std::is_same_v<T, std::monostate>)
             {
