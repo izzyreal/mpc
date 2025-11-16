@@ -8,11 +8,18 @@
 
 namespace mpc::performance
 {
-    struct SetDrumProgram
+    struct UpdateDrumProgram
     {
         DrumBusIndex drumBusIndex;
         ProgramIndex programIndex;
         performance::Program performanceProgram;
+    };
+
+    struct UpdateNoteParameters
+    {
+        ProgramIndex programIndex;
+        DrumNoteNumber drumNoteNumber;
+        performance::NoteParameters performanceNoteParameters;
     };
 
     using PerformanceMessagePayload =
@@ -20,7 +27,8 @@ namespace mpc::performance
                      PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
                      ProgramPadPressEvent, ProgramPadAftertouchEvent,
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
-                     NoteOffEvent, SetDrumProgram>;
+                     NoteOffEvent, UpdateDrumProgram,
+                     UpdateNoteParameters>;
 
     struct PerformanceMessage
     {

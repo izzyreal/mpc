@@ -13,19 +13,19 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Program::Program(
-    Mpc &mpc, Sampler *const samplerToUse,
-    const std::function<void(performance::PerformanceMessage &)> dispatch)
-    : sampler(samplerToUse), dispatch(dispatch)
-{
-    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
-    {
-        auto n = new NoteParameters(i, dispatch);
+Program::Program(Mpc &mpc, Sampler *samplerToUse, const std::function<performance::Program()> &getSnapshot,
+                 const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    : sampler(samplerToUse), getSnapshot(getSnapshot), dispatch(dispatch) {
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++) {
+        auto getNoteParametersSnapshot = [this, drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber)] {
+            return this->getSnapshot().getNoteParameters(drumNoteNumber);
+        };
+        auto n = new NoteParameters(i, getNoteParametersSnapshot, dispatch
+        );
         noteParameters.push_back(n);
     }
 
-    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
-    {
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++) {
         auto p = new Pad(mpc, ProgramPadIndex(i));
         pads.push_back(p);
     }
@@ -33,21 +33,16 @@ Program::Program(
     slider = new PgmSlider();
 }
 
-void Program::init()
-{
+void Program::init() {
     midiProgramChange = 1;
 }
 
-int Program::getNumberOfSamples() const
-{
+int Program::getNumberOfSamples() const {
     auto counter = 0;
 
-    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
-    {
-
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++) {
         if (const auto np = getNoteParameters(i + MinDrumNoteNumber);
-            np->getSoundIndex() != -1)
-        {
+            np->getSoundIndex() != -1) {
             counter++;
         }
     }
@@ -55,57 +50,46 @@ int Program::getNumberOfSamples() const
     return counter;
 }
 
-void Program::setName(const std::string &s)
-{
+void Program::setName(const std::string &s) {
     name = s;
 }
 
-std::string Program::getName()
-{
+std::string Program::getName() {
     return name;
 }
 
-NoteParameters *Program::getNoteParameters(const int noteNumber) const
-{
-    if (noteNumber < MinDrumNoteNumber || noteNumber > MaxDrumNoteNumber)
-    {
+NoteParameters *Program::getNoteParameters(const int noteNumber) const {
+    if (noteNumber < MinDrumNoteNumber || noteNumber > MaxDrumNoteNumber) {
         return nullptr;
     }
 
     return noteParameters[noteNumber - MinDrumNoteNumber];
 }
 
-Pad *Program::getPad(const int i) const
-{
+Pad *Program::getPad(const int i) const {
     return pads[i];
 }
 
 std::shared_ptr<StereoMixer>
-Program::getStereoMixerChannel(const int noteIndex) const
-{
+Program::getStereoMixerChannel(const int noteIndex) const {
     return std::dynamic_pointer_cast<StereoMixer>(
         noteParameters[noteIndex]->getStereoMixerChannel());
 }
 
 std::shared_ptr<IndivFxMixer>
-Program::getIndivFxMixerChannel(const int noteIndex) const
-{
+Program::getIndivFxMixerChannel(const int noteIndex) const {
     return std::dynamic_pointer_cast<IndivFxMixer>(
         noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
 mpc::ProgramPadIndex
-Program::getPadIndexFromNote(const DrumNoteNumber note) const
-{
-    if (note < MinDrumNoteNumber || note > MaxDrumNoteNumber)
-    {
+Program::getPadIndexFromNote(const DrumNoteNumber note) const {
+    if (note < MinDrumNoteNumber || note > MaxDrumNoteNumber) {
         return NoProgramPadIndex;
     }
 
-    for (int8_t i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
-    {
-        if (pads[i]->getNote() == note)
-        {
+    for (int8_t i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++) {
+        if (pads[i]->getNote() == note) {
             return ProgramPadIndex{i};
         }
     }
@@ -113,59 +97,47 @@ Program::getPadIndexFromNote(const DrumNoteNumber note) const
     return NoProgramPadIndex;
 }
 
-std::vector<NoteParameters *> Program::getNotesParameters()
-{
+std::vector<NoteParameters *> Program::getNotesParameters() {
     return noteParameters;
 }
 
-PgmSlider *Program::getSlider() const
-{
+PgmSlider *Program::getSlider() const {
     return slider;
 }
 
 void Program::setNoteParameters(const int noteParametersIndex,
-                                NoteParameters *noteParametersToUse)
-{
-    if (noteParameters[noteParametersIndex] != nullptr)
-    {
+                                NoteParameters *noteParametersToUse) {
+    if (noteParameters[noteParametersIndex] != nullptr) {
         delete noteParameters[noteParametersIndex];
     }
 
     noteParameters[noteParametersIndex] = noteParametersToUse;
 }
 
-int Program::getMidiProgramChange() const
-{
+int Program::getMidiProgramChange() const {
     return midiProgramChange;
 }
 
-void Program::setMidiProgramChange(const int i)
-{
+void Program::setMidiProgramChange(const int i) {
     midiProgramChange = std::clamp(i, 1, 128);
 }
 
-void Program::initPadAssign() const
-{
-    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
-    {
+void Program::initPadAssign() const {
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++) {
         pads[i]->setNote((*sampler->getInitMasterPadAssign())[i]);
     }
 }
 
-mpc::DrumNoteNumber Program::getNoteFromPad(const ProgramPadIndex i) const
-{
+mpc::DrumNoteNumber Program::getNoteFromPad(const ProgramPadIndex i) const {
     return pads[i]->getNote();
 }
 
 std::vector<mpc::ProgramPadIndex>
-Program::getPadIndicesFromNote(const DrumNoteNumber note) const
-{
+Program::getPadIndicesFromNote(const DrumNoteNumber note) const {
     std::vector<ProgramPadIndex> result;
 
-    for (int i = 0; i < pads.size(); i++)
-    {
-        if (pads[i]->getNote() == note)
-        {
+    for (int i = 0; i < pads.size(); i++) {
+        if (pads[i]->getNote() == note) {
             result.push_back(ProgramPadIndex(i));
         }
     }
@@ -173,15 +145,12 @@ Program::getPadIndicesFromNote(const DrumNoteNumber note) const
     return result;
 }
 
-Program::~Program()
-{
+Program::~Program() {
     delete slider;
-    for (const auto &np : noteParameters)
-    {
+    for (const auto &np: noteParameters) {
         delete np;
     }
-    for (const auto &p : pads)
-    {
+    for (const auto &p: pads) {
         delete p;
     }
 }

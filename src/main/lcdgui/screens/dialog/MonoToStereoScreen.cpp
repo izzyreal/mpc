@@ -153,7 +153,7 @@ void MonoToStereoScreen::function(const int j)
             }
 
             newSound->setName(newStName);
-            sampler->mergeToStereo(left->getSampleData(), newSampleDataRight,
+            sampler::Sampler::mergeToStereo(left->getSampleData(), newSampleDataRight,
                                    newSound->getMutableSampleData());
             newSound->setMono(false);
             openScreenById(ScreenId::SoundScreen);

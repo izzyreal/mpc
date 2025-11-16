@@ -29,7 +29,7 @@ void PerformanceManager::registerSetDrumProgram(
     const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
     const std::shared_ptr<sampler::Program> sp)
 {
-    SetDrumProgram payload{drumBusIndex, programIndex};
+    UpdateDrumProgram payload{drumBusIndex, programIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
     PerformanceMessage msg;
     msg.payload = payload;
@@ -208,7 +208,14 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         {
             using T = std::decay_t<decltype(payload)>;
 
-            if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
+            if constexpr (std::is_same_v<T, UpdateNoteParameters>)
+            {
+                auto &p = activeState.programs[payload.programIndex];
+                const size_t noteParametersIndex = payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                auto &noteParameters = p.noteParameters[noteParametersIndex];
+                noteParameters = payload.performanceNoteParameters;
+            }
+            else if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
                 activeState.physicalPadEvents.push_back(payload);
                 actions.push_back(
@@ -370,7 +377,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     });
                 activeState.noteEvents.erase(it);
             }
-            else if constexpr (std::is_same_v<T, SetDrumProgram>)
+            else if constexpr (std::is_same_v<T, UpdateDrumProgram>)
             {
                 activeState.drums[payload.drumBusIndex].program =
                     payload.performanceProgram;

@@ -17,8 +17,8 @@ Bus::Bus(const BusType busType) : busType(busType) {}
 
 DrumBus::DrumBus(
     const DrumBusIndex drumIndexToUse,
-    const std::shared_ptr<performance::PerformanceManager> performanceManager,
-    std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn)
+    const std::shared_ptr<performance::PerformanceManager> &performanceManager,
+    const std::function<std::shared_ptr<sampler::Sampler>()> &getSamplerFn)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
       performanceManager(performanceManager), getSamplerFn(getSamplerFn)
 {
@@ -32,7 +32,7 @@ DrumBus::DrumBus(
     }
 }
 
-mpc::DrumBusIndex DrumBus::getIndex() const
+DrumBusIndex DrumBus::getIndex() const
 {
     return drumIndex;
 }
@@ -44,7 +44,7 @@ void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
         drumIndex, programIndex, getSamplerFn()->getProgram(programIndex));
 }
 
-mpc::ProgramIndex DrumBus::getProgramIndex() const
+ProgramIndex DrumBus::getProgramIndex() const
 {
     return programIndex;
 }
@@ -101,7 +101,7 @@ std::vector<std::shared_ptr<IndivFxMixer>> &DrumBus::getIndivFxMixerChannels()
 
 performance::Program DrumBus::getPerformanceProgram() const
 {
-    return performanceManager->getSnapshot().getProgram(drumIndex);
+    return performanceManager->getSnapshot().getDrumProgram(drumIndex);
 }
 performance::StereoMixer
 DrumBus::getPerformanceStereoMixer(const DrumNoteNumber drumNoteNumber) const

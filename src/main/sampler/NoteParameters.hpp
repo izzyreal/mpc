@@ -10,79 +10,128 @@
 #include <memory>
 #include <functional>
 
-namespace mpc::sampler
-{
+namespace mpc::sampler {
     class Sampler;
 
-    class NoteParameters
-    {
+    class NoteParameters {
     public:
         explicit NoteParameters(
             int index,
-            std::function<void(performance::PerformanceMessage &)> dispatch);
+            const std::function<performance::NoteParameters()> &getSnapshot,
+            const std::function<void(performance::PerformanceMessage &)> &dispatch);
 
         NoteParameters *clone(int newIndex) const;
+
         DrumNoteNumber getNumber() const;
 
         void setSoundIndex(int i);
+
         void setSoundGenMode(int i);
+
         void setVeloRangeLower(int i);
+
         int getVelocityRangeLower() const;
+
         void setOptNoteA(DrumNoteNumber);
+
         void setVeloRangeUpper(int i);
+
         int getVelocityRangeUpper() const;
+
         void setOptionalNoteB(DrumNoteNumber);
+
         void setVoiceOverlapMode(VoiceOverlapMode);
+
         void setMuteAssignA(DrumNoteNumber);
+
         void setMuteAssignB(DrumNoteNumber);
+
         void setTune(int i);
+
         void setAttack(int i);
+
         void setDecay(int i);
+
         void setDecayMode(int i);
+
         void setFilterFrequency(int i);
+
         void setFilterResonance(int i);
+
         void setFilterAttack(int i);
+
         void setFilterDecay(int i);
+
         void setFilterEnvelopeAmount(int i);
+
         void setVeloToLevel(int i);
+
         void setVelocityToAttack(int i);
+
         void setVelocityToStart(int i);
+
         void setVelocityToFilterFrequency(int i);
+
         void setSliderParameterNumber(int i);
+
         int getSliderParameterNumber() const;
+
         void setVelocityToPitch(int i);
+
         int getVelocityToPitch() const;
+
         int getSoundIndex() const;
+
         int getSoundGenerationMode() const;
+
         DrumNoteNumber getOptionalNoteA() const;
+
         DrumNoteNumber getOptionalNoteB() const;
+
         DrumNoteNumber getMuteAssignA() const;
+
         DrumNoteNumber getMuteAssignB() const;
+
         int getTune() const;
+
         int getVelocityToStart() const;
+
         int getAttack() const;
+
         int getDecay() const;
+
         int getVelocityToAttack() const;
+
         int getDecayMode() const;
+
         int getVeloToLevel() const;
+
         int getFilterFrequency() const;
+
         int getVelocityToFilterFrequency() const;
+
         int getFilterAttack() const;
+
         int getFilterDecay() const;
+
         int getFilterResonance() const;
+
         int getFilterEnvelopeAmount() const;
+
         VoiceOverlapMode getVoiceOverlapMode() const;
 
         std::shared_ptr<engine::StereoMixer> getStereoMixerChannel();
+
         std::shared_ptr<engine::IndivFxMixer> getIndivFxMixerChannel();
 
     private:
         const int index;
+        const std::function<performance::NoteParameters()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixerChannel =
-            std::make_shared<engine::StereoMixer>();
+                std::make_shared<engine::StereoMixer>();
         std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =
-            std::make_shared<engine::IndivFxMixer>();
+                std::make_shared<engine::IndivFxMixer>();
         int soundIndex = -1;
         int soundGenerationMode = 0;
         int velocityRangeLower = 0;

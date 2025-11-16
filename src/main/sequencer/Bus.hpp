@@ -48,8 +48,8 @@ namespace mpc::sequencer
     {
     public:
         explicit DrumBus(
-            DrumBusIndex, std::shared_ptr<performance::PerformanceManager>,
-            std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn);
+            DrumBusIndex, const std::shared_ptr<performance::PerformanceManager> &,
+            const std::function<std::shared_ptr<sampler::Sampler>()> &getSamplerFn);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
