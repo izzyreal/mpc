@@ -3,8 +3,10 @@
 #include "IntTypes.hpp"
 #include "sampler/NoteParameters.hpp"
 #include "sampler/PgmSlider.hpp"
+#include "performance/PerformanceMessage.hpp"
 
 #include <memory>
+#include <functional>
 
 namespace mpc::engine
 {
@@ -19,13 +21,12 @@ namespace mpc
 
 namespace mpc::sampler
 {
-
     class Pad;
 
     class Program
     {
     public:
-        Program(Mpc &mpc, Sampler *samplerToUse);
+        Program(Mpc &mpc, Sampler *samplerToUse, std::function<void(performance::PerformanceMessage&)> dispatch);
         ~Program();
 
         std::shared_ptr<engine::StereoMixer>
@@ -37,6 +38,7 @@ namespace mpc::sampler
 
     private:
         Sampler *const sampler;
+        const std::function<void(performance::PerformanceMessage&)> dispatch;
         std::string name;
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;

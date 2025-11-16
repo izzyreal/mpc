@@ -13,11 +13,13 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Program::Program(Mpc &mpc, Sampler *const samplerToUse) : sampler(samplerToUse)
+Program::Program(Mpc &mpc, Sampler *const samplerToUse,
+                 const std::function<void(performance::PerformanceMessage&)> dispatch)
+    : sampler(samplerToUse), dispatch(dispatch)
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto n = new NoteParameters(i);
+        auto n = new NoteParameters(i, dispatch);
         noteParameters.push_back(n);
     }
 

@@ -219,6 +219,11 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
     }
 }
 
+void SequencerStateManager::enqueue(SequencerMessage &m) const noexcept
+{
+    AtomicStateExchange::enqueue(std::move(m));
+}
+
 void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
 {
     /*std::visit(

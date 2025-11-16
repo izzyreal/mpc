@@ -41,7 +41,12 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Sampler::Sampler(Mpc &mpc) : mpc(mpc) {}
+Sampler::Sampler(
+    Mpc &mpc,
+    const std::function<void(performance::PerformanceMessage&)> dispatch)
+    : mpc(mpc), dispatch(dispatch)
+{
+}
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
@@ -290,7 +295,7 @@ int Sampler::getProgramCount() const
 
 std::weak_ptr<Program> Sampler::addProgram(const int i)
 {
-    programs[i] = std::make_shared<Program>(mpc, this);
+    programs[i] = std::make_shared<Program>(mpc, this, dispatch);
     return programs[i];
 }
 
@@ -302,7 +307,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
     {
         if (!p)
         {
-            p = std::make_shared<Program>(mpc, this);
+            p = std::make_shared<Program>(mpc, this, dispatch);
 
             if (repairDrumPrograms)
             {
@@ -423,7 +428,8 @@ void Sampler::repairProgramReferences() const
 
         if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
         {
-            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0; programIndex--)
+            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0;
+                 programIndex--)
             {
                 if (programs[programIndex])
                 {

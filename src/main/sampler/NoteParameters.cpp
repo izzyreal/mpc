@@ -8,7 +8,10 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-NoteParameters::NoteParameters(const int index) : index(index)
+NoteParameters::NoteParameters(
+    const int index,
+    const std::function<void(performance::PerformanceMessage&)> dispatch)
+    : index(index), dispatch(dispatch)
 {
     decay = 5;
     filterFrequency = 100;
@@ -282,7 +285,7 @@ int NoteParameters::getVelocityToPitch() const
 
 NoteParameters *NoteParameters::clone(const int newIndex) const
 {
-    const auto res = new NoteParameters(newIndex);
+    const auto res = new NoteParameters(newIndex, dispatch);
     res->setAttack(attack);
     res->setDecay(decay);
     res->setDecayMode(decayMode);
