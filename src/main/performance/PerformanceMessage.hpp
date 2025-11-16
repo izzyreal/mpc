@@ -27,8 +27,7 @@ namespace mpc::performance
                      PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
                      ProgramPadPressEvent, ProgramPadAftertouchEvent,
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
-                     NoteOffEvent, UpdateDrumProgram,
-                     UpdateNoteParameters>;
+                     NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters>;
 
     struct PerformanceMessage
     {

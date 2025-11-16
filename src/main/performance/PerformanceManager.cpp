@@ -211,7 +211,8 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             if constexpr (std::is_same_v<T, UpdateNoteParameters>)
             {
                 auto &p = activeState.programs[payload.programIndex];
-                const size_t noteParametersIndex = payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                const size_t noteParametersIndex =
+                    payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
                 auto &noteParameters = p.noteParameters[noteParametersIndex];
                 noteParameters = payload.performanceNoteParameters;
             }

@@ -25,8 +25,7 @@ namespace mpc::performance
         PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
-              noteEvents(other.noteEvents),
-              drums(other.drums),
+              noteEvents(other.noteEvents), drums(other.drums),
               programs(other.programs)
         {
         }

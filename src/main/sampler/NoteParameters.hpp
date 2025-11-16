@@ -10,15 +10,18 @@
 #include <memory>
 #include <functional>
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sampler;
 
-    class NoteParameters {
+    class NoteParameters
+    {
     public:
         explicit NoteParameters(
             int index,
             const std::function<performance::NoteParameters()> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)> &dispatch);
+            const std::function<void(performance::PerformanceMessage &)>
+                &dispatch);
 
         NoteParameters *clone(int newIndex) const;
 
@@ -129,8 +132,8 @@ namespace mpc::sampler {
         const std::function<performance::NoteParameters()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixerChannel =
-                std::make_shared<engine::StereoMixer>();
+            std::make_shared<engine::StereoMixer>();
         std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =
-                std::make_shared<engine::IndivFxMixer>();
+            std::make_shared<engine::IndivFxMixer>();
     };
 } // namespace mpc::sampler

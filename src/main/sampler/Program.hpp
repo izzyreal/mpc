@@ -8,24 +8,28 @@
 #include <memory>
 #include <functional>
 
-namespace mpc::engine {
+namespace mpc::engine
+{
     class StereoMixer;
     class IndivFxMixer;
 } // namespace mpc::engine
 
-namespace mpc {
+namespace mpc
+{
     class Mpc;
 }
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Pad;
 
-    class Program {
+    class Program
+    {
     public:
-        Program(
-            Mpc &mpc, Sampler *samplerToUse,
-            const std::function<performance::Program()> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)> &dispatch);
+        Program(Mpc &mpc, Sampler *samplerToUse,
+                const std::function<performance::Program()> &getSnapshot,
+                const std::function<void(performance::PerformanceMessage &)>
+                    &dispatch);
 
         ~Program();
 
@@ -76,6 +80,6 @@ namespace mpc::sampler {
         DrumNoteNumber getNoteFromPad(ProgramPadIndex) const;
 
         std::vector<ProgramPadIndex>
-        getPadIndicesFromNote(DrumNoteNumber) const;
+            getPadIndicesFromNote(DrumNoteNumber) const;
     };
 } // namespace mpc::sampler

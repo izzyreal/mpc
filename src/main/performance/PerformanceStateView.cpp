@@ -120,13 +120,13 @@ Program PerformanceStateView::getProg(const ProgramIndex programIndex) const
     return state->programs[programIndex];
 }
 
-Program PerformanceStateView::getDrumProgram(const DrumBusIndex drumBusIndex) const
+Program
+PerformanceStateView::getDrumProgram(const DrumBusIndex drumBusIndex) const
 {
     return state->drums[drumBusIndex].program;
 }
 
-Drum
-PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
+Drum PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
 {
     return state->drums[drumBusIndex];
 }

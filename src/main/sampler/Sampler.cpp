@@ -41,18 +41,23 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Sampler::Sampler(Mpc &mpc, const std::function<performance::Program(ProgramIndex)> &getSnapshot,
+Sampler::Sampler(
+    Mpc &mpc,
+    const std::function<performance::Program(ProgramIndex)> &getSnapshot,
     const std::function<void(performance::PerformanceMessage &)> &dispatch)
-: mpc(mpc), getSnapshot(getSnapshot), dispatch(dispatch)
+    : mpc(mpc), getSnapshot(getSnapshot), dispatch(dispatch)
 {
 }
 
-std::shared_ptr<Sound> Sampler::getPreviewSound() {
+std::shared_ptr<Sound> Sampler::getPreviewSound()
+{
     return sounds.back();
 }
 
-std::shared_ptr<Sound> Sampler::getSound(const int index) {
-    if (index < 0 || index >= sounds.size()) {
+std::shared_ptr<Sound> Sampler::getSound(const int index)
+{
+    if (index < 0 || index >= sounds.size())
+    {
         return {};
     }
 
@@ -60,29 +65,37 @@ std::shared_ptr<Sound> Sampler::getSound(const int index) {
 }
 
 void Sampler::replaceSound(const int index,
-                           const std::shared_ptr<Sound> &newSound) {
+                           const std::shared_ptr<Sound> &newSound)
+{
     int newIndex = -1;
 
-    for (size_t i = 0; i < sounds.size(); i++) {
-        if (sounds[i] == newSound) {
+    for (size_t i = 0; i < sounds.size(); i++)
+    {
+        if (sounds[i] == newSound)
+        {
             newIndex = i;
             break;
         }
     }
 
-    if (newIndex != -1) {
+    if (newIndex != -1)
+    {
         sounds[index] = sounds[newIndex];
         sounds.erase(sounds.begin() + newIndex);
     }
 }
 
-std::shared_ptr<Program> Sampler::getProgram(const int index) {
+std::shared_ptr<Program> Sampler::getProgram(const int index)
+{
     return programs[index];
 }
 
-void Sampler::nudgeSoundIndex(const bool up) {
-    if (up) {
-        if (soundIndex >= sounds.size() - 1) {
+void Sampler::nudgeSoundIndex(const bool up)
+{
+    if (up)
+    {
+        if (soundIndex >= sounds.size() - 1)
+        {
             return;
         }
 
@@ -90,28 +103,34 @@ void Sampler::nudgeSoundIndex(const bool up) {
         return;
     }
 
-    if (soundIndex == 0) {
+    if (soundIndex == 0)
+    {
         return;
     }
 
     soundIndex--;
 }
 
-void Sampler::setSoundIndex(const int i) {
+void Sampler::setSoundIndex(const int i)
+{
     soundIndex =
-            std::clamp(i, 0, std::max(0, static_cast<int>(sounds.size() - 1)));
+        std::clamp(i, 0, std::max(0, static_cast<int>(sounds.size() - 1)));
 
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     zoneScreen->initZones();
 }
 
-short Sampler::getSoundIndex() const {
+short Sampler::getSoundIndex() const
+{
     return soundIndex;
 }
 
-std::shared_ptr<Sound> Sampler::getSound() {
-    if (soundIndex < 0) {
-        if (sounds.empty()) {
+std::shared_ptr<Sound> Sampler::getSound()
+{
+    if (soundIndex < 0)
+    {
+        if (sounds.empty())
+        {
             return {};
         }
 
@@ -121,41 +140,50 @@ std::shared_ptr<Sound> Sampler::getSound() {
         soundIndex = 0;
     }
 
-    if (soundIndex >= sounds.size()) {
+    if (soundIndex >= sounds.size())
+    {
         return {};
     }
 
     return getSortedSounds()[soundIndex].first;
 }
 
-std::string Sampler::getPreviousScreenName() {
+std::string Sampler::getPreviousScreenName()
+{
     return previousScreenName;
 }
 
-void Sampler::setPreviousScreenName(const std::string &s) {
+void Sampler::setPreviousScreenName(const std::string &s)
+{
     previousScreenName = s;
 }
 
-std::vector<mpc::DrumNoteNumber> *Sampler::getInitMasterPadAssign() {
+std::vector<mpc::DrumNoteNumber> *Sampler::getInitMasterPadAssign()
+{
     return &initMasterPadAssign;
 }
 
-std::vector<mpc::DrumNoteNumber> *Sampler::getMasterPadAssign() {
+std::vector<mpc::DrumNoteNumber> *Sampler::getMasterPadAssign()
+{
     return &masterPadAssign;
 }
 
-void Sampler::setMasterPadAssign(const std::vector<DrumNoteNumber> &v) {
+void Sampler::setMasterPadAssign(const std::vector<DrumNoteNumber> &v)
+{
     masterPadAssign = v;
 }
 
-void Sampler::init() {
+void Sampler::init()
+{
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
     const auto program = createNewProgramAddFirstAvailableSlot().lock();
     program->setName("NewPgm-A");
 
-    for (int i = 0; i < 4; i++) {
-        for (auto j = 0; j < 16; j++) {
+    for (int i = 0; i < 4; i++)
+    {
+        for (auto j = 0; j < 16; j++)
+        {
             std::string result = "";
             result.append(abcd[i]);
             result.append(StrUtil::padLeft(std::to_string(j + 1), "0", 2));
@@ -169,17 +197,22 @@ void Sampler::init() {
 
     auto clickData = MpcResourceUtil::get_resource_data("audio/click.wav");
 
-    if (clickData.size() != 146) {
+    if (clickData.size() != 146)
+    {
         MLOG(
             "Warning: click.wav does not exist or doesn't have the correct "
             "size!");
-    } else {
+    }
+    else
+    {
         auto stream = wav_init_istringstream(&clickData[0], clickData.size());
         int sampleRate, validBits, numChannels, numFrames;
         wav_read_header(stream, sampleRate, validBits, numChannels, numFrames);
 
-        if (numChannels == 1 && validBits == 16) {
-            for (int i = 0; i < numFrames; i++) {
+        if (numChannels == 1 && validBits == 16)
+        {
+            for (int i = 0; i < numFrames; i++)
+            {
                 const float frame = wav_get_LE(stream, 2) / 32768.0;
                 clickSound->insertFrame(std::vector{frame},
                                         clickSound->getFrameCount());
@@ -191,11 +224,13 @@ void Sampler::init() {
     masterPadAssign = initMasterPadAssign;
 }
 
-void Sampler::playMetronome(unsigned int velocity, const int framePos) const {
+void Sampler::playMetronome(unsigned int velocity, const int framePos) const
+{
     const auto metronomeSoundScreen =
-            mpc.screens->get<ScreenId::MetronomeSoundScreen>();
+        mpc.screens->get<ScreenId::MetronomeSoundScreen>();
 
-    if (metronomeSoundScreen->getSound() == 0) {
+    if (metronomeSoundScreen->getSound() == 0)
+    {
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
         mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             CLICK_SOUND, velocity, framePos);
@@ -210,23 +245,23 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const {
     const auto programIndex = drumBus->getProgramIndex();
 
     const auto accent = velocity == 127;
-    velocity = accent
-                   ? metronomeSoundScreen->getAccentVelo()
-                   : metronomeSoundScreen->getNormalVelo();
-    const auto pad = accent
-                         ? metronomeSoundScreen->getAccentPad()
-                         : metronomeSoundScreen->getNormalPad();
+    velocity = accent ? metronomeSoundScreen->getAccentVelo()
+                      : metronomeSoundScreen->getNormalVelo();
+    const auto pad = accent ? metronomeSoundScreen->getAccentPad()
+                            : metronomeSoundScreen->getNormalPad();
     const auto note =
-            programs[programIndex]->getNoteFromPad(ProgramPadIndex(pad));
+        programs[programIndex]->getNoteFromPad(ProgramPadIndex(pad));
     const auto soundNumber =
-            programs[programIndex]->getNoteParameters(note)->getSoundIndex();
+        programs[programIndex]->getNoteParameters(note)->getSoundIndex();
     mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(soundNumber,
                                                             velocity, framePos);
 }
 
 void Sampler::playPreviewSample(const int start, const int end,
-                                const int loopTo) const {
-    if (sounds.empty()) {
+                                const int loopTo) const
+{
+    if (sounds.empty())
+    {
         return;
     }
 
@@ -244,11 +279,14 @@ void Sampler::playPreviewSample(const int start, const int end,
     previewSound->setLoopTo(oldLoopTo);
 }
 
-int Sampler::getProgramCount() const {
+int Sampler::getProgramCount() const
+{
     int res = 0;
 
-    for (auto &p: programs) {
-        if (p) {
+    for (auto &p : programs)
+    {
+        if (p)
+        {
             res++;
         }
     }
@@ -256,26 +294,40 @@ int Sampler::getProgramCount() const {
     return res;
 }
 
-std::weak_ptr<Program> Sampler::addProgram(const int i) {
-    auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)] { return getSnapshot(programIndex); };
-    programs[i] = std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
+std::weak_ptr<Program> Sampler::addProgram(const int i)
+{
+    auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)]
+    {
+        return getSnapshot(programIndex);
+    };
+    programs[i] =
+        std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
     return programs[i];
 }
 
-std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot() {
+std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
+{
     const bool repairDrumPrograms = getProgramCount() == 0;
 
-    for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++programIndex) {
-        if (auto &p = programs[programIndex]; !p) {
-            auto getProgramSnapshot = [this, programIndex = ProgramIndex(programIndex)] {
+    for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
+         ++programIndex)
+    {
+        if (auto &p = programs[programIndex]; !p)
+        {
+            auto getProgramSnapshot =
+                [this, programIndex = ProgramIndex(programIndex)]
+            {
                 return getSnapshot(programIndex);
             };
-            p = std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
+            p = std::make_shared<Program>(mpc, this, getProgramSnapshot,
+                                          dispatch);
 
-            if (repairDrumPrograms) {
-                for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++) {
+            if (repairDrumPrograms)
+            {
+                for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
+                {
                     const auto drumBus =
-                            mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
+                        mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
                     drumBus->setProgramIndex(ProgramIndex(0));
                 }
             }
@@ -286,9 +338,12 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot() {
     return std::weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(const std::weak_ptr<Program> &program) {
-    for (auto &&p: programs) {
-        if (p == program.lock()) {
+void Sampler::deleteProgram(const std::weak_ptr<Program> &program)
+{
+    for (auto &&p : programs)
+    {
+        if (p == program.lock())
+        {
             p.reset();
             break;
         }
@@ -297,11 +352,13 @@ void Sampler::deleteProgram(const std::weak_ptr<Program> &program) {
     repairProgramReferences();
 }
 
-std::vector<std::shared_ptr<Sound> > &Sampler::getSounds() {
+std::vector<std::shared_ptr<Sound>> &Sampler::getSounds()
+{
     return sounds;
 }
 
-std::shared_ptr<Sound> Sampler::addSound() {
+std::shared_ptr<Sound> Sampler::addSound()
+{
     return addSound(44100);
 }
 
@@ -317,8 +374,10 @@ std::shared_ptr<Sound> Sampler::addSound() {
  * button push), to finally return to the previous screen (before the popup was
  * opened).
  */
-std::shared_ptr<Sound> Sampler::addSound(const int sampleRate) {
-    if (sounds.size() >= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY) {
+std::shared_ptr<Sound> Sampler::addSound(const int sampleRate)
+{
+    if (sounds.size() >= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY)
+    {
         mpc.getLayeredScreen()->showPopupAndAwaitInteraction(
             "Sound directory full(256max)");
         return {};
@@ -328,61 +387,78 @@ std::shared_ptr<Sound> Sampler::addSound(const int sampleRate) {
     return sounds.back();
 }
 
-int Sampler::getSoundCount() const {
+int Sampler::getSoundCount() const
+{
     return sounds.size();
 }
 
-std::string Sampler::getSoundName(const int i) const {
+std::string Sampler::getSoundName(const int i) const
+{
     return sounds[i]->getName();
 }
 
-std::string Sampler::getPadName(const int i) {
-    if (i < 0) {
+std::string Sampler::getPadName(const int i)
+{
+    if (i < 0)
+    {
         return "OFF";
     }
     return padNames[i];
 }
 
-std::vector<std::weak_ptr<Program> > Sampler::getPrograms() const {
-    auto res = std::vector<std::weak_ptr<Program> >();
+std::vector<std::weak_ptr<Program>> Sampler::getPrograms() const
+{
+    auto res = std::vector<std::weak_ptr<Program>>();
 
-    for (auto &p: programs) {
+    for (auto &p : programs)
+    {
         res.push_back(p);
     }
 
     return res;
 }
 
-void Sampler::deleteAllPrograms(const bool createDefaultProgram) {
-    for (auto &p: programs) {
+void Sampler::deleteAllPrograms(const bool createDefaultProgram)
+{
+    for (auto &p : programs)
+    {
         p.reset();
     }
 
-    if (createDefaultProgram) {
+    if (createDefaultProgram)
+    {
         createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
     }
 }
 
-void Sampler::repairProgramReferences() const {
+void Sampler::repairProgramReferences() const
+{
     for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
-         ++drumBusIndex) {
+         ++drumBusIndex)
+    {
         const auto drumBus =
-                mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
+            mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
 
-        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm]) {
+        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
+        {
             for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0;
-                 programIndex--) {
-                if (programs[programIndex]) {
+                 programIndex--)
+            {
+                if (programs[programIndex])
+                {
                     pgm = programIndex;
                     break;
                 }
             }
 
-            if (!programs[pgm]) {
+            if (!programs[pgm])
+            {
                 for (int programIndex = 0;
                      programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
-                     programIndex++) {
-                    if (programs[programIndex]) {
+                     programIndex++)
+                {
+                    if (programs[programIndex])
+                    {
                         pgm = programIndex;
                         break;
                     }
@@ -395,25 +471,31 @@ void Sampler::repairProgramReferences() const {
 }
 
 void Sampler::trimSample(const int sampleNumber, const int start,
-                         const int end) const {
+                         const int end) const
+{
     const auto s = sounds[sampleNumber];
     Sampler::trimSample(s, start, end);
 }
 
 void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
-                         int end) {
+                         int end)
+{
     const auto s = sound.lock();
     std::vector<float> newData = *s->getSampleData();
     const auto frameCount = s->getFrameCount();
 
-    if (end > frameCount) {
+    if (end > frameCount)
+    {
         end = frameCount;
     }
 
-    if (s->isMono()) {
+    if (s->isMono())
+    {
         newData.erase(newData.begin() + end, newData.end());
         newData.erase(newData.begin(), newData.begin() + start);
-    } else {
+    }
+    else
+    {
         const int startRight = start + frameCount;
         const int endRight = end + frameCount;
 
@@ -424,7 +506,7 @@ void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
         newData.erase(newData.begin(), newData.begin() + start);
     }
 
-    s->setSampleData(std::make_shared<std::vector<float> >(newData));
+    s->setSampleData(std::make_shared<std::vector<float>>(newData));
 
     s->setStart(0);
     s->setEnd(s->getFrameCount());
@@ -433,57 +515,70 @@ void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
 
 void Sampler::deleteSection(const unsigned int sampleNumber,
                             const unsigned int start,
-                            const unsigned int end) const {
+                            const unsigned int end) const
+{
     const auto s = sounds[sampleNumber];
     std::vector<float> newData = *s->getSampleData();
     const auto frameCount = s->getFrameCount();
 
-    if (!s->isMono()) {
+    if (!s->isMono())
+    {
         const unsigned int startRight = start + frameCount;
         const unsigned int endRight = end + frameCount;
         newData.erase(newData.begin() + startRight, newData.begin() + endRight);
     }
 
     newData.erase(newData.begin() + start, newData.begin() + end);
-    s->setSampleData(std::make_shared<std::vector<float> >(newData));
+    s->setSampleData(std::make_shared<std::vector<float>>(newData));
 }
 
-std::string Sampler::getSoundSortingTypeName() const {
-    if (soundSortingType == 0) {
+std::string Sampler::getSoundSortingTypeName() const
+{
+    if (soundSortingType == 0)
+    {
         return "MEMORY";
     }
-    if (soundSortingType == 1) {
+    if (soundSortingType == 1)
+    {
         return "NAME";
     }
     return "SIZE";
 }
 
-void Sampler::switchToNextSoundSortType() {
+void Sampler::switchToNextSoundSortType()
+{
     const auto s = getSound();
 
-    if (soundSortingType++ >= 2) {
+    if (soundSortingType++ >= 2)
+    {
         soundSortingType = 0;
     }
 
     const auto sortedSounds = getSortedSounds();
 
-    for (int i = 0; i < sortedSounds.size(); i++) {
-        if (sortedSounds[i].first == s) {
+    for (int i = 0; i < sortedSounds.size(); i++)
+    {
+        if (sortedSounds[i].first == s)
+        {
             soundIndex = i;
             break;
         }
     }
 }
 
-void Sampler::deleteAllSamples() {
+void Sampler::deleteAllSamples()
+{
     sounds.clear();
 
-    for (const auto &p: programs) {
-        if (!p) {
+    for (const auto &p : programs)
+    {
+        if (!p)
+        {
             continue;
         }
 
-        for (const auto &n: p->getNotesParameters()) {
+        for (const auto &n : p->getNotesParameters())
+        {
             n->setSoundIndex(-1);
         }
     }
@@ -491,12 +586,16 @@ void Sampler::deleteAllSamples() {
     soundIndex = 0;
 }
 
-void Sampler::process12Bit(std::vector<float> &data) {
-    for (auto j = 0; j < data.size(); j++) {
-        if (data[j] != 0.0f) {
+void Sampler::process12Bit(std::vector<float> &data)
+{
+    for (auto j = 0; j < data.size(); j++)
+    {
+        if (data[j] != 0.0f)
+        {
             auto fShort = static_cast<int16_t>(data[j] * 32767.4999999);
 
-            if (data[j] > 0.9999999f) {
+            if (data[j] > 0.9999999f)
+            {
                 fShort = 32767;
             }
 
@@ -507,33 +606,44 @@ void Sampler::process12Bit(std::vector<float> &data) {
             newShort &= ~(1 << 3);
 
             data[j] = static_cast<float>(newShort / 32767.4999999);
-        } else {
+        }
+        else
+        {
             data[j] = 0;
         }
     }
 }
 
-void Sampler::process8Bit(std::vector<float> &data) {
-    for (auto j = 0; j < data.size(); j++) {
-        if (data[j] != 0.0f) {
+void Sampler::process8Bit(std::vector<float> &data)
+{
+    for (auto j = 0; j < data.size(); j++)
+    {
+        if (data[j] != 0.0f)
+        {
             float f = data[j];
 
-            if (f < -1) {
+            if (f < -1)
+            {
                 f = -1;
-            } else if (f > 1) {
+            }
+            else if (f > 1)
+            {
                 f = 1;
             }
 
             const unsigned short ushort =
-                    static_cast<signed short>((f + 1) * 32767.4999999);
+                static_cast<signed short>((f + 1) * 32767.4999999);
             const unsigned char eightBit = ushort >> 8;
             const signed sshort = (eightBit - 128) << 8;
 
             f = static_cast<float>(sshort / 32767.49999999);
 
-            if (f < -1) {
+            if (f < -1)
+            {
                 f = -1;
-            } else if (f > 1) {
+            }
+            else if (f > 1)
+            {
                 f = 1;
             }
 
@@ -544,15 +654,16 @@ void Sampler::process8Bit(std::vector<float> &data) {
 
 void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
                        const int sourceRate,
-                       const std::shared_ptr<Sound> &destSnd) {
+                       const std::shared_ptr<Sound> &destSnd)
+{
     const auto inputFrameCount =
-            static_cast<int>(destSnd->isMono() ? data->size() : data->size() / 2);
+        static_cast<int>(destSnd->isMono() ? data->size() : data->size() / 2);
     const auto srcRatio = static_cast<double>(destSnd->getSampleRate()) /
                           static_cast<double>(sourceRate);
     const auto outputFrameCount =
-            static_cast<int>((floor)(inputFrameCount * srcRatio));
+        static_cast<int>((floor)(inputFrameCount * srcRatio));
     const auto destinationSampleCount =
-            destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
+        destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
 
     SRC_DATA srcData;
     srcData.input_frames = inputFrameCount;
@@ -565,14 +676,16 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
 
     const int numChannels = destSnd->isMono() ? 1 : 2;
 
-    for (int i = 0; i < numChannels; i++) {
+    for (int i = 0; i < numChannels; i++)
+    {
         const auto srcArray = &(*data)[i * inputFrameCount];
         srcData.data_in = srcArray;
 
         float *destArray = &(*destinationSampleData)[i * outputFrameCount];
         srcData.data_out = destArray;
 
-        if (const auto error = src_simple(&srcData, 0, 1); error != 0) {
+        if (const auto error = src_simple(&srcData, 0, 1); error != 0)
+        {
             const char *errormsg = src_strerror(error);
             std::string errorStr(errormsg);
             MLOG("libsamplerate error: " + errorStr);
@@ -580,9 +693,12 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
     }
 }
 
-void Sampler::stopAllVoices(const int frameOffset) const {
-    for (const auto &voice: mpc.getEngineHost()->getVoices()) {
-        if (voice->isFinished()) {
+void Sampler::stopAllVoices(const int frameOffset) const
+{
+    for (const auto &voice : mpc.getEngineHost()->getVoices())
+    {
+        if (voice->isFinished())
+        {
             continue;
         }
 
@@ -590,27 +706,36 @@ void Sampler::stopAllVoices(const int frameOffset) const {
     }
 }
 
-void Sampler::playX() {
+void Sampler::playX()
+{
     const auto sound = getSortedSounds()[soundIndex].first;
     auto start = 0;
     auto end = sound->getSampleData()->size() - 1;
 
-    if (!sound->isMono()) {
+    if (!sound->isMono())
+    {
         end *= 0.5;
     }
 
     const auto fullEnd = end;
 
-    if (playXMode == 1) {
+    if (playXMode == 1)
+    {
         const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
         const auto zone = zoneScreen->getZone();
         start = zone[0];
         end = zone[1];
-    } else if (playXMode == 2) {
+    }
+    else if (playXMode == 2)
+    {
         end = sound->getStart();
-    } else if (playXMode == 3) {
+    }
+    else if (playXMode == 3)
+    {
         end = sound->getLoopTo();
-    } else if (playXMode == 4) {
+    }
+    else if (playXMode == 4)
+    {
         start = sound->getEnd();
         end = fullEnd;
     }
@@ -625,28 +750,37 @@ void Sampler::playX() {
     sound->setEnd(oldEnd);
 }
 
-std::shared_ptr<Sound> Sampler::getPlayXSound() {
+std::shared_ptr<Sound> Sampler::getPlayXSound()
+{
     return getSortedSounds()[soundIndex].first;
 }
 
-int Sampler::getFreeSampleSpace() const {
+int Sampler::getFreeSampleSpace() const
+{
     double freeSpace = 32620;
 
-    for (auto &s: sounds) {
+    for (auto &s : sounds)
+    {
         freeSpace -= s->getSampleData()->size() * 2 / static_cast<double>(1024);
     }
 
     return static_cast<int>(floor(freeSpace));
 }
 
-int Sampler::getLastInt(const std::string &s) {
+int Sampler::getLastInt(const std::string &s)
+{
     auto offset = s.length();
 
-    for (int i = s.length() - 1; i >= 0; i--) {
-        if (const auto c = s[i]; isdigit(c)) {
+    for (int i = s.length() - 1; i >= 0; i--)
+    {
+        if (const auto c = s[i]; isdigit(c))
+        {
             offset--;
-        } else {
-            if (offset == s.length()) {
+        }
+        else
+        {
+            if (offset == s.length())
+            {
                 return INT_MIN;
             }
 
@@ -656,15 +790,19 @@ int Sampler::getLastInt(const std::string &s) {
     return stoi(s.substr(offset));
 }
 
-std::string Sampler::addOrIncreaseNumber(const std::string &s) const {
+std::string Sampler::addOrIncreaseNumber(const std::string &s) const
+{
     auto res = s;
     bool exists = true;
 
-    while (exists) {
+    while (exists)
+    {
         exists = false;
 
-        for (int i = 0; i < getSoundCount(); i++) {
-            if (getSoundName(i) == res) {
+        for (int i = 0; i < getSoundCount(); i++)
+        {
+            if (getSoundName(i) == res)
+            {
                 exists = true;
                 res = Sampler::addOrIncreaseNumber2(res);
                 break;
@@ -675,12 +813,15 @@ std::string Sampler::addOrIncreaseNumber(const std::string &s) const {
     return res;
 }
 
-std::string Sampler::addOrIncreaseNumber2(const std::string &s) {
+std::string Sampler::addOrIncreaseNumber2(const std::string &s)
+{
     int candidate = getLastInt(s);
     std::string res = s;
 
-    if (candidate == INT_MIN) {
-        if (res.length() >= 16) {
+    if (candidate == INT_MIN)
+    {
+        if (res.length() >= 16)
+        {
             res = res.substr(0, 15);
         }
         return res + std::to_string(1);
@@ -696,7 +837,8 @@ std::string Sampler::addOrIncreaseNumber2(const std::string &s) {
     candidateStr = std::to_string(candidate);
     candidateLength = candidateStr.length();
 
-    if (res.length() + candidateLength > 16) {
+    if (res.length() + candidateLength > 16)
+    {
         res = res.substr(0, 16 - candidateLength);
     }
 
@@ -704,16 +846,21 @@ std::string Sampler::addOrIncreaseNumber2(const std::string &s) {
     return res;
 }
 
-std::vector<std::shared_ptr<Sound> > Sampler::getUsedSounds() const {
-    std::set<std::shared_ptr<Sound> > usedSounds;
+std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds() const
+{
+    std::set<std::shared_ptr<Sound>> usedSounds;
 
-    for (auto &p: programs) {
-        if (!p) {
+    for (auto &p : programs)
+    {
+        if (!p)
+        {
             continue;
         }
 
-        for (const auto &nn: p->getNotesParameters()) {
-            if (nn->getSoundIndex() != -1) {
+        for (const auto &nn : p->getNotesParameters())
+        {
+            if (nn->getSoundIndex() != -1)
+            {
                 usedSounds.insert(sounds[nn->getSoundIndex()]);
             }
         }
@@ -721,73 +868,93 @@ std::vector<std::shared_ptr<Sound> > Sampler::getUsedSounds() const {
     return {begin(usedSounds), end(usedSounds)};
 }
 
-int Sampler::getUnusedSampleCount() const {
+int Sampler::getUnusedSampleCount() const
+{
     return static_cast<int>(sounds.size() - getUsedSounds().size());
 }
 
-void Sampler::purge() {
+void Sampler::purge()
+{
     auto usedSounds = getUsedSounds();
 
-    for (int i = sounds.size() - 1; i >= 0; i--) {
+    for (int i = sounds.size() - 1; i >= 0; i--)
+    {
         auto maybeUnusedSound = sounds[i];
 
         const auto pos =
-                find_if(begin(usedSounds), end(usedSounds),
-                        [&maybeUnusedSound](const std::shared_ptr<Sound> &sound) {
-                            return sound == maybeUnusedSound;
-                        });
+            find_if(begin(usedSounds), end(usedSounds),
+                    [&maybeUnusedSound](const std::shared_ptr<Sound> &sound)
+                    {
+                        return sound == maybeUnusedSound;
+                    });
 
-        if (pos == usedSounds.end()) {
+        if (pos == usedSounds.end())
+        {
             deleteSound(maybeUnusedSound);
         }
     }
 }
 
-void Sampler::deleteSound(const int deleteSoundIndex) {
+void Sampler::deleteSound(const int deleteSoundIndex)
+{
     deleteSound(sounds[deleteSoundIndex]);
 }
 
 void Sampler::deleteSoundWithoutRepairingPrograms(
-    const std::shared_ptr<Sound> &sound) {
+    const std::shared_ptr<Sound> &sound)
+{
     int index = -1;
 
-    for (int i = 0; i < sounds.size(); i++) {
-        if (sounds[i] == sound) {
+    for (int i = 0; i < sounds.size(); i++)
+    {
+        if (sounds[i] == sound)
+        {
             index = i;
             break;
         }
     }
 
-    if (index == -1) {
+    if (index == -1)
+    {
         return;
     }
 
     sounds.erase(sounds.begin() + index);
 }
 
-void Sampler::deleteSound(const std::shared_ptr<Sound> &sound) {
+void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
+{
     int index = -1;
 
-    for (int i = 0; i < sounds.size(); i++) {
-        if (sounds[i] == sound) {
+    for (int i = 0; i < sounds.size(); i++)
+    {
+        if (sounds[i] == sound)
+        {
             index = i;
             break;
         }
     }
 
-    if (index == -1) {
+    if (index == -1)
+    {
         return;
     }
 
-    for (const auto &p: programs) {
-        if (!p) {
+    for (const auto &p : programs)
+    {
+        if (!p)
+        {
             continue;
         }
 
-        for (const auto &n: p->getNotesParameters()) {
-            if (n->getSoundIndex() == index) {
+        for (const auto &n : p->getNotesParameters())
+        {
+            if (n->getSoundIndex() == index)
+            {
                 n->setSoundIndex(-1);
-            } else if (n->getSoundIndex() > index) {
+            }
+            else if (n->getSoundIndex() > index)
+            {
                 n->setSoundIndex(n->getSoundIndex() - 1);
             }
         }
@@ -795,31 +962,41 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound) {
 
     sounds.erase(sounds.begin() + index);
 
-    if (soundIndex >= sounds.size()) {
+    if (soundIndex >= sounds.size())
+    {
         soundIndex--;
     }
 
-    if (soundIndex < 0) {
+    if (soundIndex < 0)
+    {
         soundIndex = 0;
     }
 }
 
 std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0,
-                                          const std::vector<float> &fa1) {
+                                          const std::vector<float> &fa1)
+{
     const int newLengthFrames =
-            fa0.size() > fa1.size() ? fa0.size() : fa1.size();
+        fa0.size() > fa1.size() ? fa0.size() : fa1.size();
     std::vector<float> newSampleData(newLengthFrames * 2);
 
-    for (int i = 0; i < newLengthFrames; i++) {
-        if (i < fa0.size()) {
+    for (int i = 0; i < newLengthFrames; i++)
+    {
+        if (i < fa0.size())
+        {
             newSampleData[i] = fa0[i];
-        } else {
+        }
+        else
+        {
             newSampleData[i] = 0;
         }
 
-        if (i < fa1.size()) {
+        if (i < fa1.size())
+        {
             newSampleData[i + newLengthFrames] = fa1[i];
-        } else {
+        }
+        else
+        {
             newSampleData[i + newLengthFrames] = 0;
         }
     }
@@ -830,60 +1007,75 @@ std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0,
 void Sampler::mergeToStereo(
     const std::shared_ptr<const std::vector<float>> &sourceLeft,
     const std::shared_ptr<const std::vector<float>> &sourceRight,
-    const std::shared_ptr<std::vector<float> > &dest) {
+    const std::shared_ptr<std::vector<float>> &dest)
+{
     dest->clear();
 
-    for (auto &f: *sourceLeft) {
+    for (auto &f : *sourceLeft)
+    {
         dest->push_back(f);
     }
 
-    if (sourceLeft->size() < sourceRight->size()) {
+    if (sourceLeft->size() < sourceRight->size())
+    {
         const auto diff = sourceRight->size() - sourceLeft->size();
 
-        for (int i = 0; i < diff; i++) {
+        for (int i = 0; i < diff; i++)
+        {
             dest->push_back(0);
         }
     }
 
-    for (auto &f: *sourceRight) {
+    for (auto &f : *sourceRight)
+    {
         dest->push_back(f);
     }
 
-    if (sourceRight->size() < sourceLeft->size()) {
+    if (sourceRight->size() < sourceLeft->size())
+    {
         const auto diff = sourceLeft->size() - sourceRight->size();
-        for (int i = 0; i < diff; i++) {
+        for (int i = 0; i < diff; i++)
+        {
             dest->push_back(0);
         }
     }
 }
 
-std::shared_ptr<Sound> Sampler::getClickSound() {
+std::shared_ptr<Sound> Sampler::getClickSound()
+{
     return clickSound;
 }
 
-int Sampler::checkExists(const std::string &soundName) const {
-    for (int i = 0; i < getSoundCount(); i++) {
+int Sampler::checkExists(const std::string &soundName) const
+{
+    for (int i = 0; i < getSoundCount(); i++)
+    {
         if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(soundName, ' ', ""),
-                                  getSoundName(i))) {
+                                  getSoundName(i)))
+        {
             return i;
         }
     }
     return -1;
 }
 
-void Sampler::selectPreviousSound() {
+void Sampler::selectPreviousSound()
+{
     nudgeSoundIndex(false);
 }
 
-void Sampler::selectNextSound() {
+void Sampler::selectNextSound()
+{
     nudgeSoundIndex(true);
 }
 
-std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source) {
+std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source)
+{
     const auto sound = source.lock();
     auto newSound = addSound(sound->getSampleRate());
 
-    if (!newSound) {
+    if (!newSound)
+    {
         return {};
     }
 
@@ -900,8 +1092,10 @@ std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source) {
     return newSound;
 }
 
-void Sampler::copyProgram(const int sourceIndex, const int destIndex) {
-    if (programs[destIndex]) {
+void Sampler::copyProgram(const int sourceIndex, const int destIndex)
+{
+    if (programs[destIndex])
+    {
         programs[destIndex].reset();
     }
 
@@ -911,7 +1105,8 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex) {
     dest->setMidiProgramChange(dest->getMidiProgramChange());
     dest->setName(src->getName());
 
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; i++)
+    {
         const auto copy = src->getNoteParameters(i + 35)->clone(i);
         dest->setNoteParameters(i, copy);
 
@@ -949,19 +1144,27 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex) {
 }
 
 mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
-                                          const bool up) const {
+                                          const bool up) const
+{
     auto res = startIndex;
 
-    if (up) {
-        for (int i = startIndex + 1; i < programs.size(); i++) {
-            if (programs[i]) {
+    if (up)
+    {
+        for (int i = startIndex + 1; i < programs.size(); i++)
+        {
+            if (programs[i])
+            {
                 res = i;
                 break;
             }
         }
-    } else {
-        for (int i = startIndex - 1; i >= 0; i--) {
-            if (programs[i]) {
+    }
+    else
+    {
+        for (int i = startIndex - 1; i >= 0; i--)
+        {
+            if (programs[i])
+            {
                 res = i;
                 break;
             }
@@ -971,22 +1174,28 @@ mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
     return ProgramIndex(res);
 }
 
-void Sampler::setPlayX(const int i) {
-    if (i < 0 || i > 4) {
+void Sampler::setPlayX(const int i)
+{
+    if (i < 0 || i > 4)
+    {
         return;
     }
 
     playXMode = i;
 }
 
-int Sampler::getPlayX() const {
+int Sampler::getPlayX() const
+{
     return playXMode;
 }
 
-bool Sampler::isSoundNameOccupied(const std::string &name) const {
-    for (auto &s: sounds) {
+bool Sampler::isSoundNameOccupied(const std::string &name) const
+{
+    for (auto &s : sounds)
+    {
         if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()),
-                                  StrUtil::trim(name))) {
+                                  StrUtil::trim(name)))
+        {
             return true;
         }
     }
@@ -994,51 +1203,61 @@ bool Sampler::isSoundNameOccupied(const std::string &name) const {
     return false;
 }
 
-std::vector<std::pair<std::shared_ptr<Sound>, int> >
-Sampler::getSoundsSortedByName() {
-    std::vector<std::pair<std::shared_ptr<Sound>, int> > result;
+std::vector<std::pair<std::shared_ptr<Sound>, int>>
+Sampler::getSoundsSortedByName()
+{
+    std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
 
-    for (int i = 0; i < sounds.size(); i++) {
+    for (int i = 0; i < sounds.size(); i++)
+    {
         result.push_back({sounds[i], i});
     }
 
     std::sort(result.begin(), result.end(),
               [](const std::pair<std::shared_ptr<Sound>, int> &s1,
-                 const std::pair<std::shared_ptr<Sound>, int> &s2) -> bool {
+                 const std::pair<std::shared_ptr<Sound>, int> &s2) -> bool
+              {
                   return s1.first->getName() < s2.first->getName();
               });
 
     return result;
 }
 
-std::vector<std::pair<std::shared_ptr<Sound>, int> >
-Sampler::getSoundsSortedBySize() {
-    std::vector<std::pair<std::shared_ptr<Sound>, int> > result;
+std::vector<std::pair<std::shared_ptr<Sound>, int>>
+Sampler::getSoundsSortedBySize()
+{
+    std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
 
-    for (int i = 0; i < sounds.size(); i++) {
+    for (int i = 0; i < sounds.size(); i++)
+    {
         result.push_back({sounds[i], i});
     }
 
     std::sort(result.begin(), result.end(),
               [](const std::pair<std::shared_ptr<Sound>, int> &s1,
-                 const std::pair<std::shared_ptr<Sound>, int> &s2) -> bool {
+                 const std::pair<std::shared_ptr<Sound>, int> &s2) -> bool
+              {
                   return s1.first->getFrameCount() < s2.first->getFrameCount();
               });
 
     return result;
 }
 
-std::vector<std::pair<std::shared_ptr<Sound>, int> > Sampler::getSortedSounds() {
-    if (soundSortingType == 0) {
-        std::vector<std::pair<std::shared_ptr<Sound>, int> > result;
+std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
+{
+    if (soundSortingType == 0)
+    {
+        std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
 
-        for (int i = 0; i < sounds.size(); i++) {
+        for (int i = 0; i < sounds.size(); i++)
+        {
             result.push_back({sounds[i], i});
         }
 
         return result;
     }
-    if (soundSortingType == 1) {
+    if (soundSortingType == 1)
+    {
         return getSoundsSortedByName();
     }
 

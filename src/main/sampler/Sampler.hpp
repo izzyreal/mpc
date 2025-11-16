@@ -26,8 +26,10 @@ namespace mpc::sampler
     public:
         explicit Sampler(
             Mpc &,
-            const std::function<performance::Program(ProgramIndex)> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)> &dispatch);
+            const std::function<performance::Program(ProgramIndex)>
+                &getSnapshot,
+            const std::function<void(performance::PerformanceMessage &)>
+                &dispatch);
 
         std::shared_ptr<Sound> getPlayXSound();
         std::shared_ptr<Sound> getClickSound();
@@ -87,8 +89,7 @@ namespace mpc::sampler
         void deleteSoundWithoutRepairingPrograms(
             const std::shared_ptr<Sound> &sound);
         void trimSample(int sampleNumber, int start, int end) const;
-        void deleteSection(unsigned int sampleNumber,
-                           unsigned int start,
+        void deleteSection(unsigned int sampleNumber, unsigned int start,
                            unsigned int end) const;
         void switchToNextSoundSortType();
         std::string getSoundSortingTypeName() const;
@@ -155,7 +156,8 @@ namespace mpc::sampler
 
         static std::string addOrIncreaseNumber2(const std::string &s);
 
-        static void trimSample(const std::weak_ptr<Sound> &, int start, int end);
+        static void trimSample(const std::weak_ptr<Sound> &, int start,
+                               int end);
         std::vector<std::pair<std::shared_ptr<Sound>, int>>
         getSoundsSortedByName();
         std::vector<std::pair<std::shared_ptr<Sound>, int>>
