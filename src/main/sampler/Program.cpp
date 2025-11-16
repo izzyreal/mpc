@@ -69,7 +69,7 @@ NoteParameters *Program::getNoteParameters(const int noteNumber) const
         return nullptr;
     }
 
-    return noteParameters[noteNumber - 35];
+    return noteParameters[noteNumber - MinDrumNoteNumber];
 }
 
 Pad *Program::getPad(const int i) const

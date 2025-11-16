@@ -28,7 +28,8 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     ctx.mixer = mixer;
     ctx.mixerSetupScreen = mixerSetupScreen;
     ctx.voices = voices;
-    ctx.mixerConnections = &mixerConnections, ctx.note = note;
+    ctx.mixerConnections = &mixerConnections;
+    ctx.note = DrumNoteNumber(note);
     ctx.velocity = velocity;
     ctx.varType = varType;
     ctx.varValue = varValue;

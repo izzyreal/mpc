@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "sampler/VoiceOverlapMode.hpp"
 
 #include <array>
 
@@ -32,7 +33,7 @@ namespace mpc::performance
         DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
         int velocityRangeUpper = 0;
         DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
-        int8_t voiceOverlapMode = 0;
+        sampler::VoiceOverlapMode voiceOverlapMode = sampler::VoiceOverlapMode::POLY;
         DrumNoteNumber muteAssignA{NoDrumNoteAssigned};
         DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
         int tune = 0;
@@ -79,6 +80,10 @@ namespace mpc::performance
         std::array<Pad, 64> pads{};
         Slider slider{};
         int midiProgramChange = 0;
+        NoteParameters getNoteParameters(const DrumNoteNumber noteNumber)
+        {
+            return noteParameters[noteNumber.get() - MinDrumNoteNumber.get()];
+        }
     };
 
     struct Drum
@@ -95,5 +100,15 @@ namespace mpc::performance
         bool receivePgmChange = false;
         bool receiveMidiVolume = false;
         MidiValue lastReceivedMidiVolume{MaxMidiValue};
+
+        StereoMixer getStereoMixer(const DrumNoteNumber drumNoteNumber)
+        {
+            return stereoMixers[drumNoteNumber.get() - MinDrumNoteNumber.get()];
+        }
+
+        IndivFxMixer getIndivFxMixer(const DrumNoteNumber drumNoteNumber)
+        {
+            return indivFxMixers[drumNoteNumber.get() - MinDrumNoteNumber.get()];
+        }
     };
 } // namespace mpc::performance

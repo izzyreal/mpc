@@ -61,9 +61,9 @@ void PreviewSoundPlayer::playSound(int soundNumber, int velocity,
     soundHasLoop = tempVars->isLoopEnabled();
 
     fader->setValue(soundNumber == -2 ? 200 : 100);
-    voice->init(velocity, tempVars, -1, nullptr, 0, 64, frameOffset,
+    voice->init(velocity, tempVars, -1, performance::NoteParameters(), 0, 64, frameOffset,
                 soundNumber != -2, -1, -1,
-                mixer->getSharedBuffer()->getSampleRate(), 1);
+                mixer->getSharedBuffer()->getSampleRate(), 1, NoProgramIndex);
 }
 
 void PreviewSoundPlayer::finishVoice() const

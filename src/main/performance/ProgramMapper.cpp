@@ -38,8 +38,7 @@ namespace mpc::performance
             dn.optionalNoteA = sn->getOptionalNoteA();
             dn.velocityRangeUpper = sn->getVelocityRangeUpper();
             dn.optionalNoteB = sn->getOptionalNoteB();
-            dn.voiceOverlapMode =
-                static_cast<int8_t>(sn->getVoiceOverlapMode());
+            dn.voiceOverlapMode = sn->getVoiceOverlapMode();
             dn.muteAssignA = sn->getMuteAssignA();
             dn.muteAssignB = sn->getMuteAssignB();
             dn.tune = sn->getTune();

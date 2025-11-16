@@ -4,6 +4,7 @@
 #include "MuteInfo.hpp"
 #include "VoiceUtil.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
+#include "performance/Drum.hpp"
 
 #include <atomic>
 #include <memory>
@@ -11,7 +12,6 @@
 namespace mpc::sampler
 {
     class Sound;
-    class NoteParameters;
 } // namespace mpc::sampler
 
 namespace mpc::engine::control
@@ -43,8 +43,7 @@ namespace mpc::engine
         // Voice overlap mode when the voice was triggered
         sampler::VoiceOverlapMode voiceOverlapMode;
 
-        // Pointer to currently playing note parameters
-        sampler::NoteParameters *noteParameters = nullptr;
+        performance::NoteParameters noteParameters;
 
         // Pointer to sample data when the voice was triggered
         std::shared_ptr<const std::vector<float>> sampleData;
@@ -84,6 +83,8 @@ namespace mpc::engine
         float envAmplitude = 0;
         float staticEnvAmp = 0;
         uint64_t noteEventId = 0;
+        DrumBusIndex drumBusIndex;
+        ProgramIndex programIndex;
     };
 
     class Voice final : public audio::core::AudioProcess
@@ -154,10 +155,11 @@ namespace mpc::engine
 
         // Called from main thread
         void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
-                  int noteNumber, sampler::NoteParameters *noteParameters,
+                  int noteNumber, performance::NoteParameters,
                   int varType, int varValue, int drumIndex, int frameOffset,
                   bool enableEnvs, int startTick, float engineSampleRate,
-                  uint64_t noteEventId);
+                  uint64_t noteEventId,
+                  ProgramIndex programIndex);
 
         uint64_t getNoteEventId();
 
@@ -173,7 +175,7 @@ namespace mpc::engine
 
         bool isFinished() const;
 
-        const sampler::NoteParameters *getNoteParameters() const;
+        bool isPlayingDrumProgramNoteCombination(DrumBusIndex, ProgramIndex, DrumNoteNumber) const;
 
         sampler::VoiceOverlapMode getVoiceOverlapMode() const;
 

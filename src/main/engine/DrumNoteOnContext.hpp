@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include "IntTypes.hpp"
 
 namespace mpc::sampler
 {
@@ -36,7 +37,7 @@ namespace mpc::engine
         std::vector<std::shared_ptr<Voice>> *voices{};
         std::vector<MixerInterconnection *> *mixerConnections{};
         std::shared_ptr<sequencer::DrumBus> drum;
-        int note{};
+        mpc::DrumNoteNumber note{};
         int velocity{};
         int varType{};
         int varValue{};

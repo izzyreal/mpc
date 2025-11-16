@@ -2,6 +2,7 @@
 
 #include "utils/TimeUtils.hpp"
 #include "performance/ProgramMapper.hpp"
+#include "performance/Drum.hpp"
 
 #include <algorithm>
 
@@ -370,7 +371,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, SetDrumProgram>)
             {
-                activeState.drums[payload.drumBusIndex];
+                activeState.drums[payload.drumBusIndex].program = payload.performanceProgram;
             }
             else if constexpr (std::is_same_v<T, std::monostate>)
             {

@@ -2,6 +2,7 @@
 
 #include "BusType.hpp"
 #include "IntTypes.hpp"
+#include "performance/Drum.hpp"
 
 #include <map>
 #include <memory>
@@ -13,6 +14,16 @@ namespace mpc::engine
     class StereoMixer;
     class IndivFxMixer;
 } // namespace mpc::engine
+
+namespace mpc::sampler
+{
+    class Sampler;
+}
+
+namespace mpc::performance
+{
+    class PerformanceManager;
+}
 
 namespace mpc::sequencer
 {
@@ -37,15 +48,18 @@ namespace mpc::sequencer
     {
     public:
         explicit DrumBus(
-            DrumBusIndex,
-            std::function<void(const DrumBusIndex, const ProgramIndex)>
-                setProgramInPerformanceState);
+            DrumBusIndex, std::shared_ptr<performance::PerformanceManager>,
+            std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
 
         ProgramIndex getProgramIndex() const;
         void setProgramIndex(ProgramIndex);
+
+        performance::Program getPerformanceProgram() const;
+        performance::StereoMixer getPerformanceStereoMixer(DrumNoteNumber) const;
+        performance::IndivFxMixer getPerformanceIndivFxMixer(DrumNoteNumber) const;
 
         bool receivesPgmChange() const;
         void setReceivePgmChange(bool b);
@@ -66,8 +80,9 @@ namespace mpc::sequencer
 
     private:
         const DrumBusIndex drumIndex;
-        const std::function<void(const DrumBusIndex, const ProgramIndex)>
-            setProgramInPerformanceState;
+        const std::shared_ptr<performance::PerformanceManager>
+            performanceManager;
+        std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn;
         ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;
