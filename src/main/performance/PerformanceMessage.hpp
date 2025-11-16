@@ -12,14 +12,14 @@ namespace mpc::performance
     {
         DrumBusIndex drumBusIndex;
         ProgramIndex programIndex;
-        performance::Program performanceProgram;
+        Program performanceProgram;
     };
 
     struct UpdateNoteParameters
     {
         ProgramIndex programIndex;
         DrumNoteNumber drumNoteNumber;
-        performance::NoteParameters performanceNoteParameters;
+        NoteParameters performanceNoteParameters;
     };
 
     using PerformanceMessagePayload =

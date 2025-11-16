@@ -24,59 +24,59 @@ namespace mpc::sampler {
 
         DrumNoteNumber getNumber() const;
 
-        void setSoundIndex(int i);
+        void setSoundIndex(int i) const;
 
-        void setSoundGenMode(int i);
+        void setSoundGenMode(int i) const;
 
-        void setVeloRangeLower(int i);
+        void setVeloRangeLower(int i) const;
 
         int getVelocityRangeLower() const;
 
-        void setOptNoteA(DrumNoteNumber);
+        void setOptNoteA(DrumNoteNumber) const;
 
-        void setVeloRangeUpper(int i);
+        void setVeloRangeUpper(int i) const;
 
         int getVelocityRangeUpper() const;
 
-        void setOptionalNoteB(DrumNoteNumber);
+        void setOptionalNoteB(DrumNoteNumber) const;
 
-        void setVoiceOverlapMode(VoiceOverlapMode);
+        void setVoiceOverlapMode(VoiceOverlapMode) const;
 
-        void setMuteAssignA(DrumNoteNumber);
+        void setMuteAssignA(DrumNoteNumber) const;
 
-        void setMuteAssignB(DrumNoteNumber);
+        void setMuteAssignB(DrumNoteNumber) const;
 
-        void setTune(int i);
+        void setTune(int i) const;
 
-        void setAttack(int i);
+        void setAttack(int i) const;
 
-        void setDecay(int i);
+        void setDecay(int i) const;
 
-        void setDecayMode(int i);
+        void setDecayMode(int i) const;
 
-        void setFilterFrequency(int i);
+        void setFilterFrequency(int i) const;
 
-        void setFilterResonance(int i);
+        void setFilterResonance(int i) const;
 
-        void setFilterAttack(int i);
+        void setFilterAttack(int i) const;
 
-        void setFilterDecay(int i);
+        void setFilterDecay(int i) const;
 
-        void setFilterEnvelopeAmount(int i);
+        void setFilterEnvelopeAmount(int i) const;
 
-        void setVeloToLevel(int i);
+        void setVeloToLevel(int i) const;
 
-        void setVelocityToAttack(int i);
+        void setVelocityToAttack(int i) const;
 
-        void setVelocityToStart(int i);
+        void setVelocityToStart(int i) const;
 
-        void setVelocityToFilterFrequency(int i);
+        void setVelocityToFilterFrequency(int i) const;
 
-        void setSliderParameterNumber(int i);
+        void setSliderParameterNumber(int i) const;
 
         int getSliderParameterNumber() const;
 
-        void setVelocityToPitch(int i);
+        void setVelocityToPitch(int i) const;
 
         int getVelocityToPitch() const;
 
@@ -132,29 +132,5 @@ namespace mpc::sampler {
                 std::make_shared<engine::StereoMixer>();
         std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =
                 std::make_shared<engine::IndivFxMixer>();
-        int soundIndex = -1;
-        int soundGenerationMode = 0;
-        int velocityRangeLower = 0;
-        DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
-        int velocityRangeUpper = 0;
-        DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
-        VoiceOverlapMode voiceOverlapMode = VoiceOverlapMode::POLY;
-        DrumNoteNumber muteAssignA{NoDrumNoteAssigned};
-        DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
-        int tune = 0;
-        int attack = 0;
-        int decay = 0;
-        int decayMode = 0;
-        int filterFrequency = 0;
-        int filterResonance = 0;
-        int filterAttack = 0;
-        int filterDecay = 0;
-        int filterEnvelopeAmount = 0;
-        int velocityToLevel = 0;
-        int velocityToAttack = 0;
-        int velocityToStart = 0;
-        int velocityToFilterFrequency = 0;
-        int sliderParameterNumber = 0;
-        int velocityToPitch = 0;
     };
 } // namespace mpc::sampler
