@@ -35,6 +35,8 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
+#include "utils/TimeUtils.hpp"
+
 #include <memory>
 
 using namespace mpc::controller;
@@ -58,6 +60,16 @@ bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
 {
     return isNoteRepeatLocked() ||
            mpc.getHardware()->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
+}
+
+mpc::TimeInMilliseconds ClientHardwareEventController::getMostRecentPhysicalPadPressTime() const
+{
+    return mostRecentPhysicalPadPressTimeMs.load();
+}
+
+mpc::Velocity ClientHardwareEventController::getMostRecentPhysicalPadPressVelocity() const
+{
+    return mostRecentPhysicalPadPressVelocity.load();
 }
 
 void ClientHardwareEventController::handleClientHardwareEvent(
@@ -115,8 +127,19 @@ void ClientHardwareEventController::handleClientHardwareEvent(
     }
 }
 
+void ClientHardwareEventController::updateMostRecentPhysicalPadPressVelocity(const Velocity newVelocity)
+{
+    if (newVelocity <= 0)
+    {
+        return;
+    }
+
+    mostRecentPhysicalPadPressVelocity.store(newVelocity);
+    mostRecentPhysicalPadPressTimeMs.store(utils::nowInMilliseconds());
+}
+
 void ClientHardwareEventController::handlePadPress(
-    const ClientHardwareEvent &event) const
+    const ClientHardwareEvent &event)
 {
     if (!event.index || !event.value)
     {
@@ -170,6 +193,8 @@ void ClientHardwareEventController::handlePadPress(
     {
         return;
     }
+
+    updateMostRecentPhysicalPadPressVelocity(Velocity(clampedVelocity));
 
     const auto track = mpc.getSequencer()->getSelectedTrack();
 

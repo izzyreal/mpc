@@ -164,12 +164,14 @@ std::vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-StereoMixer ApsProgram::getStereoMixerChannel(const int noteIndex) const
+mpc::performance::StereoMixer
+ApsProgram::getStereoMixerChannel(const int noteIndex) const
 {
     return mixer->getStereoMixerChannel(noteIndex);
 }
 
-IndivFxMixer ApsProgram::getIndivFxMixerChannel(const int noteIndex) const
+mpc::performance::IndivFxMixer
+ApsProgram::getIndivFxMixerChannel(const int noteIndex) const
 {
     return mixer->getIndivFxMixerChannel(noteIndex);
 }

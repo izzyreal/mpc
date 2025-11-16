@@ -29,7 +29,13 @@ void CopyNoteParametersScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "prog0")
     {
-        setProg0(prog0 + increment);
+        const bool up = increment > 0;
+        auto candidate = prog0;
+        for (int i = 0; i < std::abs(increment); ++i)
+        {
+            candidate = sampler->getUsedProgram(candidate, up);
+        }
+        setProg0(candidate);
     }
     else if (focusedFieldName == "note0")
     {
@@ -37,7 +43,13 @@ void CopyNoteParametersScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "prog1")
     {
-        setProg1(prog1 + increment);
+        const bool up = increment > 0;
+        auto candidate = prog1;
+        for (int i = 0; i < std::abs(increment); ++i)
+        {
+            candidate = sampler->getUsedProgram(candidate, up);
+        }
+        setProg1(candidate);
     }
     else if (focusedFieldName == "note1")
     {

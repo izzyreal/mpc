@@ -313,8 +313,9 @@
  "note", [ "_", "_", "_", "veloattack" ],
  "veloattack", [ "_", "_", "note", "velostart" ],
  "velostart", [ "_", "_", "veloattack", "velolevel" ],
- "velolevel", [ "_", "_", "velostart", "_" ],
- "velo" ],
+ "velolevel", [ "_", "velo", "velostart", "_" ],
+ "velo", [ "velolevel", "_", "note", "_" ]
+ ],
  "fblabels" : [ null, null, null, "CLOSE", "PLAY", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
 },
@@ -330,7 +331,8 @@
  "decay", [ "_", "velofreq", "attack", "amount" ],
  "amount", [ "_", "velo", "decay", "_" ],
  "velofreq", [ "attack", "_", "note", "velo" ],
- "velo", [ "amount", "_", "velofreq", "_" ]],
+ "velo", [ "amount", "_", "velofreq", "_" ]
+ ],
  "fblabels" : [ null, null, null, "CLOSE", "PLAY", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
 },
@@ -340,7 +342,12 @@
  "x" : [ 25, 67, 139, 175 ],
  "y" : [ 11, 28, 28, 40 ],
  "tfsize" : [ 138, 24, 24, 18 ],
- "parameters" : [ "note", "tune", "velo-pitch", "velo" ],
+ "parameters" : [
+     "note", [ "_", "_", "_", "tune" ],
+     "tune", [ "_", "velo-pitch", "note", "_" ],
+     "velo-pitch", [ "tune", "_", "note", "velo_" ],
+     "velo", [ "tune", "_", "velo-pitch", "_" ]
+ ],
  "fblabels" : [ null, null, null, "CLOSE", "PLAY", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
 },

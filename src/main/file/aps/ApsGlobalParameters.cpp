@@ -47,7 +47,7 @@ ApsGlobalParameters::ApsGlobalParameters(Mpc &mpc)
     auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
     auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
-    auto const padAssignMasterVal = pgmAssignScreen->padAssign;
+    auto const padAssignMasterVal = pgmAssignScreen->isPadAssignMaster();
 
     auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
     auto const stereoMixSourceDrumVal =

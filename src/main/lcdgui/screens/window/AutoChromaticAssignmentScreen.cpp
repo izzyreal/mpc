@@ -63,10 +63,12 @@ void AutoChromaticAssignmentScreen::function(const int i)
             {
                 const auto pad = newProgram->getPad(j - MinDrumNoteNumber);
                 pad->setNote(DrumNoteNumber(j));
-                const auto noteParameters =
-                    new NoteParameters(j - MinDrumNoteNumber);
-                newProgram->setNoteParameters(j - MinDrumNoteNumber,
-                                              noteParameters);
+                auto noteParameters = newProgram->getNoteParameters(j);
+                //                const auto noteParameters =
+                //                    new NoteParameters(j - MinDrumNoteNumber);
+                //                newProgram->setNoteParameters(j -
+                //                MinDrumNoteNumber,
+                //                                              noteParameters);
                 noteParameters->setSoundIndex(sourceSoundIndex);
 
                 noteParameters->setTune((j - originalKey) * 10 + tune);

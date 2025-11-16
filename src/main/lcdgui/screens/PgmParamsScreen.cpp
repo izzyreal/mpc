@@ -23,20 +23,111 @@ PgmParamsScreen::PgmParamsScreen(Mpc &mpc, const int layerIndex)
 
 void PgmParamsScreen::open()
 {
-    mpc.clientEventController->addObserver(this);
-    displayPgm();
-    displayNote();
-    displayDecayMode();
-    displayFreq();
-    displayReson();
-    displayTune();
-    displayVoiceOverlap();
-    displayAttackDecay();
-}
+    auto displayNoteProperties = [&]
+    {
+        displayNote();
+        displayDecayMode();
+        displayFreq();
+        displayReson();
+        displayTune();
+        displayVoiceOverlap();
+        displayAttackDecay();
+    };
 
-void PgmParamsScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
+    auto getSelectedNote = [this]
+    {
+        return this->mpc.clientEventController->getSelectedNote();
+    };
+
+    auto getSelectedNoteParameters = [this, getSelectedNote]
+    {
+        return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+    };
+
+    if (isReactiveBindingsEmpty())
+    {
+        addReactiveBinding({[this]
+                            {
+                                return getActiveDrumBus()->getProgramIndex();
+                            },
+                            [displayNoteProperties, this](auto)
+                            {
+                                displayPgm();
+                                displayNoteProperties();
+                            }});
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [displayNoteProperties](auto)
+                            {
+                                displayNoteProperties();
+                            }});
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()->getAttack();
+                            },
+                            [this](auto)
+                            {
+                                displayAttackDecay();
+                            }});
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()->getDecay();
+                            },
+                            [this](auto)
+                            {
+                                displayAttackDecay();
+                            }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getDecayMode();
+             },
+             [this](auto)
+             {
+                 displayDecayMode();
+                 displayAttackDecay();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getFilterFrequency();
+             },
+             [this](auto)
+             {
+                 displayFreq();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getFilterResonance();
+             },
+             [this](auto)
+             {
+                 displayReson();
+             }});
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()->getTune();
+                            },
+                            [this](auto)
+                            {
+                                displayTune();
+                            }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVoiceOverlapMode();
+             },
+             [this](auto)
+             {
+                 displayVoiceOverlap();
+             }});
+    }
+
+    displayPgm();
+    displayNoteProperties();
 }
 
 void PgmParamsScreen::function(const int i)
@@ -87,7 +178,6 @@ void PgmParamsScreen::turnWheel(const int i)
     {
         selectedNoteParameters->setDecayMode(
             selectedNoteParameters->getDecayMode() + i);
-        displayDecayMode();
     }
     else if (focusedFieldName == "voiceoverlap")
     {
@@ -109,32 +199,26 @@ void PgmParamsScreen::turnWheel(const int i)
                              static_cast<int>(M::NOTE_OFF));
 
         selectedNoteParameters->setVoiceOverlapMode(static_cast<M>(modeVal));
-
-        displayVoiceOverlap();
     }
     else if (focusedFieldName == "reson")
     {
         selectedNoteParameters->setFilterResonance(
             selectedNoteParameters->getFilterResonance() + i);
-        displayReson();
     }
     else if (focusedFieldName == "freq")
     {
         selectedNoteParameters->setFilterFrequency(
             selectedNoteParameters->getFilterFrequency() + i);
-        displayFreq();
     }
     else if (focusedFieldName == "decay")
     {
         selectedNoteParameters->setDecay(selectedNoteParameters->getDecay() +
                                          i);
-        displayAttackDecay();
     }
     else if (focusedFieldName == "attack")
     {
         selectedNoteParameters->setAttack(selectedNoteParameters->getAttack() +
                                           i);
-        displayAttackDecay();
     }
     else if (focusedFieldName == "pgm")
     {
@@ -144,30 +228,15 @@ void PgmParamsScreen::turnWheel(const int i)
             candidate != pgm)
         {
             getActiveDrumBus()->setProgramIndex(candidate);
-            displayPgm();
-            displayAttackDecay();
-            displayDecayMode();
-            displayFreq();
-            displayNote();
-            displayReson();
-            displayTune();
-            displayVoiceOverlap();
         }
     }
     else if (focusedFieldName == "note")
     {
         if (const auto candidate =
                 mpc.clientEventController->getSelectedNote() + i;
-            candidate > 34)
+            candidate > NoDrumNoteAssigned)
         {
             mpc.clientEventController->setSelectedNote(candidate);
-            displayAttackDecay();
-            displayDecayMode();
-            displayFreq();
-            displayNote();
-            displayReson();
-            displayTune();
-            displayVoiceOverlap();
         }
     }
 }
@@ -199,20 +268,6 @@ void PgmParamsScreen::openWindow()
     else if (focusedFieldName == "voiceoverlap")
     {
         openScreenById(ScreenId::MuteAssignScreen);
-    }
-}
-
-void PgmParamsScreen::update(Observable *observable, const Message message)
-{
-    if (const auto msg = std::get<std::string>(message); msg == "note")
-    {
-        displayAttackDecay();
-        displayDecayMode();
-        displayFreq();
-        displayNote();
-        displayReson();
-        displayTune();
-        displayVoiceOverlap();
     }
 }
 

@@ -13,7 +13,7 @@ namespace mpc::performance
     {
     public:
         explicit PerformanceStateView(
-            std::shared_ptr<const PerformanceState> s) noexcept;
+            const std::shared_ptr<const PerformanceState> &s) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
@@ -27,8 +27,9 @@ namespace mpc::performance
 
         int getTotalNoteOnCount() const;
 
-        performance::Program getProgram(DrumBusIndex) const;
-        performance::Drum getDrum(DrumBusIndex) const;
+        Program getProg(ProgramIndex) const;
+        Program getDrumProgram(DrumBusIndex) const;
+        Drum getDrum(DrumBusIndex) const;
 
     private:
         std::shared_ptr<const PerformanceState> state;

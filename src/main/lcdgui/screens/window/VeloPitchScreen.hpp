@@ -7,16 +7,13 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        void turnWheel(int i) override;
-
         VeloPitchScreen(Mpc &mpc, int layerIndex);
-
+        void turnWheel(int i) override;
         void open() override;
-        void close() override;
-
-        void update(Observable *observable, Message message) override;
 
     private:
+        Velocity velo;
+        void setVelo(Velocity);
         void displayVelo() const;
         void displayNote() const;
         void displayVeloPitch() const;

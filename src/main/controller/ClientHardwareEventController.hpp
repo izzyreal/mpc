@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "hardware/ComponentId.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
@@ -13,7 +14,6 @@ namespace mpc
 
 namespace mpc::controller
 {
-
     class ClientHardwareEventController
     {
     public:
@@ -42,6 +42,9 @@ namespace mpc::controller
 
         bool isNoteRepeatLockedOrPressed() const;
 
+        TimeInMilliseconds getMostRecentPhysicalPadPressTime() const;
+        Velocity getMostRecentPhysicalPadPressVelocity() const;
+
     protected:
         // Maps component label to accumulated delta for discretization
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
@@ -49,7 +52,15 @@ namespace mpc::controller
     private:
         Mpc &mpc;
 
-        void handlePadPress(const client::event::ClientHardwareEvent &) const;
+        // The velocity of the most recent physical pad press. This is used
+        // in the Velocity Modulation, Velo/Env >> Filter, and Velo >> Pitch
+        // windows.
+        std::atomic<Velocity> mostRecentPhysicalPadPressVelocity{MaxVelocity};
+        std::atomic<TimeInMilliseconds> mostRecentPhysicalPadPressTimeMs{0};
+
+        void updateMostRecentPhysicalPadPressVelocity(Velocity);
+
+        void handlePadPress(const client::event::ClientHardwareEvent &);
         void
         handlePadAftertouch(const client::event::ClientHardwareEvent &) const;
         void handlePadRelease(const client::event::ClientHardwareEvent &) const;

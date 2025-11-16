@@ -1,5 +1,7 @@
 #include "file/pgmwriter/Mixer.hpp"
 
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 
@@ -13,8 +15,8 @@ Mixer::Mixer(Program *program)
     for (int i = 0; i < 64; i++)
     {
         auto noteParameters = program->getNoteParameters(i + 35);
-        auto smc = noteParameters->getStereoMixerChannel();
-        auto ifmc = noteParameters->getIndivFxMixerChannel();
+        auto smc = noteParameters->getStereoMixer();
+        auto ifmc = noteParameters->getIndivFxMixer();
         setVolume(i, smc->getLevel());
         setPan(i, smc->getPanning());
         setVolumeIndividual(i, ifmc->getVolumeIndividualOut());

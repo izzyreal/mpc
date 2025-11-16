@@ -1,312 +1,55 @@
-#include <algorithm>
 #include "sampler/NoteParameters.hpp"
 
 #include "IntTypes.hpp"
 
-#include <cassert>
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
 
 using namespace mpc::sampler;
-using namespace mpc::engine;
 
-NoteParameters::NoteParameters(const int index) : index(index)
+NoteParameters::NoteParameters(
+    const int index, const std::function<ProgramIndex()> &getProgramIndex,
+    const std::function<performance::NoteParameters()> &getSnapshot,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : index(index), getProgramIndex(getProgramIndex), getSnapshot(getSnapshot),
+      dispatch(dispatch)
 {
-    decay = 5;
-    filterFrequency = 100;
-    velocityRangeLower = 44;
-    velocityRangeUpper = 88;
-    velocityToLevel = 100;
-    muteAssignA = NoDrumNoteAssigned;
-    muteAssignB = NoDrumNoteAssigned;
-    optionalNoteA = NoDrumNoteAssigned;
-    optionalNoteB = NoDrumNoteAssigned;
-}
-
-int NoteParameters::getSoundIndex() const
-{
-    return soundIndex;
-}
-
-void NoteParameters::setSoundIndex(const int i)
-{
-    assert(i >= -1);
-    soundIndex = i;
-}
-
-void NoteParameters::setSoundGenMode(const int i)
-{
-    soundGenerationMode = std::clamp(i, 0, 3);
-}
-
-int NoteParameters::getSoundGenerationMode() const
-{
-    return soundGenerationMode;
-}
-
-void NoteParameters::setVeloRangeLower(const int i)
-{
-    velocityRangeLower = std::clamp(i, 0, 126);
-
-    if (velocityRangeUpper <= velocityRangeLower)
-    {
-        setVeloRangeUpper(velocityRangeLower + 1);
-    }
-}
-
-void NoteParameters::setVeloRangeUpper(const int i)
-{
-    velocityRangeUpper = std::clamp(i, 1, 127);
-
-    if (velocityRangeLower >= velocityRangeUpper)
-    {
-        setVeloRangeLower(velocityRangeUpper - 1);
-    }
-}
-
-int NoteParameters::getVelocityRangeLower() const
-{
-    return velocityRangeLower;
-}
-
-void NoteParameters::setOptNoteA(const DrumNoteNumber i)
-{
-    optionalNoteA = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
-}
-
-mpc::DrumNoteNumber NoteParameters::getOptionalNoteA() const
-{
-    return optionalNoteA;
-}
-
-int NoteParameters::getVelocityRangeUpper() const
-{
-    return velocityRangeUpper;
-}
-
-void NoteParameters::setOptionalNoteB(const DrumNoteNumber i)
-{
-    optionalNoteB = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
-}
-
-mpc::DrumNoteNumber NoteParameters::getOptionalNoteB() const
-{
-    return optionalNoteB;
-}
-
-VoiceOverlapMode NoteParameters::getVoiceOverlapMode() const
-{
-    return voiceOverlapMode;
-}
-
-void NoteParameters::setVoiceOverlapMode(
-    const VoiceOverlapMode voiceOverlapModeToUse)
-{
-    if (voiceOverlapMode != VoiceOverlapMode::MONO &&
-        voiceOverlapMode != VoiceOverlapMode::NOTE_OFF &&
-        voiceOverlapMode != VoiceOverlapMode::POLY)
-    {
-        return;
-    }
-
-    voiceOverlapMode = voiceOverlapModeToUse;
-}
-
-void NoteParameters::setMuteAssignA(const DrumNoteNumber i)
-{
-    muteAssignA = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
-}
-
-mpc::DrumNoteNumber NoteParameters::getMuteAssignA() const
-{
-    return muteAssignA;
-}
-
-void NoteParameters::setMuteAssignB(const DrumNoteNumber i)
-{
-    muteAssignB = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
-}
-
-mpc::DrumNoteNumber NoteParameters::getMuteAssignB() const
-{
-    return muteAssignB;
-}
-
-void NoteParameters::setTune(const int i)
-{
-    tune = std::clamp(i, -240, 240);
-}
-
-int NoteParameters::getTune() const
-{
-    return tune;
-}
-
-void NoteParameters::setAttack(const int i)
-{
-    attack = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getAttack() const
-{
-    return attack;
-}
-
-void NoteParameters::setDecay(const int i)
-{
-    decay = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getDecay() const
-{
-    return decay;
-}
-
-void NoteParameters::setDecayMode(const int i)
-{
-    decayMode = std::clamp(i, 0, 1);
-}
-
-int NoteParameters::getDecayMode() const
-{
-    return decayMode;
-}
-
-void NoteParameters::setFilterFrequency(const int i)
-{
-    filterFrequency = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getFilterFrequency() const
-{
-    return filterFrequency;
-}
-
-void NoteParameters::setFilterResonance(const int i)
-{
-    filterResonance = std::clamp(i, 0, 15);
-}
-
-int NoteParameters::getFilterResonance() const
-{
-    return filterResonance;
-}
-
-void NoteParameters::setFilterAttack(const int i)
-{
-    filterAttack = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getFilterAttack() const
-{
-    return filterAttack;
-}
-
-void NoteParameters::setFilterDecay(const int i)
-{
-    filterDecay = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getFilterDecay() const
-{
-    return filterDecay;
-}
-
-void NoteParameters::setFilterEnvelopeAmount(const int i)
-{
-    filterEnvelopeAmount = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getFilterEnvelopeAmount() const
-{
-    return filterEnvelopeAmount;
-}
-
-void NoteParameters::setVeloToLevel(const int i)
-{
-    velocityToLevel = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getVeloToLevel() const
-{
-    return velocityToLevel;
-}
-
-void NoteParameters::setVelocityToAttack(const int i)
-{
-    velocityToAttack = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getVelocityToAttack() const
-{
-    return velocityToAttack;
-}
-
-void NoteParameters::setVelocityToStart(const int i)
-{
-    velocityToStart = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getVelocityToStart() const
-{
-    return velocityToStart;
-}
-
-void NoteParameters::setVelocityToFilterFrequency(const int i)
-{
-    velocityToFilterFrequency = std::clamp(i, 0, 100);
-}
-
-int NoteParameters::getVelocityToFilterFrequency() const
-{
-    return velocityToFilterFrequency;
-}
-
-void NoteParameters::setSliderParameterNumber(const int i)
-{
-    sliderParameterNumber = std::clamp(i, 0, 3);
-}
-
-int NoteParameters::getSliderParameterNumber() const
-{
-    return sliderParameterNumber;
-}
-
-void NoteParameters::setVelocityToPitch(const int i)
-{
-    velocityToPitch = std::clamp(i, -120, 120);
-}
-
-int NoteParameters::getVelocityToPitch() const
-{
-    return velocityToPitch;
+    stereoMixer = std::make_shared<engine::StereoMixer>(
+        [this]
+        {
+            return this->getSnapshot().stereoMixer;
+        },
+        []
+        {
+            return NoDrumBusIndex;
+        },
+        getProgramIndex,
+        [this]
+        {
+            return DrumNoteNumber(this->index + MinDrumNoteNumber);
+        },
+        dispatch);
+    indivFxMixer = std::make_shared<engine::IndivFxMixer>(
+        [this]
+        {
+            return this->getSnapshot().indivFxMixer;
+        },
+        []
+        {
+            return NoDrumBusIndex;
+        },
+        getProgramIndex,
+        [this]
+        {
+            return DrumNoteNumber(this->index + MinDrumNoteNumber);
+        },
+        dispatch);
 }
 
 NoteParameters *NoteParameters::clone(const int newIndex) const
 {
-    const auto res = new NoteParameters(newIndex);
-    res->setAttack(attack);
-    res->setDecay(decay);
-    res->setDecayMode(decayMode);
-    res->setFilterAttack(filterAttack);
-    res->setFilterDecay(filterDecay);
-    res->setFilterEnvelopeAmount(filterEnvelopeAmount);
-    res->setFilterFrequency(filterFrequency);
-    res->setFilterResonance(filterResonance);
-    res->setMuteAssignA(muteAssignA);
-    res->setMuteAssignB(muteAssignB);
-    res->setOptNoteA(optionalNoteA);
-    res->setOptionalNoteB(optionalNoteB);
-    res->setSliderParameterNumber(sliderParameterNumber);
-    res->setSoundGenMode(soundGenerationMode);
-    res->setSoundIndex(soundIndex);
-    res->setTune(tune);
-    res->setVelocityToAttack(velocityToAttack);
-    res->setVelocityToFilterFrequency(velocityToFilterFrequency);
-    res->setVelocityToPitch(velocityToPitch);
-    res->setVeloToLevel(velocityToLevel);
-    res->setVelocityToStart(velocityToStart);
-    res->setVeloRangeLower(velocityRangeLower);
-    res->setVeloRangeUpper(velocityRangeUpper);
-    res->setVoiceOverlapMode(voiceOverlapMode);
+    const auto res =
+        new NoteParameters(newIndex, getProgramIndex, getSnapshot, dispatch);
     return res;
 }
 
@@ -315,12 +58,415 @@ mpc::DrumNoteNumber NoteParameters::getNumber() const
     return DrumNoteNumber(index + MinDrumNoteNumber);
 }
 
-std::shared_ptr<StereoMixer> NoteParameters::getStereoMixerChannel()
+int NoteParameters::getSoundIndex() const
 {
-    return stereoMixerChannel;
+    return getSnapshot().soundIndex;
 }
 
-std::shared_ptr<IndivFxMixer> NoteParameters::getIndivFxMixerChannel()
+int NoteParameters::getSoundGenerationMode() const
 {
-    return indivFxMixerChannel;
+    return getSnapshot().soundGenerationMode;
+}
+
+void NoteParameters::setSoundIndex(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int16_tMemberToUpdate = &performance::NoteParameters::soundIndex;
+    payload.int16_tValue = std::clamp(i, -1, 256);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+int NoteParameters::getVelocityRangeLower() const
+{
+    return getSnapshot().velocityRangeLower;
+}
+
+int NoteParameters::getVelocityRangeUpper() const
+{
+    return getSnapshot().velocityRangeUpper;
+}
+
+mpc::DrumNoteNumber NoteParameters::getOptionalNoteA() const
+{
+    return getSnapshot().optionalNoteA;
+}
+
+mpc::DrumNoteNumber NoteParameters::getOptionalNoteB() const
+{
+    return getSnapshot().optionalNoteB;
+}
+
+VoiceOverlapMode NoteParameters::getVoiceOverlapMode() const
+{
+    return getSnapshot().voiceOverlapMode;
+}
+
+mpc::DrumNoteNumber NoteParameters::getMuteAssignA() const
+{
+    return getSnapshot().muteAssignA;
+}
+
+mpc::DrumNoteNumber NoteParameters::getMuteAssignB() const
+{
+    return getSnapshot().muteAssignB;
+}
+
+int NoteParameters::getTune() const
+{
+    return getSnapshot().tune;
+}
+
+int NoteParameters::getAttack() const
+{
+    return getSnapshot().attack;
+}
+
+int NoteParameters::getDecay() const
+{
+    return getSnapshot().decay;
+}
+
+int NoteParameters::getDecayMode() const
+{
+    return getSnapshot().decayMode;
+}
+
+int NoteParameters::getFilterFrequency() const
+{
+    return getSnapshot().filterFrequency;
+}
+
+int NoteParameters::getFilterResonance() const
+{
+    return getSnapshot().filterResonance;
+}
+
+int NoteParameters::getFilterAttack() const
+{
+    return getSnapshot().filterAttack;
+}
+
+int NoteParameters::getFilterDecay() const
+{
+    return getSnapshot().filterDecay;
+}
+
+int NoteParameters::getFilterEnvelopeAmount() const
+{
+    return getSnapshot().filterEnvelopeAmount;
+}
+
+int NoteParameters::getVeloToLevel() const
+{
+    return getSnapshot().velocityToLevel;
+}
+
+int NoteParameters::getVelocityToAttack() const
+{
+    return getSnapshot().velocityToAttack;
+}
+
+int NoteParameters::getVelocityToStart() const
+{
+    return getSnapshot().velocityToStart;
+}
+
+int NoteParameters::getVelocityToFilterFrequency() const
+{
+    return getSnapshot().velocityToFilterFrequency;
+}
+
+int NoteParameters::getSliderParameterNumber() const
+{
+    return getSnapshot().sliderParameterNumber;
+}
+
+int NoteParameters::getVelocityToPitch() const
+{
+    return getSnapshot().velocityToPitch;
+}
+
+std::shared_ptr<mpc::engine::StereoMixer> NoteParameters::getStereoMixer()
+{
+    return stereoMixer;
+}
+
+std::shared_ptr<mpc::engine::IndivFxMixer> NoteParameters::getIndivFxMixer()
+{
+    return indivFxMixer;
+}
+
+void NoteParameters::setSoundGenMode(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::soundGenerationMode;
+    payload.int8_tValue = std::clamp(i, 0, 3);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVeloRangeLower(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityRangeLower;
+    payload.int8_tValue = std::clamp(i, 0, 126);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVeloRangeUpper(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityRangeUpper;
+    payload.int8_tValue = std::clamp(i, 1, 127);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setOptionalNoteA(const DrumNoteNumber i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.drumNoteMemberToUpdate =
+        &performance::NoteParameters::optionalNoteA;
+    payload.drumNoteValue = i;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setOptionalNoteB(const DrumNoteNumber i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.drumNoteMemberToUpdate =
+        &performance::NoteParameters::optionalNoteB;
+    payload.drumNoteValue = i;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setMuteAssignA(const DrumNoteNumber i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.drumNoteMemberToUpdate = &performance::NoteParameters::muteAssignA;
+    payload.drumNoteValue = i;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setMuteAssignB(const DrumNoteNumber i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.drumNoteMemberToUpdate = &performance::NoteParameters::muteAssignB;
+    payload.drumNoteValue = i;
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setTune(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::tune;
+    payload.int8_tValue = std::clamp(i, -120, 120);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setAttack(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::attack;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setDecay(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::decay;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setDecayMode(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::decayMode;
+    payload.int8_tValue = std::clamp(i, 0, 1);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setFilterFrequency(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::filterFrequency;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setFilterResonance(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::filterResonance;
+    payload.int8_tValue = std::clamp(i, 0, 15);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setFilterAttack(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::filterAttack;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setFilterDecay(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate = &performance::NoteParameters::filterDecay;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setFilterEnvelopeAmount(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::filterEnvelopeAmount;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVeloToLevel(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityToLevel;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVelocityToAttack(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityToAttack;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVelocityToStart(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityToStart;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVelocityToFilterFrequency(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityToFilterFrequency;
+    payload.int8_tValue = std::clamp(i, 0, 100);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setSliderParameterNumber(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::sliderParameterNumber;
+    payload.int8_tValue = std::clamp(i, 0, 3);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVelocityToPitch(const int i) const
+{
+    performance::PerformanceMessage msg;
+    performance::UpdateNoteParameters payload{
+        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+    payload.int8_tMemberToUpdate =
+        &performance::NoteParameters::velocityToPitch;
+    payload.int8_tValue = std::clamp(i, -120, 120);
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode m) const
+{
+    if (m == VoiceOverlapMode::MONO || m == VoiceOverlapMode::NOTE_OFF ||
+        m == VoiceOverlapMode::POLY)
+    {
+        performance::PerformanceMessage msg;
+        performance::UpdateNoteParameters payload{
+            getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+        payload.voiceOverlapModeMemberToUpdate =
+            &performance::NoteParameters::voiceOverlapMode;
+        payload.voiceOverlapMode = m;
+        msg.payload = std::move(payload);
+        dispatch(std::move(msg));
+    }
 }

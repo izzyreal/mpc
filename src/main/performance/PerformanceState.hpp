@@ -12,6 +12,7 @@ namespace mpc::performance
         NoteOnEvents noteEvents;
 
         std::array<Drum, 4> drums;
+        std::array<Program, mpc::Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
 
         PerformanceState()
         {
@@ -24,7 +25,8 @@ namespace mpc::performance
         PerformanceState(const PerformanceState &other) noexcept
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
-              noteEvents(other.noteEvents), drums(other.drums)
+              noteEvents(other.noteEvents), drums(other.drums),
+              programs(other.programs)
         {
         }
 
@@ -34,6 +36,7 @@ namespace mpc::performance
             programPadEvents = other.programPadEvents;
             noteEvents = other.noteEvents;
             drums = other.drums;
+            programs = other.programs;
             return *this;
         }
     };

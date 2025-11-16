@@ -19,6 +19,9 @@
 
 #include <stdexcept>
 
+#include "engine/IndivFxMixer.hpp"
+#include "engine/StereoMixer.hpp"
+
 using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::pgmreader;
@@ -78,7 +81,7 @@ void PgmFileToProgramConverter::setNoteParameters(
             DrumNoteNumber(pgmNoteParameters->getMuteAssign1(programPadIndex)));
         programNoteParameters->setMuteAssignB(
             DrumNoteNumber(pgmNoteParameters->getMuteAssign2(programPadIndex)));
-        programNoteParameters->setOptNoteA(DrumNoteNumber(
+        programNoteParameters->setOptionalNoteA(DrumNoteNumber(
             pgmNoteParameters->getAlsoPlayUse1(programPadIndex)));
         programNoteParameters->setOptionalNoteB(DrumNoteNumber(
             pgmNoteParameters->getAlsoPlayUse2(programPadIndex)));
@@ -120,14 +123,17 @@ void PgmFileToProgramConverter::setMixer(
     for (int i = 0; i < 64; i++)
     {
         const auto noteParameters = program->getNoteParameters(i + 35);
-        const auto smc = noteParameters->getStereoMixerChannel();
-        const auto ifmc = noteParameters->getIndivFxMixerChannel();
+        const auto stereoMixer = noteParameters->getStereoMixer();
+        const auto indivFxMixer = noteParameters->getIndivFxMixer();
 
-        smc->setLevel(pgmMixer->getVolume(i));
-        smc->setPanning(pgmMixer->getPan(i));
-        ifmc->setVolumeIndividualOut(pgmMixer->getVolumeIndividual(i));
-        ifmc->setOutput(pgmMixer->getOutput(i));
-        ifmc->setFxPath(pgmMixer->getEffectsOutput(i));
+        stereoMixer->setLevel(DrumMixerLevel(pgmMixer->getVolume(i)));
+        stereoMixer->setPanning(DrumMixerPanning(pgmMixer->getPan(i)));
+        indivFxMixer->setVolumeIndividualOut(
+            DrumMixerLevel(pgmMixer->getVolumeIndividual(i)));
+        indivFxMixer->setOutput(
+            DrumMixerIndividualOutput(pgmMixer->getOutput(i)));
+        indivFxMixer->setFxPath(
+            DrumMixerIndividualFxPath(pgmMixer->getEffectsOutput(i)));
     }
 }
 

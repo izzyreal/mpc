@@ -3,20 +3,16 @@
 
 namespace mpc::lcdgui::screens
 {
-
     class PgmParamsScreen final : public ScreenComponent
     {
-
     public:
+        PgmParamsScreen(Mpc &mpc, int layerIndex);
+
         void function(int i) override;
         void turnWheel(int i) override;
         void openWindow() override;
 
-        PgmParamsScreen(Mpc &mpc, int layerIndex);
-
         void open() override;
-        void close() override;
-        void update(Observable *observable, Message message) override;
 
     private:
         void displayReson() const;

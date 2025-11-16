@@ -38,7 +38,7 @@ void TextComp::enableTwoDots()
     SetDirty();
 }
 
-void TextComp::setSize(int w, int h)
+void TextComp::setSize(const int w, const int h)
 {
     if (alignmentEndX == -1)
     {
@@ -220,7 +220,7 @@ int TextComp::getH() const
     return h;
 }
 
-void TextComp::setInverted(bool b)
+void TextComp::setInverted(const bool b)
 {
     if (inverted != b)
     {
@@ -229,7 +229,7 @@ void TextComp::setInverted(bool b)
     }
 }
 
-void TextComp::setDoubleInverted(bool b)
+void TextComp::setDoubleInverted(const bool b)
 {
     if (doubleInverted != b)
     {
@@ -305,7 +305,7 @@ void TextComp::setTextPadded(const std::string &s, const std::string &padding)
     setText(padded);
 }
 
-void TextComp::setTextPadded(int i, const std::string &padding)
+void TextComp::setTextPadded(const int i, const std::string &padding)
 {
     setTextPadded(std::to_string(i), padding);
 }
@@ -337,7 +337,7 @@ void TextComp::runBlinkThread()
     }
 }
 
-void TextComp::setBlinking(bool b)
+void TextComp::setBlinking(const bool b)
 {
     if (blinking == b)
     {
@@ -357,7 +357,7 @@ void TextComp::setBlinking(bool b)
     }
 }
 
-void TextComp::setAlignment(const Alignment newAlignment, int endX)
+void TextComp::setAlignment(const Alignment newAlignment, const int endX)
 {
     alignment = newAlignment;
     alignmentEndX = endX;

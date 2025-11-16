@@ -41,7 +41,13 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Sampler::Sampler(Mpc &mpc) : mpc(mpc) {}
+Sampler::Sampler(
+    Mpc &mpc,
+    const std::function<performance::Program(ProgramIndex)> &getSnapshot,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : mpc(mpc), getSnapshot(getSnapshot), dispatch(dispatch)
+{
+}
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
@@ -290,7 +296,13 @@ int Sampler::getProgramCount() const
 
 std::weak_ptr<Program> Sampler::addProgram(const int i)
 {
-    programs[i] = std::make_shared<Program>(mpc, this);
+    auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)]
+    {
+        return getSnapshot(programIndex);
+    };
+    programs[i] =
+        std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
+    programs[i]->setIndex(ProgramIndex(i));
     return programs[i];
 }
 
@@ -298,11 +310,19 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
 {
     const bool repairDrumPrograms = getProgramCount() == 0;
 
-    for (auto &p : programs)
+    for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
+         ++programIndex)
     {
-        if (!p)
+        if (auto &p = programs[programIndex]; !p)
         {
-            p = std::make_shared<Program>(mpc, this);
+            auto getProgramSnapshot =
+                [this, programIndex = ProgramIndex(programIndex)]
+            {
+                return getSnapshot(programIndex);
+            };
+            p = std::make_shared<Program>(mpc, this, getProgramSnapshot,
+                                          dispatch);
+            p->setIndex(ProgramIndex(programIndex));
 
             if (repairDrumPrograms)
             {
@@ -423,7 +443,8 @@ void Sampler::repairProgramReferences() const
 
         if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
         {
-            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0; programIndex--)
+            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0;
+                 programIndex--)
             {
                 if (programs[programIndex])
                 {
@@ -455,11 +476,11 @@ void Sampler::trimSample(const int sampleNumber, const int start,
                          const int end) const
 {
     const auto s = sounds[sampleNumber];
-    trimSample(s, start, end);
+    Sampler::trimSample(s, start, end);
 }
 
 void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
-                         int end) const
+                         int end)
 {
     const auto s = sound.lock();
     std::vector<float> newData = *s->getSampleData();
@@ -633,32 +654,6 @@ void Sampler::process8Bit(std::vector<float> &data)
     }
 }
 
-std::vector<float>
-Sampler::resampleSingleChannel(const std::vector<float> &input,
-                               const int sourceRate, const int destRate)
-{
-    const auto ratio = static_cast<double>(destRate) / sourceRate;
-    const auto outputFrameCount = static_cast<int>(ceil(input.size() * ratio));
-
-    std::vector<float> result(outputFrameCount);
-
-    SRC_DATA srcData;
-    srcData.data_in = &input[0];
-    srcData.input_frames = input.size();
-    srcData.data_out = &result[0];
-    srcData.output_frames = outputFrameCount;
-    srcData.src_ratio = 1.0 / ratio;
-
-    if (const auto error = src_simple(&srcData, 0, 1); error != 0)
-    {
-        const char *errormsg = src_strerror(error);
-        const std::string errorStr(errormsg);
-        MLOG("libsamplerate error: " + errorStr);
-    }
-
-    return result;
-}
-
 void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
                        const int sourceRate,
                        const std::shared_ptr<Sound> &destSnd)
@@ -774,7 +769,7 @@ int Sampler::getFreeSampleSpace() const
     return static_cast<int>(floor(freeSpace));
 }
 
-int Sampler::getLastInt(const std::string &s) const
+int Sampler::getLastInt(const std::string &s)
 {
     auto offset = s.length();
 
@@ -811,7 +806,7 @@ std::string Sampler::addOrIncreaseNumber(const std::string &s) const
             if (getSoundName(i) == res)
             {
                 exists = true;
-                res = addOrIncreaseNumber2(res);
+                res = Sampler::addOrIncreaseNumber2(res);
                 break;
             }
         }
@@ -820,7 +815,7 @@ std::string Sampler::addOrIncreaseNumber(const std::string &s) const
     return res;
 }
 
-std::string Sampler::addOrIncreaseNumber2(const std::string &s) const
+std::string Sampler::addOrIncreaseNumber2(const std::string &s)
 {
     int candidate = getLastInt(s);
     std::string res = s;
@@ -1014,7 +1009,7 @@ std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0,
 void Sampler::mergeToStereo(
     const std::shared_ptr<const std::vector<float>> &sourceLeft,
     const std::shared_ptr<const std::vector<float>> &sourceRight,
-    const std::shared_ptr<std::vector<float>> &dest) const
+    const std::shared_ptr<std::vector<float>> &dest)
 {
     dest->clear();
 

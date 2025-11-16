@@ -24,7 +24,12 @@ namespace mpc::sampler
     class Sampler final
     {
     public:
-        explicit Sampler(Mpc &);
+        explicit Sampler(
+            Mpc &,
+            const std::function<performance::Program(ProgramIndex)>
+                &getSnapshot,
+            const std::function<void(performance::PerformanceMessage &&)>
+                &dispatch);
 
         std::shared_ptr<Sound> getPlayXSound();
         std::shared_ptr<Sound> getClickSound();
@@ -72,7 +77,7 @@ namespace mpc::sampler
         void repairProgramReferences() const;
         std::vector<std::shared_ptr<Sound>> &getSounds();
         std::shared_ptr<Sound> addSound();
-        std::shared_ptr<Sound> addSound(const int sampleRate);
+        std::shared_ptr<Sound> addSound(int sampleRate);
         int getSoundCount() const;
         std::string getSoundName(int i) const;
         void replaceSound(int index, const std::shared_ptr<Sound> &newSound);
@@ -84,9 +89,8 @@ namespace mpc::sampler
         void deleteSoundWithoutRepairingPrograms(
             const std::shared_ptr<Sound> &sound);
         void trimSample(int sampleNumber, int start, int end) const;
-        void deleteSection(const unsigned int sampleNumber,
-                           const unsigned int start,
-                           const unsigned int end) const;
+        void deleteSection(unsigned int sampleNumber, unsigned int start,
+                           unsigned int end) const;
         void switchToNextSoundSortType();
         std::string getSoundSortingTypeName() const;
         void deleteAllSamples();
@@ -97,10 +101,11 @@ namespace mpc::sampler
         std::string addOrIncreaseNumber(const std::string &s) const;
         int getUnusedSampleCount() const;
         void purge();
-        void mergeToStereo(
+
+        static void mergeToStereo(
             const std::shared_ptr<const std::vector<float>> &sourceLeft,
             const std::shared_ptr<const std::vector<float>> &sourceRight,
-            const std::shared_ptr<std::vector<float>> &dest) const;
+            const std::shared_ptr<std::vector<float>> &dest);
 
         ProgramIndex getUsedProgram(int startIndex, bool up) const;
         int checkExists(const std::string &soundName) const;
@@ -121,17 +126,16 @@ namespace mpc::sampler
         static void
         resample(const std::shared_ptr<const std::vector<float>> &data,
                  int sourceRate, const std::shared_ptr<Sound> &destSnd);
-        static std::vector<float>
-        resampleSingleChannel(const std::vector<float> &input, int sourceRate,
-                              int destRate);
         std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
     private:
+        Mpc &mpc;
+        const std::function<performance::Program(ProgramIndex)> getSnapshot;
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
         int soundIndex = 0;
         int playXMode = 0;
         std::string previousScreenName;
 
-        Mpc &mpc;
         std::vector<DrumNoteNumber> initMasterPadAssign;
         std::vector<DrumNoteNumber> masterPadAssign;
 
@@ -147,9 +151,13 @@ namespace mpc::sampler
         std::vector<std::string> sortNames =
             std::vector<std::string>{"MEMORY", "NAME", "SIZE"};
         std::vector<std::shared_ptr<Sound>> getUsedSounds() const;
-        int getLastInt(const std::string &s) const;
-        std::string addOrIncreaseNumber2(const std::string &s) const;
-        void trimSample(const std::weak_ptr<Sound> &, int start, int end) const;
+
+        static int getLastInt(const std::string &s);
+
+        static std::string addOrIncreaseNumber2(const std::string &s);
+
+        static void trimSample(const std::weak_ptr<Sound> &, int start,
+                               int end);
         std::vector<std::pair<std::shared_ptr<Sound>, int>>
         getSoundsSortedByName();
         std::vector<std::pair<std::shared_ptr<Sound>, int>>

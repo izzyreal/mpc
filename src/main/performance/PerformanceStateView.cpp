@@ -6,7 +6,7 @@ using namespace mpc;
 using namespace mpc::performance;
 
 PerformanceStateView::PerformanceStateView(
-    const std::shared_ptr<const PerformanceState> s) noexcept
+    const std::shared_ptr<const PerformanceState> &s) noexcept
     : state(s)
 {
 }
@@ -115,13 +115,18 @@ int PerformanceStateView::getTotalNoteOnCount() const
     return state->noteEvents.size();
 }
 
-Program PerformanceStateView::getProgram(const DrumBusIndex drumBusIndex) const
+Program PerformanceStateView::getProg(const ProgramIndex programIndex) const
 {
-    return state->drums[drumBusIndex].program;
+    return state->programs[programIndex];
 }
 
-performance::Drum
-PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
+Program
+PerformanceStateView::getDrumProgram(const DrumBusIndex drumBusIndex) const
+{
+    return getProg(state->drums[drumBusIndex].programIndex);
+}
+
+Drum PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
 {
     return state->drums[drumBusIndex];
 }

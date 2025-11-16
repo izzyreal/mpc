@@ -12,16 +12,52 @@ MuteAssignScreen::MuteAssignScreen(Mpc &mpc, const int layerIndex)
 
 void MuteAssignScreen::open()
 {
+    if (isReactiveBindingsEmpty())
+    {
+        auto getSelectedNote = [this]
+        {
+            return this->mpc.clientEventController->getSelectedNote();
+        };
+
+        auto getSelectedNoteParameters = [this, getSelectedNote]
+        {
+            return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+        };
+
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [this](auto)
+                            {
+                                displayNote();
+                                displayNote0();
+                                displayNote1();
+                            }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getMuteAssignA();
+             },
+             [this](auto)
+             {
+                 displayNote0();
+             }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getMuteAssignB();
+             },
+             [this](auto)
+             {
+                 displayNote1();
+             }});
+    }
     displayNote();
     displayNote0();
     displayNote1();
-    mpc.clientEventController->addObserver(
-        this); // Subscribe to "note" messages
-}
-
-void MuteAssignScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
 }
 
 void MuteAssignScreen::turnWheel(const int i)
@@ -30,9 +66,8 @@ void MuteAssignScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "note")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note")
     {
         mpc.clientEventController->setSelectedNote(
             mpc.clientEventController->getSelectedNote() + i);
@@ -41,13 +76,11 @@ void MuteAssignScreen::turnWheel(const int i)
     {
         selectedNoteParameters->setMuteAssignA(
             selectedNoteParameters->getMuteAssignA() + i);
-        displayNote0();
     }
     else if (focusedFieldName == "note1")
     {
         selectedNoteParameters->setMuteAssignB(
             selectedNoteParameters->getMuteAssignB() + i);
-        displayNote1();
     }
 }
 
@@ -79,7 +112,7 @@ void MuteAssignScreen::displayNote0() const
         mpc.clientEventController->getSelectedNote());
     const auto note0 = selectedNoteParameters->getMuteAssignA();
 
-    if (note0 == 34)
+    if (note0 == NoDrumNoteAssigned)
     {
         findField("note0")->setText("--");
         return;
@@ -87,9 +120,9 @@ void MuteAssignScreen::displayNote0() const
 
     const auto pad = program->getPadIndexFromNote(note0);
     std::string soundName = "OFF";
-    const auto sound = program->getNoteParameters(note0)->getSoundIndex();
 
-    if (sound != -1)
+    if (const auto sound = program->getNoteParameters(note0)->getSoundIndex();
+        sound != -1)
     {
         soundName = sampler->getSoundName(sound);
     }
@@ -105,7 +138,7 @@ void MuteAssignScreen::displayNote1() const
         mpc.clientEventController->getSelectedNote());
     const auto note1 = selectedNoteParameters->getMuteAssignB();
 
-    if (note1 == 34)
+    if (note1 == NoDrumNoteAssigned)
     {
         findField("note1")->setText("--");
         return;
@@ -113,25 +146,13 @@ void MuteAssignScreen::displayNote1() const
 
     const auto pad = program->getPadIndexFromNote(note1);
     std::string soundName = "OFF";
-    const auto sound = program->getNoteParameters(note1)->getSoundIndex();
 
-    if (sound != -1)
+    if (const auto sound = program->getNoteParameters(note1)->getSoundIndex();
+        sound != -1)
     {
         soundName = sampler->getSoundName(sound);
     }
 
     findField("note1")->setText(std::to_string(note1) + "/" +
                                 sampler->getPadName(pad) + "-" + soundName);
-}
-
-void MuteAssignScreen::update(Observable *o, const Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
-    {
-        displayNote();
-        displayNote0();
-        displayNote1();
-    }
 }

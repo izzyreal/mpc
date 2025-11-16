@@ -5,7 +5,6 @@
 #include "engine/IndivFxMixer.hpp"
 
 #include "performance/PerformanceManager.hpp"
-#include "sampler/Sampler.hpp"
 
 #include <algorithm>
 
@@ -17,22 +16,70 @@ Bus::Bus(const BusType busType) : busType(busType) {}
 
 DrumBus::DrumBus(
     const DrumBusIndex drumIndexToUse,
-    const std::shared_ptr<performance::PerformanceManager> performanceManager,
-    std::function<std::shared_ptr<sampler::Sampler>()> getSamplerFn)
+    const std::shared_ptr<performance::PerformanceManager> &performanceManager)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
-      performanceManager(performanceManager), getSamplerFn(getSamplerFn)
+      performanceManager(performanceManager)
 {
     receivePgmChange = true;
     receiveMidiVolume = true;
 
+    auto dispatch = [performanceManager](performance::PerformanceMessage &&m)
+    {
+        performanceManager->enqueue(std::move(m));
+    };
+
     for (int i = 0; i < 64; i++)
     {
-        stereoMixerChannels.emplace_back(std::make_shared<StereoMixer>());
-        indivFxMixerChannels.emplace_back(std::make_shared<IndivFxMixer>());
+        const auto drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber);
+        auto getStereoMixerSnapshot = [performanceManager, this, drumNoteNumber]
+        {
+            return performanceManager->getSnapshot()
+                .getDrum(drumIndex)
+                .getStereoMixer(drumNoteNumber);
+        };
+
+        auto getIndivFxMixerSnapshot =
+            [performanceManager, this, drumNoteNumber]
+        {
+            return performanceManager->getSnapshot()
+                .getDrum(drumIndex)
+                .getIndivFxMixer(drumNoteNumber);
+        };
+
+        stereoMixerChannels.emplace_back(std::make_shared<StereoMixer>(
+            getStereoMixerSnapshot,
+            [this]
+            {
+                return drumIndex;
+            },
+            []
+            {
+                return NoProgramIndex;
+            },
+            [drumNoteNumber]
+            {
+                return drumNoteNumber;
+            },
+            dispatch));
+        indivFxMixerChannels.emplace_back(std::make_shared<IndivFxMixer>(
+            getIndivFxMixerSnapshot,
+            [this]
+            {
+                return drumIndex;
+            },
+            []
+            {
+                return NoProgramIndex;
+            },
+            [drumNoteNumber]
+            {
+                return drumNoteNumber;
+            },
+            dispatch));
     }
 }
 
-mpc::DrumBusIndex DrumBus::getIndex() const
+DrumBusIndex DrumBus::getIndex() const
 {
     return drumIndex;
 }
@@ -40,11 +87,10 @@ mpc::DrumBusIndex DrumBus::getIndex() const
 void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
 {
     programIndex = programIndexToUse;
-    performanceManager->registerSetDrumProgram(
-        drumIndex, programIndex, getSamplerFn()->getProgram(programIndex));
+    performanceManager->registerUpdateDrumProgram(drumIndex, programIndex);
 }
 
-mpc::ProgramIndex DrumBus::getProgramIndex() const
+ProgramIndex DrumBus::getProgramIndex() const
 {
     return programIndex;
 }
@@ -101,7 +147,7 @@ std::vector<std::shared_ptr<IndivFxMixer>> &DrumBus::getIndivFxMixerChannels()
 
 performance::Program DrumBus::getPerformanceProgram() const
 {
-    return performanceManager->getSnapshot().getProgram(drumIndex);
+    return performanceManager->getSnapshot().getDrumProgram(drumIndex);
 }
 performance::StereoMixer
 DrumBus::getPerformanceStereoMixer(const DrumNoteNumber drumNoteNumber) const

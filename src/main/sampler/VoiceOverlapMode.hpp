@@ -4,7 +4,7 @@
 
 namespace mpc::sampler
 {
-    enum class VoiceOverlapMode : uint8_t
+    enum class VoiceOverlapMode : int8_t
     {
         POLY = 0,
         MONO = 1,

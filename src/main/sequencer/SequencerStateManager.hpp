@@ -16,8 +16,6 @@ namespace mpc::sequencer
     public:
         explicit SequencerStateManager(Sequencer *);
 
-        void enqueue(SequencerMessage &&msg) const noexcept override;
-
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;
 
