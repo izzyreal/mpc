@@ -58,8 +58,10 @@ namespace mpc::sequencer
         void setProgramIndex(ProgramIndex);
 
         performance::Program getPerformanceProgram() const;
-        performance::StereoMixer getPerformanceStereoMixer(DrumNoteNumber) const;
-        performance::IndivFxMixer getPerformanceIndivFxMixer(DrumNoteNumber) const;
+        performance::StereoMixer
+            getPerformanceStereoMixer(DrumNoteNumber) const;
+        performance::IndivFxMixer
+            getPerformanceIndivFxMixer(DrumNoteNumber) const;
 
         bool receivesPgmChange() const;
         void setReceivePgmChange(bool b);

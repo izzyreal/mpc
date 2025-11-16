@@ -155,10 +155,9 @@ namespace mpc::engine
 
         // Called from main thread
         void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
-                  int noteNumber, performance::NoteParameters,
-                  int varType, int varValue, int drumIndex, int frameOffset,
-                  bool enableEnvs, int startTick, float engineSampleRate,
-                  uint64_t noteEventId,
+                  int noteNumber, performance::NoteParameters, int varType,
+                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
+                  int startTick, float engineSampleRate, uint64_t noteEventId,
                   ProgramIndex programIndex);
 
         uint64_t getNoteEventId();
@@ -175,7 +174,8 @@ namespace mpc::engine
 
         bool isFinished() const;
 
-        bool isPlayingDrumProgramNoteCombination(DrumBusIndex, ProgramIndex, DrumNoteNumber) const;
+        bool isPlayingDrumProgramNoteCombination(DrumBusIndex, ProgramIndex,
+                                                 DrumNoteNumber) const;
 
         sampler::VoiceOverlapMode getVoiceOverlapMode() const;
 

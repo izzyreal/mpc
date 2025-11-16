@@ -33,7 +33,8 @@ namespace mpc::performance
         DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
         int velocityRangeUpper = 0;
         DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
-        sampler::VoiceOverlapMode voiceOverlapMode = sampler::VoiceOverlapMode::POLY;
+        sampler::VoiceOverlapMode voiceOverlapMode =
+            sampler::VoiceOverlapMode::POLY;
         DrumNoteNumber muteAssignA{NoDrumNoteAssigned};
         DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
         int tune = 0;
@@ -108,7 +109,8 @@ namespace mpc::performance
 
         IndivFxMixer getIndivFxMixer(const DrumNoteNumber drumNoteNumber)
         {
-            return indivFxMixers[drumNoteNumber.get() - MinDrumNoteNumber.get()];
+            return indivFxMixers[drumNoteNumber.get() -
+                                 MinDrumNoteNumber.get()];
         }
     };
 } // namespace mpc::performance

@@ -174,7 +174,8 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
     voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue,
                 c.drum->getIndex(), c.frameOffset, true, c.startTick,
-                c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId, c.drum->getProgramIndex());
+                c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId,
+                c.drum->getProgramIndex());
 
     if (c.firstGeneration && np.soundGenerationMode == 1)
     {
@@ -224,7 +225,8 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
             if (!voice->isFinished() &&
                 voice->getStartTick() == c.noteOnStartTick &&
                 voice->getNote() == noteToStop &&
-                voice->getVoiceOverlapMode() == sampler::VoiceOverlapMode::NOTE_OFF &&
+                voice->getVoiceOverlapMode() ==
+                    sampler::VoiceOverlapMode::NOTE_OFF &&
                 !voice->isDecaying() &&
                 c.drumIndex == voice->getMuteInfo().getDrum() &&
                 (c.noteEventId == 0 || voice->getNoteEventId() == noteEventId))
