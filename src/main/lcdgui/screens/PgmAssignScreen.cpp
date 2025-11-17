@@ -95,14 +95,15 @@ void PgmAssignScreen::open()
                                 displayPadAndNoteParameters();
                             }});
 
-        addReactiveBinding({[getSelectedNoteParameters]
-                            {
-                                return getSelectedNoteParameters()->getSoundGenerationMode();
-                            },
-                            [this](auto)
-                            {
-                                displaySoundGenerationMode();
-                            }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getSoundGenerationMode();
+             },
+             [this](auto)
+             {
+                 displaySoundGenerationMode();
+             }});
     }
 
     const auto program = getProgramOrThrow();
