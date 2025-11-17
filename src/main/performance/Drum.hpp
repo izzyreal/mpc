@@ -84,8 +84,10 @@ namespace mpc::performance
 
         Program()
         {
-            for (int i = 0; i < 64; i++) {
-                noteParameters[i].noteNumber = DrumNoteNumber(i + MinDrumNoteNumber.get());
+            for (int i = 0; i < 64; i++)
+            {
+                noteParameters[i].noteNumber =
+                    DrumNoteNumber(i + MinDrumNoteNumber.get());
             }
         }
         NoteParameters getNoteParameters(const DrumNoteNumber noteNumber) const
@@ -98,7 +100,6 @@ namespace mpc::performance
     {
         DrumBusIndex drumBusIndex;
         ProgramIndex programIndex;
-        Program program{};
         std::array<StereoMixer, 64> stereoMixers{};
         std::array<IndivFxMixer, 64> indivFxMixers{};
         std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, 64>

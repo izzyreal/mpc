@@ -8,14 +8,10 @@
 
 namespace mpc::performance
 {
-    //
-    // Move-only payload structs
-    //
     struct UpdateDrumProgram
     {
         DrumBusIndex drumBusIndex{};
         ProgramIndex programIndex{};
-        Program performanceProgram{};
 
         UpdateDrumProgram() = default;
 
@@ -38,7 +34,8 @@ namespace mpc::performance
         UpdateNoteParameters &operator=(const UpdateNoteParameters &) = delete;
 
         UpdateNoteParameters(UpdateNoteParameters &&) noexcept = default;
-        UpdateNoteParameters &operator=(UpdateNoteParameters &&) noexcept = default;
+        UpdateNoteParameters &
+        operator=(UpdateNoteParameters &&) noexcept = default;
     };
 
     struct UpdateStereoMixer
@@ -67,34 +64,19 @@ namespace mpc::performance
         UpdateIndivFxMixer &operator=(UpdateIndivFxMixer &&) noexcept = default;
     };
 
-    //
-    // Variant payload
-    //
     using PerformanceMessagePayload =
-        std::variant<
-            std::monostate,
-            PhysicalPadPressEvent,
-            PhysicalPadAftertouchEvent,
-            PhysicalPadReleaseEvent,
-            ProgramPadPressEvent,
-            ProgramPadAftertouchEvent,
-            ProgramPadReleaseEvent,
-            NoteOnEvent,
-            NoteAftertouchEvent,
-            NoteOffEvent,
-            UpdateDrumProgram,
-            UpdateNoteParameters,
-            UpdateIndivFxMixer,
-            UpdateStereoMixer>;
+        std::variant<std::monostate, PhysicalPadPressEvent,
+                     PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
+                     ProgramPadPressEvent, ProgramPadAftertouchEvent,
+                     ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
+                     NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
+                     UpdateIndivFxMixer, UpdateStereoMixer>;
 
-    //
-    // Move-only message
-    //
     struct PerformanceMessage
     {
         PerformanceMessagePayload payload{};
         PerformanceEventSource source{};
-        std::function<void(void*)> action = [](void*) {};
+        std::function<void(void *)> action = [](void *) {};
 
         PerformanceMessage() = default;
 
@@ -104,5 +86,4 @@ namespace mpc::performance
         PerformanceMessage(PerformanceMessage &&) noexcept = default;
         PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
     };
-
 } // namespace mpc::performance

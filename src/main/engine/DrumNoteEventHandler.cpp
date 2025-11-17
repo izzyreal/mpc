@@ -61,7 +61,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         return;
     }
 
-    const auto &program = c.drum.program;
+    const auto program = c.drumBus->getPerformanceProgram();
     const auto np = program.getNoteParameters(c.note);
 
     handleMuteGroups(np, c.drum.drumBusIndex, c.voices);

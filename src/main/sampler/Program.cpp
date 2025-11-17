@@ -26,7 +26,13 @@ Program::Program(
         {
             return this->getSnapshot().getNoteParameters(drumNoteNumber);
         };
-        auto n = new NoteParameters(i, [this]{return index;}, getNoteParametersSnapshot, dispatch);
+        auto n = new NoteParameters(
+            i,
+            [this]
+            {
+                return index;
+            },
+            getNoteParametersSnapshot, dispatch);
         noteParameters.push_back(n);
     }
 

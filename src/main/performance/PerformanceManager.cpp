@@ -25,12 +25,10 @@ void PerformanceManager::reserveState(PerformanceState &s) const
     s.noteEvents.reserve(CAPACITY);
 }
 
-void PerformanceManager::registerSetDrumProgram(
-    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex,
-    const std::shared_ptr<sampler::Program> &sp) const
+void PerformanceManager::registerUpdateDrumProgram(
+    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex) const
 {
     UpdateDrumProgram payload{drumBusIndex, programIndex};
-    mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
     PerformanceMessage msg;
     msg.payload = std::move(payload);
     enqueue(std::move(msg));
@@ -380,8 +378,6 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateDrumProgram>)
             {
-                activeState.drums[payload.drumBusIndex].program =
-                    payload.performanceProgram;
                 activeState.drums[payload.drumBusIndex].programIndex =
                     payload.programIndex;
             }

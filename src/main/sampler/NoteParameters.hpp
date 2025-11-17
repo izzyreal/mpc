@@ -21,8 +21,7 @@ namespace mpc::sampler
     {
     public:
         explicit NoteParameters(
-            int index,
-            const std::function<ProgramIndex()> &getProgramIndex,
+            int index, const std::function<ProgramIndex()> &getProgramIndex,
             const std::function<performance::NoteParameters()> &getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);

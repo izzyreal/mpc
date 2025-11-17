@@ -20,11 +20,11 @@ namespace mpc::concurrency
             Message payload;
 
             SequencedMessage() = default;
-            SequencedMessage(const SequencedMessage&) = delete;
-            SequencedMessage& operator=(const SequencedMessage&) = delete;
+            SequencedMessage(const SequencedMessage &) = delete;
+            SequencedMessage &operator=(const SequencedMessage &) = delete;
 
-            SequencedMessage(SequencedMessage&&) = default;
-            SequencedMessage& operator=(SequencedMessage&&) = default;
+            SequencedMessage(SequencedMessage &&) = default;
+            SequencedMessage &operator=(SequencedMessage &&) = default;
         };
 
         using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
@@ -33,7 +33,7 @@ namespace mpc::concurrency
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
-                                     size_t messageQueueCapacity = 512*8)
+                                     size_t messageQueueCapacity = 512 * 8)
         {
             actions.reserve(10);
             reserveFn(activeState);
@@ -90,10 +90,11 @@ namespace mpc::concurrency
             //            sequencedMessages.size());
             // }
 
-            for (auto &msg : sequencedMessages) {
+            for (auto &msg : sequencedMessages)
+            {
                 applyMessage(msg.payload);
                 // printf("sequencedMessages size: %zu\n",
-                       // sequencedMessages.size());
+                // sequencedMessages.size());
             }
 
             sequencedMessages.clear();

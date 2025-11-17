@@ -113,11 +113,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
         audioServer->getSampleRate());
 
-    mpc.performanceManager->registerSetDrumProgram(
-        drumBus->getIndex(), drumBus->getProgramIndex(),
-        mpc.getSampler()->getProgram(drumBus->getProgramIndex()));
-    mpc.performanceManager->drainQueue();
-
     auto performanceDrum =
         mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
 

@@ -5,7 +5,6 @@
 #include "engine/IndivFxMixer.hpp"
 
 #include "performance/PerformanceManager.hpp"
-#include "sampler/Sampler.hpp"
 
 #include <algorithm>
 
@@ -17,10 +16,9 @@ Bus::Bus(const BusType busType) : busType(busType) {}
 
 DrumBus::DrumBus(
     const DrumBusIndex drumIndexToUse,
-    const std::shared_ptr<performance::PerformanceManager> &performanceManager,
-    const std::function<std::shared_ptr<sampler::Sampler>()> &getSamplerFn)
+    const std::shared_ptr<performance::PerformanceManager> &performanceManager)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
-      performanceManager(performanceManager), getSamplerFn(getSamplerFn)
+      performanceManager(performanceManager)
 {
     receivePgmChange = true;
     receiveMidiVolume = true;
@@ -63,9 +61,7 @@ DrumBusIndex DrumBus::getIndex() const
 void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
 {
     programIndex = programIndexToUse;
-    auto samplerProgram = getSamplerFn()->getProgram(programIndex);
-    performanceManager->registerSetDrumProgram(drumIndex, programIndex,
-                                               samplerProgram);
+    performanceManager->registerUpdateDrumProgram(drumIndex, programIndex);
 }
 
 ProgramIndex DrumBus::getProgramIndex() const

@@ -123,7 +123,7 @@ Program PerformanceStateView::getProg(const ProgramIndex programIndex) const
 Program
 PerformanceStateView::getDrumProgram(const DrumBusIndex drumBusIndex) const
 {
-    return state->drums[drumBusIndex].program;
+    return getProg(state->drums[drumBusIndex].programIndex);
 }
 
 Drum PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
