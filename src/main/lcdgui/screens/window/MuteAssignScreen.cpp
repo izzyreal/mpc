@@ -12,7 +12,8 @@ MuteAssignScreen::MuteAssignScreen(Mpc &mpc, const int layerIndex)
 
 void MuteAssignScreen::open()
 {
-    if (isReactiveBindingsEmpty()) {
+    if (isReactiveBindingsEmpty())
+    {
         auto getSelectedNote = [this]
         {
             return this->mpc.clientEventController->getSelectedNote();
@@ -24,34 +25,35 @@ void MuteAssignScreen::open()
         };
 
         addReactiveBinding({[getSelectedNote]
-                    {
-                        return getSelectedNote();
-                    },
-                    [this](auto)
-                    {
-                        displayNote();
-                        displayNote0();
-                        displayNote1();
-                    }});
+                            {
+                                return getSelectedNote();
+                            },
+                            [this](auto)
+                            {
+                                displayNote();
+                                displayNote0();
+                                displayNote1();
+                            }});
 
-        addReactiveBinding({[getSelectedNoteParameters]
-                    {
-                        return getSelectedNoteParameters()->getMuteAssignA();
-                    },
-                    [this](auto)
-                    {
-                        displayNote0();
-                    }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getMuteAssignA();
+             },
+             [this](auto)
+             {
+                 displayNote0();
+             }});
 
-        addReactiveBinding({[getSelectedNoteParameters]
-                    {
-                        return getSelectedNoteParameters()->getMuteAssignB();
-                    },
-                    [this](auto)
-                    {
-                        displayNote1();
-                    }});
-
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getMuteAssignB();
+             },
+             [this](auto)
+             {
+                 displayNote1();
+             }});
     }
     displayNote();
     displayNote0();
@@ -64,7 +66,8 @@ void MuteAssignScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    if (const auto focusedFieldName = getFocusedFieldNameOrThrow(); focusedFieldName == "note")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note")
     {
         mpc.clientEventController->setSelectedNote(
             mpc.clientEventController->getSelectedNote() + i);
@@ -118,7 +121,8 @@ void MuteAssignScreen::displayNote0() const
     const auto pad = program->getPadIndexFromNote(note0);
     std::string soundName = "OFF";
 
-    if (const auto sound = program->getNoteParameters(note0)->getSoundIndex(); sound != -1)
+    if (const auto sound = program->getNoteParameters(note0)->getSoundIndex();
+        sound != -1)
     {
         soundName = sampler->getSoundName(sound);
     }
@@ -143,7 +147,8 @@ void MuteAssignScreen::displayNote1() const
     const auto pad = program->getPadIndexFromNote(note1);
     std::string soundName = "OFF";
 
-    if (const auto sound = program->getNoteParameters(note1)->getSoundIndex(); sound != -1)
+    if (const auto sound = program->getNoteParameters(note1)->getSoundIndex();
+        sound != -1)
     {
         soundName = sampler->getSoundName(sound);
     }

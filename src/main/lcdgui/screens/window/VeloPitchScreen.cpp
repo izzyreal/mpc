@@ -16,7 +16,6 @@ VeloPitchScreen::VeloPitchScreen(Mpc &mpc, const int layerIndex)
 
 void VeloPitchScreen::open()
 {
-
     if (isReactiveBindingsEmpty())
     {
         auto getSelectedNote = [this]
@@ -30,34 +29,34 @@ void VeloPitchScreen::open()
         };
 
         addReactiveBinding({[getSelectedNote]
-                    {
-                        return getSelectedNote();
-                    },
-                    [this](auto)
-                    {
-                        displayNote();
-                        displayTune();
-                        displayVelo();
-                    }});
+                            {
+                                return getSelectedNote();
+                            },
+                            [this](auto)
+                            {
+                                displayNote();
+                                displayTune();
+                                displayVelo();
+                            }});
 
         addReactiveBinding({[getSelectedNoteParameters]
-                    {
-                        return getSelectedNoteParameters()->getTune();
-                    },
-                    [this](auto)
-                    {
-                        displayTune();
-                    }});
+                            {
+                                return getSelectedNoteParameters()->getTune();
+                            },
+                            [this](auto)
+                            {
+                                displayTune();
+                            }});
 
-        addReactiveBinding({[getSelectedNoteParameters]
-                    {
-                        return getSelectedNoteParameters()->getVelocityToPitch();
-                    },
-                    [this](auto)
-                    {
-                        displayVeloPitch();
-                    }});
-
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityToPitch();
+             },
+             [this](auto)
+             {
+                 displayVeloPitch();
+             }});
     }
 
     displayNote();

@@ -13,8 +13,8 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
-        // Should be set based on hitting a drum pad, but is currently unimplemented
-        // so we display a fixed value.
+        // Should be set based on hitting a drum pad, but is currently
+        // unimplemented so we display a fixed value.
         unsigned int velo = 127;
         void setVelo(int i);
         void displayVelo() const;

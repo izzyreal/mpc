@@ -15,7 +15,8 @@ VeloEnvFilterScreen::VeloEnvFilterScreen(Mpc &mpc, const int layerIndex)
 
 void VeloEnvFilterScreen::open()
 {
-    auto displayNoteProperties = [this] {
+    auto displayNoteProperties = [this]
+    {
         displayNote();
         displayAttack();
         displayDecay();
@@ -33,7 +34,8 @@ void VeloEnvFilterScreen::open()
         return getProgramOrThrow()->getNoteParameters(getSelectedNote());
     };
 
-    if (isReactiveBindingsEmpty()) {
+    if (isReactiveBindingsEmpty())
+    {
         addReactiveBinding({[getSelectedNote]
                             {
                                 return getSelectedNote();
@@ -70,15 +72,15 @@ void VeloEnvFilterScreen::open()
              {
                  displayAmount();
              }});
-        addReactiveBinding(
-            {[getSelectedNoteParameters]
-             {
-                 return getSelectedNoteParameters()->getVelocityToFilterFrequency();
-             },
-             [this](auto)
-             {
-                 displayVeloFreq();
-             }});
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()
+                                    ->getVelocityToFilterFrequency();
+                            },
+                            [this](auto)
+                            {
+                                displayVeloFreq();
+                            }});
     }
 
     displayNoteProperties();
@@ -91,7 +93,8 @@ void VeloEnvFilterScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    if (const auto focusedFieldName = getFocusedFieldNameOrThrow(); focusedFieldName == "attack")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "attack")
     {
         selectedNoteParameters->setFilterAttack(
             selectedNoteParameters->getFilterAttack() + i);
