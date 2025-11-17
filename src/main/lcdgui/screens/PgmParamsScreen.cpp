@@ -234,7 +234,7 @@ void PgmParamsScreen::turnWheel(const int i)
     {
         if (const auto candidate =
                 mpc.clientEventController->getSelectedNote() + i;
-            candidate > 34)
+            candidate > NoDrumNoteAssigned)
         {
             mpc.clientEventController->setSelectedNote(candidate);
         }
