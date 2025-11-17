@@ -22,6 +22,7 @@ namespace mpc::sampler
     public:
         explicit NoteParameters(
             int index,
+            const std::function<ProgramIndex()> &getProgramIndex,
             const std::function<performance::NoteParameters()> &getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
@@ -132,6 +133,7 @@ namespace mpc::sampler
 
     private:
         const int index;
+        const std::function<ProgramIndex()> getProgramIndex;
         const std::function<performance::NoteParameters()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixer;

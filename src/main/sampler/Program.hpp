@@ -41,7 +41,10 @@ namespace mpc::sampler
 
         ProgramPadIndex getPadIndexFromNote(DrumNoteNumber) const;
 
+        void setIndex(ProgramIndex);
+
     private:
+        ProgramIndex index;
         Sampler *const sampler;
         const std::function<performance::Program()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;

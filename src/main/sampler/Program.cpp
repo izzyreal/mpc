@@ -26,7 +26,7 @@ Program::Program(
         {
             return this->getSnapshot().getNoteParameters(drumNoteNumber);
         };
-        auto n = new NoteParameters(i, getNoteParametersSnapshot, dispatch);
+        auto n = new NoteParameters(i, [this]{return index;}, getNoteParametersSnapshot, dispatch);
         noteParameters.push_back(n);
     }
 
@@ -114,6 +114,11 @@ Program::getPadIndexFromNote(const DrumNoteNumber note) const
     }
 
     return NoProgramPadIndex;
+}
+
+void Program::setIndex(const ProgramIndex programIndex)
+{
+    index = programIndex;
 }
 
 std::vector<NoteParameters *> Program::getNotesParameters()

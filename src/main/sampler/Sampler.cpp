@@ -302,6 +302,7 @@ std::weak_ptr<Program> Sampler::addProgram(const int i)
     };
     programs[i] =
         std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
+    programs[i]->setIndex(ProgramIndex(i));
     return programs[i];
 }
 
@@ -321,6 +322,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
             };
             p = std::make_shared<Program>(mpc, this, getProgramSnapshot,
                                           dispatch);
+            p->setIndex(ProgramIndex(programIndex));
 
             if (repairDrumPrograms)
             {

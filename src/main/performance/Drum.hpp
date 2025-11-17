@@ -24,7 +24,7 @@ namespace mpc::performance
 
     struct NoteParameters
     {
-        NoteNumber noteNumber;
+        DrumNoteNumber noteNumber;
         StereoMixer stereoMixer{};
         IndivFxMixer indivFxMixer{};
         int soundIndex = -1;
@@ -81,6 +81,13 @@ namespace mpc::performance
         std::array<Pad, 64> pads{};
         Slider slider{};
         int midiProgramChange = 0;
+
+        Program()
+        {
+            for (int i = 0; i < 64; i++) {
+                noteParameters[i].noteNumber = DrumNoteNumber(i + MinDrumNoteNumber.get());
+            }
+        }
         NoteParameters getNoteParameters(const DrumNoteNumber noteNumber) const
         {
             return noteParameters[noteNumber.get() - MinDrumNoteNumber.get()];

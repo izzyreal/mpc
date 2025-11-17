@@ -9,9 +9,10 @@ using namespace mpc::sampler;
 
 NoteParameters::NoteParameters(
     const int index,
+    const std::function<ProgramIndex()> &getProgramIndex,
     const std::function<performance::NoteParameters()> &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : index(index), getSnapshot(getSnapshot), dispatch(dispatch)
+    : index(index), getProgramIndex(getProgramIndex), getSnapshot(getSnapshot), dispatch(dispatch)
 {
     stereoMixer = std::make_shared<engine::StereoMixer>(
         [this]
@@ -29,7 +30,7 @@ NoteParameters::NoteParameters(
 
 NoteParameters *NoteParameters::clone(const int newIndex) const
 {
-    const auto res = new NoteParameters(newIndex, getSnapshot, dispatch);
+    const auto res = new NoteParameters(newIndex, getProgramIndex, getSnapshot, dispatch);
     return res;
 }
 
@@ -48,7 +49,7 @@ void NoteParameters::setSoundIndex(const int i) const
     auto s = getSnapshot();
     s.soundIndex = std::clamp(i, -1, 999999);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -57,7 +58,7 @@ void NoteParameters::setSoundGenMode(const int i) const
     auto s = getSnapshot();
     s.soundGenerationMode = std::clamp(i, 0, 3);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -75,7 +76,7 @@ void NoteParameters::setVeloRangeLower(const int i) const
         s.velocityRangeUpper = s.velocityRangeLower + 1;
     }
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -88,7 +89,7 @@ void NoteParameters::setVeloRangeUpper(const int i) const
         s.velocityRangeLower = s.velocityRangeUpper - 1;
     }
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -107,7 +108,7 @@ void NoteParameters::setOptNoteA(const DrumNoteNumber i) const
     auto s = getSnapshot();
     s.optionalNoteA = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -121,7 +122,7 @@ void NoteParameters::setOptionalNoteB(const DrumNoteNumber i) const
     auto s = getSnapshot();
     s.optionalNoteB = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -143,7 +144,7 @@ void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode m) const
     {
         s.voiceOverlapMode = m;
         performance::PerformanceMessage msg;
-        msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
         dispatch(std::move(msg));
     }
 }
@@ -153,7 +154,7 @@ void NoteParameters::setMuteAssignA(const DrumNoteNumber i) const
     auto s = getSnapshot();
     s.muteAssignA = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -167,7 +168,7 @@ void NoteParameters::setMuteAssignB(const DrumNoteNumber i) const
     auto s = getSnapshot();
     s.muteAssignB = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -181,7 +182,7 @@ void NoteParameters::setTune(const int i) const
     auto s = getSnapshot();
     s.tune = std::clamp(i, -240, 240);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -195,7 +196,7 @@ void NoteParameters::setAttack(const int i) const
     auto s = getSnapshot();
     s.attack = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -209,7 +210,7 @@ void NoteParameters::setDecay(const int i) const
     auto s = getSnapshot();
     s.decay = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -223,7 +224,7 @@ void NoteParameters::setDecayMode(const int i) const
     auto s = getSnapshot();
     s.decayMode = std::clamp(i, 0, 1);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -237,7 +238,7 @@ void NoteParameters::setFilterFrequency(const int i) const
     auto s = getSnapshot();
     s.filterFrequency = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -251,7 +252,7 @@ void NoteParameters::setFilterResonance(const int i) const
     auto s = getSnapshot();
     s.filterResonance = std::clamp(i, 0, 15);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -265,7 +266,7 @@ void NoteParameters::setFilterAttack(const int i) const
     auto s = getSnapshot();
     s.filterAttack = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -279,7 +280,7 @@ void NoteParameters::setFilterDecay(const int i) const
     auto s = getSnapshot();
     s.filterDecay = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -293,7 +294,7 @@ void NoteParameters::setFilterEnvelopeAmount(const int i) const
     auto s = getSnapshot();
     s.filterEnvelopeAmount = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -307,7 +308,7 @@ void NoteParameters::setVeloToLevel(const int i) const
     auto s = getSnapshot();
     s.velocityToLevel = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -321,7 +322,7 @@ void NoteParameters::setVelocityToAttack(const int i) const
     auto s = getSnapshot();
     s.velocityToAttack = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -335,7 +336,7 @@ void NoteParameters::setVelocityToStart(const int i) const
     auto s = getSnapshot();
     s.velocityToStart = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -349,7 +350,7 @@ void NoteParameters::setVelocityToFilterFrequency(const int i) const
     auto s = getSnapshot();
     s.velocityToFilterFrequency = std::clamp(i, 0, 100);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -363,7 +364,7 @@ void NoteParameters::setSliderParameterNumber(const int i) const
     auto s = getSnapshot();
     s.sliderParameterNumber = std::clamp(i, 0, 3);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
@@ -377,7 +378,7 @@ void NoteParameters::setVelocityToPitch(const int i) const
     auto s = getSnapshot();
     s.velocityToPitch = std::clamp(i, -120, 120);
     performance::PerformanceMessage msg;
-    msg.payload = performance::UpdateNoteParameters{{}, {}, s};
+    msg.payload = performance::UpdateNoteParameters{getProgramIndex(), s.noteNumber, s};
     dispatch(std::move(msg));
 }
 
