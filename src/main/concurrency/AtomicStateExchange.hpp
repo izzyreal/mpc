@@ -79,7 +79,8 @@ namespace mpc::concurrency
                 auto msg = std::move(it->payload);
                 it = sequencedMessages.erase(it);
                 applyMessage(msg);
-                printf("sequencedMessages size: %zu\n", sequencedMessages.size());
+                printf("sequencedMessages size: %zu\n",
+                       sequencedMessages.size());
             }
 
             sequencedMessages.clear();
