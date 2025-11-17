@@ -47,14 +47,6 @@ namespace mpc::concurrency
     public:
         virtual ~AtomicStateExchange() = default;
 
-        virtual void enqueue(Message &msg) const noexcept
-        {
-            SequencedMessage sm;
-            sm.seq = globalSeq.fetch_add(1, std::memory_order_relaxed);
-            sm.payload = std::move(msg);
-            eventMessageQueue->enqueue(std::move(sm));
-        }
-
         virtual void enqueue(Message &&msg) const noexcept
         {
             SequencedMessage sm;
@@ -87,6 +79,7 @@ namespace mpc::concurrency
                 auto msg = std::move(it->payload);
                 it = sequencedMessages.erase(it);
                 applyMessage(msg);
+                printf("sequencedMessages size: %zu\n", sequencedMessages.size());
             }
 
             sequencedMessages.clear();

@@ -12,7 +12,7 @@ namespace mpc::engine
     public:
         IndivFxMixer(
             const std::function<performance::IndivFxMixer()> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)>
+            const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
         void setFollowStereo(bool b) const;
@@ -37,6 +37,6 @@ namespace mpc::engine
 
     private:
         const std::function<performance::IndivFxMixer()> getSnapshot;
-        std::function<void(performance::PerformanceMessage &)> dispatch;
+        std::function<void(performance::PerformanceMessage &&)> dispatch;
     };
 } // namespace mpc::engine

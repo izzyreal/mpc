@@ -23,7 +23,7 @@ namespace mpc::sampler
         explicit NoteParameters(
             int index,
             const std::function<performance::NoteParameters()> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)>
+            const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
         NoteParameters *clone(int newIndex) const;
@@ -133,7 +133,7 @@ namespace mpc::sampler
     private:
         const int index;
         const std::function<performance::NoteParameters()> getSnapshot;
-        const std::function<void(performance::PerformanceMessage &)> dispatch;
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixer;
         std::shared_ptr<engine::IndivFxMixer> indivFxMixer;
     };

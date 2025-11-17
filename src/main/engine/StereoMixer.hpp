@@ -12,7 +12,7 @@ namespace mpc::engine
     public:
         StereoMixer(
             const std::function<performance::StereoMixer()> &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)>
+            const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
         void setPanning(DrumMixerPanning) const;
@@ -25,6 +25,6 @@ namespace mpc::engine
 
     private:
         const std::function<performance::StereoMixer()> getSnapshot;
-        std::function<void(performance::PerformanceMessage &)> dispatch;
+        std::function<void(performance::PerformanceMessage &&)> dispatch;
     };
 } // namespace mpc::engine

@@ -44,7 +44,7 @@ using namespace mpc::engine;
 Sampler::Sampler(
     Mpc &mpc,
     const std::function<performance::Program(ProgramIndex)> &getSnapshot,
-    const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : mpc(mpc), getSnapshot(getSnapshot), dispatch(dispatch)
 {
 }

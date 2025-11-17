@@ -28,7 +28,7 @@ namespace mpc::sampler
     public:
         Program(Mpc &mpc, Sampler *samplerToUse,
                 const std::function<performance::Program()> &getSnapshot,
-                const std::function<void(performance::PerformanceMessage &)>
+                const std::function<void(performance::PerformanceMessage &&)>
                     &dispatch);
 
         ~Program();
@@ -44,7 +44,7 @@ namespace mpc::sampler
     private:
         Sampler *const sampler;
         const std::function<performance::Program()> getSnapshot;
-        const std::function<void(performance::PerformanceMessage &)> dispatch;
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
         std::string name;
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;

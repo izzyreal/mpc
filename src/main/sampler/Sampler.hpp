@@ -28,7 +28,7 @@ namespace mpc::sampler
             Mpc &,
             const std::function<performance::Program(ProgramIndex)>
                 &getSnapshot,
-            const std::function<void(performance::PerformanceMessage &)>
+            const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
         std::shared_ptr<Sound> getPlayXSound();
@@ -131,7 +131,7 @@ namespace mpc::sampler
     private:
         Mpc &mpc;
         const std::function<performance::Program(ProgramIndex)> getSnapshot;
-        const std::function<void(performance::PerformanceMessage &)> dispatch;
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
         int soundIndex = 0;
         int playXMode = 0;
         std::string previousScreenName;

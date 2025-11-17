@@ -25,9 +25,9 @@ DrumBus::DrumBus(
     receivePgmChange = true;
     receiveMidiVolume = true;
 
-    auto dispatch = [performanceManager](performance::PerformanceMessage &m)
+    auto dispatch = [performanceManager](performance::PerformanceMessage &&m)
     {
-        performanceManager->enqueue(m);
+        performanceManager->enqueue(std::move(m));
     };
 
     for (int i = 0; i < 64; i++)

@@ -16,7 +16,7 @@ using namespace mpc::engine;
 Program::Program(
     Mpc &mpc, Sampler *samplerToUse,
     const std::function<performance::Program()> &getSnapshot,
-    const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : sampler(samplerToUse), getSnapshot(getSnapshot), dispatch(dispatch)
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)

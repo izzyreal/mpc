@@ -4,7 +4,7 @@ using namespace mpc::engine;
 
 IndivFxMixer::IndivFxMixer(
     const std::function<performance::IndivFxMixer()> &getSnapshot,
-    const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : getSnapshot(getSnapshot), dispatch(dispatch)
 {
 }
@@ -15,7 +15,7 @@ void IndivFxMixer::setFollowStereo(const bool b) const
     s.followStereo = b;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateIndivFxMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 bool IndivFxMixer::isFollowingStereo() const
@@ -34,7 +34,7 @@ void IndivFxMixer::setOutput(const DrumMixerIndividualOutput output) const
     s.individualOutput = output;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateIndivFxMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 void IndivFxMixer::setVolumeIndividualOut(const DrumMixerLevel level) const
@@ -43,7 +43,7 @@ void IndivFxMixer::setVolumeIndividualOut(const DrumMixerLevel level) const
     s.individualOutLevel = level;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateIndivFxMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 mpc::DrumMixerLevel IndivFxMixer::getVolumeIndividualOut() const
@@ -57,7 +57,7 @@ void IndivFxMixer::setFxPath(const DrumMixerIndividualFxPath path) const
     s.fxPath = path;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateIndivFxMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 mpc::DrumMixerIndividualFxPath IndivFxMixer::getFxPath() const
@@ -71,7 +71,7 @@ void IndivFxMixer::setFxSendLevel(const DrumMixerLevel level) const
     s.fxSendLevel = level;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateIndivFxMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 mpc::DrumMixerLevel IndivFxMixer::getFxSendLevel() const

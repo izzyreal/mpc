@@ -117,9 +117,9 @@ void Mpc::init()
         {
             return performanceManager->getSnapshot().getProg(programIndex);
         },
-        [&](performance::PerformanceMessage &m)
+        [&](performance::PerformanceMessage &&m)
         {
-            performanceManager->enqueue(m);
+            performanceManager->enqueue(std::move(m));
         });
     MLOG("Sampler created");
 

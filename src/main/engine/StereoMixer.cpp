@@ -4,7 +4,7 @@ using namespace mpc::engine;
 
 StereoMixer::StereoMixer(
     const std::function<performance::StereoMixer()> &getSnapshot,
-    const std::function<void(performance::PerformanceMessage &)> &dispatch)
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : getSnapshot(getSnapshot), dispatch(dispatch)
 {
 }
@@ -15,7 +15,7 @@ void StereoMixer::setPanning(const DrumMixerPanning panning) const
     s.panning = panning;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateStereoMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 mpc::DrumMixerPanning StereoMixer::getPanning() const
@@ -29,7 +29,7 @@ void StereoMixer::setLevel(const DrumMixerLevel level) const
     s.level = level;
     performance::PerformanceMessage msg;
     msg.payload = performance::UpdateStereoMixer{s};
-    dispatch(msg);
+    dispatch(std::move(msg));
 }
 
 mpc::DrumMixerLevel StereoMixer::getLevel() const
