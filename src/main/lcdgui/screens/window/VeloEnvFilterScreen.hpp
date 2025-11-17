@@ -5,18 +5,16 @@ namespace mpc::lcdgui::screens::window
 {
     class VeloEnvFilterScreen final : public ScreenComponent
     {
-
     public:
-        void turnWheel(int i) override;
-
         VeloEnvFilterScreen(Mpc &mpc, int layerIndex);
 
-        void open() override;
-        void close() override;
+        void turnWheel(int i) override;
 
-        void update(Observable *observable, Message message) override;
+        void open() override;
 
     private:
+        // Should be set based on hitting a drum pad, but is currently unimplemented
+        // so we display a fixed value.
         unsigned int velo = 127;
         void setVelo(int i);
         void displayVelo() const;

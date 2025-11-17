@@ -15,20 +15,74 @@ VeloEnvFilterScreen::VeloEnvFilterScreen(Mpc &mpc, const int layerIndex)
 
 void VeloEnvFilterScreen::open()
 {
-    velo = 127;
-    displayNote();
-    displayAttack();
-    displayDecay();
-    displayAmount();
-    displayVeloFreq();
+    auto displayNoteProperties = [this] {
+        displayNote();
+        displayAttack();
+        displayDecay();
+        displayAmount();
+        displayVeloFreq();
+    };
+
+    auto getSelectedNote = [this]
+    {
+        return this->mpc.clientEventController->getSelectedNote();
+    };
+
+    auto getSelectedNoteParameters = [this, getSelectedNote]
+    {
+        return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+    };
+
+    if (isReactiveBindingsEmpty()) {
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [displayNoteProperties](auto)
+                            {
+                                displayNoteProperties();
+                            }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getFilterAttack();
+             },
+             [this](auto)
+             {
+                 displayAttack();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getFilterDecay();
+             },
+             [this](auto)
+             {
+                 displayDecay();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getFilterEnvelopeAmount();
+             },
+             [this](auto)
+             {
+                 displayAmount();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityToFilterFrequency();
+             },
+             [this](auto)
+             {
+                 displayVeloFreq();
+             }});
+    }
+
+    displayNoteProperties();
     displayVelo();
-
-    mpc.clientEventController->addObserver(this);
-}
-
-void VeloEnvFilterScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
 }
 
 void VeloEnvFilterScreen::turnWheel(const int i)
@@ -37,54 +91,30 @@ void VeloEnvFilterScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "attack")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow(); focusedFieldName == "attack")
     {
         selectedNoteParameters->setFilterAttack(
             selectedNoteParameters->getFilterAttack() + i);
-        displayAttack();
     }
     else if (focusedFieldName == "decay")
     {
         selectedNoteParameters->setFilterDecay(
             selectedNoteParameters->getFilterDecay() + i);
-        displayDecay();
     }
     else if (focusedFieldName == "amount")
     {
         selectedNoteParameters->setFilterEnvelopeAmount(
             selectedNoteParameters->getFilterEnvelopeAmount() + i);
-        displayAmount();
     }
     else if (focusedFieldName == "velofreq")
     {
         selectedNoteParameters->setVelocityToFilterFrequency(
             selectedNoteParameters->getVelocityToFilterFrequency() + i);
-        displayVeloFreq();
     }
     else if (focusedFieldName == "note")
     {
         mpc.clientEventController->setSelectedNote(
             mpc.clientEventController->getSelectedNote() + i);
-    }
-    else if (focusedFieldName == "velo")
-    {
-        setVelo(velo + i);
-    }
-}
-
-void VeloEnvFilterScreen::update(Observable *observable, const Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
-    {
-        displayNote();
-        displayAttack();
-        displayDecay();
-        displayAmount();
-        displayVeloFreq();
     }
 }
 
