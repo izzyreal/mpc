@@ -190,7 +190,7 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
         transport->setPosition(*positionQuarterNotesToStartPlayingFrom);
     }
 
-    drainQueue();
+    // drainQueue();
 
     if (!songMode)
     {

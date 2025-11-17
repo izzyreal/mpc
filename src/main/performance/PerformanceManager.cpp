@@ -32,7 +32,7 @@ void PerformanceManager::registerSetDrumProgram(
     UpdateDrumProgram payload{drumBusIndex, programIndex};
     mapSamplerProgramToPerformanceProgram(*sp, payload.performanceProgram);
     PerformanceMessage msg;
-    msg.payload = payload;
+    msg.payload = std::move(payload);
     enqueue(std::move(msg));
 }
 
