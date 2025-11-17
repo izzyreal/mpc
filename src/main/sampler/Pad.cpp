@@ -77,7 +77,7 @@ void Pad::setNote(const DrumNoteNumber i)
 
     if (const auto pgmAssignScreen =
             mpc.screens->get<ScreenId::PgmAssignScreen>();
-        pgmAssignScreen->padAssign)
+        pgmAssignScreen->isPadAssignMaster())
     {
         (*mpc.getSampler()->getMasterPadAssign())[index] = i;
     }
@@ -91,7 +91,7 @@ mpc::DrumNoteNumber Pad::getNote() const
 {
     if (const auto pgmAssignScreen =
             mpc.screens->get<ScreenId::PgmAssignScreen>();
-        pgmAssignScreen->padAssign)
+        pgmAssignScreen->isPadAssignMaster())
     {
         return (*mpc.getSampler()->getMasterPadAssign())[index];
     }

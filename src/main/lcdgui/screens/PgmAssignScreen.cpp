@@ -20,6 +20,91 @@ PgmAssignScreen::PgmAssignScreen(Mpc &mpc, const int layerIndex)
 
 void PgmAssignScreen::open()
 {
+    auto displayPadAndNoteParameters = [this]
+    {
+        displayNote();
+        displayOptionalNoteA();
+        displayOptionalNoteB();
+        displayPad();
+        displayPadNote();
+        displaySoundGenerationMode();
+        displaySoundName();
+        displayVeloRangeLower();
+        displayVeloRangeUpper();
+    };
+
+    if (isReactiveBindingsEmpty())
+    {
+        auto getSelectedNote = [this]
+        {
+            return this->mpc.clientEventController->getSelectedNote();
+        };
+        auto getSelectedPadIndex = [this]
+        {
+            return this->mpc.clientEventController->getSelectedPad();
+        };
+        auto getSelectedPad = [this, getSelectedPadIndex]
+        {
+            return getProgramOrThrow()->getPad(getSelectedPadIndex());
+        };
+
+        auto getSelectedNoteParameters = [this, getSelectedNote]
+        {
+            return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+        };
+
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [displayPadAndNoteParameters](auto)
+                            {
+                                displayPadAndNoteParameters();
+                            }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters, this]
+             {
+                 if (!getProgram())
+                 {
+                     return -1;
+                 }
+                 return getSelectedNoteParameters()->getSoundIndex();
+             },
+             [this](auto)
+             {
+                 displaySoundName();
+             }});
+
+        addReactiveBinding({[getSelectedPad]
+                            {
+                                return getSelectedPad()->getNote();
+                            },
+                            [displayPadAndNoteParameters](auto)
+                            {
+                                displayPadAndNoteParameters();
+                            }});
+
+        addReactiveBinding({[this]
+                            {
+                                return getActiveDrumBus()->getProgramIndex();
+                            },
+                            [displayPadAndNoteParameters, this](auto)
+                            {
+                                displayPgm();
+                                displayPadAndNoteParameters();
+                            }});
+
+        addReactiveBinding({[getSelectedNoteParameters]
+                            {
+                                return getSelectedNoteParameters()->getSoundGenerationMode();
+                            },
+                            [this](auto)
+                            {
+                                displaySoundGenerationMode();
+                            }});
+    }
+
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
@@ -33,23 +118,10 @@ void PgmAssignScreen::open()
     findField("pad-assign")->setAlignment(Alignment::Centered);
     findField("pad-assign")->setLocation(194, 11);
 
-    mpc.clientEventController->addObserver(this);
-    displayNote();
-    displayOptionalNoteA();
-    displayOptionalNoteB();
-    displayPad();
     displayPadAssign();
-    displayPadNote();
     displayPgm();
-    displaySoundGenerationMode();
-    displaySoundName();
-    displayVeloRangeLower();
-    displayVeloRangeUpper();
-}
 
-void PgmAssignScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
+    displayPadAndNoteParameters();
 }
 
 void PgmAssignScreen::function(const int i)
@@ -110,18 +182,6 @@ void PgmAssignScreen::turnWheel(const int i)
             candidate != pgm)
         {
             getActiveDrumBus()->setProgramIndex(candidate);
-
-            displayNote();
-            displayOptionalNoteA();
-            displayOptionalNoteB();
-            displayPad();
-            displayPadAssign();
-            displayPadNote();
-            displayPgm();
-            displaySoundGenerationMode();
-            displaySoundName();
-            displayVeloRangeLower();
-            displayVeloRangeUpper();
         }
     }
     else if (focusedFieldName == "pad")
@@ -150,15 +210,6 @@ void PgmAssignScreen::turnWheel(const int i)
         selectedPad->setNote(selectedPad->getNote() + i);
 
         mpc.clientEventController->setSelectedNote(selectedPad->getNote());
-
-        displayPad();
-        displayNote();
-        displayOptionalNoteA();
-        displayOptionalNoteB();
-        displayPadNote();
-        displayPgm();
-        displaySoundGenerationMode();
-        displaySoundName();
     }
     else if (focusedFieldName == "note")
     {
@@ -344,7 +395,6 @@ void PgmAssignScreen::displayPadAssign() const
 
 void PgmAssignScreen::displayPadNote() const
 {
-
     const auto program = getProgramOrThrow();
     const auto selectedPad =
         program->getPad(mpc.clientEventController->getSelectedPad());
@@ -477,24 +527,12 @@ void PgmAssignScreen::displayPad() const
         sampler->getPadName(mpc.clientEventController->getSelectedPad()));
 }
 
-void PgmAssignScreen::update(Observable *o, const Message message)
-{
-    if (const auto msg = std::get<std::string>(message); msg == "note")
-    {
-        displayNote();
-        displaySoundName();
-    }
-    else if (msg == "pad")
-    {
-        displayNote();
-        displayPad();
-        displayPadNote();
-        displaySoundName();
-        displaySoundGenerationMode();
-    }
-}
-
 void PgmAssignScreen::setPadAssign(const bool isMaster)
 {
     padAssign = isMaster;
+}
+
+bool PgmAssignScreen::isPadAssignMaster() const
+{
+    return padAssign;
 }
