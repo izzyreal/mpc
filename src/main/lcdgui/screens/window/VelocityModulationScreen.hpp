@@ -5,16 +5,12 @@ namespace mpc::lcdgui::screens::window
 {
     class VelocityModulationScreen final : public ScreenComponent
     {
-
     public:
-        void turnWheel(int i) override;
-
         VelocityModulationScreen(Mpc &mpc, int layerIndex);
 
-        void open() override;
-        void close() override;
+        void turnWheel(int i) override;
 
-        void update(Observable *observable, Message message) override;
+        void open() override;
 
     private:
         void displayVeloAttack() const;

@@ -104,6 +104,46 @@ void PgmAssignScreen::open()
              {
                  displaySoundGenerationMode();
              }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityRangeLower();
+             },
+             [this](auto)
+             {
+                 displayVeloRangeLower();
+             }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityRangeUpper();
+             },
+             [this](auto)
+             {
+                 displayVeloRangeUpper();
+             }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getOptionalNoteA();
+             },
+             [this](auto)
+             {
+                 displayOptionalNoteA();
+             }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getOptionalNoteB();
+             },
+             [this](auto)
+             {
+                 displayOptionalNoteB();
+             }});
     }
 
     const auto program = getProgramOrThrow();
@@ -197,14 +237,6 @@ void PgmAssignScreen::turnWheel(const int i)
         const auto nextNote = program->getPad(candidate)->getNote();
         mpc.clientEventController->setSelectedNote(nextNote);
         mpc.clientEventController->setSelectedPad(candidate);
-        displayPad();
-        displayNote();
-        displayOptionalNoteA();
-        displayOptionalNoteB();
-        displayPadNote();
-        displayPgm();
-        displaySoundGenerationMode();
-        displaySoundName();
     }
     else if (focusedFieldName == "pad-note")
     {
@@ -222,8 +254,6 @@ void PgmAssignScreen::turnWheel(const int i)
         }
 
         mpc.clientEventController->setSelectedNote(candidate);
-        displayNote();
-        displaySoundName();
     }
     else if (focusedFieldName == "snd")
     {
@@ -237,7 +267,6 @@ void PgmAssignScreen::turnWheel(const int i)
         if (currentSoundIndex == 0 && i < 0)
         {
             selectedNoteParameters->setSoundIndex(-1);
-            displaySoundName();
             return;
         }
 
@@ -273,44 +302,33 @@ void PgmAssignScreen::turnWheel(const int i)
         }
 
         const auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
-
         selectedNoteParameters->setSoundIndex(nextMemoryIndex);
-
         sampler->setSoundIndex(nextMemoryIndex);
-
-        displaySoundName();
     }
     else if (focusedFieldName == "mode")
     {
         selectedNoteParameters->setSoundGenMode(
             selectedNoteParameters->getSoundGenerationMode() + i);
-        displaySoundGenerationMode();
     }
     else if (focusedFieldName == "velocity-range-lower")
     {
         selectedNoteParameters->setVeloRangeLower(
             selectedNoteParameters->getVelocityRangeLower() + i);
-        displayVeloRangeLower();
-        displayVeloRangeUpper();
     }
     else if (focusedFieldName == "velocity-range-upper")
     {
         selectedNoteParameters->setVeloRangeUpper(
             selectedNoteParameters->getVelocityRangeUpper() + i);
-        displayVeloRangeLower();
-        displayVeloRangeUpper();
     }
     else if (focusedFieldName == "optional-note-a")
     {
         selectedNoteParameters->setOptionalNoteA(
             selectedNoteParameters->getOptionalNoteA() + i);
-        displayOptionalNoteA();
     }
     else if (focusedFieldName == "optional-note-b")
     {
         selectedNoteParameters->setOptionalNoteB(
             selectedNoteParameters->getOptionalNoteB() + i);
-        displayOptionalNoteB();
     }
 }
 

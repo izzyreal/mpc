@@ -15,19 +15,66 @@ VelocityModulationScreen::VelocityModulationScreen(Mpc &mpc,
 
 void VelocityModulationScreen::open()
 {
-    displayNote();
-    displayVeloAttack();
-    displayVeloStart();
-    displayVeloLevel();
+    auto displayNoteProperties = [this]
+    {
+        displayNote();
+        displayVeloAttack();
+        displayVeloStart();
+        displayVeloLevel();
+    };
+
+    displayNoteProperties();
     displayVelo();
 
-    mpc.clientEventController->addObserver(
-        this); // Subscribe to "note" messages
-}
+    auto getSelectedNote = [this]
+    {
+        return this->mpc.clientEventController->getSelectedNote();
+    };
 
-void VelocityModulationScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
+    auto getSelectedNoteParameters = [this, getSelectedNote]
+    {
+        return getProgramOrThrow()->getNoteParameters(getSelectedNote());
+    };
+
+    if (isReactiveBindingsEmpty())
+    {
+        addReactiveBinding({[getSelectedNote]
+                            {
+                                return getSelectedNote();
+                            },
+                            [displayNoteProperties](auto)
+                            {
+                                displayNoteProperties();
+                            }});
+
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityToAttack();
+             },
+             [this](auto)
+             {
+                 displayVeloAttack();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVelocityToStart();
+             },
+             [this](auto)
+             {
+                 displayVeloStart();
+             }});
+        addReactiveBinding(
+            {[getSelectedNoteParameters]
+             {
+                 return getSelectedNoteParameters()->getVeloToLevel();
+             },
+             [this](auto)
+             {
+                 displayVeloLevel();
+             }});
+    }
 }
 
 void VelocityModulationScreen::turnWheel(const int i)
@@ -36,31 +83,26 @@ void VelocityModulationScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "veloattack")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "veloattack")
     {
         selectedNoteParameters->setVelocityToAttack(
             selectedNoteParameters->getVelocityToAttack() + i);
-        displayVeloAttack();
     }
     else if (focusedFieldName == "velostart")
     {
         selectedNoteParameters->setVelocityToStart(
             selectedNoteParameters->getVelocityToStart() + i);
-        displayVeloStart();
     }
     else if (focusedFieldName == "velolevel")
     {
         selectedNoteParameters->setVeloToLevel(
             selectedNoteParameters->getVeloToLevel() + i);
-        displayVeloLevel();
     }
     else if (focusedFieldName == "note")
     {
         mpc.clientEventController->setSelectedNote(
             mpc.clientEventController->getSelectedNote() + i);
-        displayNote();
     }
 }
 
@@ -113,18 +155,4 @@ void VelocityModulationScreen::displayVeloLevel() const
         mpc.clientEventController->getSelectedNote());
     findField("velolevel")
         ->setTextPadded(selectedNoteParameters->getVeloToLevel(), " ");
-}
-
-void VelocityModulationScreen::update(Observable *observable,
-                                      const Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
-    {
-        displayNote();
-        displayVeloAttack();
-        displayVeloStart();
-        displayVeloLevel();
-    }
 }

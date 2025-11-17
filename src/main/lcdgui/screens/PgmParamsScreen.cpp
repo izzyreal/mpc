@@ -38,14 +38,6 @@ void PgmParamsScreen::open()
     {
         return this->mpc.clientEventController->getSelectedNote();
     };
-    auto getSelectedPadIndex = [this]
-    {
-        return this->mpc.clientEventController->getSelectedPad();
-    };
-    auto getSelectedPad = [this, getSelectedPadIndex]
-    {
-        return getProgramOrThrow()->getPad(getSelectedPadIndex());
-    };
 
     auto getSelectedNoteParameters = [this, getSelectedNote]
     {
