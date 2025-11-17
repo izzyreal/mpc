@@ -26,6 +26,31 @@ NoteParameters::NoteParameters(
             return this->getSnapshot().indivFxMixer;
         },
         dispatch);
+
+    setSoundIndex(-1);
+    setTune(0);
+    setSoundGenMode(0);
+    setVoiceOverlapMode(VoiceOverlapMode::POLY);
+    setVeloRangeLower(44);
+    setVeloRangeUpper(88);
+    setVeloToLevel(100);
+    setVelocityToPitch(0);
+    setVelocityToFilterFrequency(0);
+    setVelocityToAttack(0);
+    setVelocityToPitch(0);
+    setMuteAssignA(NoDrumNoteAssigned);
+    setMuteAssignB(NoDrumNoteAssigned);
+    setOptionalNoteA(NoDrumNoteAssigned);
+    setOptionalNoteB(NoDrumNoteAssigned);
+    setAttack(0);
+    setDecay(5);
+    setDecayMode(0);
+    setFilterFrequency(100);
+    setFilterResonance(0);
+    setFilterAttack(0);
+    setFilterDecay(0);
+    setFilterEnvelopeAmount(0);
+    setSliderParameterNumber(0);
 }
 
 NoteParameters *NoteParameters::clone(const int newIndex) const
@@ -103,7 +128,7 @@ int NoteParameters::getVelocityRangeUpper() const
     return getSnapshot().velocityRangeUpper;
 }
 
-void NoteParameters::setOptNoteA(const DrumNoteNumber i) const
+void NoteParameters::setOptionalNoteA(const DrumNoteNumber i) const
 {
     auto s = getSnapshot();
     s.optionalNoteA = std::clamp(i, NoDrumNoteAssigned, MaxDrumNoteNumber);

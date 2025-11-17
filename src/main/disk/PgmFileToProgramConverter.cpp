@@ -81,7 +81,7 @@ void PgmFileToProgramConverter::setNoteParameters(
             DrumNoteNumber(pgmNoteParameters->getMuteAssign1(programPadIndex)));
         programNoteParameters->setMuteAssignB(
             DrumNoteNumber(pgmNoteParameters->getMuteAssign2(programPadIndex)));
-        programNoteParameters->setOptNoteA(DrumNoteNumber(
+        programNoteParameters->setOptionalNoteA(DrumNoteNumber(
             pgmNoteParameters->getAlsoPlayUse1(programPadIndex)));
         programNoteParameters->setOptionalNoteB(DrumNoteNumber(
             pgmNoteParameters->getAlsoPlayUse2(programPadIndex)));

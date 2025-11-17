@@ -39,7 +39,7 @@ namespace mpc::sampler
 
         int getVelocityRangeLower() const;
 
-        void setOptNoteA(DrumNoteNumber) const;
+        void setOptionalNoteA(DrumNoteNumber) const;
 
         void setVeloRangeUpper(int i) const;
 

@@ -208,7 +208,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
                 DrumNoteNumber(srcNoteParams->getMute1()));
             destNoteParams->setMuteAssignB(
                 DrumNoteNumber(srcNoteParams->getMute2()));
-            destNoteParams->setOptNoteA(
+            destNoteParams->setOptionalNoteA(
                 DrumNoteNumber(srcNoteParams->getAlsoPlay1()));
             destNoteParams->setOptionalNoteB(
                 DrumNoteNumber(srcNoteParams->getAlsoPlay2()));

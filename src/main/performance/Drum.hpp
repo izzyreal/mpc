@@ -24,14 +24,14 @@ namespace mpc::performance
 
     struct NoteParameters
     {
-        DrumNoteNumber noteNumber;
+        DrumNoteNumber noteNumber{NoDrumNoteAssigned};
         StereoMixer stereoMixer{};
         IndivFxMixer indivFxMixer{};
         int soundIndex = -1;
         int soundGenerationMode = 0;
-        int velocityRangeLower = 0;
+        int velocityRangeLower = 44;
+        int velocityRangeUpper = 88;
         DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
-        int velocityRangeUpper = 0;
         DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
         sampler::VoiceOverlapMode voiceOverlapMode =
             sampler::VoiceOverlapMode::POLY;
@@ -39,14 +39,14 @@ namespace mpc::performance
         DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
         int tune = 0;
         int attack = 0;
-        int decay = 0;
+        int decay = 5;
         int decayMode = 0;
-        int filterFrequency = 0;
+        int filterFrequency = 100;
         int filterResonance = 0;
         int filterAttack = 0;
         int filterDecay = 0;
         int filterEnvelopeAmount = 0;
-        int velocityToLevel = 0;
+        int velocityToLevel = 100;
         int velocityToAttack = 0;
         int velocityToStart = 0;
         int velocityToFilterFrequency = 0;

@@ -250,7 +250,7 @@ void PgmAssignScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "optional-note-a")
     {
-        selectedNoteParameters->setOptNoteA(
+        selectedNoteParameters->setOptionalNoteA(
             selectedNoteParameters->getOptionalNoteA() + i);
         displayOptionalNoteA();
     }
