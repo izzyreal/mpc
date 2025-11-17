@@ -27,31 +27,33 @@ namespace mpc::performance
         DrumNoteNumber noteNumber{NoDrumNoteAssigned};
         StereoMixer stereoMixer{};
         IndivFxMixer indivFxMixer{};
-        int soundIndex = -1;
-        int soundGenerationMode = 0;
-        int velocityRangeLower = 44;
-        int velocityRangeUpper = 88;
         DrumNoteNumber optionalNoteA{NoDrumNoteAssigned};
         DrumNoteNumber optionalNoteB{NoDrumNoteAssigned};
         sampler::VoiceOverlapMode voiceOverlapMode =
             sampler::VoiceOverlapMode::POLY;
         DrumNoteNumber muteAssignA{NoDrumNoteAssigned};
         DrumNoteNumber muteAssignB{NoDrumNoteAssigned};
-        int tune = 0;
-        int attack = 0;
-        int decay = 5;
-        int decayMode = 0;
-        int filterFrequency = 100;
-        int filterResonance = 0;
-        int filterAttack = 0;
-        int filterDecay = 0;
-        int filterEnvelopeAmount = 0;
-        int velocityToLevel = 100;
-        int velocityToAttack = 0;
-        int velocityToStart = 0;
-        int velocityToFilterFrequency = 0;
-        int sliderParameterNumber = 0;
-        int velocityToPitch = 0;
+
+        int16_t soundIndex = -1;
+
+        int8_t soundGenerationMode = 0;
+        int8_t velocityRangeLower = 44;
+        int8_t velocityRangeUpper = 88;
+        int8_t tune = 0;
+        int8_t attack = 0;
+        int8_t decay = 5;
+        int8_t decayMode = 0;
+        int8_t filterFrequency = 100;
+        int8_t filterResonance = 0;
+        int8_t filterAttack = 0;
+        int8_t filterDecay = 0;
+        int8_t filterEnvelopeAmount = 0;
+        int8_t velocityToLevel = 100;
+        int8_t velocityToAttack = 0;
+        int8_t velocityToStart = 0;
+        int8_t velocityToFilterFrequency = 0;
+        int8_t sliderParameterNumber = 0;
+        int8_t velocityToPitch = 0;
     };
 
     struct Pad

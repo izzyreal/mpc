@@ -26,7 +26,17 @@ namespace mpc::performance
     {
         ProgramIndex programIndex{};
         DrumNoteNumber drumNoteNumber{};
-        NoteParameters performanceNoteParameters{};
+
+        int8_t NoteParameters::*int8_tMemberToUpdate = nullptr;
+        int16_t NoteParameters::*int16_tMemberToUpdate = nullptr;
+        DrumNoteNumber NoteParameters::*drumNoteMemberToUpdate = nullptr;
+        sampler::VoiceOverlapMode NoteParameters::*
+            voiceOverlapModeMemberToUpdate = nullptr;
+
+        int8_t int8_tValue;
+        int16_t int16_tValue;
+        DrumNoteNumber drumNoteValue;
+        sampler::VoiceOverlapMode voiceOverlapMode;
 
         UpdateNoteParameters() = default;
 

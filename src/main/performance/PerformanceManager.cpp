@@ -212,7 +212,27 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 const size_t noteParametersIndex =
                     payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
                 auto &noteParameters = p.noteParameters[noteParametersIndex];
-                noteParameters = payload.performanceNoteParameters;
+
+                if (payload.int8_tMemberToUpdate != nullptr)
+                {
+                    noteParameters.*(payload.int8_tMemberToUpdate) =
+                        payload.int8_tValue;
+                }
+                else if (payload.int16_tMemberToUpdate != nullptr)
+                {
+                    noteParameters.*(payload.int16_tMemberToUpdate) =
+                        payload.int16_tValue;
+                }
+                else if (payload.drumNoteMemberToUpdate != nullptr)
+                {
+                    noteParameters.*(payload.drumNoteMemberToUpdate) =
+                        payload.drumNoteValue;
+                }
+                else if (payload.voiceOverlapModeMemberToUpdate != nullptr)
+                {
+                    noteParameters.*(payload.voiceOverlapModeMemberToUpdate) =
+                        payload.voiceOverlapMode;
+                }
             }
             else if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
