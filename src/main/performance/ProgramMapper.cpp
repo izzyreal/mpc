@@ -11,58 +11,58 @@ using namespace mpc;
 
 namespace mpc::performance
 {
-    void mapSamplerProgramToPerformanceProgram(const mpc::sampler::Program &src,
-                                               mpc::performance::Program &dst)
+    void mapSamplerProgramToPerformanceProgram(const sampler::Program &samplerProgram,
+                                               Program &dst)
     {
         for (int i = 0; i < 64; ++i)
         {
-            auto *sn = src.getNoteParameters(i + MinDrumNoteNumber);
-            auto &dn = dst.noteParameters[i];
+            const auto pgmNoteParameters = samplerProgram.getNoteParameters(i + MinDrumNoteNumber);
+            auto &perfNoteParameters = dst.noteParameters[i];
 
-            dn.noteNumber = sn->getNumber();
+            perfNoteParameters.noteNumber = pgmNoteParameters->getNumber();
 
-            const auto stereo = sn->getStereoMixer();
-            dn.stereoMixer.level = DrumMixerLevel(stereo->getLevel());
-            dn.stereoMixer.panning = DrumMixerPanning(stereo->getPanning());
+            const auto stereo = pgmNoteParameters->getStereoMixer();
+            perfNoteParameters.stereoMixer.level = DrumMixerLevel(stereo->getLevel());
+            perfNoteParameters.stereoMixer.panning = DrumMixerPanning(stereo->getPanning());
 
-            const auto fx = sn->getIndivFxMixer();
-            dn.indivFxMixer.individualOutLevel =
+            const auto fx = pgmNoteParameters->getIndivFxMixer();
+            perfNoteParameters.indivFxMixer.individualOutLevel =
                 DrumMixerLevel(fx->getVolumeIndividualOut());
-            dn.indivFxMixer.fxSendLevel = DrumMixerLevel(fx->getFxSendLevel());
-            dn.indivFxMixer.individualOutput =
+            perfNoteParameters.indivFxMixer.fxSendLevel = DrumMixerLevel(fx->getFxSendLevel());
+            perfNoteParameters.indivFxMixer.individualOutput =
                 DrumMixerIndividualOutput(fx->getOutput());
-            dn.indivFxMixer.fxPath = DrumMixerIndividualFxPath(fx->getFxPath());
-            dn.indivFxMixer.followStereo = fx->isFollowingStereo();
+            perfNoteParameters.indivFxMixer.fxPath = DrumMixerIndividualFxPath(fx->getFxPath());
+            perfNoteParameters.indivFxMixer.followStereo = fx->isFollowingStereo();
 
-            dn.soundIndex = sn->getSoundIndex();
-            dn.soundGenerationMode = sn->getSoundGenerationMode();
-            dn.velocityRangeLower = sn->getVelocityRangeLower();
-            dn.optionalNoteA = sn->getOptionalNoteA();
-            dn.velocityRangeUpper = sn->getVelocityRangeUpper();
-            dn.optionalNoteB = sn->getOptionalNoteB();
-            dn.voiceOverlapMode = sn->getVoiceOverlapMode();
-            dn.muteAssignA = sn->getMuteAssignA();
-            dn.muteAssignB = sn->getMuteAssignB();
-            dn.tune = sn->getTune();
-            dn.attack = sn->getAttack();
-            dn.decay = sn->getDecay();
-            dn.decayMode = sn->getDecayMode();
-            dn.filterFrequency = sn->getFilterFrequency();
-            dn.filterResonance = sn->getFilterResonance();
-            dn.filterAttack = sn->getFilterAttack();
-            dn.filterDecay = sn->getFilterDecay();
-            dn.filterEnvelopeAmount = sn->getFilterEnvelopeAmount();
-            dn.velocityToLevel = sn->getVeloToLevel();
-            dn.velocityToAttack = sn->getVelocityToAttack();
-            dn.velocityToStart = sn->getVelocityToStart();
-            dn.velocityToFilterFrequency = sn->getVelocityToFilterFrequency();
-            dn.sliderParameterNumber = sn->getSliderParameterNumber();
-            dn.velocityToPitch = sn->getVelocityToPitch();
+            perfNoteParameters.soundIndex = pgmNoteParameters->getSoundIndex();
+            perfNoteParameters.soundGenerationMode = pgmNoteParameters->getSoundGenerationMode();
+            perfNoteParameters.velocityRangeLower = pgmNoteParameters->getVelocityRangeLower();
+            perfNoteParameters.optionalNoteA = pgmNoteParameters->getOptionalNoteA();
+            perfNoteParameters.velocityRangeUpper = pgmNoteParameters->getVelocityRangeUpper();
+            perfNoteParameters.optionalNoteB = pgmNoteParameters->getOptionalNoteB();
+            perfNoteParameters.voiceOverlapMode = pgmNoteParameters->getVoiceOverlapMode();
+            perfNoteParameters.muteAssignA = pgmNoteParameters->getMuteAssignA();
+            perfNoteParameters.muteAssignB = pgmNoteParameters->getMuteAssignB();
+            perfNoteParameters.tune = pgmNoteParameters->getTune();
+            perfNoteParameters.attack = pgmNoteParameters->getAttack();
+            perfNoteParameters.decay = pgmNoteParameters->getDecay();
+            perfNoteParameters.decayMode = pgmNoteParameters->getDecayMode();
+            perfNoteParameters.filterFrequency = pgmNoteParameters->getFilterFrequency();
+            perfNoteParameters.filterResonance = pgmNoteParameters->getFilterResonance();
+            perfNoteParameters.filterAttack = pgmNoteParameters->getFilterAttack();
+            perfNoteParameters.filterDecay = pgmNoteParameters->getFilterDecay();
+            perfNoteParameters.filterEnvelopeAmount = pgmNoteParameters->getFilterEnvelopeAmount();
+            perfNoteParameters.velocityToLevel = pgmNoteParameters->getVeloToLevel();
+            perfNoteParameters.velocityToAttack = pgmNoteParameters->getVelocityToAttack();
+            perfNoteParameters.velocityToStart = pgmNoteParameters->getVelocityToStart();
+            perfNoteParameters.velocityToFilterFrequency = pgmNoteParameters->getVelocityToFilterFrequency();
+            perfNoteParameters.sliderParameterNumber = pgmNoteParameters->getSliderParameterNumber();
+            perfNoteParameters.velocityToPitch = pgmNoteParameters->getVelocityToPitch();
         }
 
         for (int i = 0; i < 64; ++i)
         {
-            const auto *sp = src.getPad(i);
+            const auto *sp = samplerProgram.getPad(i);
             auto &dp = dst.pads[i];
 
             dp.note = sp->getNote();
@@ -70,7 +70,7 @@ namespace mpc::performance
         }
 
         {
-            const auto &ss = src.getSlider();
+            const auto &ss = samplerProgram.getSlider();
             auto &ds = dst.slider;
 
             ds.assignNote = ss->getNote();
@@ -86,6 +86,6 @@ namespace mpc::performance
             ds.parameter = ss->getParameter();
         }
 
-        dst.midiProgramChange = src.getMidiProgramChange();
+        dst.midiProgramChange = samplerProgram.getMidiProgramChange();
     }
 } // namespace mpc::performance

@@ -14,15 +14,15 @@ NoteParameters::NoteParameters(
     : index(index), getSnapshot(getSnapshot), dispatch(dispatch)
 {
     stereoMixer = std::make_shared<engine::StereoMixer>(
-        [&]
+        [this]
         {
-            return getSnapshot().stereoMixer;
+            return this->getSnapshot().stereoMixer;
         },
         dispatch);
     indivFxMixer = std::make_shared<engine::IndivFxMixer>(
-        [&]
+        [this]
         {
-            return getSnapshot().indivFxMixer;
+            return this->getSnapshot().indivFxMixer;
         },
         dispatch);
 }
