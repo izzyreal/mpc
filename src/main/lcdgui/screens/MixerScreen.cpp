@@ -30,6 +30,37 @@ MixerScreen::MixerScreen(Mpc &mpc, const int layerIndex)
 {
     selection.set(0);
     addMixerStrips();
+
+    const auto getStereoLevel = [this](const int stripIndex){ return getStereoMixerChannel(stripIndex)->getLevel(); };
+    const auto getStereoPanning = [this](const int stripIndex){ return getStereoMixerChannel(stripIndex)->getPanning(); };
+
+    const auto getIndivLevel = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getVolumeIndividualOut(); };
+    const auto getIndivOut = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getOutput(); };
+    const auto getIndivFxSendLevel = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getFxSendLevel(); };
+    const auto getIndivFxPath = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getFxPath(); };
+    const auto getIndivFollowStereo = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->isFollowingStereo(); };
+
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getStereoLevel,i]{return getStereoLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getStereoPanning,i]{return getStereoPanning(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getIndivLevel,i]{return getIndivLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getIndivOut,i]{return getIndivOut(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getIndivFxSendLevel,i]{return getIndivFxSendLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getIndivFxPath,i]{return getIndivFxPath(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
+    for (int i = 0; i < 16; ++i) {
+        addReactiveBinding({[getIndivFollowStereo,i]{return getIndivFollowStereo(i);}, [i, this](auto){displayMixerStrip(i);}});
+    }
 }
 
 void MixerScreen::open()
@@ -80,7 +111,7 @@ MixerScreen::getStereoMixerChannel(const int index) const
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
 
-    if (note < 35 || note > 98)
+    if (note < MinDrumNoteNumber || note > MaxDrumNoteNumber)
     {
         return {};
     }
@@ -92,7 +123,7 @@ MixerScreen::getStereoMixerChannel(const int index) const
         mixerSetupScreen->isStereoMixSourceDrum();
 
     return stereoMixSourceIsDrum
-               ? getActiveDrumBus()->getStereoMixerChannels()[note - 35]
+               ? getActiveDrumBus()->getStereoMixerChannels()[note.get() - MinDrumNoteNumber.get()]
                : noteParameters->getStereoMixer();
 }
 
@@ -106,7 +137,7 @@ MixerScreen::getIndivFxMixerChannel(const int index) const
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
 
-    if (note < 35 || note > 98)
+    if (note < MinDrumNoteNumber || note > MaxDrumNoteNumber)
     {
         return {};
     }
@@ -117,7 +148,7 @@ MixerScreen::getIndivFxMixerChannel(const int index) const
     const bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
     return indivFxSourceIsDrum
-               ? getActiveDrumBus()->getIndivFxMixerChannels()[note - 35]
+               ? getActiveDrumBus()->getIndivFxMixerChannels()[note.get() - MinDrumNoteNumber.get()]
                : noteParameters->getIndivFxMixer();
 }
 
@@ -293,6 +324,8 @@ void MixerScreen::setXPos(const unsigned char newXPos)
 
     selection.set(xPos);
     mixerStrips[xPos]->setSelection(yPos);
+
+    displayFunctionKeys();
 }
 
 void MixerScreen::setYPos(const int i)
@@ -318,7 +351,6 @@ void MixerScreen::down()
 
 void MixerScreen::left()
 {
-
     if (xPos <= 0)
     {
         return;
@@ -383,7 +415,6 @@ void MixerScreen::function(const int i)
 
 void MixerScreen::turnWheel(const int i)
 {
-
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -422,8 +453,6 @@ void MixerScreen::turnWheel(const int i)
                     recordMixerEvent(padIndex + bank * 16, 1,
                                      stereoMixer->getPanning());
                 }
-
-                displayPanning();
             }
             else if (yPos == 1)
             {
@@ -434,8 +463,6 @@ void MixerScreen::turnWheel(const int i)
                     recordMixerEvent(padIndex + bank * 16, 0,
                                      stereoMixer->getLevel());
                 }
-
-                displayStereoFaders();
             }
         }
         else if (tab == 1)
@@ -443,13 +470,11 @@ void MixerScreen::turnWheel(const int i)
             if (yPos == 0)
             {
                 indivFxMixer->setOutput(indivFxMixer->getOutput() + i);
-                displayIndividualOutputs();
             }
             else if (yPos == 1)
             {
                 indivFxMixer->setVolumeIndividualOut(
                     indivFxMixer->getVolumeIndividualOut() + i);
-                displayIndivFaders();
             }
         }
         else if (tab == 2)
@@ -457,13 +482,11 @@ void MixerScreen::turnWheel(const int i)
             if (yPos == 0)
             {
                 indivFxMixer->setFxPath(indivFxMixer->getFxPath() + i);
-                displayFxPaths();
             }
             else if (yPos == 1)
             {
                 indivFxMixer->setFxSendLevel(indivFxMixer->getFxSendLevel() +
                                              i);
-                displayFxSendLevels();
             }
         }
     }
@@ -748,6 +771,8 @@ void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)
     {
         selection.flip(padIndexWithoutBank);
     }
+
+    xPos = padIndexWithoutBank;
 
     displayMixerStrips();
     displayFunctionKeys();
