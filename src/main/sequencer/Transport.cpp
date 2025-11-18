@@ -654,7 +654,10 @@ void Transport::setPosition(const double positionQuarterNotes,
         Sequencer::ticksToQuarterNotes(sequence->getLastTick());
     auto wrappedNewPosition = positionQuarterNotes;
 
-    if (wrappedNewPosition < 0 || wrappedNewPosition >= seqLengthQuarterNotes)
+    if (seqLengthQuarterNotes == 0) {
+        wrappedNewPosition = 0;
+    }
+    else if (wrappedNewPosition < 0 || wrappedNewPosition >= seqLengthQuarterNotes)
     {
         wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
         while (wrappedNewPosition < 0)
