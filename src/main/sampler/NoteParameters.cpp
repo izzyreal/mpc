@@ -70,9 +70,10 @@ int NoteParameters::getSoundGenerationMode() const
 
 void NoteParameters::setSoundIndex(const int i) const
 {
+    auto programIndex = getProgramIndex();
     performance::PerformanceMessage msg;
     performance::UpdateNoteParameters payload{
-        getProgramIndex(), DrumNoteNumber(index + MinDrumNoteNumber)};
+        programIndex, DrumNoteNumber(index + MinDrumNoteNumber)};
     payload.int16_tMemberToUpdate = &performance::NoteParameters::soundIndex;
     payload.int16_tValue = std::clamp(i, -1, 256);
     msg.payload = std::move(payload);

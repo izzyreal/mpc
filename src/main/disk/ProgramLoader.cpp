@@ -16,6 +16,8 @@
 
 #include <thread>
 
+#include "performance/PerformanceManager.hpp"
+
 #ifdef __linux__
 #include <pthread.hpp>
 #endif // __linux__
@@ -179,33 +181,8 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
 
                 for (auto &srcNoteParams : p->getNotesParameters())
                 {
-                    auto localSoundIndex = srcNoteParams->getSoundIndex();
-
-                    std::string localSoundName;
-
-                    for (auto &localEntry : localTable)
-                    {
-                        if (localEntry.first == localSoundIndex)
-                        {
-                            localSoundName = localEntry.second;
-                            break;
-                        }
-                    }
-
-                    srcNoteParams->setSoundIndex(-1);
-
-                    if (!localSoundName.empty())
-                    {
-                        for (auto &convertedEntry : convertedTable)
-                        {
-                            if (convertedEntry.second == localSoundName)
-                            {
-                                srcNoteParams->setSoundIndex(
-                                    convertedEntry.first);
-                                break;
-                            }
-                        }
-                    }
+                    performance::AddProgramSound payload{srcNoteParams, localTable, convertedTable};
+                    mpc.performanceManager->enqueue(performance::PerformanceMessage{payload});
                 }
 
                 auto ls = mpc.getLayeredScreen();

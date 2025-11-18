@@ -11,6 +11,8 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#include "engine/EngineHost.hpp"
+
 CMRC_DECLARE(mpctest);
 
 using namespace mpc;
@@ -71,6 +73,8 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
     (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
 
+    mpc.getEngineHost()->applyPendingStateChanges();
+
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
 
@@ -80,6 +84,8 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     REQUIRE(mpc.getSampler()->getSound(1)->getEnd() == 1000);
 
     REQUIRE(p1->getName() == "PROGRAM1");
+
+    REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == 1);
 
@@ -98,6 +104,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
     (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2);
+    mpc.getEngineHost()->applyPendingStateChanges();
 }
 
 TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")

@@ -80,21 +80,9 @@ namespace mpc::concurrency
                           return a.seq < b.seq;
                       });
 
-            // for (auto it = sequencedMessages.begin();
-            //      it != sequencedMessages.end();)
-            // {
-            //     auto msg = std::move(it->payload);
-            //     it = sequencedMessages.erase(it);
-            //     applyMessage(msg);
-            //     printf("sequencedMessages size: %zu\n",
-            //            sequencedMessages.size());
-            // }
-
             for (auto &msg : sequencedMessages)
             {
                 applyMessage(msg.payload);
-                // printf("sequencedMessages size: %zu\n",
-                // sequencedMessages.size());
             }
 
             sequencedMessages.clear();

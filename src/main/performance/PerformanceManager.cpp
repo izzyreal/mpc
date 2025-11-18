@@ -2,6 +2,7 @@
 
 #include "utils/TimeUtils.hpp"
 #include "performance/Drum.hpp"
+#include "sampler/NoteParameters.hpp"
 
 #include <algorithm>
 
@@ -214,6 +215,36 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                             np.soundIndex = -1;
                         else if (np.soundIndex > idx)
                             np.soundIndex--;
+                    }
+                }
+            }
+            else if constexpr (std::is_same_v<T, AddProgramSound>) {
+                const sampler::NoteParameters *srcNoteParams = payload.noteParameters;
+                auto localSoundIndex = srcNoteParams->getSoundIndex();
+
+                std::string localSoundName;
+
+                for (auto &localEntry : payload.localTable)
+                {
+                    if (localEntry.first == localSoundIndex)
+                    {
+                        localSoundName = localEntry.second;
+                        break;
+                    }
+                }
+
+                srcNoteParams->setSoundIndex(-1);
+
+                if (!localSoundName.empty())
+                {
+                    for (auto &convertedEntry : payload.convertedTable)
+                    {
+                        if (convertedEntry.second == localSoundName)
+                        {
+                            srcNoteParams->setSoundIndex(
+                                convertedEntry.first);
+                            break;
+                        }
                     }
                 }
             }
