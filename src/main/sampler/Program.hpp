@@ -65,7 +65,7 @@ namespace mpc::sampler
 
         Pad *getPad(int i) const;
 
-        std::vector<NoteParameters *> getNotesParameters();
+        std::vector<NoteParameters *>& getNotesParameters();
 
         NoteParameters *getNoteParameters(int noteNumber) const;
 

@@ -26,7 +26,8 @@ namespace mpc::disk
     public:
         static program_or_error
         loadProgram(Mpc &, const std::shared_ptr<MpcFile> &,
-                    const std::shared_ptr<sampler::Program> &);
+                    const std::shared_ptr<sampler::Program> &,
+                    int programIndex);
 
     private:
         static void showLoadingSoundNamePopup(Mpc &mpc, const std::string &name,

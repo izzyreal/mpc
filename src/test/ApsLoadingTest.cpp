@@ -9,6 +9,8 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#include "engine/EngineHost.hpp"
+
 CMRC_DECLARE(mpctest);
 
 using namespace mpc;
@@ -43,6 +45,7 @@ void doApsTest(Mpc &mpc)
     auto apsFile = disk->getFile("ALL_PGMS.APS");
 
     ApsLoader::load(mpc, apsFile);
+    mpc.getEngineHost()->applyPendingStateChanges();
 
     auto p1 = mpc.getSampler()->getProgram(0);
     auto p2 = mpc.getSampler()->getProgram(1);

@@ -2,6 +2,7 @@
 
 #include "utils/TimeUtils.hpp"
 #include "performance/Drum.hpp"
+#include "sampler/NoteParameters.hpp"
 
 #include <algorithm>
 
@@ -216,6 +217,39 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                             np.soundIndex--;
                     }
                 }
+            }
+            else if constexpr (std::is_same_v<T, AddProgramSound>) {
+                auto p = payload.programIndex;
+                auto n = payload.drumNoteNumber;
+                auto &srcNoteParams = activeState.programs[p].noteParameters[n.get() - MinDrumNoteNumber.get()];
+                auto localSoundIndex = srcNoteParams.soundIndex;
+
+                std::string localSoundName;
+
+                for (auto &localEntry : payload.localTable)
+                {
+                    if (localEntry.first == localSoundIndex)
+                    {
+                        localSoundName = localEntry.second;
+                        break;
+                    }
+                }
+
+                srcNoteParams.soundIndex = -1;
+
+                if (!localSoundName.empty())
+                {
+                    for (auto &convertedEntry : payload.convertedTable)
+                    {
+                        if (convertedEntry.second == localSoundName)
+                        {
+                            srcNoteParams.soundIndex = convertedEntry.first;
+                            break;
+                        }
+                    }
+                }
+
+                publishState();
             }
             else if constexpr (std::is_same_v<T, UpdateStereoMixer>)
             {

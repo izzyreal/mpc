@@ -656,19 +656,20 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 }
 
 void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
-                            std::shared_ptr<Program> p)
+                            std::shared_ptr<Program> p,
+                            int programIndex)
 {
     if (readPgmThread.joinable())
     {
         readPgmThread.join();
     }
     readPgmThread = std::thread(
-        [this, f, p]
+        [this, f, p, programIndex]
         {
             const std::function<tl::expected<bool, mpc_io_error_msg>()>
-                readFunc = [this, f, p]
+                readFunc = [this, f, p, programIndex]
             {
-                (void)ProgramLoader::loadProgram(mpc, f, p);
+                (void)ProgramLoader::loadProgram(mpc, f, p, programIndex);
                 return true;
             };
 

@@ -11,6 +11,8 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#include "engine/EngineHost.hpp"
+
 CMRC_DECLARE(mpctest);
 
 using namespace mpc;
@@ -69,7 +71,9 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     mpc.getSampler()->deleteAllSamples();
 
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
-    (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1, 0);
+
+    mpc.getEngineHost()->applyPendingStateChanges();
 
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
@@ -80,6 +84,8 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     REQUIRE(mpc.getSampler()->getSound(1)->getEnd() == 1000);
 
     REQUIRE(p1->getName() == "PROGRAM1");
+
+    REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == 1);
 
@@ -97,7 +103,8 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
-    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2, 1);
+    mpc.getEngineHost()->applyPendingStateChanges();
 }
 
 TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")
@@ -175,7 +182,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
     std::thread loadThread(
         [&]
         {
-            (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
+            (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1, 0);
         });
 
     int counter = 0;
@@ -208,7 +215,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
 
     REQUIRE(cantFindFileScreenHasBeenOpened);
     assert(mpc.getLayeredScreen()->getCurrentScreenName() != "cant-find-file");
-
+    mpc.getEngineHost()->applyPendingStateChanges();
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
 
@@ -233,7 +240,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
-    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2, 1);
 }
 
 TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound",
@@ -247,6 +254,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound",
         std::shared_ptr<sampler::Program> p2;
 
         doTestWithMissingSound(mpc, false, i == 0, p1, p2);
+        mpc.getEngineHost()->applyPendingStateChanges();
 
         REQUIRE(mpc.getSampler()->getProgramCount() == 2);
         REQUIRE(mpc.getSampler()->getProgram(1) == p2);

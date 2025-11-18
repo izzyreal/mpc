@@ -44,7 +44,7 @@ void LoadAProgramScreen::function(const int i)
             sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
             sampler->deleteAllSamples();
 
-            mpc.getDisk()->readPgm2(selectedFile, sampler->getProgram(0));
+            mpc.getDisk()->readPgm2(selectedFile, sampler->getProgram(0), 0);
             break;
         }
         case 3:
@@ -55,7 +55,12 @@ void LoadAProgramScreen::function(const int i)
             const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
 
-            mpc.getDisk()->readPgm2(selectedFile, newProgram);
+            for (int pi = 0; pi < 24; pi++) {
+                if (sampler->getProgram(pi) == newProgram) {
+                    mpc.getDisk()->readPgm2(selectedFile, newProgram, pi);
+                    break;
+                }
+            }
 
             if (const auto track = sequencer->getSelectedTrack();
                 sequencer::isDrumBusType(track->getBusType()))

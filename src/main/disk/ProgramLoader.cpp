@@ -16,6 +16,9 @@
 
 #include <thread>
 
+#include "engine/EngineHost.hpp"
+#include "performance/PerformanceManager.hpp"
+
 #ifdef __linux__
 #include <pthread.hpp>
 #endif // __linux__
@@ -67,7 +70,7 @@ findSoundFileByFilenameWithoutExtension(const mpc::Mpc &mpc,
 
 program_or_error
 ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
-                           const std::shared_ptr<Program> &program)
+                           const std::shared_ptr<Program> &program, int programIndex)
 {
     const auto cantFindFileScreen =
         mpc.screens->get<ScreenId::CantFindFileScreen>();
@@ -80,7 +83,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
     return PgmFileToProgramConverter::loadFromFileAndConvert(file, program,
                                                              pgmSoundNames)
         .map(
-            [pgmSoundNames, &mpc](std::shared_ptr<Program> p)
+            [pgmSoundNames, &mpc, programIndex](std::shared_ptr<Program> p)
             {
                 std::vector<std::pair<int, std::string>> localTable;
 
@@ -177,35 +180,10 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                     }
                 }
 
-                for (auto &srcNoteParams : p->getNotesParameters())
+                for (int npi = 0; npi < 64; ++npi)
                 {
-                    auto localSoundIndex = srcNoteParams->getSoundIndex();
-
-                    std::string localSoundName;
-
-                    for (auto &localEntry : localTable)
-                    {
-                        if (localEntry.first == localSoundIndex)
-                        {
-                            localSoundName = localEntry.second;
-                            break;
-                        }
-                    }
-
-                    srcNoteParams->setSoundIndex(-1);
-
-                    if (!localSoundName.empty())
-                    {
-                        for (auto &convertedEntry : convertedTable)
-                        {
-                            if (convertedEntry.second == localSoundName)
-                            {
-                                srcNoteParams->setSoundIndex(
-                                    convertedEntry.first);
-                                break;
-                            }
-                        }
-                    }
+                    performance::AddProgramSound payload{ProgramIndex(programIndex), DrumNoteNumber(npi + MinDrumNoteNumber), localTable, convertedTable};
+                    mpc.performanceManager->enqueue(performance::PerformanceMessage{payload});
                 }
 
                 auto ls = mpc.getLayeredScreen();

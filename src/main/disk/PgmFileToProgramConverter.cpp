@@ -59,7 +59,7 @@ void PgmFileToProgramConverter::setNoteParameters(
         const auto note = padNote == -1 ? NoDrumNoteAssigned : padNote;
         program->getPad(programPadIndex)->setNote(DrumNoteNumber(note));
 
-        NoteParameters *programNoteParameters =
+        const NoteParameters *programNoteParameters =
             program->getNoteParameters(programPadIndex + MinDrumNoteNumber);
         programNoteParameters->setAttack(
             pgmNoteParameters->getAttack(programPadIndex));

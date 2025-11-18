@@ -127,7 +127,7 @@ void Program::setIndex(const ProgramIndex programIndex)
     index = programIndex;
 }
 
-std::vector<NoteParameters *> Program::getNotesParameters()
+std::vector<NoteParameters *> &Program::getNotesParameters()
 {
     return noteParameters;
 }
