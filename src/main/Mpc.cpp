@@ -216,6 +216,9 @@ void Mpc::init()
     MLOG("Mpc is ready");
 
     layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    startMidiDeviceDetector();
+    getEngineHost()->getAudioServer()->start();
 }
 
 std::shared_ptr<Hardware> Mpc::getHardware()

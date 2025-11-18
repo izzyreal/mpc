@@ -45,22 +45,11 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                                      std::shared_ptr<SaveTarget> saveTarget,
                                      const bool headless)
 {
-    auto onCompletionTask = [&]
-    {
-        mpc.getLayeredScreen()->postToUiThread(
-            [&]
-            {
-                mpc.startMidiDeviceDetector();
-                mpc.getEngineHost()->getAudioServer()->start();
-            });
-    };
-
     const auto vmpcAutoSaveScreen =
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 &&
         !mpc.isPluginModeEnabled())
     {
-        onCompletionTask();
         return;
     }
 
@@ -80,12 +69,11 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
     if (availableFiles.empty())
     {
-        onCompletionTask();
         return;
     }
 
     const auto restoreAction =
-        [&mpc, availableFiles, saveTarget, headless, onCompletionTask]
+        [&mpc, availableFiles, saveTarget, headless]
     {
         auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;
@@ -302,8 +290,6 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                 d->setProgramIndex(ProgramIndex{0});
             }
         }
-
-        onCompletionTask();
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&
