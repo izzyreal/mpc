@@ -30,7 +30,6 @@ void MixerSetupScreen::open()
 
 void MixerSetupScreen::displayMasterLevel()
 {
-
     auto level = getMasterLevelString();
 
     if (getMasterLevel() != -13)
@@ -116,11 +115,7 @@ int MixerSetupScreen::getMasterLevel() const
 
 void MixerSetupScreen::setMasterLevel(const int i)
 {
-    if (i < -13 || i > 2)
-    {
-        return;
-    }
-    masterLevel = i;
+    masterLevel = std::clamp(i, -13, 2);
 
     mpc.getEngineHost()->setMixerMasterLevel(
         masterLevelValues[masterLevel + 13]);
@@ -135,11 +130,7 @@ int MixerSetupScreen::getFxDrum() const
 
 void MixerSetupScreen::setFxDrum(const int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-    fxDrum = i;
+    fxDrum = std::clamp(i, 0, 3);
     displayFxDrum();
 }
 
