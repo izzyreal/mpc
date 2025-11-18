@@ -48,7 +48,12 @@ void CopyProgramScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "pgm0")
     {
-        setPgm0(pgm0 + increment);
+        const bool up = increment > 0;
+        auto candidate = pgm0;
+        for (int i = 0; i < std::abs(increment); ++i) {
+            candidate = sampler->getUsedProgram(candidate, up);
+        }
+        setPgm0(candidate);
     }
     else if (focusedFieldName == "pgm1")
     {
@@ -58,35 +63,14 @@ void CopyProgramScreen::turnWheel(const int increment)
 
 void CopyProgramScreen::setPgm0(const ProgramIndex i)
 {
-    ProgramIndex candidate = i;
-    const auto up = i > pgm0;
-
-    candidate = up ? candidate - 1 : candidate + 1;
-
-    do
-    {
-        candidate = up ? candidate + 1 : candidate - 1;
-
-        if (candidate < MinProgramIndex || candidate > MaxProgramIndex)
-        {
-            return;
-        }
-    } while (!sampler->getProgram(candidate));
-
-    pgm0 = candidate;
-
+    pgm0 = std::clamp(i, MinProgramIndex, MaxProgramIndex);
     displayPgm0();
     displayFunctionKeys();
 }
 
 void CopyProgramScreen::setPgm1(const ProgramIndex i)
 {
-    if (i < 0 || i > MaxProgramIndex)
-    {
-        return;
-    }
-
-    pgm1 = i;
+    pgm1 = std::clamp(i, MinProgramIndex, MaxProgramIndex);
     displayPgm1();
     displayFunctionKeys();
 }
