@@ -31,8 +31,7 @@ DrumBus::DrumBus(
     for (int i = 0; i < 64; i++)
     {
         const auto drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber);
-        auto getStereoMixerSnapshot =
-            [performanceManager, this, drumNoteNumber]
+        auto getStereoMixerSnapshot = [performanceManager, this, drumNoteNumber]
         {
             return performanceManager->getSnapshot()
                 .getDrum(drumIndex)
@@ -47,21 +46,36 @@ DrumBus::DrumBus(
                 .getIndivFxMixer(drumNoteNumber);
         };
 
-        stereoMixerChannels.emplace_back(
-            std::make_shared<StereoMixer>(
-                getStereoMixerSnapshot,
-                [this]{return drumIndex;},
-                []{ return NoProgramIndex; },
-                [drumNoteNumber] { return drumNoteNumber; },
-                dispatch
-                ));
-        indivFxMixerChannels.emplace_back(
-            std::make_shared<IndivFxMixer>(
-                getIndivFxMixerSnapshot,
-                [this]{return drumIndex;},
-                []{ return NoProgramIndex; },
-                [drumNoteNumber] { return drumNoteNumber; },
-                dispatch));
+        stereoMixerChannels.emplace_back(std::make_shared<StereoMixer>(
+            getStereoMixerSnapshot,
+            [this]
+            {
+                return drumIndex;
+            },
+            []
+            {
+                return NoProgramIndex;
+            },
+            [drumNoteNumber]
+            {
+                return drumNoteNumber;
+            },
+            dispatch));
+        indivFxMixerChannels.emplace_back(std::make_shared<IndivFxMixer>(
+            getIndivFxMixerSnapshot,
+            [this]
+            {
+                return drumIndex;
+            },
+            []
+            {
+                return NoProgramIndex;
+            },
+            [drumNoteNumber]
+            {
+                return drumNoteNumber;
+            },
+            dispatch));
     }
 }
 

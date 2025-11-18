@@ -8,7 +8,9 @@ StereoMixer::StereoMixer(
     const std::function<ProgramIndex()> &getProgramIndex,
     const std::function<DrumNoteNumber()> &getDrumNoteNumber,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : getSnapshot(getSnapshot), getDrumIndex(getDrumIndex), getProgramIndex(getProgramIndex), getDrumNoteNumber(getDrumNoteNumber), dispatch(dispatch)
+    : getSnapshot(getSnapshot), getDrumIndex(getDrumIndex),
+      getProgramIndex(getProgramIndex), getDrumNoteNumber(getDrumNoteNumber),
+      dispatch(dispatch)
 {
 }
 

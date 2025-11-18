@@ -31,35 +31,112 @@ MixerScreen::MixerScreen(Mpc &mpc, const int layerIndex)
     selection.set(0);
     addMixerStrips();
 
-    const auto getStereoLevel = [this](const int stripIndex){ return getStereoMixerChannel(stripIndex)->getLevel(); };
-    const auto getStereoPanning = [this](const int stripIndex){ return getStereoMixerChannel(stripIndex)->getPanning(); };
+    const auto getStereoLevel = [this](const int stripIndex)
+    {
+        return getStereoMixerChannel(stripIndex)->getLevel();
+    };
+    const auto getStereoPanning = [this](const int stripIndex)
+    {
+        return getStereoMixerChannel(stripIndex)->getPanning();
+    };
 
-    const auto getIndivLevel = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getVolumeIndividualOut(); };
-    const auto getIndivOut = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getOutput(); };
-    const auto getIndivFxSendLevel = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getFxSendLevel(); };
-    const auto getIndivFxPath = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->getFxPath(); };
-    const auto getIndivFollowStereo = [this](const int stripIndex){ return getIndivFxMixerChannel(stripIndex)->isFollowingStereo(); };
+    const auto getIndivLevel = [this](const int stripIndex)
+    {
+        return getIndivFxMixerChannel(stripIndex)->getVolumeIndividualOut();
+    };
+    const auto getIndivOut = [this](const int stripIndex)
+    {
+        return getIndivFxMixerChannel(stripIndex)->getOutput();
+    };
+    const auto getIndivFxSendLevel = [this](const int stripIndex)
+    {
+        return getIndivFxMixerChannel(stripIndex)->getFxSendLevel();
+    };
+    const auto getIndivFxPath = [this](const int stripIndex)
+    {
+        return getIndivFxMixerChannel(stripIndex)->getFxPath();
+    };
+    const auto getIndivFollowStereo = [this](const int stripIndex)
+    {
+        return getIndivFxMixerChannel(stripIndex)->isFollowingStereo();
+    };
 
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getStereoLevel,i]{return getStereoLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getStereoLevel, i]
+                            {
+                                return getStereoLevel(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getStereoPanning,i]{return getStereoPanning(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getStereoPanning, i]
+                            {
+                                return getStereoPanning(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getIndivLevel,i]{return getIndivLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getIndivLevel, i]
+                            {
+                                return getIndivLevel(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getIndivOut,i]{return getIndivOut(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getIndivOut, i]
+                            {
+                                return getIndivOut(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getIndivFxSendLevel,i]{return getIndivFxSendLevel(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getIndivFxSendLevel, i]
+                            {
+                                return getIndivFxSendLevel(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getIndivFxPath,i]{return getIndivFxPath(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getIndivFxPath, i]
+                            {
+                                return getIndivFxPath(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
-    for (int i = 0; i < 16; ++i) {
-        addReactiveBinding({[getIndivFollowStereo,i]{return getIndivFollowStereo(i);}, [i, this](auto){displayMixerStrip(i);}});
+    for (int i = 0; i < 16; ++i)
+    {
+        addReactiveBinding({[getIndivFollowStereo, i]
+                            {
+                                return getIndivFollowStereo(i);
+                            },
+                            [i, this](auto)
+                            {
+                                displayMixerStrip(i);
+                            }});
     }
 }
 
@@ -123,7 +200,9 @@ MixerScreen::getStereoMixerChannel(const int index) const
         mixerSetupScreen->isStereoMixSourceDrum();
 
     return stereoMixSourceIsDrum
-               ? getActiveDrumBus()->getStereoMixerChannels()[note.get() - MinDrumNoteNumber.get()]
+               ? getActiveDrumBus()
+                     ->getStereoMixerChannels()[note.get() -
+                                                MinDrumNoteNumber.get()]
                : noteParameters->getStereoMixer();
 }
 
@@ -148,7 +227,9 @@ MixerScreen::getIndivFxMixerChannel(const int index) const
     const bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
     return indivFxSourceIsDrum
-               ? getActiveDrumBus()->getIndivFxMixerChannels()[note.get() - MinDrumNoteNumber.get()]
+               ? getActiveDrumBus()
+                     ->getIndivFxMixerChannels()[note.get() -
+                                                 MinDrumNoteNumber.get()]
                : noteParameters->getIndivFxMixer();
 }
 
@@ -307,25 +388,17 @@ int MixerScreen::getTab() const
 
 void MixerScreen::setXPos(const unsigned char newXPos)
 {
-    if (selection.all())
-    {
-        xPos = std::clamp(static_cast<int>(newXPos), 0, 15);
-        return;
-    }
-
-    selection.reset();
-
-    for (const auto &m : mixerStrips)
-    {
-        m->setSelection(-1);
-    }
+    const auto oldXPos = xPos;
 
     xPos = std::clamp(static_cast<int>(newXPos), 0, 15);
 
-    selection.set(xPos);
-    mixerStrips[xPos]->setSelection(yPos);
-
-    displayFunctionKeys();
+    if (selection.count() == 1)
+    {
+        mixerStrips[oldXPos]->setSelection(-1);
+        selection.reset();
+        selection.set(xPos);
+        mixerStrips[xPos]->setSelection(yPos);
+    }
 }
 
 void MixerScreen::setYPos(const int i)
@@ -770,6 +843,10 @@ void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)
     else
     {
         selection.flip(padIndexWithoutBank);
+        if (selection.none())
+        {
+            selection.flip(padIndexWithoutBank);
+        }
     }
 
     xPos = padIndexWithoutBank;
