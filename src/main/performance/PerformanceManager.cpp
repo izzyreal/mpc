@@ -1,7 +1,6 @@
 #include "PerformanceManager.hpp"
 
 #include "utils/TimeUtils.hpp"
-#include "performance/ProgramMapper.hpp"
 #include "performance/Drum.hpp"
 
 #include <algorithm>
@@ -18,7 +17,7 @@ PerformanceManager::PerformanceManager()
 {
 }
 
-void PerformanceManager::reserveState(PerformanceState &s) const
+void PerformanceManager::reserveState(PerformanceState &s)
 {
     s.physicalPadEvents.reserve(CAPACITY);
     s.programPadEvents.reserve(CAPACITY);
@@ -205,8 +204,64 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         [&](auto &&payload)
         {
             using T = std::decay_t<decltype(payload)>;
+            if constexpr (std::is_same_v<T, UpdateStereoMixer>)
+            {
+                StereoMixer *m;
 
-            if constexpr (std::is_same_v<T, UpdateNoteParameters>)
+                if (payload.drumBusIndex != NoDrumBusIndex)
+                {
+                    m = &activeState.drums[payload.drumBusIndex]
+                             .stereoMixers[payload.drumNoteNumber.get() -
+                                           MinDrumNoteNumber.get()];
+                }
+                else /*if (payload.programIndex != NoProgramIndex)*/
+                {
+                    m = &activeState.programs[payload.programIndex]
+                             .noteParameters[payload.drumNoteNumber.get() -
+                                             MinDrumNoteNumber.get()]
+                             .stereoMixer;
+                }
+
+                m->*(payload.member) = payload.newValue;
+            }
+            if constexpr (std::is_same_v<T, UpdateIndivFxMixer>)
+            {
+                IndivFxMixer *m;
+
+                if (payload.drumBusIndex != NoDrumBusIndex)
+                {
+                    m = &activeState.drums[payload.drumBusIndex]
+                             .indivFxMixers[payload.drumNoteNumber.get() -
+                                            MinDrumNoteNumber.get()];
+                }
+                else /*if (payload.programIndex != NoProgramIndex)*/
+                {
+                    m = &activeState.programs[payload.programIndex]
+                             .noteParameters[payload.drumNoteNumber.get() -
+                                             MinDrumNoteNumber.get()]
+                             .indivFxMixer;
+                }
+
+                if (payload.value0To100Member)
+                {
+                    m->*(payload.value0To100Member) = payload.newValue;
+                }
+                else if (payload.individualOutputMember)
+                {
+                    m->*(payload.individualOutputMember) =
+                        payload.individualOutput;
+                }
+                else if (payload.individualFxPathMember)
+                {
+                    m->*(payload.individualFxPathMember) =
+                        payload.individualFxPath;
+                }
+                else /*if (payload.followStereoMember)*/
+                {
+                    m->*(payload.followStereoMember) = payload.followStereo;
+                }
+            }
+            else if constexpr (std::is_same_v<T, UpdateNoteParameters>)
             {
                 auto &p = activeState.programs[payload.programIndex];
                 const size_t noteParametersIndex =

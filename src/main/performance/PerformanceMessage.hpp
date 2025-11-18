@@ -50,7 +50,14 @@ namespace mpc::performance
 
     struct UpdateStereoMixer
     {
-        StereoMixer stereoMixer{};
+        DrumBusIndex drumBusIndex{};
+        ProgramIndex programIndex{NoProgramIndex};
+
+        DrumNoteNumber drumNoteNumber{};
+
+        Value0To100 StereoMixer::*member = nullptr;
+
+        Value0To100 newValue;
 
         UpdateStereoMixer() = default;
 
@@ -63,7 +70,22 @@ namespace mpc::performance
 
     struct UpdateIndivFxMixer
     {
-        IndivFxMixer indivFxMixer{};
+        DrumBusIndex drumBusIndex{};
+        ProgramIndex programIndex{NoProgramIndex};
+
+        DrumNoteNumber drumNoteNumber{};
+
+        Value0To100 IndivFxMixer::*value0To100Member = nullptr;
+        DrumMixerIndividualOutput IndivFxMixer::*individualOutputMember =
+            nullptr;
+        DrumMixerIndividualFxPath IndivFxMixer::*individualFxPathMember =
+            nullptr;
+        bool IndivFxMixer::*followStereoMember = nullptr;
+
+        Value0To100 newValue;
+        DrumMixerIndividualOutput individualOutput;
+        DrumMixerIndividualFxPath individualFxPath;
+        bool followStereo;
 
         UpdateIndivFxMixer() = default;
 

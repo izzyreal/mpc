@@ -12,6 +12,9 @@ namespace mpc::engine
     public:
         StereoMixer(
             const std::function<performance::StereoMixer()> &getSnapshot,
+            const std::function<DrumBusIndex()> &getDrumIndex,
+            const std::function<ProgramIndex()> &getProgramIndex,
+            const std::function<DrumNoteNumber()> &getDrumNoteNumber,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
@@ -25,6 +28,9 @@ namespace mpc::engine
 
     private:
         const std::function<performance::StereoMixer()> getSnapshot;
+        const std::function<DrumBusIndex()> getDrumIndex;
+        const std::function<ProgramIndex()> getProgramIndex;
+        const std::function<DrumNoteNumber()> getDrumNoteNumber;
         std::function<void(performance::PerformanceMessage &&)> dispatch;
     };
 } // namespace mpc::engine

@@ -19,12 +19,18 @@ NoteParameters::NoteParameters(
         {
             return this->getSnapshot().stereoMixer;
         },
+        []{ return NoDrumBusIndex; },
+        getProgramIndex,
+        [this] { return DrumNoteNumber(this->index + MinDrumNoteNumber); },
         dispatch);
     indivFxMixer = std::make_shared<engine::IndivFxMixer>(
         [this]
         {
             return this->getSnapshot().indivFxMixer;
         },
+        []{ return NoDrumBusIndex; },
+        getProgramIndex,
+        [this] { return DrumNoteNumber(this->index + MinDrumNoteNumber); },
         dispatch);
 }
 

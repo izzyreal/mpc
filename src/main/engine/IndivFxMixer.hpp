@@ -12,6 +12,9 @@ namespace mpc::engine
     public:
         IndivFxMixer(
             const std::function<performance::IndivFxMixer()> &getSnapshot,
+            const std::function<DrumBusIndex()> &getDrumIndex,
+            const std::function<ProgramIndex()> &getProgramIndex,
+            const std::function<DrumNoteNumber()> &getDrumNoteNumber,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
@@ -37,6 +40,9 @@ namespace mpc::engine
 
     private:
         const std::function<performance::IndivFxMixer()> getSnapshot;
+        const std::function<DrumBusIndex()> getDrumIndex;
+        const std::function<ProgramIndex()> getProgramIndex;
+        const std::function<DrumNoteNumber()> getDrumNoteNumber;
         std::function<void(performance::PerformanceMessage &&)> dispatch;
     };
 } // namespace mpc::engine

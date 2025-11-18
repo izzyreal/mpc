@@ -23,12 +23,14 @@ namespace mpc
     using ProgramIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX>;
     using DrumBusIndex =
-        ConstrainedInt<int8_t, 0, Mpc2000XlSpecs::DRUM_BUS_COUNT - 1>;
+        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::DRUM_BUS_COUNT - 1>;
     using SequenceIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::LAST_SEQUENCE_INDEX>;
 
-    using DrumMixerLevel = ConstrainedInt<int8_t, 0, 100>;
-    using DrumMixerPanning = ConstrainedInt<int8_t, 0, 100>;
+    using Value0To100 = ConstrainedInt<int8_t, 0, 100>;
+    using DrumMixerLevel = Value0To100;
+    using DrumMixerPanning = Value0To100;
+
     using DrumMixerIndividualOutput = ConstrainedInt<int8_t, 0, 8>;
     using DrumMixerIndividualFxPath = ConstrainedInt<int8_t, 0, 4>;
 
@@ -56,6 +58,8 @@ namespace mpc
 
     using TimeInMilliseconds = int64_t;
     using TimeInNanoseconds = int64_t;
+
+    constexpr DrumBusIndex NoDrumBusIndex{-1};
 
     constexpr MidiValue NoMidiValue{-1};
 
