@@ -1,6 +1,8 @@
 #include "TestMpc.hpp"
 
 #include "TestPaths.hpp"
+#include "engine/EngineHost.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <memory>
 
@@ -11,4 +13,5 @@ void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
     fs::remove_all(testDocPath);
     fs::create_directories(testDocPath);
     mpc.init();
+    mpc.getEngineHost()->getAudioServer()->start();
 }

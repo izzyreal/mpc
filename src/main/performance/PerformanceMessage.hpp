@@ -8,6 +8,10 @@
 
 namespace mpc::performance
 {
+    struct DeleteSoundAndReindex {
+        int deletedIndex;
+    };
+
     struct UpdateDrumProgram
     {
         DrumBusIndex drumBusIndex{};
@@ -102,7 +106,7 @@ namespace mpc::performance
                      ProgramPadPressEvent, ProgramPadAftertouchEvent,
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
                      NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
-                     UpdateIndivFxMixer, UpdateStereoMixer>;
+                     UpdateIndivFxMixer, UpdateStereoMixer, DeleteSoundAndReindex>;
 
     struct PerformanceMessage
     {

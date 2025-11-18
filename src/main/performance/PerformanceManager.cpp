@@ -204,7 +204,20 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         [&](auto &&payload)
         {
             using T = std::decay_t<decltype(payload)>;
-            if constexpr (std::is_same_v<T, UpdateStereoMixer>)
+            if constexpr (std::is_same_v<T, DeleteSoundAndReindex>)
+            {
+                const int idx = payload.deletedIndex;
+                for (auto& program : activeState.programs) {
+                    for (auto& np : program.noteParameters) {
+
+                        if (np.soundIndex == idx)
+                            np.soundIndex = -1;
+                        else if (np.soundIndex > idx)
+                            np.soundIndex--;
+                    }
+                }
+            }
+            else if constexpr (std::is_same_v<T, UpdateStereoMixer>)
             {
                 StereoMixer *m;
 

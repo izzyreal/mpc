@@ -33,6 +33,7 @@
 #include <samplerate.h>
 
 #include "Logger.hpp"
+#include "performance/PerformanceManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -942,25 +943,7 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
         return;
     }
 
-    for (const auto &p : programs)
-    {
-        if (!p)
-        {
-            continue;
-        }
-
-        for (const auto &n : p->getNotesParameters())
-        {
-            if (n->getSoundIndex() == index)
-            {
-                n->setSoundIndex(-1);
-            }
-            else if (n->getSoundIndex() > index)
-            {
-                n->setSoundIndex(n->getSoundIndex() - 1);
-            }
-        }
-    }
+    mpc.performanceManager->enqueue(performance::PerformanceMessage{performance::DeleteSoundAndReindex{index}});
 
     sounds.erase(sounds.begin() + index);
 
