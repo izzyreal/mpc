@@ -638,12 +638,17 @@ void Transport::setPosition(const double positionQuarterNotes,
                             const bool shouldSyncTrackEventIndicesToNewPosition,
                             const bool shouldSetPlayStartPosition) const
 {
-    const auto songSequenceIndex = sequencer.getSongSequenceIndex();
     const bool songMode = sequencer.isSongModeEnabled();
+    
+    SequenceIndex songSequenceIndex{NoSequenceIndex};
 
-    if (songMode && songSequenceIndex == NoSequenceIndex)
+    if (songMode)
     {
-        return;
+        songSequenceIndex = sequencer.getSongSequenceIndex();
+        if (songSequenceIndex == NoSequenceIndex)
+        {
+            return;
+        }
     }
 
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()

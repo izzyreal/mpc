@@ -129,7 +129,7 @@ namespace mpc::sequencer
 
         std::shared_ptr<Sequence> undoPlaceHolder;
 
-        bool secondSequenceEnabled = false;
+        std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
 
         std::string defaultSequenceName;
