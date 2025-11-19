@@ -27,7 +27,6 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            auto &s = activeState;
             auto &t = activeState.transportState;
 
             if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
@@ -81,7 +80,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         msg);
 }
 
-void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
+void SequencerStateManager::applyPlayMessage(const bool fromStart) const noexcept
 {
     const auto transport = sequencer->getTransport();
 

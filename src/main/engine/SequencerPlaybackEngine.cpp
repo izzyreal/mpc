@@ -500,6 +500,8 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
+    sequencer->getStateManager()->drainQueue();
+
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = getSampleRate();
 
