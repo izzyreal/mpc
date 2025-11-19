@@ -181,11 +181,11 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                     }
                 }
 
-                for (int npi = 0; npi < 64; ++npi)
+                for (int drumNote = MinDrumNoteNumber; drumNote <= MaxDrumNoteNumber; ++drumNote)
                 {
                     performance::AddProgramSound payload{
                         ProgramIndex(programIndex),
-                        DrumNoteNumber(npi + MinDrumNoteNumber), localTable,
+                        DrumNoteNumber(drumNote), localTable,
                         convertedTable};
                     mpc.performanceManager->enqueue(
                         performance::PerformanceMessage{std::move(payload)});
