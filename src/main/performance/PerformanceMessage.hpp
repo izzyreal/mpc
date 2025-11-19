@@ -152,7 +152,8 @@ namespace mpc::performance
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramsBulk, UpdateProgramMidiProgramChange, SetProgramUsed>;
+        UpdateProgramBulk, UpdateProgramsBulk, UpdateProgramMidiProgramChange,
+        SetProgramUsed>;
 
     struct PerformanceMessage
     {

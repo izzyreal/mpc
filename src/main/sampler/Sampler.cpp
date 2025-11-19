@@ -1092,7 +1092,8 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        const auto copy = src->getNoteParameters(i + MinDrumNoteNumber)->clone(i);
+        const auto copy =
+            src->getNoteParameters(i + MinDrumNoteNumber)->clone(i);
         dest->setNoteParameters(i, copy);
 
         const auto mc1 = dest->getIndivFxMixerChannel(i);

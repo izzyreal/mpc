@@ -243,7 +243,8 @@ void SaveScreen::turnWheel(const int i)
             {
                 unsigned char counter = 0;
 
-                for (int idx = programIndex; i < 0 ? idx >= 0 : idx < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
+                for (int idx = programIndex;
+                     i < 0 ? idx >= 0 : idx < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
                      i < 0 ? idx-- : idx++)
                 {
                     if (sampler->getProgram(idx)->isUsed())
