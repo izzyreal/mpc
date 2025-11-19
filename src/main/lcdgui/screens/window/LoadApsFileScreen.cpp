@@ -31,7 +31,9 @@ void LoadApsFileScreen::function(const int i)
                     });
             };
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-            mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
+            constexpr bool headless = false;
+            mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success,
+                                    headless);
             break;
         }
         default:;

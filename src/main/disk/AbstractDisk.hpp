@@ -155,8 +155,8 @@ namespace mpc::disk
                          std::shared_ptr<file::sndreader::SndReader>)>);
         sequence_or_error readMid2(std::shared_ptr<MpcFile>);
 
-        void readAps2(std::shared_ptr<MpcFile>,
-                      std::function<void()> onSuccess);
+        void readAps2(std::shared_ptr<MpcFile>, std::function<void()> onSuccess,
+                      bool headless);
         void readAll2(std::shared_ptr<MpcFile>,
                       std::function<void()> onSuccess);
         sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);

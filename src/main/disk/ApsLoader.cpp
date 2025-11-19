@@ -36,7 +36,8 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::aps;
 
-void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
+void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
+                     bool headless)
 {
     if (!file->exists())
     {
@@ -62,7 +63,7 @@ void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
     }
 
     constexpr auto withoutSounds = false;
-    loadFromParsedAps(apsParser, mpc, withoutSounds);
+    loadFromParsedAps(apsParser, mpc, withoutSounds, headless);
 
     mpc.getSampler()->setSoundIndex(0);
 }

@@ -677,19 +677,19 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
 }
 
 void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f,
-                            std::function<void()> onSuccess)
+                            std::function<void()> onSuccess, bool headless)
 {
     if (readApsThread.joinable())
     {
         readApsThread.join();
     }
     readApsThread = std::thread(
-        [this, f, onSuccess]
+        [this, f, onSuccess, headless]
         {
             const std::function<tl::expected<bool, mpc_io_error_msg>()>
-                readFunc = [this, f, onSuccess]
+                readFunc = [this, f, onSuccess, headless]
             {
-                ApsLoader::load(mpc, f);
+                ApsLoader::load(mpc, f, headless);
                 onSuccess();
                 return true;
             };

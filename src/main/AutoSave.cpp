@@ -1,9 +1,8 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
-#include "engine/EngineHost.hpp"
+
 #include "controller/ClientEventController.hpp"
-#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "mpc_fs.hpp"
 
@@ -145,7 +144,14 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             if (f == "APS.APS")
             {
                 ApsParser apsParser(data);
-                disk::ApsLoader::loadFromParsedAps(apsParser, mpc, true, true);
+                constexpr bool withoutSounds = true;
+                // Regardless of whether the outer context is headless, we want
+                // the ApsLoader to always operate in headless mode so it
+                // doesn't spawn popups. We manage popups ourselves here in
+                // AutoSave.
+                constexpr bool apsLoadingHeadless = true;
+                disk::ApsLoader::loadFromParsedAps(
+                    apsParser, mpc, withoutSounds, apsLoadingHeadless);
             }
             else if (f == "ALL.ALL")
             {
