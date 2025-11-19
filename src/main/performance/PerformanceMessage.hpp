@@ -83,13 +83,6 @@ namespace mpc::performance
         MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
-    struct UpdateProgramName
-    {
-        ProgramIndex programIndex;
-        std::string name;
-
-        MPC_NON_COPYABLE(UpdateProgramName)
-    };
     struct UpdateProgramMidiProgramChange
     {
         ProgramIndex programIndex;
@@ -145,7 +138,7 @@ namespace mpc::performance
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramMidiProgramChange, UpdateProgramName>;
+        UpdateProgramBulk, UpdateProgramMidiProgramChange>;
 
     struct PerformanceMessage
     {
