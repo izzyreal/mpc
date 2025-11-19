@@ -70,17 +70,11 @@ void LayeredScreen::postToUiThread(const std::function<void()> &fn)
 bool LayeredScreen::isPreviousScreen(
     const std::initializer_list<ScreenId> ids) const
 {
-    if (history.size() < 2)
-    {
-        return false;
-    }
-
-    const auto &prev = history[history.size() - 2];
-    const auto id = getScreenId(prev);
+    auto screenId = previousScreenId.load();
 
     for (const auto candidate : ids)
     {
-        if (id == candidate)
+        if (screenId == candidate)
         {
             return true;
         }
@@ -92,17 +86,11 @@ bool LayeredScreen::isPreviousScreen(
 bool LayeredScreen::isPreviousScreenNot(
     const std::initializer_list<ScreenId> ids) const
 {
-    if (history.size() < 2)
-    {
-        return true;
-    }
-
-    const auto &prev = history[history.size() - 2];
-    const auto id = getScreenId(prev);
+    auto screenId = previousScreenId.load();
 
     for (const auto candidate : ids)
     {
-        if (id == candidate)
+        if (screenId == candidate)
         {
             return false;
         }
@@ -114,22 +102,11 @@ bool LayeredScreen::isPreviousScreenNot(
 bool LayeredScreen::isCurrentScreen(
     const std::initializer_list<ScreenId> ids) const
 {
-    if (history.empty())
-    {
-        return false;
-    }
-
-    const auto &curr = history.back();
-    if (!curr)
-    {
-        return false;
-    }
-
-    const auto id = getScreenId(curr);
-
+    auto screenId = currentScreenId.load();
+    
     for (const auto candidate : ids)
     {
-        if (id == candidate)
+        if (screenId == candidate)
         {
             return true;
         }
@@ -140,14 +117,8 @@ bool LayeredScreen::isCurrentScreen(
 
 bool LayeredScreen::isCurrentScreenPopupFor(const ScreenId targetId) const
 {
-    if (currentScreenId == ScreenId::NoScreenId ||
-        previousScreenId == ScreenId::NoScreenId)
-    {
-        return false;
-    }
-
-    return currentScreenId == ScreenId::PopupScreen &&
-           previousScreenId == targetId;
+    return currentScreenId.load() == ScreenId::PopupScreen &&
+           previousScreenId.load() == targetId;
 }
 
 ScreenId
@@ -239,7 +210,7 @@ void LayeredScreen::openScreen(const std::string &screenName)
 
 void LayeredScreen::openScreenById(const ScreenId id)
 {
-    if (!history.empty() && history.back() && getScreenId(history.back()) == id)
+    if (currentScreenId.load() == id)
     {
         return;
     }
@@ -518,7 +489,7 @@ ScreenId LayeredScreen::getCurrentScreenId() const
 
 std::string LayeredScreen::getCurrentScreenName() const
 {
-    if (history.empty())
+    if (currentScreenId.load() == ScreenId::NoScreenId)
     {
         return "";
     }
