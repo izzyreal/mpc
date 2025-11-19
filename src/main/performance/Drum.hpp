@@ -193,7 +193,7 @@ namespace mpc::performance
             }
 
             slider = Slider();
-            midiProgramChange = 0;
+            midiProgramChange = 1;
         }
     };
 

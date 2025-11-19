@@ -14,10 +14,11 @@ using namespace mpc::sampler;
 using namespace mpc::engine;
 
 Program::Program(
-    Mpc &mpc, Sampler *samplerToUse,
+    Mpc &mpc, Sampler *const samplerToUse,
     const std::function<performance::Program()> &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : sampler(samplerToUse), getSnapshot(getSnapshot), dispatch(dispatch)
+    : slider(new PgmSlider()), sampler(samplerToUse), getSnapshot(getSnapshot),
+      dispatch(dispatch)
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
@@ -41,13 +42,6 @@ Program::Program(
         auto p = new Pad(mpc, ProgramPadIndex(i));
         pads.push_back(p);
     }
-
-    slider = new PgmSlider();
-}
-
-void Program::init()
-{
-    midiProgramChange = 1;
 }
 
 int Program::getNumberOfSamples() const
@@ -150,12 +144,16 @@ void Program::setNoteParameters(const int noteParametersIndex,
 
 int Program::getMidiProgramChange() const
 {
-    return midiProgramChange;
+    return getSnapshot().midiProgramChange;
 }
 
-void Program::setMidiProgramChange(const int i)
+void Program::setMidiProgramChange(const int i) const
 {
-    midiProgramChange = std::clamp(i, 1, 128);
+    performance::PerformanceMessage msg;
+    performance::UpdateProgramMidiProgramChange payload{index,
+                                                        std::clamp(i, 1, 128)};
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
 void Program::initPadAssign() const

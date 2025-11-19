@@ -3,6 +3,8 @@
 #include "performance/EventTypes.hpp"
 #include "performance/Drum.hpp"
 
+#include "MpcMacros.hpp"
+
 #include <functional>
 #include <variant>
 
@@ -16,6 +18,7 @@ namespace mpc::performance
     struct DeleteSoundAndReindex
     {
         int deletedIndex;
+        MPC_NON_COPYABLE(DeleteSoundAndReindex)
     };
 
     struct AddProgramSound
@@ -24,6 +27,8 @@ namespace mpc::performance
         DrumNoteNumber drumNoteNumber;
         std::vector<std::pair<int, std::string>> localTable;
         std::vector<std::pair<int, std::string>> convertedTable;
+
+        MPC_NON_COPYABLE(AddProgramSound)
     };
 
     struct UpdateDrumProgram
@@ -33,11 +38,7 @@ namespace mpc::performance
 
         UpdateDrumProgram() = default;
 
-        UpdateDrumProgram(const UpdateDrumProgram &) = delete;
-        UpdateDrumProgram &operator=(const UpdateDrumProgram &) = delete;
-
-        UpdateDrumProgram(UpdateDrumProgram &&) noexcept = default;
-        UpdateDrumProgram &operator=(UpdateDrumProgram &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateDrumProgram)
     };
 
     struct UpdateNoteParameters
@@ -58,43 +59,44 @@ namespace mpc::performance
 
         UpdateNoteParameters() = default;
 
-        UpdateNoteParameters(const UpdateNoteParameters &) = delete;
-        UpdateNoteParameters &operator=(const UpdateNoteParameters &) = delete;
-
-        UpdateNoteParameters(UpdateNoteParameters &&) noexcept = default;
-        UpdateNoteParameters &
-        operator=(UpdateNoteParameters &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateNoteParameters)
     };
 
-    struct UpdateNoteParametersBulk {
+    struct UpdateNoteParametersBulk
+    {
         ProgramIndex programIndex{};
         DrumNoteNumber drumNoteNumber{};
         NoteParameters noteParameters{};
 
         UpdateNoteParametersBulk() = default;
 
-        UpdateNoteParametersBulk(const UpdateNoteParametersBulk &) = delete;
-        UpdateNoteParametersBulk &operator=(const UpdateNoteParametersBulk &) = delete;
-
-        UpdateNoteParametersBulk(UpdateNoteParametersBulk &&) noexcept = default;
-        UpdateNoteParametersBulk &
-        operator=(UpdateNoteParametersBulk &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateNoteParametersBulk)
     };
 
-    struct UpdateProgramBulk {
+    struct UpdateProgramBulk
+    {
         ProgramIndex programIndex{};
         Program program{};
 
         UpdateProgramBulk() = default;
 
-        UpdateProgramBulk(const UpdateProgramBulk &) = delete;
-        UpdateProgramBulk &operator=(const UpdateProgramBulk &) = delete;
-
-        UpdateProgramBulk(UpdateProgramBulk &&) noexcept = default;
-        UpdateProgramBulk &
-        operator=(UpdateProgramBulk &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
+    struct UpdateProgramName
+    {
+        ProgramIndex programIndex;
+        std::string name;
+
+        MPC_NON_COPYABLE(UpdateProgramName)
+    };
+    struct UpdateProgramMidiProgramChange
+    {
+        ProgramIndex programIndex;
+        int midiProgramChange;
+
+        MPC_NON_COPYABLE(UpdateProgramMidiProgramChange)
+    };
 
     struct UpdateStereoMixer
     {
@@ -109,11 +111,7 @@ namespace mpc::performance
 
         UpdateStereoMixer() = default;
 
-        UpdateStereoMixer(const UpdateStereoMixer &) = delete;
-        UpdateStereoMixer &operator=(const UpdateStereoMixer &) = delete;
-
-        UpdateStereoMixer(UpdateStereoMixer &&) noexcept = default;
-        UpdateStereoMixer &operator=(UpdateStereoMixer &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateStereoMixer)
     };
 
     struct UpdateIndivFxMixer
@@ -137,23 +135,17 @@ namespace mpc::performance
 
         UpdateIndivFxMixer() = default;
 
-        UpdateIndivFxMixer(const UpdateIndivFxMixer &) = delete;
-        UpdateIndivFxMixer &operator=(const UpdateIndivFxMixer &) = delete;
-
-        UpdateIndivFxMixer(UpdateIndivFxMixer &&) noexcept = default;
-        UpdateIndivFxMixer &operator=(UpdateIndivFxMixer &&) noexcept = default;
+        MPC_NON_COPYABLE(UpdateIndivFxMixer)
     };
 
-    using PerformanceMessagePayload =
-        std::variant<std::monostate, PhysicalPadPressEvent,
-                     PhysicalPadAftertouchEvent, PhysicalPadReleaseEvent,
-                     ProgramPadPressEvent, ProgramPadAftertouchEvent,
-                     ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
-                     NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
-                     UpdateIndivFxMixer, UpdateStereoMixer,
-                     DeleteSoundAndReindex, AddProgramSound,
-                     UpdateNoteParametersBulk,
-                     UpdateProgramBulk>;
+    using PerformanceMessagePayload = std::variant<
+        std::monostate, PhysicalPadPressEvent, PhysicalPadAftertouchEvent,
+        PhysicalPadReleaseEvent, ProgramPadPressEvent,
+        ProgramPadAftertouchEvent, ProgramPadReleaseEvent, NoteOnEvent,
+        NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
+        UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
+        DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
+        UpdateProgramBulk, UpdateProgramMidiProgramChange, UpdateProgramName>;
 
     struct PerformanceMessage
     {
@@ -162,11 +154,9 @@ namespace mpc::performance
         std::function<void(void *)> action = [](void *) {};
 
         PerformanceMessage() = default;
+        explicit PerformanceMessage(PerformanceMessagePayload && payload)
+            : payload{std::move(payload)} {}
 
-        PerformanceMessage(const PerformanceMessage &) = delete;
-        PerformanceMessage &operator=(const PerformanceMessage &) = delete;
-
-        PerformanceMessage(PerformanceMessage &&) noexcept = default;
-        PerformanceMessage &operator=(PerformanceMessage &&) noexcept = default;
+        MPC_NON_COPYABLE(PerformanceMessage)
     };
 } // namespace mpc::performance

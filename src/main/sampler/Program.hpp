@@ -44,17 +44,16 @@ namespace mpc::sampler
         void setIndex(ProgramIndex);
 
     private:
+        std::string name;
         ProgramIndex index;
+        PgmSlider *const slider;
         Sampler *const sampler;
+
         const std::function<performance::Program()> getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;
-        std::string name;
+
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;
-        PgmSlider *slider = nullptr;
-        int midiProgramChange = 0;
-
-        void init();
 
     public:
         int getNumberOfSamples() const;
@@ -76,7 +75,7 @@ namespace mpc::sampler
 
         int getMidiProgramChange() const;
 
-        void setMidiProgramChange(int i);
+        void setMidiProgramChange(int i) const;
 
         void initPadAssign() const;
 

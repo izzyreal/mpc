@@ -188,7 +188,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                         DrumNoteNumber(npi + MinDrumNoteNumber), localTable,
                         convertedTable};
                     mpc.performanceManager->enqueue(
-                        performance::PerformanceMessage{payload});
+                        performance::PerformanceMessage{std::move(payload)});
                 }
 
                 auto ls = mpc.getLayeredScreen();

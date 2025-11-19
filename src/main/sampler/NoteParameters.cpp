@@ -70,18 +70,17 @@ int NoteParameters::getSoundGenerationMode() const
 
 void NoteParameters::setSoundIndex(const int i) const
 {
-    auto programIndex = getProgramIndex();
+    const auto programIndex = getProgramIndex();
     if (programIndex == 0 && index == 0 && i == -1)
     {
         return;
     }
-    performance::PerformanceMessage msg;
+
     performance::UpdateNoteParameters payload{
         programIndex, DrumNoteNumber(index + MinDrumNoteNumber)};
     payload.int16_tMemberToUpdate = &performance::NoteParameters::soundIndex;
     payload.int16_tValue = std::clamp(i, -1, 256);
-    msg.payload = std::move(payload);
-    dispatch(std::move(msg));
+    dispatch(performance::PerformanceMessage(std::move(payload)));
 }
 
 int NoteParameters::getVelocityRangeLower() const
@@ -199,7 +198,8 @@ std::shared_ptr<mpc::engine::StereoMixer> NoteParameters::getStereoMixer() const
     return stereoMixer;
 }
 
-std::shared_ptr<mpc::engine::IndivFxMixer> NoteParameters::getIndivFxMixer() const
+std::shared_ptr<mpc::engine::IndivFxMixer>
+NoteParameters::getIndivFxMixer() const
 {
     return indivFxMixer;
 }
