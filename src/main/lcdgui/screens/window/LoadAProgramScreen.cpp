@@ -55,8 +55,10 @@ void LoadAProgramScreen::function(const int i)
             const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
 
-            for (int pi = 0; pi < 24; pi++) {
-                if (sampler->getProgram(pi) == newProgram) {
+            for (int pi = 0; pi < 24; pi++)
+            {
+                if (sampler->getProgram(pi) == newProgram)
+                {
                     mpc.getDisk()->readPgm2(selectedFile, newProgram, pi);
                     break;
                 }

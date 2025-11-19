@@ -208,20 +208,29 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             if constexpr (std::is_same_v<T, DeleteSoundAndReindex>)
             {
                 const int idx = payload.deletedIndex;
-                for (auto& program : activeState.programs) {
-                    for (auto& np : program.noteParameters) {
+                for (auto &program : activeState.programs)
+                {
+                    for (auto &np : program.noteParameters)
+                    {
 
                         if (np.soundIndex == idx)
+                        {
                             np.soundIndex = -1;
+                        }
                         else if (np.soundIndex > idx)
+                        {
                             np.soundIndex--;
+                        }
                     }
                 }
             }
-            else if constexpr (std::is_same_v<T, AddProgramSound>) {
+            else if constexpr (std::is_same_v<T, AddProgramSound>)
+            {
                 auto p = payload.programIndex;
                 auto n = payload.drumNoteNumber;
-                auto &srcNoteParams = activeState.programs[p].noteParameters[n.get() - MinDrumNoteNumber.get()];
+                auto &srcNoteParams =
+                    activeState.programs[p]
+                        .noteParameters[n.get() - MinDrumNoteNumber.get()];
                 auto localSoundIndex = srcNoteParams.soundIndex;
 
                 std::string localSoundName;

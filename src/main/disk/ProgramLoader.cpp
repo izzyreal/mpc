@@ -70,7 +70,8 @@ findSoundFileByFilenameWithoutExtension(const mpc::Mpc &mpc,
 
 program_or_error
 ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
-                           const std::shared_ptr<Program> &program, int programIndex)
+                           const std::shared_ptr<Program> &program,
+                           int programIndex)
 {
     const auto cantFindFileScreen =
         mpc.screens->get<ScreenId::CantFindFileScreen>();
@@ -182,8 +183,12 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
 
                 for (int npi = 0; npi < 64; ++npi)
                 {
-                    performance::AddProgramSound payload{ProgramIndex(programIndex), DrumNoteNumber(npi + MinDrumNoteNumber), localTable, convertedTable};
-                    mpc.performanceManager->enqueue(performance::PerformanceMessage{payload});
+                    performance::AddProgramSound payload{
+                        ProgramIndex(programIndex),
+                        DrumNoteNumber(npi + MinDrumNoteNumber), localTable,
+                        convertedTable};
+                    mpc.performanceManager->enqueue(
+                        performance::PerformanceMessage{payload});
                 }
 
                 auto ls = mpc.getLayeredScreen();

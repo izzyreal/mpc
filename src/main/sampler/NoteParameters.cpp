@@ -71,7 +71,10 @@ int NoteParameters::getSoundGenerationMode() const
 void NoteParameters::setSoundIndex(const int i) const
 {
     auto programIndex = getProgramIndex();
-    if (programIndex == 0 && index == 0 && i == -1) return;
+    if (programIndex == 0 && index == 0 && i == -1)
+    {
+        return;
+    }
     performance::PerformanceMessage msg;
     performance::UpdateNoteParameters payload{
         programIndex, DrumNoteNumber(index + MinDrumNoteNumber)};

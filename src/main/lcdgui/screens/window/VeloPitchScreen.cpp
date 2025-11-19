@@ -11,16 +11,21 @@
 using namespace mpc::lcdgui::screens::window;
 
 VeloPitchScreen::VeloPitchScreen(Mpc &mpc, const int layerIndex)
-    : ScreenComponent(mpc, "velo-pitch", layerIndex) {
-    addReactiveBinding({
-        [this] {
-            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
-            return controller->getMostRecentPhysicalPadPressTime();
-        }, [this](auto) mutable {
-            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
-            setVelo(controller->getMostRecentPhysicalPadPressVelocity());
-        }
-    });
+    : ScreenComponent(mpc, "velo-pitch", layerIndex)
+{
+    addReactiveBinding(
+        {[this]
+         {
+             const auto controller =
+                 this->mpc.clientEventController->clientHardwareEventController;
+             return controller->getMostRecentPhysicalPadPressTime();
+         },
+         [this](auto) mutable
+         {
+             const auto controller =
+                 this->mpc.clientEventController->clientHardwareEventController;
+             setVelo(controller->getMostRecentPhysicalPadPressVelocity());
+         }});
 }
 
 void VeloPitchScreen::open()
@@ -82,7 +87,8 @@ void VeloPitchScreen::turnWheel(const int i)
     const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
-    if (const auto focusedFieldName = getFocusedFieldNameOrThrow(); focusedFieldName == "tune")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "tune")
     {
         selectedNoteParameters->setTune(selectedNoteParameters->getTune() + i);
     }

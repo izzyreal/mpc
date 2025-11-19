@@ -62,12 +62,14 @@ bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
            mpc.getHardware()->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 }
 
-mpc::TimeInMilliseconds ClientHardwareEventController::getMostRecentPhysicalPadPressTime() const
+mpc::TimeInMilliseconds
+ClientHardwareEventController::getMostRecentPhysicalPadPressTime() const
 {
     return mostRecentPhysicalPadPressTimeMs.load();
 }
 
-mpc::Velocity ClientHardwareEventController::getMostRecentPhysicalPadPressVelocity() const
+mpc::Velocity
+ClientHardwareEventController::getMostRecentPhysicalPadPressVelocity() const
 {
     return mostRecentPhysicalPadPressVelocity.load();
 }
@@ -127,7 +129,8 @@ void ClientHardwareEventController::handleClientHardwareEvent(
     }
 }
 
-void ClientHardwareEventController::updateMostRecentPhysicalPadPressVelocity(const Velocity newVelocity)
+void ClientHardwareEventController::updateMostRecentPhysicalPadPressVelocity(
+    const Velocity newVelocity)
 {
     if (newVelocity <= 0)
     {

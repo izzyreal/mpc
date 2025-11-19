@@ -656,8 +656,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 }
 
 void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
-                            std::shared_ptr<Program> p,
-                            int programIndex)
+                            std::shared_ptr<Program> p, int programIndex)
 {
     if (readPgmThread.joinable())
     {

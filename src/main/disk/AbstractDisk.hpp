@@ -117,8 +117,7 @@ namespace mpc::disk
         virtual void initRoot() = 0;
 
         void readPgm2(std::shared_ptr<MpcFile>,
-                      std::shared_ptr<sampler::Program>,
-                      int programIndex);
+                      std::shared_ptr<sampler::Program>, int programIndex);
 
     private:
         std::thread programSoundsSaveThread = std::thread([] {});

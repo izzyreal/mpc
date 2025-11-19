@@ -72,8 +72,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const auto restoreAction =
-        [&mpc, availableFiles, saveTarget, headless]
+    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless]
     {
         auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;

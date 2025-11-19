@@ -12,15 +12,19 @@ VeloEnvFilterScreen::VeloEnvFilterScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
     addChildT<EnvGraph>(mpc);
-    addReactiveBinding({
-        [this] {
-            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
-            return controller->getMostRecentPhysicalPadPressTime();
-        }, [this](auto) mutable {
-            const auto controller = this->mpc.clientEventController->clientHardwareEventController;
-            setVelo(controller->getMostRecentPhysicalPadPressVelocity());
-        }
-    });
+    addReactiveBinding(
+        {[this]
+         {
+             const auto controller =
+                 this->mpc.clientEventController->clientHardwareEventController;
+             return controller->getMostRecentPhysicalPadPressTime();
+         },
+         [this](auto) mutable
+         {
+             const auto controller =
+                 this->mpc.clientEventController->clientHardwareEventController;
+             setVelo(controller->getMostRecentPhysicalPadPressVelocity());
+         }});
 }
 
 void VeloEnvFilterScreen::open()

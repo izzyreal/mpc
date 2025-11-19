@@ -943,7 +943,8 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
         return;
     }
 
-    mpc.performanceManager->enqueue(performance::PerformanceMessage{performance::DeleteSoundAndReindex{index}});
+    mpc.performanceManager->enqueue(performance::PerformanceMessage{
+        performance::DeleteSoundAndReindex{index}});
 
     sounds.erase(sounds.begin() + index);
 

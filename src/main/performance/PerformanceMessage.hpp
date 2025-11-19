@@ -6,17 +6,20 @@
 #include <functional>
 #include <variant>
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class NoteParameters;
 }
 
 namespace mpc::performance
 {
-    struct DeleteSoundAndReindex {
+    struct DeleteSoundAndReindex
+    {
         int deletedIndex;
     };
 
-    struct AddProgramSound {
+    struct AddProgramSound
+    {
         ProgramIndex programIndex;
         DrumNoteNumber drumNoteNumber;
         std::vector<std::pair<int, std::string>> localTable;
@@ -117,7 +120,8 @@ namespace mpc::performance
                      ProgramPadPressEvent, ProgramPadAftertouchEvent,
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
                      NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
-                     UpdateIndivFxMixer, UpdateStereoMixer, DeleteSoundAndReindex, AddProgramSound>;
+                     UpdateIndivFxMixer, UpdateStereoMixer,
+                     DeleteSoundAndReindex, AddProgramSound>;
 
     struct PerformanceMessage
     {
