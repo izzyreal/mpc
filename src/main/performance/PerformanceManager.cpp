@@ -205,7 +205,15 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         [&](auto &&payload)
         {
             using T = std::decay_t<decltype(payload)>;
-            if constexpr (std::is_same_v<T, DeleteSoundAndReindex>)
+            if constexpr (std::is_same_v<T, UpdateProgramBulk>) {
+                activeState.programs[payload.programIndex] = payload.program;
+            }
+            else if constexpr (std::is_same_v<T, UpdateNoteParametersBulk>) {
+                const int noteParametersIdx = payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                activeState.programs[payload.programIndex].noteParameters[noteParametersIdx] =
+                    payload.noteParameters;
+            }
+            else if constexpr (std::is_same_v<T, DeleteSoundAndReindex>)
             {
                 const int idx = payload.deletedIndex;
                 for (auto &program : activeState.programs)

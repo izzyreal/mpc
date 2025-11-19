@@ -11,6 +11,53 @@ using namespace mpc;
 
 namespace mpc::performance
 {
+    NoteParameters mapSamplerNoteParametersToPerformanceNoteParameters(const sampler::NoteParameters *s)
+    {
+        NoteParameters result;
+        mapSamplerNoteParametersToPerformanceNoteParameters(s, result);
+        return result;
+    }
+
+    void mapSamplerNoteParametersToPerformanceNoteParameters(
+        const sampler::NoteParameters *s,
+        NoteParameters &p)
+    {
+        p.noteNumber = s->getNumber();
+        p.soundIndex = s->getSoundIndex();
+        p.voiceOverlapMode = s->getVoiceOverlapMode();
+        p.muteAssignA = s->getMuteAssignA();
+        p.muteAssignB = s->getMuteAssignB();
+        p.tune = s->getTune();
+        p.attack = s->getAttack();
+        p.decay = s->getDecay();
+        p.decayMode = s->getDecayMode();
+        p.filterFrequency = s->getFilterFrequency();
+        p.filterResonance = s->getFilterResonance();
+        p.filterEnvelopeAmount = s->getFilterEnvelopeAmount();
+        p.filterEnvelopeAmount = s->getFilterAttack();
+        p.filterDecay = s->getFilterDecay();
+        p.velocityRangeLower = s->getVelocityRangeLower();
+        p.velocityRangeUpper = s->getVelocityRangeUpper();
+        p.velocityToFilterFrequency = s->getVelocityToFilterFrequency();
+        p.velocityToAttack = s->getVelocityToAttack();
+        p.velocityToLevel = s->getVeloToLevel();
+        p.velocityToPitch = s->getVelocityToPitch();
+        p.velocityToStart = s->getVelocityToStart();
+        p.optionalNoteA = s->getOptionalNoteA();
+        p.optionalNoteB = s->getOptionalNoteB();
+        p.sliderParameterNumber = s->getSliderParameterNumber();
+        p.soundGenerationMode = s->getSoundGenerationMode();
+
+        p.stereoMixer.level = s->getStereoMixer()->getLevel();
+        p.stereoMixer.panning = s->getStereoMixer()->getPanning();
+
+        p.indivFxMixer.followStereo = s->getIndivFxMixer()->isFollowingStereo();
+        p.indivFxMixer.individualOutput = s->getIndivFxMixer()->getOutput();
+        p.indivFxMixer.individualOutLevel = s->getIndivFxMixer()->getVolumeIndividualOut();
+        p.indivFxMixer.fxPath = s->getIndivFxMixer()->getFxPath();
+        p.indivFxMixer.fxSendLevel = s->getIndivFxMixer()->getFxSendLevel();
+    }
+
     void mapSamplerProgramToPerformanceProgram(
         const sampler::Program &samplerProgram, Program &dst)
     {

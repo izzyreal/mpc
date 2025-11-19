@@ -126,9 +126,9 @@ namespace mpc::sampler
 
         VoiceOverlapMode getVoiceOverlapMode() const;
 
-        std::shared_ptr<engine::StereoMixer> getStereoMixer();
+        std::shared_ptr<engine::StereoMixer> getStereoMixer() const;
 
-        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixer();
+        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixer() const;
 
     private:
         const int index;

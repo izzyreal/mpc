@@ -194,12 +194,12 @@ int NoteParameters::getVelocityToPitch() const
     return getSnapshot().velocityToPitch;
 }
 
-std::shared_ptr<mpc::engine::StereoMixer> NoteParameters::getStereoMixer()
+std::shared_ptr<mpc::engine::StereoMixer> NoteParameters::getStereoMixer() const
 {
     return stereoMixer;
 }
 
-std::shared_ptr<mpc::engine::IndivFxMixer> NoteParameters::getIndivFxMixer()
+std::shared_ptr<mpc::engine::IndivFxMixer> NoteParameters::getIndivFxMixer() const
 {
     return indivFxMixer;
 }

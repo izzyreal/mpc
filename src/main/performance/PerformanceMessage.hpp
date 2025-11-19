@@ -66,6 +66,36 @@ namespace mpc::performance
         operator=(UpdateNoteParameters &&) noexcept = default;
     };
 
+    struct UpdateNoteParametersBulk {
+        ProgramIndex programIndex{};
+        DrumNoteNumber drumNoteNumber{};
+        NoteParameters noteParameters{};
+
+        UpdateNoteParametersBulk() = default;
+
+        UpdateNoteParametersBulk(const UpdateNoteParametersBulk &) = delete;
+        UpdateNoteParametersBulk &operator=(const UpdateNoteParametersBulk &) = delete;
+
+        UpdateNoteParametersBulk(UpdateNoteParametersBulk &&) noexcept = default;
+        UpdateNoteParametersBulk &
+        operator=(UpdateNoteParametersBulk &&) noexcept = default;
+    };
+
+    struct UpdateProgramBulk {
+        ProgramIndex programIndex{};
+        Program program{};
+
+        UpdateProgramBulk() = default;
+
+        UpdateProgramBulk(const UpdateProgramBulk &) = delete;
+        UpdateProgramBulk &operator=(const UpdateProgramBulk &) = delete;
+
+        UpdateProgramBulk(UpdateProgramBulk &&) noexcept = default;
+        UpdateProgramBulk &
+        operator=(UpdateProgramBulk &&) noexcept = default;
+    };
+
+
     struct UpdateStereoMixer
     {
         DrumBusIndex drumBusIndex{};
@@ -121,7 +151,9 @@ namespace mpc::performance
                      ProgramPadReleaseEvent, NoteOnEvent, NoteAftertouchEvent,
                      NoteOffEvent, UpdateDrumProgram, UpdateNoteParameters,
                      UpdateIndivFxMixer, UpdateStereoMixer,
-                     DeleteSoundAndReindex, AddProgramSound>;
+                     DeleteSoundAndReindex, AddProgramSound,
+                     UpdateNoteParametersBulk,
+                     UpdateProgramBulk>;
 
     struct PerformanceMessage
     {
