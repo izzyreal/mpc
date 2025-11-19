@@ -95,6 +95,8 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
         mpc.getSampler()->deleteAllSamples();
     }
 
+    mpc.getEngineHost()->applyPendingStateChanges();
+
     disk->moveBack();
     disk->initFiles();
     disk->moveForward("program2");
