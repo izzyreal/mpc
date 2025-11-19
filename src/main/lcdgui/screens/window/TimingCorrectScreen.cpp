@@ -110,7 +110,7 @@ void TimingCorrectScreen::turnWheel(int i)
 
     if (focusedFieldName == "notevalue")
     {
-        setNoteValue(noteValue + i);
+        setNoteValue(noteValue.load() + i);
     }
     else if (focusedFieldName == "swing")
     {
@@ -131,12 +131,13 @@ void TimingCorrectScreen::turnWheel(int i)
 
 void TimingCorrectScreen::displayNoteValue()
 {
-    findChild<FunctionKey>("fk4")->Hide(noteValue == 0);
+    auto currentNoteValue = noteValue.load();
+    findChild<FunctionKey>("fk4")->Hide(currentNoteValue == 0);
     SetDirty();
 
-    findField("notevalue")->setText(noteValueNames[noteValue]);
-    findLabel("swing")->Hide(!(noteValue == 1 || noteValue == 3));
-    findField("swing")->Hide(!(noteValue == 1 || noteValue == 3));
+    findField("notevalue")->setText(noteValueNames[currentNoteValue]);
+    findLabel("swing")->Hide(!(currentNoteValue == 1 || currentNoteValue == 3));
+    findField("swing")->Hide(!(currentNoteValue == 1 || currentNoteValue == 3));
 }
 
 void TimingCorrectScreen::displaySwing() const
@@ -212,7 +213,7 @@ void TimingCorrectScreen::setAmount(int i)
 {
     int maxVal = 0;
 
-    switch (noteValue)
+    switch (noteValue.load())
     {
         case 0:
             maxVal = 0;
@@ -263,17 +264,17 @@ void TimingCorrectScreen::setSwing(int i)
 
 unsigned char TimingCorrectScreen::getNoteValueLengthInTicks() const
 {
-    return noteValueLengthsInTicks[noteValue];
+    return noteValueLengthsInTicks[noteValue.load()];
 }
 
 int TimingCorrectScreen::getNoteValue() const
 {
-    return noteValue;
+    return noteValue.load();
 }
 
 void TimingCorrectScreen::setNoteValue(int i)
 {
-    noteValue = std::clamp(i, 0, 6);
+    noteValue.store(std::clamp(i, 0, 6));
     setAmount(amount); // reclamp to new bounds
     displayNoteValue();
 }

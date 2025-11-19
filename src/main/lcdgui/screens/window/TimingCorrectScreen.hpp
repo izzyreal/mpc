@@ -34,7 +34,7 @@ namespace mpc::lcdgui::screens::window
         bool shiftTimingLater = false;
         int swing = 50;
         int amount = 0;
-        int noteValue = 3;
+        std::atomic<int8_t> noteValue{3};
 
     public:
         unsigned char getNoteValueLengthInTicks() const;
