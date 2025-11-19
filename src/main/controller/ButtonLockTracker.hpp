@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <vector>
 
 #include "hardware/ComponentId.hpp"
 
@@ -8,37 +9,51 @@ namespace mpc::controller
 {
     class ButtonLockTracker
     {
-        std::unordered_map<hardware::ComponentId, bool> states;
+        std::unordered_map<hardware::ComponentId, std::atomic<bool>> states;
 
     public:
+        ButtonLockTracker()
+        {
+            initializeEntries({hardware::REC, hardware::OVERDUB,
+                               hardware::TAP_TEMPO_OR_NOTE_REPEAT});
+        }
+
         void lock(const hardware::ComponentId id)
         {
-            states[id] = true;
+            states.at(id).store(true);
         }
 
         bool isLocked(const hardware::ComponentId id) const noexcept
         {
-            if (auto it = states.find(id); it != states.end())
-            {
-                return it->second;
-            }
-            return false;
+            return states.at(id).load();
         }
 
         void unlock(const hardware::ComponentId id) noexcept
         {
-            states[id] = false;
+            states.at(id).store(false);
         }
 
         void toggle(const hardware::ComponentId id)
         {
-            if (isLocked(id))
+            auto &flag = states.at(id);
+            bool expected = flag.load(std::memory_order_relaxed);
+            for (;;)
             {
-                unlock(id);
+                if (const bool desired = !expected; flag.compare_exchange_weak(
+                        expected, desired, std::memory_order_acq_rel,
+                        std::memory_order_relaxed))
+                {
+                    return;
+                }
             }
-            else
+        }
+
+    private:
+        void initializeEntries(const std::vector<hardware::ComponentId> &&ids)
+        {
+            for (auto id : ids)
             {
-                lock(id);
+                states.emplace(id, false);
             }
         }
     };
