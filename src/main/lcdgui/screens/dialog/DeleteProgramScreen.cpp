@@ -40,14 +40,15 @@ void DeleteProgramScreen::function(const int i)
 
             openScreenById(ScreenId::ProgramScreen);
             break;
+        default:;
     }
 }
 
 void DeleteProgramScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "pgm")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "pgm")
     {
         setPgm(pgm + i);
     }

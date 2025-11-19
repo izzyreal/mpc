@@ -109,6 +109,8 @@ namespace mpc::lcdgui::screengroups
                std::dynamic_pointer_cast<LoopToFineScreen>(s) ||
                std::dynamic_pointer_cast<MuteAssignScreen>(s) ||
                std::dynamic_pointer_cast<ProgramScreen>(s) ||
+               std::dynamic_pointer_cast<DeleteProgramScreen>(s) ||
+               std::dynamic_pointer_cast<CopyProgramScreen>(s) ||
                std::dynamic_pointer_cast<StartFineScreen>(s) ||
                std::dynamic_pointer_cast<VeloEnvFilterScreen>(s) ||
                std::dynamic_pointer_cast<VeloPitchScreen>(s) ||

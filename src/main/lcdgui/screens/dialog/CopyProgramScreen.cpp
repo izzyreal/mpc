@@ -87,7 +87,7 @@ void CopyProgramScreen::displayPgm1() const
 {
     const auto program1 = sampler->getProgram(pgm1);
 
-    const auto programName = program1 ? program1->getName() : "(no program)";
+    const auto programName = program1->isUsed() ? program1->getName() : "(no program)";
     findField("pgm1")->setText(
         StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
 }
