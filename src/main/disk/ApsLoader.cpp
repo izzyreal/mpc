@@ -10,9 +10,6 @@
 #include "file/aps/ApsParser.hpp"
 #include "file/aps/ApsSlider.hpp"
 
-#include "sampler/NoteParameters.hpp"
-#include "sampler/PgmSlider.hpp"
-
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
@@ -26,7 +23,6 @@
 #include "engine/IndivFxMixer.hpp"
 #include "engine/StereoMixer.hpp"
 #include "performance/PerformanceManager.hpp"
-#include "performance/ProgramMapper.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -40,7 +36,7 @@ using namespace mpc::sampler;
 using namespace mpc::file::aps;
 
 void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
-                     bool headless)
+                     const bool headless)
 {
     if (!file->exists())
     {
@@ -150,6 +146,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         sampler->getProgram(apsProgram->index)->setName(apsProgram->getName());
 
         auto &perfProgram = perfPrograms[apsProgram->index];
+        perfProgram.used = true;
 
         auto assignTable = apsProgram->getAssignTable()->get();
 
