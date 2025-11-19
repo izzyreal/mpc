@@ -83,6 +83,8 @@ namespace mpc::performance
         MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
+    struct RepairProgramReferences{};
+
     struct UpdateProgramsBulk
     {
         std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs{};
@@ -153,7 +155,7 @@ namespace mpc::performance
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
         UpdateProgramBulk, UpdateProgramsBulk, UpdateProgramMidiProgramChange,
-        SetProgramUsed>;
+        SetProgramUsed, RepairProgramReferences>;
 
     struct PerformanceMessage
     {

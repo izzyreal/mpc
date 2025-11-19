@@ -239,5 +239,10 @@ namespace mpc::performance
             return indivFxMixers[drumNoteNumber.get() -
                                  MinDrumNoteNumber.get()];
         }
+
+        Drum()
+        {
+            programIndex = ProgramIndex{0};
+        }
     };
 } // namespace mpc::performance

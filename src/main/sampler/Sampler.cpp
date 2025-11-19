@@ -351,7 +351,7 @@ void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
         }
     }
 
-    repairProgramReferences();
+    mpc.performanceManager->enqueue(performance::PerformanceMessage(performance::RepairProgramReferences{}));
 }
 
 std::vector<std::shared_ptr<Sound>> &Sampler::getSounds()
@@ -430,45 +430,6 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
     if (createDefaultProgram)
     {
         createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
-    }
-}
-
-void Sampler::repairProgramReferences() const
-{
-    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
-         ++drumBusIndex)
-    {
-        const auto drumBus =
-            mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
-
-        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm]->isUsed())
-        {
-            for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0;
-                 programIndex--)
-            {
-                if (programs[programIndex]->isUsed())
-                {
-                    pgm = programIndex;
-                    break;
-                }
-            }
-
-            if (!programs[pgm]->isUsed())
-            {
-                for (int programIndex = 0;
-                     programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
-                     programIndex++)
-                {
-                    if (programs[programIndex]->isUsed())
-                    {
-                        pgm = programIndex;
-                        break;
-                    }
-                }
-            }
-
-            drumBus->setProgramIndex(ProgramIndex(pgm));
-        }
     }
 }
 

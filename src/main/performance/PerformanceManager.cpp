@@ -217,6 +217,24 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.programs[payload.programIndex].used = true;
             }
+            else if constexpr (std::is_same_v<T, RepairProgramReferences>)
+            {
+                for (int drumBusIndex = 0; drumBusIndex < 4; ++drumBusIndex)
+                {
+                    auto &drum = activeState.drums[drumBusIndex];
+                    if (auto &pgm1 = drum.programIndex;
+                        !activeState.programs[pgm1].used)
+                    {
+                        for (int pgm2 = 0; pgm2 < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++pgm2)
+                        {
+                            if (!activeState.programs[pgm2].used) continue;
+
+                            pgm1 = ProgramIndex(pgm2);
+                            break;
+                        }
+                    }
+                }
+            }
             else if constexpr (std::is_same_v<T,
                                               UpdateProgramMidiProgramChange>)
             {

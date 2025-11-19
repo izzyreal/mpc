@@ -50,7 +50,7 @@ namespace mpc::sequencer
         DrumBusIndex getIndex() const;
 
         ProgramIndex getProgramIndex() const;
-        void setProgramIndex(ProgramIndex);
+        void setProgramIndex(ProgramIndex) const;
 
         performance::Program getPerformanceProgram() const;
         performance::StereoMixer
@@ -79,7 +79,6 @@ namespace mpc::sequencer
         const DrumBusIndex drumIndex;
         const std::shared_ptr<performance::PerformanceManager>
             performanceManager;
-        ProgramIndex programIndex{0};
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;
         std::vector<std::shared_ptr<engine::IndivFxMixer>> indivFxMixerChannels;

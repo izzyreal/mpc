@@ -84,15 +84,14 @@ DrumBusIndex DrumBus::getIndex() const
     return drumIndex;
 }
 
-void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse)
+void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse) const
 {
-    programIndex = programIndexToUse;
-    performanceManager->registerUpdateDrumProgram(drumIndex, programIndex);
+    performanceManager->registerUpdateDrumProgram(drumIndex, programIndexToUse);
 }
 
 ProgramIndex DrumBus::getProgramIndex() const
 {
-    return programIndex;
+    return performanceManager->getSnapshot().getDrum(drumIndex).programIndex;
 }
 
 bool DrumBus::receivesPgmChange() const

@@ -74,7 +74,6 @@ namespace mpc::sampler
          */
         void deleteAllPrograms(bool createDefaultProgram);
 
-        void repairProgramReferences() const;
         std::vector<std::shared_ptr<Sound>> &getSounds();
         std::shared_ptr<Sound> addSound();
         std::shared_ptr<Sound> addSound(int sampleRate);
