@@ -187,9 +187,9 @@ namespace mpc::performance
             {
                 noteParameters[i] = NoteParameters();
                 noteParameters[i].noteNumber =
-                    DrumNoteNumber(static_cast<int8_t>(i) + MinDrumNoteNumber.get());
+                    DrumNoteNumber(static_cast<uint8_t>(i) + MinDrumNoteNumber.get());
                 pads[i] = Pad();
-                pads[i].index = ProgramPadIndex(i);
+                pads[i].index = ProgramPadIndex(static_cast<int8_t>(i));
             }
 
             slider = Slider();
