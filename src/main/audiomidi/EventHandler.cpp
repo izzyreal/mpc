@@ -271,8 +271,7 @@ void EventHandler::handleUnfinalizedNoteOn(
     {
         const auto drumBus = mpc.getSequencer()->getDrumBus(*drumBusType);
         assert(drumBus);
-        const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
+
         const auto note = noteOnEvent->getNote();
 
         const auto velocityWithTrackVelocityRatioApplied =
@@ -282,7 +281,7 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
-        auto performanceDrum =
+        const auto performanceDrum =
             mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
@@ -320,8 +319,6 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
 
         assert(drumBus);
 
-        const auto program =
-            mpc.getSampler()->getProgram(drumBus->getProgramIndex());
         const auto note = noteOffEvent->getNote();
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(

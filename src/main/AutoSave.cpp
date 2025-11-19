@@ -290,7 +290,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         {
             if (auto d = mpc.getSequencer()->getDrumBus(
                     sequencer::drumBusIndexToDrumBusType(drumBusIndex));
-                !mpc.getSampler()->getProgram(d->getProgramIndex()))
+                !mpc.getSampler()->getProgram(d->getProgramIndex())->isUsed())
             {
                 d->setProgramIndex(ProgramIndex{0});
             }

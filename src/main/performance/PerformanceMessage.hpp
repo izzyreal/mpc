@@ -83,6 +83,15 @@ namespace mpc::performance
         MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
+    struct UpdateProgramsBulk
+    {
+        std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs{};
+
+        UpdateProgramsBulk() = default;
+
+        MPC_NON_COPYABLE(UpdateProgramsBulk)
+    };
+
     struct UpdateProgramMidiProgramChange
     {
         ProgramIndex programIndex;
@@ -131,6 +140,11 @@ namespace mpc::performance
         MPC_NON_COPYABLE(UpdateIndivFxMixer)
     };
 
+    struct SetProgramUsed
+    {
+        ProgramIndex programIndex;
+    };
+
     using PerformanceMessagePayload = std::variant<
         std::monostate, PhysicalPadPressEvent, PhysicalPadAftertouchEvent,
         PhysicalPadReleaseEvent, ProgramPadPressEvent,
@@ -138,7 +152,7 @@ namespace mpc::performance
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramMidiProgramChange>;
+        UpdateProgramBulk, UpdateProgramsBulk, UpdateProgramMidiProgramChange, SetProgramUsed>;
 
     struct PerformanceMessage
     {
@@ -147,8 +161,10 @@ namespace mpc::performance
         std::function<void(void *)> action = [](void *) {};
 
         PerformanceMessage() = default;
-        explicit PerformanceMessage(PerformanceMessagePayload && payload)
-            : payload{std::move(payload)} {}
+        explicit PerformanceMessage(PerformanceMessagePayload &&payloadToUse)
+            : payload{std::move(payloadToUse)}
+        {
+        }
 
         MPC_NON_COPYABLE(PerformanceMessage)
     };

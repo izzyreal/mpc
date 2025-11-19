@@ -178,6 +178,16 @@ void Sampler::init()
 {
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++i)
+    {
+        auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)]
+        {
+            return getSnapshot(programIndex);
+        };
+        programs[i] = std::make_shared<Program>(ProgramIndex(i), mpc, this,
+                                                getProgramSnapshot, dispatch);
+    }
+
     const auto program = createNewProgramAddFirstAvailableSlot().lock();
     program->setName("NewPgm-A");
 
@@ -286,7 +296,7 @@ int Sampler::getProgramCount() const
 
     for (auto &p : programs)
     {
-        if (p)
+        if (p->isUsed())
         {
             res++;
         }
@@ -297,13 +307,8 @@ int Sampler::getProgramCount() const
 
 std::weak_ptr<Program> Sampler::addProgram(const int i)
 {
-    auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)]
-    {
-        return getSnapshot(programIndex);
-    };
-    programs[i] =
-        std::make_shared<Program>(mpc, this, getProgramSnapshot, dispatch);
-    programs[i]->setIndex(ProgramIndex(i));
+    assert(!programs[i]->isUsed());
+    programs[i]->setUsed();
     return programs[i];
 }
 
@@ -314,16 +319,9 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
     for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
          ++programIndex)
     {
-        if (auto &p = programs[programIndex]; !p)
+        if (auto &p = programs[programIndex]; !p->isUsed())
         {
-            auto getProgramSnapshot =
-                [this, programIndex = ProgramIndex(programIndex)]
-            {
-                return getSnapshot(programIndex);
-            };
-            p = std::make_shared<Program>(mpc, this, getProgramSnapshot,
-                                          dispatch);
-            p->setIndex(ProgramIndex(programIndex));
+            p->setUsed();
 
             if (repairDrumPrograms)
             {
@@ -334,6 +332,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
                     drumBus->setProgramIndex(ProgramIndex(0));
                 }
             }
+
             return p;
         }
     }
@@ -341,13 +340,13 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
     return std::weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(const std::weak_ptr<Program> &program)
+void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
 {
     for (auto &&p : programs)
     {
         if (p == program.lock())
         {
-            p.reset();
+            p->resetToDefaultValues();
             break;
         }
     }
@@ -425,7 +424,7 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
 {
     for (auto &p : programs)
     {
-        p.reset();
+        deleteProgram(p);
     }
 
     if (createDefaultProgram)
@@ -442,25 +441,25 @@ void Sampler::repairProgramReferences() const
         const auto drumBus =
             mpc.getSequencer()->getDrumBus(DrumBusIndex(drumBusIndex));
 
-        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm])
+        if (size_t pgm = drumBus->getProgramIndex(); !programs[pgm]->isUsed())
         {
             for (int programIndex = static_cast<int>(pgm) - 1; programIndex > 0;
                  programIndex--)
             {
-                if (programs[programIndex])
+                if (programs[programIndex]->isUsed())
                 {
                     pgm = programIndex;
                     break;
                 }
             }
 
-            if (!programs[pgm])
+            if (!programs[pgm]->isUsed())
             {
                 for (int programIndex = 0;
                      programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
                      programIndex++)
                 {
-                    if (programs[programIndex])
+                    if (programs[programIndex]->isUsed())
                     {
                         pgm = programIndex;
                         break;
@@ -575,7 +574,7 @@ void Sampler::deleteAllSamples()
 
     for (const auto &p : programs)
     {
-        if (!p)
+        if (!p->isUsed())
         {
             continue;
         }
@@ -855,7 +854,7 @@ std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds() const
 
     for (auto &p : programs)
     {
-        if (!p)
+        if (!p->isUsed())
         {
             continue;
         }
@@ -1080,9 +1079,9 @@ std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source)
 
 void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 {
-    if (programs[destIndex])
+    if (programs[destIndex]->isUsed())
     {
-        programs[destIndex].reset();
+        programs[destIndex]->resetToDefaultValues();
     }
 
     const auto src = programs[sourceIndex];
@@ -1091,9 +1090,9 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
     dest->setMidiProgramChange(dest->getMidiProgramChange());
     dest->setName(src->getName());
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        const auto copy = src->getNoteParameters(i + 35)->clone(i);
+        const auto copy = src->getNoteParameters(i + MinDrumNoteNumber)->clone(i);
         dest->setNoteParameters(i, copy);
 
         const auto mc1 = dest->getIndivFxMixerChannel(i);
@@ -1136,9 +1135,9 @@ mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
 
     if (up)
     {
-        for (int i = startIndex + 1; i < programs.size(); i++)
+        for (int i = startIndex + 1; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; i++)
         {
-            if (programs[i])
+            if (programs[i]->isUsed())
             {
                 res = i;
                 break;
@@ -1149,7 +1148,7 @@ mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
     {
         for (int i = startIndex - 1; i >= 0; i--)
         {
-            if (programs[i])
+            if (programs[i]->isUsed())
             {
                 res = i;
                 break;
@@ -1162,12 +1161,7 @@ mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
 
 void Sampler::setPlayX(const int i)
 {
-    if (i < 0 || i > 4)
-    {
-        return;
-    }
-
-    playXMode = i;
+    playXMode = std::clamp(i, 0, 4);
 }
 
 int Sampler::getPlayX() const

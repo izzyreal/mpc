@@ -55,7 +55,7 @@ void LoadAProgramScreen::function(const int i)
             const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
 
-            for (int pi = 0; pi < 24; pi++)
+            for (int pi = 0; pi < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pi++)
             {
                 if (sampler->getProgram(pi) == newProgram)
                 {

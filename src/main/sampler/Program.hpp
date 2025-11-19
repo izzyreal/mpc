@@ -26,7 +26,7 @@ namespace mpc::sampler
     class Program
     {
     public:
-        Program(Mpc &mpc, Sampler *samplerToUse,
+        Program(ProgramIndex, Mpc &mpc, Sampler *samplerToUse,
                 const std::function<performance::Program()> &getSnapshot,
                 const std::function<void(performance::PerformanceMessage &&)>
                     &dispatch);
@@ -41,11 +41,9 @@ namespace mpc::sampler
 
         ProgramPadIndex getPadIndexFromNote(DrumNoteNumber) const;
 
-        void setIndex(ProgramIndex);
-
     private:
+        const ProgramIndex index;
         std::string name;
-        ProgramIndex index;
         PgmSlider *const slider;
         Sampler *const sampler;
 
@@ -56,6 +54,12 @@ namespace mpc::sampler
         std::vector<Pad *> pads;
 
     public:
+        bool isUsed() const;
+
+        void setUsed() const;
+
+        void resetToDefaultValues() const;
+
         int getNumberOfSamples() const;
 
         void setName(const std::string &s);

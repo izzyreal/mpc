@@ -77,7 +77,7 @@ void NoteRepeatProcessor::process(
             continue;
         }
 
-        if (!isSixteenLevelsEnabled() && program)
+        if (!isSixteenLevelsEnabled() && program->isUsed())
         {
             note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }

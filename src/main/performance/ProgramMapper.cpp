@@ -11,7 +11,8 @@ using namespace mpc;
 
 namespace mpc::performance
 {
-    NoteParameters mapSamplerNoteParametersToPerformanceNoteParameters(const sampler::NoteParameters *s)
+    NoteParameters mapSamplerNoteParametersToPerformanceNoteParameters(
+        const sampler::NoteParameters *s)
     {
         NoteParameters result;
         mapSamplerNoteParametersToPerformanceNoteParameters(s, result);
@@ -19,8 +20,7 @@ namespace mpc::performance
     }
 
     void mapSamplerNoteParametersToPerformanceNoteParameters(
-        const sampler::NoteParameters *s,
-        NoteParameters &p)
+        const sampler::NoteParameters *s, NoteParameters &p)
     {
         p.noteNumber = s->getNumber();
         p.soundIndex = s->getSoundIndex();
@@ -53,7 +53,8 @@ namespace mpc::performance
 
         p.indivFxMixer.followStereo = s->getIndivFxMixer()->isFollowingStereo();
         p.indivFxMixer.individualOutput = s->getIndivFxMixer()->getOutput();
-        p.indivFxMixer.individualOutLevel = s->getIndivFxMixer()->getVolumeIndividualOut();
+        p.indivFxMixer.individualOutLevel =
+            s->getIndivFxMixer()->getVolumeIndividualOut();
         p.indivFxMixer.fxPath = s->getIndivFxMixer()->getFxPath();
         p.indivFxMixer.fxSendLevel = s->getIndivFxMixer()->getFxSendLevel();
     }

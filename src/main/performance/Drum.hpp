@@ -9,14 +9,16 @@ namespace mpc::performance
 {
     struct StereoMixer
     {
-        StereoMixer() {
+        StereoMixer()
+        {
             resetValuesToDefaults();
         }
 
         DrumMixerLevel level;
         DrumMixerPanning panning;
 
-        void resetValuesToDefaults() {
+        void resetValuesToDefaults()
+        {
             level = MaxDrumMixerLevel;
             panning = PanningCenter;
         }
@@ -24,7 +26,8 @@ namespace mpc::performance
 
     struct IndivFxMixer
     {
-        IndivFxMixer() {
+        IndivFxMixer()
+        {
             resetValuesToDefaults();
         }
         DrumMixerLevel individualOutLevel;
@@ -45,7 +48,8 @@ namespace mpc::performance
 
     struct NoteParameters
     {
-        NoteParameters() {
+        NoteParameters()
+        {
             resetValuesToDefaults();
         }
 
@@ -79,7 +83,8 @@ namespace mpc::performance
         sampler::VoiceOverlapMode voiceOverlapMode;
         DrumNoteNumber muteAssignA;
 
-        void resetValuesToDefaults() {
+        void resetValuesToDefaults()
+        {
             noteNumber = NoDrumNoteAssigned;
             stereoMixer = StereoMixer();
             indivFxMixer = IndivFxMixer();
@@ -117,7 +122,8 @@ namespace mpc::performance
         ProgramPadIndex index;
         DrumNoteNumber note;
 
-        Pad() {
+        Pad()
+        {
             resetValuesToDefaults();
         }
 
@@ -165,11 +171,13 @@ namespace mpc::performance
 
     struct Program
     {
-        std::array<NoteParameters, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> noteParameters;
+        std::array<NoteParameters, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+            noteParameters;
         std::array<Pad, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> pads;
 
         Slider slider;
         int midiProgramChange;
+        bool used;
 
         Program()
         {
@@ -183,11 +191,13 @@ namespace mpc::performance
 
         void resetValuesToDefaults()
         {
+            used = false;
+
             for (size_t i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; ++i)
             {
                 noteParameters[i] = NoteParameters();
-                noteParameters[i].noteNumber =
-                    DrumNoteNumber(static_cast<uint8_t>(i) + MinDrumNoteNumber.get());
+                noteParameters[i].noteNumber = DrumNoteNumber(
+                    static_cast<uint8_t>(i) + MinDrumNoteNumber.get());
                 pads[i] = Pad();
                 pads[i].index = ProgramPadIndex(static_cast<int8_t>(i));
             }
@@ -201,12 +211,16 @@ namespace mpc::performance
     {
         DrumBusIndex drumBusIndex;
         ProgramIndex programIndex;
-        std::array<StereoMixer, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> stereoMixers{};
-        std::array<IndivFxMixer, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> indivFxMixers{};
-        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+        std::array<StereoMixer, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+            stereoMixers{};
+        std::array<IndivFxMixer, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+            indivFxMixers{};
+        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>,
+                   Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
             simultaneousNotesA{
                 std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}};
-        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+        std::array<std::pair<DrumNoteNumber, DrumNoteNumber>,
+                   Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
             simultaneousNotesB{
                 std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}};
         bool receivePgmChange = false;

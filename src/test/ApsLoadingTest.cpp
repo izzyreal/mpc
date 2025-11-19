@@ -44,7 +44,8 @@ void doApsTest(Mpc &mpc)
     auto disk = mpc.getDisk();
     auto apsFile = disk->getFile("ALL_PGMS.APS");
 
-    ApsLoader::load(mpc, apsFile);
+    constexpr bool headless = true;
+    ApsLoader::load(mpc, apsFile, headless);
     mpc.getEngineHost()->applyPendingStateChanges();
 
     auto p1 = mpc.getSampler()->getProgram(0);

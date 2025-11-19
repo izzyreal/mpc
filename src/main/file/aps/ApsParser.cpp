@@ -122,11 +122,11 @@ ApsParser::ApsParser(Mpc &mpc, std::string apsNameString)
 
     chunks.push_back({1, 127});
 
-    for (int i = 0; i < 24; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; i++)
     {
         auto p = sampler->getProgram(i);
 
-        if (!p)
+        if (!p->isUsed())
         {
             continue;
         }

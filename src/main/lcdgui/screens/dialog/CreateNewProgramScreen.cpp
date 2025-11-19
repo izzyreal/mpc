@@ -47,7 +47,7 @@ void CreateNewProgramScreen::open()
 
         for (int i = 0; i < sampler->getPrograms().size(); i++)
         {
-            if (!sampler->getProgram(i))
+            if (!sampler->getProgram(i)->isUsed())
             {
                 letterIndex = 21 + i;
                 midiProgramChange = i + 1;

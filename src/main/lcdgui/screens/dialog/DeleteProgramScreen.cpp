@@ -75,7 +75,7 @@ void DeleteProgramScreen::setPgm(const int i)
         {
             return;
         }
-    } while (!sampler->getProgram(candidate));
+    } while (!sampler->getProgram(candidate)->isUsed());
 
     pgm = candidate;
     displayPgm();

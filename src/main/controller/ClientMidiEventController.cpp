@@ -187,7 +187,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     auto programIndex = screen->getProgramIndex();
 
-    if (program && programIndex)
+    if (program->isUsed() && programIndex)
     {
         programPadIndex =
             program->getPadIndexFromNote(DrumNoteNumber(e.getNoteNumber()));
@@ -263,7 +263,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             program = sampler->getProgram(programIndex);
         }
 
-        if (program)
+        if (program->isUsed())
         {
             programPadIndex =
                 program->getPadIndexFromNote(DrumNoteNumber(noteNumber));
@@ -307,7 +307,7 @@ void ClientMidiEventController::handleKeyAftertouch(
         PerformanceEventSource::MidiInput, NoteNumber(note), Pressure(pressure),
         std::optional<MidiChannel>(e.getChannel()));
 
-    if (const auto program = getProgramForEvent(e); program)
+    if (const auto program = getProgramForEvent(e); program->isUsed())
     {
         if (const auto programPadIndex =
                 program->getPadIndexFromNote(DrumNoteNumber(note));
@@ -438,7 +438,7 @@ void ClientMidiEventController::handleProgramChange(
     {
         if (const auto drumBus = getDrumBusForEvent(e); drumBus)
         {
-            if (sampler->getProgram(e.getProgramNumber()))
+            if (sampler->getProgram(e.getProgramNumber())->isUsed())
             {
                 drumBus->setProgramIndex(ProgramIndex(e.getProgramNumber()));
             }

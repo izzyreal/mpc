@@ -6,12 +6,14 @@ namespace mpc::sampler
 {
     class Program;
     class NoteParameters;
-}
+} // namespace mpc::sampler
 
 namespace mpc::performance
 {
-    NoteParameters mapSamplerNoteParametersToPerformanceNoteParameters(const sampler::NoteParameters *);
-    void mapSamplerNoteParametersToPerformanceNoteParameters(const sampler::NoteParameters *, NoteParameters &);
+    NoteParameters mapSamplerNoteParametersToPerformanceNoteParameters(
+        const sampler::NoteParameters *);
+    void mapSamplerNoteParametersToPerformanceNoteParameters(
+        const sampler::NoteParameters *, NoteParameters &);
     void mapSamplerProgramToPerformanceProgram(const sampler::Program &,
                                                performance::Program &);
 } // namespace mpc::performance

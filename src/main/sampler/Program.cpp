@@ -14,11 +14,11 @@ using namespace mpc::sampler;
 using namespace mpc::engine;
 
 Program::Program(
-    Mpc &mpc, Sampler *const samplerToUse,
+    const ProgramIndex programIndex, Mpc &mpc, Sampler *const samplerToUse,
     const std::function<performance::Program()> &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : slider(new PgmSlider()), sampler(samplerToUse), getSnapshot(getSnapshot),
-      dispatch(dispatch)
+    : index(programIndex), slider(new PgmSlider()), sampler(samplerToUse),
+      getSnapshot(getSnapshot), dispatch(dispatch)
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
@@ -42,6 +42,30 @@ Program::Program(
         auto p = new Pad(mpc, ProgramPadIndex(i));
         pads.push_back(p);
     }
+}
+
+bool Program::isUsed() const
+{
+    return getSnapshot().used;
+}
+void Program::setUsed() const
+{
+    performance::PerformanceMessage msg;
+    auto p = getSnapshot();
+    p.resetValuesToDefaults();
+    performance::SetProgramUsed payload{index};
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
+}
+
+void Program::resetToDefaultValues() const
+{
+    performance::PerformanceMessage msg;
+    auto p = getSnapshot();
+    p.resetValuesToDefaults();
+    performance::UpdateProgramBulk payload{index, p};
+    msg.payload = std::move(payload);
+    dispatch(std::move(msg));
 }
 
 int Program::getNumberOfSamples() const
@@ -114,11 +138,6 @@ Program::getPadIndexFromNote(const DrumNoteNumber note) const
     }
 
     return NoProgramPadIndex;
-}
-
-void Program::setIndex(const ProgramIndex programIndex)
-{
-    index = programIndex;
 }
 
 std::vector<NoteParameters *> &Program::getNotesParameters()

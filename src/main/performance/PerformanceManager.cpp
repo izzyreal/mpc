@@ -209,6 +209,14 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.programs[payload.programIndex] = payload.program;
             }
+            else if constexpr (std::is_same_v<T, UpdateProgramsBulk>)
+            {
+                activeState.programs = payload.programs;
+            }
+            else if constexpr (std::is_same_v<T, SetProgramUsed>)
+            {
+                activeState.programs[payload.programIndex].used = true;
+            }
             else if constexpr (std::is_same_v<T,
                                               UpdateProgramMidiProgramChange>)
             {

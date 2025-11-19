@@ -35,9 +35,9 @@ void SaveScreen::open()
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
 
-    for (int i = 0; i < 24; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; i++)
     {
-        if (sampler->getProgram(i))
+        if (sampler->getProgram(i)->isUsed())
         {
             programIndex = i;
             break;
@@ -243,10 +243,10 @@ void SaveScreen::turnWheel(const int i)
             {
                 unsigned char counter = 0;
 
-                for (int idx = programIndex; i < 0 ? idx >= 0 : idx < 24;
+                for (int idx = programIndex; i < 0 ? idx >= 0 : idx < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
                      i < 0 ? idx-- : idx++)
                 {
-                    if (sampler->getProgram(idx))
+                    if (sampler->getProgram(idx)->isUsed())
                     {
                         programIndex = idx;
                     }
@@ -282,7 +282,6 @@ void SaveScreen::turnWheel(const int i)
         displayDeviceType();
         ls->setFunctionKeysArrangement(
             mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
-        return;
     }
 }
 
@@ -292,9 +291,9 @@ void SaveScreen::setType(const int i)
 
     if (i == 3)
     {
-        for (int j = 0; j < 24; j++)
+        for (int j = 0; j < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; j++)
         {
-            if (sampler->getProgram(j))
+            if (sampler->getProgram(j)->isUsed())
             {
                 programIndex = j;
                 break;
@@ -435,10 +434,8 @@ void SaveScreen::displayDeviceType()
 
 void SaveScreen::up()
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "device")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "device")
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();

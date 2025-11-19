@@ -22,8 +22,11 @@
 #include <stdexcept>
 
 #include "Logger.hpp"
+#include "engine/EngineHost.hpp"
 #include "engine/IndivFxMixer.hpp"
 #include "engine/StereoMixer.hpp"
+#include "performance/PerformanceManager.hpp"
+#include "performance/ProgramMapper.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -139,38 +142,28 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         }
     }
 
-    sampler->deleteAllPrograms(/*createDefaultProgram=*/false);
+    std::array<performance::Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> perfPrograms{};
 
     for (auto &apsProgram : apsParser.getPrograms())
     {
-        auto newProgram = sampler->addProgram(apsProgram->index).lock();
-        auto assignTable = apsProgram->getAssignTable()->get();
+        sampler->getProgram(apsProgram->index)->setName(apsProgram->getName());
 
-        newProgram->setName(apsProgram->getName());
+        auto &perfProgram = perfPrograms[apsProgram->index];
+
+        auto assignTable = apsProgram->getAssignTable()->get();
 
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
-            newProgram->getPad(noteIndex)->setNote(
-                DrumNoteNumber(assignTable[noteIndex]));
+            perfProgram.pads[noteIndex].note = DrumNoteNumber(assignTable[noteIndex]);
 
             auto sourceStereoMixerChannel =
                 apsProgram->getStereoMixerChannel(noteIndex);
             auto sourceIndivFxMixerChannel =
                 apsProgram->getIndivFxMixerChannel(noteIndex);
 
-            auto destNoteParams = newProgram->getNoteParameters(noteIndex + 35);
-            auto destStereoMixerCh = destNoteParams->getStereoMixer();
-            auto destIndivFxCh = destNoteParams->getIndivFxMixer();
-
-            destIndivFxCh->setFxPath(sourceIndivFxMixerChannel.fxPath);
-            destStereoMixerCh->setLevel(sourceStereoMixerChannel.level);
-            destStereoMixerCh->setPanning(sourceStereoMixerChannel.panning);
-            destIndivFxCh->setVolumeIndividualOut(
-                sourceIndivFxMixerChannel.individualOutLevel);
-            destIndivFxCh->setFxSendLevel(
-                sourceIndivFxMixerChannel.fxSendLevel);
-            destIndivFxCh->setOutput(
-                sourceIndivFxMixerChannel.individualOutput);
+            auto &destNoteParams = perfProgram.noteParameters[noteIndex];
+            destNoteParams.stereoMixer = sourceStereoMixerChannel;
+            destNoteParams.indivFxMixer = sourceIndivFxMixerChannel;
 
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
 
@@ -189,62 +182,57 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
                 soundIndex = finalSoundIndices[soundIndex];
             }
 
-            destNoteParams->setSoundIndex(soundIndex);
-            destNoteParams->setTune(srcNoteParams->getTune());
-            destNoteParams->setVoiceOverlapMode(
-                srcNoteParams->getVoiceOverlapMode());
-            destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
-            destNoteParams->setAttack(srcNoteParams->getAttack());
-            destNoteParams->setDecay(srcNoteParams->getDecay());
-            destNoteParams->setFilterAttack(
-                srcNoteParams->getVelocityToFilterAttack());
-            destNoteParams->setFilterDecay(
-                srcNoteParams->getVelocityToFilterDecay());
-            destNoteParams->setFilterEnvelopeAmount(
-                srcNoteParams->getVelocityToFilterAmount());
-            destNoteParams->setFilterFrequency(
-                srcNoteParams->getCutoffFrequency());
-            destNoteParams->setFilterResonance(srcNoteParams->getResonance());
-            destNoteParams->setMuteAssignA(
-                DrumNoteNumber(srcNoteParams->getMute1()));
-            destNoteParams->setMuteAssignB(
-                DrumNoteNumber(srcNoteParams->getMute2()));
-            destNoteParams->setOptionalNoteA(
-                DrumNoteNumber(srcNoteParams->getAlsoPlay1()));
-            destNoteParams->setOptionalNoteB(
-                DrumNoteNumber(srcNoteParams->getAlsoPlay2()));
-            destNoteParams->setSliderParameterNumber(
-                srcNoteParams->getSliderParameter());
-            destNoteParams->setSoundGenMode(
-                srcNoteParams->getSoundGenerationMode());
-            destNoteParams->setVelocityToStart(
-                srcNoteParams->getVelocityToStart());
-            destNoteParams->setVelocityToAttack(
-                srcNoteParams->getVelocityToAttack());
-            destNoteParams->setVelocityToFilterFrequency(
-                srcNoteParams->getVelocityToFilterFrequency());
-            destNoteParams->setVeloToLevel(srcNoteParams->getVelocityToLevel());
-            destNoteParams->setVeloRangeLower(
-                srcNoteParams->getVelocityRangeLower());
-            destNoteParams->setVeloRangeUpper(
-                srcNoteParams->getVelocityRangeUpper());
-            destNoteParams->setVelocityToPitch(
-                srcNoteParams->getVelocityToPitch());
+            destNoteParams.soundIndex = soundIndex;
+            destNoteParams.tune = srcNoteParams->getTune();
+            destNoteParams.voiceOverlapMode = srcNoteParams->getVoiceOverlapMode();
+
+            destNoteParams.decayMode = srcNoteParams->getDecayMode();
+            destNoteParams.attack = srcNoteParams->getAttack();
+            destNoteParams.decay = srcNoteParams->getDecay();
+
+            destNoteParams.filterAttack = srcNoteParams->getVelocityToFilterAttack();
+            destNoteParams.filterDecay = srcNoteParams->getVelocityToFilterDecay();
+            destNoteParams.filterEnvelopeAmount = srcNoteParams->getVelocityToFilterAmount();
+
+            destNoteParams.filterFrequency = srcNoteParams->getCutoffFrequency();
+            destNoteParams.filterResonance = srcNoteParams->getResonance();
+
+            destNoteParams.muteAssignA = DrumNoteNumber(srcNoteParams->getMute1());
+            destNoteParams.muteAssignB = DrumNoteNumber(srcNoteParams->getMute2());
+
+            destNoteParams.optionalNoteA = DrumNoteNumber(srcNoteParams->getAlsoPlay1());
+            destNoteParams.optionalNoteB = DrumNoteNumber(srcNoteParams->getAlsoPlay2());
+
+            destNoteParams.sliderParameterNumber = srcNoteParams->getSliderParameter();
+            destNoteParams.soundGenerationMode = srcNoteParams->getSoundGenerationMode();
+
+            destNoteParams.velocityToStart = srcNoteParams->getVelocityToStart();
+            destNoteParams.velocityToAttack = srcNoteParams->getVelocityToAttack();
+            destNoteParams.velocityToFilterFrequency =
+                srcNoteParams->getVelocityToFilterFrequency();
+
+            destNoteParams.velocityToLevel = srcNoteParams->getVelocityToLevel();
+
+            destNoteParams.velocityRangeLower = srcNoteParams->getVelocityRangeLower();
+            destNoteParams.velocityRangeUpper = srcNoteParams->getVelocityRangeUpper();
+
+            destNoteParams.velocityToPitch = srcNoteParams->getVelocityToPitch();
         }
 
-        auto slider = newProgram->getSlider();
-        slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
-        slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
-        slider->setControlChange(apsProgram->getSlider()->getProgramChange());
-        slider->setDecayHighRange(apsProgram->getSlider()->getDecayHigh());
-        slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
-        slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
-        slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
-        slider->setAssignNote(
-            DrumNoteNumber(apsProgram->getSlider()->getNote()));
-        slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
-        slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
+        perfProgram.slider.attackHighRange = apsProgram->getSlider()->getAttackHigh();
+        perfProgram.slider.attackLowRange = apsProgram->getSlider()->getAttackLow();
+        perfProgram.slider.controlChange = apsProgram->getSlider()->getProgramChange();
+        perfProgram.slider.decayHighRange = apsProgram->getSlider()->getDecayHigh();
+        perfProgram.slider.decayLowRange = apsProgram->getSlider()->getDecayLow();
+        perfProgram.slider.filterHighRange = apsProgram->getSlider()->getFilterHigh();
+        perfProgram.slider.filterLowRange = apsProgram->getSlider()->getFilterLow();
+        perfProgram.slider.assignNote = DrumNoteNumber(apsProgram->getSlider()->getNote());
+        perfProgram.slider.tuneHighRange = apsProgram->getSlider()->getTuneHigh();
+        perfProgram.slider.tuneLowRange = apsProgram->getSlider()->getTuneLow();
     }
+
+    performance::UpdateProgramsBulk payload{perfPrograms};
+    mpc.performanceManager->enqueue(performance::PerformanceMessage(std::move(payload)));
 
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {

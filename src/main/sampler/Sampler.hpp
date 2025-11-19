@@ -61,7 +61,7 @@ namespace mpc::sampler
 
         std::weak_ptr<Program> addProgram(int i);
 
-        void deleteProgram(const std::weak_ptr<Program> &program);
+        void deleteProgram(const std::weak_ptr<Program> &program) const;
 
         /**
          * This method deletes all programs and sets all DRUMs to program
