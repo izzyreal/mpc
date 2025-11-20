@@ -16,7 +16,7 @@ namespace mpc::sampler
         int filterLowRange = -50;
         int filterHighRange = 50;
         int controlChange = 0;
-        int parameter = 0;
+        NoteVariationType parameter = NoteVariationTypeTune;
 
     public:
         void setAssignNote(DrumNoteNumber);
@@ -39,7 +39,7 @@ namespace mpc::sampler
         int getFilterHighRange() const;
         void setControlChange(int i);
         int getControlChange() const;
-        int getParameter() const;
+        NoteVariationType getParameter() const;
         void setParameter(int i);
     };
 } // namespace mpc::sampler

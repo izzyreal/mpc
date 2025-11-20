@@ -2,22 +2,21 @@
 
 using namespace mpc::sequencer;
 
-void ProgramChangeEvent::setProgram(const int i)
+ProgramChangeEvent::ProgramChangeEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
-    if (i < 1 || i > 128)
-    {
-        return;
-    }
-    programChangeValue = i;
+}
+
+void ProgramChangeEvent::setProgram(const int i) const
+{
+    auto e = getSnapshot();
+    e.second.programChangeProgramIndex = ProgramIndex(i);
+    dispatch(UpdateEvent{e});
 }
 
 int ProgramChangeEvent::getProgram() const
 {
-    return programChangeValue;
-}
-
-ProgramChangeEvent::ProgramChangeEvent(const ProgramChangeEvent &event)
-    : Event(event)
-{
-    setProgram(event.getProgram());
+    return getSnapshot().second.programChangeProgramIndex;
 }

@@ -20,7 +20,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
@@ -80,7 +80,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
                         },
                         [&](const auto &a, const auto &b)
                         {
-                            return visibleEventsEqual(a, b);
+                            return eventsEqual(a, b);
                         }});
 
     addReactiveBinding(
@@ -110,36 +110,6 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
              findField("now2")->setTextPadded(
                  sequencer->getTransport()->getCurrentClockNumber(), "0");
          }});
-}
-
-bool StepEditorScreen::visibleEventsEqual(
-    const std::vector<std::shared_ptr<Event>> &a,
-    const std::vector<std::shared_ptr<Event>> &b) const
-{
-    if (a.size() != b.size())
-    {
-        return false;
-    }
-
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        if ((!a[i] && b[i]) || (a[i] && !b[i]))
-        {
-            return false;
-        }
-
-        if (!a[i] && !b[i])
-        {
-            continue;
-        }
-
-        if (!eventsEqual(a[i], b[i]))
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 void StepEditorScreen::openWindow()
@@ -305,7 +275,7 @@ void StepEditorScreen::function(int i)
                 auto track = sequencer->getSelectedTrack();
                 for (int e = 0; e < track->getEvents().size(); e++)
                 {
-                    if (track->getEvents()[e] == visibleEvents[rowIndex])
+                    if (eventsEqual(track->getEvents()[e], visibleEvents[rowIndex]))
                     {
                         track->removeEvent(e);
                         break;
@@ -410,7 +380,7 @@ void StepEditorScreen::function(int i)
                     else if (isD)
                     {
                         editMultipleScreen->setEditValue(
-                            *noteEvent->getDuration());
+                            noteEvent->getDuration());
                     }
                     else if (isE)
                     {
@@ -429,7 +399,7 @@ void StepEditorScreen::function(int i)
                     else if (isB)
                     {
                         editMultipleScreen->setEditValue(
-                            *noteEvent->getDuration());
+                            noteEvent->getDuration());
                     }
                     else if (isC)
                     {
@@ -478,12 +448,11 @@ void StepEditorScreen::function(int i)
                     auto eventNumber = getActiveRow();
                     const auto visibleEvents = computeVisibleEvents();
                     auto event = visibleEvents[eventNumber];
-                    auto noteEvent =
-                        std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-                    if (noteEvent)
+                    if (auto noteEvent =
+                        std::dynamic_pointer_cast<NoteOnEvent>(event))
                     {
-                        adhocPlayNoteEvent(noteEvent);
+                        adhocPlayNoteEvent(noteEvent->getSnapshot().second);
                     }
                 }
             }
@@ -498,7 +467,8 @@ void StepEditorScreen::function(int i)
 
 bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 {
-    return ls->getFocusedFieldName().find(letter) != std::string::npos;
+    auto focusedFieldName = ls->getFocusedFieldName();
+    return focusedFieldName.find(letter) != std::string::npos;
 }
 
 void StepEditorScreen::turnWheel(const int increment)
@@ -658,7 +628,7 @@ void StepEditorScreen::turnWheel(const int increment)
         }
         else if (const auto note = std::dynamic_pointer_cast<NoteOnEvent>(
                      visibleEvents[eventNumber]);
-                 isDrumBusType(track->getBusType()) && note)
+                 isMidiBusType(track->getBusType()) && note)
         {
             if (paramIsLetter("a"))
             {
@@ -673,7 +643,7 @@ void StepEditorScreen::turnWheel(const int increment)
                 note->setVelocity(note->getVelocity() + increment);
             }
         }
-        else if (note && isMidiBusType(track->getBusType()))
+        else if (note && isDrumBusType(track->getBusType()))
         {
             if (paramIsLetter("a"))
             {
@@ -710,7 +680,7 @@ void StepEditorScreen::turnWheel(const int increment)
             }
             else if (paramIsLetter("b"))
             {
-                note->incrementVariationType(increment);
+                note->setVariationType(note->getVariationType() + increment);
             }
             else if (paramIsLetter("c"))
             {
@@ -1077,7 +1047,7 @@ StepEditorScreen::computeEventsAtCurrentTick() const
     std::vector<std::shared_ptr<Event>> result;
 
     const auto track = sequencer->getSelectedTrack();
-
+    auto trackEvents = track->getEvents();
     for (auto &event : track->getEvents())
     {
         if (event->getTick() == sequencer->getTransport()->getTickPosition())
@@ -1497,11 +1467,10 @@ int StepEditorScreen::getYOffset() const
 }
 
 void StepEditorScreen::adhocPlayNoteEvent(
-    const std::shared_ptr<NoteOnEvent> &noteEvent) const
+    const EventState &noteEvent) const
 {
-    const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
     const auto track = sequencer->getSelectedTrack();
-    mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
+    mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
@@ -1575,9 +1544,9 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
     const auto track = sequencer->getSelectedTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {
-        if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+        if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            adhocPlayNoteEvent(noteEvent);
+            adhocPlayNoteEvent(noteEvent->getSnapshot().second);
         }
     }
 }

@@ -2,53 +2,45 @@
 
 using namespace mpc::sequencer;
 
-void MixerEvent::setParameter(const int i)
+MixerEvent::MixerEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-    mixerParameter = i;
+}
+
+void MixerEvent::setParameter(const int i) const
+{
+    auto e = getSnapshot();
+    e.second.mixerParameter = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getParameter() const
 {
-    return mixerParameter;
+    return getSnapshot().second.mixerParameter;
 }
 
-void MixerEvent::setPadNumber(const int i)
+void MixerEvent::setPadNumber(const int i) const
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    padNumber = i;
+    auto e = getSnapshot();
+    e.second.mixerPad = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getPad() const
 {
-    return padNumber;
+    return getSnapshot().second.mixerPad;
 }
 
-void MixerEvent::setValue(const int i)
+void MixerEvent::setValue(const int i) const
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
-    mixerParameterValue = i;
+    auto e = getSnapshot();
+    e.second.mixerValue = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getValue() const
 {
-    return mixerParameterValue;
-}
-
-MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
-{
-    setPadNumber(event.getPad());
-    setParameter(event.getParameter());
-    setValue(event.getValue());
+    return getSnapshot().second.mixerValue;
 }

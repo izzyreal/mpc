@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens
     {
         void downOrUp(int increment);
         void adhocPlayNoteEvent(
-            const std::shared_ptr<sequencer::NoteOnEvent> &noteEvent) const;
+            const sequencer::EventState &noteEvent) const;
         void adhocPlayNoteEventsAtCurrentPosition() const;
 
         std::vector<std::shared_ptr<sequencer::Event>>
@@ -32,10 +32,6 @@ namespace mpc::lcdgui::screens
         std::vector<std::shared_ptr<sequencer::Event>> computeVisibleEvents(
             const std::vector<std::shared_ptr<sequencer::Event>>
                 &eventsAtCurrentTick = {}) const;
-
-        bool visibleEventsEqual(
-            const std::vector<std::shared_ptr<sequencer::Event>> &a,
-            const std::vector<std::shared_ptr<sequencer::Event>> &b) const;
 
         void shift();
 
@@ -100,7 +96,6 @@ namespace mpc::lcdgui::screens
         void setNoteB(NoteNumber);
         void setControl(int i);
         void setyOffset(int i);
-        void setSelectedEventIndex(int i);
         void setSelectionEndIndex(int i);
         void setSelectionStartIndex(int i);
         void setSelectedEvents();
@@ -111,7 +106,6 @@ namespace mpc::lcdgui::screens
         void displayView() const;
 
     public:
-        std::vector<std::shared_ptr<sequencer::Event>> &getVisibleEvents();
         std::vector<std::shared_ptr<sequencer::Event>> &getSelectedEvents();
         std::shared_ptr<sequencer::Event> getSelectedEvent();
         std::string getSelectedParameterLetter();

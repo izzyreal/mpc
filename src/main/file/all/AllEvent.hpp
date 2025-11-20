@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sequencer/EventState.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -12,29 +14,26 @@ namespace mpc::file::all
 {
     class AllEvent
     {
-
     public:
-        static const int TICK_BYTE1_OFFSET = 0;
-        static const int TICK_BYTE2_OFFSET = 1;
-        static const int TICK_BYTE3_OFFSET = 2;
+        static constexpr int TICK_BYTE1_OFFSET = 0;
+        static constexpr int TICK_BYTE2_OFFSET = 1;
+        static constexpr int TICK_BYTE3_OFFSET = 2;
         static std::vector<int> TICK_BYTE3_BIT_RANGE;
 
-        static const int TRACK_OFFSET = 3;
-        static const int EVENT_ID_OFFSET = 4;
+        static constexpr int TRACK_OFFSET = 3;
+        static constexpr int EVENT_ID_OFFSET = 4;
 
-        static const char POLY_PRESSURE_ID = 0xA0;
-        static const char CONTROL_CHANGE_ID = 0xB0;
-        static const char PGM_CHANGE_ID = 0xC0;
-        static const char CH_PRESSURE_ID = 0xD0;
-        static const char PITCH_BEND_ID = 0xE0;
-        static const char SYS_EX_ID = 0xF0;
+        static constexpr char POLY_PRESSURE_ID = 0xA0;
+        static constexpr char CONTROL_CHANGE_ID = 0xB0;
+        static constexpr char PGM_CHANGE_ID = 0xC0;
+        static constexpr char CH_PRESSURE_ID = 0xD0;
+        static constexpr char PITCH_BEND_ID = 0xE0;
+        static constexpr char SYS_EX_ID = 0xF0;
 
         static int readTick(const std::vector<char> &);
         static void writeTick(std::vector<char> &, int);
 
-        static std::shared_ptr<sequencer::Event>
-        bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<sequencer::Event> &);
+        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

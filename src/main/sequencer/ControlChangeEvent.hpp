@@ -3,19 +3,17 @@
 
 namespace mpc::sequencer
 {
-    class ControlChangeEvent : public Event
+    class ControlChangeEvent final : public Event
     {
-        int controllerNumber = 0;
-        int controllerValue = 0;
-
     public:
-        void setController(int i);
+        void setController(int i) const;
         int getController() const;
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
-        ControlChangeEvent() = default;
-        ControlChangeEvent(const ControlChangeEvent &event);
+        explicit ControlChangeEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

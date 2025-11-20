@@ -12,7 +12,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -575,9 +575,9 @@ void SequencerScreen::displayTsig() const
 {
     std::string result;
     const auto ts = sequencer->getSelectedSequence()->getTimeSignature();
-    result.append(std::to_string(ts.getNumerator()));
+    result.append(std::to_string(ts.numerator));
     result.append("/");
-    result.append(std::to_string(ts.getDenominator()));
+    result.append(std::to_string(ts.denominator));
     findField("tsig")->setText(Util::distributeTimeSig(result));
 }
 

@@ -2,6 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
+#include "SequenceStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -24,9 +25,9 @@ int SeqUtil::getTickFromBar(const int i, const Sequence *s, int position)
     }
 
     const auto difference = i - getBarFromTick(s, position);
-    const auto den = s->getTimeSignature().getDenominator();
+    const auto den = s->getTimeSignature().denominator;
 
-    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    if (const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
         position + difference * denTicks * 4 > s->getLastTick())
     {
         position = s->getLastTick();
@@ -46,10 +47,8 @@ int SeqUtil::getBarFromTick(const Sequence *s, const int position)
         return 0;
     }
 
-    const auto ts = s->getTimeSignature();
-    const auto num = ts.getNumerator();
-    const auto den = ts.getDenominator();
-    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto [num, den] = s->getTimeSignature();
+    const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
     const auto bar = static_cast<int>(floor(position / (denTicks * num)));
 
     return bar;
@@ -57,14 +56,14 @@ int SeqUtil::getBarFromTick(const Sequence *s, const int position)
 
 double SeqUtil::secondsPerTick(const double tempo)
 {
-    return 60.0 / tempo / 96.0;
+    return 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
 }
 
 double SeqUtil::ticksPerSecond(const double tempo)
 {
 
     const auto bps = tempo / 60.0;
-    return bps * 96.0;
+    return bps * Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
 }
 
 double SeqUtil::ticksToFrames(const double ticks, const double tempo,
@@ -160,9 +159,9 @@ int SeqUtil::setBar(int i, const Sequence *sequence, int position)
     }
 
     const auto difference = i - getBar(sequence, position);
-    const auto den = sequence->getTimeSignature().getDenominator();
+    const auto den = sequence->getTimeSignature().denominator;
 
-    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    if (const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
         position + difference * denTicks * 4 > sequence->getLastTick())
     {
         position = sequence->getLastTick();
@@ -182,18 +181,16 @@ int SeqUtil::setBeat(int i, const Sequence *s, int position)
         i = 0;
     }
 
-    const auto ts = s->getTimeSignature();
+    const auto [num, den] = s->getTimeSignature();
 
-    if (const auto num = ts.getNumerator(); i >= num)
+    if (i >= num)
     {
         i = num - 1;
     }
 
     const auto difference = i - getBeat(s, position);
 
-    const auto den = ts.getDenominator();
-
-    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    if (const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
         position + difference * denTicks > s->getLastTick())
     {
         position = s->getLastTick();
@@ -213,9 +210,9 @@ int SeqUtil::setClock(int i, const Sequence *s, int position)
         i = 0;
     }
 
-    const auto den = s->getTimeSignature().getDenominator();
+    const auto den = s->getTimeSignature().denominator;
 
-    if (const auto denTicks = static_cast<int>(96 * (4.0 / den)); i >= denTicks)
+    if (const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den)); i >= denTicks)
     {
         i = denTicks - 1;
     }
@@ -240,10 +237,8 @@ int SeqUtil::getBar(const Sequence *s, const int position)
         return 0;
     }
 
-    const auto ts = s->getTimeSignature();
-    const auto num = ts.getNumerator();
-    const auto den = ts.getDenominator();
-    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto [num, den] = s->getTimeSignature();
+    const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
     const auto bar = static_cast<int>(floor(position / (denTicks * num)));
     return bar;
 }
@@ -255,8 +250,8 @@ int SeqUtil::getBeat(const Sequence *s, const int position)
         return 0;
     }
 
-    const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto den = s->getTimeSignature().denominator;
+    const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
     auto beat = static_cast<int>(floor(position / denTicks));
     beat = beat % den;
     return beat;
@@ -264,8 +259,8 @@ int SeqUtil::getBeat(const Sequence *s, const int position)
 
 int SeqUtil::getClock(const Sequence *s, const int position)
 {
-    const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto den = s->getTimeSignature().denominator;
+    const auto denTicks = static_cast<int>(Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
 
     if (position == 0)
     {
@@ -293,9 +288,9 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     const auto toSequence = sequencer->getSequence(toSeqIndex);
     auto numberOfDestinationBars = (copyLastBar - copyFirstBar + 1) * copyCount;
 
-    if (numberOfDestinationBars > 999)
+    if (numberOfDestinationBars > Mpc2000XlSpecs::MAX_BAR_COUNT)
     {
-        numberOfDestinationBars = 999;
+        numberOfDestinationBars = Mpc2000XlSpecs::MAX_BAR_COUNT;
     }
 
     if (!toSequence->isUsed())
@@ -304,9 +299,9 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     }
     else
     {
-        if (toSequence->getLastBarIndex() + numberOfDestinationBars > 998)
+        if (toSequence->getLastBarIndex() + numberOfDestinationBars > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
         {
-            numberOfDestinationBars = 998 - toSequence->getLastBarIndex();
+            numberOfDestinationBars = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - toSequence->getLastBarIndex();
         }
 
         toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
@@ -334,19 +329,21 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     auto firstTickOfFromSequence = 0;
     auto lastTickOfFromSequence = 0;
 
-    for (int i = 0; i < 999; i++)
+    const auto fromSeqSnapshot = fromSequence->getStateManager()->getSnapshot();
+
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyFirstBar)
         {
             break;
         }
 
-        firstTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
+        firstTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
     }
 
-    for (int i = 0; i < 999; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        lastTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
+        lastTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
 
         if (i == copyLastBar)
         {
@@ -356,21 +353,23 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
     auto firstTickOfToSequence = 0;
 
-    for (int i = 0; i < 999; i++)
+    const auto toSeqSnapshot = toSequence->getStateManager()->getSnapshot();
+
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyAfterBar)
         {
             break;
         }
 
-        firstTickOfToSequence += toSequence->getBarLengthsInTicks()[i];
+        firstTickOfToSequence += toSeqSnapshot.getBarLength(i);
     }
 
     const auto segmentLengthTicks =
         lastTickOfFromSequence - firstTickOfFromSequence;
     const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
     {
         const auto t1 = fromSequence->getTrack(i);
 
@@ -390,7 +389,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
         const auto toSeqLastTick = toSequence->getLastTick();
 
-        for (auto &event : t1Events)
+        for (const auto &event : t1Events)
         {
             const auto firstCopyTick = event->getTick() + offset;
 
@@ -412,7 +411,11 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                     break;
                 }
 
-                t2->cloneEventIntoTrack(event, tick);
+                EventState eventToInsert = event->getSnapshot().second;
+
+                eventToInsert.tick = tick;
+
+                t2->insertEvent(eventToInsert);
             }
         }
     }

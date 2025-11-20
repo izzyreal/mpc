@@ -387,8 +387,8 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
             seq->insertBars(1, seq->getLastBarIndex());
             seq->setTimeSignature(seq->getLastBarIndex(),
                                   seq->getLastBarIndex(),
-                                  userScreen->timeSig.getNumerator(),
-                                  userScreen->timeSig.getDenominator());
+                                  userScreen->timeSig.numerator,
+                                  userScreen->timeSig.denominator);
         }
         else
         {
@@ -616,7 +616,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         tickFrameOffset = frameIndex;
 
         triggerClickIfNeeded();
-        displayPunchRects();
+
+        layeredScreen->postToUiThread([this]{displayPunchRects();});
 
         if (sequencer->getTransport()->isCountingIn())
         {

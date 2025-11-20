@@ -274,8 +274,13 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                 {
                     const auto destinationTick =
                         destinationFirstBarStartTick + sourceEvent->getTick();
-                    destinationTrack->cloneEventIntoTrack(
-                        sourceEvent, destinationTick, true);
+
+
+                    EventState eventState = sourceEvent->getSnapshot().second;
+                    eventState.tick = destinationTick;
+
+                    constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
+                    destinationTrack->insertEvent(eventState, allowMultipleNoteEventsWithSameNoteOnSameTick);
                 }
             }
         }

@@ -1,34 +1,31 @@
 #include "AllPolyPressureEvent.hpp"
 
 #include "file/all/AllEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<PolyPressureEvent>
-AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    auto event = std::make_shared<PolyPressureEvent>();
+    EventState e;
+    e.type = EventType::PolyPressure;
+    e.tick = AllEvent::readTick(bytes);
+    e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
+    e.noteNumber = NoteNumber(bytes[NOTE_OFFSET]);
+    e.amount = bytes[AMOUNT_OFFSET];
 
-    event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
-    event->setNote(bytes[NOTE_OFFSET]);
-    event->setAmount(bytes[AMOUNT_OFFSET]);
-
-    return event;
+    return e;
 }
 
-std::vector<char> AllPolyPressureEvent::mpcEventToBytes(
-    const std::shared_ptr<PolyPressureEvent> &event)
+std::vector<char> AllPolyPressureEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::POLY_PRESSURE_ID;
-    AllEvent::writeTick(bytes, event->getTick());
-    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
-    bytes[NOTE_OFFSET] = static_cast<int8_t>(event->getNote());
-    bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());
+    AllEvent::writeTick(bytes, e.tick);
+    bytes[AllEvent::TRACK_OFFSET] = e.trackIndex;
+    bytes[NOTE_OFFSET] = e.noteNumber;
+    bytes[AMOUNT_OFFSET] = e.amount;
 
     return bytes;
 }

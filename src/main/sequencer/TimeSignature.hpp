@@ -1,30 +1,17 @@
 #pragma once
+#include "IntTypes.hpp"
 
 namespace mpc::sequencer
 {
-    class TimeSignature
+    struct TimeSignature
     {
-        int numerator{};
-        int denominator{};
+        TimeSigNumerator numerator{DefaultTimeSigNumerator};
+        TimeSigDenominator denominator{DefaultTimeSigDenominator};
 
-    public:
-        TimeSignature() = default;
-        TimeSignature(const TimeSignature &other);
-        bool operator!=(const TimeSignature &other) const
+        bool operator==(TimeSignature const& other) const
         {
-            return numerator != other.numerator ||
-                   denominator != other.denominator;
+            return numerator == other.numerator && denominator == other.denominator;
         }
-        bool operator==(const TimeSignature &other) const
-        {
-            return numerator == other.numerator &&
-                   denominator == other.denominator;
-        }
-        void setNumerator(int i);
-        int getNumerator() const;
-
-        void setDenominator(int i);
-        int getDenominator() const;
 
         void increase();
         void decrease();

@@ -1,32 +1,30 @@
 #include "AllProgramChangeEvent.hpp"
 
 #include "file/all/AllEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<ProgramChangeEvent>
+EventState
 AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    auto event = std::make_shared<ProgramChangeEvent>();
+    EventState e;
+    e.type = EventType::ProgramChange;
+    e.tick = AllEvent::readTick(bytes);
+    e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
+    e.programChangeProgramIndex = ProgramIndex(bytes[PROGRAM_OFFSET] + 1);
 
-    event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
-    event->setProgram(bytes[PROGRAM_OFFSET] + 1);
-
-    return event;
+    return e;
 }
 
-std::vector<char> AllProgramChangeEvent::mpcEventToBytes(
-    const std::shared_ptr<ProgramChangeEvent> &event)
+std::vector<char> AllProgramChangeEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PGM_CHANGE_ID;
-    AllEvent::writeTick(bytes, event->getTick());
-    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
-    bytes[PROGRAM_OFFSET] = static_cast<int8_t>(event->getProgram() - 1);
+    AllEvent::writeTick(bytes, e.tick);
+    bytes[AllEvent::TRACK_OFFSET] = e.trackIndex;
+    bytes[PROGRAM_OFFSET] = e.programChangeProgramIndex;
 
     return bytes;
 }

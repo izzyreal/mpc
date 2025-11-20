@@ -3,17 +3,15 @@
 
 namespace mpc::sequencer
 {
-    class PitchBendEvent : public Event
+    class PitchBendEvent final : public Event
     {
-
-        int pitchBendAmount{0};
-
     public:
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
-        PitchBendEvent() = default;
-        PitchBendEvent(const PitchBendEvent &);
+        explicit PitchBendEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

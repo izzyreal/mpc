@@ -1,24 +1,15 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
-namespace mpc::sequencer
-{
-    class ChannelPressureEvent;
-}
+#include "sequencer/EventState.hpp"
 
 namespace mpc::file::all
 {
     class AllChannelPressureEvent
     {
-
-        const static int AMOUNT_OFFSET = 5;
+        static constexpr int AMOUNT_OFFSET = 5;
 
     public:
-        static std::shared_ptr<sequencer::ChannelPressureEvent>
-        bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(
-            const std::shared_ptr<sequencer::ChannelPressureEvent> &);
+        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

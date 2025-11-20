@@ -1,10 +1,11 @@
 #include "Util.hpp"
 
 #include "Mpc.hpp"
-#include "sequencer/NoteEvent.hpp"
 
 #include "StrUtil.hpp"
+
 #include "lcdgui/screens/UserScreen.hpp"
+
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -199,7 +200,7 @@ void Util::initSequence(mpc::Mpc &mpc)
     initSequence(mpc.getSequencer()->getSelectedSequenceIndex(), mpc);
 }
 
-void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
+void Util::initSequence(const int sequenceIndex, mpc::Mpc &mpc)
 {
     const auto sequencer = mpc.getSequencer();
     const auto sequence = sequencer->getSequence(sequenceIndex);
@@ -219,35 +220,35 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
 }
 
 void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
-                             const std::shared_ptr<NoteOnEvent> &event)
+                             sequencer::EventState &event)
 {
     if (!ctx.isSixteenLevelsEnabled)
     {
         return;
     }
 
-    const auto _16l_type = static_cast<NoteOnEvent::VARIATION_TYPE>(ctx.type);
+    const auto _16l_type = NoteVariationType(ctx.type);
     const auto _16l_key = ctx.originalKeyPad;
     const auto _16l_note = ctx.note;
     const auto _16l_param = ctx.parameter;
 
-    event->setNote(NoteNumber(_16l_note));
-    event->setVariationType(_16l_type);
+    event.noteNumber = NoteNumber(_16l_note);
+    event.noteVariationType = _16l_type;
 
-    if (_16l_param == 0 && event->getVelocity() != 0)
+    if (_16l_param == 0 && event.velocity != 0)
     {
         const auto velocity =
             static_cast<int>((ctx.padIndexWithoutBank + 1) * (127.0 / 16.0));
 
-        event->setVelocity(Velocity{static_cast<int8_t>(velocity)});
+        event.velocity = Velocity{static_cast<int8_t>(velocity)};
     }
     else if (_16l_param == 1)
     {
-        if (_16l_type != 0)
+        if (_16l_type != NoteVariationTypeTune)
         {
             const auto value = static_cast<int>(floor(100 / 16.0) *
                                                 (ctx.padIndexWithoutBank + 1));
-            event->setVariationValue(value);
+            event.noteVariationValue = NoteVariationValue(value);
             return;
         }
 
@@ -263,15 +264,14 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
             candidate = 4;
         }
 
-        event->setVariationValue(candidate);
+        event.noteVariationValue = NoteVariationValue(candidate);
     }
 }
 
-std::pair<NoteOnEvent::VARIATION_TYPE, int>
+std::pair<NoteVariationType, int>
 Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
 {
-    const auto variationType =
-        static_cast<NoteOnEvent::VARIATION_TYPE>(ctx.sliderParameter);
+    const auto variationType = ctx.sliderParameter;
     const int sliderValue = ctx.sliderValue;
 
     switch (variationType)
@@ -315,15 +315,16 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             auto filterValue = static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, filterValue};
         }
+        default:;
     }
 
-    return {NoteOnEvent::VARIATION_TYPE::TUNE_0, 0};
+    return {NoteVariationTypeTune, 0};
 }
 
-std::vector<char> Util::vecCopyOfRange(const std::vector<char> &src, int offset,
-                                       int endOffset)
+std::vector<char> Util::vecCopyOfRange(const std::vector<char> &src,
+                                       const int offset, const int length)
 {
-    return {begin(src) + offset, begin(src) + endOffset};
+    return {begin(src) + offset, begin(src) + length};
 }
 
 bool Util::vecEquals(const std::vector<char> &a, const std::vector<char> &b)

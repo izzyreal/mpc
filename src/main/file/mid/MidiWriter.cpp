@@ -24,7 +24,6 @@
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
@@ -36,6 +35,8 @@
 
 #include <set>
 #include "file/mid/util/MidiUtil.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::file::mid::event;
 using namespace mpc::file::mid;
@@ -55,13 +56,13 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
     std::vector<std::shared_ptr<meta::Tempo>> tempos;
     int previousTick = 0;
     auto tempo = sequence->getInitialTempo();
-    auto mpqn = (int)(6.0E7 / tempo);
+    auto mpqn = static_cast<int>(6.0E7 / tempo);
     tempos.push_back(std::make_shared<meta::Tempo>(0, 0, mpqn));
 
     for (auto &e : sequence->getTempoChangeEvents())
     {
         tempo = e->getTempo();
-        mpqn = (int)(6.0E7 / tempo);
+        mpqn = static_cast<int>(6.0E7 / tempo);
         tempos.push_back(std::make_shared<meta::Tempo>(
             e->getTick(), e->getTick() - previousTick, mpqn));
         previousTick = e->getTick();
@@ -77,6 +78,7 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
     std::set<std::vector<int>> tSigs;
     auto tSigTick = 0;
     auto lastAdded = std::vector<int>(3);
+    const auto snapshot = sequence->getStateManager()->getSnapshot();
     for (int i = 0; i < sequence->getLastBarIndex() + 1; i++)
     {
         auto actualTick = tSigTick;
@@ -88,14 +90,15 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
 
         auto vec = std::vector{sequence->getNumerator(i),
                                sequence->getDenominator(i), actualTick};
-        auto foo = tSigs.emplace(vec);
-        if (foo.second)
+
+        if (tSigs.emplace(vec).second)
         {
             lastAdded[0] = sequence->getNumerator(i);
             lastAdded[1] = sequence->getDenominator(i);
             lastAdded[2] = actualTick;
         }
-        tSigTick += sequence->getBarLengthsInTicks()[i];
+
+        tSigTick += snapshot.getBarLength(i);
     }
     previousTick = 0;
     for (auto &ia : tSigs)
@@ -146,7 +149,7 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
 
         if (t->getDeviceIndex() > 0)
         {
-            auto value = stoi(trackDevice, 0, 16);
+            auto value = stoi(trackDevice, nullptr, 16);
             value += t->getDeviceIndex();
             trackDevice = util::MidiUtil::byteToHex(static_cast<char>(value));
         }
@@ -219,7 +222,7 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
             else if (mpcSysExEvent)
             {
                 auto sysExData = std::vector<char>(
-                    (int)mpcSysExEvent->getBytes().size() - 1);
+                    static_cast<int>(mpcSysExEvent->getBytes().size()) - 1);
 
                 for (int j = 0; j < sysExData.size(); j++)
                 {
@@ -343,13 +346,12 @@ void MidiWriter::addNoteOn(const std::shared_ptr<NoteOn> &noteOn)
 
 void MidiWriter::createDeltas(const std::weak_ptr<MidiTrack> &midiTrack) const
 {
-    auto mt = midiTrack.lock();
+    const auto mt = midiTrack.lock();
     std::shared_ptr<MidiEvent> previousEvent;
 
     for (auto &me : mt->getEvents())
     {
-        auto event = std::dynamic_pointer_cast<NoteOn>(me.lock());
-        if (event)
+        if (const auto event = std::dynamic_pointer_cast<NoteOn>(me.lock()))
         {
             if (previousEvent)
             {
@@ -366,14 +368,14 @@ void MidiWriter::createDeltas(const std::weak_ptr<MidiTrack> &midiTrack) const
             previousEvent = event;
         }
     }
-    auto previousTick = !previousEvent ? 0 : previousEvent->getTick();
+    const auto previousTick = !previousEvent ? 0 : previousEvent->getTick();
     mt->setEndOfTrackDelta(sequence->getLastTick() - previousTick);
 }
 
 void MidiWriter::writeToOStream(
     const std::shared_ptr<std::ostream> &_ostream) const
 {
-    auto _ofstream = std::dynamic_pointer_cast<std::ofstream>(_ostream);
+    const auto _ofstream = std::dynamic_pointer_cast<std::ofstream>(_ostream);
     if (_ofstream)
     {
         _ofstream->unsetf(std::ios::skipws);

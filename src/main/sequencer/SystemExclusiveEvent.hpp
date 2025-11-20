@@ -3,11 +3,8 @@
 
 namespace mpc::sequencer
 {
-    class SystemExclusiveEvent : public Event
+    class SystemExclusiveEvent final : public Event
     {
-
-        std::vector<unsigned char> bytes = std::vector<unsigned char>(2);
-
     public:
         void setByteA(unsigned char i);
         unsigned char getByteA() const;
@@ -16,8 +13,9 @@ namespace mpc::sequencer
         void setBytes(const std::vector<unsigned char> &ba);
         const std::vector<unsigned char> &getBytes() const;
 
-        SystemExclusiveEvent() = default;
-        SystemExclusiveEvent(const SystemExclusiveEvent &event);
+        explicit SystemExclusiveEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
         std::string getTypeName() const override
         {
             return "system-exclusive";

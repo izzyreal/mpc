@@ -143,7 +143,7 @@ TEST_CASE("ALL file note event", "[allfile]")
     event->setVelocity(mpc::Velocity(127));
     event->setDuration(1600);
     event->setTick(0);
-    event->incrementVariationType(3);
+    event->setVariationType(3);
     event->setVariationValue(20);
 
     auto disk = mpc.getDisk();

@@ -2,38 +2,33 @@
 
 using namespace mpc::sequencer;
 
-void ControlChangeEvent::setController(const int i)
+ControlChangeEvent::ControlChangeEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-    controllerNumber = i;
+}
+
+void ControlChangeEvent::setController(const int i) const
+{
+    auto e = getSnapshot();
+    e.second.controllerNumber = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ControlChangeEvent::getController() const
 {
-    return controllerNumber;
+    return getSnapshot().second.controllerNumber;
 }
 
-void ControlChangeEvent::setAmount(const int i)
+void ControlChangeEvent::setAmount(const int i) const
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    controllerValue = i;
+    auto e = getSnapshot();
+    e.second.controllerValue = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ControlChangeEvent::getAmount() const
 {
-    return controllerValue;
-}
-
-ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-    setController(event.getController());
+    return getSnapshot().second.controllerValue;
 }

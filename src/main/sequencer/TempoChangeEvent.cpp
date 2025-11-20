@@ -5,20 +5,11 @@
 
 using namespace mpc::sequencer;
 
-TempoChangeEvent::TempoChangeEvent(Sequence *parent)
-    : TempoChangeEvent(parent, 1000)
+TempoChangeEvent::TempoChangeEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch, Sequence *parent)
+    : Event(getSnapshot, dispatch), parent(parent)
 {
-}
-
-TempoChangeEvent::TempoChangeEvent(Sequence *parent, const int ratio)
-{
-    this->ratio = ratio;
-    this->parent = parent;
-}
-
-TempoChangeEvent::TempoChangeEvent(const TempoChangeEvent &event) : Event(event)
-{
-    setRatio(event.getRatio());
 }
 
 void TempoChangeEvent::setParent(Sequence *newParent)
@@ -26,166 +17,170 @@ void TempoChangeEvent::setParent(Sequence *newParent)
     parent = newParent;
 }
 
-void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next) const
 {
-    tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) + 1);
+    auto candidate = parent->getFirstTickOfBar(
+        SeqUtil::getBar(parent, getSnapshot().second.tick) + 1);
 
-    if (tick > parent->getLastTick())
+    if (candidate > parent->getLastTick())
     {
-        tick = parent->getLastTick();
+        candidate = parent->getLastTick();
     }
 
     if (next != nullptr)
     {
-        if (tick >= next->getTick())
+        if (candidate >= next->getTick())
         {
-            tick = next->getTick() - 1;
+            candidate = next->getTick() - 1;
         }
     }
 
-    notifyObservers(std::string("tempo-change"));
+    setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous) const
 {
-    tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) - 1);
+    auto candidate = parent->getFirstTickOfBar(
+        SeqUtil::getBar(parent, getSnapshot().second.tick) - 1);
 
-    if (tick < 0)
+    if (candidate < 0)
     {
-        tick = 0;
+        candidate = 0;
     }
 
     if (previous != nullptr)
     {
-        if (tick <= previous->getTick())
+        if (candidate <= previous->getTick())
         {
-            tick = previous->getTick() + 1;
+            candidate = previous->getTick() + 1;
         }
     }
 
-    notifyObservers(std::string("tempo-change"));
+    setTick(candidate);
 }
 
-void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next) const
 {
-    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
-                                      SeqUtil::getBeat(parent, tick) + 1);
+    const auto oldTick = getSnapshot().second.tick;
 
-    if (tick >= parent->getLastTick())
+    auto candidate =
+        parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
+                                   SeqUtil::getBeat(parent, oldTick) + 1);
+
+    if (candidate >= parent->getLastTick())
     {
-        tick = parent->getLastTick() - 1;
+        candidate = parent->getLastTick() - 1;
     }
 
     if (next != nullptr)
     {
-        if (tick >= next->getTick())
+        if (candidate >= next->getTick())
         {
-            tick = next->getTick() - 1;
+            candidate = next->getTick() - 1;
         }
     }
 
-    notifyObservers(std::string("tempo-change"));
+    setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous) const
 {
-    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
-                                      SeqUtil::getBeat(parent, tick) - 1);
+    const auto oldTick = getSnapshot().second.tick;
+    auto candidate =
+        parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
+                                   SeqUtil::getBeat(parent, oldTick) - 1);
 
-    if (tick < 0)
+    if (candidate < 0)
     {
-        tick = 0;
+        candidate = 0;
     }
 
     if (previous != nullptr)
     {
-        if (tick <= previous->getTick())
+        if (candidate <= previous->getTick())
         {
-            tick = previous->getTick() + 1;
+            candidate = previous->getTick() + 1;
         }
     }
 
-    notifyObservers(std::string("tempo-change"));
+    setTick(candidate);
 }
 
-void TempoChangeEvent::plusOneClock(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneClock(const TempoChangeEvent *next) const
 {
-    if (next != nullptr && tick == next->getTick() - 1)
+    const auto oldTick = getSnapshot().second.tick;
+
+    if (next != nullptr && oldTick == next->getTick() - 1)
     {
         return;
     }
 
-    if (tick + 1 >= parent->getLastTick())
+    if (oldTick + 1 >= parent->getLastTick())
     {
         return;
     }
 
-    tick++;
+    auto candidate = oldTick + 1;
 
-    if (tick > parent->getLastTick())
+    if (candidate > parent->getLastTick())
     {
-        tick = parent->getLastTick();
+        candidate = parent->getLastTick();
     }
 
-    notifyObservers(std::string("tempo-change"));
+    setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneClock(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneClock(const TempoChangeEvent *previous) const
 {
+    const auto oldTick = getSnapshot().second.tick;
+
     if (previous != nullptr)
     {
-        if (tick == previous->getTick() + 1)
+        if (oldTick == previous->getTick() + 1)
         {
             return;
         }
     }
 
-    tick--;
-
-    notifyObservers(std::string("tempo-change"));
+    setTick(oldTick - 1);
 }
 
-void TempoChangeEvent::setRatio(const int i)
+void TempoChangeEvent::setRatio(const int i) const
 {
-    if (i < 100 || i > 9998)
-    {
-        return;
-    }
-
-    ratio = i;
-
-    notifyObservers(std::string("tempo-change"));
+    auto e = getSnapshot();
+    e.second.amount = std::clamp(i, 100, 9998);
+    dispatch(UpdateEvent{e});
 }
 
 int TempoChangeEvent::getRatio() const
 {
-    return ratio;
+    return getSnapshot().second.amount;
 }
 
 int TempoChangeEvent::getBar(const int n, const int d) const
 {
-    const auto barLength = (int)(96 * (4.0 / d) * n);
-    const auto bar = tick / barLength;
+    const auto barLength = static_cast<int>(96 * (4.0 / d) * n);
+    const auto bar = getSnapshot().second.tick / barLength;
     return bar;
 }
 
 int TempoChangeEvent::getBeat(const int n, const int d) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / d));
-    const auto beat = tick / beatLength % n;
+    const auto beat = getSnapshot().second.tick / beatLength % n;
     return beat;
 }
 
 int TempoChangeEvent::getClock(const int denominator) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / denominator));
-    const auto clock = tick % beatLength;
+    const auto clock = getSnapshot().second.tick % beatLength;
     return clock;
 }
 
 double TempoChangeEvent::getTempo() const
 {
-    const auto tempo = parent->getInitialTempo() * ratio * 0.001;
+    const auto tempo = parent->getInitialTempo() * getRatio() * 0.001;
 
     if (tempo < 30.0)
     {

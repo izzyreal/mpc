@@ -30,7 +30,6 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -373,9 +372,7 @@ void ClientHardwareEventController::handlePadRelease(
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
 
-        const auto recordingNoteEventId = recordingNoteOnEvent != nullptr
-                                              ? recordingNoteOnEvent->getId()
-                                              : NoNoteEventId;
+        const auto recordingNoteEventId = recordingNoteOnEvent.second.noteEventId;
 
         if (p->noteNumber != NoNoteNumber)
         {

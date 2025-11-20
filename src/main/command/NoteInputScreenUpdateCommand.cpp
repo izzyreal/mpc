@@ -8,8 +8,6 @@
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
 
-#include "sequencer/NoteEvent.hpp"
-
 #include <memory>
 
 using namespace mpc::lcdgui;
@@ -33,7 +31,7 @@ void NoteInputScreenUpdateCommand::execute()
 
     const auto screenComponent = ctx.screenComponent;
 
-    if (sequencer::isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
+    if (isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
         ctx.setSelectedNote(note);
     }
@@ -48,7 +46,7 @@ void NoteInputScreenUpdateCommand::execute()
                      screenComponent);
              assign16LevelsScreen)
     {
-        assert(sequencer::isDrumNote(note));
+        assert(isDrumNote(note));
         assign16LevelsScreen->setNote(DrumNoteNumber(note));
     }
     else if (const auto editMultipleScreen =

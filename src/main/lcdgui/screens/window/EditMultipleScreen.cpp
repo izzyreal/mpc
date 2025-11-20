@@ -9,6 +9,7 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 #include "lcdgui/screens/StepEditorScreen.hpp"
 
@@ -173,7 +174,7 @@ void EditMultipleScreen::turnWheel(const int increment)
             }
             else if (paramLetter == "b")
             {
-                incrementVariationType(increment);
+                setVariationType(variationType + increment);
             }
             else if (paramLetter == "c")
             {
@@ -239,7 +240,7 @@ void EditMultipleScreen::checkThreeParameters() const
     }
 }
 
-void EditMultipleScreen::checkFiveParameters()
+void EditMultipleScreen::checkFiveParameters() const
 {
     const auto stepEditorScreen =
         mpc.screens->get<ScreenId::StepEditorScreen>();
@@ -257,7 +258,7 @@ void EditMultipleScreen::checkFiveParameters()
 
         if (note)
         {
-            note->setDuration(editValue);
+            note->setDuration(Duration(editValue));
         }
         else if (programChange)
         {
@@ -341,7 +342,7 @@ void EditMultipleScreen::updateEditMultiple() const
             {
                 findLabel("value0")->setText(singleLabels[2]);
 
-                if (variationType == NoteOnEvent::VARIATION_TYPE::TUNE_0)
+                if (variationType == NoteVariationTypeTune)
                 {
                     findField("value0")->setSize(4 * 6 + 1, 9);
                     findField("value0")->setLocation(
@@ -376,8 +377,8 @@ void EditMultipleScreen::updateEditMultiple() const
                     }
                 }
 
-                if (variationType == NoteOnEvent::VARIATION_TYPE::DECAY_1 ||
-                    variationType == NoteOnEvent::VARIATION_TYPE::ATTACK_2)
+                if (variationType == NoteVariationTypeDecay ||
+                    variationType == NoteVariationTypeAttack)
                 {
                     auto noteVarValue = variationValue;
 
@@ -392,7 +393,7 @@ void EditMultipleScreen::updateEditMultiple() const
                     findField("value0")->setLocation(
                         51, findField("value0")->getY());
                 }
-                else if (variationType == NoteOnEvent::VARIATION_TYPE::FILTER_3)
+                else if (variationType == NoteVariationTypeFilter)
                 {
                     findField("value0")->setSize(4 * 6 + 1, 9);
                     findField("value0")->setLocation(
@@ -507,24 +508,16 @@ void EditMultipleScreen::setChangeNoteTo(const NoteNumber i)
     updateEditMultiple();
 }
 
-void EditMultipleScreen::setVariationType(
-    const NoteOnEvent::VARIATION_TYPE type)
+void EditMultipleScreen::setVariationType(const NoteVariationType type)
 {
     variationType = type;
     updateEditMultiple();
 }
 
-void EditMultipleScreen::incrementVariationType(const int i)
-{
-    variationType =
-        static_cast<NoteOnEvent::VARIATION_TYPE>(std::clamp(i, 0, 3));
-    updateEditMultiple();
-}
-
 void EditMultipleScreen::setVariationValue(const int i)
 {
-    variationValue = std::clamp(
-        i, 0, variationType == NoteOnEvent::VARIATION_TYPE::TUNE_0 ? 124 : 100);
+    variationValue =
+        std::clamp(i, 0, variationType == NoteVariationTypeTune ? 124 : 100);
     updateEditMultiple();
 }
 

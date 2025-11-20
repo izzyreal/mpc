@@ -2,22 +2,21 @@
 
 using namespace mpc::sequencer;
 
-void ChannelPressureEvent::setAmount(const int i)
+ChannelPressureEvent::ChannelPressureEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-    channelPressureValue = i;
+}
+
+void ChannelPressureEvent::setAmount(const int i) const
+{
+    auto e = getSnapshot();
+    e.second.amount = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ChannelPressureEvent::getAmount() const
 {
-    return channelPressureValue;
-}
-
-ChannelPressureEvent::ChannelPressureEvent(const ChannelPressureEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
+    return getSnapshot().second.amount;
 }

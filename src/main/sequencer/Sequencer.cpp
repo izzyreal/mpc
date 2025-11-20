@@ -1,6 +1,7 @@
 #include "Sequencer.hpp"
 
 #include "MpcSpecs.hpp"
+#include "SequenceStateManager.hpp"
 
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Transport.hpp"
@@ -28,6 +29,7 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
+#include "TrackEventStateWorker.hpp"
 
 #include <chrono>
 
@@ -88,6 +90,7 @@ Sequencer::Sequencer(
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
+    trackEventStateWorker = std::make_shared<TrackEventStateWorker>(this);
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
@@ -142,6 +145,8 @@ void Sequencer::init()
     {
         songs[i] = std::make_shared<Song>();
     }
+
+    trackEventStateWorker->start();
 }
 
 void Sequencer::deleteSong(const int i)
@@ -278,7 +283,7 @@ void Sequencer::setSoloEnabled(const bool b)
     }
 }
 
-std::shared_ptr<Sequence> Sequencer::getSequence(const int i)
+std::shared_ptr<sequencer::Sequence> Sequencer::getSequence(const int i)
 {
     return sequences[i];
 }
@@ -395,7 +400,7 @@ void Sequencer::purgeAllSequences()
     setSelectedSequenceIndex(MinSequenceIndex, true);
 }
 
-std::shared_ptr<Sequence> Sequencer::makeNewSequence()
+std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
 {
     return std::make_shared<Sequence>(
         [&](const int trackIndex)
@@ -500,7 +505,7 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
     copySequenceParameters(sequences[source], sequences[dest]);
 }
 
-std::shared_ptr<Sequence>
+std::shared_ptr<sequencer::Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
     auto copy = makeNewSequence();
@@ -514,10 +519,9 @@ Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 
     copy->getTempoChangeTrack()->removeEvents();
 
-    for (auto &event : source->getTempoChangeTrack()->getEvents())
+    for (const auto &event : source->getTempoChangeTrack()->getEvents())
     {
-        copy->getTempoChangeTrack()->cloneEventIntoTrack(event,
-                                                         event->getTick());
+        copy->getTempoChangeTrack()->insertEvent(event->getSnapshot().second);
     }
 
     return copy;
@@ -531,7 +535,7 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setUsed(source->isUsed());
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
-    dest->setBarLengths(source->getBarLengthsInTicks());
+    dest->setBarLengths(source->getStateManager()->getSnapshot().getBarLengths());
     dest->setNumeratorsAndDenominators(source->getNumerators(),
                                        source->getDenominators());
     dest->setLoopStart(source->getLoopStart());
@@ -544,8 +548,7 @@ void Sequencer::copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
 {
     for (const auto &e1 : src->getTempoChangeEvents())
     {
-        const auto copy = dst->addTempoChangeEvent(e1->getTick());
-        copy->setRatio(e1->getRatio());
+        dst->addTempoChangeEvent(e1->getTick(), e1->getRatio());
     }
 }
 
@@ -612,7 +615,7 @@ void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
 
     for (auto &e : src->getEvents())
     {
-        dest->cloneEventIntoTrack(e, e->getTick());
+        dest->insertEvent(e->getSnapshot().second);
     }
 
     copyTrackParameters(src, dest);
@@ -645,7 +648,7 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
     defaultTrackNames[i] = s;
 }
 
-std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
+std::shared_ptr<sequencer::Sequence> Sequencer::getSelectedSequence()
 {
     if (const bool songMode = isSongModeEnabled();
         songMode &&
@@ -665,7 +668,8 @@ int Sequencer::getUsedSequenceCount() const
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences() const
+std::vector<std::shared_ptr<sequencer::Sequence>>
+Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
@@ -877,7 +881,7 @@ void Sequencer::tap()
     transport->setTempo(newTempo);
 }
 
-std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
+std::shared_ptr<sequencer::Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
     const auto seqIndex = getCurrentlyPlayingSequenceIndex();
 
@@ -1071,7 +1075,7 @@ void Sequencer::resetUndo()
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
-std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
+std::shared_ptr<sequencer::Sequence> Sequencer::createSeqInPlaceHolder()
 {
     placeHolder = makeNewSequence();
     return placeHolder;
@@ -1090,7 +1094,7 @@ void Sequencer::movePlaceHolderTo(const int destIndex)
     clearPlaceHolder();
 }
 
-std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
+std::shared_ptr<sequencer::Sequence> Sequencer::getPlaceHolder()
 {
     return placeHolder;
 }

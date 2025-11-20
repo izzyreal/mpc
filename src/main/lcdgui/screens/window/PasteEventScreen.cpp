@@ -20,21 +20,47 @@ void PasteEventScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
-    switch (i)
+    if (i != 4)
     {
-        case 4:
-            const auto stepEditorScreen =
-                mpc.screens->get<ScreenId::StepEditorScreen>();
+        return;
+    }
 
-            constexpr bool allowMultipleNotesOnSameTick = true;
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
 
-            for (auto &event : stepEditorScreen->getPlaceHolder())
+    if (stepEditorScreen->getPlaceHolder().empty())
+    {
+        openScreenById(ScreenId::StepEditorScreen);
+        return;
+    }
+
+    for (int eventIndex = 0;
+         eventIndex < stepEditorScreen->getPlaceHolder().size();
+         ++eventIndex)
+    {
+        const auto event =
+            stepEditorScreen->getPlaceHolder()[eventIndex];
+        constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick =
+            true;
+        sequencer::EventState eventState = event->getSnapshot().second;
+        eventState.tick = sequencer->getTransport()->getTickPosition();
+
+        std::function onComplete = [] {};
+
+        if (eventIndex == stepEditorScreen->getPlaceHolder().size() - 1)
+        {
+            onComplete = [ls = mpc.getLayeredScreen()]
             {
-                sequencer->getSelectedTrack()->cloneEventIntoTrack(
-                    event, sequencer->getTransport()->getTickPosition(),
-                    allowMultipleNotesOnSameTick);
-            }
-            openScreenById(ScreenId::StepEditorScreen);
-            break;
+                ls->postToUiThread(
+                    [ls]
+                    {
+                        ls->openScreenById(ScreenId::StepEditorScreen);
+                    });
+            };
+        }
+
+        sequencer->getSelectedTrack()->insertEvent(
+            eventState, allowMultipleNoteEventsWithSameNoteOnSameTick,
+            onComplete);
     }
 }

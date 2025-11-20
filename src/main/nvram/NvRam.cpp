@@ -45,15 +45,15 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
     userScreen->setSequenceName(defaults.getDefaultSeqName());
     const auto defTrackNames = defaults.getDefaultTrackNames();
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
     {
         userScreen->setTrackName(i, defTrackNames[i]);
     }
 
     userScreen->device = defaults.getDevices()[0];
     sequencer::TimeSignature timeSignature;
-    timeSignature.setNumerator(defaults.getTimeSigNum());
-    timeSignature.setDenominator(defaults.getTimeSigDen());
+    timeSignature.numerator = TimeSigNumerator(defaults.getTimeSigNum());
+    timeSignature.denominator = TimeSigDenominator(defaults.getTimeSigDen());
     userScreen->timeSig = timeSignature;
     userScreen->pgm = defaults.getPgms()[0];
     userScreen->tempo = defaults.getTempo() / 10.0;

@@ -119,8 +119,8 @@ void UserScreen::displayLoop() const
 
 void UserScreen::displayTsig() const
 {
-    const auto numerator = std::to_string(timeSig.getNumerator());
-    const auto denominator = std::to_string(timeSig.getDenominator());
+    const auto numerator = std::to_string(timeSig.numerator);
+    const auto denominator = std::to_string(timeSig.denominator);
     findField("tsig")->setText(numerator + "/" + denominator);
 }
 
@@ -227,8 +227,8 @@ void UserScreen::resetPreferences()
     }
 
     lastBar = 1;
-    timeSig.setNumerator(4);
-    timeSig.setDenominator(4);
+    timeSig.numerator = TimeSigNumerator(4);
+    timeSig.denominator = TimeSigDenominator(4);
 
     deviceNames.clear();
 
@@ -334,8 +334,8 @@ void UserScreen::setSequenceName(const std::string &name)
 
 void UserScreen::setTimeSig(const int num, const int den)
 {
-    timeSig.setNumerator(num);
-    timeSig.setDenominator(den);
+    timeSig.numerator = TimeSigNumerator(num);
+    timeSig.denominator = TimeSigDenominator(den);
 }
 
 void UserScreen::setTrackName(const int i, const std::string &s)

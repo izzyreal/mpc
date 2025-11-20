@@ -3,17 +3,15 @@
 
 namespace mpc::sequencer
 {
-    class ProgramChangeEvent : public Event
+    class ProgramChangeEvent final : public Event
     {
-
-        int programChangeValue = 0;
-
     public:
-        void setProgram(int i);
+        void setProgram(int i) const;
         int getProgram() const;
 
-        ProgramChangeEvent() = default;
-        ProgramChangeEvent(const ProgramChangeEvent &event);
+        explicit ProgramChangeEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

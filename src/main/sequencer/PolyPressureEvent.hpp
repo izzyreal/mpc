@@ -3,20 +3,17 @@
 
 namespace mpc::sequencer
 {
-    class PolyPressureEvent : public Event
+    class PolyPressureEvent final : public Event
     {
-
-        int note{0};
-        int polyPressureValue{0};
-
     public:
-        void setNote(int i);
+        void setNote(int i) const;
         int getNote() const;
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
-        PolyPressureEvent() = default;
-        PolyPressureEvent(const PolyPressureEvent &event);
+        explicit PolyPressureEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

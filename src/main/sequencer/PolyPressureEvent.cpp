@@ -2,38 +2,33 @@
 
 using namespace mpc::sequencer;
 
-void PolyPressureEvent::setNote(const int i)
+PolyPressureEvent::PolyPressureEvent(
+    const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-    note = i;
+}
+
+void PolyPressureEvent::setNote(const int i) const
+{
+    auto e = getSnapshot();
+    e.second.noteNumber = NoteNumber(i);
+    dispatch(UpdateEvent{e});
 }
 
 int PolyPressureEvent::getNote() const
 {
-    return note;
+    return getSnapshot().second.noteNumber;
 }
 
-void PolyPressureEvent::setAmount(const int i)
+void PolyPressureEvent::setAmount(const int i) const
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    polyPressureValue = i;
+    auto e = getSnapshot();
+    e.second.amount = i;
+    dispatch(UpdateEvent{e});
 }
 
 int PolyPressureEvent::getAmount() const
 {
-    return polyPressureValue;
-}
-
-PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-    setNote(event.getNote());
+    return getSnapshot().second.amount;
 }

@@ -12,7 +12,7 @@ namespace mpc::performance
         NoteOnEvents noteEvents;
 
         std::array<Drum, 4> drums;
-        std::array<Program, mpc::Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
+        std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
 
         PerformanceState()
         {

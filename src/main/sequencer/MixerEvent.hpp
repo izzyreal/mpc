@@ -3,23 +3,19 @@
 
 namespace mpc::sequencer
 {
-    class MixerEvent : public Event
+    class MixerEvent final : public Event
     {
-
-        int mixerParameter{0};
-        int padNumber{0};
-        int mixerParameterValue{0};
-
     public:
-        void setParameter(int i);
+        void setParameter(int i) const;
         int getParameter() const;
-        void setPadNumber(int i);
+        void setPadNumber(int i) const;
         int getPad() const;
-        void setValue(int i);
+        void setValue(int i) const;
         int getValue() const;
 
-        MixerEvent() = default;
-        MixerEvent(const MixerEvent &);
+        explicit MixerEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

@@ -100,16 +100,16 @@ namespace mpc::lcdgui
 
     private:
         void setColors() const;
-        void setLabelTexts(const std::vector<std::string> &labels) const;
-        void setSizesAndLocations(const std::vector<int> &xPosArray,
-                                  const std::vector<int> &sizeArray) const;
+        void setLabelTexts(const std::vector<std::string> &labelTexts) const;
+        void setSizesAndLocations(const std::vector<int> &xPositions,
+                                  const std::vector<int> &fieldWidths) const;
 
     public:
         void setEvent(const std::weak_ptr<sequencer::Event> &newEvent);
         void setSelected(bool b);
         bool isSelected() const;
 
-        EventRow(Mpc &mpc, int rowNumber);
+        EventRow(Mpc &mpc, int rowIndex);
 
         static std::vector<std::string> controlNames;
     };

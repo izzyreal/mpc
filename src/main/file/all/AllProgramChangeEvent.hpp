@@ -1,24 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
-namespace mpc::sequencer
-{
-    class ProgramChangeEvent;
-}
+#include "sequencer/EventState.hpp"
 
 namespace mpc::file::all
 {
     class AllProgramChangeEvent
     {
-
-        const static int PROGRAM_OFFSET = 5;
+        static constexpr int PROGRAM_OFFSET = 5;
 
     public:
-        static std::shared_ptr<sequencer::ProgramChangeEvent>
-        bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<sequencer::ProgramChangeEvent> &);
+        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

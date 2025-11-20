@@ -99,6 +99,50 @@ namespace mpc
 
             return ConstrainedInt(static_cast<IntType>(clamped));
         }
+
+        constexpr ConstrainedInt &operator++()
+        {
+            long long raw = static_cast<long long>(value) + 1;
+            value = constrainedIntClampWide(raw);
+            return *this;
+        }
+
+        constexpr ConstrainedInt operator++(int)
+        {
+            ConstrainedInt tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+
+        constexpr ConstrainedInt &operator--()
+        {
+            long long raw = static_cast<long long>(value) - 1;
+            value = constrainedIntClampWide(raw);
+            return *this;
+        }
+
+        constexpr ConstrainedInt operator--(int)
+        {
+            ConstrainedInt tmp(*this);
+            --(*this);
+            return tmp;
+        }
+
+        constexpr ConstrainedInt& operator*=(IntType rhs)
+        {
+            long long raw =
+                static_cast<long long>(value) * static_cast<long long>(rhs);
+            value = constrainedIntClampWide(raw);
+            return *this;
+        }
+
+        constexpr ConstrainedInt& operator/=(IntType rhs)
+        {
+            long long raw =
+                static_cast<long long>(value) / static_cast<long long>(rhs);
+            value = constrainedIntClampWide(raw);
+            return *this;
+        }
     };
 
 } // namespace mpc

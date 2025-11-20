@@ -3,16 +3,15 @@
 
 namespace mpc::sequencer
 {
-    class ChannelPressureEvent : public Event
+    class ChannelPressureEvent final : public Event
     {
-        int channelPressureValue{0};
-
     public:
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
-        ChannelPressureEvent() = default;
-        ChannelPressureEvent(const ChannelPressureEvent &event);
+        explicit ChannelPressureEvent(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

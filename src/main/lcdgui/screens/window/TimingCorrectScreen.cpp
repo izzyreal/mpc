@@ -11,6 +11,7 @@
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -22,7 +23,7 @@ TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void TimingCorrectScreen::open()
 {
-    auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer->getSelectedTrack();
 
     if (track->getBusType() != BusType::MIDI)
     {
@@ -32,7 +33,7 @@ void TimingCorrectScreen::open()
     findField("note1")->setAlignment(Alignment::Centered, 18);
     findField("note1")->setLocation(116, 40);
 
-    auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -57,7 +58,7 @@ void TimingCorrectScreen::function(int i)
 
             std::vector<int> noteRange(2);
 
-            auto track = sequencer->getSelectedTrack();
+            const auto track = sequencer->getSelectedTrack();
 
             if (track->getBusType() != BusType::MIDI)
             {
@@ -78,13 +79,14 @@ void TimingCorrectScreen::function(int i)
                 noteRange[1] = note1;
             }
 
-            auto eventRange = track->getEventRange(time0, time1);
+            const auto eventRange = track->getEventRange(time0, time1);
 
-            auto sequence = sequencer->getSelectedSequence();
+            const auto sequence = sequencer->getSelectedSequence();
 
             for (auto &e : eventRange)
             {
-                if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+                if (const auto noteEvent =
+                        std::dynamic_pointer_cast<NoteOnEvent>(e))
                 {
                     if (noteEvent->getNote() >= noteRange[0] &&
                         noteEvent->getNote() <= noteRange[1])
@@ -101,14 +103,14 @@ void TimingCorrectScreen::function(int i)
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
+        default:;
     }
 }
 
 void TimingCorrectScreen::turnWheel(int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "notevalue")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "notevalue")
     {
         setNoteValue(noteValue.load() + i);
     }
@@ -131,7 +133,7 @@ void TimingCorrectScreen::turnWheel(int i)
 
 void TimingCorrectScreen::displayNoteValue()
 {
-    auto currentNoteValue = noteValue.load();
+    const auto currentNoteValue = noteValue.load();
     findChild<FunctionKey>("fk4")->Hide(currentNoteValue == 0);
     SetDirty();
 
@@ -147,7 +149,7 @@ void TimingCorrectScreen::displaySwing() const
 
 void TimingCorrectScreen::displayNotes()
 {
-    auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer->getSelectedTrack();
 
     if (track->getBusType() == BusType::MIDI)
     {
@@ -175,9 +177,10 @@ void TimingCorrectScreen::displayNotes()
         }
         else
         {
-            auto program = getProgramOrThrow();
-            auto padIndex = program->getPadIndexFromNote(DrumNoteNumber(note0));
-            auto padName = sampler->getPadName(padIndex);
+            const auto program = getProgramOrThrow();
+            const auto padIndex =
+                program->getPadIndexFromNote(DrumNoteNumber(note0));
+            const auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 
@@ -198,7 +201,7 @@ void TimingCorrectScreen::displayAmount() const
 
 void TimingCorrectScreen::displayTime()
 {
-    auto s = sequencer->getSelectedSequence().get();
+    const auto s = sequencer->getSelectedSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1,
                                       "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");

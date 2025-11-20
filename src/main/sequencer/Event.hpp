@@ -1,26 +1,30 @@
 #pragma once
 #include "IntTypes.hpp"
-#include "Observer.hpp"
+#include "TrackEventMessage.hpp"
+#include "sequencer/EventState.hpp"
+
+#include <functional>
 
 namespace mpc::sequencer
 {
-    class Event : public Observable
+    class Event
     {
     public:
-        bool dontDelete = false;
-        int wasMoved = 0;
+        explicit Event(
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
+        Event(const Event &);
 
-        void setTick(int relativeTick);
+        virtual ~Event() = default;
+
+        void setTick(int tick) const;
         int getTick() const;
-        virtual void setTrack(TrackIndex);
+        void setTrack(TrackIndex) const;
         TrackIndex getTrack() const;
 
         virtual std::string getTypeName() const = 0;
-        Event() = default;
-        Event(const Event &);
 
-    protected:
-        int tick = 0;
-        TrackIndex track{0};
+        std::function<std::pair<EventIndex, EventState>()> getSnapshot;
+        std::function<void(TrackEventMessage &&)> dispatch;
     };
 } // namespace mpc::sequencer

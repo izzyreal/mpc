@@ -29,6 +29,6 @@ namespace mpc::file::mid
         std::unique_ptr<MidiFile> mf;
 
         void addNoteOn(const std::shared_ptr<event::NoteOn> &noteOn);
-        void createDeltas(const std::weak_ptr<MidiTrack> &mt) const;
+        void createDeltas(const std::weak_ptr<MidiTrack> &midiTrack) const;
     };
 } // namespace mpc::file::mid

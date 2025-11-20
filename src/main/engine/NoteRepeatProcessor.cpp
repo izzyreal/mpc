@@ -10,7 +10,7 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+
 #include "engine/DrumNoteEventHandler.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -19,6 +19,7 @@
 using namespace mpc;
 using namespace mpc::engine;
 using namespace mpc::sequencer;
+using namespace mpc::performance;
 using namespace mpc::sampler;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -82,8 +83,12 @@ void NoteRepeatProcessor::process(
             note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }
 
-        auto noteEvent = std::make_shared<sequencer::NoteOnEvent>(note);
-        noteEvent->setTick(static_cast<int>(tickPosition));
+        EventState noteEvent;
+        noteEvent.type = EventType::NoteOn;
+        noteEvent.noteNumber = note;
+        noteEvent.tick = tickPosition;
+        noteEvent.trackIndex = track->getIndex();
+
         const bool isSliderNote =
             program && program->getSlider()->getNote() == note;
 
@@ -106,8 +111,8 @@ void NoteRepeatProcessor::process(
 
             auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
                 sliderNoteVariationContext);
-            noteEvent->setVariationType(type);
-            noteEvent->setVariationValue(value);
+            noteEvent.noteVariationType = type;
+            noteEvent.noteVariationValue = NoteVariationValue(value);
         }
 
         const PhysicalPadIndex physicalPadIndex =
@@ -125,7 +130,7 @@ void NoteRepeatProcessor::process(
                 assign16LevelsScreen->getParameter(),
                 programPadIndex % 16};
 
-            noteEvent->setVelocity(MaxVelocity);
+            noteEvent.velocity = MaxVelocity;
             Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
         }
         else
@@ -134,21 +139,17 @@ void NoteRepeatProcessor::process(
                 snapshot.getPressedProgramPadAfterTouchOrVelocity(
                     ProgramPadIndex(programPadIndex));
 
-            noteEvent->setVelocity(isFullLevelEnabled()
-                                       ? MaxVelocity
-                                       : velocityToUseIfNotFullLevel);
+            noteEvent.velocity = isFullLevelEnabled()
+                                     ? MaxVelocity
+                                     : velocityToUseIfNotFullLevel;
         }
 
-        noteEvent->setDuration(durationTicks);
+        noteEvent.duration = Duration(durationTicks);
 
-        noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) +
-                                         durationTicks);
+        const auto velocityBeforeTrackVelocityRatioApplied = noteEvent.velocity;
 
-        const auto velocityBeforeTrackVelocityRatioApplied =
-            noteEvent->getVelocity();
-
-        noteEvent->setVelocity(Velocity(noteEvent->getVelocity() *
-                                        (track->getVelocityRatio() * 0.01)));
+        noteEvent.velocity = Velocity(velocityBeforeTrackVelocityRatioApplied *
+                                      (track->getVelocityRatio() * 0.01));
 
         const auto durationFrames = static_cast<int>(
             durationTicks == -1
@@ -170,8 +171,8 @@ void NoteRepeatProcessor::process(
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
-                voices, mixerConnections, note, noteEvent->getVelocity(),
-                noteEvent->getVariationType(), noteEvent->getVariationValue(),
+                voices, mixerConnections, note, noteEvent.velocity,
+                noteEvent.noteVariationType, noteEvent.noteVariationValue,
                 eventFrameOffset,
                 /* firstGeneration */ true, // Always true for invokers that
                                             // are not
@@ -194,8 +195,8 @@ void NoteRepeatProcessor::process(
 
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
-            noteEvent->setVelocity(velocityBeforeTrackVelocityRatioApplied);
-            track->insertEventWhileRetainingSort(noteEvent);
+            noteEvent.velocity = velocityBeforeTrackVelocityRatioApplied;
+            track->insertEvent(noteEvent);
         }
 
         sequencerPlaybackEngine->enqueueEventAfterNFrames(

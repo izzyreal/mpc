@@ -6,6 +6,7 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -29,42 +30,26 @@ void ChangeTsigScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
-    switch (i)
+    if (i != 4)
     {
-        case 4:
-            const auto sequence = sequencer->getSelectedSequence();
-
-            const auto barLengths = sequence->getBarLengthsInTicks();
-
-            sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(),
-                                       timesignature.getDenominator());
-
-            const auto &newBarLengths = sequence->getBarLengthsInTicks();
-
-            for (int j = 0; j < barLengths.size(); j++)
-            {
-                if (barLengths[j] != newBarLengths[j])
-                {
-                    sequencer->getTransport()->setPosition(
-                        0); // Only reset sequencer position when a
-                            // bar length has changed
-                    break;
-                }
-            }
-
-            openScreenById(ScreenId::SequencerScreen);
-            break;
+        return;
     }
+
+    const auto sequence = sequencer->getSelectedSequence();
+
+    sequence->setTimeSignature(bar0, bar1, timesignature.numerator,
+                               timesignature.denominator);
+
+    sequencer->getTransport()->setPosition(0);
+    openScreenById(ScreenId::SequencerScreen);
 }
 
 void ChangeTsigScreen::turnWheel(const int i)
 {
-
     const auto seq = sequencer->getSelectedSequence();
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "bar0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "bar0")
     {
         setBar0(bar0 + i, seq->getLastBarIndex());
         displayBars();
@@ -100,9 +85,9 @@ void ChangeTsigScreen::displayNewTsig() const
     }
 
     const auto result =
-        StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +
+        StrUtil::padLeft(std::to_string(timesignature.numerator), " ", 2) +
         "/" +
-        StrUtil::padLeft(std::to_string(timesignature.getDenominator()), " ",
+        StrUtil::padLeft(std::to_string(timesignature.denominator), " ",
                          2);
     findField("newtsig")->setText(result);
 }

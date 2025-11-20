@@ -1,18 +1,13 @@
 #include "InsertEventScreen.hpp"
-#include "sequencer/Transport.hpp"
-#include "Mpc.hpp"
-#include "TimingCorrectScreen.hpp"
 
-#include "sequencer/ChannelPressureEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/MixerEvent.hpp"
+#include "Mpc.hpp"
+
+#include "sequencer/Transport.hpp"
+
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "sequencer/EventState.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
-#include "sequencer/PitchBendEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
-#include "sequencer/SystemExclusiveEvent.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -42,7 +37,6 @@ void InsertEventScreen::function(const int i)
         case 4:
             insertEvent();
             eventAddedBeforeLeavingTheScreen = true;
-            openScreenById(ScreenId::StepEditorScreen);
             break;
         default:;
     }
@@ -50,79 +44,66 @@ void InsertEventScreen::function(const int i)
 
 void InsertEventScreen::insertEvent() const
 {
-    const auto track = sequencer->getSelectedTrack();
+    EventState e;
+    e.tick = sequencer->getTransport()->getTickPosition();
 
     if (insertEventType == 0)
     {
-        constexpr bool allowMultipleNotesOnSameTick = true;
-        const auto noteEvent = std::make_shared<NoteOnEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), noteEvent,
-                        allowMultipleNotesOnSameTick);
+        e.type = EventType::NoteOn;
         const auto timingCorrectScreen =
             mpc.screens->get<ScreenId::TimingCorrectScreen>();
-        unsigned short duration =
-            timingCorrectScreen->getNoteValueLengthInTicks();
-        noteEvent->setDuration(duration);
-        noteEvent->setNote(NoteNumber(60));
-        noteEvent->setVelocity(MaxVelocity);
-        noteEvent->setVariationType(NoteOnEvent::VARIATION_TYPE::TUNE_0);
-        noteEvent->setVariationValue(64);
+
+        e.duration = Duration(timingCorrectScreen->getNoteValueLengthInTicks());
+        e.noteNumber = NoteNumber(60);
+        e.velocity = MaxVelocity;
+        e.noteVariationType = NoteVariationTypeTune;
+        e.noteVariationValue = DefaultNoteVariationValue;
     }
     else if (insertEventType == 1)
     {
-        const auto pitchBendEvent = std::make_shared<PitchBendEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        pitchBendEvent);
-        pitchBendEvent->setAmount(0);
+        e.type = EventType::PitchBend;
+        e.amount = 0;
     }
     else if (insertEventType == 2)
     {
-        const auto controlChangeEvent = std::make_shared<ControlChangeEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        controlChangeEvent);
-        controlChangeEvent->setController(0);
-        controlChangeEvent->setAmount(0);
+        e.type = EventType::ControlChange;
+        e.controllerNumber = 0;
+        e.controllerValue = 0;
     }
     else if (insertEventType == 3)
     {
-        const auto programChangeEvent = std::make_shared<ProgramChangeEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        programChangeEvent);
-        programChangeEvent->setProgram(1);
+        e.type = EventType::ProgramChange;
+        e.programChangeProgramIndex = ProgramIndex(1);
     }
     else if (insertEventType == 4)
     {
-        const auto channelPressureEvent =
-            std::make_shared<ChannelPressureEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        channelPressureEvent);
-        channelPressureEvent->setAmount(0);
+        e.type = EventType::ChannelPressure;
+        e.amount = 0;
     }
     else if (insertEventType == 5)
     {
-        const auto polyPressureEvent = std::make_shared<PolyPressureEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        polyPressureEvent);
-        polyPressureEvent->setNote(60);
-        polyPressureEvent->setAmount(0);
+        e.type = EventType::PolyPressure;
+        e.noteNumber = NoteNumber(60);
+        e.amount = 0;
     }
     else if (insertEventType == 6)
     {
-        const auto systemExclusiveEvent =
-            std::make_shared<SystemExclusiveEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        systemExclusiveEvent);
-        systemExclusiveEvent->setByteB(247);
+        e.type = EventType::SystemExclusive;
     }
     else if (insertEventType == 7)
     {
-        const auto mixerEvent = std::make_shared<MixerEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(),
-                        mixerEvent);
-        mixerEvent->setPadNumber(0);
-        mixerEvent->setParameter(0);
-        mixerEvent->setValue(0);
+        e.type = EventType::Mixer;
+        e.mixerPad = 0;
+        e.mixerParameter = 0;
+        e.mixerValue = 0;
     }
+
+    constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
+    const auto onComplete = [ls = mpc.getLayeredScreen()]
+    {
+        ls->postToUiThread([ls]{ ls->openScreenById(ScreenId::StepEditorScreen);});
+    };
+    sequencer->getSelectedTrack()->insertEvent(e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
 }
 
 void InsertEventScreen::turnWheel(const int i)

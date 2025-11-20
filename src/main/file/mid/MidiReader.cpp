@@ -17,31 +17,23 @@
 #include "file/mid/event/meta/Text.hpp"
 #include "file/mid/event/meta/TimeSignatureEvent.hpp"
 #include "file/mid/event/meta/TrackName.hpp"
-#include "sequencer/ChannelPressureEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/MixerEvent.hpp"
+
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
-#include "sequencer/PitchBendEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SystemExclusiveEvent.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
 
 using namespace mpc::file::mid;
 using namespace mpc::file::mid::event;
 using namespace mpc::sequencer;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
-                       const std::weak_ptr<Sequence> &_dest)
-    : dest(_dest)
+                       const std::weak_ptr<Sequence> &dest)
+    : dest(dest)
 {
     midiFile = std::make_unique<MidiFile>(istream);
 }
 
-void MidiReader::parseSequence(Mpc &mpc)
+void MidiReader::parseSequence(Mpc &mpc) const
 {
     auto lSequencer = mpc.getSequencer();
     auto midiTracks = midiFile->getTracks();
@@ -130,9 +122,9 @@ void MidiReader::parseSequence(Mpc &mpc)
     for (int i = 1; i < tempoChanges.size(); i++)
     {
         auto lTcMidi = tempoChanges[i].lock();
-        auto tce = sequence->addTempoChangeEvent(lTcMidi->getTick());
         auto ratio = lTcMidi->getBpm() / initialTempo;
-        tce->setRatio((int)(ratio * 1000.0));
+        auto amount = static_cast<int>(ratio * 1000.0);
+        sequence->addTempoChangeEvent(lTcMidi->getTick(), amount);
     }
 
     if (timeSignatures.size() == 1)
@@ -159,8 +151,10 @@ void MidiReader::parseSequence(Mpc &mpc)
             {
                 sequence->setTimeSignature(barCounter, current->getNumerator(),
                                            current->getRealDenominator());
-                int barLength = sequence->getBarLengthsInTicks()[barCounter++];
+                const auto newDenTicks = 96 * (4.0 / current->getRealDenominator());
+                const auto barLength = static_cast<int>(newDenTicks * current->getNumerator());
                 accumLength += barLength;
+                barCounter++;
             }
         }
         else
@@ -169,8 +163,10 @@ void MidiReader::parseSequence(Mpc &mpc)
             {
                 sequence->setTimeSignature(barCounter, current->getNumerator(),
                                            current->getRealDenominator());
-                int barLength = sequence->getBarLengthsInTicks()[barCounter++];
+                const auto newDenTicks = 96 * (4.0 / current->getRealDenominator());
+                const auto barLength = static_cast<int>(newDenTicks * current->getNumerator());
                 accumLength += barLength;
+                barCounter++;
             }
         }
     }
@@ -188,8 +184,8 @@ void MidiReader::parseSequence(Mpc &mpc)
         sequence->setLastLoopBarIndex(lastLoopBar);
     }
 
-    std::unique_ptr<NoteOnEvent> nVariation;
-    const int maxNoteOffTick = 999999999;
+    std::pair noteVariationData{NoteVariationTypeTune,
+                                DefaultNoteVariationValue};
 
     const std::string trackDataPrefix = "TRACK DATA:";
 
@@ -205,27 +201,27 @@ void MidiReader::parseSequence(Mpc &mpc)
 
         for (auto &e : mt->getEvents())
         {
-            auto textEvent = std::dynamic_pointer_cast<meta::Text>(e.lock());
-            if (textEvent)
+            if (auto textEvent =
+                    std::dynamic_pointer_cast<meta::Text>(e.lock()))
             {
-                auto text = textEvent->getText();
-                if (text.find(trackDataPrefix) != std::string::npos)
+                if (auto text = textEvent->getText();
+                    text.find(trackDataPrefix) != std::string::npos)
                 {
                     auto payload = text.substr(trackDataPrefix.length());
                     trackIndex = stoi(payload.substr(0, 2));
-                    auto deviceIndexStr = payload.substr(2, 2);
 
-                    if (deviceIndexStr != "C0")
+                    if (auto deviceIndexStr = payload.substr(2, 2);
+                        deviceIndexStr != "C0")
                     {
-                        deviceIndex = stoi(deviceIndexStr, 0, 16) -
-                                      stoi(std::string("E0"), 0, 16);
+                        deviceIndex = stoi(deviceIndexStr, nullptr, 16) -
+                                      stoi(std::string("E0"), nullptr, 16);
                     }
                     break;
                 }
             }
         }
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
-        std::vector<std::shared_ptr<NoteOnEvent>> noteOns;
+        std::vector<EventState> noteOns;
 
         auto track = sequence->purgeTrack(trackIndex);
         track->setDeviceIndex(deviceIndex);
@@ -240,9 +236,9 @@ void MidiReader::parseSequence(Mpc &mpc)
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<NoteOnEvent>();
-                    nVariation->incrementVariationType(noteOff->getNoteValue());
-                    nVariation->setVariationValue(noteOff->getVelocity());
+                    noteVariationData = {
+                        NoteVariationType(noteOff->getNoteValue()),
+                        NoteVariationValue(noteOff->getVelocity())};
                 }
                 else if (noteOn)
                 {
@@ -266,22 +262,15 @@ void MidiReader::parseSequence(Mpc &mpc)
                                 0));
                         }
 
-                        auto ne = std::make_shared<NoteOnEvent>(
-                            NoteNumber(noteOn->getNoteValue()));
-                        ne->setTick(noteOn->getTick());
-                        ne->setVelocity(Velocity(noteOn->getVelocity()));
+                        EventState ne;
+                        ne.type = EventType::NoteOn;
+                        ne.noteNumber = NoteNumber(noteOn->getNoteValue());
 
-                        if (nVariation)
-                        {
-                            ne->incrementVariationType(
-                                nVariation->getVariationType());
-                            ne->setVariationValue(
-                                nVariation->getVariationValue());
-                        }
-                        else
-                        {
-                            ne->setVariationValue(64);
-                        }
+                        ne.tick = noteOn->getTick();
+                        ne.velocity = Velocity(noteOn->getVelocity());
+
+                        ne.noteVariationType = noteVariationData.first;
+                        ne.noteVariationValue = noteVariationData.second;
 
                         noteOns.emplace_back(ne);
                     }
@@ -301,19 +290,20 @@ void MidiReader::parseSequence(Mpc &mpc)
                 }
                 else if (noteOn)
                 {
-                    auto mpcNoteEvent = std::make_shared<NoteOnEvent>(
-                        NoteNumber(noteOn->getNoteValue()));
-                    mpcNoteEvent->setTick(noteOn->getTick());
-                    mpcNoteEvent->setVelocity(Velocity(noteOn->getVelocity()));
-                    noteOns.emplace_back(mpcNoteEvent);
+                    EventState ne;
+                    ne.type = EventType::NoteOn;
+                    ne.noteNumber = NoteNumber(noteOn->getNoteValue());
+                    ne.tick = noteOn->getTick();
+                    ne.velocity = Velocity(noteOn->getVelocity());
+                    noteOns.emplace_back(ne);
                 }
             }
         }
 
         for (auto &n : noteOns)
         {
-            auto noteOn = track->recordNoteEventNonLive(
-                n->getTick(), n->getNote(), n->getVelocity());
+            auto noteOn = track->recordNoteEventNonLive(n.tick, n.noteNumber,
+                                                        n.velocity, 0);
 
             int indexCandidate = -1;
 
@@ -322,9 +312,8 @@ void MidiReader::parseSequence(Mpc &mpc)
                 int noteValue;
                 int tick;
 
-                auto noteOff1 = std::dynamic_pointer_cast<NoteOn>(noteOffs[k]);
-
-                if (noteOff1)
+                if (auto noteOff1 =
+                        std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
                 {
                     // isMpc2000XlMidiFile == true. MPC2000XL MIDI files use
                     // MIDI Note On events to indicate the end of a note.
@@ -341,9 +330,10 @@ void MidiReader::parseSequence(Mpc &mpc)
                     tick = noteOff2->getTick();
                 }
 
-                if (noteValue == noteOn->getNote() && tick >= noteOn->getTick())
+                if (noteValue == noteOn.noteNumber && tick >= noteOn.tick)
                 {
-                    if (tick < maxNoteOffTick)
+                    if (constexpr int maxNoteOffTick = 999999999;
+                        tick < maxNoteOffTick)
                     {
                         indexCandidate = k;
                         break;
@@ -353,34 +343,36 @@ void MidiReader::parseSequence(Mpc &mpc)
 
             if (indexCandidate != -1)
             {
-                noteOn->setDuration(noteOffs[indexCandidate]->getTick() -
-                                    noteOn->getTick());
+                noteOn.duration =
+                    Duration(noteOffs[indexCandidate]->getTick() - noteOn.tick);
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else
             {
-                noteOn->setDuration(24);
+                noteOn.duration = Duration(24);
             }
         }
 
         for (auto &me : mt->getEvents())
         {
             if (const auto sysEx =
-                    std::dynamic_pointer_cast<event::SystemExclusiveEvent>(
-                        me.lock());
+                    std::dynamic_pointer_cast<SystemExclusiveEvent>(me.lock());
                 sysEx)
             {
-                auto sysExEventBytes = sysEx->getData();
 
-                if (sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 &&
+                if (auto sysExEventBytes = sysEx->getData();
+                    sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 &&
                     sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 &&
-                    sysExEventBytes[3] == 69 && sysExEventBytes[7] == (char)247)
+                    sysExEventBytes[3] == 69 &&
+                    sysExEventBytes[7] == static_cast<char>(247))
                 {
-                    auto mixerEvent = std::make_shared<MixerEvent>();
-                    track->addEvent(sysEx->getTick(), mixerEvent);
-                    mixerEvent->setParameter(sysExEventBytes[4] - 1);
-                    mixerEvent->setPadNumber(sysExEventBytes[5]);
-                    mixerEvent->setValue(sysExEventBytes[6]);
+                    EventState e;
+                    e.type = EventType::Mixer;
+                    e.tick = sysEx->getTick();
+                    e.mixerParameter = sysExEventBytes[4] - 1;
+                    e.mixerPad = sysExEventBytes[5];
+                    e.mixerValue = sysExEventBytes[6];
+                    track->insertEvent(e);
                 }
                 else
                 {
@@ -393,44 +385,52 @@ void MidiReader::parseSequence(Mpc &mpc)
                         sysExEventBytes[j + 1] = sysEx->getData()[j];
                     }
 
-                    auto see =
-                        std::make_shared<sequencer::SystemExclusiveEvent>();
-                    track->addEvent(sysEx->getTick(), see);
-                    std::vector<unsigned char> tmp;
+                    EventState e;
+                    e.type = EventType::SystemExclusive;
+                    e.tick = sysEx->getTick();
 
-                    for (char c : sysExEventBytes)
-                    {
-                        tmp.push_back(static_cast<unsigned char>(c));
-                    }
+                    // std::vector<unsigned char> tmp;
+                    //
+                    // for (char c : sysExEventBytes)
+                    // {
+                    //     tmp.push_back(static_cast<unsigned char>(c));
+                    // }
+                    //
+                    // e->setBytes(tmp);
 
-                    see->setBytes(tmp);
+                    track->insertEvent(e);
                 }
             }
             else if (const auto noteAfterTouch =
                          std::dynamic_pointer_cast<NoteAftertouch>(me.lock());
                      noteAfterTouch)
             {
-                auto ppe = std::make_shared<PolyPressureEvent>();
-                track->addEvent(noteAfterTouch->getTick(), ppe);
-                ppe->setNote(noteAfterTouch->getNoteValue());
-                ppe->setAmount(noteAfterTouch->getAmount());
+                EventState e;
+                e.type = EventType::PolyPressure;
+                e.tick = noteAfterTouch->getTick();
+                e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
+                e.amount = noteAfterTouch->getAmount();
+                track->insertEvent(e);
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
                              me.lock());
                      channelAfterTouch)
             {
-                auto cpe = std::make_shared<ChannelPressureEvent>();
-                track->addEvent(channelAfterTouch->getTick(), cpe);
-                cpe->setAmount(channelAfterTouch->getAmount());
+                EventState e;
+                e.type = EventType::ChannelPressure;
+                e.amount = channelAfterTouch->getAmount();
+                track->insertEvent(e);
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
                      programChange)
             {
-                auto pce = std::make_shared<ProgramChangeEvent>();
-                track->addEvent(programChange->getTick(), pce);
-                pce->setProgram(programChange->getProgramNumber() + 1);
+                EventState e;
+                e.type = EventType::ProgramChange;
+                e.programChangeProgramIndex =
+                    ProgramIndex(programChange->getProgramNumber());
+                track->insertEvent(e);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
@@ -442,18 +442,20 @@ void MidiReader::parseSequence(Mpc &mpc)
                          std::dynamic_pointer_cast<Controller>(me.lock());
                      controller)
             {
-                auto cce = std::make_shared<ControlChangeEvent>();
-                track->addEvent(controller->getTick(), cce);
-                cce->setController(controller->getControllerType());
-                cce->setAmount(controller->getValue());
+                EventState e;
+                e.type = EventType::ControlChange;
+                e.controllerNumber = controller->getControllerType();
+                e.controllerValue = controller->getValue();
+                track->insertEvent(e);
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
                      pitchBend)
             {
-                auto pbe = std::make_shared<PitchBendEvent>();
-                track->addEvent(pitchBend->getTick(), pbe);
-                pbe->setAmount(pitchBend->getBendAmount() - 8192);
+                EventState e;
+                e.type = EventType::PitchBend;
+                e.amount = pitchBend->getBendAmount();
+                track->insertEvent(e);
             }
         }
     }
@@ -473,16 +475,14 @@ bool MidiReader::isInteger(const std::string &s)
 }
 
 int MidiReader::getNumberOfNoteOns(
-    int noteValue,
-    const std::vector<std::shared_ptr<ChannelEvent>> &allNotes) const
+    const int noteValue,
+    const std::vector<std::shared_ptr<ChannelEvent>> &allNotes)
 {
     int counter = 0;
 
     for (auto &no : allNotes)
     {
-        auto noteOn = std::dynamic_pointer_cast<NoteOn>(no);
-
-        if (noteOn)
+        if (const auto noteOn = std::dynamic_pointer_cast<NoteOn>(no))
         {
             if (noteOn->getNoteValue() == noteValue)
             {
@@ -494,15 +494,14 @@ int MidiReader::getNumberOfNoteOns(
     return counter;
 }
 
-int MidiReader::getNumberOfNotes(
-    int noteValue,
-    const std::vector<std::shared_ptr<NoteOnEvent>> &allNotes) const
+int MidiReader::getNumberOfNotes(const int noteValue,
+                                 const std::vector<EventState> &allNotes)
 {
     int counter = 0;
 
     for (auto &ne : allNotes)
     {
-        if (ne->getNote() == noteValue)
+        if (ne.noteNumber == noteValue)
         {
             counter++;
         }

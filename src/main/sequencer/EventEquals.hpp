@@ -1,6 +1,6 @@
 #pragma once
 #include "sequencer/Event.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
@@ -8,6 +8,7 @@
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
 
 #include <memory>
 
@@ -19,26 +20,14 @@ namespace mpc::sequencer
                a.getTypeName() == b.getTypeName();
     }
 
-    inline bool operator==(const NoteOffEvent &a, const NoteOffEvent &b)
-    {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getNote() == b.getNote();
-    }
-
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
                a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&
-               a.getDuration().has_value() == b.getDuration().has_value() &&
-               (!a.getDuration().has_value() ||
-                *a.getDuration() == *b.getDuration()) &&
+               a.getDuration() == b.getDuration() &&
                a.getVariationType() == b.getVariationType() &&
-               a.getVariationValue() == b.getVariationValue() &&
-               ((!a.getNoteOff() && !b.getNoteOff()) ||
-                (a.getNoteOff() && b.getNoteOff() &&
-                 *a.getNoteOff() == *b.getNoteOff())) &&
-               a.isFinalized() == b.isFinalized();
+               a.getVariationValue() == b.getVariationValue();
     }
 
     inline bool operator==(const MixerEvent &a, const MixerEvent &b)
@@ -46,6 +35,12 @@ namespace mpc::sequencer
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
                a.getParameter() == b.getParameter() &&
                a.getPad() == b.getPad() && a.getValue() == b.getValue();
+    }
+
+    inline bool operator==(const TempoChangeEvent &a, const TempoChangeEvent &b)
+    {
+        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
+               a.getRatio() == b.getRatio();
     }
 
     inline bool operator==(const ChannelPressureEvent &a,
@@ -107,10 +102,6 @@ namespace mpc::sequencer
         {
             return *na == *std::dynamic_pointer_cast<NoteOnEvent>(b);
         }
-        if (auto no = std::dynamic_pointer_cast<NoteOffEvent>(a))
-        {
-            return *no == *std::dynamic_pointer_cast<NoteOffEvent>(b);
-        }
         if (auto me = std::dynamic_pointer_cast<MixerEvent>(a))
         {
             return *me == *std::dynamic_pointer_cast<MixerEvent>(b);
@@ -139,6 +130,10 @@ namespace mpc::sequencer
         {
             return *sy == *std::dynamic_pointer_cast<SystemExclusiveEvent>(b);
         }
+        if (auto tc = std::dynamic_pointer_cast<TempoChangeEvent>(a))
+        {
+            return *tc == *std::dynamic_pointer_cast<TempoChangeEvent>(b);
+        }
 
         // fallback for unknown or base Event
         return *a == *b;
@@ -156,10 +151,6 @@ namespace mpc::sequencer
         if (auto n = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
             return std::make_shared<NoteOnEvent>(*n);
-        }
-        if (auto n = std::dynamic_pointer_cast<NoteOffEvent>(e))
-        {
-            return std::make_shared<NoteOffEvent>(*n);
         }
         if (auto m = std::dynamic_pointer_cast<MixerEvent>(e))
         {
@@ -189,7 +180,39 @@ namespace mpc::sequencer
         {
             return std::make_shared<SystemExclusiveEvent>(*sx);
         }
-
+        if (auto tc = std::dynamic_pointer_cast<TempoChangeEvent>(e))
+        {
+            return std::make_shared<TempoChangeEvent>(*tc);
+        }
         return nullptr;
+    }
+
+    inline bool eventsEqual(const std::vector<std::shared_ptr<Event>> &a,
+                            const std::vector<std::shared_ptr<Event>> &b)
+    {
+        if (a.size() != b.size())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < a.size(); ++i)
+        {
+            if ((!a[i] && b[i]) || (a[i] && !b[i]))
+            {
+                return false;
+            }
+
+            if (!a[i] && !b[i])
+            {
+                continue;
+            }
+
+            if (!eventsEqual(a[i], b[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 } // namespace mpc::sequencer

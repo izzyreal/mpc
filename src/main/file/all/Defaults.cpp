@@ -252,8 +252,8 @@ void Defaults::setBarCount()
 void Defaults::setTimeSig()
 {
     auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    saveBytes[TIMESIG_NUM_OFFSET] = userScreen->timeSig.getNumerator();
-    saveBytes[TIMESIG_DEN_OFFSET] = userScreen->timeSig.getDenominator();
+    saveBytes[TIMESIG_NUM_OFFSET] = userScreen->timeSig.numerator;
+    saveBytes[TIMESIG_DEN_OFFSET] = userScreen->timeSig.denominator;
 }
 
 void Defaults::setNames()

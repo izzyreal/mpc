@@ -3,50 +3,39 @@
 #include "AllEvent.hpp"
 #include "AllSequence.hpp"
 
-#include "sequencer/NoteEvent.hpp"
-
 #include "file/BitUtil.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<NoteOnEvent>
-AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    auto event = std::make_shared<NoteOnEvent>();
-
-    event->setNote(NoteNumber(bytes[NOTE_NUMBER_OFFSET]));
-    event->setTick(AllEvent::readTick(bytes));
+    EventState e;
+    e.type = EventType::NoteOn;
+    e.noteNumber = NoteNumber(bytes[NOTE_NUMBER_OFFSET]);
+    e.tick = AllEvent::readTick(bytes);
     const auto track = readTrackNumber(bytes);
-    event->setTrack(TrackIndex(track));
-    event->setDuration(readDuration(bytes) - track * 4);
-    event->setVelocity(Velocity(readVelocity(bytes)));
-    event->setVariationType(readVariationType(bytes));
-    event->setVariationValue(readVariationValue(bytes));
+    e.trackIndex = TrackIndex(track);
+    e.duration = Duration(readDuration(bytes) - track * 4);
+    e.velocity = Velocity(readVelocity(bytes));
+    e.noteVariationType = readVariationType(bytes);
+    e.noteVariationValue = NoteVariationValue(readVariationValue(bytes));
 
-    return event;
+    return e;
 }
 
-std::vector<char>
-AllNoteOnEvent::mpcEventToBytes(const std::shared_ptr<NoteOnEvent> &event)
+std::vector<char> AllNoteOnEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(AllSequence::EVENT_SEG_LENGTH);
 
-    bytes[NOTE_NUMBER_OFFSET] = static_cast<int8_t>(event->getNote());
+    bytes[NOTE_NUMBER_OFFSET] = static_cast<int8_t>(e.noteNumber);
 
-    try
-    {
-        writeTrackNumber(bytes, event->getTrack());
-        writeVariationType(bytes, event->getVariationType());
-        writeVariationValue(bytes, event->getVariationValue());
-        AllEvent::writeTick(bytes, event->getTick());
-        writeDuration(bytes, event->getDuration().value_or(-1));
-        writeVelocity(bytes, event->getVelocity());
-    }
-    catch (const std::exception &e)
-    {
-        throw e;
-    }
+    writeTrackNumber(bytes, e.trackIndex);
+    writeVariationType(bytes, e.noteVariationType);
+    writeVariationValue(bytes, e.noteVariationValue);
+    AllEvent::writeTick(bytes, e.tick);
+    writeDuration(bytes, e.duration);
+    writeVelocity(bytes, e.velocity);
 
     return bytes;
 }
@@ -90,6 +79,20 @@ int AllNoteOnEvent::readTrackNumber(const std::vector<char> &bytes)
             b = BitUtil::setBit(b, i, false);
         }
     }
+
+    if (b > 128)
+    {
+        b -= 128;
+    }
+    if (b < 0)
+    {
+        b += 128;
+    }
+    if (b > 63)
+    {
+        b -= 64;
+    }
+
     return b;
 }
 
@@ -119,7 +122,7 @@ int AllNoteOnEvent::readVariationValue(const std::vector<char> &bytes)
     return b;
 }
 
-NoteOnEvent::VARIATION_TYPE
+mpc::NoteVariationType
 AllNoteOnEvent::readVariationType(const std::vector<char> &bytes)
 {
     const auto byte1 = bytes[VAR_TYPE_BYTE1_OFFSET];
@@ -130,20 +133,20 @@ AllNoteOnEvent::readVariationType(const std::vector<char> &bytes)
 
     if (b1 && b2)
     {
-        return NoteOnEvent::VARIATION_TYPE::FILTER_3;
+        return NoteVariationTypeFilter;
     }
     if (b1 && !b2)
     {
-        return NoteOnEvent::VARIATION_TYPE::ATTACK_2;
+        return NoteVariationTypeAttack;
     }
     if (!b1 && b2)
     {
-        return NoteOnEvent::VARIATION_TYPE::DECAY_1;
+        return NoteVariationTypeDecay;
     }
-    return NoteOnEvent::VARIATION_TYPE::TUNE_0;
+    return NoteVariationTypeTune;
 }
 
-void AllNoteOnEvent::writeVelocity(std::vector<char> &event, int v)
+void AllNoteOnEvent::writeVelocity(std::vector<char> &event, const int v)
 {
     const auto value = static_cast<int8_t>(v);
     event[VELOCITY_OFFSET] = BitUtil::stitchBytes(
@@ -152,7 +155,7 @@ void AllNoteOnEvent::writeVelocity(std::vector<char> &event, int v)
         VELOCITY_BIT_RANGE);
 }
 
-void AllNoteOnEvent::writeTrackNumber(std::vector<char> &event, int t)
+void AllNoteOnEvent::writeTrackNumber(std::vector<char> &event, const int t)
 {
     const auto value = static_cast<int8_t>(t);
     event[TRACK_NUMBER_OFFSET] = BitUtil::stitchBytes(
@@ -160,7 +163,7 @@ void AllNoteOnEvent::writeTrackNumber(std::vector<char> &event, int t)
         TRACK_NUMBER_BIT_RANGE);
 }
 
-void AllNoteOnEvent::writeVariationValue(std::vector<char> &event, int v)
+void AllNoteOnEvent::writeVariationValue(std::vector<char> &event, const int v)
 {
     const auto value = static_cast<int8_t>(v);
     event[VAR_VALUE_OFFSET] = BitUtil::stitchBytes(
@@ -169,7 +172,7 @@ void AllNoteOnEvent::writeVariationValue(std::vector<char> &event, int v)
         VAR_VALUE_BIT_RANGE);
 }
 
-void AllNoteOnEvent::writeDuration(std::vector<char> &event, int duration)
+void AllNoteOnEvent::writeDuration(std::vector<char> &event, const int duration)
 {
     const auto s1 = static_cast<short>(duration >> 6);
     const auto s2 = static_cast<short>(duration >> 2);
@@ -186,7 +189,8 @@ void AllNoteOnEvent::writeDuration(std::vector<char> &event, int duration)
     event[DURATION_BYTE3_OFFSET] = static_cast<int8_t>(s3);
 }
 
-void AllNoteOnEvent::writeVariationType(std::vector<char> &event, int type)
+void AllNoteOnEvent::writeVariationType(std::vector<char> &event,
+                                        const int type)
 {
     auto byte1 = event[VAR_TYPE_BYTE1_OFFSET];
     auto byte2 = event[VAR_TYPE_BYTE2_OFFSET];

@@ -10,7 +10,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include "lcdgui/screens/UserScreen.hpp"
@@ -19,6 +19,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -148,12 +149,12 @@ void EventsScreen::function(const int i)
                     }
                     else if (durationMode == 2)
                     {
-                        noteEvent->setDuration(noteEvent->getDuration() *
-                                               durationValue * 0.01);
+                        noteEvent->setDuration(Duration(
+                            noteEvent->getDuration() * durationValue * 0.01));
                     }
                     else if (durationMode == 3)
                     {
-                        noteEvent->setDuration(durationValue);
+                        noteEvent->setDuration(Duration(durationValue));
                     }
                 }
             }
@@ -669,11 +670,13 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     auto destDenominator = -1;
     auto destBarLength = -1;
 
+    const auto snapshot = toSequence->getStateManager()->getSnapshot();
+
     for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
     {
         const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
 
-        if (const auto barLength = toSequence->getBarLengthsInTicks()[i];
+        if (const auto barLength = snapshot.getBarLength(i);
             destStart >= firstTickOfBar &&
             destStart <= firstTickOfBar + barLength)
         {
@@ -759,7 +762,9 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
                     break;
                 }
 
-                destTrack->cloneEventIntoTrack(e, tickCandidate);
+                EventState eventState = e->getSnapshot().second;
+                eventState.tick = tickCandidate;
+                destTrack->insertEvent(eventState);
             }
         }
     }
