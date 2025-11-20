@@ -2,13 +2,15 @@
 
 using namespace mpc::sequencer;
 
+ChannelPressureEvent::ChannelPressureEvent(
+    const std::function<performance::Event()> &getSnapshot)
+        : Event(getSnapshot)
+{
+}
+
 void ChannelPressureEvent::setAmount(const int i)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-    channelPressureValue = i;
+    channelPressureValue = std::clamp(i, 0, 127);
 }
 
 int ChannelPressureEvent::getAmount() const

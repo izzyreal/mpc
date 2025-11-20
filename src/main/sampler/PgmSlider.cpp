@@ -167,14 +167,13 @@ int PgmSlider::getControlChange() const
     return controlChange;
 }
 
-int PgmSlider::getParameter() const
+mpc::NoteVariationType PgmSlider::getParameter() const
 {
     return parameter;
 }
 
-void PgmSlider::setParameter(int i)
+void PgmSlider::setParameter(const int i)
 {
-    i = std::clamp(i, 0, 3);
-    parameter = i;
+    parameter = NoteVariationType(i);
     notifyObservers("parameter");
 }

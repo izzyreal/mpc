@@ -3,7 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class ControlChangeEvent : public Event
+    class ControlChangeEvent final : public Event
     {
         int controllerNumber = 0;
         int controllerValue = 0;
@@ -14,7 +14,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        ControlChangeEvent() = default;
+        explicit ControlChangeEvent(const std::function<performance::Event()> &getSnapshot);
         ControlChangeEvent(const ControlChangeEvent &event);
 
         std::string getTypeName() const override

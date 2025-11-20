@@ -2,6 +2,19 @@
 
 using namespace mpc::sequencer;
 
+SystemExclusiveEvent::SystemExclusiveEvent(
+    const std::function<performance::Event()> &getSnapshot)
+        : Event(getSnapshot)
+{
+}
+
+SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent &event)
+    : Event(event)
+{
+    setBytes(event.getBytes());
+}
+
+
 void SystemExclusiveEvent::setByteA(const unsigned char i)
 {
     if (i < 0 || i > 255)
@@ -40,10 +53,4 @@ void SystemExclusiveEvent::setBytes(const std::vector<unsigned char> &ba)
 const std::vector<unsigned char> &SystemExclusiveEvent::getBytes() const
 {
     return bytes;
-}
-
-SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent &event)
-    : Event(event)
-{
-    setBytes(event.getBytes());
 }

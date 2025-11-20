@@ -1,14 +1,15 @@
 #pragma once
 
-#include "performance/PerformanceManager.hpp"
+#include "performance/PerformanceEventSource.hpp"
+
 #include <memory>
 #include <functional>
 #include <cstdint>
+#include <optional>
 
 namespace mpc::performance
 {
     class PerformanceManager;
-    class NoteOnEvent;
 } // namespace mpc::performance
 
 namespace mpc::sampler
@@ -19,8 +20,6 @@ namespace mpc::sampler
 namespace mpc::sequencer
 {
     class Bus;
-    class NoteOnEvent;
-    class NoteOffEvent;
     class Track;
     class DrumBus;
 } // namespace mpc::sequencer
@@ -40,9 +39,9 @@ namespace mpc::command::context
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;
         const bool currentScreenIsSamplerScreen;
-        std::shared_ptr<sequencer::NoteOffEvent> noteOffEvent;
+        NoteNumber noteNumber;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<sequencer::NoteOnEvent> recordOnEvent;
+        std::optional<performance::Event> recordOnEvent = std::nullopt;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
         sequencer::Track *track;

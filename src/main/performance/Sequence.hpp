@@ -8,12 +8,16 @@
 namespace mpc::performance
 {
     enum class EventType : uint8_t {
-        Note = 0,
-        ProgramChange = 1,
-        ControlChange = 2,
-        PitchBend = 3,
-        PolyPressure = 4,
-        Mixer = 5,
+        NoteOn = 0,
+        NoteOff = 1,
+        ProgramChange = 2,
+        ControlChange = 3,
+        PitchBend = 4,
+        PolyPressure = 5,
+        Mixer = 6,
+        ChannelPressure = 7,
+        SystemExclusive = 8,
+        TempoChange = 9,
         Unknown
     };
 
@@ -29,10 +33,28 @@ namespace mpc::performance
 
         Tick tick;
 
+        NoteNumber noteNumber;
+        NoteEventId noteEventId;
+        bool beingRecorded;
+        int wasMoved;
+        bool dontDelete;
+        int64_t metronomeOnlyTickPosition;
+
         Duration duration;
         Velocity velocity;
-        NoteVariationType noteVarationType;
+        NoteVariationType noteVariationType;
         NoteVariationValue noteVariationValue;
+
+        int8_t amount;
+
+        int8_t controllerNumber;
+        int8_t controllerValue;
+
+        ProgramIndex programChangeProgramIndex;
+
+        int8_t mixerParameter;
+        int8_t mixerPad;
+        int8_t mixerValue;
 
         Event()
         {
@@ -51,9 +73,13 @@ namespace mpc::performance
 
             tick = NoTick;
 
+            noteNumber = NoNoteNumber;
+            noteEventId = NoNoteEventId;
+            beingRecorded = false;
+
             duration = NoDuration;
             velocity = NoVelocityOrPressure;
-            noteVarationType = NoteVariationTypeTune;
+            noteVariationType = NoteVariationTypeTune;
             noteVariationValue = DefaultNoteVariationValue;
         }
     };

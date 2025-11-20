@@ -1,12 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
-namespace mpc::sequencer
-{
-    class ControlChangeEvent;
-}
+#include "performance/Sequence.hpp"
 
 namespace mpc::file::all
 {
@@ -18,9 +12,7 @@ namespace mpc::file::all
         const static int AMOUNT_OFFSET = 6;
 
     public:
-        static std::shared_ptr<sequencer::ControlChangeEvent>
-        bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<sequencer::ControlChangeEvent> &);
+        static performance::Event bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const performance::Event &);
     };
 } // namespace mpc::file::all

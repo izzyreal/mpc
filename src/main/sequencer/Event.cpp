@@ -4,11 +4,22 @@
 
 using namespace mpc::sequencer;
 
+Event::Event(const std::function<performance::Event()> &getSnapshot)
+    : getSnapshot(getSnapshot)
+{
+
+}
+
+Event::Event(const Event &event)
+{
+    setTick(event.getTick());
+    Event::setTrack(event.getTrack());
+    getSnapshot = event.getSnapshot;
+}
+
 void Event::setTick(const int relativeTick)
 {
     tick = relativeTick;
-
-    // notifyObservers(std::string("tick"));
 }
 
 int Event::getTick() const
@@ -24,10 +35,4 @@ mpc::TrackIndex Event::getTrack() const
 void Event::setTrack(const TrackIndex i)
 {
     track = i;
-}
-
-Event::Event(const Event &event)
-{
-    setTick(event.getTick());
-    Event::setTrack(event.getTrack());
 }

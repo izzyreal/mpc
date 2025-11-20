@@ -3,6 +3,7 @@
 #include "IntTypes.hpp"
 #include "Observer.hpp"
 #include "sequencer/BusType.hpp"
+#include "performance/Sequence.hpp"
 
 #include <memory>
 #include <optional>
@@ -19,9 +20,6 @@ namespace mpc::sequencer
 {
     class Track;
     class Event;
-    class NoteOnEvent;
-    class NoteOffEvent;
-    class NoteOnEventPlayOnly;
     class DrumBus;
 } // namespace mpc::sequencer
 
@@ -30,19 +28,13 @@ namespace mpc::audiomidi
     class EventHandler final : public Observable
     {
     public:
-        EventHandler(Mpc &mpc);
+        explicit EventHandler(Mpc &mpc);
 
     private:
-        using Track = sequencer::Track;
-        using Event = sequencer::Event;
-        using NoteOnEvent = sequencer::NoteOnEvent;
-        using NoteOffEvent = sequencer::NoteOffEvent;
-        using NoteOnEventPlayOnly = sequencer::NoteOnEventPlayOnly;
-
         std::atomic<uint64_t> noteEventId = 1;
 
     public:
-        void handleFinalizedEvent(const std::shared_ptr<Event> &, Track *);
+        void handleFinalizedEvent(const performance::Event &, sequencer::Track *);
 
         // Handles physical pad presses.
         //
@@ -64,7 +56,7 @@ namespace mpc::audiomidi
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
         void handleUnfinalizedNoteOn(
-            const std::shared_ptr<NoteOnEvent> &, Track *,
+            const performance::Event &, sequencer::Track *,
             std::optional<int> trackDevice,
             std::optional<int> trackVelocityRatio,
             std::optional<sequencer::BusType> drumBusType) const;
@@ -89,7 +81,7 @@ namespace mpc::audiomidi
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
         void handleNoteOffFromUnfinalizedNoteOn(
-            const std::shared_ptr<NoteOffEvent> &, Track *,
+            NoteNumber, sequencer::Track *,
             std::optional<int> trackDevice, std::optional<DrumBusIndex>) const;
 
         /**
@@ -103,7 +95,7 @@ namespace mpc::audiomidi
          */
         void clearTransposeCache()
         {
-            transposeCache.clear();
+            // transposeCache.clear();
         }
 
     private:
@@ -117,7 +109,7 @@ namespace mpc::audiomidi
                                        */
 
         void handleFinalizedDrumNoteOnEvent(
-            const std::shared_ptr<NoteOnEvent> &,
+            const performance::Event &,
             const std::shared_ptr<sequencer::DrumBus> &,
             const sequencer::Track *);
 
@@ -144,7 +136,7 @@ namespace mpc::audiomidi
          * use a nice spacious number based on intuition, which is 512.
          */
         const size_t TRANSPOSE_CACHE_CAPACITY = 512;
-        std::unordered_map<std::shared_ptr<NoteOffEvent>, int> transposeCache;
+        // std::unordered_map<std::shared_ptr<NoteOffEvent>, int> transposeCache;
 
         Mpc &mpc;
     };

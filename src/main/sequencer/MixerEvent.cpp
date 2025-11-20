@@ -2,6 +2,18 @@
 
 using namespace mpc::sequencer;
 
+MixerEvent::MixerEvent(const std::function<performance::Event()> &getSnapshot)
+    : Event(getSnapshot)
+{
+}
+
+MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
+{
+    setPadNumber(event.getPad());
+    setParameter(event.getParameter());
+    setValue(event.getValue());
+}
+
 void MixerEvent::setParameter(const int i)
 {
     if (i < 0 || i > 3)
@@ -44,11 +56,4 @@ void MixerEvent::setValue(const int i)
 int MixerEvent::getValue() const
 {
     return mixerParameterValue;
-}
-
-MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
-{
-    setPadNumber(event.getPad());
-    setParameter(event.getParameter());
-    setValue(event.getValue());
 }

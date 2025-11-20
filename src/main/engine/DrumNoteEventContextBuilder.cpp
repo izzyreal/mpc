@@ -12,15 +12,16 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-    uint64_t noteEventId, const performance::Drum &drum,
+    const uint64_t noteEventId, const performance::Drum &drum,
     const std::shared_ptr<sequencer::DrumBus> drumBus,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<AudioMixer> &mixer,
     const std::shared_ptr<MixerSetupScreen> &mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>> *voices,
-    std::vector<MixerInterconnection *> &mixerConnections, int note,
-    int velocity, int varType, int varValue, int frameOffset,
-    bool firstGeneration, int startTick, int durationFrames)
+    std::vector<MixerInterconnection *> &mixerConnections, const int note,
+    const int velocity, const int varType, const int varValue,
+    const int frameOffset, const bool firstGeneration, const int startTick,
+    const int durationFrames)
 {
     DrumNoteOnContext ctx;
     ctx.noteEventId = noteEventId;
@@ -39,11 +40,11 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     ctx.firstGeneration = firstGeneration;
     ctx.startTick = startTick;
     ctx.durationFrames = durationFrames;
-    ctx.setOptA = [drumBus](int n1, int n2)
+    ctx.setOptA = [drumBus](const int n1, const int n2)
     {
         drumBus->getSimultA()[n1] = n2;
     };
-    ctx.setOptB = [drumBus](int n1, int n2)
+    ctx.setOptB = [drumBus](const int n1, const int n2)
     {
         drumBus->getSimultB()[n1] = n2;
     };
@@ -51,8 +52,9 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
 }
 
 DrumNoteOffContext DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-    uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
-    std::vector<std::shared_ptr<Voice>> *voices, int note, int noteOnStartTick)
+    const uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
+    std::vector<std::shared_ptr<Voice>> *voices, const int note,
+    const int noteOnStartTick)
 {
     DrumNoteOffContext ctx;
     ctx.noteEventId = noteEventId;

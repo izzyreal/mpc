@@ -1,32 +1,31 @@
 #include "file/all/AllChannelPressureEvent.hpp"
 
 #include "file/all/AllEvent.hpp"
-#include "sequencer/ChannelPressureEvent.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::sequencer;
+using namespace mpc::performance;
 
-std::shared_ptr<ChannelPressureEvent>
+Event
 AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    auto event = std::make_shared<ChannelPressureEvent>();
+    Event e;
+    e.type = EventType::ChannelPressure;
+    e.tick = AllEvent::readTick(bytes);
+    e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
+    e.amount = bytes[AMOUNT_OFFSET];
 
-    event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
-    event->setAmount(bytes[AMOUNT_OFFSET]);
-
-    return event;
+    return e;
 }
 
 std::vector<char> AllChannelPressureEvent::mpcEventToBytes(
-    const std::shared_ptr<ChannelPressureEvent> &event)
+    const Event &e)
 {
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CH_PRESSURE_ID;
-    AllEvent::writeTick(bytes, event->getTick());
-    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
-    bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());
+    AllEvent::writeTick(bytes, e.tick);
+    bytes[AllEvent::TRACK_OFFSET] = e.trackIndex;
+    bytes[AMOUNT_OFFSET] = e.amount;
 
     return bytes;
 }

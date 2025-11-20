@@ -1,12 +1,17 @@
 #pragma once
 #include "IntTypes.hpp"
-#include "Observer.hpp"
+#include "performance/Sequence.hpp"
+
+#include <functional>
 
 namespace mpc::sequencer
 {
     class Event
     {
     public:
+        explicit Event(const std::function<performance::Event()> &getSnapshot);
+        Event(const Event &);
+
         virtual ~Event() = default;
         bool dontDelete = false;
         int wasMoved = 0;
@@ -17,8 +22,8 @@ namespace mpc::sequencer
         TrackIndex getTrack() const;
 
         virtual std::string getTypeName() const = 0;
-        Event() = default;
-        Event(const Event &);
+
+        const std::function<performance::Event()> getSnapshot;
 
     protected:
         int tick = 0;

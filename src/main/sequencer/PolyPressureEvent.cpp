@@ -2,6 +2,19 @@
 
 using namespace mpc::sequencer;
 
+PolyPressureEvent::PolyPressureEvent(
+    const std::function<performance::Event()> &getSnapshot)
+        : Event(getSnapshot)
+{
+}
+
+PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent &event)
+    : Event(event)
+{
+    setAmount(event.getAmount());
+    setNote(event.getNote());
+}
+
 void PolyPressureEvent::setNote(const int i)
 {
     if (i < 0 || i > 127)
@@ -29,11 +42,4 @@ void PolyPressureEvent::setAmount(const int i)
 int PolyPressureEvent::getAmount() const
 {
     return polyPressureValue;
-}
-
-PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-    setNote(event.getNote());
 }

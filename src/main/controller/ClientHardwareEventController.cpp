@@ -373,9 +373,7 @@ void ClientHardwareEventController::handlePadRelease(
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
 
-        const auto recordingNoteEventId = recordingNoteOnEvent != nullptr
-                                              ? recordingNoteOnEvent->getId()
-                                              : NoNoteEventId;
+        const auto recordingNoteEventId = recordingNoteOnEvent.noteEventId;
 
         if (p->noteNumber != NoNoteNumber)
         {

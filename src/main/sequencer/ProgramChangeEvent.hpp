@@ -3,7 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class ProgramChangeEvent : public Event
+    class ProgramChangeEvent final : public Event
     {
 
         int programChangeValue = 0;
@@ -12,7 +12,7 @@ namespace mpc::sequencer
         void setProgram(int i);
         int getProgram() const;
 
-        ProgramChangeEvent() = default;
+        explicit ProgramChangeEvent(const std::function<performance::Event()> &getSnapshot);
         ProgramChangeEvent(const ProgramChangeEvent &event);
 
         std::string getTypeName() const override

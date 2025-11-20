@@ -3,6 +3,8 @@
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
 
+#include "performance/Sequence.hpp"
+
 #include <vector>
 #include <memory>
 #include <string>
@@ -86,14 +88,14 @@ namespace mpc::sequencer
         void setUsed(bool b);
         void setOn(bool b);
 
-        bool insertEventWhileRetainingSort(
-            const std::shared_ptr<Event> &event,
+        void insertEventWhileRetainingSort(
+            const performance::Event &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        std::shared_ptr<NoteOnEvent>
-        recordNoteEventNonLive(int tick, NoteNumber, Velocity);
+        mpc::performance::Event
+        recordNoteEventNonLive(int tick, NoteNumber, Velocity, int64_t metronomeOnlyTick);
 
-        std::shared_ptr<NoteOnEvent> recordNoteEventLive(NoteNumber, Velocity);
+        performance::Event recordNoteEventLive(NoteNumber, Velocity);
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
@@ -102,13 +104,19 @@ namespace mpc::sequencer
         // MAIN screen when the sequencer is not running, use
         // NoteOnEvent::finalizeNonLive.
         void
-        finalizeNoteEventLive(const std::shared_ptr<NoteOnEvent> &event) const;
+        finalizeNoteEventLive(const performance::Event &) const;
 
         void
-        addEvent(int tick, const std::shared_ptr<Event> &event,
+        finalizeNoteEventNonLive(const performance::Event &) const;
+
+        void
+        addEvent(const performance::Event &,
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        void cloneEventIntoTrack(const std::shared_ptr<Event> &src, int tick,
+        void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,
+                                 bool allowMultipleNotesOnSameTick = false);
+
+        void cloneEventIntoTrack(const performance::Event &, int tick,
                                  bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i);
@@ -145,9 +153,9 @@ namespace mpc::sequencer
 
         void purge();
 
-        std::shared_ptr<NoteOnEvent> findRecordingNoteOnEventById(NoteEventId);
+        performance::Event findRecordingNoteOnEventById(NoteEventId);
 
-        std::shared_ptr<NoteOnEvent>
+        performance::Event
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
     private:
@@ -166,11 +174,11 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<Event>> events;
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            std::shared_ptr<NoteOnEvent>,
+            performance::Event,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            std::shared_ptr<NoteOffEvent>,
+            performance::Event,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
@@ -195,8 +203,8 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns;
-        std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs;
+        std::vector<performance::Event> bulkNoteOns;
+        std::vector<performance::Event> bulkNoteOffs;
 
         void updateEventTick(const std::shared_ptr<Event> &e, int newTick);
         std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, NoteNumber) const;

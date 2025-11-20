@@ -8,7 +8,7 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
-    class TempoChangeEvent : public Event
+    class TempoChangeEvent final : public Event
     {
 
         int ratio = 1000;
@@ -28,12 +28,10 @@ namespace mpc::sequencer
         int getClock(int denominator) const;
         double getTempo() const;
 
-        // Smelly smelly smelly
         void setParent(Sequence *newParent);
 
-        TempoChangeEvent(Sequence *parent);
-        TempoChangeEvent(Sequence *parent, int ratio);
-        TempoChangeEvent(Sequence *parent, int ratio, int step);
+        explicit TempoChangeEvent(const std::function<performance::Event()> &getSnapshot, Sequence *parent);
+        TempoChangeEvent(const std::function<performance::Event()> &getSnapshot, Sequence *parent, int ratio);
         TempoChangeEvent(const TempoChangeEvent &);
 
         std::string getTypeName() const override

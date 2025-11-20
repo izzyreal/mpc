@@ -3,7 +3,6 @@
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOffContext.hpp"
 #include "performance/PerformanceManager.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
@@ -20,11 +19,6 @@ TriggerLocalNoteOffCommand::TriggerLocalNoteOffCommand(
 
 void TriggerLocalNoteOffCommand::execute()
 {
-    if (!ctx->noteOffEvent)
-    {
-        return;
-    }
-
     std::optional<DrumBusIndex> drumIndex = std::nullopt;
 
     if (const auto drumBus =
@@ -37,12 +31,12 @@ void TriggerLocalNoteOffCommand::execute()
     if (ctx->currentScreenIsSamplerScreen)
     {
         ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx->noteOffEvent, nullptr, std::nullopt, drumIndex);
+            ctx->noteNumber, nullptr, std::nullopt, drumIndex);
     }
     else
     {
         ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx->noteOffEvent, ctx->track, ctx->track->getDeviceIndex(),
+            ctx->noteNumber, ctx->track, ctx->track->getDeviceIndex(),
             drumIndex);
     }
 
@@ -56,15 +50,15 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->sequencerIsRecordingOrOverdubbing)
         {
-            ctx->track->finalizeNoteEventLive(ctx->recordOnEvent);
+            ctx->track->finalizeNoteEventLive(*ctx->recordOnEvent);
         }
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
         {
             auto newDuration =
                 ctx->metronomeOnlyTickPosition -
-                ctx->recordOnEvent->getMetronomeOnlyTickPosition();
-            ctx->recordOnEvent->setTick(ctx->sequencerTickPosition);
+                ctx->recordOnEvent->metronomeOnlyTickPosition;
+            ctx->recordOnEvent->tick = ctx->sequencerTickPosition;
 
             if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
             {
@@ -76,10 +70,12 @@ void TriggerLocalNoteOffCommand::execute()
                 }
             }
 
-            const bool durationHasBeenAdjusted =
-                ctx->recordOnEvent->finalizeNonLive(newDuration);
+            const Duration oldDuration = ctx->recordOnEvent->duration;
+            ctx->recordOnEvent->duration = Duration(newDuration);
 
-            if ((durationHasBeenAdjusted && ctx->isRecMainWithoutPlaying) ||
+            ctx->track->finalizeNoteEventLive(*ctx->recordOnEvent);
+
+            if ((oldDuration != ctx->recordOnEvent->duration && ctx->isRecMainWithoutPlaying) ||
                 (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
             {
                 if (thisIsTheLastActiveNoteOn)
@@ -87,15 +83,15 @@ void TriggerLocalNoteOffCommand::execute()
                     int nextPos = ctx->sequencerTickPosition +
                                   ctx->noteValueLengthInTicks;
 
-                    auto bar = ctx->currentBarIndex + 1;
+                    const auto bar = ctx->currentBarIndex + 1;
 
                     nextPos = ctx->track->timingCorrectTick(
                         0, bar, nextPos, ctx->noteValueLengthInTicks,
                         ctx->swing);
 
-                    auto lastTick = ctx->sequencerGetActiveSequenceLastTick();
-
-                    if (nextPos != 0 && nextPos < lastTick)
+                    if (const auto lastTick =
+                            ctx->sequencerGetActiveSequenceLastTick();
+                        nextPos != 0 && nextPos < lastTick)
                     {
                         const double nextPosQuarterNotes =
                             sequencer::Sequencer::ticksToQuarterNotes(nextPos);

@@ -3,9 +3,8 @@
 
 namespace mpc::sequencer
 {
-    class PolyPressureEvent : public Event
+    class PolyPressureEvent final : public Event
     {
-
         int note{0};
         int polyPressureValue{0};
 
@@ -15,7 +14,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        PolyPressureEvent() = default;
+        explicit PolyPressureEvent(const std::function<performance::Event()> &getSnapshot);
         PolyPressureEvent(const PolyPressureEvent &event);
 
         std::string getTypeName() const override

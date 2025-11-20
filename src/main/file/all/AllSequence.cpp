@@ -28,11 +28,11 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
 {
     barList = new BarList(Util::vecCopyOfRange(
         bytes, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
-    auto nameBytes = Util::vecCopyOfRange(bytes, NAME_OFFSET,
+    const auto nameBytes = Util::vecCopyOfRange(bytes, NAME_OFFSET,
                                           NAME_OFFSET + AllParser::NAME_LENGTH);
     name = "";
 
-    for (char c : nameBytes)
+    for (const char c : nameBytes)
     {
         if (c == 0x00)
         {
@@ -46,7 +46,7 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
 
     tempo = getTempoDouble(
         std::vector{bytes[TEMPO_BYTE1_OFFSET], bytes[TEMPO_BYTE2_OFFSET]});
-    auto barCountBytes = std::vector{bytes[BAR_COUNT_BYTE1_OFFSET],
+    const auto barCountBytes = std::vector{bytes[BAR_COUNT_BYTE1_OFFSET],
                                      bytes[BAR_COUNT_BYTE2_OFFSET]};
     barCount = ByteUtil::bytes2ushort(barCountBytes);
     loopFirst = ByteUtil::bytes2ushort(
@@ -70,12 +70,12 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
 
     for (int i = 0; i < 33; i++)
     {
-        auto offset = DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        const auto offset = DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
         std::string stringBuffer;
         auto stringBytes = Util::vecCopyOfRange(
             bytes, offset, offset + AllParser::DEV_NAME_LENGTH);
 
-        for (char c : stringBytes)
+        for (const char c : stringBytes)
         {
             if (c == 0x00)
             {
@@ -112,18 +112,18 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
 
     for (int i = 0; i < barCount; i++)
     {
-        auto num = barList->getBars()[i]->getNumerator();
-        auto den = barList->getBars()[i]->getDenominator();
+        const auto num = barList->getBars()[i]->getNumerator();
+        const auto den = barList->getBars()[i]->getDenominator();
         mpcSeq->setTimeSignature(i, num, den);
     }
 
     mpcSeq->setName(name);
     mpcSeq->setInitialTempo(tempo);
-    auto at = tracks;
+    const auto at = tracks;
 
     for (int i = 0; i < 64; i++)
     {
-        auto t = mpcSeq->getTrack(i);
+        const auto t = mpcSeq->getTrack(i);
         t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
         t->setName(at->getName(i));
         t->setDeviceIndex(at->getDevice(i));
@@ -136,24 +136,15 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
     for (int j = 0; j < getEventAmount(); j++)
     {
         auto e = allEvents[j];
-        if (e == nullptr)
+
+        if (e.type == performance::EventType::Unknown)
         {
             continue;
         }
-        int track = e->getTrack();
-        if (track > 128)
-        {
-            track -= 128;
-        }
-        if (track < 0)
-        {
-            track += 128;
-        }
-        if (track > 63)
-        {
-            track -= 64;
-        }
-        mpcSeq->getTrack(track)->cloneEventIntoTrack(e, e->getTick());
+
+        const int track = e.trackIndex;
+
+        mpcSeq->getTrack(track)->cloneEventIntoTrack(e, e.tick);
     }
 
     for (int i = 0; i < 32; i++)
@@ -225,7 +216,7 @@ AllSequence::AllSequence(Sequence *seq, int number)
 
     if (seq->isLastLoopBarEnd())
     {
-        loopEndBytes = std::vector{(char)255, (char)255};
+        loopEndBytes = std::vector{static_cast<char>(255), static_cast<char>(255)};
     }
 
     saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
@@ -277,7 +268,7 @@ AllSequence::AllSequence(Sequence *seq, int number)
         saveBytes[i] = eventArraysChunk[i - EVENTS_OFFSET];
     }
 
-    for (int i = (int)saveBytes.size() - 8; i < saveBytes.size(); i++)
+    for (int i = static_cast<int>(saveBytes.size()) - 8; i < saveBytes.size(); i++)
     {
         saveBytes[i] = static_cast<char>(255);
     }
@@ -293,8 +284,9 @@ const char AllSequence::PITCH_BEND_ID;
 const char AllSequence::SYS_EX_ID;
 const char AllSequence::SYS_EX_TERMINATOR_ID;
 std::vector<char> AllSequence::TERMINATOR =
-    std::vector{(char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF,
-                (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF};
+    std::vector{
+    static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF),
+                static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF)};
 const int AllSequence::MAX_EVENT_SEG_COUNT;
 const int AllSequence::EVENT_SEG_LENGTH;
 const int AllSequence::NAME_OFFSET;
@@ -316,7 +308,7 @@ const int AllSequence::LOOP_LAST_OFFSET;
 const int AllSequence::LOOP_ENABLED_OFFSET;
 const int AllSequence::PADDING4_OFFSET;
 std::vector<char> AllSequence::PADDING4 =
-    std::vector<char>{40, 0, (char)128, 0, 0};
+    std::vector<char>{40, 0, static_cast<char>(128), 0, 0};
 const int AllSequence::LAST_TICK_BYTE3_OFFSET;
 const int AllSequence::LAST_TICK_BYTE4_OFFSET;
 const int AllSequence::DEVICE_NAMES_OFFSET;
@@ -326,14 +318,14 @@ const int AllSequence::BAR_LIST_OFFSET;
 const int AllSequence::BAR_LIST_LENGTH;
 const int AllSequence::EVENTS_OFFSET;
 
-std::vector<std::shared_ptr<Event>>
-AllSequence::readEvents(const std::vector<char> &sequenceBytes)
+std::vector<mpc::performance::Event>
+AllSequence::readEvents(const std::vector<char> &seqBytes)
 {
-    std::vector<std::shared_ptr<Event>> events;
+    std::vector<performance::Event> events;
 
-    for (auto &eventBytes : readEventSegments(sequenceBytes))
+    for (auto &eventBytes : readEventSegments(seqBytes))
     {
-        events.push_back(AllEvent::bytesToMpcEvent(eventBytes));
+        events.emplace_back(AllEvent::bytesToMpcEvent(eventBytes));
     }
 
     return events;
@@ -355,9 +347,9 @@ AllSequence::readEventSegments(const std::vector<char> &seqBytes)
             break;
         }
 
-        int sysexSegs;
         if (ea[EVENT_ID_OFFSET] == SYS_EX_ID)
         {
+            int sysexSegs;
             for (sysexSegs = 0; sysexSegs < MAX_SYSEX_SIZE; sysexSegs++)
             {
                 auto potentialTerminator = Util::vecCopyOfRange(
@@ -378,14 +370,14 @@ AllSequence::readEventSegments(const std::vector<char> &seqBytes)
                                           sysexSegs * EVENT_SEG_LENGTH);
         }
         eventArrays.push_back(ea);
-        candidateOffset += (int)ea.size();
+        candidateOffset += static_cast<int>(ea.size());
     }
     return eventArrays;
 }
 
-double AllSequence::getTempoDouble(const std::vector<char> &bytePair) const
+double AllSequence::getTempoDouble(const std::vector<char> &bytePair)
 {
-    auto s = ByteUtil::bytes2ushort(bytePair);
+    const auto s = ByteUtil::bytes2ushort(bytePair);
     return static_cast<double>(s) / 10.0;
 }
 
@@ -396,7 +388,7 @@ int AllSequence::getNumberOfEventSegmentsForThisSeq(
 
     for (auto &ba : readEventSegments(seqBytes))
     {
-        accum += (int)ba.size() / 8;
+        accum += static_cast<int>(ba.size()) / 8;
     }
 
     return accum;
@@ -404,14 +396,14 @@ int AllSequence::getNumberOfEventSegmentsForThisSeq(
 
 int AllSequence::getEventAmount()
 {
-    return (int)allEvents.size();
+    return static_cast<int>(allEvents.size());
 }
 
 int AllSequence::getSegmentCount(Sequence *seq)
 {
     int segmentCount = 0;
 
-    for (auto &track : seq->getTracks())
+    for (const auto &track : seq->getTracks())
     {
         if (track->getIndex() > 63)
         {
@@ -424,8 +416,10 @@ int AllSequence::getSegmentCount(Sequence *seq)
                     std::dynamic_pointer_cast<SystemExclusiveEvent>(e);
                 sysExEvent)
             {
-                int dataSegments =
-                    (int)ceil((int)sysExEvent->getBytes().size() / 8.0);
+                const int dataSegments =
+                    static_cast<int>(
+                    ceil(
+                    static_cast<int>(sysExEvent->getBytes().size()) / 8.0));
                 segmentCount += dataSegments + 2;
             }
             else if (const auto mixerEvent =
@@ -443,10 +437,10 @@ int AllSequence::getSegmentCount(Sequence *seq)
     return segmentCount;
 }
 
-void AllSequence::setUnknown32BitInt(Sequence *seq)
+void AllSequence::setUnknown32BitInt(const Sequence *seq)
 {
-    auto unknownNumberBytes1 = ByteUtil::uint2bytes(10000000);
-    auto unknownNumberBytes2 =
+    const auto unknownNumberBytes1 = ByteUtil::uint2bytes(10000000);
+    const auto unknownNumberBytes2 =
         ByteUtil::uint2bytes(seq->getLastTick() * 5208.333333333333);
 
     for (int i = 0; i < 2; i++)
@@ -468,9 +462,9 @@ void AllSequence::setUnknown32BitInt(Sequence *seq)
     }
 }
 
-void AllSequence::setBarCount(int i)
+void AllSequence::setBarCount(const int i)
 {
-    auto ba = ByteUtil::ushort2bytes(i);
+    const auto ba = ByteUtil::ushort2bytes(i);
     saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
     saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
@@ -481,7 +475,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
 
     for (int i = 0; i < seq->getLastTick(); i++)
     {
-        for (auto &track : seq->getTracks())
+        for (const auto &track : seq->getTracks())
         {
             if (track->getIndex() > 63)
             {
@@ -493,7 +487,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
                 if (event->getTick() == i)
                 {
                     event->setTrack(track->getIndex());
-                    ea.push_back(AllEvent::mpcEventToBytes(event));
+                    ea.push_back(AllEvent::mpcEventToBytes(event->getSnapshot()));
                 }
             }
         }
@@ -503,20 +497,21 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
     return ByteUtil::stitchByteArrays(ea);
 }
 
-void AllSequence::setTempoDouble(double tempoForSaveBytes)
+void AllSequence::setTempoDouble(const double tempoForSaveBytes)
 {
-    auto ba =
-        ByteUtil::ushort2bytes((unsigned short)(tempoForSaveBytes * 10.0));
+    const auto ba =
+        ByteUtil::ushort2bytes(
+        static_cast<unsigned short>(tempoForSaveBytes * 10.0));
     saveBytes[TEMPO_BYTE1_OFFSET] = ba[0];
     saveBytes[TEMPO_BYTE2_OFFSET] = ba[1];
 }
 
-void AllSequence::setLastTick(Sequence *seq)
+void AllSequence::setLastTick(const Sequence *seq)
 {
-    auto lastTick = seq->getLastTick();
-    auto remainder = lastTick % 65536;
-    auto b = ByteUtil::ushort2bytes(remainder);
-    auto large = static_cast<int>(floor(lastTick / 65536.0));
+    const auto lastTick = seq->getLastTick();
+    const auto remainder = lastTick % 65536;
+    const auto b = ByteUtil::ushort2bytes(remainder);
+    const auto large = static_cast<int>(floor(lastTick / 65536.0));
     saveBytes[LAST_TICK_BYTE1_OFFSET] = b[0];
     saveBytes[LAST_TICK_BYTE2_OFFSET] = b[1];
     saveBytes[LAST_TICK_BYTE2_OFFSET + 1] = large;

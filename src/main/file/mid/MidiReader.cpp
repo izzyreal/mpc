@@ -35,8 +35,8 @@ using namespace mpc::file::mid::event;
 using namespace mpc::sequencer;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
-                       const std::weak_ptr<Sequence> &_dest)
-    : dest(_dest)
+                       const std::weak_ptr<Sequence> &dest)
+    : dest(dest)
 {
     midiFile = std::make_unique<MidiFile>(istream);
 }
@@ -132,7 +132,7 @@ void MidiReader::parseSequence(Mpc &mpc)
         auto lTcMidi = tempoChanges[i].lock();
         auto tce = sequence->addTempoChangeEvent(lTcMidi->getTick());
         auto ratio = lTcMidi->getBpm() / initialTempo;
-        tce->setRatio((int)(ratio * 1000.0));
+        tce->setRatio(static_cast<int>(ratio * 1000.0));
     }
 
     if (timeSignatures.size() == 1)
@@ -189,7 +189,6 @@ void MidiReader::parseSequence(Mpc &mpc)
     }
 
     std::unique_ptr<NoteOnEvent> nVariation;
-    const int maxNoteOffTick = 999999999;
 
     const std::string trackDataPrefix = "TRACK DATA:";
 
@@ -205,17 +204,17 @@ void MidiReader::parseSequence(Mpc &mpc)
 
         for (auto &e : mt->getEvents())
         {
-            auto textEvent = std::dynamic_pointer_cast<meta::Text>(e.lock());
-            if (textEvent)
+            if (auto textEvent =
+                    std::dynamic_pointer_cast<meta::Text>(e.lock()))
             {
-                auto text = textEvent->getText();
-                if (text.find(trackDataPrefix) != std::string::npos)
+                if (auto text = textEvent->getText();
+                    text.find(trackDataPrefix) != std::string::npos)
                 {
                     auto payload = text.substr(trackDataPrefix.length());
                     trackIndex = stoi(payload.substr(0, 2));
-                    auto deviceIndexStr = payload.substr(2, 2);
 
-                    if (deviceIndexStr != "C0")
+                    if (auto deviceIndexStr = payload.substr(2, 2);
+                        deviceIndexStr != "C0")
                     {
                         deviceIndex = stoi(deviceIndexStr, 0, 16) -
                                       stoi(std::string("E0"), 0, 16);
@@ -225,7 +224,7 @@ void MidiReader::parseSequence(Mpc &mpc)
             }
         }
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
-        std::vector<std::shared_ptr<NoteOnEvent>> noteOns;
+        std::vector<performance::Event> noteOns;
 
         auto track = sequence->purgeTrack(trackIndex);
         track->setDeviceIndex(deviceIndex);
@@ -240,7 +239,7 @@ void MidiReader::parseSequence(Mpc &mpc)
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<NoteOnEvent>();
+                    nVariation = std::make_unique<NoteOnEvent>([]{return performance::Event();});
                     nVariation->incrementVariationType(noteOff->getNoteValue());
                     nVariation->setVariationValue(noteOff->getVelocity());
                 }
@@ -266,21 +265,21 @@ void MidiReader::parseSequence(Mpc &mpc)
                                 0));
                         }
 
-                        auto ne = std::make_shared<NoteOnEvent>(
-                            NoteNumber(noteOn->getNoteValue()));
-                        ne->setTick(noteOn->getTick());
-                        ne->setVelocity(Velocity(noteOn->getVelocity()));
+                        performance::Event ne;
+                        ne.type = performance::EventType::NoteOn;
+                        ne.noteNumber = NoteNumber(noteOn->getNoteValue());
+
+                        ne.tick = noteOn->getTick();
+                        ne.velocity = Velocity(noteOn->getVelocity());
 
                         if (nVariation)
                         {
-                            ne->incrementVariationType(
-                                nVariation->getVariationType());
-                            ne->setVariationValue(
-                                nVariation->getVariationValue());
+                            ne.noteVariationType = NoteVariationType(nVariation->getVariationType());
+                            ne.noteVariationValue = NoteVariationValue(nVariation->getVariationValue());
                         }
                         else
                         {
-                            ne->setVariationValue(64);
+                            ne.noteVariationValue = DefaultNoteVariationValue;
                         }
 
                         noteOns.emplace_back(ne);
@@ -301,11 +300,12 @@ void MidiReader::parseSequence(Mpc &mpc)
                 }
                 else if (noteOn)
                 {
-                    auto mpcNoteEvent = std::make_shared<NoteOnEvent>(
-                        NoteNumber(noteOn->getNoteValue()));
-                    mpcNoteEvent->setTick(noteOn->getTick());
-                    mpcNoteEvent->setVelocity(Velocity(noteOn->getVelocity()));
-                    noteOns.emplace_back(mpcNoteEvent);
+                    performance::Event ne;
+                    ne.type = performance::EventType::NoteOn;
+                    ne.noteNumber = NoteNumber(noteOn->getNoteValue());
+                    ne.tick = noteOn->getTick();
+                    ne.velocity = Velocity(noteOn->getVelocity());
+                    noteOns.emplace_back(ne);
                 }
             }
         }
@@ -313,7 +313,7 @@ void MidiReader::parseSequence(Mpc &mpc)
         for (auto &n : noteOns)
         {
             auto noteOn = track->recordNoteEventNonLive(
-                n->getTick(), n->getNote(), n->getVelocity());
+                n.tick, n.noteNumber, n.velocity, 0);
 
             int indexCandidate = -1;
 
@@ -341,9 +341,10 @@ void MidiReader::parseSequence(Mpc &mpc)
                     tick = noteOff2->getTick();
                 }
 
-                if (noteValue == noteOn->getNote() && tick >= noteOn->getTick())
+                if (noteValue == noteOn.noteNumber && tick >= noteOn.tick)
                 {
-                    if (tick < maxNoteOffTick)
+                    if (constexpr int maxNoteOffTick = 999999999;
+                        tick < maxNoteOffTick)
                     {
                         indexCandidate = k;
                         break;
@@ -353,13 +354,13 @@ void MidiReader::parseSequence(Mpc &mpc)
 
             if (indexCandidate != -1)
             {
-                noteOn->setDuration(noteOffs[indexCandidate]->getTick() -
-                                    noteOn->getTick());
+                noteOn.duration = Duration(noteOffs[indexCandidate]->getTick() -
+                                    noteOn.tick);
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else
             {
-                noteOn->setDuration(24);
+                noteOn.duration = Duration(24);
             }
         }
 
@@ -370,11 +371,11 @@ void MidiReader::parseSequence(Mpc &mpc)
                         me.lock());
                 sysEx)
             {
-                auto sysExEventBytes = sysEx->getData();
 
-                if (sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 &&
+                if (auto sysExEventBytes = sysEx->getData();
+                    sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 &&
                     sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 &&
-                    sysExEventBytes[3] == 69 && sysExEventBytes[7] == (char)247)
+                    sysExEventBytes[3] == 69 && sysExEventBytes[7] == static_cast<char>(247))
                 {
                     auto mixerEvent = std::make_shared<MixerEvent>();
                     track->addEvent(sysEx->getTick(), mixerEvent);
@@ -484,7 +485,7 @@ int MidiReader::getNumberOfNoteOns(
 
         if (noteOn)
         {
-            if (noteOn->getNoteValue() == noteValue)
+            if (noteOn.getNoteValue() == noteValue)
             {
                 counter++;
             }
@@ -495,14 +496,14 @@ int MidiReader::getNumberOfNoteOns(
 }
 
 int MidiReader::getNumberOfNotes(
-    int noteValue,
-    const std::vector<std::shared_ptr<NoteOnEvent>> &allNotes) const
+    const int noteValue,
+    const std::vector<performance::Event> &allNotes)
 {
     int counter = 0;
 
     for (auto &ne : allNotes)
     {
-        if (ne->getNote() == noteValue)
+        if (ne.noteNumber == noteValue)
         {
             counter++;
         }

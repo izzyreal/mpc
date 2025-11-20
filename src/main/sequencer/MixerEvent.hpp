@@ -3,7 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class MixerEvent : public Event
+    class MixerEvent final : public Event
     {
 
         int mixerParameter{0};
@@ -18,7 +18,7 @@ namespace mpc::sequencer
         void setValue(int i);
         int getValue() const;
 
-        MixerEvent() = default;
+        explicit MixerEvent(const std::function<performance::Event()> &getSnapshot);
         MixerEvent(const MixerEvent &);
 
         std::string getTypeName() const override

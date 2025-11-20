@@ -41,7 +41,7 @@ namespace mpc
         {
             const int sliderValue;
             const int programNote;
-            const int sliderParameter;
+            const NoteVariationType sliderParameter;
             const int tuneLowRange;
             const int tuneHighRange;
             const int decayLowRange;
@@ -71,9 +71,9 @@ namespace mpc
         static void initSequence(int sequenceIndex, Mpc &mpc);
         static void
         set16LevelsValues(const SixteenLevelsContext &,
-                          const std::shared_ptr<sequencer::NoteOnEvent> &);
+                          performance::Event &);
 
-        static std::pair<sequencer::NoteOnEvent::VARIATION_TYPE, int>
+        static std::pair<NoteVariationType, int>
         getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);
 
         static std::vector<char> vecCopyOfRange(const std::vector<char> &src,

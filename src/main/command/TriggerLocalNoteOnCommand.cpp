@@ -31,8 +31,10 @@ void TriggerLocalNoteOnCommand::execute()
 {
     const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
 
-    const auto noteOnEvent = std::make_shared<sequencer::NoteOnEventPlayOnly>(
-        ctx->note, Velocity(velo));
+    performance::Event noteOnEvent;
+    noteOnEvent.type = performance::EventType::NoteOn;
+    noteOnEvent.noteNumber = ctx->note;
+    noteOnEvent.velocity = velo;
 
     if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
         ctx->sequencer->getTransport()->isPlaying())
@@ -46,7 +48,7 @@ void TriggerLocalNoteOnCommand::execute()
     }
 
     auto apply16LevelsAndSliderNoteVariation =
-        [&](const std::shared_ptr<sequencer::NoteOnEvent> &noteEventToApplyTo)
+        [&](performance::Event &noteEventToApplyTo)
     {
         if (ctx->program && ctx->programPadIndex)
         {
@@ -90,8 +92,8 @@ void TriggerLocalNoteOnCommand::execute()
             {
                 auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
                     sliderNoteVariationContext);
-                noteEventToApplyTo->setVariationType(type);
-                noteEventToApplyTo->setVariationValue(value);
+                noteEventToApplyTo.noteVariationType = type;
+                noteEventToApplyTo.noteVariationValue = NoteVariationValue(value);
             }
         }
     };
@@ -121,7 +123,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->track->getVelocityRatio(), drumBusType);
     }
 
-    std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
+    std::optional<performance::Event> recordNoteOnEvent = std::nullopt;
 
     if (ctx->sequencer->getTransport()->isRecordingOrOverdubbing())
     {
@@ -131,20 +133,19 @@ void TriggerLocalNoteOnCommand::execute()
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||
               sequencer::isDrumNote(ctx->note)))
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
-
         ctx->sequencer->getTransport()->playMetronomeTrack();
 
-        recordNoteOnEvent->setMetronomeOnlyTickPosition(
-            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
+        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
+            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo,
+            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition()
+            );
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
         ctx->sequencer->getTransport()->playMetronomeTrack();
-        recordNoteOnEvent->setTick(
+
+        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
+            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo,
             ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
@@ -170,7 +171,10 @@ void TriggerLocalNoteOnCommand::execute()
 
     if (recordNoteOnEvent)
     {
-        apply16LevelsAndSliderNoteVariation(recordNoteOnEvent);
-        ctx->registryNoteOnEvent.recordNoteEventId = recordNoteOnEvent->getId();
+        // TODO These changes still need to be committed. We should probably
+        // construct the whole Event before enqueueing it.
+        apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
+
+        ctx->registryNoteOnEvent.recordNoteEventId = recordNoteOnEvent->noteEventId;
     }
 }

@@ -2,6 +2,8 @@
 
 #include "file/mid/MidiFile.hpp"
 
+#include "performance/Sequence.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -46,9 +48,9 @@ namespace mpc::file::mid
             int noteValue,
             const std::vector<std::shared_ptr<event::ChannelEvent>> &allNotes)
             const;
-        int getNumberOfNotes(
+        static int getNumberOfNotes(
             int noteValue,
-            const std::vector<std::shared_ptr<sequencer::NoteOnEvent>>
-                &allNotes) const;
+            const std::vector<mpc::performance::Event>
+                &allNotes);
     };
 } // namespace mpc::file::mid

@@ -2,6 +2,19 @@
 
 using namespace mpc::sequencer;
 
+ControlChangeEvent::ControlChangeEvent(
+    const std::function<performance::Event()> &getSnapshot)
+        : Event(getSnapshot)
+{
+}
+
+ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event)
+    : Event(event)
+{
+    setAmount(event.getAmount());
+    setController(event.getController());
+}
+
 void ControlChangeEvent::setController(const int i)
 {
     if (i < 0 || i > 127)
@@ -29,11 +42,4 @@ void ControlChangeEvent::setAmount(const int i)
 int ControlChangeEvent::getAmount() const
 {
     return controllerValue;
-}
-
-ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-    setController(event.getController());
 }

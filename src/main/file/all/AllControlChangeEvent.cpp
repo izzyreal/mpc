@@ -1,34 +1,33 @@
 #include "file/all/AllControlChangeEvent.hpp"
 
 #include "file/all/AllEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::sequencer;
+using namespace mpc::performance;
 
-std::shared_ptr<ControlChangeEvent>
+Event
 AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    auto event = std::make_shared<ControlChangeEvent>();
+    Event e;
+    e.type = EventType::ControlChange;
+    e.tick = AllEvent::readTick(bytes);
+    e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
+    e.controllerNumber = bytes[CONTROLLER_OFFSET];
+    e.controllerValue = bytes[AMOUNT_OFFSET];
 
-    event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
-    event->setController(bytes[CONTROLLER_OFFSET]);
-    event->setAmount(bytes[AMOUNT_OFFSET]);
-
-    return event;
+    return e;
 }
 
 std::vector<char> AllControlChangeEvent::mpcEventToBytes(
-    const std::shared_ptr<ControlChangeEvent> &event)
+    const Event &e)
 {
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
-    AllEvent::writeTick(bytes, event->getTick());
-    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
-    bytes[CONTROLLER_OFFSET] = static_cast<int8_t>(event->getController());
-    bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());
+    AllEvent::writeTick(bytes, e.tick);
+    bytes[AllEvent::TRACK_OFFSET] = e.trackIndex;
+    bytes[CONTROLLER_OFFSET] = e.controllerNumber;
+    bytes[AMOUNT_OFFSET] = e.controllerValue;
 
     return bytes;
 }

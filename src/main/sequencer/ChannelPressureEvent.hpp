@@ -3,7 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class ChannelPressureEvent : public Event
+    class ChannelPressureEvent final : public Event
     {
         int channelPressureValue{0};
 
@@ -11,7 +11,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        ChannelPressureEvent() = default;
+        explicit ChannelPressureEvent(const std::function<performance::Event()> &getSnapshot);
         ChannelPressureEvent(const ChannelPressureEvent &event);
 
         std::string getTypeName() const override

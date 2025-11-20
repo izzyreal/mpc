@@ -3,7 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class PitchBendEvent : public Event
+    class PitchBendEvent final : public Event
     {
 
         int pitchBendAmount{0};
@@ -12,7 +12,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        PitchBendEvent() = default;
+        PitchBendEvent(const std::function<performance::Event()> &getSnapshot);
         PitchBendEvent(const PitchBendEvent &);
 
         std::string getTypeName() const override

@@ -6,7 +6,7 @@ using namespace mpc::sequencer;
 
 bool mpc::sequencer::isDrumNote(const NoteNumber number)
 {
-    return number >= 35 && number <= 98;
+    return number >= MinDrumNoteNumber && number <= MaxDrumNoteNumber;
 }
 
 void NoteOffEvent::setNote(const NoteNumber i)
@@ -19,28 +19,30 @@ mpc::NoteNumber NoteOffEvent::getNote() const
     return number;
 }
 
-NoteOnEvent::NoteOnEvent(const NoteNumber noteNumber, const Velocity vel,
+NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot,
+                         const NoteNumber noteNumber, const Velocity vel,
                          const NoteEventId id)
-    : id(id), noteNumber(noteNumber)
+    : Event(getSnapshot), id(id), noteNumber(noteNumber)
 {
-    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+    noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
     setNote(noteNumber);
     setVelocity(vel);
 }
 
-NoteOnEvent::NoteOnEvent() : id(NoNoteEventId)
+NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot)
+ : Event(getSnapshot), id(NoNoteEventId)
 {
-    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+    noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
 }
-NoteOnEvent::NoteOnEvent(const DrumNoteNumber drumNoteNumber)
-    : id(NoNoteEventId), noteNumber(drumNoteNumber)
+NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot, const DrumNoteNumber drumNoteNumber)
+    : Event(getSnapshot), id(NoNoteEventId), noteNumber(drumNoteNumber)
 {
-    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+    noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
 }
 
 NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
 {
-    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+    noteOff = std::make_shared<NoteOffEvent>(event.getSnapshot);
     setNote(event.noteNumber);
     setVelocity(event.velocity);
     setDuration(event.duration);

@@ -87,37 +87,37 @@ void Track::purge()
     bulkNoteOns.resize(20);
     bulkNoteOffs.resize(20);
     queuedNoteOnEvents = std::make_shared<
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>>(20);
+        moodycamel::ConcurrentQueue<performance::Event>>(20);
     queuedNoteOffEvents = std::make_shared<
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>>(20);
+        moodycamel::ConcurrentQueue<performance::Event>>(20);
 }
 
-std::shared_ptr<NoteOnEvent>
+mpc::performance::Event
 Track::findRecordingNoteOnEventById(const NoteEventId id)
 {
     for (auto &e : events)
     {
-        if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
+        if (const auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
             noteOnEvent && noteOnEvent->getId() == id)
         {
             assert(noteOnEvent->isBeingRecorded());
-            return noteOnEvent;
+            return noteOnEvent->getSnapshot();
         }
     }
 
-    std::shared_ptr<NoteOnEvent> found;
-    std::shared_ptr<NoteOnEvent> e;
+    performance::Event found;
+    performance::Event e;
 
     size_t count = 0;
 
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
-        if (e->getId() == id)
+        if (e.noteEventId == id)
         {
             found = e;
         }
 
-        assert(e->isBeingRecorded());
+        assert(e.beingRecorded);
         bulkNoteOns[count++] = e;
     }
 
@@ -129,27 +129,27 @@ Track::findRecordingNoteOnEventById(const NoteEventId id)
     return found;
 }
 
-std::shared_ptr<NoteOnEvent>
+mpc::performance::Event
 Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
     for (auto &e : events)
     {
-        if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
+        if (const auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
             noteOnEvent && noteOnEvent->isBeingRecorded() &&
             noteOnEvent->getNote() == noteNumber)
         {
-            return noteOnEvent;
+            return noteOnEvent->getSnapshot();
         }
     }
 
-    std::shared_ptr<NoteOnEvent> found;
-    std::shared_ptr<NoteOnEvent> e;
+    performance::Event found;
+    performance::Event e;
 
     size_t count = 0;
 
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
-        if (e->isBeingRecorded() && e->getNote() == noteNumber)
+        if (e.beingRecorded && e.noteNumber == noteNumber)
         {
             found = e;
         }
@@ -227,12 +227,11 @@ mpc::TrackIndex Track::getIndex() const
 
 void Track::flushNoteCache() const
 {
-    std::shared_ptr<NoteOnEvent> e1;
-    std::shared_ptr<NoteOffEvent> e2;
-    while (queuedNoteOnEvents->try_dequeue(e1))
+    performance::Event e;
+    while (queuedNoteOnEvents->try_dequeue(e))
     {
     }
-    while (queuedNoteOffEvents->try_dequeue(e2))
+    while (queuedNoteOffEvents->try_dequeue(e))
     {
     }
 }
@@ -264,59 +263,74 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
     }
 }
 
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventLive(NoteNumber note,
-                                                        Velocity velocity)
+mpc::performance::Event Track::recordNoteEventLive(const NoteNumber note,
+                                                   const Velocity velocity)
 {
-    auto noteOnEvent =
-        std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
-    noteOnEvent->setBeingRecorded(true);
+    const NoteEventId noteEventIdToUse = nextNoteEventId;
     nextNoteEventId = getNextNoteEventId(nextNoteEventId);
-    noteOnEvent->setTrack(getIndex());
-    noteOnEvent->setTick(TickUnassignedWhileRecording);
-    queuedNoteOnEvents->enqueue(noteOnEvent);
-    return noteOnEvent;
+
+    performance::Event e;
+    e.type = performance::EventType::NoteOn;
+    e.noteNumber = note;
+    e.velocity = velocity;
+    e.noteEventId = noteEventIdToUse;
+    e.beingRecorded = true;
+    e.trackIndex = getIndex();
+    e.tick = TickUnassignedWhileRecording;
+    queuedNoteOnEvents->enqueue(e);
+    return e;
 }
 
-void Track::finalizeNoteEventLive(
-    const std::shared_ptr<NoteOnEvent> &event) const
+void Track::finalizeNoteEventLive(const performance::Event &noteOnEvent) const
 {
-    const auto offEvent = event->getNoteOff();
-    offEvent->setTick(TickUnassignedWhileRecording);
-    event->setBeingRecorded(false);
-    queuedNoteOffEvents->enqueue(offEvent);
+    performance::Event e;
+    e.type = performance::EventType::NoteOff;
+    e.noteNumber = noteOnEvent.noteNumber;
+    e.tick = TickUnassignedWhileRecording;
+    queuedNoteOffEvents->enqueue(e);
 }
 
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventNonLive(const int tick,
-                                                           NoteNumber note,
-                                                           Velocity velocity)
+void Track::finalizeNoteEventNonLive(const performance::Event &noteOnEvent) const
 {
-    auto onEvent = getNoteEvent(tick, note);
-    if (!onEvent)
-    {
-        onEvent =
-            std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
-        nextNoteEventId = getNextNoteEventId(nextNoteEventId);
-        onEvent->setTrack(this->getIndex());
-        onEvent->setTick(tick);
-        onEvent->setBeingRecorded(true);
-        insertEventWhileRetainingSort(onEvent);
-        return onEvent;
-    }
-    onEvent->setBeingRecorded(true);
-    onEvent->setVelocity(velocity);
-    onEvent->resetDuration();
-    return onEvent;
+    performance::Event e;
+    e.type = performance::EventType::NoteOff;
+    e.noteNumber = noteOnEvent.noteNumber;
+    queuedNoteOffEvents->enqueue(e);
 }
 
-void Track::addEvent(const int tick, const std::shared_ptr<Event> &event,
+mpc::performance::Event Track::recordNoteEventNonLive(const int tick,
+                                                           const NoteNumber note,
+                                                           const Velocity velocity,
+                                                           const int64_t metronomeOnlyTick)
+{
+    return{};
+
+    // auto onEvent = getNoteEvent(tick, note);
+    //
+    // if (!onEvent)
+    // {
+    //     onEvent =
+    //         std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
+    //     nextNoteEventId = getNextNoteEventId(nextNoteEventId);
+    //     onEvent->setTrack(this->getIndex());
+    //     onEvent->setTick(tick);
+    //     onEvent->setBeingRecorded(true);
+    //     insertEventWhileRetainingSort(onEvent);
+    //     return onEvent;
+    // }
+    // onEvent->setBeingRecorded(true);
+    // onEvent->setVelocity(velocity);
+    // onEvent->resetDuration();
+    // return onEvent;
+}
+
+void Track::addEvent(const performance::Event &event,
                      const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (events.empty())
     {
         setUsed(true);
     }
-
-    event->setTick(tick);
 
     insertEventWhileRetainingSort(
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
@@ -328,63 +342,67 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
 {
     std::shared_ptr<Event> clone;
 
-    if (const auto noteOnSrc = std::dynamic_pointer_cast<NoteOnEvent>(src))
-    {
-        clone = std::make_shared<NoteOnEvent>(*noteOnSrc);
-    }
-    else if (const auto mixerSrc = std::dynamic_pointer_cast<MixerEvent>(src))
-    {
-        clone = std::make_shared<MixerEvent>(*mixerSrc);
-    }
-    else if (const auto chanPressSrc =
-                 std::dynamic_pointer_cast<ChannelPressureEvent>(src))
-    {
-        clone = std::make_shared<ChannelPressureEvent>(*chanPressSrc);
-    }
-    else if (const auto polyPressSrc =
-                 std::dynamic_pointer_cast<PolyPressureEvent>(src))
-    {
-        clone = std::make_shared<PolyPressureEvent>(*polyPressSrc);
-    }
-    else if (const auto pitchBendSrc =
-                 std::dynamic_pointer_cast<PitchBendEvent>(src))
-    {
-        clone = std::make_shared<PitchBendEvent>(*pitchBendSrc);
-    }
-    else if (const auto tempoSrc =
-                 std::dynamic_pointer_cast<TempoChangeEvent>(src))
-    {
-        const auto t = std::make_shared<TempoChangeEvent>(*tempoSrc);
-        t->setParent(parent);
-        clone = t;
-    }
-    else if (const auto ctrlChangeSrc =
-                 std::dynamic_pointer_cast<ControlChangeEvent>(src))
-    {
-        clone = std::make_shared<ControlChangeEvent>(*ctrlChangeSrc);
-    }
-    else if (const auto progChangeSrc =
-                 std::dynamic_pointer_cast<ProgramChangeEvent>(src))
-    {
-        clone = std::make_shared<ProgramChangeEvent>(*progChangeSrc);
-    }
-    else if (const auto sysExSrc =
-                 std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
-    {
-        clone = std::make_shared<SystemExclusiveEvent>(*sysExSrc);
-    }
-
-    if (clone)
-    {
-        clone->setTick(tick);
-
-        if (!used)
-        {
-            setUsed(true);
-        }
-
-        insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
-    }
+    // if (const auto noteOnSrc = std::dynamic_pointer_cast<NoteOnEvent>(src))
+    // {
+    //     clone = std::make_shared<NoteOnEvent>(*noteOnSrc);
+    // }
+    // else if (const auto mixerSrc = std::dynamic_pointer_cast<MixerEvent>(src))
+    // {
+    //     clone = std::make_shared<MixerEvent>(*mixerSrc);
+    // }
+    // else if (const auto chanPressSrc =
+    //              std::dynamic_pointer_cast<ChannelPressureEvent>(src))
+    // {
+    //     clone = std::make_shared<ChannelPressureEvent>(*chanPressSrc);
+    // }
+    // else if (const auto polyPressSrc =
+    //              std::dynamic_pointer_cast<PolyPressureEvent>(src))
+    // {
+    //     clone = std::make_shared<PolyPressureEvent>(*polyPressSrc);
+    // }
+    // else if (const auto pitchBendSrc =
+    //              std::dynamic_pointer_cast<PitchBendEvent>(src))
+    // {
+    //     clone = std::make_shared<PitchBendEvent>(*pitchBendSrc);
+    // }
+    // else if (const auto tempoSrc =
+    //              std::dynamic_pointer_cast<TempoChangeEvent>(src))
+    // {
+    //     const auto t = std::make_shared<TempoChangeEvent>(*tempoSrc);
+    //     t->setParent(parent);
+    //     clone = t;
+    // }
+    // else if (const auto ctrlChangeSrc =
+    //              std::dynamic_pointer_cast<ControlChangeEvent>(src))
+    // {
+    //     clone = std::make_shared<ControlChangeEvent>(*ctrlChangeSrc);
+    // }
+    // else if (const auto progChangeSrc =
+    //              std::dynamic_pointer_cast<ProgramChangeEvent>(src))
+    // {
+    //     clone = std::make_shared<ProgramChangeEvent>(*progChangeSrc);
+    // }
+    // else if (const auto sysExSrc =
+    //              std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
+    // {
+    //     clone = std::make_shared<SystemExclusiveEvent>(*sysExSrc);
+    // }
+    //
+    // if (clone)
+    // {
+    //     clone->setTick(tick);
+    //
+    //     if (!used)
+    //     {
+    //         setUsed(true);
+    //     }
+    //
+    //     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
+    // }
+}
+void Track::cloneEventIntoTrack(const performance::Event &, int tick,
+                                bool allowMultipleNotesOnSameTick)
+{
 }
 
 void Track::removeEvent(const int i)
@@ -526,9 +544,9 @@ int Track::getCorrectedTickPos() const
 void Track::processRealtimeQueuedEvents()
 {
     const auto noteOnCount =
-        this->queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), 20);
+        queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), 20);
     const auto noteOffCount =
-        this->queuedNoteOffEvents->try_dequeue_bulk(bulkNoteOffs.begin(), 20);
+        queuedNoteOffEvents->try_dequeue_bulk(bulkNoteOffs.begin(), 20);
 
     if (noteOnCount == 0 && noteOffCount == 0)
     {
@@ -540,10 +558,10 @@ void Track::processRealtimeQueuedEvents()
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
     {
-        if (const auto noteOff = bulkNoteOffs[noteOffIndex];
-            noteOff->getTick() == TickUnassignedWhileRecording)
+        if (auto noteOff = bulkNoteOffs[noteOffIndex];
+            noteOff.tick == TickUnassignedWhileRecording)
         {
-            noteOff->setTick(pos);
+            noteOff.tick = pos;
         }
     }
 
@@ -551,16 +569,16 @@ void Track::processRealtimeQueuedEvents()
     {
         auto noteOn = bulkNoteOns[noteOnIndex];
 
-        if (noteOn->getTick() == TickUnassignedWhileRecording)
+        if (noteOn.tick == TickUnassignedWhileRecording)
         {
-            noteOn->setTick(pos);
+            noteOn.tick = pos;
 
             if (correctedTickPos != pos && correctedTickPos != -1)
             {
-                noteOn->setTick(correctedTickPos);
+                noteOn.tick = correctedTickPos;
             }
 
-            noteOn->wasMoved = noteOn->getTick() - pos;
+            noteOn.wasMoved = noteOn.tick - pos;
         }
 
         bool needsToBeRequeued = true;
@@ -568,9 +586,9 @@ void Track::processRealtimeQueuedEvents()
         for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
         {
             if (auto noteOff = bulkNoteOffs[noteOffIndex];
-                noteOff->getNote() == noteOn->getNote())
+                noteOff.noteNumber == noteOn.noteNumber)
             {
-                auto newTick = noteOff->getTick() + noteOn->wasMoved;
+                auto newTick = noteOff.tick + noteOn.wasMoved;
                 if (newTick < 0)
                 {
                     newTick += parent->getLastTick();
@@ -579,27 +597,28 @@ void Track::processRealtimeQueuedEvents()
                 {
                     newTick -= parent->getLastTick();
                 }
-                noteOff->setTick(newTick);
 
-                auto duration = noteOff->getTick() - noteOn->getTick();
+                noteOff.tick = newTick;
+
+                auto duration = noteOff.tick - noteOn.tick;
                 bool fixEventIndex = false;
 
-                if (noteOff->getTick() < noteOn->getTick())
+                if (noteOff.tick < noteOn.tick)
                 {
-                    duration = parent->getLastTick() - noteOn->getTick();
+                    duration = parent->getLastTick() - noteOn.tick;
                     fixEventIndex = true;
-                    noteOn->dontDelete = true;
+                    noteOn.dontDelete = true;
                 }
 
                 if (duration < 1)
                 {
                     duration = 1;
                 }
-                noteOn->setDuration(duration);
 
-                if (const bool wasInserted =
-                        insertEventWhileRetainingSort(noteOn);
-                    fixEventIndex && wasInserted)
+                noteOn.duration = Duration(duration);
+                insertEventWhileRetainingSort(noteOn);
+
+                if (fixEventIndex)
                 {
                     eventIndex--;
                 }
@@ -608,13 +627,13 @@ void Track::processRealtimeQueuedEvents()
             }
             else
             {
-                this->queuedNoteOffEvents->enqueue(noteOff);
+                queuedNoteOffEvents->enqueue(noteOff);
             }
         }
 
         if (needsToBeRequeued)
         {
-            this->queuedNoteOnEvents->enqueue(noteOn);
+            queuedNoteOnEvents->enqueue(noteOn);
         }
     }
 }
@@ -1115,8 +1134,8 @@ std::string Track::getActualName()
     return name;
 }
 
-bool Track::insertEventWhileRetainingSort(
-    const std::shared_ptr<Event> &event,
+void Track::insertEventWhileRetainingSort(
+    const performance::Event &event,
     const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (!isUsed())
@@ -1124,19 +1143,20 @@ bool Track::insertEventWhileRetainingSort(
         setUsed(true);
     }
 
-    auto tick = event->getTick();
+    auto tick = event.tick;
 
-    if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-        noteEvent && !allowMultipleNoteEventsWithSameNoteOnSameTick)
+    if (event.type == performance::EventType::NoteOn &&
+        !allowMultipleNoteEventsWithSameNoteOnSameTick)
     {
-        for (auto &e : events)
+        for (auto it = events.begin(); it != events.end(); ++it)
         {
-            if (auto e2 = std::dynamic_pointer_cast<NoteOnEvent>(e);
-                e2 && e2->getTick() == tick &&
-                e2->getNote() == noteEvent->getNote())
+            if (const auto n = std::dynamic_pointer_cast<NoteOnEvent>(*it))
             {
-                e2.swap(noteEvent);
-                return false;
+                if (n->getTick() == tick && n->getNote() == event.noteNumber)
+                {
+                    events.erase(it);
+                    break;
+                }
             }
         }
     }
@@ -1155,19 +1175,17 @@ bool Track::insertEventWhileRetainingSort(
 
         if (insertAt == events.end())
         {
-            events.emplace_back(event);
+            // events.emplace_back(event);
         }
         else
         {
-            events.emplace(insertAt, event);
+            // events.emplace(insertAt, event);
         }
     }
     else
     {
-        events.emplace_back(event);
+        // events.emplace_back(event);
     }
 
     eventIndex++;
-
-    return true;
 }
