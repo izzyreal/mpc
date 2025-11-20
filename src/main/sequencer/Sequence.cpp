@@ -288,9 +288,8 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
             for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0;
                  eventIndex--)
             {
-                const auto event = t->getEvent(eventIndex);
-
-                if (event->getTick() >= nextBarStartTick &&
+                if (const auto event = t->getEvent(eventIndex);
+                    event->getTick() >= nextBarStartTick &&
                     event->getTick() < getLastTick())
                 {
                     event->setTick(event->getTick() + tickShift);
