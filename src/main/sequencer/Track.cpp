@@ -5,20 +5,13 @@
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/NoteEvent.hpp"
-#include "sequencer/MixerEvent.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/PitchBendEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
-#include "sequencer/ChannelPressureEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
-#include "sequencer/SystemExclusiveEvent.hpp"
 #include "audiomidi/EventHandler.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
+#include "performance/EventMapper.hpp""
 
 #include <concurrentqueue.h>
 
@@ -34,6 +27,7 @@ using namespace mpc::lcdgui::screens::window;
 constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
+    std::shared_ptr<performance::PerformanceManager> performanceManager,
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,
@@ -55,7 +49,7 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : trackIndex(trackIndex), parent(parent),
+    : performanceManager(performanceManager), trackIndex(trackIndex), parent(parent),
       getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
@@ -800,7 +794,7 @@ void Track::playNext()
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
-        eventHandler->handleFinalizedEvent(event, this);
+        eventHandler->handleFinalizedEvent(event->getSnapshot(), this);
     }
 
     eventIndex++;
@@ -1175,16 +1169,16 @@ void Track::insertEventWhileRetainingSort(
 
         if (insertAt == events.end())
         {
-            // events.emplace_back(event);
+            events.emplace_back(performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
         }
         else
         {
-            // events.emplace(insertAt, event);
+            events.emplace(insertAt, performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
         }
     }
     else
     {
-        // events.emplace_back(event);
+        events.emplace_back(performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
     }
 
     eventIndex++;

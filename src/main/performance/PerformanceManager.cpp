@@ -191,6 +191,14 @@ void PerformanceManager::registerNoteOff(
     msg.action = action;
     enqueue(std::move(msg));
 }
+Event PerformanceManager::claimEvent(const performance::Event& e)
+{
+    eventPool.events[eventPool.nextEventIndex].sequenceIndex = e.sequenceIndex;
+    eventPool.events[eventPool.nextEventIndex].trackIndex = e.trackIndex;
+    const auto claimedEventIndex = eventPool.nextEventIndex;
+    eventPool.nextEventIndex = (eventPool.nextEventIndex + 1) % eventPool.events.size();
+    return eventPool.events[claimedEventIndex];
+}
 
 void PerformanceManager::clear() const
 {

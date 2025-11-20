@@ -17,17 +17,10 @@
 #include "file/mid/event/meta/Text.hpp"
 #include "file/mid/event/meta/TimeSignatureEvent.hpp"
 #include "file/mid/event/meta/TrackName.hpp"
-#include "sequencer/ChannelPressureEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/MixerEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
-#include "sequencer/PitchBendEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 
 using namespace mpc::file::mid;
@@ -41,7 +34,7 @@ MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
     midiFile = std::make_unique<MidiFile>(istream);
 }
 
-void MidiReader::parseSequence(Mpc &mpc)
+void MidiReader::parseSequence(Mpc &mpc) const
 {
     auto lSequencer = mpc.getSequencer();
     auto midiTracks = midiFile->getTracks();
@@ -322,9 +315,8 @@ void MidiReader::parseSequence(Mpc &mpc)
                 int noteValue;
                 int tick;
 
-                auto noteOff1 = std::dynamic_pointer_cast<NoteOn>(noteOffs[k]);
-
-                if (noteOff1)
+                if (auto noteOff1 =
+                        std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
                 {
                     // isMpc2000XlMidiFile == true. MPC2000XL MIDI files use
                     // MIDI Note On events to indicate the end of a note.
@@ -367,7 +359,7 @@ void MidiReader::parseSequence(Mpc &mpc)
         for (auto &me : mt->getEvents())
         {
             if (const auto sysEx =
-                    std::dynamic_pointer_cast<event::SystemExclusiveEvent>(
+                    std::dynamic_pointer_cast<SystemExclusiveEvent>(
                         me.lock());
                 sysEx)
             {
@@ -377,11 +369,13 @@ void MidiReader::parseSequence(Mpc &mpc)
                     sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 &&
                     sysExEventBytes[3] == 69 && sysExEventBytes[7] == static_cast<char>(247))
                 {
-                    auto mixerEvent = std::make_shared<MixerEvent>();
-                    track->addEvent(sysEx->getTick(), mixerEvent);
-                    mixerEvent->setParameter(sysExEventBytes[4] - 1);
-                    mixerEvent->setPadNumber(sysExEventBytes[5]);
-                    mixerEvent->setValue(sysExEventBytes[6]);
+                    performance::Event e;
+                    e.type = performance::EventType::Mixer;
+                    e.tick = sysEx->getTick();
+                    e.mixerParameter = sysExEventBytes[4] - 1;
+                    e.mixerPad = sysExEventBytes[5];
+                    e.mixerValue = sysExEventBytes[6];
+                    track->addEvent(e);
                 }
                 else
                 {
@@ -394,44 +388,47 @@ void MidiReader::parseSequence(Mpc &mpc)
                         sysExEventBytes[j + 1] = sysEx->getData()[j];
                     }
 
-                    auto see =
-                        std::make_shared<sequencer::SystemExclusiveEvent>();
-                    track->addEvent(sysEx->getTick(), see);
-                    std::vector<unsigned char> tmp;
+                    performance::Event e;
+                    e.type = performance::EventType::SystemExclusive;
+                    e.tick = sysEx->getTick();
 
-                    for (char c : sysExEventBytes)
-                    {
-                        tmp.push_back(static_cast<unsigned char>(c));
-                    }
+                    // std::vector<unsigned char> tmp;
+                    //
+                    // for (char c : sysExEventBytes)
+                    // {
+                    //     tmp.push_back(static_cast<unsigned char>(c));
+                    // }
+                    //
+                    // e->setBytes(tmp);
 
-                    see->setBytes(tmp);
+                    track->addEvent(e);
                 }
             }
             else if (const auto noteAfterTouch =
                          std::dynamic_pointer_cast<NoteAftertouch>(me.lock());
                      noteAfterTouch)
             {
-                auto ppe = std::make_shared<PolyPressureEvent>();
-                track->addEvent(noteAfterTouch->getTick(), ppe);
-                ppe->setNote(noteAfterTouch->getNoteValue());
-                ppe->setAmount(noteAfterTouch->getAmount());
+                // auto ppe = std::make_shared<PolyPressureEvent>();
+                // track->addEvent(noteAfterTouch->getTick(), ppe);
+                // ppe->setNote(noteAfterTouch->getNoteValue());
+                // ppe->setAmount(noteAfterTouch->getAmount());
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
                              me.lock());
                      channelAfterTouch)
             {
-                auto cpe = std::make_shared<ChannelPressureEvent>();
-                track->addEvent(channelAfterTouch->getTick(), cpe);
-                cpe->setAmount(channelAfterTouch->getAmount());
+                // auto cpe = std::make_shared<ChannelPressureEvent>();
+                // track->addEvent(channelAfterTouch->getTick(), cpe);
+                // cpe->setAmount(channelAfterTouch->getAmount());
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
                      programChange)
             {
-                auto pce = std::make_shared<ProgramChangeEvent>();
-                track->addEvent(programChange->getTick(), pce);
-                pce->setProgram(programChange->getProgramNumber() + 1);
+                // auto pce = std::make_shared<ProgramChangeEvent>();
+                // track->addEvent(programChange->getTick(), pce);
+                // pce->setProgram(programChange->getProgramNumber() + 1);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
@@ -443,18 +440,18 @@ void MidiReader::parseSequence(Mpc &mpc)
                          std::dynamic_pointer_cast<Controller>(me.lock());
                      controller)
             {
-                auto cce = std::make_shared<ControlChangeEvent>();
-                track->addEvent(controller->getTick(), cce);
-                cce->setController(controller->getControllerType());
-                cce->setAmount(controller->getValue());
+                // auto cce = std::make_shared<ControlChangeEvent>();
+                // track->addEvent(controller->getTick(), cce);
+                // cce->setController(controller->getControllerType());
+                // cce->setAmount(controller->getValue());
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
                      pitchBend)
             {
-                auto pbe = std::make_shared<PitchBendEvent>();
-                track->addEvent(pitchBend->getTick(), pbe);
-                pbe->setAmount(pitchBend->getBendAmount() - 8192);
+                // auto pbe = std::make_shared<PitchBendEvent>();
+                // track->addEvent(pitchBend->getTick(), pbe);
+                // pbe->setAmount(pitchBend->getBendAmount() - 8192);
             }
         }
     }
@@ -474,18 +471,16 @@ bool MidiReader::isInteger(const std::string &s)
 }
 
 int MidiReader::getNumberOfNoteOns(
-    int noteValue,
-    const std::vector<std::shared_ptr<ChannelEvent>> &allNotes) const
+    const int noteValue,
+    const std::vector<std::shared_ptr<ChannelEvent>> &allNotes)
 {
     int counter = 0;
 
     for (auto &no : allNotes)
     {
-        auto noteOn = std::dynamic_pointer_cast<NoteOn>(no);
-
-        if (noteOn)
+        if (const auto noteOn = std::dynamic_pointer_cast<NoteOn>(no))
         {
-            if (noteOn.getNoteValue() == noteValue)
+            if (noteOn->getNoteValue() == noteValue)
             {
                 counter++;
             }

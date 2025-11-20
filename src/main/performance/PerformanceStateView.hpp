@@ -1,6 +1,7 @@
 #pragma once
 
 #include "performance/EventTypes.hpp"
+#include "performance/Sequence.hpp"
 #include "performance/Drum.hpp"
 
 #include <memory>

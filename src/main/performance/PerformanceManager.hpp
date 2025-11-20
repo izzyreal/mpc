@@ -72,7 +72,11 @@ namespace mpc::performance
                              std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
 
+        performance::Event claimEvent(const performance::Event &);
+
         void clear() const;
+
+        EventPool eventPool;
 
     protected:
         void applyMessage(const PerformanceMessage &) noexcept override;
@@ -82,6 +86,5 @@ namespace mpc::performance
 
         static void reserveState(PerformanceState &);
 
-        EventPool eventPool;
     };
 } // namespace mpc::performance

@@ -398,6 +398,7 @@ void Sequencer::purgeAllSequences()
 std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
 {
     return std::make_shared<Sequence>(
+        performanceManager,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];

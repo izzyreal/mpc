@@ -9,6 +9,10 @@
 #include <functional>
 #include <string>
 
+namespace mpc::performance
+{
+    class PerformanceManager;
+}
 namespace mpc::sequencer
 {
     class Bus;
@@ -48,7 +52,8 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(std::function<std::string(int)> getDefaultTrackName,
+        Sequence(std::shared_ptr<performance::PerformanceManager>,
+            std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
                  std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
                  std::function<bool()> isRecordingModeMulti,

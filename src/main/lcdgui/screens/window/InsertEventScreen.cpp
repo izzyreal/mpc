@@ -50,6 +50,7 @@ void InsertEventScreen::function(const int i)
 
 void InsertEventScreen::insertEvent() const
 {
+    /*
     const auto track = sequencer->getSelectedTrack();
 
     if (insertEventType == 0)
@@ -123,6 +124,7 @@ void InsertEventScreen::insertEvent() const
         mixerEvent->setParameter(0);
         mixerEvent->setValue(0);
     }
+    */
 }
 
 void InsertEventScreen::turnWheel(const int i)

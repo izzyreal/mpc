@@ -36,7 +36,7 @@ namespace mpc::file::mid
     public:
         MidiReader(std::shared_ptr<std::istream>,
                    const std::weak_ptr<sequencer::Sequence> &dest);
-        void parseSequence(Mpc &);
+        void parseSequence(Mpc &) const;
 
     private:
         static bool isInteger(const std::string &);
@@ -44,10 +44,9 @@ namespace mpc::file::mid
         std::unique_ptr<MidiFile> midiFile;
         std::weak_ptr<sequencer::Sequence> dest;
 
-        int getNumberOfNoteOns(
+        static int getNumberOfNoteOns(
             int noteValue,
-            const std::vector<std::shared_ptr<event::ChannelEvent>> &allNotes)
-            const;
+            const std::vector<std::shared_ptr<event::ChannelEvent>> &allNotes);
         static int getNumberOfNotes(
             int noteValue,
             const std::vector<mpc::performance::Event>

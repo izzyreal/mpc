@@ -23,7 +23,7 @@ namespace mpc::sequencer
 
         virtual std::string getTypeName() const = 0;
 
-        const std::function<performance::Event()> getSnapshot;
+        std::function<performance::Event()> getSnapshot;
 
     protected:
         int tick = 0;

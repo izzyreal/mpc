@@ -11,6 +11,10 @@
 #include <functional>
 #include <cstdint>
 
+namespace mpc::performance
+{
+    class PerformanceManager;
+}
 namespace moodycamel
 {
     struct ConcurrentQueueDefaultTraits;
@@ -44,6 +48,7 @@ namespace mpc::sequencer
     {
     public:
         Track(
+        std::shared_ptr<performance::PerformanceManager>,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -183,6 +188,7 @@ namespace mpc::sequencer
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};
+        std::shared_ptr<performance::PerformanceManager> performanceManager;
         std::function<std::string(int)> getDefaultTrackName;
         std::function<int64_t()> getTickPosition;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;

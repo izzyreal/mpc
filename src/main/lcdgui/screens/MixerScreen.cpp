@@ -568,12 +568,12 @@ void MixerScreen::turnWheel(const int i)
 void MixerScreen::recordMixerEvent(const int pad, const int param,
                                    const int value) const
 {
-    const auto event = std::make_shared<MixerEvent>();
-    sequencer->getSelectedTrack()->addEvent(
-        sequencer->getTransport()->getTickPosition(), event);
-    event->setPadNumber(pad);
-    event->setParameter(param);
-    event->setValue(value);
+    // const auto event = std::make_shared<MixerEvent>();
+    // sequencer->getSelectedTrack()->addEvent(
+    //     sequencer->getTransport()->getTickPosition(), event);
+    // event->setPadNumber(pad);
+    // event->setParameter(param);
+    // event->setValue(value);
 }
 
 void MixerScreen::displayStereoFaders()

@@ -87,6 +87,7 @@ namespace mpc::performance
     struct EventPool
     {
         std::array<Event, 300'000> events{};
+        int64_t nextEventIndex = 0;
     };
 
     struct Track
