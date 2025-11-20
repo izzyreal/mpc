@@ -45,11 +45,11 @@ namespace mpc::sequencer
         static int setClock(int i, const Sequence *, int position);
 
     private:
-        static double secondsPerTick(const double tempo);
-        static double ticksPerSecond(const double tempo);
+        static double secondsPerTick(double tempo);
+        static double ticksPerSecond(double tempo);
 
     public:
-        static double ticksToFrames(double ticks, const double tempo, int sr);
+        static double ticksToFrames(double ticks, double tempo, int sr);
 
         static double sequenceFrameLength(const Sequence *, int firstTick,
                                           int lastTick, int sr);
