@@ -8,7 +8,7 @@ void Event::setTick(const int relativeTick)
 {
     tick = relativeTick;
 
-    notifyObservers(std::string("tick"));
+    // notifyObservers(std::string("tick"));
 }
 
 int Event::getTick() const

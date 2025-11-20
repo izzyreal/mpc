@@ -26,7 +26,7 @@ void TempoChangeEvent::setParent(Sequence *newParent)
     parent = newParent;
 }
 
-void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next)
 {
     tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) + 1);
 
@@ -42,11 +42,9 @@ void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
             tick = next->getTick() - 1;
         }
     }
-
-    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous)
 {
     tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) - 1);
 
@@ -62,11 +60,9 @@ void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
             tick = previous->getTick() + 1;
         }
     }
-
-    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next)
 {
     tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
                                       SeqUtil::getBeat(parent, tick) + 1);
@@ -83,11 +79,9 @@ void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
             tick = next->getTick() - 1;
         }
     }
-
-    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous)
 {
     tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
                                       SeqUtil::getBeat(parent, tick) - 1);
@@ -104,11 +98,9 @@ void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
             tick = previous->getTick() + 1;
         }
     }
-
-    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::plusOneClock(TempoChangeEvent *next)
+void TempoChangeEvent::plusOneClock(const TempoChangeEvent *next)
 {
     if (next != nullptr && tick == next->getTick() - 1)
     {
@@ -126,11 +118,9 @@ void TempoChangeEvent::plusOneClock(TempoChangeEvent *next)
     {
         tick = parent->getLastTick();
     }
-
-    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::minusOneClock(TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneClock(const TempoChangeEvent *previous)
 {
     if (previous != nullptr)
     {
@@ -141,20 +131,11 @@ void TempoChangeEvent::minusOneClock(TempoChangeEvent *previous)
     }
 
     tick--;
-
-    notifyObservers(std::string("tempo-change"));
 }
 
 void TempoChangeEvent::setRatio(const int i)
 {
-    if (i < 100 || i > 9998)
-    {
-        return;
-    }
-
-    ratio = i;
-
-    notifyObservers(std::string("tempo-change"));
+    ratio = std::clamp(i, 100, 9998);
 }
 
 int TempoChangeEvent::getRatio() const
@@ -164,7 +145,7 @@ int TempoChangeEvent::getRatio() const
 
 int TempoChangeEvent::getBar(const int n, const int d) const
 {
-    const auto barLength = (int)(96 * (4.0 / d) * n);
+    const auto barLength = static_cast<int>(96 * (4.0 / d) * n);
     const auto bar = tick / barLength;
     return bar;
 }

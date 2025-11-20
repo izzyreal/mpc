@@ -15,12 +15,12 @@ namespace mpc::sequencer
         Sequence *parent = nullptr;
 
     public:
-        void plusOneBar(TempoChangeEvent *next);
-        void minusOneBar(TempoChangeEvent *previous);
-        void plusOneBeat(TempoChangeEvent *next);
-        void minusOneBeat(TempoChangeEvent *previous);
-        void plusOneClock(TempoChangeEvent *next);
-        void minusOneClock(TempoChangeEvent *previous);
+        void plusOneBar(const TempoChangeEvent *next);
+        void minusOneBar(const TempoChangeEvent *previous);
+        void plusOneBeat(const TempoChangeEvent *next);
+        void minusOneBeat(const TempoChangeEvent *previous);
+        void plusOneClock(const TempoChangeEvent *next);
+        void minusOneClock(const TempoChangeEvent *previous);
         void setRatio(int i);
         int getRatio() const;
         int getBar(int n, int d) const;

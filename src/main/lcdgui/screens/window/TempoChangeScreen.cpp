@@ -7,8 +7,6 @@
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
 
-#include "sequencer/Track.hpp"
-
 #include "lcdgui/HorizontalBar2.hpp"
 
 #include "Util.hpp"
@@ -80,14 +78,6 @@ void TempoChangeScreen::open()
 void TempoChangeScreen::initVisibleEvents()
 {
     const auto seq = sequencer->getSelectedSequence();
-
-    for (auto &t : visibleTempoChanges)
-    {
-        if (t)
-        {
-            t->deleteObserver(this);
-        }
-    }
 
     visibleTempoChanges = std::vector<std::shared_ptr<TempoChangeEvent>>(3);
 

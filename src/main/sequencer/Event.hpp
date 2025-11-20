@@ -4,9 +4,10 @@
 
 namespace mpc::sequencer
 {
-    class Event : public Observable
+    class Event
     {
     public:
+        virtual ~Event() = default;
         bool dontDelete = false;
         int wasMoved = 0;
 
