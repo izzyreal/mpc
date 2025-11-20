@@ -33,7 +33,7 @@ TEST_CASE("Delete program", "[program]")
         ->setProgramIndex(ProgramIndex(2));
     mpc.getSequencer()
         ->getBus<DrumBus>(BusType::DRUM4)
-    ->setProgramIndex(ProgramIndex(3));
+        ->setProgramIndex(ProgramIndex(3));
 
     mpc.getEngineHost()->applyPendingStateChanges();
 

@@ -16,7 +16,7 @@
 
 using namespace mpc::sequencer;
 
-int SeqUtil::getTickFromBar(const int i, Sequence *s, int position)
+int SeqUtil::getTickFromBar(const int i, const Sequence *s, int position)
 {
     if (i < 0)
     {
@@ -25,9 +25,9 @@ int SeqUtil::getTickFromBar(const int i, Sequence *s, int position)
 
     const auto difference = i - getBarFromTick(s, position);
     const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + difference * denTicks * 4 > s->getLastTick())
+    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+        position + difference * denTicks * 4 > s->getLastTick())
     {
         position = s->getLastTick();
     }
@@ -39,7 +39,7 @@ int SeqUtil::getTickFromBar(const int i, Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::getBarFromTick(Sequence *s, const int position)
+int SeqUtil::getBarFromTick(const Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -49,8 +49,8 @@ int SeqUtil::getBarFromTick(Sequence *s, const int position)
     const auto ts = s->getTimeSignature();
     const auto num = ts.getNumerator();
     const auto den = ts.getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
-    const auto bar = (int)floor(position / (denTicks * num));
+    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto bar = static_cast<int>(floor(position / (denTicks * num)));
 
     return bar;
 }
@@ -73,7 +73,7 @@ double SeqUtil::ticksToFrames(const double ticks, const double tempo,
     return ticks * secondsPerTick(tempo) * sr;
 }
 
-double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
+double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
                                     const int lastTick, const int sr)
 {
     double result = 0;
@@ -88,9 +88,9 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
             ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
         return result;
     }
-    const auto firstTceTick = tempoChangeEvents[0]->getTick();
 
-    if (firstTick < firstTceTick)
+    if (const auto firstTceTick = tempoChangeEvents[0]->getTick();
+        firstTick < firstTceTick)
     {
         result =
             ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
@@ -124,10 +124,10 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
 
     result +=
         ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
-    return (int)ceil(result);
+    return static_cast<int>(ceil(result));
 }
 
-int SeqUtil::loopFrameLength(Sequence *seq, const int sr)
+int SeqUtil::loopFrameLength(const Sequence *seq, const int sr)
 {
     return static_cast<int>(
         sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
@@ -151,76 +151,8 @@ int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
 
     return static_cast<int>(result);
 }
-void SeqUtil::setTimeSignature(Sequence *sequence, const int firstBarIndex,
-                               const int tsLastBarIndex, const int num,
-                               const int den)
-{
-    for (int i = firstBarIndex; i <= tsLastBarIndex; i++)
-    {
-        setTimeSignature(sequence, i, num, den);
-    }
-}
 
-void SeqUtil::setTimeSignature(Sequence *sequence, const int bar, const int num,
-                               const int den)
-{
-    const auto newDenTicks = 96 * (4.0 / den);
-
-    const auto barStart = sequence->getFirstTickOfBar(bar);
-    const auto oldBarLength = sequence->getBarLengthsInTicks()[bar];
-    const auto newBarLength = newDenTicks * num;
-    const auto tickShift = newBarLength - oldBarLength;
-
-    if (newBarLength < oldBarLength)
-    {
-        // The bar will be cropped, so we may have to remove some events
-        // if they fall outside the new new bar's region.
-        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength;
-             tick++)
-        {
-            for (const auto &t : sequence->getTracks())
-            {
-                for (int eventIndex = t->getEvents().size() - 1;
-                     eventIndex >= 0; eventIndex--)
-                {
-                    if (t->getEvent(eventIndex)->getTick() == tick)
-                    {
-                        t->removeEvent(eventIndex);
-                    }
-                }
-            }
-        }
-    }
-
-    if (bar < 998)
-    {
-        // We're changing the timesignature of not the last bar, so
-        // all bars after the bar we're changing are shifting. Here we
-        // shift all relevant event ticks.
-        const auto nextBarStartTick = sequence->getFirstTickOfBar(bar + 1);
-
-        for (const auto &t : sequence->getTracks())
-        {
-            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0;
-                 eventIndex--)
-            {
-                const auto event = t->getEvent(eventIndex);
-
-                if (event->getTick() >= nextBarStartTick &&
-                    event->getTick() < sequence->getLastTick())
-                {
-                    event->setTick(event->getTick() + tickShift);
-                }
-            }
-        }
-    }
-
-    sequence->getBarLengthsInTicks()[bar] = newBarLength;
-    sequence->getNumerators()[bar] = num;
-    sequence->getDenominators()[bar] = den;
-}
-
-int SeqUtil::setBar(int i, Sequence *sequence, int position)
+int SeqUtil::setBar(int i, const Sequence *sequence, int position)
 {
     if (i < 0)
     {
@@ -229,9 +161,9 @@ int SeqUtil::setBar(int i, Sequence *sequence, int position)
 
     const auto difference = i - getBar(sequence, position);
     const auto den = sequence->getTimeSignature().getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + difference * denTicks * 4 > sequence->getLastTick())
+    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+        position + difference * denTicks * 4 > sequence->getLastTick())
     {
         position = sequence->getLastTick();
     }
@@ -243,7 +175,7 @@ int SeqUtil::setBar(int i, Sequence *sequence, int position)
     return position;
 }
 
-int SeqUtil::setBeat(int i, Sequence *s, int position)
+int SeqUtil::setBeat(int i, const Sequence *s, int position)
 {
     if (i < 0)
     {
@@ -251,9 +183,8 @@ int SeqUtil::setBeat(int i, Sequence *s, int position)
     }
 
     const auto ts = s->getTimeSignature();
-    const auto num = ts.getNumerator();
 
-    if (i >= num)
+    if (const auto num = ts.getNumerator(); i >= num)
     {
         i = num - 1;
     }
@@ -261,9 +192,9 @@ int SeqUtil::setBeat(int i, Sequence *s, int position)
     const auto difference = i - getBeat(s, position);
 
     const auto den = ts.getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + difference * denTicks > s->getLastTick())
+    if (const auto denTicks = static_cast<int>(96 * (4.0 / den));
+        position + difference * denTicks > s->getLastTick())
     {
         position = s->getLastTick();
     }
@@ -275,7 +206,7 @@ int SeqUtil::setBeat(int i, Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::setClock(int i, Sequence *s, int position)
+int SeqUtil::setClock(int i, const Sequence *s, int position)
 {
     if (i < 0)
     {
@@ -283,16 +214,14 @@ int SeqUtil::setClock(int i, Sequence *s, int position)
     }
 
     const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (i >= denTicks)
+    if (const auto denTicks = static_cast<int>(96 * (4.0 / den)); i >= denTicks)
     {
         i = denTicks - 1;
     }
 
-    const auto difference = i - getClock(s, position);
-
-    if (position + difference > s->getLastTick())
+    if (const auto difference = i - getClock(s, position);
+        position + difference > s->getLastTick())
     {
         position = s->getLastTick();
     }
@@ -304,7 +233,7 @@ int SeqUtil::setClock(int i, Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::getBar(Sequence *s, const int position)
+int SeqUtil::getBar(const Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -314,12 +243,12 @@ int SeqUtil::getBar(Sequence *s, const int position)
     const auto ts = s->getTimeSignature();
     const auto num = ts.getNumerator();
     const auto den = ts.getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
-    const auto bar = (int)floor(position / (denTicks * num));
+    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto bar = static_cast<int>(floor(position / (denTicks * num)));
     return bar;
 }
 
-int SeqUtil::getBeat(Sequence *s, const int position)
+int SeqUtil::getBeat(const Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -327,16 +256,16 @@ int SeqUtil::getBeat(Sequence *s, const int position)
     }
 
     const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
-    auto beat = (int)floor(position / denTicks);
+    const auto denTicks = static_cast<int>(96 * (4.0 / den));
+    auto beat = static_cast<int>(floor(position / denTicks));
     beat = beat % den;
     return beat;
 }
 
-int SeqUtil::getClock(Sequence *s, const int position)
+int SeqUtil::getClock(const Sequence *s, const int position)
 {
     const auto den = s->getTimeSignature().getDenominator();
-    const auto denTicks = (int)(96 * (4.0 / den));
+    const auto denTicks = static_cast<int>(96 * (4.0 / den));
 
     if (position == 0)
     {

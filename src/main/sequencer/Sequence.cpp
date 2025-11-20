@@ -4,7 +4,6 @@
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/SeqUtil.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
 
@@ -107,17 +106,19 @@ void Sequence::setLastLoopBarIndex(int i)
         i = 0;
     }
 
+    const auto currentLastBarIndex = lastBarIndex.load();
+
     if (lastLoopBarEnd)
     {
-        if (i < lastBarIndex)
+        if (i < currentLastBarIndex)
         {
             lastLoopBarEnd = false;
-            lastLoopBarIndex = lastBarIndex;
+            lastLoopBarIndex = currentLastBarIndex;
             return;
         }
         return;
     }
-    if (i > lastBarIndex)
+    if (i > currentLastBarIndex)
     {
         lastLoopBarEnd = true;
     }
@@ -136,7 +137,7 @@ int Sequence::getLastLoopBarIndex() const
 {
     if (lastLoopBarEnd)
     {
-        return lastBarIndex;
+        return lastBarIndex.load();
     }
 
     return lastLoopBarIndex;
@@ -174,17 +175,17 @@ std::string Sequence::getDeviceName(const int i)
 
 void Sequence::setLastBarIndex(const int i)
 {
-    lastBarIndex = std::clamp(i, 0, 998);
+    lastBarIndex.store(std::clamp(i, 0, 998));
 }
 
 int Sequence::getLastBarIndex() const
 {
-    return lastBarIndex;
+    return lastBarIndex.load();
 }
 
 int Sequence::getBarCount() const
 {
-    return lastBarIndex + 1;
+    return lastBarIndex.load() + 1;
 }
 
 void Sequence::setLoopEnabled(const bool b)
@@ -238,13 +239,69 @@ void Sequence::init(const int newLastBarIndex)
 void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
                                 const int num, const int den)
 {
-    SeqUtil::setTimeSignature(this, firstBar, tsLastBar, num, den);
+    for (int i = firstBar; i <= tsLastBar; i++)
+    {
+        setTimeSignature(i, num, den);
+    }
 }
 
 void Sequence::setTimeSignature(const int barIndex, const int num,
                                 const int den)
 {
-    SeqUtil::setTimeSignature(this, barIndex, num, den);
+    const auto newDenTicks = 96 * (4.0 / den);
+
+    const auto barStart = getFirstTickOfBar(barIndex);
+    const auto oldBarLength = getBarLengthsInTicks()[barIndex];
+    const auto newBarLength = newDenTicks * num;
+    const auto tickShift = newBarLength - oldBarLength;
+
+    if (newBarLength < oldBarLength)
+    {
+        // The bar will be cropped, so we may have to remove some events
+        // if they fall outside the new bar's region.
+        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength;
+             tick++)
+        {
+            for (const auto &t : getTracks())
+            {
+                for (int eventIndex = t->getEvents().size() - 1;
+                     eventIndex >= 0; eventIndex--)
+                {
+                    if (t->getEvent(eventIndex)->getTick() == tick)
+                    {
+                        t->removeEvent(eventIndex);
+                    }
+                }
+            }
+        }
+    }
+
+    if (barIndex < 998)
+    {
+        // We're changing the timesignature of not the last bar, so
+        // all bars after the bar we're changing are shifting. Here we
+        // shift all relevant event ticks.
+        const auto nextBarStartTick = getFirstTickOfBar(barIndex + 1);
+
+        for (const auto &t : getTracks())
+        {
+            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0;
+                 eventIndex--)
+            {
+                const auto event = t->getEvent(eventIndex);
+
+                if (event->getTick() >= nextBarStartTick &&
+                    event->getTick() < getLastTick())
+                {
+                    event->setTick(event->getTick() + tickShift);
+                }
+            }
+        }
+    }
+
+    getBarLengthsInTicks()[barIndex] = newBarLength;
+    getNumerators()[barIndex] = num;
+    getDenominators()[barIndex] = den;
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()
@@ -338,7 +395,7 @@ TimeSignature Sequence::getTimeSignature() const
     auto ts = TimeSignature();
     int bar = getCurrentBarIndex();
 
-    if (bar > lastBarIndex && bar != 0)
+    if (bar > lastBarIndex.load() && bar != 0)
     {
         bar--;
     }
@@ -385,7 +442,7 @@ void Sequence::setBarLengths(const std::vector<int> &newBarLengths)
 
 void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 {
-    if (lastBarIndex == -1)
+    if (lastBarIndex.load() == -1)
     {
         return;
     }
@@ -421,7 +478,6 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
     }
 
     const auto difference = lastBarToDelete - firstBar;
-    lastBarIndex -= difference;
     int oldBarStartPos = 0;
     auto barCounter = 0;
 
@@ -480,17 +536,21 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
         }
     }
 
-    if (firstLoopBarIndex > lastBarIndex)
+    const int newLastBarIndex = lastBarIndex.load() - difference;
+
+    lastBarIndex.store(newLastBarIndex);
+
+    if (firstLoopBarIndex > newLastBarIndex)
     {
-        firstLoopBarIndex = lastBarIndex;
+        firstLoopBarIndex = newLastBarIndex;
     }
 
-    if (lastLoopBarIndex > lastBarIndex)
+    if (lastLoopBarIndex > newLastBarIndex)
     {
-        lastLoopBarIndex = lastBarIndex;
+        lastLoopBarIndex = newLastBarIndex;
     }
 
-    if (lastBarIndex == -1)
+    if (newLastBarIndex == -1)
     {
         setUsed(false);
     }
@@ -498,11 +558,12 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 
 void Sequence::insertBars(int barCount, const int afterBar)
 {
-    const bool isAppending = afterBar - 1 == lastBarIndex;
+    const auto oldLastBarIndex = lastBarIndex.load();
+    const bool isAppending = afterBar - 1 == oldLastBarIndex;
 
-    if (lastBarIndex + barCount > 998)
+    if (oldLastBarIndex + barCount > 998)
     {
-        barCount = 998 - lastBarIndex;
+        barCount = 998 - oldLastBarIndex;
     }
 
     if (barCount == 0)
@@ -510,7 +571,9 @@ void Sequence::insertBars(int barCount, const int afterBar)
         return;
     }
 
-    lastBarIndex += barCount;
+    const auto newLastBarIndex = oldLastBarIndex + barCount;
+
+    lastBarIndex.store(newLastBarIndex);
 
     oldBarLengthsInTicks = barLengthsInTicks;
     oldNumerators = numerators;
@@ -586,7 +649,7 @@ void Sequence::insertBars(int barCount, const int afterBar)
         }
     }
 
-    if (lastBarIndex != -1 && !isUsed())
+    if (newLastBarIndex != -1 && !isUsed())
     {
         setUsed(true);
     }
@@ -654,14 +717,16 @@ int Sequence::getEventCount() const
 
 void Sequence::initLoop()
 {
-    if (firstLoopBarIndex == -1 && lastBarIndex >= 0)
+    const auto currentLastBarIndex = lastBarIndex.load();
+
+    if (firstLoopBarIndex == -1 && currentLastBarIndex >= 0)
     {
         firstLoopBarIndex = 0;
     }
 
-    if (lastLoopBarIndex == -1 && lastBarIndex >= 0)
+    if (lastLoopBarIndex == -1 && currentLastBarIndex >= 0)
     {
-        lastLoopBarIndex = lastBarIndex;
+        lastLoopBarIndex = currentLastBarIndex;
     }
 
     const auto firstBar = getFirstLoopBarIndex();

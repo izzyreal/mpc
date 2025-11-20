@@ -225,9 +225,13 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     if (auto &pgm1 = drum.programIndex;
                         !activeState.programs[pgm1].used)
                     {
-                        for (int pgm2 = 0; pgm2 < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++pgm2)
+                        for (int pgm2 = 0;
+                             pgm2 < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++pgm2)
                         {
-                            if (!activeState.programs[pgm2].used) continue;
+                            if (!activeState.programs[pgm2].used)
+                            {
+                                continue;
+                            }
 
                             pgm1 = ProgramIndex(pgm2);
                             break;

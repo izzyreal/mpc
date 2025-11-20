@@ -160,7 +160,7 @@ namespace mpc::sequencer
 
         std::string name;
         bool loopEnabled = true;
-        int lastBarIndex = -1;
+        std::atomic<int> lastBarIndex{-1};
         bool used = false;
         bool tempoChangeOn = true;
         int loopStart = 0;

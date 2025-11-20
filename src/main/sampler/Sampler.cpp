@@ -351,7 +351,8 @@ void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
         }
     }
 
-    mpc.performanceManager->enqueue(performance::PerformanceMessage(performance::RepairProgramReferences{}));
+    mpc.performanceManager->enqueue(performance::PerformanceMessage(
+        performance::RepairProgramReferences{}));
 }
 
 std::vector<std::shared_ptr<Sound>> &Sampler::getSounds()

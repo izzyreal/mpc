@@ -35,17 +35,14 @@ namespace mpc::sequencer
     class SeqUtil
     {
     public:
-        static void setTimeSignature(Sequence *, int firstBarIndex,
-                                     int lastBarIndex, int num, int den);
-        static void setTimeSignature(Sequence *, int bar, int num, int den);
-        static int getTickFromBar(int i, Sequence *s, int position);
-        static int getBarFromTick(Sequence *, int position);
-        static int getBeat(Sequence *, int position);
-        static int getClock(Sequence *, int position);
-        static int getBar(Sequence *, int position);
-        static int setBar(int i, Sequence *, int position);
-        static int setBeat(int i, Sequence *, int position);
-        static int setClock(int i, Sequence *, int position);
+        static int getTickFromBar(int i, const Sequence *s, int position);
+        static int getBarFromTick(const Sequence *, int position);
+        static int getBeat(const Sequence *, int position);
+        static int getClock(const Sequence *, int position);
+        static int getBar(const Sequence *, int position);
+        static int setBar(int i, const Sequence *, int position);
+        static int setBeat(int i, const Sequence *, int position);
+        static int setClock(int i, const Sequence *, int position);
 
     private:
         static double secondsPerTick(const double tempo);
@@ -54,9 +51,9 @@ namespace mpc::sequencer
     public:
         static double ticksToFrames(double ticks, const double tempo, int sr);
 
-        static double sequenceFrameLength(Sequence *, int firstTick,
+        static double sequenceFrameLength(const Sequence *, int firstTick,
                                           int lastTick, int sr);
-        static int loopFrameLength(Sequence *, int sr);
+        static int loopFrameLength(const Sequence *, int sr);
         static int songFrameLength(Song *song, Sequencer *, int sr);
 
         static void copyBars(Mpc &, uint8_t fromSeqIndex, uint8_t toSeqIndex,

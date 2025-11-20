@@ -176,7 +176,8 @@ void Sequencer::playToTick(const int targetTick) const
     {
         if (i == 1)
         {
-            if (!secondSequenceEnabled.load() || transport->isMetronomeOnlyEnabled() ||
+            if (!secondSequenceEnabled.load() ||
+                transport->isMetronomeOnlyEnabled() ||
                 secondSequenceScreen->sq ==
                     seqIndex) // Real 2KXL would play all events twice (i.e.
                               // double as loud as normal) for the last clause

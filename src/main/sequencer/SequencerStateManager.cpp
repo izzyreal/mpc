@@ -80,7 +80,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         msg);
 }
 
-void SequencerStateManager::applyPlayMessage(const bool fromStart) const noexcept
+void SequencerStateManager::applyPlayMessage(
+    const bool fromStart) const noexcept
 {
     const auto transport = sequencer->getTransport();
 

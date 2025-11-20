@@ -639,7 +639,7 @@ void Transport::setPosition(const double positionQuarterNotes,
                             const bool shouldSetPlayStartPosition) const
 {
     const bool songMode = sequencer.isSongModeEnabled();
-    
+
     SequenceIndex songSequenceIndex{NoSequenceIndex};
 
     if (songMode)

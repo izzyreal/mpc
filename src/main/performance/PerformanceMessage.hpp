@@ -83,7 +83,9 @@ namespace mpc::performance
         MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
-    struct RepairProgramReferences{};
+    struct RepairProgramReferences
+    {
+    };
 
     struct UpdateProgramsBulk
     {

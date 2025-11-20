@@ -103,7 +103,7 @@ bool LayeredScreen::isCurrentScreen(
     const std::initializer_list<ScreenId> ids) const
 {
     auto screenId = currentScreenId.load();
-    
+
     for (const auto candidate : ids)
     {
         if (screenId == candidate)
