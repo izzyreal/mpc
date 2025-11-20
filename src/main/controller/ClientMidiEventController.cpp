@@ -563,7 +563,7 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
     return sequencer->getSelectedTrackIndex();
 }
 
-std::shared_ptr<Track>
+std::shared_ptr<mpc::sequencer::Track>
 ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 {
     if (const auto trackIndex = getTrackIndexForEvent(e); trackIndex)

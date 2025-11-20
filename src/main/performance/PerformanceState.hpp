@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Sequence.hpp"
 #include "performance/EventTypes.hpp"
 #include "performance/Drum.hpp"
 
@@ -12,7 +13,11 @@ namespace mpc::performance
         NoteOnEvents noteEvents;
 
         std::array<Drum, 4> drums;
-        std::array<Program, mpc::Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
+        std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
+
+        EventPool eventPool;
+
+        std::array<Sequence, Mpc2000XlSpecs::SEQUENCE_COUNT> sequences;
 
         PerformanceState()
         {

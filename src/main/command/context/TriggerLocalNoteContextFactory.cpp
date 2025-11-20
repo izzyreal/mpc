@@ -35,7 +35,7 @@ std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const PerformanceEventSource source,
     const performance::NoteOnEvent &registryNoteOnEvent, const NoteNumber note,
-    const Velocity velocity, Track *track, const std::shared_ptr<Bus> &bus,
+    const Velocity velocity, sequencer::Track *track, const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
@@ -122,7 +122,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const PerformanceEventSource source, const NoteNumber note,
-    const NoteEventId recordedNoteOnEventId, Track *track,
+    const NoteEventId recordedNoteOnEventId, sequencer::Track *track,
     const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
