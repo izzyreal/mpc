@@ -9,6 +9,8 @@
 #include "performance/PerformanceStateView.hpp"
 #include "sequencer/BusType.hpp"
 
+#include "performance/Sequence.hpp"
+
 #include <optional>
 #include <functional>
 
