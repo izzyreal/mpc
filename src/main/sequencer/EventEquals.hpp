@@ -30,9 +30,7 @@ namespace mpc::sequencer
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
                a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&
-               a.getDuration().has_value() == b.getDuration().has_value() &&
-               (!a.getDuration().has_value() ||
-                *a.getDuration() == *b.getDuration()) &&
+               a.getDuration() == b.getDuration() &&
                a.getVariationType() == b.getVariationType() &&
                a.getVariationValue() == b.getVariationValue() &&
                ((!a.getNoteOff() && !b.getNoteOff()) ||

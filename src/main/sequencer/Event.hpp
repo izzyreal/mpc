@@ -26,7 +26,6 @@ namespace mpc::sequencer
         std::function<performance::Event()> getSnapshot;
 
     protected:
-        int tick = 0;
         TrackIndex track{0};
     };
 } // namespace mpc::sequencer

@@ -661,7 +661,7 @@ void EventRow::setDrumNoteEventValues() const
     }
 
     fields[3]->setText(StrUtil::padLeft(
-        std::to_string(ne->getDuration().value_or(1)), " ", 4));
+        std::to_string(ne->getDuration() == NoDuration ? 1 : ne->getDuration()), " ", 4));
     fields[4]->setText(
         StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
 
@@ -687,7 +687,7 @@ void EventRow::setMidiNoteEventValues() const
     fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) +
                        "(" + Util::noteNames()[ne->getNote()] + ")");
     fields[1]->setText(
-        StrUtil::padLeft(std::to_string(*ne->getDuration()), " ", 4));
+        StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
     fields[2]->setText(std::to_string(ne->getVelocity()));
 
     horizontalBar->setValue(ne->getVelocity());

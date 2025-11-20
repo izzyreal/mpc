@@ -257,7 +257,7 @@ void EditMultipleScreen::checkFiveParameters()
 
         if (note)
         {
-            note->setDuration(editValue);
+            note->setDuration(Duration(editValue));
         }
         else if (programChange)
         {

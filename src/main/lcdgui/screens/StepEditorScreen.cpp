@@ -114,7 +114,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
 
 bool StepEditorScreen::visibleEventsEqual(
     const std::vector<std::shared_ptr<Event>> &a,
-    const std::vector<std::shared_ptr<Event>> &b) const
+    const std::vector<std::shared_ptr<Event>> &b)
 {
     if (a.size() != b.size())
     {
@@ -410,7 +410,7 @@ void StepEditorScreen::function(int i)
                     else if (isD)
                     {
                         editMultipleScreen->setEditValue(
-                            *noteEvent->getDuration());
+                            noteEvent->getDuration());
                     }
                     else if (isE)
                     {
@@ -429,7 +429,7 @@ void StepEditorScreen::function(int i)
                     else if (isB)
                     {
                         editMultipleScreen->setEditValue(
-                            *noteEvent->getDuration());
+                            noteEvent->getDuration());
                     }
                     else if (isC)
                     {
@@ -1499,8 +1499,8 @@ int StepEditorScreen::getYOffset() const
 void StepEditorScreen::adhocPlayNoteEvent(
     const std::shared_ptr<NoteOnEvent> &noteEvent) const
 {
-    const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
-    const auto track = sequencer->getSelectedTrack();
+    // const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
+    // const auto track = sequencer->getSelectedTrack();
     // mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
 }
 

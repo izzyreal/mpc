@@ -33,9 +33,9 @@ namespace mpc::lcdgui::screens
             const std::vector<std::shared_ptr<sequencer::Event>>
                 &eventsAtCurrentTick = {}) const;
 
-        bool visibleEventsEqual(
+        static bool visibleEventsEqual(
             const std::vector<std::shared_ptr<sequencer::Event>> &a,
-            const std::vector<std::shared_ptr<sequencer::Event>> &b) const;
+            const std::vector<std::shared_ptr<sequencer::Event>> &b);
 
         void shift();
 

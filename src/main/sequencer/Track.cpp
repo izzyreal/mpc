@@ -11,7 +11,7 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
-#include "performance/EventMapper.hpp""
+#include "performance/EventMapper.hpp"
 
 #include <concurrentqueue.h>
 
@@ -394,9 +394,12 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
     //     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
     // }
 }
-void Track::cloneEventIntoTrack(const performance::Event &, int tick,
-                                bool allowMultipleNotesOnSameTick)
+void Track::cloneEventIntoTrack(const performance::Event &e,
+                                const bool allowMultipleNotesOnSameTick)
 {
+    performance::Event toInsert = e;
+    toInsert.tick = e.tick;
+    insertEventWhileRetainingSort(toInsert, allowMultipleNotesOnSameTick);
 }
 
 void Track::removeEvent(const int i)

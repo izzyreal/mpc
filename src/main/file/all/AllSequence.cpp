@@ -144,7 +144,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
 
         const int track = e.trackIndex;
 
-        mpcSeq->getTrack(track)->cloneEventIntoTrack(e, e.tick);
+        mpcSeq->getTrack(track)->cloneEventIntoTrack(e);
     }
 
     for (int i = 0; i < 32; i++)

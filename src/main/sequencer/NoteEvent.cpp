@@ -11,18 +11,18 @@ bool mpc::sequencer::isDrumNote(const NoteNumber number)
 
 void NoteOffEvent::setNote(const NoteNumber i)
 {
-    number = i;
+    // number = i;
 }
 
 mpc::NoteNumber NoteOffEvent::getNote() const
 {
-    return number;
+    return getSnapshot().noteNumber;
 }
 
 NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot,
                          const NoteNumber noteNumber, const Velocity vel,
                          const NoteEventId id)
-    : Event(getSnapshot), id(id), noteNumber(noteNumber)
+    : Event(getSnapshot), id(id)
 {
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
     setNote(noteNumber);
@@ -35,28 +35,10 @@ NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot)
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
 }
 NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot, const DrumNoteNumber drumNoteNumber)
-    : Event(getSnapshot), id(NoNoteEventId), noteNumber(drumNoteNumber)
+    : Event(getSnapshot), id(NoNoteEventId)
 {
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
-}
-
-NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
-{
-    noteOff = std::make_shared<NoteOffEvent>(event.getSnapshot);
-    setNote(event.noteNumber);
-    setVelocity(event.velocity);
-    setDuration(event.duration);
-    setVariationType(event.variationType);
-    setVariationValue(event.variationValue);
-    NoteOnEvent::setTrack(event.track);
-}
-
-bool NoteOnEvent::finalizeNonLive(const int newDuration)
-{
-    const auto oldDuration = getDuration();
-    setDuration(newDuration);
-    setBeingRecorded(false);
-    return oldDuration != duration;
+    setNote(drumNoteNumber);
 }
 
 void NoteOnEvent::setMetronomeOnlyTickPosition(const int pos)
@@ -91,31 +73,31 @@ bool NoteOnEvent::isBeingRecorded() const
 
 void NoteOnEvent::setNote(const NoteNumber n)
 {
-    noteNumber = n;
+    // noteNumber = n;
     noteOff->setNote(n);
 }
 
 mpc::NoteNumber NoteOnEvent::getNote() const
 {
-    return noteNumber;
+    return getSnapshot().noteNumber;
 }
 
 void NoteOnEvent::setDuration(const Duration d)
 {
     if (d)
     {
-        duration = std::clamp(*d, 0, 9999);
+        // duration = std::clamp(*d, 0, 9999);
     }
 }
 
-NoteOnEvent::Duration NoteOnEvent::getDuration() const
+mpc::Duration NoteOnEvent::getDuration() const
 {
-    return duration;
+    return getSnapshot().duration;
 }
 
 void NoteOnEvent::resetDuration()
 {
-    duration = std::nullopt;
+    setDuration(NoDuration);
 }
 
 NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
@@ -163,12 +145,7 @@ mpc::Velocity NoteOnEvent::getVelocity() const
 
 bool NoteOnEvent::isFinalized() const
 {
-    return duration.has_value();
-}
-
-bool NoteOnEvent::isPlayOnly()
-{
-    return dynamic_cast<NoteOnEventPlayOnly *>(this) != nullptr;
+    return getDuration() != NoDuration;
 }
 
 uint32_t NoteOnEvent::getId() const

@@ -121,7 +121,7 @@ namespace mpc::sequencer
         void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,
                                  bool allowMultipleNotesOnSameTick = false);
 
-        void cloneEventIntoTrack(const performance::Event &, int tick,
+        void cloneEventIntoTrack(const performance::Event &,
                                  bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i);

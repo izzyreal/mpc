@@ -148,12 +148,12 @@ void EventsScreen::function(const int i)
                     }
                     else if (durationMode == 2)
                     {
-                        noteEvent->setDuration(noteEvent->getDuration() *
-                                               durationValue * 0.01);
+                        noteEvent->setDuration(Duration(
+                            noteEvent->getDuration() * durationValue * 0.01));
                     }
                     else if (durationMode == 3)
                     {
-                        noteEvent->setDuration(durationValue);
+                        noteEvent->setDuration(Duration(durationValue));
                     }
                 }
             }

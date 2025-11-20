@@ -19,12 +19,12 @@ Event::Event(const Event &event)
 
 void Event::setTick(const int relativeTick)
 {
-    tick = relativeTick;
+    // tick = relativeTick;
 }
 
 int Event::getTick() const
 {
-    return tick;
+    return getSnapshot().tick;
 }
 
 mpc::TrackIndex Event::getTrack() const
