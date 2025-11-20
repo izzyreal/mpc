@@ -15,8 +15,6 @@ namespace mpc::performance
         std::array<Drum, 4> drums;
         std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs;
 
-        EventPool eventPool;
-
         std::array<Sequence, Mpc2000XlSpecs::SEQUENCE_COUNT> sequences;
 
         PerformanceState()
@@ -31,7 +29,7 @@ namespace mpc::performance
             : physicalPadEvents(other.physicalPadEvents),
               programPadEvents(other.programPadEvents),
               noteEvents(other.noteEvents), drums(other.drums),
-              programs(other.programs)
+              programs(other.programs), sequences(other.sequences)
         {
         }
 
@@ -42,6 +40,7 @@ namespace mpc::performance
             noteEvents = other.noteEvents;
             drums = other.drums;
             programs = other.programs;
+            sequences = other.sequences;
             return *this;
         }
     };

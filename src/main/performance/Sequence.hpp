@@ -20,6 +20,7 @@ namespace mpc::performance
     struct Event
     {
         EventType type;
+        SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
 
         EventIndex eventIndex;
@@ -41,6 +42,7 @@ namespace mpc::performance
         void resetToDefaultValues()
         {
             type = EventType::Unknown;
+            sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
 
             eventIndex = NoEventIndex;
@@ -66,8 +68,16 @@ namespace mpc::performance
         EventIndex eventIndex;
     };
 
+    struct TimeSignature
+    {
+        TimeSigNumerator numerator{DefaultTimeSigNumerator};
+        TimeSigDenominator denominator{DefaultTimeSigDenominator};
+    };
+
     struct Sequence
     {
         std::array<Track, Mpc2000XlSpecs::TRACK_COUNT> tracks;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures;
+        std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths;
     };
 }

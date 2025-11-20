@@ -171,8 +171,15 @@ namespace mpc
 
     /////////
 
-
     using TimeInMilliseconds = int64_t;
     using TimeInNanoseconds = int64_t;
+
+    /////////
+
+    using TimeSigNumerator = ConstrainedInt<int8_t, 0, 32>;
+    using TimeSigDenominator = ConstrainedInt<int8_t, 0, 32>;
+
+    constexpr TimeSigNumerator DefaultTimeSigNumerator{4};
+    constexpr TimeSigDenominator DefaultTimeSigDenominator{4};
 
 } // namespace mpc
