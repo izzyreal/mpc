@@ -397,9 +397,8 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
 void Track::cloneEventIntoTrack(const performance::Event &e,
                                 const bool allowMultipleNotesOnSameTick)
 {
-    performance::Event toInsert = e;
-    toInsert.tick = e.tick;
-    insertEventWhileRetainingSort(toInsert, allowMultipleNotesOnSameTick);
+    printf("cloning into track with tick %lld and duration %i\n", e.tick, e.duration.get());
+    insertEventWhileRetainingSort(e, allowMultipleNotesOnSameTick);
 }
 
 void Track::removeEvent(const int i)

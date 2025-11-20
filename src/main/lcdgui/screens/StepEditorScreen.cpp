@@ -1077,7 +1077,7 @@ StepEditorScreen::computeEventsAtCurrentTick() const
     std::vector<std::shared_ptr<Event>> result;
 
     const auto track = sequencer->getSelectedTrack();
-
+auto trackEvents = track->getEvents();
     for (auto &event : track->getEvents())
     {
         if (event->getTick() == sequencer->getTransport()->getTickPosition())
@@ -1086,6 +1086,8 @@ StepEditorScreen::computeEventsAtCurrentTick() const
                 std::dynamic_pointer_cast<NoteOnEvent>(event))
             {
                 auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+                printf("Note event %i %i %i\n", ne->getTick(), ne->getNote().get(), ne->getDuration().get());
 
                 if (isMidiBusType(track->getBusType()))
                 {
