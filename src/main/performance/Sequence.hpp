@@ -26,12 +26,12 @@ namespace mpc::performance
         EventIndex previousEventIndex;
         EventIndex nextEventIndex;
 
-        int64_t tick;
+        Tick tick;
 
-        int16_t duration;
-        int8_t velocity;
-        int8_t noteVarationType;
-        int8_t noteVarationValue;
+        Duration duration;
+        Velocity velocity;
+        NoteVariationType noteVarationType;
+        NoteVariationValue noteVariationValue;
 
         Event()
         {
@@ -42,6 +42,17 @@ namespace mpc::performance
         {
             type = EventType::Unknown;
             trackIndex = NoTrackIndex;
+
+            eventIndex = NoEventIndex;
+            previousEventIndex = NoEventIndex;
+            nextEventIndex = NoEventIndex;
+
+            tick = NoTick;
+
+            duration = NoDuration;
+            velocity = NoVelocityOrPressure;
+            noteVarationType = NoteVariationTypeTune;
+            noteVariationValue = DefaultNoteVariationValue;
         }
     };
 

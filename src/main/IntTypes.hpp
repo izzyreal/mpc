@@ -147,6 +147,31 @@ namespace mpc
 
     /////////
 
+    using Tick = int64_t;
+    constexpr Tick NoTick{-1};
+    constexpr Tick NoTickAssignedWhileRecording{-2};
+
+    /////////
+
+    using Duration = ConstrainedInt<int16_t, -1, 9999>;
+    constexpr Duration NoDuration{-1};
+
+    /////////
+
+    using NoteVariationType = ConstrainedInt<int8_t, 0, 3>;
+    constexpr NoteVariationType NoteVariationTypeTune{0};
+    constexpr NoteVariationType NoteVariationTypeDecay{1};
+    constexpr NoteVariationType NoteVariationTypeAttack{2};
+    constexpr NoteVariationType NoteVariationTypeFilter{3};
+
+    /////////
+
+    using NoteVariationValue = ConstrainedInt<int8_t, 0, 124>;
+    constexpr NoteVariationValue DefaultNoteVariationValue{64};
+
+    /////////
+
+
     using TimeInMilliseconds = int64_t;
     using TimeInNanoseconds = int64_t;
 
