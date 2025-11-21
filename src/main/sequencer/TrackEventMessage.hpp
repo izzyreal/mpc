@@ -22,6 +22,12 @@ namespace mpc::sequencer
         Tick currentTick;
     };
 
+    struct FinalizeNonLiveNoteEvent
+    {
+        EventState noteOnEvent;
+        Duration duration;
+    };
+
     struct InsertEvent
     {
         EventState eventState;
@@ -67,5 +73,6 @@ namespace mpc::sequencer
         std::variant<SyncEventIndex, InsertEvent, ClearEvents, RemoveEvent,
                      RemoveEventByIndex, RemoveDontDeleteFlag, UpdateEventTick,
                      RemoveDoubles, AddToEventIndex,
-                     UpdateTrackIndexOfAllEvents, UpdateEvent>;
+                     UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     FinalizeNonLiveNoteEvent>;
 } // namespace mpc::sequencer

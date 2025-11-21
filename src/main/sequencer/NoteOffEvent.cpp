@@ -18,9 +18,11 @@ NoteOffEvent::NoteOffEvent(
 {
 }
 
-void NoteOffEvent::setNote(const NoteNumber i)
+void NoteOffEvent::setNote(const NoteNumber i) const
 {
-    // number = i;
+    auto e = getSnapshot();
+    e.noteNumber = i;
+    dispatch(UpdateEvent{e});
 }
 
 mpc::NoteNumber NoteOffEvent::getNote() const

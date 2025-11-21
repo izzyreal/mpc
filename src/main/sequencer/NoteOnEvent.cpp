@@ -64,7 +64,9 @@ bool NoteOnEvent::isBeingRecorded() const
 
 void NoteOnEvent::setNote(const NoteNumber n) const
 {
-    // noteNumber = n;
+    auto e = getSnapshot();
+    e.noteNumber = n;
+    dispatch(UpdateEvent{e});
     noteOff->setNote(n);
 }
 

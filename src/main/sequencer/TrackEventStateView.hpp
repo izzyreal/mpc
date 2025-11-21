@@ -30,6 +30,10 @@ namespace mpc::sequencer
 
         std::vector<EventState> getNoteEvents() const;
 
+        EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
+
+        EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
+
     private:
         const std::shared_ptr<const TrackEventState> state;
     };

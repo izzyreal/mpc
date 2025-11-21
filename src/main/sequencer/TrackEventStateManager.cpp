@@ -35,6 +35,11 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     e.trackIndex = m.trackIndex;
                 }
             }
+            else if constexpr (std::is_same_v<T, FinalizeNonLiveNoteEvent>)
+            {
+                activeState.events[m.noteOnEvent.eventIndex].duration = m.duration;
+                activeState.events[m.noteOnEvent.eventIndex].beingRecorded = false;
+            }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
                 activeState.events[m.eventState.eventIndex] = m.eventState;
@@ -75,15 +80,18 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     if (insertAt == events.end())
                     {
                         events.emplace_back(m.eventState);
+                        events.back().eventIndex = EventIndex(events.size() - 1);
                     }
                     else
                     {
-                        events.emplace(insertAt, m.eventState);
+                        auto insertedEvent = events.emplace(insertAt, m.eventState);
+                        insertedEvent->eventIndex = EventIndex(insertAt - events.begin());
                     }
                 }
                 else
                 {
                     events.emplace_back(m.eventState);
+                    events.back().eventIndex = EventIndex(events.size() - 1);
                 }
 
                 activeState.eventIndex = activeState.eventIndex + 1;

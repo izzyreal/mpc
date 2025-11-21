@@ -96,7 +96,7 @@ namespace mpc::sequencer
         EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick);
 
-        sequencer::EventState recordNoteEventLive(NoteNumber, Velocity);
+        EventState recordNoteEventLive(NoteNumber, Velocity);
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
@@ -104,9 +104,9 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // NoteOnEvent::finalizeNonLive.
-        void finalizeNoteEventLive(const sequencer::EventState &) const;
+        void finalizeNoteEventLive(const EventState &) const;
 
-        void finalizeNoteEventNonLive(const sequencer::EventState &) const;
+        void finalizeNoteEventNonLive(const EventState &, Duration) const;
 
         void
         addEvent(const sequencer::EventState &,

@@ -17,7 +17,7 @@ namespace mpc::sequencer
             const std::function<EventState()> &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
 
-        void setNote(NoteNumber);
+        void setNote(NoteNumber) const;
 
         NoteNumber getNote() const;
 

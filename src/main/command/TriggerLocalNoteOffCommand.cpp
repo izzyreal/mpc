@@ -70,9 +70,8 @@ void TriggerLocalNoteOffCommand::execute()
             }
 
             const Duration oldDuration = ctx->recordOnEvent->duration;
-            ctx->recordOnEvent->duration = Duration(newDuration);
 
-            ctx->track->finalizeNoteEventLive(*ctx->recordOnEvent);
+            ctx->track->finalizeNoteEventNonLive(*ctx->recordOnEvent, Duration(newDuration));
 
             if ((oldDuration != ctx->recordOnEvent->duration &&
                  ctx->isRecMainWithoutPlaying) ||

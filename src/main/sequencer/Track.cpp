@@ -95,11 +95,15 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
 
     size_t count = 0;
 
+    bool foundInQueue = false;
+
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
         if (e.noteEventId == id)
         {
             found = e;
+            foundInQueue = true;
+            break;
         }
 
         assert(e.beingRecorded);
@@ -109,6 +113,12 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
     for (size_t i = 0; i < count; i++)
     {
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+    }
+
+
+    if (!foundInQueue)
+    {
+        found = eventStateManager->getSnapshot().findRecordingNoteOnByNoteEventId(id);
     }
 
     return found;
@@ -122,11 +132,15 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     size_t count = 0;
 
+    bool foundInQueue = false;
+
     while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
     {
         if (e.beingRecorded && e.noteNumber == noteNumber)
         {
             found = e;
+            foundInQueue = true;
+            break;
         }
 
         bulkNoteOns[count++] = e;
@@ -135,6 +149,11 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
     for (size_t i = 0; i < count; i++)
     {
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+    }
+
+    if (!foundInQueue)
+    {
+        found = eventStateManager->getSnapshot().findRecordingNoteOnByNoteNumber(noteNumber);
     }
 
     return found;
@@ -230,6 +249,7 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
         noteEvent->velocity = velocity;
         noteEvent->duration = NoDuration;
         noteEvent->metronomeOnlyTickPosition = metronomeOnlyTick;
+        dispatch(UpdateEvent{*noteEvent});
         return *noteEvent;
     }
 
@@ -244,16 +264,14 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     noteEvent.trackIndex = trackIndex;
     noteEvent.tick = tick;
     noteEvent.beingRecorded = true;
+    noteEvent.metronomeOnlyTickPosition = metronomeOnlyTick;
     insertEvent(noteEvent);
     return noteEvent;
 }
 
-void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent) const
+void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent, const Duration duration) const
 {
-    EventState e;
-    e.type = EventType::NoteOff;
-    e.noteNumber = noteOnEvent.noteNumber;
-    queuedNoteOffEvents->enqueue(e);
+    eventStateManager->enqueue(FinalizeNonLiveNoteEvent{noteOnEvent, duration});
 }
 
 void Track::addEvent(const EventState &event,

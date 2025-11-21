@@ -83,3 +83,31 @@ std::vector<EventState> TrackEventStateView::getNoteEvents() const
 
     return result;
 }
+
+EventState TrackEventStateView::findRecordingNoteOnByNoteNumber(
+    const NoteNumber noteNumber) const
+{
+    for (auto &e : getNoteEvents())
+    {
+        if (e.noteNumber == noteNumber &&
+            e.beingRecorded)
+        {
+            return e;
+        }
+    }
+    return {};
+}
+
+EventState TrackEventStateView::findRecordingNoteOnByNoteEventId(
+    const NoteEventId id) const
+{
+    for (auto &e : getNoteEvents())
+    {
+        if (e.noteEventId == id &&
+            e.beingRecorded)
+        {
+            return e;
+        }
+    }
+    return {};
+}
