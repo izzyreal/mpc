@@ -103,7 +103,6 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
         {
             found = e;
             foundInQueue = true;
-            break;
         }
 
         assert(e.beingRecorded);
@@ -140,7 +139,6 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
         {
             found = e;
             foundInQueue = true;
-            break;
         }
 
         bulkNoteOns[count++] = e;
