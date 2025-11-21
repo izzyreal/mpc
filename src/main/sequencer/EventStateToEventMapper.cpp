@@ -2,12 +2,13 @@
 
 #include "sequencer/NoteOnEvent.hpp"
 
-#include "EventState.hpp"
 #include "EventType.hpp"
 
 namespace mpc::sequencer
 {
-    std::shared_ptr<Event> mapEventStateToEvent(const EventState &e)
+    std::shared_ptr<Event> mapEventStateToEvent(
+        const EventState &e,
+        const std::function<void(TrackEventMessage &&)> &dispatch)
     {
         if (e.type == EventType::NoteOn)
         {
@@ -15,7 +16,8 @@ namespace mpc::sequencer
                 [e]
                 {
                     return e;
-                });
+                },
+                dispatch);
         }
         return {};
     }

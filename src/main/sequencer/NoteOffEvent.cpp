@@ -3,16 +3,18 @@
 using namespace mpc::sequencer;
 
 NoteOffEvent::NoteOffEvent(
-            const std::function<EventState()> &getSnapshot,
-            const NoteNumber noteNumber)
-            : Event(getSnapshot)
+    const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch,
+    const NoteNumber noteNumber)
+    : Event(getSnapshot, dispatch)
 {
     setNote(noteNumber);
 }
 
 NoteOffEvent::NoteOffEvent(
-            const std::function<EventState()> &getSnapshot)
-            : Event(getSnapshot)
+    const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
 }
 

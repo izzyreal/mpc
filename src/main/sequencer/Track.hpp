@@ -2,6 +2,7 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
+#include "TrackEventMessage.hpp"
 
 #include "sequencer/EventState.hpp"
 
@@ -156,6 +157,7 @@ namespace mpc::sequencer
 
     private:
         std::shared_ptr<TrackEventStateManager> eventStateManager;
+        std::function<void(TrackEventMessage &&)> dispatch;
         BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};

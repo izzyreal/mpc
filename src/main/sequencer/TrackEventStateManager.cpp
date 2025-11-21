@@ -35,6 +35,10 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     e.trackIndex = m.trackIndex;
                 }
             }
+            else if constexpr (std::is_same_v<T, UpdateEvent>)
+            {
+                activeState.events[m.eventState.eventIndex] = m.eventState;
+            }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
                 auto &events = activeState.events;

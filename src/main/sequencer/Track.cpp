@@ -66,6 +66,7 @@ Track::Track(
       isSoloEnabled(isSoloEnabled)
 {
     eventStateManager = std::make_shared<TrackEventStateManager>();
+    dispatch = [this](TrackEventMessage&& m) { eventStateManager->enqueue(std::move(m)); };
     purge();
 }
 
@@ -346,7 +347,7 @@ std::shared_ptr<Event> Track::getEvent(const int i) const
 {
     const auto eventState =
         eventStateManager->getSnapshot().getEventByIndex(EventIndex(i));
-    return mapEventStateToEvent(eventState);
+    return mapEventStateToEvent(eventState, dispatch);
 }
 
 void Track::setName(const std::string &s)
@@ -373,8 +374,8 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
 
     for (int i = 0; i < eventCount; ++i)
     {
-        result.emplace_back(
-            mapEventStateToEvent(snapshot.getEventByIndex(EventIndex(i))));
+        auto event = mapEventStateToEvent(snapshot.getEventByIndex(EventIndex(i)), dispatch);
+        result.emplace_back(event);
     }
 
     return result;
@@ -713,7 +714,7 @@ Track::getEventRange(const int startTick, const int endTick) const
     for (const auto &e :
          eventStateManager->getSnapshot().getEventRange(startTick, endTick))
     {
-        result.emplace_back(mapEventStateToEvent(e));
+        result.emplace_back(mapEventStateToEvent(e, dispatch));
     }
     return result;
 }
@@ -884,7 +885,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     for (auto &e : eventStateManager->getSnapshot().getNoteEvents())
     {
         result.emplace_back(
-            std::dynamic_pointer_cast<NoteOnEvent>(mapEventStateToEvent(e)));
+            std::dynamic_pointer_cast<NoteOnEvent>(mapEventStateToEvent(e, dispatch)));
     }
 
     return result;

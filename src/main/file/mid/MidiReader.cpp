@@ -181,7 +181,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
         sequence->setLastLoopBarIndex(lastLoopBar);
     }
 
-    std::unique_ptr<NoteOnEvent> nVariation;
+    std::pair noteVariationData
+    {
+        NoteVariationTypeTune, DefaultNoteVariationValue
+    };
 
     const std::string trackDataPrefix = "TRACK DATA:";
 
@@ -209,8 +212,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     if (auto deviceIndexStr = payload.substr(2, 2);
                         deviceIndexStr != "C0")
                     {
-                        deviceIndex = stoi(deviceIndexStr, 0, 16) -
-                                      stoi(std::string("E0"), 0, 16);
+                        deviceIndex = stoi(deviceIndexStr, nullptr, 16) -
+                                      stoi(std::string("E0"), nullptr, 16);
                     }
                     break;
                 }
@@ -232,13 +235,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<NoteOnEvent>(
-                        []
-                        {
-                            return EventState();
-                        });
-                    nVariation->incrementVariationType(noteOff->getNoteValue());
-                    nVariation->setVariationValue(noteOff->getVelocity());
+                    noteVariationData = {
+                        NoteVariationType(noteOff->getNoteValue()),
+                        NoteVariationValue(noteOff->getVelocity())
+                    };
                 }
                 else if (noteOn)
                 {
@@ -269,17 +269,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                         ne.tick = noteOn->getTick();
                         ne.velocity = Velocity(noteOn->getVelocity());
 
-                        if (nVariation)
-                        {
-                            ne.noteVariationType = NoteVariationType(
-                                nVariation->getVariationType());
-                            ne.noteVariationValue = NoteVariationValue(
-                                nVariation->getVariationValue());
-                        }
-                        else
-                        {
-                            ne.noteVariationValue = DefaultNoteVariationValue;
-                        }
+                        ne.noteVariationType = noteVariationData.first;
+                        ne.noteVariationValue = noteVariationData.second;
 
                         noteOns.emplace_back(ne);
                     }

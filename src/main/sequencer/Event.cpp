@@ -4,8 +4,10 @@
 
 using namespace mpc::sequencer;
 
-Event::Event(const std::function<sequencer::EventState()> &getSnapshot)
-    : getSnapshot(getSnapshot)
+Event::Event(const std::function<EventState()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)>
+                &dispatch)
+    : getSnapshot(getSnapshot), dispatch(dispatch)
 {
 }
 
@@ -14,6 +16,7 @@ Event::Event(const Event &event)
     setTick(event.getTick());
     Event::setTrack(event.getTrack());
     getSnapshot = event.getSnapshot;
+    dispatch = event.dispatch;
 }
 
 void Event::setTick(const int relativeTick)

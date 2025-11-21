@@ -25,10 +25,12 @@ namespace mpc::sequencer
 
     public:
         explicit NoteOnEvent(const std::function<EventState()> &getSnapshot,
+        const std::function<void(TrackEventMessage &&)> &dispatch,
                              NoteNumber, Velocity vel = MaxVelocity,
                              NoteEventId = NoNoteEventId);
-        explicit NoteOnEvent(const std::function<EventState()> &getSnapshot);
+        explicit NoteOnEvent(const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch);
         explicit NoteOnEvent(const std::function<EventState()> &getSnapshot,
+        const std::function<void(TrackEventMessage &&)> &dispatch,
                              DrumNoteNumber);
 
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
@@ -41,17 +43,16 @@ namespace mpc::sequencer
 
         int getMetronomeOnlyTickPosition() const;
 
-        void setNote(NoteNumber);
+        void setNote(NoteNumber) const;
         NoteNumber getNote() const;
-        void setDuration(Duration duration);
+        void setDuration(Duration duration) const;
         Duration getDuration() const;
-        void resetDuration();
+        void resetDuration() const;
         NoteVariationType getVariationType() const;
-        void incrementVariationType(int amount);
-        void setVariationType(NoteVariationType);
-        void setVariationValue(int i);
+        void setVariationType(NoteVariationType) const;
+        void setVariationValue(int i) const;
         int getVariationValue() const;
-        void setVelocity(Velocity);
+        void setVelocity(Velocity) const;
         Velocity getVelocity() const;
         bool isFinalized() const;
 

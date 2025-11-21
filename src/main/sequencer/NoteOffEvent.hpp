@@ -10,10 +10,12 @@ namespace mpc::sequencer
     public:
         explicit NoteOffEvent(
             const std::function<EventState()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch,
             NoteNumber);
 
         explicit NoteOffEvent(
-            const std::function<EventState()> &getSnapshot);
+            const std::function<EventState()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
 
         void setNote(NoteNumber);
 

@@ -6,8 +6,8 @@ EmptyEvent::EmptyEvent()
     : Event(
           []
           {
-              return sequencer::EventState();
-          })
+              return EventState();
+          }, [](TrackEventMessage&&){})
 {
     // very empty indeed.
 }

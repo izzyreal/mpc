@@ -58,9 +58,14 @@ namespace mpc::sequencer
         int valueToAdd;
     };
 
+    struct UpdateEvent
+    {
+        EventState eventState;
+    };
+
     using TrackEventMessage =
         std::variant<SyncEventIndex, InsertEvent, ClearEvents, RemoveEvent,
                      RemoveEventByIndex, RemoveDontDeleteFlag, UpdateEventTick,
                      RemoveDoubles, AddToEventIndex,
-                     UpdateTrackIndexOfAllEvents>;
+                     UpdateTrackIndexOfAllEvents, UpdateEvent>;
 } // namespace mpc::sequencer

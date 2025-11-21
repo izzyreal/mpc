@@ -12,7 +12,9 @@ namespace mpc::sequencer
         int getAmount() const;
 
         explicit ChannelPressureEvent(
-            const std::function<sequencer::EventState()> &getSnapshot);
+            const std::function<EventState()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
+
         ChannelPressureEvent(const ChannelPressureEvent &event);
 
         std::string getTypeName() const override

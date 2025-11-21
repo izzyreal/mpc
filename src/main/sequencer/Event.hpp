@@ -1,5 +1,6 @@
 #pragma once
 #include "IntTypes.hpp"
+#include "TrackEventMessage.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <functional>
@@ -9,7 +10,9 @@ namespace mpc::sequencer
     class Event
     {
     public:
-        explicit Event(const std::function<EventState()> &getSnapshot);
+        explicit Event(
+            const std::function<EventState()> &getSnapshot,
+            const std::function<void(TrackEventMessage &&)> &dispatch);
         Event(const Event &);
 
         virtual ~Event() = default;
@@ -23,7 +26,8 @@ namespace mpc::sequencer
 
         virtual std::string getTypeName() const = 0;
 
-        std::function<sequencer::EventState()> getSnapshot;
+        std::function<EventState()> getSnapshot;
+        std::function<void(TrackEventMessage &&)> dispatch;
 
     protected:
         TrackIndex track{0};

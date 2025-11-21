@@ -710,7 +710,7 @@ void StepEditorScreen::turnWheel(const int increment)
             }
             else if (paramIsLetter("b"))
             {
-                note->incrementVariationType(increment);
+                note->setVariationType(note->getVariationType() + increment);
             }
             else if (paramIsLetter("c"))
             {

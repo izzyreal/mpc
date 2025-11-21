@@ -19,7 +19,7 @@ namespace mpc::sequencer
         int getValue() const;
 
         explicit MixerEvent(
-            const std::function<sequencer::EventState()> &getSnapshot);
+            const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch);
         MixerEvent(const MixerEvent &);
 
         std::string getTypeName() const override

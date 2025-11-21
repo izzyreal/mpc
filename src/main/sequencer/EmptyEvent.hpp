@@ -3,9 +3,8 @@
 
 namespace mpc::sequencer
 {
-    class EmptyEvent : public Event
+    class EmptyEvent final : public Event
     {
-
     public:
         EmptyEvent();
         std::string getTypeName() const override

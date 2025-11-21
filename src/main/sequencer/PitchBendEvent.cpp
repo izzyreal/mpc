@@ -2,9 +2,9 @@
 
 using namespace mpc::sequencer;
 
-PitchBendEvent::PitchBendEvent(
-    const std::function<sequencer::EventState()> &getSnapshot)
-    : Event(getSnapshot)
+PitchBendEvent::PitchBendEvent(const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
+    : Event(getSnapshot, dispatch)
 {
 }
 
