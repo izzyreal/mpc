@@ -39,6 +39,7 @@ namespace mpc::audiomidi
 namespace mpc::sequencer
 {
     class SequencerStateManager;
+    class SequenceStateManager;
     class Transport;
     class Sequence;
     class Bus;
@@ -115,6 +116,7 @@ namespace mpc::sequencer
         std::function<bool()> isSixteenLevelsEnabled;
 
         std::shared_ptr<SequencerStateManager> stateManager;
+        std::shared_ptr<SequenceStateManager> sequenceStateManager;
         std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
             getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
