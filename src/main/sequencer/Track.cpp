@@ -1,6 +1,8 @@
 #include "sequencer/Track.hpp"
 
 #include "sampler/Sampler.hpp"
+
+#include "sequencer/TrackEventStateManager.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
@@ -27,7 +29,7 @@ using namespace mpc::lcdgui::screens::window;
 constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
-    std::shared_ptr<performance::PerformanceManager> performanceManager,
+    const std::shared_ptr<performance::PerformanceManager> &performanceManager,
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,
@@ -64,6 +66,7 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
+    eventStateManager = std::make_shared<TrackEventStateManager>();
     purge();
 }
 

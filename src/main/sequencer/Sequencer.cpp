@@ -3,7 +3,6 @@
 #include "MpcSpecs.hpp"
 
 #include "sequencer/SequencerStateManager.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
@@ -89,7 +88,6 @@ Sequencer::Sequencer(
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-    sequenceStateManager = std::make_shared<SequenceStateManager>();
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const

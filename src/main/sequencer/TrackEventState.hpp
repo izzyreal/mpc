@@ -4,7 +4,7 @@
 
 namespace mpc::sequencer
 {
-    struct SequenceState
+    struct TrackEventState
     {
     };
 } // namespace mpc::sequencer

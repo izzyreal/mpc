@@ -38,6 +38,7 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    class TrackEventStateManager;
     class Sequence;
     class Event;
     class NoteOnEvent;
@@ -48,7 +49,7 @@ namespace mpc::sequencer
     {
     public:
         Track(
-        std::shared_ptr<performance::PerformanceManager>,
+            const std::shared_ptr<performance::PerformanceManager> &,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -164,6 +165,7 @@ namespace mpc::sequencer
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
     private:
+        std::shared_ptr<TrackEventStateManager> eventStateManager;
         BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};

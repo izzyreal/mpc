@@ -7,10 +7,10 @@
 
 namespace mpc::sequencer
 {
-    struct UpdateSequence
+    struct UpdateTrackEvent
     {
     };
 
-    using SequenceMessage =
-        std::variant<UpdateSequence>;
+    using TrackEventMessage =
+        std::variant<UpdateTrackEvent>;
 } // namespace mpc::sequencer
