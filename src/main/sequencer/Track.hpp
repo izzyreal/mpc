@@ -89,11 +89,11 @@ namespace mpc::sequencer
         void setUsed(bool b);
         void setOn(bool b);
 
-        void insertEventWhileRetainingSort(
-            const sequencer::EventState &event,
+        void insertEvent(
+            const EventState &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        mpc::sequencer::EventState
+        EventState
         recordNoteEventNonLive(int tick, NoteNumber, Velocity, int64_t metronomeOnlyTick);
 
         sequencer::EventState recordNoteEventLive(NoteNumber, Velocity);
@@ -115,9 +115,6 @@ namespace mpc::sequencer
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
         void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,
-                                 bool allowMultipleNotesOnSameTick = false);
-
-        void cloneEventIntoTrack(const sequencer::EventState &,
                                  bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i) const;

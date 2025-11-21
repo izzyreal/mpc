@@ -100,47 +100,47 @@ void NoteOnEvent::resetDuration()
     setDuration(NoDuration);
 }
 
-NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
+mpc::NoteVariationType NoteOnEvent::getVariationType() const
 {
-    return variationType;
+    return getSnapshot().noteVariationType;
 }
 
 void NoteOnEvent::incrementVariationType(const int amount)
 {
-    variationType = static_cast<VARIATION_TYPE>(
-        std::clamp(static_cast<int>(variationType) + amount, 0, 3));
+    // variationType = static_cast<VARIATION_TYPE>(
+    //     std::clamp(static_cast<int>(variationType) + amount, 0, 3));
 }
 
-void NoteOnEvent::setVariationType(const VARIATION_TYPE type)
+void NoteOnEvent::setVariationType(const NoteVariationType type)
 {
-    variationType = type;
+    // variationType = type;
 }
 
 void NoteOnEvent::setVariationValue(const int i)
 {
-    if (variationType == TUNE_0)
-    {
-        variationValue = std::clamp(i, 0, 124);
-    }
-    else
-    {
-        variationValue = std::clamp(i, 0, 100);
-    }
+    // if (variationType == TUNE_0)
+    // {
+    //     variationValue = std::clamp(i, 0, 124);
+    // }
+    // else
+    // {
+    //     variationValue = std::clamp(i, 0, 100);
+    // }
 }
 
 int NoteOnEvent::getVariationValue() const
 {
-    return variationValue;
+    return getSnapshot().noteVariationValue;
 }
 
 void NoteOnEvent::setVelocity(const Velocity i)
 {
-    velocity = i;
+    //velocity = i;
 }
 
 mpc::Velocity NoteOnEvent::getVelocity() const
 {
-    return velocity;
+    return getSnapshot().velocity;
 }
 
 bool NoteOnEvent::isFinalized() const

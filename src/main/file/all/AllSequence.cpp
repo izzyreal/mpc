@@ -137,14 +137,14 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
     {
         auto e = allEvents[j];
 
-        if (e.type == sequencer::EventType::Unknown)
+        if (e.type == EventType::Unknown)
         {
             continue;
         }
 
         const int track = e.trackIndex;
 
-        mpcSeq->getTrack(track)->cloneEventIntoTrack(e);
+        mpcSeq->getTrack(track)->insertEvent(e);
     }
 
     for (int i = 0; i < 32; i++)
@@ -318,10 +318,10 @@ const int AllSequence::BAR_LIST_OFFSET;
 const int AllSequence::BAR_LIST_LENGTH;
 const int AllSequence::EVENTS_OFFSET;
 
-std::vector<mpc::sequencer::EventState>
+std::vector<EventState>
 AllSequence::readEvents(const std::vector<char> &seqBytes)
 {
-    std::vector<sequencer::EventState> events;
+    std::vector<EventState> events;
 
     for (auto &eventBytes : readEventSegments(seqBytes))
     {

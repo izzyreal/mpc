@@ -197,7 +197,7 @@ void NoteRepeatProcessor::process(
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
             noteEvent.velocity = velocityBeforeTrackVelocityRatioApplied;
-            track->insertEventWhileRetainingSort(noteEvent);
+            track->insertEvent(noteEvent);
         }
 
         sequencerPlaybackEngine->enqueueEventAfterNFrames(

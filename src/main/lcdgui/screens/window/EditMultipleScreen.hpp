@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens::window
         void close() override;
 
         void setChangeNoteTo(NoteNumber);
-        void setVariationType(NoteOnEvent::VARIATION_TYPE type);
+        void setVariationType(NoteVariationType);
         void setVariationValue(int i);
         void setEditValue(int i);
 
@@ -36,19 +36,17 @@ namespace mpc::lcdgui::screens::window
         std::vector<std::string> doubleLabels = {"Edit type:", "Value:"};
 
         NoteNumber changeNoteTo = MinDrumNoteNumber;
-        NoteOnEvent::VARIATION_TYPE variationType =
-            NoteOnEvent::VARIATION_TYPE::TUNE_0;
+        NoteVariationType variationType = NoteVariationTypeTune;
+
         int variationValue = 0;
         int editValue = 0;
 
         void checkThreeParameters() const;
-        void checkFiveParameters();
+        void checkFiveParameters() const;
         void checkNotes() const;
 
         void updateEditMultiple() const;
         void updateDouble() const;
         void setEditType(int i);
-
-        void incrementVariationType(int i);
     };
 } // namespace mpc::lcdgui::screens::window

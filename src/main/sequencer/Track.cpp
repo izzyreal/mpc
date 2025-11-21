@@ -254,7 +254,7 @@ EventState Track::recordNoteEventNonLive(const int tick,
     //     onEvent->setTrack(this->getIndex());
     //     onEvent->setTick(tick);
     //     onEvent->setBeingRecorded(true);
-    //     insertEventWhileRetainingSort(onEvent);
+    //     insertEvent(onEvent);
     //     return onEvent;
     // }
     // onEvent->setBeingRecorded(true);
@@ -271,7 +271,7 @@ void Track::addEvent(const EventState &event,
         setUsed(true);
     }
 
-    insertEventWhileRetainingSort(
+    insertEvent(
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
 }
 
@@ -338,12 +338,6 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
     //
     //     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
     // }
-}
-void Track::cloneEventIntoTrack(const EventState &e,
-                                const bool allowMultipleNotesOnSameTick)
-{
-    printf("cloning into track with tick %lld and duration %i\n", e.tick, e.duration.get());
-    insertEventWhileRetainingSort(e, allowMultipleNotesOnSameTick);
 }
 
 void Track::removeEvent(const int i) const
@@ -569,7 +563,7 @@ void Track::processRealtimeQueuedEvents()
                 }
 
                 noteOn.duration = Duration(duration);
-                insertEventWhileRetainingSort(noteOn);
+                insertEvent(noteOn);
 
                 if (fixEventIndex)
                 {
@@ -989,7 +983,7 @@ std::string Track::getActualName()
     return name;
 }
 
-void Track::insertEventWhileRetainingSort(
+void Track::insertEvent(
     const EventState &event,
     const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {

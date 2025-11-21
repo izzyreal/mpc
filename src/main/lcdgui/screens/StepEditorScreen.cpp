@@ -1087,8 +1087,6 @@ auto trackEvents = track->getEvents();
             {
                 auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-                printf("Note event %i %i %i\n", ne->getTick(), ne->getNote().get(), ne->getDuration().get());
-
                 if (isMidiBusType(track->getBusType()))
                 {
                     if (fromNote == NoDrumNoteAssigned || view == 0)

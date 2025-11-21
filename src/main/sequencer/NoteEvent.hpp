@@ -1,6 +1,5 @@
 #pragma once
 #include "IntTypes.hpp"
-#include "MpcMacros.hpp"
 #include "sequencer/Event.hpp"
 
 #include <memory>
@@ -13,13 +12,13 @@ namespace mpc::sequencer
     class NoteOffEvent final : public Event
     {
     public:
-        explicit NoteOffEvent(const std::function<sequencer::EventState()> &getSnapshot, const NoteNumber numberToUse)
-            : Event(getSnapshot)
+        explicit NoteOffEvent(const std::function<EventState()> &getSnapshotToUse, const NoteNumber numberToUse)
+            : Event(getSnapshotToUse)
         {
             setNote(numberToUse);
         }
 
-        explicit NoteOffEvent(const std::function<sequencer::EventState()> &getSnapshot) : Event(getSnapshot) {}
+        explicit NoteOffEvent(const std::function<EventState()> &getSnapshotToUse) : Event(getSnapshotToUse) {}
 
         void setNote(NoteNumber);
 
@@ -33,21 +32,8 @@ namespace mpc::sequencer
 
     class NoteOnEvent final : public Event
     {
-    public:
-        enum VARIATION_TYPE
-        {
-            TUNE_0 = 0,
-            DECAY_1 = 1,
-            ATTACK_2 = 2,
-            FILTER_3 = 3
-        };
-
-    private:
         bool beingRecorded = false;
         NoteEventId id;
-        VARIATION_TYPE variationType = TUNE_0;
-        int variationValue = 64;
-        Velocity velocity;
 
         // Used when recording in the step editor or in the MAIN screen when the
         // sequencer is not running, and we need to derive duration based on how
@@ -59,10 +45,10 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
-        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot, NoteNumber, Velocity vel = MaxVelocity,
+        explicit NoteOnEvent(const std::function<EventState()> &getSnapshot, NoteNumber, Velocity vel = MaxVelocity,
                              NoteEventId = NoNoteEventId);
-        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot);
-        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot, DrumNoteNumber);
+        explicit NoteOnEvent(const std::function<EventState()> &getSnapshot);
+        explicit NoteOnEvent(const std::function<EventState()> &getSnapshot, DrumNoteNumber);
 
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
         void setTrack(TrackIndex trackIndexToUse) override;
@@ -79,9 +65,9 @@ namespace mpc::sequencer
         void setDuration(Duration duration);
         Duration getDuration() const;
         void resetDuration();
-        VARIATION_TYPE getVariationType() const;
+        NoteVariationType getVariationType() const;
         void incrementVariationType(int amount);
-        void setVariationType(VARIATION_TYPE type);
+        void setVariationType(NoteVariationType);
         void setVariationValue(int i);
         int getVariationValue() const;
         void setVelocity(Velocity);
