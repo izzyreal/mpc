@@ -217,7 +217,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
             }
         }
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
-        std::vector<performance::Event> noteOns;
+        std::vector<sequencer::EventState> noteOns;
 
         auto track = sequence->purgeTrack(trackIndex);
         track->setDeviceIndex(deviceIndex);
@@ -232,7 +232,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<NoteOnEvent>([]{return performance::Event();});
+                    nVariation = std::make_unique<NoteOnEvent>([]{return sequencer::EventState();});
                     nVariation->incrementVariationType(noteOff->getNoteValue());
                     nVariation->setVariationValue(noteOff->getVelocity());
                 }
@@ -258,8 +258,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                                 0));
                         }
 
-                        performance::Event ne;
-                        ne.type = performance::EventType::NoteOn;
+                        sequencer::EventState ne;
+                        ne.type = sequencer::EventType::NoteOn;
                         ne.noteNumber = NoteNumber(noteOn->getNoteValue());
 
                         ne.tick = noteOn->getTick();
@@ -293,8 +293,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
                 else if (noteOn)
                 {
-                    performance::Event ne;
-                    ne.type = performance::EventType::NoteOn;
+                    sequencer::EventState ne;
+                    ne.type = sequencer::EventType::NoteOn;
                     ne.noteNumber = NoteNumber(noteOn->getNoteValue());
                     ne.tick = noteOn->getTick();
                     ne.velocity = Velocity(noteOn->getVelocity());
@@ -369,8 +369,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 &&
                     sysExEventBytes[3] == 69 && sysExEventBytes[7] == static_cast<char>(247))
                 {
-                    performance::Event e;
-                    e.type = performance::EventType::Mixer;
+                    sequencer::EventState e;
+                    e.type = sequencer::EventType::Mixer;
                     e.tick = sysEx->getTick();
                     e.mixerParameter = sysExEventBytes[4] - 1;
                     e.mixerPad = sysExEventBytes[5];
@@ -388,8 +388,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                         sysExEventBytes[j + 1] = sysEx->getData()[j];
                     }
 
-                    performance::Event e;
-                    e.type = performance::EventType::SystemExclusive;
+                    sequencer::EventState e;
+                    e.type = sequencer::EventType::SystemExclusive;
                     e.tick = sysEx->getTick();
 
                     // std::vector<unsigned char> tmp;
@@ -492,7 +492,7 @@ int MidiReader::getNumberOfNoteOns(
 
 int MidiReader::getNumberOfNotes(
     const int noteValue,
-    const std::vector<performance::Event> &allNotes)
+    const std::vector<sequencer::EventState> &allNotes)
 {
     int counter = 0;
 

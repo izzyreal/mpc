@@ -31,8 +31,8 @@ void TriggerLocalNoteOnCommand::execute()
 {
     const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
 
-    performance::Event noteOnEvent;
-    noteOnEvent.type = performance::EventType::NoteOn;
+    sequencer::EventState noteOnEvent;
+    noteOnEvent.type = sequencer::EventType::NoteOn;
     noteOnEvent.noteNumber = ctx->note;
     noteOnEvent.velocity = velo;
 
@@ -48,7 +48,7 @@ void TriggerLocalNoteOnCommand::execute()
     }
 
     auto apply16LevelsAndSliderNoteVariation =
-        [&](performance::Event &noteEventToApplyTo)
+        [&](sequencer::EventState &noteEventToApplyTo)
     {
         if (ctx->program && ctx->programPadIndex)
         {
@@ -123,7 +123,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->track->getVelocityRatio(), drumBusType);
     }
 
-    std::optional<performance::Event> recordNoteOnEvent = std::nullopt;
+    std::optional<sequencer::EventState> recordNoteOnEvent = std::nullopt;
 
     if (ctx->sequencer->getTransport()->isRecordingOrOverdubbing())
     {

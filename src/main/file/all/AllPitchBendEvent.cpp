@@ -5,12 +5,12 @@
 #include "file/ByteUtil.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
-Event
+EventState
 AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    Event e;
+    EventState e;
     e.type = EventType::PitchBend;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -30,7 +30,7 @@ AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char>
-AllPitchBendEvent::mpcEventToBytes(const Event &e)
+AllPitchBendEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PITCH_BEND_ID;

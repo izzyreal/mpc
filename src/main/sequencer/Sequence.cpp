@@ -15,7 +15,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
-    std::shared_ptr<performance::PerformanceManager> performanceManager,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
     std::function<std::shared_ptr<Screens>()> getScreens,
@@ -39,7 +38,6 @@ Sequence::Sequence(
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
         tracks.emplace_back(std::make_shared<Track>(
-            performanceManager,
             trackIndex, this, getDefaultTrackName, getTickPosition, getScreens,
             isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
             isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
@@ -49,7 +47,6 @@ Sequence::Sequence(
     }
 
     tempoChangeTrack = std::make_shared<Track>(
-        performanceManager,
         64, this, getDefaultTrackName, getTickPosition, getScreens,
         isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
         isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,

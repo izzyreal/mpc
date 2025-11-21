@@ -1,6 +1,6 @@
 #pragma once
 
-#include "performance/Sequence.hpp"
+#include "sequencer/EventState.hpp"
 
 #include <memory>
 #include <vector>
@@ -33,9 +33,9 @@ namespace mpc::file::all
         static int readTick(const std::vector<char> &);
         static void writeTick(std::vector<char> &, int);
 
-        static performance::Event
+        static sequencer::EventState
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-        mpcEventToBytes(const performance::Event &);
+        mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

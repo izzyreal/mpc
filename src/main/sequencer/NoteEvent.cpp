@@ -19,7 +19,7 @@ mpc::NoteNumber NoteOffEvent::getNote() const
     return getSnapshot().noteNumber;
 }
 
-NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot,
+NoteOnEvent::NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot,
                          const NoteNumber noteNumber, const Velocity vel,
                          const NoteEventId id)
     : Event(getSnapshot), id(id)
@@ -29,12 +29,12 @@ NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot,
     setVelocity(vel);
 }
 
-NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot)
+NoteOnEvent::NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot)
  : Event(getSnapshot), id(NoNoteEventId)
 {
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
 }
-NoteOnEvent::NoteOnEvent(const std::function<performance::Event()> &getSnapshot, const DrumNoteNumber drumNoteNumber)
+NoteOnEvent::NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot, const DrumNoteNumber drumNoteNumber)
     : Event(getSnapshot), id(NoNoteEventId)
 {
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);

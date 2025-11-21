@@ -5,12 +5,12 @@
 
 using namespace mpc::sequencer;
 
-TempoChangeEvent::TempoChangeEvent(const std::function<performance::Event()> &getSnapshot, Sequence *parent)
+TempoChangeEvent::TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent)
     : TempoChangeEvent(getSnapshot, parent, 1000)
 {
 }
 
-TempoChangeEvent::TempoChangeEvent(const std::function<performance::Event()> &getSnapshot, Sequence *parent, const int ratio)
+TempoChangeEvent::TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent, const int ratio)
     : Event(getSnapshot)
 {
     this->ratio = ratio;

@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "sequencer/Sequence.hpp"
-#include "performance/Sequence.hpp"
+#include "sequencer/EventState.hpp"
 
 namespace mpc::sequencer
 {
@@ -93,12 +93,12 @@ namespace mpc::file::all
         std::vector<std::string> devNames = std::vector<std::string>(33);
         Tracks *tracks = nullptr;
         BarList *barList = nullptr;
-        std::vector<performance::Event> allEvents;
+        std::vector<sequencer::EventState> allEvents;
 
     private:
         std::vector<char> saveBytes;
 
-        static std::vector<performance::Event>
+        static std::vector<sequencer::EventState>
         readEvents(const std::vector<char> &seqBytes);
         static std::vector<std::vector<char>>
         readEventSegments(const std::vector<char> &seqBytes);

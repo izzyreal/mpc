@@ -3,7 +3,7 @@
 using namespace mpc::sequencer;
 
 ProgramChangeEvent::ProgramChangeEvent(
-    const std::function<performance::Event()> &getSnapshot)
+    const std::function<sequencer::EventState()> &getSnapshot)
         : Event(getSnapshot)
 {
 }

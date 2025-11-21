@@ -137,7 +137,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
     {
         auto e = allEvents[j];
 
-        if (e.type == performance::EventType::Unknown)
+        if (e.type == sequencer::EventType::Unknown)
         {
             continue;
         }
@@ -318,10 +318,10 @@ const int AllSequence::BAR_LIST_OFFSET;
 const int AllSequence::BAR_LIST_LENGTH;
 const int AllSequence::EVENTS_OFFSET;
 
-std::vector<mpc::performance::Event>
+std::vector<mpc::sequencer::EventState>
 AllSequence::readEvents(const std::vector<char> &seqBytes)
 {
-    std::vector<performance::Event> events;
+    std::vector<sequencer::EventState> events;
 
     for (auto &eventBytes : readEventSegments(seqBytes))
     {

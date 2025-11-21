@@ -1,6 +1,6 @@
 #pragma once
 
-#include "performance/Sequence.hpp"
+#include "sequencer/EventState.hpp"
 
 namespace mpc::file::all
 {
@@ -40,9 +40,9 @@ namespace mpc::file::all
         friend class AllEvent;
 
     public:
-        static performance::Event
+        static sequencer::EventState
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-        mpcEventToBytes(const performance::Event &);
+        mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

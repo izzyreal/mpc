@@ -85,7 +85,7 @@ void NoteRepeatProcessor::process(
             note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }
 
-        performance::Event noteEvent;
+        sequencer::EventState noteEvent;
         noteEvent.type = EventType::NoteOn;
         noteEvent.tick = tickPosition;
 

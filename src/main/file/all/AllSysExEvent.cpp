@@ -5,18 +5,18 @@
 #include "Util.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
 std::vector<char> AllSysExEvent::MIXER_SIGNATURE = {static_cast<char>(240), 71, 0, 68, 69};
 
-Event
+EventState
 AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     const int byteCount = bytes[BYTE_COUNT_OFFSET];
 
     std::vector<char> sysexLoadData(byteCount);
 
-    Event e;
+    EventState e;
 
     for (int i = 0; i < byteCount; i++)
     {
@@ -55,7 +55,7 @@ AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char>
-AllSysExEvent::mpcEventToBytes(const Event &e)
+AllSysExEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes;
 

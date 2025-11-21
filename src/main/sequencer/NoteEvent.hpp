@@ -13,13 +13,13 @@ namespace mpc::sequencer
     class NoteOffEvent final : public Event
     {
     public:
-        explicit NoteOffEvent(const std::function<performance::Event()> &getSnapshot, const NoteNumber numberToUse)
+        explicit NoteOffEvent(const std::function<sequencer::EventState()> &getSnapshot, const NoteNumber numberToUse)
             : Event(getSnapshot)
         {
             setNote(numberToUse);
         }
 
-        explicit NoteOffEvent(const std::function<performance::Event()> &getSnapshot) : Event(getSnapshot) {}
+        explicit NoteOffEvent(const std::function<sequencer::EventState()> &getSnapshot) : Event(getSnapshot) {}
 
         void setNote(NoteNumber);
 
@@ -59,10 +59,10 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
-        explicit NoteOnEvent(const std::function<performance::Event()> &getSnapshot, NoteNumber, Velocity vel = MaxVelocity,
+        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot, NoteNumber, Velocity vel = MaxVelocity,
                              NoteEventId = NoNoteEventId);
-        explicit NoteOnEvent(const std::function<performance::Event()> &getSnapshot);
-        explicit NoteOnEvent(const std::function<performance::Event()> &getSnapshot, DrumNoteNumber);
+        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot);
+        explicit NoteOnEvent(const std::function<sequencer::EventState()> &getSnapshot, DrumNoteNumber);
 
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
         void setTrack(TrackIndex trackIndexToUse) override;

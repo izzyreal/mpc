@@ -3,22 +3,21 @@
 #include "file/all/AllEvent.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
-Event
+EventState
 AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    Event e;
+    EventState e;
     e.type = EventType::ChannelPressure;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
     e.amount = bytes[AMOUNT_OFFSET];
-
     return e;
 }
 
 std::vector<char> AllChannelPressureEvent::mpcEventToBytes(
-    const Event &e)
+    const EventState &e)
 {
     std::vector<char> bytes(8);
 

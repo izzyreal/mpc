@@ -219,7 +219,7 @@ void Util::initSequence(const int sequenceIndex, mpc::Mpc &mpc)
 }
 
 void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
-                             performance::Event &event)
+                             sequencer::EventState &event)
 {
     if (!ctx.isSixteenLevelsEnabled)
     {

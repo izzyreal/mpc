@@ -1,5 +1,6 @@
 #include "sequencer/Track.hpp"
 
+#include "EventStateToEventMapper.hpp"
 #include "sampler/Sampler.hpp"
 
 #include "sequencer/TrackEventStateManager.hpp"
@@ -13,7 +14,6 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
-#include "performance/EventMapper.hpp"
 
 #include <concurrentqueue.h>
 
@@ -29,7 +29,6 @@ using namespace mpc::lcdgui::screens::window;
 constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
-    const std::shared_ptr<performance::PerformanceManager> &performanceManager,
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,
@@ -51,7 +50,7 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : performanceManager(performanceManager), trackIndex(trackIndex), parent(parent),
+    : trackIndex(trackIndex), parent(parent),
       getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
@@ -84,12 +83,12 @@ void Track::purge()
     bulkNoteOns.resize(20);
     bulkNoteOffs.resize(20);
     queuedNoteOnEvents = std::make_shared<
-        moodycamel::ConcurrentQueue<performance::Event>>(20);
+        moodycamel::ConcurrentQueue<sequencer::EventState>>(20);
     queuedNoteOffEvents = std::make_shared<
-        moodycamel::ConcurrentQueue<performance::Event>>(20);
+        moodycamel::ConcurrentQueue<sequencer::EventState>>(20);
 }
 
-mpc::performance::Event
+mpc::sequencer::EventState
 Track::findRecordingNoteOnEventById(const NoteEventId id)
 {
     for (auto &e : events)
@@ -102,8 +101,8 @@ Track::findRecordingNoteOnEventById(const NoteEventId id)
         }
     }
 
-    performance::Event found;
-    performance::Event e;
+    sequencer::EventState found;
+    sequencer::EventState e;
 
     size_t count = 0;
 
@@ -126,7 +125,7 @@ Track::findRecordingNoteOnEventById(const NoteEventId id)
     return found;
 }
 
-mpc::performance::Event
+mpc::sequencer::EventState
 Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
     for (auto &e : events)
@@ -139,8 +138,8 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
         }
     }
 
-    performance::Event found;
-    performance::Event e;
+    sequencer::EventState found;
+    sequencer::EventState e;
 
     size_t count = 0;
 
@@ -224,7 +223,7 @@ mpc::TrackIndex Track::getIndex() const
 
 void Track::flushNoteCache() const
 {
-    performance::Event e;
+    sequencer::EventState e;
     while (queuedNoteOnEvents->try_dequeue(e))
     {
     }
@@ -260,14 +259,14 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
     }
 }
 
-mpc::performance::Event Track::recordNoteEventLive(const NoteNumber note,
+mpc::sequencer::EventState Track::recordNoteEventLive(const NoteNumber note,
                                                    const Velocity velocity)
 {
     const NoteEventId noteEventIdToUse = nextNoteEventId;
     nextNoteEventId = getNextNoteEventId(nextNoteEventId);
 
-    performance::Event e;
-    e.type = performance::EventType::NoteOn;
+    sequencer::EventState e;
+    e.type = sequencer::EventType::NoteOn;
     e.noteNumber = note;
     e.velocity = velocity;
     e.noteEventId = noteEventIdToUse;
@@ -278,24 +277,24 @@ mpc::performance::Event Track::recordNoteEventLive(const NoteNumber note,
     return e;
 }
 
-void Track::finalizeNoteEventLive(const performance::Event &noteOnEvent) const
+void Track::finalizeNoteEventLive(const sequencer::EventState &noteOnEvent) const
 {
-    performance::Event e;
-    e.type = performance::EventType::NoteOff;
+    sequencer::EventState e;
+    e.type = sequencer::EventType::NoteOff;
     e.noteNumber = noteOnEvent.noteNumber;
     e.tick = TickUnassignedWhileRecording;
     queuedNoteOffEvents->enqueue(e);
 }
 
-void Track::finalizeNoteEventNonLive(const performance::Event &noteOnEvent) const
+void Track::finalizeNoteEventNonLive(const sequencer::EventState &noteOnEvent) const
 {
-    performance::Event e;
-    e.type = performance::EventType::NoteOff;
+    sequencer::EventState e;
+    e.type = sequencer::EventType::NoteOff;
     e.noteNumber = noteOnEvent.noteNumber;
     queuedNoteOffEvents->enqueue(e);
 }
 
-mpc::performance::Event Track::recordNoteEventNonLive(const int tick,
+mpc::sequencer::EventState Track::recordNoteEventNonLive(const int tick,
                                                            const NoteNumber note,
                                                            const Velocity velocity,
                                                            const int64_t metronomeOnlyTick)
@@ -321,7 +320,7 @@ mpc::performance::Event Track::recordNoteEventNonLive(const int tick,
     // return onEvent;
 }
 
-void Track::addEvent(const performance::Event &event,
+void Track::addEvent(const sequencer::EventState &event,
                      const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (events.empty())
@@ -397,7 +396,7 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
     //     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
     // }
 }
-void Track::cloneEventIntoTrack(const performance::Event &e,
+void Track::cloneEventIntoTrack(const sequencer::EventState &e,
                                 const bool allowMultipleNotesOnSameTick)
 {
     printf("cloning into track with tick %lld and duration %i\n", e.tick, e.duration.get());
@@ -1134,7 +1133,7 @@ std::string Track::getActualName()
 }
 
 void Track::insertEventWhileRetainingSort(
-    const performance::Event &event,
+    const sequencer::EventState &event,
     const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (!isUsed())
@@ -1144,7 +1143,7 @@ void Track::insertEventWhileRetainingSort(
 
     auto tick = event.tick;
 
-    if (event.type == performance::EventType::NoteOn &&
+    if (event.type == sequencer::EventType::NoteOn &&
         !allowMultipleNoteEventsWithSameNoteOnSameTick)
     {
         for (auto it = events.begin(); it != events.end(); ++it)
@@ -1174,16 +1173,16 @@ void Track::insertEventWhileRetainingSort(
 
         if (insertAt == events.end())
         {
-            events.emplace_back(performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
+            events.emplace_back(mapEventStateToEvent(event));
         }
         else
         {
-            events.emplace(insertAt, performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
+            events.emplace(insertAt, mapEventStateToEvent(event));
         }
     }
     else
     {
-        events.emplace_back(performance::mapPerformanceEventToSequencerEvent(performanceManager, event));
+        events.emplace_back(mapEventStateToEvent(event));
     }
 
     eventIndex++;

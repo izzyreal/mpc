@@ -9,8 +9,6 @@
 #include "performance/PerformanceStateView.hpp"
 #include "sequencer/BusType.hpp"
 
-#include "performance/Sequence.hpp"
-
 #include <optional>
 #include <functional>
 
@@ -72,11 +70,7 @@ namespace mpc::performance
                              std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
 
-        performance::Event claimEvent(const performance::Event &);
-
         void clear() const;
-
-        EventPool eventPool;
 
     protected:
         void applyMessage(const PerformanceMessage &) noexcept override;

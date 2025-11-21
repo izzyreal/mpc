@@ -3,12 +3,12 @@
 #include "file/all/AllEvent.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
-Event
+EventState
 AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    Event e;
+    EventState e;
     e.type = EventType::PolyPressure;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -19,7 +19,7 @@ AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char> AllPolyPressureEvent::mpcEventToBytes(
-    const Event &e)
+    const EventState &e)
 {
     std::vector<char> bytes(8);
 

@@ -12,7 +12,7 @@ namespace mpc::sequencer
         void setProgram(int i);
         int getProgram() const;
 
-        explicit ProgramChangeEvent(const std::function<performance::Event()> &getSnapshot);
+        explicit ProgramChangeEvent(const std::function<sequencer::EventState()> &getSnapshot);
         ProgramChangeEvent(const ProgramChangeEvent &event);
 
         std::string getTypeName() const override

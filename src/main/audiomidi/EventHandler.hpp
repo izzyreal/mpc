@@ -3,7 +3,7 @@
 #include "IntTypes.hpp"
 #include "Observer.hpp"
 #include "sequencer/BusType.hpp"
-#include "performance/Sequence.hpp"
+#include "sequencer/EventState.hpp"
 
 #include <memory>
 #include <optional>
@@ -34,7 +34,7 @@ namespace mpc::audiomidi
         std::atomic<uint64_t> noteEventId = 1;
 
     public:
-        void handleFinalizedEvent(const performance::Event &, sequencer::Track *);
+        void handleFinalizedEvent(const sequencer::EventState &, sequencer::Track *);
 
         // Handles physical pad presses.
         //
@@ -56,7 +56,7 @@ namespace mpc::audiomidi
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
         void handleUnfinalizedNoteOn(
-            const performance::Event &, sequencer::Track *,
+            const sequencer::EventState &, sequencer::Track *,
             std::optional<int> trackDevice,
             std::optional<int> trackVelocityRatio,
             std::optional<sequencer::BusType> drumBusType) const;
@@ -109,7 +109,7 @@ namespace mpc::audiomidi
                                        */
 
         void handleFinalizedDrumNoteOnEvent(
-            const performance::Event &,
+            const sequencer::EventState &,
             const std::shared_ptr<sequencer::DrumBus> &,
             const sequencer::Track *);
 

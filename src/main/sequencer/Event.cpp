@@ -4,7 +4,7 @@
 
 using namespace mpc::sequencer;
 
-Event::Event(const std::function<performance::Event()> &getSnapshot)
+Event::Event(const std::function<sequencer::EventState()> &getSnapshot)
     : getSnapshot(getSnapshot)
 {
 

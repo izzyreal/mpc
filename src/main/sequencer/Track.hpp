@@ -3,7 +3,7 @@
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
 
-#include "performance/Sequence.hpp"
+#include "sequencer/EventState.hpp"
 
 #include <vector>
 #include <memory>
@@ -11,10 +11,6 @@
 #include <functional>
 #include <cstdint>
 
-namespace mpc::performance
-{
-    class PerformanceManager;
-}
 namespace moodycamel
 {
     struct ConcurrentQueueDefaultTraits;
@@ -49,7 +45,6 @@ namespace mpc::sequencer
     {
     public:
         Track(
-            const std::shared_ptr<performance::PerformanceManager> &,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -95,13 +90,13 @@ namespace mpc::sequencer
         void setOn(bool b);
 
         void insertEventWhileRetainingSort(
-            const performance::Event &event,
+            const sequencer::EventState &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        mpc::performance::Event
+        mpc::sequencer::EventState
         recordNoteEventNonLive(int tick, NoteNumber, Velocity, int64_t metronomeOnlyTick);
 
-        performance::Event recordNoteEventLive(NoteNumber, Velocity);
+        sequencer::EventState recordNoteEventLive(NoteNumber, Velocity);
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
@@ -110,19 +105,19 @@ namespace mpc::sequencer
         // MAIN screen when the sequencer is not running, use
         // NoteOnEvent::finalizeNonLive.
         void
-        finalizeNoteEventLive(const performance::Event &) const;
+        finalizeNoteEventLive(const sequencer::EventState &) const;
 
         void
-        finalizeNoteEventNonLive(const performance::Event &) const;
+        finalizeNoteEventNonLive(const sequencer::EventState &) const;
 
         void
-        addEvent(const performance::Event &,
+        addEvent(const sequencer::EventState &,
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
         void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,
                                  bool allowMultipleNotesOnSameTick = false);
 
-        void cloneEventIntoTrack(const performance::Event &,
+        void cloneEventIntoTrack(const sequencer::EventState &,
                                  bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i);
@@ -159,9 +154,9 @@ namespace mpc::sequencer
 
         void purge();
 
-        performance::Event findRecordingNoteOnEventById(NoteEventId);
+        sequencer::EventState findRecordingNoteOnEventById(NoteEventId);
 
-        performance::Event
+        sequencer::EventState
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
     private:
@@ -181,16 +176,15 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<Event>> events;
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            performance::Event,
+            sequencer::EventState,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            performance::Event,
+            sequencer::EventState,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};
-        std::shared_ptr<performance::PerformanceManager> performanceManager;
         std::function<std::string(int)> getDefaultTrackName;
         std::function<int64_t()> getTickPosition;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
@@ -211,8 +205,8 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<performance::Event> bulkNoteOns;
-        std::vector<performance::Event> bulkNoteOffs;
+        std::vector<sequencer::EventState> bulkNoteOns;
+        std::vector<sequencer::EventState> bulkNoteOffs;
 
         void updateEventTick(const std::shared_ptr<Event> &e, int newTick);
         std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, NoteNumber) const;

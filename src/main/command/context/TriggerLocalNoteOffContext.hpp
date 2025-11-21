@@ -1,6 +1,7 @@
 #pragma once
 
 #include "performance/PerformanceEventSource.hpp"
+#include "sequencer/EventState.hpp"
 
 #include <memory>
 #include <functional>
@@ -41,7 +42,7 @@ namespace mpc::command::context
         const bool currentScreenIsSamplerScreen;
         NoteNumber noteNumber;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::optional<performance::Event> recordOnEvent = std::nullopt;
+        std::optional<sequencer::EventState> recordOnEvent = std::nullopt;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
         sequencer::Track *track;

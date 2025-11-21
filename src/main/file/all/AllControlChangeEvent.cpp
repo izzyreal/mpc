@@ -3,12 +3,12 @@
 #include "file/all/AllEvent.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
-Event
+EventState
 AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    Event e;
+    EventState e;
     e.type = EventType::ControlChange;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -19,7 +19,7 @@ AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char> AllControlChangeEvent::mpcEventToBytes(
-    const Event &e)
+    const EventState &e)
 {
     std::vector<char> bytes(8);
 

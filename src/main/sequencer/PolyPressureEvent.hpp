@@ -14,7 +14,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        explicit PolyPressureEvent(const std::function<performance::Event()> &getSnapshot);
+        explicit PolyPressureEvent(const std::function<sequencer::EventState()> &getSnapshot);
         PolyPressureEvent(const PolyPressureEvent &event);
 
         std::string getTypeName() const override

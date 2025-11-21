@@ -48,7 +48,7 @@ EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 }
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
-    const performance::Event &noteOnEvent,
+    const EventState &noteOnEvent,
     const std::shared_ptr<DrumBus> &drumBus, const Track *track)
 {
     const auto sampler = mpc.getSampler();
@@ -174,7 +174,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         noteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
 }
 
-void EventHandler::handleFinalizedEvent(const performance::Event &event,
+void EventHandler::handleFinalizedEvent(const EventState &event,
                                         Track *const track)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
@@ -182,12 +182,12 @@ void EventHandler::handleFinalizedEvent(const performance::Event &event,
         return;
     }
 
-    if (event.type == performance::EventType::TempoChange)
+    if (event.type == sequencer::EventType::TempoChange)
     {
         return;
     }
 
-    if (event.type == performance::EventType::NoteOn)
+    if (event.type == sequencer::EventType::NoteOn)
     {
         assert(event.noteNumber != NoNoteNumber && event.duration != NoDuration);
 
@@ -226,7 +226,7 @@ void EventHandler::handleFinalizedEvent(const performance::Event &event,
         // sequencerPlaybackEngine->enqueueEventAfterNFrames(
         //     midiNoteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
     }
-    else if (event.type == performance::EventType::Mixer)
+    else if (event.type == sequencer::EventType::Mixer)
     {
         const auto pad = event.mixerPad;
         const auto sampler = mpc.getSampler();
@@ -256,12 +256,12 @@ void EventHandler::handleFinalizedEvent(const performance::Event &event,
 }
 
 void EventHandler::handleUnfinalizedNoteOn(
-    const performance::Event &noteOnEvent, Track *track,
+    const EventState &noteOnEvent, Track *track,
     const std::optional<int> trackDevice,
     const std::optional<int> trackVelocityRatio,
     const std::optional<BusType> drumBusType) const
 {
-    assert(noteOnEvent.type == performance::EventType::NoteOn && noteOnEvent.duration == NoDuration);
+    assert(noteOnEvent.type == sequencer::EventType::NoteOn && noteOnEvent.duration == NoDuration);
 
     if (drumBusType.has_value() && isDrumNote(noteOnEvent.noteNumber))
     {

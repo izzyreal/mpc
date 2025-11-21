@@ -71,7 +71,7 @@ namespace mpc
         static void initSequence(int sequenceIndex, Mpc &mpc);
         static void
         set16LevelsValues(const SixteenLevelsContext &,
-                          performance::Event &);
+                          sequencer::EventState &);
 
         static std::pair<NoteVariationType, int>
         getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);

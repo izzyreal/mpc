@@ -6,12 +6,12 @@
 #include "file/BitUtil.hpp"
 
 using namespace mpc::file::all;
-using namespace mpc::performance;
+using namespace mpc::sequencer;
 
-Event
+EventState
 AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    Event e;
+    EventState e;
     e.type = EventType::NoteOn;
     e.noteNumber = NoteNumber(bytes[NOTE_NUMBER_OFFSET]);
     e.tick = AllEvent::readTick(bytes);
@@ -26,7 +26,7 @@ AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char>
-AllNoteOnEvent::mpcEventToBytes(const Event &e)
+AllNoteOnEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(AllSequence::EVENT_SEG_LENGTH);
 

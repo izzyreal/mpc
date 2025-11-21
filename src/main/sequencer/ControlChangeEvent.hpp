@@ -14,7 +14,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        explicit ControlChangeEvent(const std::function<performance::Event()> &getSnapshot);
+        explicit ControlChangeEvent(const std::function<sequencer::EventState()> &getSnapshot);
         ControlChangeEvent(const ControlChangeEvent &event);
 
         std::string getTypeName() const override

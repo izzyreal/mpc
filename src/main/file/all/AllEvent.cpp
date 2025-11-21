@@ -18,7 +18,7 @@ using namespace mpc::sequencer;
 
 std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE{0, 3};
 
-mpc::performance::Event AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+mpc::sequencer::EventState AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     if (const auto eventID = bytes[EVENT_ID_OFFSET]; eventID < 0)
     {
@@ -43,35 +43,35 @@ mpc::performance::Event AllEvent::bytesToMpcEvent(const std::vector<char> &bytes
     return AllNoteOnEvent::bytesToMpcEvent(bytes);
 }
 
-std::vector<char> AllEvent::mpcEventToBytes(const performance::Event &e)
+std::vector<char> AllEvent::mpcEventToBytes(const sequencer::EventState &e)
 {
-    assert(e.type != performance::EventType::NoteOff);
+    assert(e.type != sequencer::EventType::NoteOff);
 
-    if (e.type == performance::EventType::NoteOn)
+    if (e.type == sequencer::EventType::NoteOn)
     {
         return AllNoteOnEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::PolyPressure)
+    if (e.type == sequencer::EventType::PolyPressure)
     {
         return AllPolyPressureEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::ControlChange)
+    if (e.type == sequencer::EventType::ControlChange)
     {
         return AllControlChangeEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::ProgramChange)
+    if (e.type == sequencer::EventType::ProgramChange)
     {
         return AllProgramChangeEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::ChannelPressure)
+    if (e.type == sequencer::EventType::ChannelPressure)
     {
         return AllChannelPressureEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::PitchBend)
+    if (e.type == sequencer::EventType::PitchBend)
     {
         return AllPitchBendEvent::mpcEventToBytes(e);
     }
-    if (e.type == performance::EventType::SystemExclusive || e.type == performance::EventType::Mixer)
+    if (e.type == sequencer::EventType::SystemExclusive || e.type == sequencer::EventType::Mixer)
     {
         return AllSysExEvent::mpcEventToBytes(e);
     }

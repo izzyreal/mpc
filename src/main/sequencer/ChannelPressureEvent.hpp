@@ -11,7 +11,7 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        explicit ChannelPressureEvent(const std::function<performance::Event()> &getSnapshot);
+        explicit ChannelPressureEvent(const std::function<sequencer::EventState()> &getSnapshot);
         ChannelPressureEvent(const ChannelPressureEvent &event);
 
         std::string getTypeName() const override
