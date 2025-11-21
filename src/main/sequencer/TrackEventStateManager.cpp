@@ -28,7 +28,14 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            if constexpr (std::is_same_v<T, InsertEvent>)
+            if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
+            {
+                for (auto &e : activeState.events)
+                {
+                    e.trackIndex = m.trackIndex;
+                }
+            }
+            else if constexpr (std::is_same_v<T, InsertEvent>)
             {
                 auto &events = activeState.events;
 

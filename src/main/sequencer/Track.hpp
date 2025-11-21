@@ -205,7 +205,6 @@ namespace mpc::sequencer
         std::vector<EventState> bulkNoteOffs;
 
         void updateEventTick(const EventState &e, int newTick) const;
-        std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, NoteNumber) const;
 
         void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;
