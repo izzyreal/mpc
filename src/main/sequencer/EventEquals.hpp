@@ -1,6 +1,7 @@
 #pragma once
 #include "sequencer/Event.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/NoteOffEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"

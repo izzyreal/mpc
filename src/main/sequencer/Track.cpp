@@ -7,7 +7,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "audiomidi/EventHandler.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"

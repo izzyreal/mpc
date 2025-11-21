@@ -1,18 +1,10 @@
 #include "InsertEventScreen.hpp"
-#include "sequencer/Transport.hpp"
-#include "Mpc.hpp"
-#include "TimingCorrectScreen.hpp"
 
-#include "sequencer/ChannelPressureEvent.hpp"
-#include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/MixerEvent.hpp"
-#include "sequencer/Sequencer.hpp"
-#include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
-#include "sequencer/PitchBendEvent.hpp"
-#include "sequencer/PolyPressureEvent.hpp"
-#include "sequencer/ProgramChangeEvent.hpp"
-#include "sequencer/SystemExclusiveEvent.hpp"
+#include "Mpc.hpp"
+
+#include "sequencer/Transport.hpp"
+
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;

@@ -6,7 +6,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

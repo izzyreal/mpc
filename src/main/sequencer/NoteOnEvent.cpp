@@ -1,26 +1,11 @@
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
-#include <algorithm>
+#include "sequencer/NoteOffEvent.hpp"
 
 using namespace mpc::sequencer;
 
-bool mpc::sequencer::isDrumNote(const NoteNumber number)
-{
-    return number >= MinDrumNoteNumber && number <= MaxDrumNoteNumber;
-}
-
-void NoteOffEvent::setNote(const NoteNumber i)
-{
-    // number = i;
-}
-
-mpc::NoteNumber NoteOffEvent::getNote() const
-{
-    return getSnapshot().noteNumber;
-}
-
 NoteOnEvent::NoteOnEvent(
-    const std::function<sequencer::EventState()> &getSnapshot,
+    const std::function<EventState()> &getSnapshot,
     const NoteNumber noteNumber, const Velocity vel, const NoteEventId id)
     : Event(getSnapshot), id(id)
 {
@@ -30,13 +15,14 @@ NoteOnEvent::NoteOnEvent(
 }
 
 NoteOnEvent::NoteOnEvent(
-    const std::function<sequencer::EventState()> &getSnapshot)
+    const std::function<EventState()> &getSnapshot)
     : Event(getSnapshot), id(NoNoteEventId)
 {
     noteOff = std::make_shared<NoteOffEvent>(getSnapshot);
 }
+
 NoteOnEvent::NoteOnEvent(
-    const std::function<sequencer::EventState()> &getSnapshot,
+    const std::function<EventState()> &getSnapshot,
     const DrumNoteNumber drumNoteNumber)
     : Event(getSnapshot), id(NoNoteEventId)
 {

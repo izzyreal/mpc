@@ -17,7 +17,7 @@
 #include "sequencer/EmptyEvent.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/MixerEvent.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"

@@ -1,8 +1,6 @@
 #pragma once
-#include "lcdgui/ScreenComponent.hpp"
-#include <sequencer/NoteEvent.hpp>
 
-using mpc::sequencer::NoteOnEvent;
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {

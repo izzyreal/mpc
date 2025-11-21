@@ -17,7 +17,6 @@
 #include "sequencer/Bus.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/SeqUtil.hpp"
-#include "sequencer/NoteEvent.hpp"
 
 #include "performance/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"

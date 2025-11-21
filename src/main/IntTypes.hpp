@@ -42,17 +42,22 @@ namespace mpc
 
     /////////
 
+    using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
+    constexpr DrumNoteNumber NoDrumNoteAssigned{34};
+    constexpr DrumNoteNumber MinDrumNoteNumber{Mpc2000XlSpecs::FIRST_DRUM_NOTE};
+    constexpr DrumNoteNumber MaxDrumNoteNumber{Mpc2000XlSpecs::LAST_DRUM_NOTE};
+
+    /////////
+
     using NoteNumber = ConstrainedInt<int8_t, -1, 127>;
     constexpr NoteNumber NoNoteNumber{-1};
     constexpr NoteNumber MinNoteNumber{0};
     constexpr NoteNumber MaxNoteNumber{127};
 
-    /////////
-
-    using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
-    constexpr DrumNoteNumber NoDrumNoteAssigned{34};
-    constexpr DrumNoteNumber MinDrumNoteNumber{Mpc2000XlSpecs::FIRST_DRUM_NOTE};
-    constexpr DrumNoteNumber MaxDrumNoteNumber{Mpc2000XlSpecs::LAST_DRUM_NOTE};
+    inline bool isDrumNote(const NoteNumber number)
+    {
+        return number >= MinDrumNoteNumber && number <= MaxDrumNoteNumber;
+    }
 
     /////////
 

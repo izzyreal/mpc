@@ -17,7 +17,6 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"

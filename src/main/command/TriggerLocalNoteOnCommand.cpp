@@ -9,7 +9,6 @@
 #include "sampler/Program.hpp"
 #include "sequencer/Bus.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"
 #include "performance/PerformanceManager.hpp"
@@ -132,7 +131,7 @@ void TriggerLocalNoteOnCommand::execute()
     }
     else if (ctx->isStepRecording &&
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||
-              sequencer::isDrumNote(ctx->note)))
+              isDrumNote(ctx->note)))
     {
         ctx->sequencer->getTransport()->playMetronomeTrack();
 

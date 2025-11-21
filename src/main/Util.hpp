@@ -1,11 +1,12 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "mpc_types.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/EventState.hpp"
 
 namespace mpc
 {

@@ -1,6 +1,6 @@
 #include "sequencer/EventStateToEventMapper.hpp"
 
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 #include "EventState.hpp"
 #include "EventType.hpp"

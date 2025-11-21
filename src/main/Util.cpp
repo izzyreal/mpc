@@ -1,10 +1,11 @@
 #include "Util.hpp"
 
 #include "Mpc.hpp"
-#include "sequencer/NoteEvent.hpp"
 
 #include "StrUtil.hpp"
+
 #include "lcdgui/screens/UserScreen.hpp"
+
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 

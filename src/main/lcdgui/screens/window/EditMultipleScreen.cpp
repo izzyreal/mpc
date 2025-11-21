@@ -9,6 +9,7 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 #include "lcdgui/screens/StepEditorScreen.hpp"
 

@@ -7,34 +7,7 @@
 
 namespace mpc::sequencer
 {
-    bool isDrumNote(NoteNumber);
-
-    class NoteOffEvent final : public Event
-    {
-    public:
-        explicit NoteOffEvent(
-            const std::function<EventState()> &getSnapshotToUse,
-            const NoteNumber numberToUse)
-            : Event(getSnapshotToUse)
-        {
-            setNote(numberToUse);
-        }
-
-        explicit NoteOffEvent(
-            const std::function<EventState()> &getSnapshotToUse)
-            : Event(getSnapshotToUse)
-        {
-        }
-
-        void setNote(NoteNumber);
-
-        NoteNumber getNote() const;
-
-        std::string getTypeName() const override
-        {
-            return "note-off";
-        }
-    };
+    class NoteOffEvent;
 
     class NoteOnEvent final : public Event
     {

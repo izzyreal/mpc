@@ -4,7 +4,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include "Util.hpp"

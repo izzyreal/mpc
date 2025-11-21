@@ -12,7 +12,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
