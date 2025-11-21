@@ -39,6 +39,7 @@ namespace mpc::audiomidi
 namespace mpc::sequencer
 {
     class SequencerStateManager;
+    class TrackEventStateWorker;
     class Transport;
     class Sequence;
     class Bus;
@@ -110,6 +111,7 @@ namespace mpc::sequencer
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
         std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;

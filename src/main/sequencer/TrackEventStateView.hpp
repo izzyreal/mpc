@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IntTypes.hpp"
+#include "sequencer/EventState.hpp"
 
 #include <memory>
-#include <cstdint>
+#include <vector>
 
 namespace mpc::sequencer
 {
@@ -14,6 +14,20 @@ namespace mpc::sequencer
     public:
         explicit TrackEventStateView(
             const std::shared_ptr<const TrackEventState> &s) noexcept;
+
+        std::optional<EventState> findNoteEvent(int tick, NoteNumber note) const;
+
+        EventState getEventByIndex(EventIndex) const;
+
+        std::vector<EventState> getEventRange(int startTick, int endTick) const;
+
+        bool isEventsEmpty() const;
+
+        int getEventCount() const;
+
+        EventIndex getEventIndex() const;
+
+        std::vector<EventState> getNoteEvents() const;
 
     private:
         const std::shared_ptr<const TrackEventState> state;

@@ -71,18 +71,18 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
         void timingCorrect(int fromBar, int toBar,
-                           const std::shared_ptr<NoteOnEvent> &noteEvent,
-                           int stepLength, int swingPercentage);
+                           const EventState &noteEvent,
+                           int stepLength, int swingPercentage) const;
 
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
                               int swingPercentage) const;
 
         void shiftTiming(const std::shared_ptr<Event> &, bool later, int amount,
-                         int lastTick);
+                         int lastTick) const;
 
         std::string getActualName();
 
-        void syncEventIndex(int tick, int oldTick);
+        void syncEventIndex(int currentTick, int previousTick) const;
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
         void flushNoteCache() const;
@@ -120,9 +120,9 @@ namespace mpc::sequencer
         void cloneEventIntoTrack(const sequencer::EventState &,
                                  bool allowMultipleNotesOnSameTick = false);
 
-        void removeEvent(int i);
-        void removeEvent(const std::shared_ptr<Event> &event);
-        void removeEvents();
+        void removeEvent(int i) const;
+        void removeEvent(const std::shared_ptr<Event> &event) const;
+        void removeEvents() const;
         void setVelocityRatio(int i);
         int getVelocityRatio() const;
         void setProgramChange(int i);
@@ -131,10 +131,10 @@ namespace mpc::sequencer
         BusType getBusType() const;
         void setDeviceIndex(int i);
         int getDeviceIndex() const;
-        std::shared_ptr<Event> getEvent(int i);
+        std::shared_ptr<Event> getEvent(int i) const;
         void setName(const std::string &s);
         std::string getName();
-        std::vector<std::shared_ptr<Event>> &getEvents();
+        std::vector<std::shared_ptr<Event>> getEvents() const;
 
         int getNextTick();
         void playNext();
@@ -147,17 +147,19 @@ namespace mpc::sequencer
         // Do not call from audio thread
         void correctTimeRange(int startPos, int endPos, int stepLength,
                               int swingPercentage, int lowestNote,
-                              int highestNote);
+                              int highestNote) const;
 
         // Do not call from audio thread
-        void removeDoubles();
+        void removeDoubles() const;
 
         void purge();
 
-        sequencer::EventState findRecordingNoteOnEventById(NoteEventId);
+        EventState findRecordingNoteOnEventById(NoteEventId);
 
-        sequencer::EventState
+        EventState
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
+
+        std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
     private:
         std::shared_ptr<TrackEventStateManager> eventStateManager;
@@ -169,18 +171,15 @@ namespace mpc::sequencer
         int device = 0;
         TrackIndex trackIndex{0};
         bool used{false};
-        int eventIndex = 0;
 
         NoteEventId nextNoteEventId{MinNoteEventId};
 
-        std::vector<std::shared_ptr<Event>> events;
-
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            sequencer::EventState,
+            EventState,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            sequencer::EventState,
+            EventState,
             moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
@@ -205,10 +204,10 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<sequencer::EventState> bulkNoteOns;
-        std::vector<sequencer::EventState> bulkNoteOffs;
+        std::vector<EventState> bulkNoteOns;
+        std::vector<EventState> bulkNoteOffs;
 
-        void updateEventTick(const std::shared_ptr<Event> &e, int newTick);
+        void updateEventTick(const EventState &e, int newTick) const;
         std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, NoteNumber) const;
 
         void processRealtimeQueuedEvents();

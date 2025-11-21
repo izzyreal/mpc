@@ -28,6 +28,7 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
+#include "TrackEventStateWorker.hpp"
 
 #include <chrono>
 
@@ -88,6 +89,7 @@ Sequencer::Sequencer(
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
+    trackEventStateWorker = std::make_shared<TrackEventStateWorker>(this);
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
@@ -142,6 +144,8 @@ void Sequencer::init()
     {
         songs[i] = std::make_shared<Song>();
     }
+
+    trackEventStateWorker->start();
 }
 
 void Sequencer::deleteSong(const int i)

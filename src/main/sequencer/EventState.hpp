@@ -12,8 +12,6 @@ namespace mpc::sequencer
         TrackIndex trackIndex;
 
         EventIndex eventIndex;
-        EventIndex previousEventIndex;
-        EventIndex nextEventIndex;
 
         Tick tick;
 
@@ -52,8 +50,6 @@ namespace mpc::sequencer
             trackIndex = NoTrackIndex;
 
             eventIndex = NoEventIndex;
-            previousEventIndex = NoEventIndex;
-            nextEventIndex = NoEventIndex;
 
             tick = NoTick;
 
@@ -65,6 +61,32 @@ namespace mpc::sequencer
             velocity = NoVelocityOrPressure;
             noteVariationType = NoteVariationTypeTune;
             noteVariationValue = DefaultNoteVariationValue;
+        }
+
+        bool operator==(EventState const& other) const
+        {
+            return type == other.type &&
+                   sequenceIndex == other.sequenceIndex &&
+                   trackIndex == other.trackIndex &&
+                   eventIndex == other.eventIndex &&
+                   tick == other.tick &&
+                   noteNumber == other.noteNumber &&
+                   noteEventId == other.noteEventId &&
+                   beingRecorded == other.beingRecorded &&
+                   wasMoved == other.wasMoved &&
+                   dontDelete == other.dontDelete &&
+                   metronomeOnlyTickPosition == other.metronomeOnlyTickPosition &&
+                   duration == other.duration &&
+                   velocity == other.velocity &&
+                   noteVariationType == other.noteVariationType &&
+                   noteVariationValue == other.noteVariationValue &&
+                   amount == other.amount &&
+                   controllerNumber == other.controllerNumber &&
+                   controllerValue == other.controllerValue &&
+                   programChangeProgramIndex == other.programChangeProgramIndex &&
+                   mixerParameter == other.mixerParameter &&
+                   mixerPad == other.mixerPad &&
+                   mixerValue == other.mixerValue;
         }
     };
 }

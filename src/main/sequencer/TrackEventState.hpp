@@ -9,5 +9,6 @@ namespace mpc::sequencer
     struct TrackEventState
     {
         std::vector<EventState> events;
+        EventIndex eventIndex{0};
     };
 } // namespace mpc::sequencer
