@@ -15,31 +15,26 @@ ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event)
     setController(event.getController());
 }
 
-void ControlChangeEvent::setController(const int i)
+void ControlChangeEvent::setController(const int i) const
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-    controllerNumber = i;
+    auto e = getSnapshot();
+    e.controllerNumber = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ControlChangeEvent::getController() const
 {
-    return controllerNumber;
+    return getSnapshot().controllerNumber;
 }
 
-void ControlChangeEvent::setAmount(const int i)
+void ControlChangeEvent::setAmount(const int i) const
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    controllerValue = i;
+    auto e = getSnapshot();
+    e.controllerValue = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ControlChangeEvent::getAmount() const
 {
-    return controllerValue;
+    return getSnapshot().controllerValue;
 }

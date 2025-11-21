@@ -5,13 +5,10 @@ namespace mpc::sequencer
 {
     class ControlChangeEvent final : public Event
     {
-        int controllerNumber = 0;
-        int controllerValue = 0;
-
     public:
-        void setController(int i);
+        void setController(int i) const;
         int getController() const;
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
         explicit ControlChangeEvent(

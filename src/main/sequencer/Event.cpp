@@ -19,9 +19,9 @@ Event::Event(const Event &event)
     dispatch = event.dispatch;
 }
 
-void Event::setTick(const int relativeTick)
+void Event::setTick(const int tick) const
 {
-    // tick = relativeTick;
+    dispatch(UpdateEventTick{getSnapshot(), tick});
 }
 
 int Event::getTick() const
@@ -31,10 +31,12 @@ int Event::getTick() const
 
 mpc::TrackIndex Event::getTrack() const
 {
-    return track;
+    return getSnapshot().trackIndex;
 }
 
 void Event::setTrack(const TrackIndex i)
 {
-    track = i;
+    auto e = getSnapshot();
+    e.trackIndex = i;
+    dispatch(UpdateEvent{e});
 }

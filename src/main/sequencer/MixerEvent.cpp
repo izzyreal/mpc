@@ -16,46 +16,38 @@ MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
     setValue(event.getValue());
 }
 
-void MixerEvent::setParameter(const int i)
+void MixerEvent::setParameter(const int i) const
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-    mixerParameter = i;
+    auto e = getSnapshot();
+    e.mixerParameter = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getParameter() const
 {
-    return mixerParameter;
+    return getSnapshot().mixerParameter;
 }
 
-void MixerEvent::setPadNumber(const int i)
+void MixerEvent::setPadNumber(const int i) const
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    padNumber = i;
+    auto e = getSnapshot();
+    e.mixerPad = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getPad() const
 {
-    return padNumber;
+    return getSnapshot().mixerPad;
 }
 
-void MixerEvent::setValue(const int i)
+void MixerEvent::setValue(const int i) const
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
-    mixerParameterValue = i;
+    auto e = getSnapshot();
+    e.mixerValue = i;
+    dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getValue() const
 {
-    return mixerParameterValue;
+    return getSnapshot().mixerValue;
 }

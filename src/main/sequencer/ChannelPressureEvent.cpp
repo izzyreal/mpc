@@ -9,14 +9,16 @@ ChannelPressureEvent::ChannelPressureEvent(
 {
 }
 
-void ChannelPressureEvent::setAmount(const int i)
+void ChannelPressureEvent::setAmount(const int i) const
 {
-    channelPressureValue = std::clamp(i, 0, 127);
+    auto e = getSnapshot();
+    e.amount = i;
+    dispatch(UpdateEvent{e});
 }
 
 int ChannelPressureEvent::getAmount() const
 {
-    return channelPressureValue;
+    return getSnapshot().amount;
 }
 
 ChannelPressureEvent::ChannelPressureEvent(const ChannelPressureEvent &event)

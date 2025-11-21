@@ -7,8 +7,6 @@
 
 namespace mpc::sequencer
 {
-    class NoteOffEvent;
-
     class NoteOnEvent final : public Event
     {
         bool beingRecorded = false;
@@ -20,9 +18,6 @@ namespace mpc::sequencer
         // is also running when Count is OFF).
         int metronomeOnlyTickPosition = 0;
 
-    protected:
-        std::shared_ptr<NoteOffEvent> noteOff;
-
     public:
         explicit NoteOnEvent(const std::function<EventState()> &getSnapshot,
         const std::function<void(TrackEventMessage &&)> &dispatch,
@@ -32,9 +27,6 @@ namespace mpc::sequencer
         explicit NoteOnEvent(const std::function<EventState()> &getSnapshot,
         const std::function<void(TrackEventMessage &&)> &dispatch,
                              DrumNoteNumber);
-
-        std::shared_ptr<NoteOffEvent> getNoteOff() const;
-        void setTrack(TrackIndex trackIndexToUse) override;
 
         void setBeingRecorded(bool);
         bool isBeingRecorded() const;
@@ -54,7 +46,6 @@ namespace mpc::sequencer
         int getVariationValue() const;
         void setVelocity(Velocity) const;
         Velocity getVelocity() const;
-        bool isFinalized() const;
 
         std::string getTypeName() const override
         {

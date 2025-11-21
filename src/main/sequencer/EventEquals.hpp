@@ -1,7 +1,6 @@
 #pragma once
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/NoteOffEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
@@ -20,12 +19,6 @@ namespace mpc::sequencer
                a.getTypeName() == b.getTypeName();
     }
 
-    inline bool operator==(const NoteOffEvent &a, const NoteOffEvent &b)
-    {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getNote() == b.getNote();
-    }
-
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
@@ -33,11 +26,7 @@ namespace mpc::sequencer
                a.getVelocity() == b.getVelocity() &&
                a.getDuration() == b.getDuration() &&
                a.getVariationType() == b.getVariationType() &&
-               a.getVariationValue() == b.getVariationValue() &&
-               ((!a.getNoteOff() && !b.getNoteOff()) ||
-                (a.getNoteOff() && b.getNoteOff() &&
-                 *a.getNoteOff() == *b.getNoteOff())) &&
-               a.isFinalized() == b.isFinalized();
+               a.getVariationValue() == b.getVariationValue();
     }
 
     inline bool operator==(const MixerEvent &a, const MixerEvent &b)
@@ -106,10 +95,6 @@ namespace mpc::sequencer
         {
             return *na == *std::dynamic_pointer_cast<NoteOnEvent>(b);
         }
-        if (auto no = std::dynamic_pointer_cast<NoteOffEvent>(a))
-        {
-            return *no == *std::dynamic_pointer_cast<NoteOffEvent>(b);
-        }
         if (auto me = std::dynamic_pointer_cast<MixerEvent>(a))
         {
             return *me == *std::dynamic_pointer_cast<MixerEvent>(b);
@@ -155,10 +140,6 @@ namespace mpc::sequencer
         if (auto n = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
             return std::make_shared<NoteOnEvent>(*n);
-        }
-        if (auto n = std::dynamic_pointer_cast<NoteOffEvent>(e))
-        {
-            return std::make_shared<NoteOffEvent>(*n);
         }
         if (auto m = std::dynamic_pointer_cast<MixerEvent>(e))
         {

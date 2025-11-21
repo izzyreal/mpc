@@ -1,7 +1,5 @@
 #include "sequencer/NoteOnEvent.hpp"
 
-#include "sequencer/NoteOffEvent.hpp"
-
 using namespace mpc::sequencer;
 
 NoteOnEvent::NoteOnEvent(
@@ -10,7 +8,6 @@ NoteOnEvent::NoteOnEvent(
     const NoteNumber noteNumber, const Velocity vel, const NoteEventId id)
     : Event(getSnapshot, dispatch), id(id)
 {
-    noteOff = std::make_shared<NoteOffEvent>(getSnapshot, dispatch);
     setNote(noteNumber);
     setVelocity(vel);
 }
@@ -19,7 +16,6 @@ NoteOnEvent::NoteOnEvent(
     const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch), id(NoNoteEventId)
 {
-    noteOff = std::make_shared<NoteOffEvent>(getSnapshot, dispatch);
 }
 
 NoteOnEvent::NoteOnEvent(
@@ -28,7 +24,6 @@ NoteOnEvent::NoteOnEvent(
     const DrumNoteNumber drumNoteNumber)
     : Event(getSnapshot, dispatch), id(NoNoteEventId)
 {
-    noteOff = std::make_shared<NoteOffEvent>(getSnapshot, dispatch);
     setNote(drumNoteNumber);
 }
 
@@ -42,16 +37,6 @@ int NoteOnEvent::getMetronomeOnlyTickPosition() const
     return metronomeOnlyTickPosition;
 }
 
-std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const
-{
-    return noteOff;
-}
-
-void NoteOnEvent::setTrack(const TrackIndex trackIndexToUse)
-{
-    track = trackIndexToUse;
-    noteOff->setTrack(trackIndexToUse);
-}
 void NoteOnEvent::setBeingRecorded(const bool b)
 {
     beingRecorded = b;
@@ -67,7 +52,6 @@ void NoteOnEvent::setNote(const NoteNumber n) const
     auto e = getSnapshot();
     e.noteNumber = n;
     dispatch(UpdateEvent{e});
-    noteOff->setNote(n);
 }
 
 mpc::NoteNumber NoteOnEvent::getNote() const
@@ -126,11 +110,6 @@ void NoteOnEvent::setVelocity(const Velocity velocity) const
 mpc::Velocity NoteOnEvent::getVelocity() const
 {
     return getSnapshot().velocity;
-}
-
-bool NoteOnEvent::isFinalized() const
-{
-    return getDuration() != NoDuration;
 }
 
 uint32_t NoteOnEvent::getId() const

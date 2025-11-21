@@ -39,7 +39,6 @@ namespace mpc::sequencer
     class Sequence;
     class Event;
     class NoteOnEvent;
-    class NoteOffEvent;
     class Bus;
 
     class Track

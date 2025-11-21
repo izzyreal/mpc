@@ -5,10 +5,8 @@ namespace mpc::sequencer
 {
     class ChannelPressureEvent final : public Event
     {
-        int channelPressureValue{0};
-
     public:
-        void setAmount(int i);
+        void setAmount(int i) const;
         int getAmount() const;
 
         explicit ChannelPressureEvent(
