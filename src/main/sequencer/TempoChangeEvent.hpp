@@ -30,8 +30,12 @@ namespace mpc::sequencer
 
         void setParent(Sequence *newParent);
 
-        explicit TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent);
-        TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent, int ratio);
+        explicit TempoChangeEvent(
+            const std::function<sequencer::EventState()> &getSnapshot,
+            Sequence *parent);
+        TempoChangeEvent(
+            const std::function<sequencer::EventState()> &getSnapshot,
+            Sequence *parent, int ratio);
         TempoChangeEvent(const TempoChangeEvent &);
 
         std::string getTypeName() const override

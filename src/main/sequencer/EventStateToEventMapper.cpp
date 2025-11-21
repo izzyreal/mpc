@@ -11,8 +11,12 @@ namespace mpc::sequencer
     {
         if (e.type == EventType::NoteOn)
         {
-            return std::make_shared<NoteOnEvent>([e]{return e;});
+            return std::make_shared<NoteOnEvent>(
+                [e]
+                {
+                    return e;
+                });
         }
         return {};
     }
-}
+} // namespace mpc::sequencer

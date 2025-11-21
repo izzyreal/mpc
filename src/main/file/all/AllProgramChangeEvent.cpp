@@ -17,8 +17,7 @@ AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllProgramChangeEvent::mpcEventToBytes(
-    const EventState &e)
+std::vector<char> AllProgramChangeEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 

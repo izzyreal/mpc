@@ -48,8 +48,7 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(
-            std::function<std::string(int)> getDefaultTrackName,
+        Sequence(std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
                  std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
                  std::function<bool()> isRecordingModeMulti,

@@ -61,8 +61,7 @@ namespace mpc
 
     /////////
 
-    using TrackIndex =
-        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::TRACK_COUNT>;
+    using TrackIndex = ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::TRACK_COUNT>;
     constexpr TrackIndex NoTrackIndex{-1};
 
     /////////
@@ -93,7 +92,8 @@ namespace mpc
 
     /////////
 
-    using EventIndex = ConstrainedInt<int64_t, -1, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
+    using EventIndex =
+        ConstrainedInt<int64_t, -1, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 
     constexpr EventIndex NoEventIndex{-1};
 

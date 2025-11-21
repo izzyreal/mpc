@@ -24,4 +24,4 @@ namespace mpc::sequencer
 
         void work() const;
     };
-}
+} // namespace mpc::sequencer

@@ -28,8 +28,7 @@ namespace mpc::file::all
         static int readTrackNumber(const std::vector<char> &);
         static int readVelocity(const std::vector<char> &);
         static int readVariationValue(const std::vector<char> &);
-        static NoteVariationType
-        readVariationType(const std::vector<char> &);
+        static NoteVariationType readVariationType(const std::vector<char> &);
 
         static void writeVelocity(std::vector<char> &event, int);
         static void writeTrackNumber(std::vector<char> &event, int);
@@ -40,9 +39,7 @@ namespace mpc::file::all
         friend class AllEvent;
 
     public:
-        static sequencer::EventState
-        bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-        mpcEventToBytes(const sequencer::EventState &);
+        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
     };
 } // namespace mpc::file::all

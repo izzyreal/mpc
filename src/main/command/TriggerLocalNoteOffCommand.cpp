@@ -55,9 +55,8 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
         {
-            auto newDuration =
-                ctx->metronomeOnlyTickPosition -
-                ctx->recordOnEvent->metronomeOnlyTickPosition;
+            auto newDuration = ctx->metronomeOnlyTickPosition -
+                               ctx->recordOnEvent->metronomeOnlyTickPosition;
             ctx->recordOnEvent->tick = ctx->sequencerTickPosition;
 
             if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
@@ -75,7 +74,8 @@ void TriggerLocalNoteOffCommand::execute()
 
             ctx->track->finalizeNoteEventLive(*ctx->recordOnEvent);
 
-            if ((oldDuration != ctx->recordOnEvent->duration && ctx->isRecMainWithoutPlaying) ||
+            if ((oldDuration != ctx->recordOnEvent->duration &&
+                 ctx->isRecMainWithoutPlaying) ||
                 (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
             {
                 if (thisIsTheLastActiveNoteOn)

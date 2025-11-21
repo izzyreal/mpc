@@ -69,9 +69,8 @@ namespace mpc
         static int getTextWidthInPixels(const std::string &text);
         static void initSequence(Mpc &mpc);
         static void initSequence(int sequenceIndex, Mpc &mpc);
-        static void
-        set16LevelsValues(const SixteenLevelsContext &,
-                          sequencer::EventState &);
+        static void set16LevelsValues(const SixteenLevelsContext &,
+                                      sequencer::EventState &);
 
         static std::pair<NoteVariationType, int>
         getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);

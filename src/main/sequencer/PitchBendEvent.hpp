@@ -12,7 +12,8 @@ namespace mpc::sequencer
         void setAmount(int i);
         int getAmount() const;
 
-        PitchBendEvent(const std::function<sequencer::EventState()> &getSnapshot);
+        PitchBendEvent(
+            const std::function<sequencer::EventState()> &getSnapshot);
         PitchBendEvent(const PitchBendEvent &);
 
         std::string getTypeName() const override

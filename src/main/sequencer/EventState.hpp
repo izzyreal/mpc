@@ -63,30 +63,28 @@ namespace mpc::sequencer
             noteVariationValue = DefaultNoteVariationValue;
         }
 
-        bool operator==(EventState const& other) const
+        bool operator==(EventState const &other) const
         {
-            return type == other.type &&
-                   sequenceIndex == other.sequenceIndex &&
+            return type == other.type && sequenceIndex == other.sequenceIndex &&
                    trackIndex == other.trackIndex &&
-                   eventIndex == other.eventIndex &&
-                   tick == other.tick &&
+                   eventIndex == other.eventIndex && tick == other.tick &&
                    noteNumber == other.noteNumber &&
                    noteEventId == other.noteEventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
                    dontDelete == other.dontDelete &&
-                   metronomeOnlyTickPosition == other.metronomeOnlyTickPosition &&
-                   duration == other.duration &&
-                   velocity == other.velocity &&
+                   metronomeOnlyTickPosition ==
+                       other.metronomeOnlyTickPosition &&
+                   duration == other.duration && velocity == other.velocity &&
                    noteVariationType == other.noteVariationType &&
                    noteVariationValue == other.noteVariationValue &&
                    amount == other.amount &&
                    controllerNumber == other.controllerNumber &&
                    controllerValue == other.controllerValue &&
-                   programChangeProgramIndex == other.programChangeProgramIndex &&
+                   programChangeProgramIndex ==
+                       other.programChangeProgramIndex &&
                    mixerParameter == other.mixerParameter &&
-                   mixerPad == other.mixerPad &&
-                   mixerValue == other.mixerValue;
+                   mixerPad == other.mixerPad && mixerValue == other.mixerValue;
         }
     };
-}
+} // namespace mpc::sequencer

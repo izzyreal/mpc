@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 SystemExclusiveEvent::SystemExclusiveEvent(
     const std::function<sequencer::EventState()> &getSnapshot)
-        : Event(getSnapshot)
+    : Event(getSnapshot)
 {
 }
 
@@ -13,7 +13,6 @@ SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent &event)
 {
     setBytes(event.getBytes());
 }
-
 
 void SystemExclusiveEvent::setByteA(const unsigned char i)
 {

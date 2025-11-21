@@ -8,4 +8,4 @@ namespace mpc::sequencer
     class Event;
 
     std::shared_ptr<Event> mapEventStateToEvent(const EventState &);
-}
+} // namespace mpc::sequencer

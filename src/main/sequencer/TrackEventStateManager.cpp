@@ -57,18 +57,16 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                 }
 
                 const bool insertRequired =
-                    !events.empty() &&
-                    events.back().tick >= m.eventState.tick;
+                    !events.empty() && events.back().tick >= m.eventState.tick;
 
                 if (insertRequired)
                 {
-                    const auto insertAt =
-                        std::find_if(events.begin(), events.end(),
-                                     [tick = m.eventState.tick](
-                                         const EventState &e)
-                                     {
-                                         return e.tick > tick;
-                                     });
+                    const auto insertAt = std::find_if(
+                        events.begin(), events.end(),
+                        [tick = m.eventState.tick](const EventState &e)
+                        {
+                            return e.tick > tick;
+                        });
 
                     if (insertAt == events.end())
                     {
@@ -115,7 +113,8 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     startIndex = activeState.eventIndex;
                 }
 
-                if (m.currentTick < m.previousTick && activeState.eventIndex == 0)
+                if (m.currentTick < m.previousTick &&
+                    activeState.eventIndex == 0)
                 {
                     return;
                 }

@@ -1077,7 +1077,7 @@ StepEditorScreen::computeEventsAtCurrentTick() const
     std::vector<std::shared_ptr<Event>> result;
 
     const auto track = sequencer->getSelectedTrack();
-auto trackEvents = track->getEvents();
+    auto trackEvents = track->getEvents();
     for (auto &event : track->getEvents())
     {
         if (event->getTick() == sequencer->getTransport()->getTickPosition())

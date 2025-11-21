@@ -15,7 +15,8 @@ namespace mpc::sequencer
         void setBytes(const std::vector<unsigned char> &ba);
         const std::vector<unsigned char> &getBytes() const;
 
-        explicit SystemExclusiveEvent(const std::function<sequencer::EventState()> &getSnapshot);
+        explicit SystemExclusiveEvent(
+            const std::function<sequencer::EventState()> &getSnapshot);
         SystemExclusiveEvent(const SystemExclusiveEvent &event);
         std::string getTypeName() const override
         {

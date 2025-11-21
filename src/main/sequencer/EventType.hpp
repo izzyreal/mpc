@@ -4,7 +4,8 @@
 
 namespace mpc::sequencer
 {
-    enum class EventType : uint8_t {
+    enum class EventType : uint8_t
+    {
         NoteOn = 0,
         NoteOff = 1,
         ProgramChange = 2,

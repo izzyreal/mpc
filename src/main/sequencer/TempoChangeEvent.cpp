@@ -5,12 +5,15 @@
 
 using namespace mpc::sequencer;
 
-TempoChangeEvent::TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent)
+TempoChangeEvent::TempoChangeEvent(
+    const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent)
     : TempoChangeEvent(getSnapshot, parent, 1000)
 {
 }
 
-TempoChangeEvent::TempoChangeEvent(const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent, const int ratio)
+TempoChangeEvent::TempoChangeEvent(
+    const std::function<sequencer::EventState()> &getSnapshot, Sequence *parent,
+    const int ratio)
     : Event(getSnapshot)
 {
     this->ratio = ratio;
@@ -29,7 +32,8 @@ void TempoChangeEvent::setParent(Sequence *newParent)
 
 void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next)
 {
-    auto candidate = parent->getFirstTickOfBar(SeqUtil::getBar(parent, getSnapshot().tick) + 1);
+    auto candidate = parent->getFirstTickOfBar(
+        SeqUtil::getBar(parent, getSnapshot().tick) + 1);
 
     if (candidate > parent->getLastTick())
     {
@@ -49,7 +53,8 @@ void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next)
 
 void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous)
 {
-    auto candidate = parent->getFirstTickOfBar(SeqUtil::getBar(parent, getSnapshot().tick) - 1);
+    auto candidate = parent->getFirstTickOfBar(
+        SeqUtil::getBar(parent, getSnapshot().tick) - 1);
 
     if (candidate < 0)
     {
@@ -71,8 +76,9 @@ void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next)
 {
     const auto oldTick = getSnapshot().tick;
 
-    auto candidate = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
-                                      SeqUtil::getBeat(parent, oldTick) + 1);
+    auto candidate =
+        parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
+                                   SeqUtil::getBeat(parent, oldTick) + 1);
 
     if (candidate >= parent->getLastTick())
     {
@@ -93,8 +99,9 @@ void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next)
 void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous)
 {
     const auto oldTick = getSnapshot().tick;
-    auto candidate = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
-                                      SeqUtil::getBeat(parent, oldTick) - 1);
+    auto candidate =
+        parent->getFirstTickOfBeat(SeqUtil::getBar(parent, oldTick),
+                                   SeqUtil::getBeat(parent, oldTick) - 1);
 
     if (candidate < 0)
     {

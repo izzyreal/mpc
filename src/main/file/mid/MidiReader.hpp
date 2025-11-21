@@ -47,9 +47,8 @@ namespace mpc::file::mid
         static int getNumberOfNoteOns(
             int noteValue,
             const std::vector<std::shared_ptr<event::ChannelEvent>> &allNotes);
-        static int getNumberOfNotes(
-            int noteValue,
-            const std::vector<sequencer::EventState>
-                &allNotes);
+        static int
+        getNumberOfNotes(int noteValue,
+                         const std::vector<sequencer::EventState> &allNotes);
     };
 } // namespace mpc::file::mid

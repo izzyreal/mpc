@@ -130,4 +130,3 @@ Drum PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
 {
     return state->drums[drumBusIndex];
 }
-

@@ -2,7 +2,8 @@
 
 using namespace mpc::sequencer;
 
-MixerEvent::MixerEvent(const std::function<sequencer::EventState()> &getSnapshot)
+MixerEvent::MixerEvent(
+    const std::function<sequencer::EventState()> &getSnapshot)
     : Event(getSnapshot)
 {
 }

@@ -232,7 +232,11 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<NoteOnEvent>([]{return sequencer::EventState();});
+                    nVariation = std::make_unique<NoteOnEvent>(
+                        []
+                        {
+                            return sequencer::EventState();
+                        });
                     nVariation->incrementVariationType(noteOff->getNoteValue());
                     nVariation->setVariationValue(noteOff->getVelocity());
                 }
@@ -267,8 +271,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                         if (nVariation)
                         {
-                            ne.noteVariationType = NoteVariationType(nVariation->getVariationType());
-                            ne.noteVariationValue = NoteVariationValue(nVariation->getVariationValue());
+                            ne.noteVariationType = NoteVariationType(
+                                nVariation->getVariationType());
+                            ne.noteVariationValue = NoteVariationValue(
+                                nVariation->getVariationValue());
                         }
                         else
                         {
@@ -305,8 +311,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
         for (auto &n : noteOns)
         {
-            auto noteOn = track->recordNoteEventNonLive(
-                n.tick, n.noteNumber, n.velocity, 0);
+            auto noteOn = track->recordNoteEventNonLive(n.tick, n.noteNumber,
+                                                        n.velocity, 0);
 
             int indexCandidate = -1;
 
@@ -346,8 +352,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
             if (indexCandidate != -1)
             {
-                noteOn.duration = Duration(noteOffs[indexCandidate]->getTick() -
-                                    noteOn.tick);
+                noteOn.duration =
+                    Duration(noteOffs[indexCandidate]->getTick() - noteOn.tick);
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else
@@ -359,15 +365,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
         for (auto &me : mt->getEvents())
         {
             if (const auto sysEx =
-                    std::dynamic_pointer_cast<SystemExclusiveEvent>(
-                        me.lock());
+                    std::dynamic_pointer_cast<SystemExclusiveEvent>(me.lock());
                 sysEx)
             {
 
                 if (auto sysExEventBytes = sysEx->getData();
                     sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 &&
                     sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 &&
-                    sysExEventBytes[3] == 69 && sysExEventBytes[7] == static_cast<char>(247))
+                    sysExEventBytes[3] == 69 &&
+                    sysExEventBytes[7] == static_cast<char>(247))
                 {
                     sequencer::EventState e;
                     e.type = sequencer::EventType::Mixer;
@@ -491,8 +497,7 @@ int MidiReader::getNumberOfNoteOns(
 }
 
 int MidiReader::getNumberOfNotes(
-    const int noteValue,
-    const std::vector<sequencer::EventState> &allNotes)
+    const int noteValue, const std::vector<sequencer::EventState> &allNotes)
 {
     int counter = 0;
 

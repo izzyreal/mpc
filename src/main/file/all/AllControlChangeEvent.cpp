@@ -18,8 +18,7 @@ AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllControlChangeEvent::mpcEventToBytes(
-    const EventState &e)
+std::vector<char> AllControlChangeEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 

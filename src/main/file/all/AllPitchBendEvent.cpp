@@ -7,8 +7,7 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventState
-AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     EventState e;
     e.type = EventType::PitchBend;
@@ -29,8 +28,7 @@ AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char>
-AllPitchBendEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllPitchBendEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PITCH_BEND_ID;

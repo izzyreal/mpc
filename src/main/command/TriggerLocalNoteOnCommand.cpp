@@ -93,7 +93,8 @@ void TriggerLocalNoteOnCommand::execute()
                 auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
                     sliderNoteVariationContext);
                 noteEventToApplyTo.noteVariationType = type;
-                noteEventToApplyTo.noteVariationValue = NoteVariationValue(value);
+                noteEventToApplyTo.noteVariationValue =
+                    NoteVariationValue(value);
             }
         }
     };
@@ -137,8 +138,7 @@ void TriggerLocalNoteOnCommand::execute()
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo,
-            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition()
-            );
+            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
@@ -175,6 +175,7 @@ void TriggerLocalNoteOnCommand::execute()
         // construct the whole Event before enqueueing it.
         apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
 
-        ctx->registryNoteOnEvent.recordNoteEventId = recordNoteOnEvent->noteEventId;
+        ctx->registryNoteOnEvent.recordNoteEventId =
+            recordNoteOnEvent->noteEventId;
     }
 }

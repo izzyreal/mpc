@@ -669,7 +669,8 @@ int Sequencer::getUsedSequenceCount() const
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<sequencer::Sequence>> Sequencer::getUsedSequences() const
+std::vector<std::shared_ptr<sequencer::Sequence>>
+Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 

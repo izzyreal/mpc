@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 ControlChangeEvent::ControlChangeEvent(
     const std::function<sequencer::EventState()> &getSnapshot)
-        : Event(getSnapshot)
+    : Event(getSnapshot)
 {
 }
 

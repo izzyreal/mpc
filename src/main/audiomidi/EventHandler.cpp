@@ -48,8 +48,8 @@ EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 }
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
-    const EventState &noteOnEvent,
-    const std::shared_ptr<DrumBus> &drumBus, const Track *track)
+    const EventState &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
+    const Track *track)
 {
     const auto sampler = mpc.getSampler();
     const auto programIndex = drumBus->getProgramIndex();
@@ -123,8 +123,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         &mpc.getEngineHost()->getVoices(),
         mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
-        noteVariationType, noteVariationValue,
-        eventFrameOffsetInBuffer, true, noteOnEvent.tick,
+        noteVariationType, noteVariationValue, eventFrameOffsetInBuffer, true,
+        noteOnEvent.tick,
         voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
 
     DrumNoteEventHandler::noteOn(ctx);
@@ -189,7 +189,8 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
 
     if (event.type == sequencer::EventType::NoteOn)
     {
-        assert(event.noteNumber != NoNoteNumber && event.duration != NoDuration);
+        assert(event.noteNumber != NoNoteNumber &&
+               event.duration != NoDuration);
 
         if (const auto drumBus =
                 mpc.getSequencer()->getBus<DrumBus>(track->getBusType());
@@ -205,11 +206,11 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
         //                        track->getVelocityRatio());
 
         // auto midiNoteOffEventFn =
-            // [this, noteOffEvent = noteOnEvent->getNoteOff(), track,
-             // trackDeviceIndex = track->getDeviceIndex()]
+        // [this, noteOffEvent = noteOnEvent->getNoteOff(), track,
+        // trackDeviceIndex = track->getDeviceIndex()]
         // {
-            // handleNoteEventMidiOut(noteOffEvent, track, trackDeviceIndex,
-            //                        std::nullopt);
+        // handleNoteEventMidiOut(noteOffEvent, track, trackDeviceIndex,
+        //                        std::nullopt);
         // };
 
         const auto engineHost = mpc.getEngineHost();
@@ -261,7 +262,8 @@ void EventHandler::handleUnfinalizedNoteOn(
     const std::optional<int> trackVelocityRatio,
     const std::optional<BusType> drumBusType) const
 {
-    assert(noteOnEvent.type == sequencer::EventType::NoteOn && noteOnEvent.duration == NoDuration);
+    assert(noteOnEvent.type == sequencer::EventType::NoteOn &&
+           noteOnEvent.duration == NoDuration);
 
     if (drumBusType.has_value() && isDrumNote(noteOnEvent.noteNumber))
     {
@@ -270,9 +272,8 @@ void EventHandler::handleUnfinalizedNoteOn(
 
         const auto note = noteOnEvent.noteNumber;
 
-        const auto velocityWithTrackVelocityRatioApplied =
-            static_cast<int>(noteOnEvent.velocity *
-                             (trackVelocityRatio.value_or(100) * 0.01f));
+        const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
+            noteOnEvent.velocity * (trackVelocityRatio.value_or(100) * 0.01f));
 
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
@@ -286,8 +287,8 @@ void EventHandler::handleUnfinalizedNoteOn(
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(),
             mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
-            noteOnEvent.noteVariationType, noteOnEvent.noteVariationValue,
-            0, true, -1, -1);
+            noteOnEvent.noteVariationType, noteOnEvent.noteVariationValue, 0,
+            true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
     }

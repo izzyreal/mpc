@@ -28,8 +28,8 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
 {
     barList = new BarList(Util::vecCopyOfRange(
         bytes, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
-    const auto nameBytes = Util::vecCopyOfRange(bytes, NAME_OFFSET,
-                                          NAME_OFFSET + AllParser::NAME_LENGTH);
+    const auto nameBytes = Util::vecCopyOfRange(
+        bytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
     name = "";
 
     for (const char c : nameBytes)
@@ -47,7 +47,7 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
     tempo = getTempoDouble(
         std::vector{bytes[TEMPO_BYTE1_OFFSET], bytes[TEMPO_BYTE2_OFFSET]});
     const auto barCountBytes = std::vector{bytes[BAR_COUNT_BYTE1_OFFSET],
-                                     bytes[BAR_COUNT_BYTE2_OFFSET]};
+                                           bytes[BAR_COUNT_BYTE2_OFFSET]};
     barCount = ByteUtil::bytes2ushort(barCountBytes);
     loopFirst = ByteUtil::bytes2ushort(
         std::vector{bytes[LOOP_FIRST_OFFSET], bytes[LOOP_FIRST_OFFSET + 1]});
@@ -70,7 +70,8 @@ AllSequence::AllSequence(const std::vector<char> &bytes)
 
     for (int i = 0; i < 33; i++)
     {
-        const auto offset = DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        const auto offset =
+            DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
         std::string stringBuffer;
         auto stringBytes = Util::vecCopyOfRange(
             bytes, offset, offset + AllParser::DEV_NAME_LENGTH);
@@ -216,7 +217,8 @@ AllSequence::AllSequence(Sequence *seq, int number)
 
     if (seq->isLastLoopBarEnd())
     {
-        loopEndBytes = std::vector{static_cast<char>(255), static_cast<char>(255)};
+        loopEndBytes =
+            std::vector{static_cast<char>(255), static_cast<char>(255)};
     }
 
     saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
@@ -268,7 +270,8 @@ AllSequence::AllSequence(Sequence *seq, int number)
         saveBytes[i] = eventArraysChunk[i - EVENTS_OFFSET];
     }
 
-    for (int i = static_cast<int>(saveBytes.size()) - 8; i < saveBytes.size(); i++)
+    for (int i = static_cast<int>(saveBytes.size()) - 8; i < saveBytes.size();
+         i++)
     {
         saveBytes[i] = static_cast<char>(255);
     }
@@ -283,10 +286,10 @@ const char AllSequence::CH_PRESSURE_ID;
 const char AllSequence::PITCH_BEND_ID;
 const char AllSequence::SYS_EX_ID;
 const char AllSequence::SYS_EX_TERMINATOR_ID;
-std::vector<char> AllSequence::TERMINATOR =
-    std::vector{
-    static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF),
-                static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF)};
+std::vector<char> AllSequence::TERMINATOR = std::vector{
+    static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF),
+    static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF),
+    static_cast<char>(0xFF), static_cast<char>(0xFF)};
 const int AllSequence::MAX_EVENT_SEG_COUNT;
 const int AllSequence::EVENT_SEG_LENGTH;
 const int AllSequence::NAME_OFFSET;
@@ -416,9 +419,7 @@ int AllSequence::getSegmentCount(Sequence *seq)
                     std::dynamic_pointer_cast<SystemExclusiveEvent>(e);
                 sysExEvent)
             {
-                const int dataSegments =
-                    static_cast<int>(
-                    ceil(
+                const int dataSegments = static_cast<int>(ceil(
                     static_cast<int>(sysExEvent->getBytes().size()) / 8.0));
                 segmentCount += dataSegments + 2;
             }
@@ -487,7 +488,8 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
                 if (event->getTick() == i)
                 {
                     event->setTrack(track->getIndex());
-                    ea.push_back(AllEvent::mpcEventToBytes(event->getSnapshot()));
+                    ea.push_back(
+                        AllEvent::mpcEventToBytes(event->getSnapshot()));
                 }
             }
         }
@@ -499,8 +501,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
 
 void AllSequence::setTempoDouble(const double tempoForSaveBytes)
 {
-    const auto ba =
-        ByteUtil::ushort2bytes(
+    const auto ba = ByteUtil::ushort2bytes(
         static_cast<unsigned short>(tempoForSaveBytes * 10.0));
     saveBytes[TEMPO_BYTE1_OFFSET] = ba[0];
     saveBytes[TEMPO_BYTE2_OFFSET] = ba[1];

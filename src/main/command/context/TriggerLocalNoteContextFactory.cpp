@@ -35,7 +35,8 @@ std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const PerformanceEventSource source,
     const performance::NoteOnEvent &registryNoteOnEvent, const NoteNumber note,
-    const Velocity velocity, sequencer::Track *track, const std::shared_ptr<Bus> &bus,
+    const Velocity velocity, sequencer::Track *track,
+    const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
@@ -138,7 +139,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 
     const auto registrySnapshot = performanceManager->getSnapshot();
 
-    std::optional<sequencer::EventState> sequencerRecordNoteOnEvent = std::nullopt;
+    std::optional<sequencer::EventState> sequencerRecordNoteOnEvent =
+        std::nullopt;
 
     if (recordedNoteOnEventId != NoNoteEventId)
     {

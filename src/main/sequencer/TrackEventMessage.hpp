@@ -61,5 +61,6 @@ namespace mpc::sequencer
     using TrackEventMessage =
         std::variant<SyncEventIndex, InsertEvent, ClearEvents, RemoveEvent,
                      RemoveEventByIndex, RemoveDontDeleteFlag, UpdateEventTick,
-                     RemoveDoubles, AddToEventIndex, UpdateTrackIndexOfAllEvents>;
+                     RemoveDoubles, AddToEventIndex,
+                     UpdateTrackIndexOfAllEvents>;
 } // namespace mpc::sequencer

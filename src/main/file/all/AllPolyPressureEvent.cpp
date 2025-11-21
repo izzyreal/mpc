@@ -5,8 +5,7 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventState
-AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     EventState e;
     e.type = EventType::PolyPressure;
@@ -18,8 +17,7 @@ AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllPolyPressureEvent::mpcEventToBytes(
-    const EventState &e)
+std::vector<char> AllPolyPressureEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 

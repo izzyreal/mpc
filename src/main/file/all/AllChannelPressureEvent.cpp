@@ -16,8 +16,7 @@ AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllChannelPressureEvent::mpcEventToBytes(
-    const EventState &e)
+std::vector<char> AllChannelPressureEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes(8);
 

@@ -34,7 +34,8 @@ namespace mpc::audiomidi
         std::atomic<uint64_t> noteEventId = 1;
 
     public:
-        void handleFinalizedEvent(const sequencer::EventState &, sequencer::Track *);
+        void handleFinalizedEvent(const sequencer::EventState &,
+                                  sequencer::Track *);
 
         // Handles physical pad presses.
         //
@@ -80,9 +81,10 @@ namespace mpc::audiomidi
         //
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
-        void handleNoteOffFromUnfinalizedNoteOn(
-            NoteNumber, sequencer::Track *,
-            std::optional<int> trackDevice, std::optional<DrumBusIndex>) const;
+        void
+        handleNoteOffFromUnfinalizedNoteOn(NoteNumber, sequencer::Track *,
+                                           std::optional<int> trackDevice,
+                                           std::optional<DrumBusIndex>) const;
 
         /**
          * Right now we only clear the cache when mpc::Mpc::panic() is invoked.
@@ -136,7 +138,8 @@ namespace mpc::audiomidi
          * use a nice spacious number based on intuition, which is 512.
          */
         const size_t TRANSPOSE_CACHE_CAPACITY = 512;
-        // std::unordered_map<std::shared_ptr<NoteOffEvent>, int> transposeCache;
+        // std::unordered_map<std::shared_ptr<NoteOffEvent>, int>
+        // transposeCache;
 
         Mpc &mpc;
     };

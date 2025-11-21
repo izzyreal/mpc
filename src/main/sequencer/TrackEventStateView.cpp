@@ -25,8 +25,7 @@ TrackEventStateView::findNoteEvent(const int tick, const NoteNumber note) const
     return std::nullopt;
 }
 
-EventState
-TrackEventStateView::getEventByIndex(const EventIndex idx) const
+EventState TrackEventStateView::getEventByIndex(const EventIndex idx) const
 {
     if (idx >= 0 && idx < state->events.size())
     {
@@ -35,13 +34,17 @@ TrackEventStateView::getEventByIndex(const EventIndex idx) const
     return {};
 }
 
-std::vector<EventState> TrackEventStateView::getEventRange(const int startTick, const int endTick) const
+std::vector<EventState>
+TrackEventStateView::getEventRange(const int startTick, const int endTick) const
 {
     std::vector<EventState> result;
 
     for (auto &e : state->events)
     {
-        if (e.tick > endTick) break;
+        if (e.tick > endTick)
+        {
+            break;
+        }
         if (e.tick >= startTick && e.tick <= endTick)
         {
             result.push_back(e);

@@ -70,8 +70,7 @@ namespace mpc::sequencer
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
-        void timingCorrect(int fromBar, int toBar,
-                           const EventState &noteEvent,
+        void timingCorrect(int fromBar, int toBar, const EventState &noteEvent,
                            int stepLength, int swingPercentage) const;
 
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
@@ -89,12 +88,12 @@ namespace mpc::sequencer
         void setUsed(bool b);
         void setOn(bool b);
 
-        void insertEvent(
-            const EventState &event,
-            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
+        void
+        insertEvent(const EventState &event,
+                    bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        EventState
-        recordNoteEventNonLive(int tick, NoteNumber, Velocity, int64_t metronomeOnlyTick);
+        EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
+                                          int64_t metronomeOnlyTick);
 
         sequencer::EventState recordNoteEventLive(NoteNumber, Velocity);
 
@@ -104,11 +103,9 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // NoteOnEvent::finalizeNonLive.
-        void
-        finalizeNoteEventLive(const sequencer::EventState &) const;
+        void finalizeNoteEventLive(const sequencer::EventState &) const;
 
-        void
-        finalizeNoteEventNonLive(const sequencer::EventState &) const;
+        void finalizeNoteEventNonLive(const sequencer::EventState &) const;
 
         void
         addEvent(const sequencer::EventState &,
@@ -153,8 +150,7 @@ namespace mpc::sequencer
 
         EventState findRecordingNoteOnEventById(NoteEventId);
 
-        EventState
-            findRecordingNoteOnEventByNoteNumber(NoteNumber);
+        EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
@@ -172,12 +168,10 @@ namespace mpc::sequencer
         NoteEventId nextNoteEventId{MinNoteEventId};
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventState,
-            moodycamel::ConcurrentQueueDefaultTraits>>
+            EventState, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventState,
-            moodycamel::ConcurrentQueueDefaultTraits>>
+            EventState, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};

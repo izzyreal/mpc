@@ -140,17 +140,16 @@ void NoteRepeatProcessor::process(
                     ProgramPadIndex(programPadIndex));
 
             noteEvent.velocity = isFullLevelEnabled()
-                                       ? MaxVelocity
-                                       : velocityToUseIfNotFullLevel;
+                                     ? MaxVelocity
+                                     : velocityToUseIfNotFullLevel;
         }
 
         noteEvent.duration = Duration(durationTicks);
 
-        const auto velocityBeforeTrackVelocityRatioApplied =
-            noteEvent.velocity;
+        const auto velocityBeforeTrackVelocityRatioApplied = noteEvent.velocity;
 
         noteEvent.velocity = Velocity(velocityBeforeTrackVelocityRatioApplied *
-                                        (track->getVelocityRatio() * 0.01));
+                                      (track->getVelocityRatio() * 0.01));
 
         const auto durationFrames = static_cast<int>(
             durationTicks == -1

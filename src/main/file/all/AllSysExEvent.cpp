@@ -7,10 +7,10 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::vector<char> AllSysExEvent::MIXER_SIGNATURE = {static_cast<char>(240), 71, 0, 68, 69};
+std::vector<char> AllSysExEvent::MIXER_SIGNATURE = {static_cast<char>(240), 71,
+                                                    0, 68, 69};
 
-EventState
-AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     const int byteCount = bytes[BYTE_COUNT_OFFSET];
 
@@ -46,7 +46,7 @@ AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     {
         e.type = EventType::SystemExclusive;
         // e.sysexData = sysexLoadData;
-        e.tick =AllEvent::readTick(bytes);
+        e.tick = AllEvent::readTick(bytes);
     }
 
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -54,8 +54,7 @@ AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char>
-AllSysExEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllSysExEvent::mpcEventToBytes(const EventState &e)
 {
     std::vector<char> bytes;
 
@@ -73,8 +72,7 @@ AllSysExEvent::mpcEventToBytes(const EventState &e)
             bytes[DATA_OFFSET + i] = MIXER_SIGNATURE[i];
         }
 
-        bytes[DATA_OFFSET + MIXER_PAD_OFFSET] =
-            e.mixerPad;
+        bytes[DATA_OFFSET + MIXER_PAD_OFFSET] = e.mixerPad;
         auto paramCandidate = e.mixerParameter;
 
         if (paramCandidate == 3)

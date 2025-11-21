@@ -79,6 +79,5 @@ namespace mpc::performance
         static constexpr size_t CAPACITY = 8192;
 
         static void reserveState(PerformanceState &);
-
     };
 } // namespace mpc::performance
