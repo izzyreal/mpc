@@ -270,7 +270,7 @@ void Track::finalizeNoteEventLive(const EventState &noteOnEvent) const
     EventState e;
     e.type = EventType::NoteOff;
     e.noteNumber = noteOnEvent.noteNumber;
-    e.tick = TickUnassignedWhileRecording;
+    e.tick = getTickPosition();
     queuedNoteOffEvents->enqueue(e);
 }
 
