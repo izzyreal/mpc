@@ -236,6 +236,7 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     nextNoteEventId = getNextNoteEventId(nextNoteEventId);
 
     EventState noteEvent;
+    noteEvent.type = EventType::NoteOn;
     noteEvent.noteEventId = noteEventIdToUse;
     noteEvent.noteNumber = note;
     noteEvent.velocity = velocity;
