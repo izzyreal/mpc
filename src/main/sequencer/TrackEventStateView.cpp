@@ -64,11 +64,6 @@ int TrackEventStateView::getEventCount() const
     return state->events.size();
 }
 
-mpc::EventIndex TrackEventStateView::getEventIndex() const
-{
-    return state->eventIndex;
-}
-
 std::vector<EventState> TrackEventStateView::getNoteEvents() const
 {
     std::vector<EventState> result;

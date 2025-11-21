@@ -16,12 +16,6 @@ namespace mpc::sequencer
         TrackIndex trackIndex;
     };
 
-    struct SyncEventIndex
-    {
-        Tick previousTick;
-        Tick currentTick;
-    };
-
     struct FinalizeNonLiveNoteEvent
     {
         EventState noteOnEvent;
@@ -59,20 +53,15 @@ namespace mpc::sequencer
     {
     };
 
-    struct AddToEventIndex
-    {
-        int valueToAdd;
-    };
-
     struct UpdateEvent
     {
         EventState eventState;
     };
 
     using TrackEventMessage =
-        std::variant<SyncEventIndex, InsertEvent, ClearEvents, RemoveEvent,
+        std::variant<InsertEvent, ClearEvents, RemoveEvent,
                      RemoveEventByIndex, RemoveDontDeleteFlag, UpdateEventTick,
-                     RemoveDoubles, AddToEventIndex,
+                     RemoveDoubles,
                      UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent>;
 } // namespace mpc::sequencer

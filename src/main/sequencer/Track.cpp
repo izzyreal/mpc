@@ -162,9 +162,47 @@ std::shared_ptr<TrackEventStateManager> Track::getEventStateManager()
     return eventStateManager;
 }
 
-void Track::syncEventIndex(const int currentTick, const int previousTick) const
+void Track::syncEventIndex(const int currentTick, const int previousTick)
 {
-    eventStateManager->enqueue(SyncEventIndex{currentTick, previousTick});
+    if (currentTick == 0)
+    {
+        playEventIndex = EventIndex(0);
+        return;
+    }
+
+    int startIndex = 0;
+
+    const auto snapshot = eventStateManager->getSnapshot();
+    const auto eventCount = snapshot.getEventCount();
+
+    if (currentTick > previousTick)
+    {
+        if (playEventIndex == eventCount)
+        {
+            return;
+        }
+
+        startIndex = playEventIndex;
+    }
+
+    if (currentTick < previousTick &&
+        playEventIndex == 0)
+    {
+        return;
+    }
+
+    auto result{EventIndex(eventCount)};
+
+    for (int i = startIndex; i < eventCount; i++)
+    {
+        if (snapshot.getEventByIndex(EventIndex(i)).tick >= currentTick)
+        {
+            result = EventIndex(i);
+            break;
+        }
+    }
+
+    playEventIndex = result;
 }
 
 void Track::setTrackIndex(const TrackIndex i)
@@ -298,9 +336,10 @@ void Track::removeEvent(const int i) const
     eventStateManager->enqueue(RemoveEventByIndex{EventIndex(i)});
 }
 
-void Track::removeEvents() const
+void Track::removeEvents()
 {
     eventStateManager->enqueue(ClearEvents{});
+    playEventIndex = EventIndex(0);
 }
 
 void Track::setVelocityRatio(int i)
@@ -522,7 +561,7 @@ void Track::processRealtimeQueuedEvents()
 
                 if (fixEventIndex)
                 {
-                    eventStateManager->enqueue(AddToEventIndex{-1});
+                    playEventIndex = playEventIndex - 1;
                 }
 
                 needsToBeRequeued = false;
@@ -543,27 +582,39 @@ void Track::processRealtimeQueuedEvents()
 int Track::getNextTick()
 {
     const auto snapshot = eventStateManager->getSnapshot();
-    const auto eventIndex = snapshot.getEventIndex();
 
-    if (eventIndex >= snapshot.getEventCount())
+    if (playEventIndex >= snapshot.getEventCount())
     {
         processRealtimeQueuedEvents();
         return std::numeric_limits<int>::max();
     }
 
     processRealtimeQueuedEvents();
-    return snapshot.getEventByIndex(eventIndex).tick;
+    return snapshot.getEventByIndex(playEventIndex).tick;
 }
 
 void Track::playNext()
 {
     const auto snapshot = eventStateManager->getSnapshot();
-    const auto eventIndex = snapshot.getEventIndex();
+    const auto eventCount = snapshot.getEventCount();
 
-    if (const auto eventCount = snapshot.getEventCount();
-        eventIndex >= eventCount)
+    if (playEventIndex >= eventCount)
     {
         return;
+    }
+
+    auto event = snapshot.getEventByIndex(playEventIndex);
+
+    while (event.tick < getTickPosition())
+    {
+        playEventIndex = playEventIndex + 1;
+
+        if (playEventIndex >= eventCount)
+        {
+            return;
+        }
+
+        event = snapshot.getEventByIndex(playEventIndex);
     }
 
     const auto recordingModeIsMulti = isRecordingModeMulti();
@@ -572,10 +623,10 @@ void Track::playNext()
                    (isActiveTrackIndex || recordingModeIsMulti) &&
                    trackIndex < 64;
 
+    const auto pos = getTickPosition();
+
     if (isRecording() && isPunchEnabled() && trackIndex < 64)
     {
-        const auto pos = getTickPosition();
-
         _delete = false;
 
         if (getAutoPunchMode() == 0 && pos >= getPunchInTime())
@@ -594,8 +645,6 @@ void Track::playNext()
             _delete = true;
         }
     }
-
-    const auto event = snapshot.getEventByIndex(eventIndex);
 
     if (event.type == EventType::NoteOn)
     {
@@ -699,18 +748,18 @@ void Track::playNext()
 
     if (_delete && !event.dontDelete)
     {
-        eventStateManager->enqueue(RemoveEventByIndex{eventIndex});
+        eventStateManager->enqueue(RemoveEventByIndex{playEventIndex});
         return;
     }
 
-    eventStateManager->enqueue(RemoveDontDeleteFlag{eventIndex});
+    eventStateManager->enqueue(RemoveDontDeleteFlag{playEventIndex});
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
         eventHandler->handleFinalizedEvent(event, this);
     }
 
-    eventStateManager->enqueue(AddToEventIndex{1});
+    playEventIndex = playEventIndex + 1;
 }
 
 bool Track::isOn() const

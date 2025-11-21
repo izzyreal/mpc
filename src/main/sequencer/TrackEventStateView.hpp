@@ -26,8 +26,6 @@ namespace mpc::sequencer
 
         int getEventCount() const;
 
-        EventIndex getEventIndex() const;
-
         std::vector<EventState> getNoteEvents() const;
 
         EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;

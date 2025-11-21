@@ -93,56 +93,10 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     events.emplace_back(m.eventState);
                     events.back().eventIndex = EventIndex(events.size() - 1);
                 }
-
-                activeState.eventIndex = activeState.eventIndex + 1;
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)
             {
                 activeState.events.clear();
-                activeState.eventIndex = EventIndex(0);
-            }
-            else if constexpr (std::is_same_v<T, AddToEventIndex>)
-            {
-                activeState.eventIndex = activeState.eventIndex + m.valueToAdd;
-            }
-            else if constexpr (std::is_same_v<T, SyncEventIndex>)
-            {
-                if (m.currentTick == 0)
-                {
-                    activeState.eventIndex = EventIndex(0);
-                    return;
-                }
-
-                int startIndex = 0;
-
-                if (m.currentTick > m.previousTick)
-                {
-                    if (activeState.eventIndex == activeState.events.size())
-                    {
-                        return;
-                    }
-
-                    startIndex = activeState.eventIndex;
-                }
-
-                if (m.currentTick < m.previousTick &&
-                    activeState.eventIndex == 0)
-                {
-                    return;
-                }
-
-                auto result{EventIndex(activeState.events.size())};
-
-                for (int i = startIndex; i < activeState.events.size(); i++)
-                {
-                    if (activeState.events[i].tick >= m.currentTick)
-                    {
-                        result = EventIndex(i);
-                        break;
-                    }
-                }
-
-                activeState.eventIndex = result;
             }
             else if constexpr (std::is_same_v<T, RemoveDoubles>)
             {

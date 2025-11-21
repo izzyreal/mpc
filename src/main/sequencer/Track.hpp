@@ -82,7 +82,7 @@ namespace mpc::sequencer
 
         std::string getActualName();
 
-        void syncEventIndex(int currentTick, int previousTick) const;
+        void syncEventIndex(int currentTick, int previousTick);
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
         void flushNoteCache() const;
@@ -117,7 +117,7 @@ namespace mpc::sequencer
 
         void removeEvent(int i) const;
         void removeEvent(const std::shared_ptr<Event> &event) const;
-        void removeEvents() const;
+        void removeEvents();
         void setVelocityRatio(int i);
         int getVelocityRatio() const;
         void setProgramChange(int i);
@@ -156,6 +156,7 @@ namespace mpc::sequencer
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
     private:
+        EventIndex playEventIndex{0};
         std::shared_ptr<TrackEventStateManager> eventStateManager;
         std::function<void(TrackEventMessage &&)> dispatch;
         BusType busType = BusType::DRUM1;
