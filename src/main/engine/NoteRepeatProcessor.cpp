@@ -85,9 +85,11 @@ void NoteRepeatProcessor::process(
             note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }
 
-        sequencer::EventState noteEvent;
+        EventState noteEvent;
         noteEvent.type = EventType::NoteOn;
+        noteEvent.noteNumber = note;
         noteEvent.tick = tickPosition;
+        noteEvent.trackIndex = track->getIndex();
 
         const bool isSliderNote =
             program && program->getSlider()->getNote() == note;
