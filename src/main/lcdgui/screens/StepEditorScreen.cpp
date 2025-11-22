@@ -275,7 +275,7 @@ void StepEditorScreen::function(int i)
                 auto track = sequencer->getSelectedTrack();
                 for (int e = 0; e < track->getEvents().size(); e++)
                 {
-                    if (track->getEvents()[e] == visibleEvents[rowIndex])
+                    if (eventsEqual(track->getEvents()[e], visibleEvents[rowIndex]))
                     {
                         track->removeEvent(e);
                         break;
