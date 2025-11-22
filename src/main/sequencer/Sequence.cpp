@@ -232,10 +232,11 @@ void Sequence::init(const int newLastBarIndex)
     addTempoChangeEvent(0, 1000);
     tempoTrackIsInitialized.store(true);
 
-    initLoop();
-
     setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.numerator,
                      userScreen->timeSig.denominator);
+
+    initLoop();
+
     used = true;
 }
 
