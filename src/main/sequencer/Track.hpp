@@ -109,7 +109,7 @@ namespace mpc::sequencer
         void finalizeNoteEventNonLive(const EventState &, Duration) const;
 
         void
-        addEvent(const sequencer::EventState &,
+        addEvent(const EventState &,
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
         void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,

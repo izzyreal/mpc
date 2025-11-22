@@ -327,7 +327,10 @@ void Track::addEvent(const EventState &event,
         setUsed(true);
     }
 
-    insertEvent(event, allowMultipleNoteEventsWithSameNoteOnSameTick);
+    EventState eventToInsert = event;
+    eventToInsert.trackIndex = trackIndex;
+
+    insertEvent(eventToInsert, allowMultipleNoteEventsWithSameNoteOnSameTick);
 }
 
 void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,

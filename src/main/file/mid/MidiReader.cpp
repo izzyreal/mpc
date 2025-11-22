@@ -17,11 +17,10 @@
 #include "file/mid/event/meta/Text.hpp"
 #include "file/mid/event/meta/TimeSignatureEvent.hpp"
 #include "file/mid/event/meta/TrackName.hpp"
+
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
 
 using namespace mpc::file::mid;
 using namespace mpc::file::mid::event;
@@ -402,27 +401,31 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<NoteAftertouch>(me.lock());
                      noteAfterTouch)
             {
-                // auto ppe = std::make_shared<PolyPressureEvent>();
-                // track->addEvent(noteAfterTouch->getTick(), ppe);
-                // ppe->setNote(noteAfterTouch->getNoteValue());
-                // ppe->setAmount(noteAfterTouch->getAmount());
+                EventState e;
+                e.type = EventType::PolyPressure;
+                e.tick = noteAfterTouch->getTick();
+                e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
+                e.amount = noteAfterTouch->getAmount();
+                track->addEvent(e);
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
                              me.lock());
                      channelAfterTouch)
             {
-                // auto cpe = std::make_shared<ChannelPressureEvent>();
-                // track->addEvent(channelAfterTouch->getTick(), cpe);
-                // cpe->setAmount(channelAfterTouch->getAmount());
+                EventState e;
+                e.type = EventType::ChannelPressure;
+                e.amount = channelAfterTouch->getAmount();
+                track->addEvent(e);
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
                      programChange)
             {
-                // auto pce = std::make_shared<ProgramChangeEvent>();
-                // track->addEvent(programChange->getTick(), pce);
-                // pce->setProgram(programChange->getProgramNumber() + 1);
+                EventState e;
+                e.type = EventType::ProgramChange;
+                e.programChangeProgramIndex = ProgramIndex(programChange->getProgramNumber());
+                track->addEvent(e);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
@@ -434,19 +437,20 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<Controller>(me.lock());
                      controller)
             {
-                // auto cce = std::make_shared<ControlChangeEvent>();
-                // track->addEvent(controller->getTick(), cce);
-                // cce->setController(controller->getControllerType());
-                // cce->setAmount(controller->getValue());
+                EventState e;
+                e.type = EventType::ControlChange;
+                e.controllerNumber = controller->getControllerType();
+                e.controllerValue = controller->getValue();
+                track->addEvent(e);
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
                      pitchBend)
             {
-                // auto pbe = std::make_shared<PitchBendEvent>();
-                // track->addEvent(pitchBend->getTick(), pbe);
-                // pbe->setAmount(pitchBend->getBendAmount() - 8192);
-            }
+                EventState e;
+                e.type = EventType::PitchBend;
+                e.amount = pitchBend->getBendAmount();
+                track->addEvent(e);            }
         }
     }
 }
