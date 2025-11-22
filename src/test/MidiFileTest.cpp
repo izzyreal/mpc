@@ -5,10 +5,11 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 #include <vector>
 
@@ -33,9 +34,16 @@ SCENARIO("A MidiFile can be written", "[file]")
         track0->setUsed(true);
         track0->setDeviceIndex(2);
 
-        auto noteEvent =
-            track0->recordNoteEventNonLive(0, NoteNumber(37), Velocity(127));
-        noteEvent->setDuration(10);
+
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = 0;
+        eventState.noteNumber = NoteNumber(37);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(10);
+        track0->insertEvent(eventState);
+
+        track0->getEventStateManager()->drainQueue();
 
         MidiWriter midiWriter(sequence.get());
         auto ostream = std::make_shared<std::ostringstream>();

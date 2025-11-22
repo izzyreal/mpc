@@ -95,7 +95,7 @@ namespace mpc::sequencer
             const std::function<void()> &onComplete = [] {});
 
         EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
-                                          int64_t metronomeOnlyTick);
+                                          int64_t metronomeOnlyTick = 0);
 
         EventState recordNoteEventLive(NoteNumber, Velocity);
 

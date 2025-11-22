@@ -105,13 +105,13 @@ namespace mpc::sequencer
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
+        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
         std::shared_ptr<performance::PerformanceManager> performanceManager;
-        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;

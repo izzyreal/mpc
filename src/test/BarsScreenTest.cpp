@@ -1,12 +1,15 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/BarsScreen.hpp"
+
+#include "sequencer/Event.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -26,13 +29,17 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = MaxVelocity;
+        eventState.duration = Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
@@ -70,13 +77,17 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = MaxVelocity;
+        eventState.duration = Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
@@ -92,9 +103,16 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto e = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        toSeq->getTrack(0)->insertEventWhileRetainingSort(e, i * 24);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = i*24;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = MaxVelocity;
+        eventState.duration = Duration(42);
+        tr->insertEvent(eventState);
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
     expectedBarCount += toSeq->getLastBarIndex() + 1;

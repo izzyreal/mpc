@@ -1,6 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
 #include "IntTypes.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
@@ -20,10 +19,10 @@ using namespace mpc::lcdgui;
 TEST_CASE("Direct to disk recording does not start with silence",
           "[direct-to-disk-recording]")
 {
-    const int BUFFER_SIZE = 512;
-    const int SAMPLE_RATE = 44100;
-    const int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
-    const int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
+    constexpr int BUFFER_SIZE = 512;
+    constexpr int SAMPLE_RATE = 44100;
+    constexpr int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
+    constexpr int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -40,14 +39,18 @@ TEST_CASE("Direct to disk recording does not start with silence",
     sound->setStart(0);
     sound->setEnd(1000);
 
-    mpc.getSampler()->getProgram(0)->getNoteParameters(35)->setSoundIndex(0);
+    mpc.getSampler()->getProgram(0)->getNoteParameters(mpc::MinDrumNoteNumber)->setSoundIndex(0);
 
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);
     seq->setInitialTempo(300);
-    auto event = seq->getTrack(0)->recordNoteEventNonLive(
-        0, mpc::NoteNumber(35), mpc::Velocity(127));
-    event->finalizeNonLive(1);
+    mpc::sequencer::EventState eventState;
+    eventState.type = mpc::sequencer::EventType::NoteOn;
+    eventState.tick = 0;
+    eventState.noteNumber = mpc::MinDrumNoteNumber;
+    eventState.velocity = mpc::MaxVelocity;
+    eventState.duration = mpc::Duration(1);
+    seq->getTrack(0)->insertEvent(eventState);
 
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);

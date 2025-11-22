@@ -1,12 +1,16 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
+
+#include "sequencer/Event.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/SequenceStateManager.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -32,13 +36,17 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -55,16 +63,16 @@ TEST_CASE("COPY1", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
+    tr->getEventStateManager()->drainQueue();
+
     REQUIRE(tr->getEvents().size() == 16);
 
     tickPos = 0;
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent =
-            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
-        REQUIRE(noteEvent->getTick() == tickPos);
-        REQUIRE(noteEvent->getNote() == 35 + (i % 8));
+        REQUIRE(tr->getEvent(i)->getTick() == tickPos);
+        REQUIRE(tr->getNoteEvents()[i]->getNote() == 35 + (i % 8));
         tickPos += 24;
     }
 }
@@ -87,13 +95,17 @@ TEST_CASE("COPY2", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -109,6 +121,8 @@ TEST_CASE("COPY2", "[events-screen]")
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
+
+    tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -145,13 +159,17 @@ TEST_CASE("COPY3", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     assert(tr->getEvents().size() == 8);
 
@@ -169,6 +187,8 @@ TEST_CASE("COPY3", "[events-screen]")
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
+
+    tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -223,11 +243,15 @@ TEST_CASE("COPY4", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
+    seq->getStateManager()->drainQueue();
+
+    auto seqSnapshot = seq->getStateManager()->getSnapshot();
+
     REQUIRE(seq->getLastTick() == 384 + 288 + 288 + 288);
-    REQUIRE(seq->getBarLengthsInTicks()[0] == 384);
-    REQUIRE(seq->getBarLengthsInTicks()[1] == 288);
-    REQUIRE(seq->getBarLengthsInTicks()[2] == 288);
-    REQUIRE(seq->getBarLengthsInTicks()[3] == 288);
+    REQUIRE(seqSnapshot.getBarLength(0) == 384);
+    REQUIRE(seqSnapshot.getBarLength(1) == 288);
+    REQUIRE(seqSnapshot.getBarLength(2) == 288);
+    REQUIRE(seqSnapshot.getBarLength(3) == 288);
 }
 
 TEST_CASE("COPY5", "[events-screen]")
@@ -249,13 +273,17 @@ TEST_CASE("COPY5", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -271,6 +299,8 @@ TEST_CASE("COPY5", "[events-screen]")
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
+
+    tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -305,13 +335,17 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::make_shared<NoteOnEvent>(NoteNumber(35 + i));
-        noteEvent->setVelocity(Velocity(127));
-        noteEvent->setDuration(42);
-        noteEvent->setTick(tickPos);
-        tr->insertEventWhileRetainingSort(noteEvent);
+        EventState eventState;
+        eventState.type = EventType::NoteOn;
+        eventState.tick = tickPos;
+        eventState.noteNumber = NoteNumber(35 + i);
+        eventState.velocity = mpc::MaxVelocity;
+        eventState.duration = mpc::Duration(42);
+        tr->insertEvent(eventState);
         tickPos += 24;
     }
+
+    tr->getEventStateManager()->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -327,6 +361,8 @@ TEST_CASE("COPY6", "[events-screen]")
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
+
+    tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 24);
 

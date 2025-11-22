@@ -4,13 +4,14 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file::all;
@@ -29,7 +30,7 @@ void deleteTestAllFile(const std::shared_ptr<AbstractDisk> &disk)
     {
         if (disk->getFileName(i) == filename)
         {
-            disk->getFile(i)->del();
+            (void) disk->getFile(i)->del();
             disk->flush();
             disk->initFiles();
             break;
@@ -39,8 +40,8 @@ void deleteTestAllFile(const std::shared_ptr<AbstractDisk> &disk)
 
 void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 {
-    auto disk = mpc.getDisk();
-    auto f = disk->newFile(filename);
+    const auto disk = mpc.getDisk();
+    const auto f = disk->newFile(filename);
 
     AllParser allParser(mpc);
     auto bytes = allParser.getBytes();
@@ -136,15 +137,12 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
-    auto event =
-        tr->recordNoteEventNonLive(0, mpc::NoteNumber(60), mpc::Velocity(127));
-    event->setNote(mpc::NoteNumber(0));
-    event->setTrack(tr->getIndex());
-    event->setVelocity(mpc::Velocity(127));
-    event->setDuration(1600);
-    event->setTick(0);
-    event->setVariationType(3);
-    event->setVariationValue(20);
+
+    auto e = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60), mpc::Velocity(127), 0);
+    tr->finalizeNoteEventNonLive(e, mpc::Duration(1600));
+    tr->getNoteEvents().front()->setVariationType(mpc::NoteVariationTypeFilter);
+    tr->getNoteEvents().front()->setVariationValue(mpc::NoteVariationValue(20));
+    tr->getEventStateManager()->drainQueue();
 
     auto disk = mpc.getDisk();
 
