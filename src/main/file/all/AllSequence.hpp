@@ -21,9 +21,8 @@ namespace mpc::file::all
 
 namespace mpc::file::all
 {
-    class AllSequence
+    class AllSequence final
     {
-
     public:
         static constexpr int MAX_SYSEX_SIZE{256};
         static constexpr int EVENT_ID_OFFSET{4};
@@ -107,14 +106,14 @@ namespace mpc::file::all
     public:
         static int
         getNumberOfEventSegmentsForThisSeq(const std::vector<char> &seqBytes);
-        virtual int getEventAmount();
+        int getEventAmount();
 
     private:
         static int getSegmentCount(sequencer::Sequence *seq);
         void setUnknown32BitInt(const sequencer::Sequence *seq);
         void setBarCount(int i);
-        std::vector<char>
-        createEventSegmentsChunk(sequencer::Sequence *seq) const;
+        static std::vector<char>
+        createEventSegmentsChunk(sequencer::Sequence *seq);
         void setTempoDouble(double tempoForSaveBytes);
         void setLastTick(const sequencer::Sequence *seq);
 
@@ -123,7 +122,7 @@ namespace mpc::file::all
 
         void applyToMpcSeq(const std::shared_ptr<sequencer::Sequence> &mpcSeq);
 
-        AllSequence(const std::vector<char> &bytes);
+        explicit AllSequence(const std::vector<char> &bytes);
         AllSequence(sequencer::Sequence *seq, int number);
         ~AllSequence();
     };

@@ -18,7 +18,7 @@ using namespace mpc::sequencer;
 
 std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE{0, 3};
 
-mpc::sequencer::EventState
+EventState
 AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     if (const auto eventID = bytes[EVENT_ID_OFFSET]; eventID < 0)
@@ -44,36 +44,36 @@ AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return AllNoteOnEvent::bytesToMpcEvent(bytes);
 }
 
-std::vector<char> AllEvent::mpcEventToBytes(const sequencer::EventState &e)
+std::vector<char> AllEvent::mpcEventToBytes(const EventState &e)
 {
     assert(e.type != sequencer::EventType::NoteOff);
 
-    if (e.type == sequencer::EventType::NoteOn)
+    if (e.type == EventType::NoteOn)
     {
         return AllNoteOnEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::PolyPressure)
+    if (e.type == EventType::PolyPressure)
     {
         return AllPolyPressureEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::ControlChange)
+    if (e.type == EventType::ControlChange)
     {
         return AllControlChangeEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::ProgramChange)
+    if (e.type == EventType::ProgramChange)
     {
         return AllProgramChangeEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::ChannelPressure)
+    if (e.type == EventType::ChannelPressure)
     {
         return AllChannelPressureEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::PitchBend)
+    if (e.type == EventType::PitchBend)
     {
         return AllPitchBendEvent::mpcEventToBytes(e);
     }
-    if (e.type == sequencer::EventType::SystemExclusive ||
-        e.type == sequencer::EventType::Mixer)
+    if (e.type == EventType::SystemExclusive ||
+        e.type == EventType::Mixer)
     {
         return AllSysExEvent::mpcEventToBytes(e);
     }

@@ -6,7 +6,7 @@ EmptyEvent::EmptyEvent()
     : Event(
           []
           {
-              return EventState();
+              return std::pair{NoEventIndex, EventState()};
           },
           [](TrackEventMessage &&) {})
 {

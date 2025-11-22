@@ -470,7 +470,7 @@ void AllSequence::setBarCount(const int i)
     saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
 
-std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
+std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq)
 {
     std::vector<std::vector<char>> ea;
 
@@ -483,13 +483,13 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq) const
                 break;
             }
 
-            for (auto &event : track->getEvents())
+            for (const auto &event : track->getEvents())
             {
                 if (event->getTick() == i)
                 {
                     event->setTrack(track->getIndex());
                     ea.push_back(
-                        AllEvent::mpcEventToBytes(event->getSnapshot()));
+                        AllEvent::mpcEventToBytes(event->getSnapshot().second));
                 }
             }
         }

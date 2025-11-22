@@ -143,7 +143,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     if (recordedNoteOnEventId != NoNoteEventId)
     {
         sequencerRecordNoteOnEvent =
-            track->findRecordingNoteOnEventById(recordedNoteOnEventId);
+            track->findRecordingNoteOnEventById(recordedNoteOnEventId).second;
     }
 
     const auto stepEditOptionsScreen =

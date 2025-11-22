@@ -11,7 +11,7 @@ namespace mpc::sequencer
     {
     public:
         explicit Event(
-            const std::function<EventState()> &getSnapshot,
+            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
         Event(const Event &);
 
@@ -24,7 +24,7 @@ namespace mpc::sequencer
 
         virtual std::string getTypeName() const = 0;
 
-        std::function<EventState()> getSnapshot;
+        std::function<std::pair<EventIndex, EventState>()> getSnapshot;
         std::function<void(TrackEventMessage &&)> dispatch;
     };
 } // namespace mpc::sequencer

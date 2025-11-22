@@ -11,7 +11,6 @@ namespace mpc::sequencer
         EventType type;
         SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
-        EventIndex eventIndex;
         Tick tick;
 
         // === RECORD SECTION ===
@@ -67,8 +66,6 @@ namespace mpc::sequencer
             sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
 
-            eventIndex = NoEventIndex;
-
             tick = NoTick;
 
             noteNumber = NoNoteNumber;
@@ -85,7 +82,7 @@ namespace mpc::sequencer
         {
             return type == other.type && sequenceIndex == other.sequenceIndex &&
                    trackIndex == other.trackIndex &&
-                   eventIndex == other.eventIndex && tick == other.tick &&
+                   tick == other.tick &&
                    noteNumber == other.noteNumber &&
                    noteEventId == other.noteEventId &&
                    beingRecorded == other.beingRecorded &&

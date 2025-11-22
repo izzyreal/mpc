@@ -15,22 +15,22 @@ namespace mpc::sequencer
         explicit TrackEventStateView(
             const std::shared_ptr<const TrackEventState> &s) noexcept;
 
-        std::optional<EventState> findNoteEvent(int tick,
+        std::optional<std::pair<EventIndex, EventState>> findNoteEvent(int tick,
                                                 NoteNumber note) const;
 
         EventState getEventByIndex(EventIndex) const;
 
-        std::vector<EventState> getEventRange(int startTick, int endTick) const;
+        std::vector<std::pair<EventIndex, EventState>> getEventRange(int startTick, int endTick) const;
 
         bool isEventsEmpty() const;
 
         int getEventCount() const;
 
-        std::vector<EventState> getNoteEvents() const;
+        std::vector<std::pair<EventIndex, EventState>> getNoteEvents() const;
 
-        EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
+        std::pair<EventIndex, EventState> findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
-        EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
+        std::pair<EventIndex, EventState> findRecordingNoteOnByNoteEventId(NoteEventId) const;
 
     private:
         const std::shared_ptr<const TrackEventState> state;

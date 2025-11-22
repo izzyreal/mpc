@@ -10,15 +10,16 @@ TrackEventStateView::TrackEventStateView(
 {
 }
 
-std::optional<EventState>
+std::optional<std::pair<mpc::EventIndex, EventState>>
 TrackEventStateView::findNoteEvent(const int tick, const NoteNumber note) const
 {
-    for (auto &e : state->events)
+    for (int i = 0; i < state->events.size(); ++i)
     {
-        if (e.type == EventType::NoteOn && e.tick == tick &&
-            e.noteNumber == note)
+        if (const auto &e = state->events[i]; e.type == EventType::NoteOn &&
+                                              e.tick == tick &&
+                                              e.noteNumber == note)
         {
-            return e;
+            return {{EventIndex(i), e}};
         }
     }
 
@@ -34,20 +35,21 @@ EventState TrackEventStateView::getEventByIndex(const EventIndex idx) const
     return {};
 }
 
-std::vector<EventState>
+std::vector<std::pair<mpc::EventIndex, EventState>>
 TrackEventStateView::getEventRange(const int startTick, const int endTick) const
 {
-    std::vector<EventState> result;
+    std::vector<std::pair<EventIndex, EventState>> result;
 
-    for (auto &e : state->events)
+    for (int i = 0; i < state->events.size(); ++i)
     {
+        auto &e = state->events[i];
         if (e.tick > endTick)
         {
             break;
         }
         if (e.tick >= startTick && e.tick <= endTick)
         {
-            result.push_back(e);
+            result.push_back({EventIndex(i), e});
         }
     }
 
@@ -64,27 +66,28 @@ int TrackEventStateView::getEventCount() const
     return state->events.size();
 }
 
-std::vector<EventState> TrackEventStateView::getNoteEvents() const
+std::vector<std::pair<mpc::EventIndex, EventState>> TrackEventStateView::getNoteEvents() const
 {
-    std::vector<EventState> result;
+    std::vector<std::pair<EventIndex, EventState>> result;
 
-    for (auto &e : state->events)
+    for (int i = 0; i < state->events.size(); ++i)
     {
-        if (e.type == EventType::NoteOn)
+        if (auto &e = state->events[i]; e.type == EventType::NoteOn)
         {
-            result.push_back(e);
+            result.push_back({EventIndex(i), e});
         }
     }
 
     return result;
 }
 
-EventState TrackEventStateView::findRecordingNoteOnByNoteNumber(
+std::pair<mpc::EventIndex, EventState> TrackEventStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.noteNumber == noteNumber && e.beingRecorded)
+        if (e.second.noteNumber == noteNumber &&
+            e.second.beingRecorded)
         {
             return e;
         }
@@ -92,12 +95,13 @@ EventState TrackEventStateView::findRecordingNoteOnByNoteNumber(
     return {};
 }
 
-EventState TrackEventStateView::findRecordingNoteOnByNoteEventId(
+std::pair<mpc::EventIndex, EventState> TrackEventStateView::findRecordingNoteOnByNoteEventId(
     const NoteEventId id) const
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.noteEventId == id && e.beingRecorded)
+        if (e.second.noteEventId == id &&
+            e.second.beingRecorded)
         {
             return e;
         }

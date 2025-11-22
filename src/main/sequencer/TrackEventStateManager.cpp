@@ -7,21 +7,6 @@ TrackEventStateManager::TrackEventStateManager()
 {
 }
 
-void moveEvent(std::vector<EventState> &v, const size_t oldIndex,
-               const size_t newIndex)
-{
-    if (oldIndex > newIndex)
-    {
-        std::rotate(v.rend() - oldIndex - 1, v.rend() - oldIndex,
-                    v.rend() - newIndex);
-    }
-    else
-    {
-        std::rotate(v.begin() + oldIndex, v.begin() + oldIndex + 1,
-                    v.begin() + newIndex + 1);
-    }
-}
-
 void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
 {
     std::visit(
@@ -37,14 +22,21 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, FinalizeNonLiveNoteEvent>)
             {
-                activeState.events[m.noteOnEvent.eventIndex].duration =
-                    m.duration;
-                activeState.events[m.noteOnEvent.eventIndex].beingRecorded =
-                    false;
+                for (auto &e : activeState.events)
+                {
+                    if (e.beingRecorded &&
+                        e.duration == NoDuration &&
+                        e.noteNumber == m.noteOnEvent.noteNumber)
+                    {
+                        e.duration = m.duration;
+                        e.beingRecorded = false;
+                        break;
+                    }
+                }
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
-                activeState.events[m.eventState.eventIndex] = m.eventState;
+                activeState.events[m.payload.first] = m.payload.second;
             }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
@@ -82,21 +74,16 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     if (insertAt == events.end())
                     {
                         events.emplace_back(m.eventState);
-                        events.back().eventIndex =
-                            EventIndex(events.size() - 1);
                     }
                     else
                     {
                         auto insertedEvent =
                             events.emplace(insertAt, m.eventState);
-                        insertedEvent->eventIndex =
-                            EventIndex(insertAt - events.begin());
                     }
                 }
                 else
                 {
                     events.emplace_back(m.eventState);
-                    events.back().eventIndex = EventIndex(events.size() - 1);
                 }
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)
@@ -155,53 +142,33 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
-                int currentIndex = -1;
-                int newIndex = -1;
+                auto& events = activeState.events;
 
-                bool higherOneExists = false;
+                const int oldIndex = m.eventIndex;
+                const Tick newTick = m.newTick;
 
-                auto &events = activeState.events;
+                // Extract the event
+                EventState ev = events[oldIndex];
+                events.erase(events.begin() + oldIndex);
 
-                for (int i = 0; i < events.size(); i++)
-                {
-                    if (currentIndex >= 0 && newIndex >= 0)
-                    {
-                        break;
-                    }
+                // Find the first element with tick > newTick
+                auto it = std::lower_bound(
+                    events.begin(),
+                    events.end(),
+                    newTick,
+                    [](const EventState& e, Tick t) { return e.tick < t; }
+                );
 
-                    if (events[i] == m.eventState)
-                    {
-                        currentIndex = i;
-                        continue;
-                    }
+                // Insert at the right place
+                events.insert(it, ev);
 
-                    if (newIndex == -1 && events[i].tick > m.newTick)
-                    {
-                        higherOneExists = true;
-                        newIndex = i - 1;
-                    }
-                }
-
-                if (!higherOneExists)
-                {
-                    newIndex = events.size() - 1;
-                }
-
-                moveEvent(events, currentIndex, newIndex);
-
-                events[newIndex].tick = m.newTick;
+                // Update the tick after insertion
+                events[it - events.begin()].tick = newTick;
             }
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
-                for (auto it = activeState.events.begin();
-                     it != activeState.events.end(); ++it)
-                {
-                    if (*it == m.eventState)
-                    {
-                        activeState.events.erase(it);
-                        break;
-                    }
-                }
+                assert(m.eventIndex < activeState.events.size());
+                activeState.events.erase(activeState.events.begin() + m.eventIndex);
             }
             else if constexpr (std::is_same_v<T, RemoveEventByIndex>)
             {

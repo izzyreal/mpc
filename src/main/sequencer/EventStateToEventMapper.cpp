@@ -17,88 +17,51 @@ namespace mpc::sequencer
     std::shared_ptr<Event> mapEventStateToEvent(
         const EventState &e,
         const std::function<void(TrackEventMessage &&)> &dispatch,
-        Sequence *parent)
+        const EventIndex eventIndex, Sequence *parent)
     {
+        auto getSnapshot = [eventIndex, e]
+        {
+            return std::pair{eventIndex, e};
+        };
+
         if (e.type == EventType::NoteOn)
         {
-            return std::make_shared<NoteOnEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<NoteOnEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::ChannelPressure)
         {
-            return std::make_shared<ChannelPressureEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<ChannelPressureEvent>(getSnapshot,
+                                                          dispatch);
         }
         if (e.type == EventType::ControlChange)
         {
-            return std::make_shared<ControlChangeEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<ControlChangeEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::Mixer)
         {
-            return std::make_shared<MixerEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<MixerEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::PitchBend)
         {
-            return std::make_shared<PitchBendEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<PitchBendEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::PolyPressure)
         {
-            return std::make_shared<PolyPressureEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<PolyPressureEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::SystemExclusive)
         {
-            return std::make_shared<SystemExclusiveEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<SystemExclusiveEvent>(getSnapshot,
+                                                          dispatch);
         }
         if (e.type == EventType::ProgramChange)
         {
-            return std::make_shared<ProgramChangeEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch);
+            return std::make_shared<ProgramChangeEvent>(getSnapshot, dispatch);
         }
         if (e.type == EventType::TempoChange)
         {
-            return std::make_shared<TempoChangeEvent>(
-                [e]
-                {
-                    return e;
-                },
-                dispatch, parent);
+            return std::make_shared<TempoChangeEvent>(getSnapshot, dispatch,
+                                                      parent);
         }
         return {};
     }

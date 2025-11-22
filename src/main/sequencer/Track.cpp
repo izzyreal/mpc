@@ -93,25 +93,25 @@ void Track::purge()
         std::make_shared<moodycamel::ConcurrentQueue<EventState>>(20);
 }
 
-EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
+std::pair<mpc::EventIndex, EventState> Track::findRecordingNoteOnEventById(const NoteEventId id)
 {
-    EventState found;
-    EventState e;
+    std::pair found{NoEventIndex, EventState()};
+    std::pair e{NoEventIndex, EventState()};
 
     size_t count = 0;
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
+    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e.second))
     {
-        if (e.noteEventId == id)
+        if (e.second.noteEventId == id)
         {
             found = e;
             foundInQueue = true;
         }
 
-        assert(e.beingRecorded);
-        bulkNoteOns[count++] = e;
+        assert(e.second.beingRecorded);
+        bulkNoteOns[count++] = e.second;
     }
 
     for (size_t i = 0; i < count; i++)
@@ -129,25 +129,25 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
     return found;
 }
 
-EventState
+std::pair<mpc::EventIndex, EventState>
 Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
-    EventState found;
-    EventState e;
+    std::pair found{NoEventIndex, EventState()};
+    std::pair e{NoEventIndex, EventState()};
 
     size_t count = 0;
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
+    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e.second))
     {
-        if (e.beingRecorded && e.noteNumber == noteNumber)
+        if (e.second.beingRecorded && e.second.noteNumber == noteNumber)
         {
             found = e;
             foundInQueue = true;
         }
 
-        bulkNoteOns[count++] = e;
+        bulkNoteOns[count++] = e.second;
     }
 
     for (size_t i = 0; i < count; i++)
@@ -251,7 +251,7 @@ void Track::setOn(const bool b)
 
 void Track::removeEvent(const std::shared_ptr<Event> &event) const
 {
-    eventStateManager->enqueue(RemoveEvent{event->getSnapshot()});
+    eventStateManager->enqueue(RemoveEvent{event->getSnapshot().first});
 }
 
 EventState Track::recordNoteEventLive(const NoteNumber note,
@@ -285,15 +285,16 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
                                          const Velocity velocity,
                                          const int64_t metronomeOnlyTick)
 {
-    if (auto noteEvent =
+    if (auto result =
             eventStateManager->getSnapshot().findNoteEvent(tick, note))
     {
-        noteEvent->beingRecorded = true;
-        noteEvent->velocity = velocity;
-        noteEvent->duration = NoDuration;
-        noteEvent->metronomeOnlyTickPosition = metronomeOnlyTick;
-        dispatch(UpdateEvent{*noteEvent});
-        return *noteEvent;
+        auto &[eventIndex, noteEvent] = *result;
+        noteEvent.beingRecorded = true;
+        noteEvent.velocity = velocity;
+        noteEvent.duration = NoDuration;
+        noteEvent.metronomeOnlyTickPosition = metronomeOnlyTick;
+        dispatch(UpdateEvent{{eventIndex, noteEvent}});
+        return noteEvent;
     }
 
     const auto noteEventIdToUse = nextNoteEventId;
@@ -333,10 +334,10 @@ void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
                                 const int tick,
                                 const bool allowMultipleNotesOnSameTick)
 {
-    EventState event = src->getSnapshot();
-    event.tick = tick;
-    event.trackIndex = trackIndex;
-    insertEvent(event, allowMultipleNotesOnSameTick);
+    auto event = src->getSnapshot();
+    event.second.tick = tick;
+    event.second.trackIndex = trackIndex;
+    insertEvent(event.second, allowMultipleNotesOnSameTick);
 }
 
 void Track::removeEvent(const int i) const
@@ -410,7 +411,7 @@ std::shared_ptr<Event> Track::getEvent(const int i) const
 {
     const auto eventState =
         eventStateManager->getSnapshot().getEventByIndex(EventIndex(i));
-    return mapEventStateToEvent(eventState, dispatch, parent);
+    return mapEventStateToEvent(eventState, dispatch, EventIndex(i), parent);
 }
 
 void Track::setName(const std::string &s)
@@ -438,7 +439,7 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
     for (int i = 0; i < eventCount; ++i)
     {
         auto event = mapEventStateToEvent(
-            snapshot.getEventByIndex(EventIndex(i)), dispatch, parent);
+            snapshot.getEventByIndex(EventIndex(i)), dispatch, EventIndex(i), parent);
         result.emplace_back(event);
     }
 
@@ -785,7 +786,7 @@ Track::getEventRange(const int startTick, const int endTick) const
     for (const auto &e :
          eventStateManager->getSnapshot().getEventRange(startTick, endTick))
     {
-        result.emplace_back(mapEventStateToEvent(e, dispatch, parent));
+        result.emplace_back(mapEventStateToEvent(e.second, dispatch, e.first, parent));
     }
     return result;
 }
@@ -823,13 +824,13 @@ void Track::correctTimeRange(const int startPos, const int endPos,
 
     for (auto &event : eventStateManager->getSnapshot().getNoteEvents())
     {
-        if (event.tick >= endPos)
+        if (event.second.tick >= endPos)
         {
             break;
         }
 
-        if (event.tick >= startPos && event.tick < endPos &&
-            event.noteNumber >= lowestNote && event.noteNumber <= highestNote)
+        if (event.second.tick >= startPos && event.second.tick < endPos &&
+            event.second.noteNumber >= lowestNote && event.second.noteNumber <= highestNote)
         {
             timingCorrect(fromBar, toBar, event, stepLength, swingPercentage);
         }
@@ -839,10 +840,10 @@ void Track::correctTimeRange(const int startPos, const int endPos,
 }
 
 void Track::timingCorrect(const int fromBar, const int toBar,
-                          const EventState &noteEvent, const int stepLength,
+                          const std::pair<EventIndex, EventState> &noteEvent, const int stepLength,
                           const int swingPercentage) const
 {
-    updateEventTick(noteEvent, timingCorrectTick(fromBar, toBar, noteEvent.tick,
+    updateEventTick(noteEvent, timingCorrectTick(fromBar, toBar, noteEvent.second.tick,
                                                  stepLength, swingPercentage));
 }
 
@@ -939,14 +940,14 @@ void Track::removeDoubles() const
     eventStateManager->enqueue(RemoveDoubles{});
 }
 
-void Track::updateEventTick(const EventState &e, const int newTick) const
+void Track::updateEventTick(const std::pair<EventIndex, EventState> &e, const int newTick) const
 {
-    if (e.tick == newTick)
+    if (e.second.tick == newTick)
     {
         return;
     }
 
-    eventStateManager->enqueue(UpdateEventTick{e, newTick});
+    eventStateManager->enqueue(UpdateEventTick{e.first, newTick});
 }
 
 std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
@@ -956,7 +957,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     for (auto &e : eventStateManager->getSnapshot().getNoteEvents())
     {
         result.emplace_back(std::dynamic_pointer_cast<NoteOnEvent>(
-            mapEventStateToEvent(e, dispatch, parent)));
+            mapEventStateToEvent(e.second, dispatch, e.first, parent)));
     }
 
     return result;
