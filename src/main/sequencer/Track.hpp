@@ -89,10 +89,10 @@ namespace mpc::sequencer
         void setUsed(bool b);
         void setOn(bool b);
 
-        void
-        insertEvent(const EventState &event,
-                    bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
-            const std::function<void()> &onComplete = []{});
+        void insertEvent(
+            const EventState &event,
+            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
+            const std::function<void()> &onComplete = [] {});
 
         EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick);
@@ -143,9 +143,11 @@ namespace mpc::sequencer
 
         void purge();
 
-        std::pair<EventIndex, EventState> findRecordingNoteOnEventById(NoteEventId);
+        std::pair<EventIndex, EventState>
+            findRecordingNoteOnEventById(NoteEventId);
 
-        std::pair<EventIndex, EventState> findRecordingNoteOnEventByNoteNumber(NoteNumber);
+        std::pair<EventIndex, EventState>
+            findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
@@ -195,7 +197,8 @@ namespace mpc::sequencer
         std::vector<EventState> bulkNoteOns;
         std::vector<EventState> bulkNoteOffs;
 
-        void updateEventTick(const std::pair<EventIndex, EventState> &e, int newTick) const;
+        void updateEventTick(const std::pair<EventIndex, EventState> &e,
+                             int newTick) const;
 
         void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;

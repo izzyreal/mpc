@@ -26,4 +26,3 @@ void SequenceStateManager::applyMessage(const SequenceMessage &msg) noexcept
         },
         msg);
 }
-

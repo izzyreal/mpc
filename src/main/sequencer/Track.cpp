@@ -94,7 +94,8 @@ void Track::purge()
         std::make_shared<moodycamel::ConcurrentQueue<EventState>>(20);
 }
 
-std::pair<mpc::EventIndex, EventState> Track::findRecordingNoteOnEventById(const NoteEventId id)
+std::pair<mpc::EventIndex, EventState>
+Track::findRecordingNoteOnEventById(const NoteEventId id)
 {
     std::pair found{NoEventIndex, EventState()};
     std::pair e{NoEventIndex, EventState()};
@@ -103,7 +104,8 @@ std::pair<mpc::EventIndex, EventState> Track::findRecordingNoteOnEventById(const
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e.second))
+    while (count < bulkNoteOns.size() &&
+           queuedNoteOnEvents->try_dequeue(e.second))
     {
         if (e.second.noteEventId == id)
         {
@@ -140,7 +142,8 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e.second))
+    while (count < bulkNoteOns.size() &&
+           queuedNoteOnEvents->try_dequeue(e.second))
     {
         if (e.second.beingRecorded && e.second.noteNumber == noteNumber)
         {
@@ -418,8 +421,9 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
 
     for (int i = 0; i < eventCount; ++i)
     {
-        auto event = mapEventStateToEvent(
-            snapshot.getEventByIndex(EventIndex(i)), dispatch, EventIndex(i), parent);
+        auto event =
+            mapEventStateToEvent(snapshot.getEventByIndex(EventIndex(i)),
+                                 dispatch, EventIndex(i), parent);
         result.emplace_back(event);
     }
 
@@ -766,7 +770,8 @@ Track::getEventRange(const int startTick, const int endTick) const
     for (const auto &e :
          eventStateManager->getSnapshot().getEventRange(startTick, endTick))
     {
-        result.emplace_back(mapEventStateToEvent(e.second, dispatch, e.first, parent));
+        result.emplace_back(
+            mapEventStateToEvent(e.second, dispatch, e.first, parent));
     }
     return result;
 }
@@ -812,7 +817,8 @@ void Track::correctTimeRange(const int startPos, const int endPos,
         }
 
         if (event.second.tick >= startPos && event.second.tick < endPos &&
-            event.second.noteNumber >= lowestNote && event.second.noteNumber <= highestNote)
+            event.second.noteNumber >= lowestNote &&
+            event.second.noteNumber <= highestNote)
         {
             timingCorrect(fromBar, toBar, event, stepLength, swingPercentage);
         }
@@ -822,11 +828,12 @@ void Track::correctTimeRange(const int startPos, const int endPos,
 }
 
 void Track::timingCorrect(const int fromBar, const int toBar,
-                          const std::pair<EventIndex, EventState> &noteEvent, const int stepLength,
-                          const int swingPercentage) const
+                          const std::pair<EventIndex, EventState> &noteEvent,
+                          const int stepLength, const int swingPercentage) const
 {
-    updateEventTick(noteEvent, timingCorrectTick(fromBar, toBar, noteEvent.second.tick,
-                                                 stepLength, swingPercentage));
+    updateEventTick(noteEvent,
+                    timingCorrectTick(fromBar, toBar, noteEvent.second.tick,
+                                      stepLength, swingPercentage));
 }
 
 int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
@@ -924,7 +931,8 @@ void Track::removeDoubles() const
     eventStateManager->enqueue(RemoveDoubles{});
 }
 
-void Track::updateEventTick(const std::pair<EventIndex, EventState> &e, const int newTick) const
+void Track::updateEventTick(const std::pair<EventIndex, EventState> &e,
+                            const int newTick) const
 {
     if (e.second.tick == newTick)
     {
@@ -989,6 +997,6 @@ void Track::insertEvent(
     EventState eventToInsert = event;
     eventToInsert.trackIndex = trackIndex;
 
-    eventStateManager->enqueue(
-        InsertEvent{event, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete});
+    eventStateManager->enqueue(InsertEvent{
+        event, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete});
 }

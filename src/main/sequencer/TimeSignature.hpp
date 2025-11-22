@@ -8,9 +8,10 @@ namespace mpc::sequencer
         TimeSigNumerator numerator{DefaultTimeSigNumerator};
         TimeSigDenominator denominator{DefaultTimeSigDenominator};
 
-        bool operator==(TimeSignature const& other) const
+        bool operator==(TimeSignature const &other) const
         {
-            return numerator == other.numerator && denominator == other.denominator;
+            return numerator == other.numerator &&
+                   denominator == other.denominator;
         }
 
         void increase();

@@ -157,8 +157,7 @@ void TempoChangeScreen::displayTempoChange0() const
     findField("a0")->setText(std::to_string(offset + 1));
     const auto timeSig = sequence->getTimeSignature();
 
-    int value =
-        tce->getBar(timeSig.numerator, timeSig.denominator) + 1;
+    int value = tce->getBar(timeSig.numerator, timeSig.denominator) + 1;
     findField("b0")->setTextPadded(value, "0");
     value = tce->getBeat(timeSig.numerator, timeSig.denominator) + 1;
     findField("c0")->setTextPadded(value, "0");
@@ -218,10 +217,8 @@ void TempoChangeScreen::displayTempoChange1() const
     findField("b1")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");
     findField("c1")->setTextPadded(
-        tce->getBeat(timeSig.numerator, timeSig.denominator) + 1,
-        "0");
-    findField("d1")->setTextPadded(tce->getClock(timeSig.denominator),
-                                   "0");
+        tce->getBeat(timeSig.numerator, timeSig.denominator) + 1, "0");
+    findField("d1")->setTextPadded(tce->getClock(timeSig.denominator), "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
     ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
@@ -272,10 +269,8 @@ void TempoChangeScreen::displayTempoChange2() const
     findField("b2")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");
     findField("c2")->setTextPadded(
-        tce->getBeat(timeSig.numerator, timeSig.denominator) + 1,
-        "0");
-    findField("d2")->setTextPadded(tce->getClock(timeSig.denominator),
-                                   "0");
+        tce->getBeat(timeSig.numerator, timeSig.denominator) + 1, "0");
+    findField("d2")->setTextPadded(tce->getClock(timeSig.denominator), "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
     ratioStr = StrUtil::padLeft(ratioStr, " ", 5);

@@ -19,8 +19,7 @@ namespace mpc::lcdgui::screens
     class StepEditorScreen final : public ScreenComponent
     {
         void downOrUp(int increment);
-        void adhocPlayNoteEvent(
-            const sequencer::EventState &noteEvent) const;
+        void adhocPlayNoteEvent(const sequencer::EventState &noteEvent) const;
         void adhocPlayNoteEventsAtCurrentPosition() const;
 
         std::vector<std::shared_ptr<sequencer::Event>>

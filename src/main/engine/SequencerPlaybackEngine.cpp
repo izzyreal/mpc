@@ -385,10 +385,9 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
             const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
             seq->insertBars(1, seq->getLastBarIndex());
-            seq->setTimeSignature(seq->getLastBarIndex(),
-                                  seq->getLastBarIndex(),
-                                  userScreen->timeSig.numerator,
-                                  userScreen->timeSig.denominator);
+            seq->setTimeSignature(
+                seq->getLastBarIndex(), seq->getLastBarIndex(),
+                userScreen->timeSig.numerator, userScreen->timeSig.denominator);
         }
         else
         {
@@ -617,7 +616,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         triggerClickIfNeeded();
 
-        layeredScreen->postToUiThread([this]{displayPunchRects();});
+        layeredScreen->postToUiThread(
+            [this]
+            {
+                displayPunchRects();
+            });
 
         if (sequencer->getTransport()->isCountingIn())
         {

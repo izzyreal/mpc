@@ -11,7 +11,8 @@ namespace mpc::sequencer
     {
     public:
         explicit Event(
-            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<std::pair<EventIndex, EventState>()>
+                &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
         Event(const Event &);
 

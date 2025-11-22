@@ -87,8 +87,7 @@ void ChangeTsigScreen::displayNewTsig() const
     const auto result =
         StrUtil::padLeft(std::to_string(timesignature.numerator), " ", 2) +
         "/" +
-        StrUtil::padLeft(std::to_string(timesignature.denominator), " ",
-                         2);
+        StrUtil::padLeft(std::to_string(timesignature.denominator), " ", 2);
     findField("newtsig")->setText(result);
 }
 

@@ -24,8 +24,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             {
                 for (auto &e : activeState.events)
                 {
-                    if (e.beingRecorded &&
-                        e.duration == NoDuration &&
+                    if (e.beingRecorded && e.duration == NoDuration &&
                         e.noteNumber == m.noteOnEvent.noteNumber)
                     {
                         e.duration = m.duration;
@@ -143,7 +142,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
-                auto& events = activeState.events;
+                auto &events = activeState.events;
 
                 const int oldIndex = m.eventIndex;
                 const Tick newTick = m.newTick;
@@ -153,12 +152,12 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                 events.erase(events.begin() + oldIndex);
 
                 // Find the first element with tick > newTick
-                auto it = std::lower_bound(
-                    events.begin(),
-                    events.end(),
-                    newTick,
-                    [](const EventState& e, Tick t) { return e.tick < t; }
-                );
+                auto it =
+                    std::lower_bound(events.begin(), events.end(), newTick,
+                                     [](const EventState &e, Tick t)
+                                     {
+                                         return e.tick < t;
+                                     });
 
                 // Insert at the right place
                 events.insert(it, ev);
@@ -169,7 +168,8 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
                 assert(m.eventIndex < activeState.events.size());
-                activeState.events.erase(activeState.events.begin() + m.eventIndex);
+                activeState.events.erase(activeState.events.begin() +
+                                         m.eventIndex);
             }
             else if constexpr (std::is_same_v<T, RemoveEventByIndex>)
             {

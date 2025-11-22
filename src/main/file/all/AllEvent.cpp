@@ -18,8 +18,7 @@ using namespace mpc::sequencer;
 
 std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE{0, 3};
 
-EventState
-AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventState AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     if (const auto eventID = bytes[EVENT_ID_OFFSET]; eventID < 0)
     {
@@ -72,8 +71,7 @@ std::vector<char> AllEvent::mpcEventToBytes(const EventState &e)
     {
         return AllPitchBendEvent::mpcEventToBytes(e);
     }
-    if (e.type == EventType::SystemExclusive ||
-        e.type == EventType::Mixer)
+    if (e.type == EventType::SystemExclusive || e.type == EventType::Mixer)
     {
         return AllSysExEvent::mpcEventToBytes(e);
     }

@@ -128,7 +128,7 @@ namespace mpc
             return tmp;
         }
 
-        constexpr ConstrainedInt& operator*=(IntType rhs)
+        constexpr ConstrainedInt &operator*=(IntType rhs)
         {
             long long raw =
                 static_cast<long long>(value) * static_cast<long long>(rhs);
@@ -136,7 +136,7 @@ namespace mpc
             return *this;
         }
 
-        constexpr ConstrainedInt& operator/=(IntType rhs)
+        constexpr ConstrainedInt &operator/=(IntType rhs)
         {
             long long raw =
                 static_cast<long long>(value) / static_cast<long long>(rhs);

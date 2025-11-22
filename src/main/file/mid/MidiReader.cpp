@@ -151,8 +151,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
             {
                 sequence->setTimeSignature(barCounter, current->getNumerator(),
                                            current->getRealDenominator());
-                const auto newDenTicks = 96 * (4.0 / current->getRealDenominator());
-                const auto barLength = static_cast<int>(newDenTicks * current->getNumerator());
+                const auto newDenTicks =
+                    96 * (4.0 / current->getRealDenominator());
+                const auto barLength =
+                    static_cast<int>(newDenTicks * current->getNumerator());
                 accumLength += barLength;
                 barCounter++;
             }
@@ -163,8 +165,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
             {
                 sequence->setTimeSignature(barCounter, current->getNumerator(),
                                            current->getRealDenominator());
-                const auto newDenTicks = 96 * (4.0 / current->getRealDenominator());
-                const auto barLength = static_cast<int>(newDenTicks * current->getNumerator());
+                const auto newDenTicks =
+                    96 * (4.0 / current->getRealDenominator());
+                const auto barLength =
+                    static_cast<int>(newDenTicks * current->getNumerator());
                 accumLength += barLength;
                 barCounter++;
             }

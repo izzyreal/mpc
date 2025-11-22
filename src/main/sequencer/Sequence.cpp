@@ -522,7 +522,8 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
             break;
         }
 
-        stateManager->enqueue(UpdateBarLength{i, snapshot.getBarLength(i + difference)});
+        stateManager->enqueue(
+            UpdateBarLength{i, snapshot.getBarLength(i + difference)});
         numerators[i] = numerators[i + difference];
         denominators[i] = denominators[i + difference];
     }
@@ -594,7 +595,8 @@ void Sequence::insertBars(int barCount, const int afterBar)
             break;
         }
 
-        stateManager->enqueue(UpdateBarLength{i, snapshot.getBarLength(i - barCount)});
+        stateManager->enqueue(
+            UpdateBarLength{i, snapshot.getBarLength(i - barCount)});
         numerators[i] = oldNumerators[i - barCount];
         denominators[i] = oldDenominators[i - barCount];
     }
@@ -615,7 +617,9 @@ void Sequence::insertBars(int barCount, const int afterBar)
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
         if (barCounter == afterBar)
+        {
             break;
+        }
 
         barStart += snapshot.getBarLength(i);
         barCounter++;
@@ -630,7 +634,9 @@ void Sequence::insertBars(int barCount, const int afterBar)
         for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
         {
             if (barCounter == afterBar + barCount)
+            {
                 break;
+            }
 
             newBarStart += snapshot.getBarLength(i);
             barCounter++;

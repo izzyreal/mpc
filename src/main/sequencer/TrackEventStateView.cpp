@@ -66,7 +66,8 @@ int TrackEventStateView::getEventCount() const
     return state->events.size();
 }
 
-std::vector<std::pair<mpc::EventIndex, EventState>> TrackEventStateView::getNoteEvents() const
+std::vector<std::pair<mpc::EventIndex, EventState>>
+TrackEventStateView::getNoteEvents() const
 {
     std::vector<std::pair<EventIndex, EventState>> result;
 
@@ -81,13 +82,13 @@ std::vector<std::pair<mpc::EventIndex, EventState>> TrackEventStateView::getNote
     return result;
 }
 
-std::pair<mpc::EventIndex, EventState> TrackEventStateView::findRecordingNoteOnByNoteNumber(
+std::pair<mpc::EventIndex, EventState>
+TrackEventStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.second.noteNumber == noteNumber &&
-            e.second.beingRecorded)
+        if (e.second.noteNumber == noteNumber && e.second.beingRecorded)
         {
             return e;
         }
@@ -95,13 +96,13 @@ std::pair<mpc::EventIndex, EventState> TrackEventStateView::findRecordingNoteOnB
     return {};
 }
 
-std::pair<mpc::EventIndex, EventState> TrackEventStateView::findRecordingNoteOnByNoteEventId(
+std::pair<mpc::EventIndex, EventState>
+TrackEventStateView::findRecordingNoteOnByNoteEventId(
     const NoteEventId id) const
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.second.noteEventId == id &&
-            e.second.beingRecorded)
+        if (e.second.noteEventId == id && e.second.beingRecorded)
         {
             return e;
         }

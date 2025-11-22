@@ -529,8 +529,8 @@ void Transport::setBarBeatClock(const int bar, const int beat,
 
     const auto [num, den] = s->getTimeSignature();
 
-    const int clampedBar =
-        std::clamp(bar, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
+    const int clampedBar = std::clamp(
+        bar, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
 
     const int clampedBeat = std::clamp(beat, 0, static_cast<int>(num) - 1);
 

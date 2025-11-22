@@ -101,9 +101,14 @@ void InsertEventScreen::insertEvent() const
     constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
     const auto onComplete = [ls = mpc.getLayeredScreen()]
     {
-        ls->postToUiThread([ls]{ ls->openScreenById(ScreenId::StepEditorScreen);});
+        ls->postToUiThread(
+            [ls]
+            {
+                ls->openScreenById(ScreenId::StepEditorScreen);
+            });
     };
-    sequencer->getSelectedTrack()->insertEvent(e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
+    sequencer->getSelectedTrack()->insertEvent(
+        e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
 }
 
 void InsertEventScreen::turnWheel(const int i)

@@ -14,7 +14,8 @@ namespace mpc::sequencer
         const std::vector<unsigned char> &getBytes() const;
 
         explicit SystemExclusiveEvent(
-            const std::function<std::pair<EventIndex, EventState>()> &getSnapshot,
+            const std::function<std::pair<EventIndex, EventState>()>
+                &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
         std::string getTypeName() const override
         {
