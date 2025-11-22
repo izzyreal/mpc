@@ -49,19 +49,18 @@ TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
                         {
                             return eventsEqual(a, b);
                         }});
-    addReactiveBinding({[&]
-                        {
-                            return sequencer->getSelectedSequence()
-                                ->getInitialTempo();
-                        },
-                        [this](auto)
-                        {
-                            displayInitialTempo();
-                            displayTempoChange0();
-                            displayTempoChange1();
-                            displayTempoChange2();
-                        }
-    });
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer->getSelectedSequence()->getInitialTempo();
+         },
+         [this](auto)
+         {
+             displayInitialTempo();
+             displayTempoChange0();
+             displayTempoChange1();
+             displayTempoChange2();
+         }});
 }
 
 void TempoChangeScreen::open()

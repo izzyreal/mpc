@@ -13,7 +13,8 @@ NoteOnEvent::NoteOnEvent(
 }
 
 NoteOnEvent::NoteOnEvent(
-    const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch)
+    const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch)
 {
 }
