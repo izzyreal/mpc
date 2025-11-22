@@ -43,7 +43,7 @@ mpc::NoteNumber NoteOnEvent::getNote() const
 void NoteOnEvent::setDuration(const Duration duration) const
 {
     auto e = getSnapshot();
-    e.second.duration = duration;
+    e.second.duration = std::clamp(duration, MinDuration, MaxDuration);
     dispatch(UpdateEvent{e});
 }
 

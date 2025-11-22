@@ -468,7 +468,8 @@ void StepEditorScreen::function(int i)
 
 bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 {
-    return ls->getFocusedFieldName().find(letter) != std::string::npos;
+    auto focusedFieldName = ls->getFocusedFieldName();
+    return focusedFieldName.find(letter) != std::string::npos;
 }
 
 void StepEditorScreen::turnWheel(const int increment)
@@ -628,7 +629,7 @@ void StepEditorScreen::turnWheel(const int increment)
         }
         else if (const auto note = std::dynamic_pointer_cast<NoteOnEvent>(
                      visibleEvents[eventNumber]);
-                 isDrumBusType(track->getBusType()) && note)
+                 isMidiBusType(track->getBusType()) && note)
         {
             if (paramIsLetter("a"))
             {
@@ -643,7 +644,7 @@ void StepEditorScreen::turnWheel(const int increment)
                 note->setVelocity(note->getVelocity() + increment);
             }
         }
-        else if (note && isMidiBusType(track->getBusType()))
+        else if (note && isDrumBusType(track->getBusType()))
         {
             if (paramIsLetter("a"))
             {

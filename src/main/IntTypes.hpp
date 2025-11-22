@@ -164,6 +164,8 @@ namespace mpc
 
     using Duration = ConstrainedInt<int16_t, -1, 9999>;
     constexpr Duration NoDuration{-1};
+    constexpr Duration MinDuration{0};
+    constexpr Duration MaxDuration{9999};
 
     /////////
 
