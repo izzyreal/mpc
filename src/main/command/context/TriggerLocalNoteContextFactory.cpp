@@ -138,8 +138,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 
     const auto registrySnapshot = performanceManager->getSnapshot();
 
-    std::optional<EventState> sequencerRecordNoteOnEvent =
-        std::nullopt;
+    std::optional<EventState> sequencerRecordNoteOnEvent = std::nullopt;
 
     if (recordedNoteOnEventId != NoNoteEventId)
     {

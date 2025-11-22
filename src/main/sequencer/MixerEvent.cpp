@@ -9,13 +9,6 @@ MixerEvent::MixerEvent(
 {
 }
 
-MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
-{
-    setPadNumber(event.getPad());
-    setParameter(event.getParameter());
-    setValue(event.getValue());
-}
-
 void MixerEvent::setParameter(const int i) const
 {
     auto e = getSnapshot();

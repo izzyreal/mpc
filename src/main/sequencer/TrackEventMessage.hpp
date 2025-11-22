@@ -38,11 +38,6 @@ namespace mpc::sequencer
         EventIndex eventIndex;
     };
 
-    struct RemoveDontDeleteFlag
-    {
-        EventIndex eventIndex;
-    };
-
     struct UpdateEventTick
     {
         EventState eventState;
@@ -59,9 +54,8 @@ namespace mpc::sequencer
     };
 
     using TrackEventMessage =
-        std::variant<InsertEvent, ClearEvents, RemoveEvent,
-                     RemoveEventByIndex, RemoveDontDeleteFlag, UpdateEventTick,
-                     RemoveDoubles,
+        std::variant<InsertEvent, ClearEvents, RemoveEvent, RemoveEventByIndex,
+                     UpdateEventTick, RemoveDoubles,
                      UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent>;
 } // namespace mpc::sequencer

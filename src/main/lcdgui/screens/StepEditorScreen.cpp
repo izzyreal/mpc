@@ -80,7 +80,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
                         },
                         [&](const auto &a, const auto &b)
                         {
-                            return visibleEventsEqual(a, b);
+                            return eventsEqual(a, b);
                         }});
 
     addReactiveBinding(
@@ -110,36 +110,6 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
              findField("now2")->setTextPadded(
                  sequencer->getTransport()->getCurrentClockNumber(), "0");
          }});
-}
-
-bool StepEditorScreen::visibleEventsEqual(
-    const std::vector<std::shared_ptr<Event>> &a,
-    const std::vector<std::shared_ptr<Event>> &b)
-{
-    if (a.size() != b.size())
-    {
-        return false;
-    }
-
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        if ((!a[i] && b[i]) || (a[i] && !b[i]))
-        {
-            return false;
-        }
-
-        if (!a[i] && !b[i])
-        {
-            continue;
-        }
-
-        if (!eventsEqual(a[i], b[i]))
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 void StepEditorScreen::openWindow()

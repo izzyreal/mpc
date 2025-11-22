@@ -158,7 +158,7 @@ SequenceIndex Sequencer::getSelectedSequenceIndex() const
     return stateManager->getSnapshot().getSelectedSequenceIndex();
 }
 
-std::shared_ptr<sequencer::Track> Sequencer::getSelectedTrack()
+std::shared_ptr<Track> Sequencer::getSelectedTrack()
 {
     if (!getSelectedSequence())
     {
@@ -548,8 +548,7 @@ void Sequencer::copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
 {
     for (const auto &e1 : src->getTempoChangeEvents())
     {
-        const auto copy = dst->addTempoChangeEvent(e1->getTick());
-        copy->setRatio(e1->getRatio());
+        dst->addTempoChangeEvent(e1->getTick(), e1->getRatio());
     }
 }
 

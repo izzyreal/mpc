@@ -101,7 +101,7 @@ namespace mpc::sequencer
         void setDeviceNames(const std::vector<std::string> &sa);
         std::vector<std::shared_ptr<TempoChangeEvent>>
         getTempoChangeEvents() const;
-        std::shared_ptr<TempoChangeEvent> addTempoChangeEvent(int tick);
+        void addTempoChangeEvent(int tick, int amount) const;
         void removeTempoChangeEvent(int i) const;
 
         bool isTempoChangeOn() const;

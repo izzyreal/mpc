@@ -7,7 +7,8 @@ EmptyEvent::EmptyEvent()
           []
           {
               return EventState();
-          }, [](TrackEventMessage&&){})
+          },
+          [](TrackEventMessage &&) {})
 {
     // very empty indeed.
 }

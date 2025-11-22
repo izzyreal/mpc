@@ -21,9 +21,8 @@ namespace mpc::lcdgui::screens::window
 
         std::vector<std::shared_ptr<HorizontalBar2>> bars;
         std::vector<std::shared_ptr<sequencer::TempoChangeEvent>>
-            visibleTempoChanges;
+        getVisibleTempoChanges() const;
 
-        void initVisibleEvents();
         void displayTempoChange0() const;
         void displayTempoChange1() const;
         void displayTempoChange2() const;
@@ -43,9 +42,9 @@ namespace mpc::lcdgui::screens::window
         void up() override;
 
     private:
-        std::weak_ptr<sequencer::TempoChangeEvent> previous;
-        std::weak_ptr<sequencer::TempoChangeEvent> current;
-        std::weak_ptr<sequencer::TempoChangeEvent> next;
+        std::shared_ptr<sequencer::TempoChangeEvent> previous;
+        std::shared_ptr<sequencer::TempoChangeEvent> current;
+        std::shared_ptr<sequencer::TempoChangeEvent> next;
         int offset = 0;
         void setOffset(int i);
 

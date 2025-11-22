@@ -85,7 +85,8 @@ void TimingCorrectScreen::function(int i)
 
             for (auto &e : eventRange)
             {
-                if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+                if (const auto noteEvent =
+                        std::dynamic_pointer_cast<NoteOnEvent>(e))
                 {
                     if (noteEvent->getNote() >= noteRange[0] &&
                         noteEvent->getNote() <= noteRange[1])
@@ -177,7 +178,8 @@ void TimingCorrectScreen::displayNotes()
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padIndex = program->getPadIndexFromNote(DrumNoteNumber(note0));
+            const auto padIndex =
+                program->getPadIndexFromNote(DrumNoteNumber(note0));
             const auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

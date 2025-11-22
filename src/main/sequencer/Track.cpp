@@ -66,14 +66,19 @@ Track::Track(
       isSoloEnabled(isSoloEnabled)
 {
     eventStateManager = std::make_shared<TrackEventStateManager>();
-    dispatch = [this](TrackEventMessage&& m) { eventStateManager->enqueue(std::move(m)); };
+    dispatch = [this](TrackEventMessage &&m)
+    {
+        eventStateManager->enqueue(std::move(m));
+    };
     purge();
 }
 
 void Track::purge()
 {
     removeEvents();
-    name = trackIndex == 64 ? "tempo" : getDefaultTrackName(trackIndex);
+    name = trackIndex == TempoChangeTrackIndex
+               ? "tempo"
+               : getDefaultTrackName(trackIndex);
     programChange = 0;
     velocityRatio = 100;
     used = false;
@@ -114,10 +119,11 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
     }
 
-
     if (!foundInQueue)
     {
-        found = eventStateManager->getSnapshot().findRecordingNoteOnByNoteEventId(id);
+        found =
+            eventStateManager->getSnapshot().findRecordingNoteOnByNoteEventId(
+                id);
     }
 
     return found;
@@ -151,7 +157,9 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     if (!foundInQueue)
     {
-        found = eventStateManager->getSnapshot().findRecordingNoteOnByNoteNumber(noteNumber);
+        found =
+            eventStateManager->getSnapshot().findRecordingNoteOnByNoteNumber(
+                noteNumber);
     }
 
     return found;
@@ -185,8 +193,7 @@ void Track::syncEventIndex(const int currentTick, const int previousTick)
         startIndex = playEventIndex;
     }
 
-    if (currentTick < previousTick &&
-        playEventIndex == 0)
+    if (currentTick < previousTick && playEventIndex == 0)
     {
         return;
     }
@@ -305,7 +312,8 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     return noteEvent;
 }
 
-void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent, const Duration duration) const
+void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent,
+                                     const Duration duration) const
 {
     eventStateManager->enqueue(FinalizeNonLiveNoteEvent{noteOnEvent, duration});
 }
@@ -402,7 +410,7 @@ std::shared_ptr<Event> Track::getEvent(const int i) const
 {
     const auto eventState =
         eventStateManager->getSnapshot().getEventByIndex(EventIndex(i));
-    return mapEventStateToEvent(eventState, dispatch);
+    return mapEventStateToEvent(eventState, dispatch, parent);
 }
 
 void Track::setName(const std::string &s)
@@ -429,7 +437,8 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
 
     for (int i = 0; i < eventCount; ++i)
     {
-        auto event = mapEventStateToEvent(snapshot.getEventByIndex(EventIndex(i)), dispatch);
+        auto event = mapEventStateToEvent(
+            snapshot.getEventByIndex(EventIndex(i)), dispatch, parent);
         result.emplace_back(event);
     }
 
@@ -548,7 +557,6 @@ void Track::processRealtimeQueuedEvents()
                 {
                     duration = parent->getLastTick() - noteOn.tick;
                     fixEventIndex = true;
-                    noteOn.dontDelete = true;
                 }
 
                 if (duration < 1)
@@ -746,13 +754,11 @@ void Track::playNext()
         }
     }
 
-    if (_delete && !event.dontDelete)
+    if (_delete)
     {
         eventStateManager->enqueue(RemoveEventByIndex{playEventIndex});
         return;
     }
-
-    eventStateManager->enqueue(RemoveDontDeleteFlag{playEventIndex});
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
@@ -779,7 +785,7 @@ Track::getEventRange(const int startTick, const int endTick) const
     for (const auto &e :
          eventStateManager->getSnapshot().getEventRange(startTick, endTick))
     {
-        result.emplace_back(mapEventStateToEvent(e, dispatch));
+        result.emplace_back(mapEventStateToEvent(e, dispatch, parent));
     }
     return result;
 }
@@ -949,8 +955,8 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 
     for (auto &e : eventStateManager->getSnapshot().getNoteEvents())
     {
-        result.emplace_back(
-            std::dynamic_pointer_cast<NoteOnEvent>(mapEventStateToEvent(e, dispatch)));
+        result.emplace_back(std::dynamic_pointer_cast<NoteOnEvent>(
+            mapEventStateToEvent(e, dispatch, parent)));
     }
 
     return result;

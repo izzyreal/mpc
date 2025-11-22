@@ -37,8 +37,10 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, FinalizeNonLiveNoteEvent>)
             {
-                activeState.events[m.noteOnEvent.eventIndex].duration = m.duration;
-                activeState.events[m.noteOnEvent.eventIndex].beingRecorded = false;
+                activeState.events[m.noteOnEvent.eventIndex].duration =
+                    m.duration;
+                activeState.events[m.noteOnEvent.eventIndex].beingRecorded =
+                    false;
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
@@ -80,12 +82,15 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     if (insertAt == events.end())
                     {
                         events.emplace_back(m.eventState);
-                        events.back().eventIndex = EventIndex(events.size() - 1);
+                        events.back().eventIndex =
+                            EventIndex(events.size() - 1);
                     }
                     else
                     {
-                        auto insertedEvent = events.emplace(insertAt, m.eventState);
-                        insertedEvent->eventIndex = EventIndex(insertAt - events.begin());
+                        auto insertedEvent =
+                            events.emplace(insertAt, m.eventState);
+                        insertedEvent->eventIndex =
+                            EventIndex(insertAt - events.begin());
                     }
                 }
                 else
@@ -202,10 +207,6 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             {
                 activeState.events.erase(activeState.events.begin() +
                                          m.eventIndex);
-            }
-            else if constexpr (std::is_same_v<T, RemoveDontDeleteFlag>)
-            {
-                activeState.events[m.eventIndex].dontDelete = false;
             }
         },
         msg);

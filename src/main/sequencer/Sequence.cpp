@@ -226,7 +226,7 @@ void Sequence::init(const int newLastBarIndex)
 
     tempoTrackIsInitialized.store(false);
     tempoChangeTrack->removeEvents();
-    addTempoChangeEvent(0);
+    addTempoChangeEvent(0, 1000);
     tempoTrackIsInitialized.store(true);
 
     initLoop();
@@ -328,7 +328,7 @@ Sequence::getTempoChangeEvents() const
 
     std::vector<std::shared_ptr<TempoChangeEvent>> res;
 
-    for (auto &t : tempoChangeTrack->getEvents())
+    for (auto t : tempoChangeTrack->getEvents())
     {
         res.push_back(std::dynamic_pointer_cast<TempoChangeEvent>(t));
     }
@@ -336,12 +336,14 @@ Sequence::getTempoChangeEvents() const
     return res;
 }
 
-std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(const int tick)
+void Sequence::addTempoChangeEvent(const int tick, const int amount) const
 {
-    // auto res = std::make_shared<TempoChangeEvent>(this);
-    // tempoChangeTrack->addEvent(tick, res);
-    // return res;
-    return {};
+    EventState e;
+    e.type = EventType::TempoChange;
+    e.tick = tick;
+    e.amount = amount;
+    e.trackIndex = TempoChangeTrackIndex;
+    tempoChangeTrack->addEvent(e, true);
 }
 
 double Sequence::getInitialTempo() const
@@ -522,7 +524,7 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 
     for (const auto &t : tracks)
     {
-        if (t->getIndex() >= 64 || t->getIndex() == 65)
+        if (t->getIndex() >= TempoChangeTrackIndex)
         {
             continue;
         }
@@ -634,7 +636,7 @@ void Sequence::insertBars(int barCount, const int afterBar)
 
         for (const auto &t : tracks)
         {
-            if (t->getIndex() == 64 || t->getIndex() == 65)
+            if (t->getIndex() == TempoChangeTrackIndex)
             {
                 continue;
             }

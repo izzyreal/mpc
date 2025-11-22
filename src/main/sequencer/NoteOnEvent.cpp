@@ -5,8 +5,8 @@ using namespace mpc::sequencer;
 NoteOnEvent::NoteOnEvent(
     const std::function<EventState()> &getSnapshot,
     const std::function<void(TrackEventMessage &&)> &dispatch,
-    const NoteNumber noteNumber, const Velocity vel, const NoteEventId id)
-    : Event(getSnapshot, dispatch), id(id)
+    const NoteNumber noteNumber, const Velocity vel)
+    : Event(getSnapshot, dispatch)
 {
     setNote(noteNumber);
     setVelocity(vel);
@@ -14,7 +14,7 @@ NoteOnEvent::NoteOnEvent(
 
 NoteOnEvent::NoteOnEvent(
     const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch)
-    : Event(getSnapshot, dispatch), id(NoNoteEventId)
+    : Event(getSnapshot, dispatch)
 {
 }
 
@@ -22,29 +22,9 @@ NoteOnEvent::NoteOnEvent(
     const std::function<EventState()> &getSnapshot,
     const std::function<void(TrackEventMessage &&)> &dispatch,
     const DrumNoteNumber drumNoteNumber)
-    : Event(getSnapshot, dispatch), id(NoNoteEventId)
+    : Event(getSnapshot, dispatch)
 {
     setNote(drumNoteNumber);
-}
-
-void NoteOnEvent::setMetronomeOnlyTickPosition(const int pos)
-{
-    metronomeOnlyTickPosition = pos;
-}
-
-int NoteOnEvent::getMetronomeOnlyTickPosition() const
-{
-    return metronomeOnlyTickPosition;
-}
-
-void NoteOnEvent::setBeingRecorded(const bool b)
-{
-    beingRecorded = b;
-}
-
-bool NoteOnEvent::isBeingRecorded() const
-{
-    return beingRecorded;
 }
 
 void NoteOnEvent::setNote(const NoteNumber n) const
@@ -110,9 +90,4 @@ void NoteOnEvent::setVelocity(const Velocity velocity) const
 mpc::Velocity NoteOnEvent::getVelocity() const
 {
     return getSnapshot().velocity;
-}
-
-uint32_t NoteOnEvent::getId() const
-{
-    return id;
 }

@@ -2,28 +2,21 @@
 
 using namespace mpc::sequencer;
 
-PitchBendEvent::PitchBendEvent(const std::function<EventState()> &getSnapshot,
+PitchBendEvent::PitchBendEvent(
+    const std::function<EventState()> &getSnapshot,
     const std::function<void(TrackEventMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch)
 {
 }
 
-PitchBendEvent::PitchBendEvent(const PitchBendEvent &event) : Event(event)
+void PitchBendEvent::setAmount(const int i) const
 {
-    setAmount(event.getAmount());
-}
-
-void PitchBendEvent::setAmount(const int i)
-{
-    if (i < -8192 || i > 8191)
-    {
-        return;
-    }
-
-    pitchBendAmount = i;
+    auto e = getSnapshot();
+    e.amount = std::clamp(i, -8192, 8191);
+    dispatch(UpdateEvent{e});
 }
 
 int PitchBendEvent::getAmount() const
 {
-    return pitchBendAmount;
+    return getSnapshot().amount;
 }

@@ -7,27 +7,45 @@ namespace mpc::sequencer
 {
     struct EventState
     {
+        // === BASE SECTION ===
         EventType type;
         SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
-
         EventIndex eventIndex;
-
         Tick tick;
 
-        NoteNumber noteNumber;
-        NoteEventId noteEventId;
-        bool beingRecorded;
-        int wasMoved;
-        bool dontDelete;
+        // === RECORD SECTION ===
+
+        // metronomeOnlyTickPosition is used when recording in the step editor
+        // or in the MAIN screen when the sequencer is not running, and we need
+        // to derive duration based on how long the note was pressed, using the
+        // metronome-only sequencer (which is also running when Count is OFF).
         int64_t metronomeOnlyTickPosition;
 
+        // This event is in the process of being recorded. It should not be
+        // considered for any operations apart from finalization. Currently, the
+        // only event type that can be in this state, is NoteOn.
+        bool beingRecorded;
+
+        // Not strictly necessary over here. Should be moved to local state in
+        // `Track::processRealtimeQueuedEvents`.
+        int wasMoved;
+
+        // === END OF RECORD SECTION ===
+
+        // === NOTE AND POLY PRESSURE SECTION ===
+        NoteNumber noteNumber;
+
+        // NOTE ON SECTION
+        NoteEventId noteEventId;
         Duration duration;
         Velocity velocity;
         NoteVariationType noteVariationType;
         NoteVariationValue noteVariationValue;
 
-        int8_t amount;
+        // PITCH BEND, POLY PRESSURE, CHANNEL PRESSURE,
+        // AND TEMPO CHANGE AMOUNT
+        int16_t amount;
 
         int8_t controllerNumber;
         int8_t controllerValue;
@@ -72,7 +90,6 @@ namespace mpc::sequencer
                    noteEventId == other.noteEventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
-                   dontDelete == other.dontDelete &&
                    metronomeOnlyTickPosition ==
                        other.metronomeOnlyTickPosition &&
                    duration == other.duration && velocity == other.velocity &&

@@ -66,8 +66,12 @@ namespace mpc
 
     /////////
 
-    using TrackIndex = ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::TRACK_COUNT>;
+    using TrackIndex = ConstrainedInt<int8_t, -1,
+                                      Mpc2000XlSpecs::LAST_TRACK_INDEX +
+                                          Mpc2000XlSpecs::META_TRACK_COUNT>;
     constexpr TrackIndex NoTrackIndex{-1};
+    constexpr TrackIndex TempoChangeTrackIndex{
+        Mpc2000XlSpecs::LAST_TRACK_INDEX + 1};
 
     /////////
 

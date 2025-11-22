@@ -16,7 +16,8 @@ namespace mpc::sequencer
 {
     std::shared_ptr<Event> mapEventStateToEvent(
         const EventState &e,
-        const std::function<void(TrackEventMessage &&)> &dispatch)
+        const std::function<void(TrackEventMessage &&)> &dispatch,
+        Sequence *parent)
     {
         if (e.type == EventType::NoteOn)
         {
@@ -27,7 +28,7 @@ namespace mpc::sequencer
                 },
                 dispatch);
         }
-        else if (e.type == EventType::ChannelPressure)
+        if (e.type == EventType::ChannelPressure)
         {
             return std::make_shared<ChannelPressureEvent>(
                 [e]
@@ -36,7 +37,7 @@ namespace mpc::sequencer
                 },
                 dispatch);
         }
-        else if (e.type == EventType::ControlChange)
+        if (e.type == EventType::ControlChange)
         {
             return std::make_shared<ControlChangeEvent>(
                 [e]
@@ -45,29 +46,59 @@ namespace mpc::sequencer
                 },
                 dispatch);
         }
-        else if (e.type == EventType::Mixer)
+        if (e.type == EventType::Mixer)
         {
-            return std::make_shared<MixerEvent>([e]{return e;}, dispatch);
+            return std::make_shared<MixerEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch);
         }
-        else if (e.type == EventType::PitchBend)
+        if (e.type == EventType::PitchBend)
         {
-                    return std::make_shared<PitchBendEvent>([e]{return e;}, dispatch);
+            return std::make_shared<PitchBendEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch);
         }
-        else if (e.type == EventType::PolyPressure)
+        if (e.type == EventType::PolyPressure)
         {
-            return std::make_shared<PolyPressureEvent>([e]{return e;}, dispatch);
+            return std::make_shared<PolyPressureEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch);
         }
-        else if (e.type == EventType::SystemExclusive)
+        if (e.type == EventType::SystemExclusive)
         {
-            return std::make_shared<SystemExclusiveEvent>([e]{return e;}, dispatch);
+            return std::make_shared<SystemExclusiveEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch);
         }
-        else if (e.type == EventType::ProgramChange)
+        if (e.type == EventType::ProgramChange)
         {
-            return std::make_shared<ProgramChangeEvent>([e]{return e;}, dispatch);
+            return std::make_shared<ProgramChangeEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch);
         }
-        else if (e.type == EventType::TempoChange)
+        if (e.type == EventType::TempoChange)
         {
-            // return std::make_shared<TempoChangeEvent>([e]{return e;}, dispatch);
+            return std::make_shared<TempoChangeEvent>(
+                [e]
+                {
+                    return e;
+                },
+                dispatch, parent);
         }
         return {};
     }

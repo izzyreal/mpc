@@ -20,9 +20,3 @@ int ChannelPressureEvent::getAmount() const
 {
     return getSnapshot().amount;
 }
-
-ChannelPressureEvent::ChannelPressureEvent(const ChannelPressureEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-}

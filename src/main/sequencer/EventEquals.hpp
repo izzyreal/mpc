@@ -8,6 +8,7 @@
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
 
 #include <memory>
 
@@ -34,6 +35,12 @@ namespace mpc::sequencer
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
                a.getParameter() == b.getParameter() &&
                a.getPad() == b.getPad() && a.getValue() == b.getValue();
+    }
+
+    inline bool operator==(const TempoChangeEvent &a, const TempoChangeEvent &b)
+    {
+        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
+               a.getRatio() == b.getRatio();
     }
 
     inline bool operator==(const ChannelPressureEvent &a,
@@ -123,6 +130,10 @@ namespace mpc::sequencer
         {
             return *sy == *std::dynamic_pointer_cast<SystemExclusiveEvent>(b);
         }
+        if (auto tc = std::dynamic_pointer_cast<TempoChangeEvent>(a))
+        {
+            return *tc == *std::dynamic_pointer_cast<TempoChangeEvent>(b);
+        }
 
         // fallback for unknown or base Event
         return *a == *b;
@@ -169,7 +180,39 @@ namespace mpc::sequencer
         {
             return std::make_shared<SystemExclusiveEvent>(*sx);
         }
-
+        if (auto tc = std::dynamic_pointer_cast<TempoChangeEvent>(e))
+        {
+            return std::make_shared<TempoChangeEvent>(*tc);
+        }
         return nullptr;
+    }
+
+    inline bool eventsEqual(const std::vector<std::shared_ptr<Event>> &a,
+                            const std::vector<std::shared_ptr<Event>> &b)
+    {
+        if (a.size() != b.size())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < a.size(); ++i)
+        {
+            if ((!a[i] && b[i]) || (a[i] && !b[i]))
+            {
+                return false;
+            }
+
+            if (!a[i] && !b[i])
+            {
+                continue;
+            }
+
+            if (!eventsEqual(a[i], b[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 } // namespace mpc::sequencer

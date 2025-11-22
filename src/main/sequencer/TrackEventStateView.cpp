@@ -84,8 +84,7 @@ EventState TrackEventStateView::findRecordingNoteOnByNoteNumber(
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.noteNumber == noteNumber &&
-            e.beingRecorded)
+        if (e.noteNumber == noteNumber && e.beingRecorded)
         {
             return e;
         }
@@ -98,8 +97,7 @@ EventState TrackEventStateView::findRecordingNoteOnByNoteEventId(
 {
     for (auto &e : getNoteEvents())
     {
-        if (e.noteEventId == id &&
-            e.beingRecorded)
+        if (e.noteEventId == id && e.beingRecorded)
         {
             return e;
         }

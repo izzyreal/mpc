@@ -123,9 +123,9 @@ void MidiReader::parseSequence(Mpc &mpc) const
     for (int i = 1; i < tempoChanges.size(); i++)
     {
         auto lTcMidi = tempoChanges[i].lock();
-        auto tce = sequence->addTempoChangeEvent(lTcMidi->getTick());
         auto ratio = lTcMidi->getBpm() / initialTempo;
-        tce->setRatio(static_cast<int>(ratio * 1000.0));
+        auto amount = static_cast<int>(ratio * 1000.0);
+        sequence->addTempoChangeEvent(lTcMidi->getTick(), amount);
     }
 
     if (timeSignatures.size() == 1)
@@ -181,10 +181,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
         sequence->setLastLoopBarIndex(lastLoopBar);
     }
 
-    std::pair noteVariationData
-    {
-        NoteVariationTypeTune, DefaultNoteVariationValue
-    };
+    std::pair noteVariationData{NoteVariationTypeTune,
+                                DefaultNoteVariationValue};
 
     const std::string trackDataPrefix = "TRACK DATA:";
 
@@ -237,8 +235,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 {
                     noteVariationData = {
                         NoteVariationType(noteOff->getNoteValue()),
-                        NoteVariationValue(noteOff->getVelocity())
-                    };
+                        NoteVariationValue(noteOff->getVelocity())};
                 }
                 else if (noteOn)
                 {
@@ -487,8 +484,8 @@ int MidiReader::getNumberOfNoteOns(
     return counter;
 }
 
-int MidiReader::getNumberOfNotes(
-    const int noteValue, const std::vector<EventState> &allNotes)
+int MidiReader::getNumberOfNotes(const int noteValue,
+                                 const std::vector<EventState> &allNotes)
 {
     int counter = 0;
 

@@ -10,18 +10,16 @@ namespace mpc::sequencer
 {
     class TempoChangeEvent final : public Event
     {
-
-        int ratio = 1000;
         Sequence *parent = nullptr;
 
     public:
-        void plusOneBar(const TempoChangeEvent *next);
-        void minusOneBar(const TempoChangeEvent *previous);
-        void plusOneBeat(const TempoChangeEvent *next);
-        void minusOneBeat(const TempoChangeEvent *previous);
-        void plusOneClock(const TempoChangeEvent *next);
-        void minusOneClock(const TempoChangeEvent *previous);
-        void setRatio(int i);
+        void plusOneBar(const TempoChangeEvent *next) const;
+        void minusOneBar(const TempoChangeEvent *previous) const;
+        void plusOneBeat(const TempoChangeEvent *next) const;
+        void minusOneBeat(const TempoChangeEvent *previous) const;
+        void plusOneClock(const TempoChangeEvent *next) const;
+        void minusOneClock(const TempoChangeEvent *previous) const;
+        void setRatio(int i) const;
         int getRatio() const;
         int getBar(int n, int d) const;
         int getBeat(int n, int d) const;
@@ -30,15 +28,10 @@ namespace mpc::sequencer
 
         void setParent(Sequence *newParent);
 
-        explicit TempoChangeEvent(
-            const std::function<EventState()> &getSnapshot,
-            const std::function<void(TrackEventMessage &&)> &dispatch,
-            Sequence *parent);
         TempoChangeEvent(
             const std::function<EventState()> &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch,
-            Sequence *parent, int ratio);
-        TempoChangeEvent(const TempoChangeEvent &);
+            Sequence *parent);
 
         std::string getTypeName() const override
         {

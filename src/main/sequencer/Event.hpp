@@ -19,7 +19,7 @@ namespace mpc::sequencer
 
         void setTick(int tick) const;
         int getTick() const;
-        void setTrack(TrackIndex);
+        void setTrack(TrackIndex) const;
         TrackIndex getTrack() const;
 
         virtual std::string getTypeName() const = 0;

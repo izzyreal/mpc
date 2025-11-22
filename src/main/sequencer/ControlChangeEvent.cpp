@@ -3,16 +3,10 @@
 using namespace mpc::sequencer;
 
 ControlChangeEvent::ControlChangeEvent(
-    const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch)
+    const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch)
 {
-}
-
-ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event)
-    : Event(event)
-{
-    setAmount(event.getAmount());
-    setController(event.getController());
 }
 
 void ControlChangeEvent::setController(const int i) const

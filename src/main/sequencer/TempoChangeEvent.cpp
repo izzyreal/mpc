@@ -6,21 +6,10 @@
 using namespace mpc::sequencer;
 
 TempoChangeEvent::TempoChangeEvent(
-    const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch, Sequence *parent)
-    : TempoChangeEvent(getSnapshot, dispatch, parent, 1000)
+    const std::function<EventState()> &getSnapshot,
+    const std::function<void(TrackEventMessage &&)> &dispatch, Sequence *parent)
+    : Event(getSnapshot, dispatch), parent(parent)
 {
-}
-
-TempoChangeEvent::TempoChangeEvent(
-    const std::function<EventState()> &getSnapshot, const std::function<void(TrackEventMessage &&)> &dispatch, Sequence *parent,
-    const int ratio)
-    : Event(getSnapshot, dispatch), ratio(ratio), parent(parent)
-{
-}
-
-TempoChangeEvent::TempoChangeEvent(const TempoChangeEvent &event) : Event(event)
-{
-    setRatio(event.getRatio());
 }
 
 void TempoChangeEvent::setParent(Sequence *newParent)
@@ -28,7 +17,7 @@ void TempoChangeEvent::setParent(Sequence *newParent)
     parent = newParent;
 }
 
-void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next) const
 {
     auto candidate = parent->getFirstTickOfBar(
         SeqUtil::getBar(parent, getSnapshot().tick) + 1);
@@ -49,7 +38,7 @@ void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next)
     setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous) const
 {
     auto candidate = parent->getFirstTickOfBar(
         SeqUtil::getBar(parent, getSnapshot().tick) - 1);
@@ -70,7 +59,7 @@ void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous)
     setTick(candidate);
 }
 
-void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next)
+void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next) const
 {
     const auto oldTick = getSnapshot().tick;
 
@@ -94,7 +83,7 @@ void TempoChangeEvent::plusOneBeat(const TempoChangeEvent *next)
     setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous) const
 {
     const auto oldTick = getSnapshot().tick;
     auto candidate =
@@ -117,7 +106,7 @@ void TempoChangeEvent::minusOneBeat(const TempoChangeEvent *previous)
     setTick(candidate);
 }
 
-void TempoChangeEvent::plusOneClock(const TempoChangeEvent *next)
+void TempoChangeEvent::plusOneClock(const TempoChangeEvent *next) const
 {
     const auto oldTick = getSnapshot().tick;
 
@@ -141,7 +130,7 @@ void TempoChangeEvent::plusOneClock(const TempoChangeEvent *next)
     setTick(candidate);
 }
 
-void TempoChangeEvent::minusOneClock(const TempoChangeEvent *previous)
+void TempoChangeEvent::minusOneClock(const TempoChangeEvent *previous) const
 {
     const auto oldTick = getSnapshot().tick;
 
@@ -156,14 +145,16 @@ void TempoChangeEvent::minusOneClock(const TempoChangeEvent *previous)
     setTick(oldTick - 1);
 }
 
-void TempoChangeEvent::setRatio(const int i)
+void TempoChangeEvent::setRatio(const int i) const
 {
-    ratio = std::clamp(i, 100, 9998);
+    auto e = getSnapshot();
+    e.amount = std::clamp(i, 100, 9998);
+    dispatch(UpdateEvent{e});
 }
 
 int TempoChangeEvent::getRatio() const
 {
-    return ratio;
+    return getSnapshot().amount;
 }
 
 int TempoChangeEvent::getBar(const int n, const int d) const
@@ -189,7 +180,7 @@ int TempoChangeEvent::getClock(const int denominator) const
 
 double TempoChangeEvent::getTempo() const
 {
-    const auto tempo = parent->getInitialTempo() * ratio * 0.001;
+    const auto tempo = parent->getInitialTempo() * getRatio() * 0.001;
 
     if (tempo < 30.0)
     {
