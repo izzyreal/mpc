@@ -96,7 +96,6 @@ namespace mpc::lcdgui::screens
         void setNoteB(NoteNumber);
         void setControl(int i);
         void setyOffset(int i);
-        void setSelectedEventIndex(int i);
         void setSelectionEndIndex(int i);
         void setSelectionStartIndex(int i);
         void setSelectedEvents();
@@ -107,7 +106,6 @@ namespace mpc::lcdgui::screens
         void displayView() const;
 
     public:
-        std::vector<std::shared_ptr<sequencer::Event>> &getVisibleEvents();
         std::vector<std::shared_ptr<sequencer::Event>> &getSelectedEvents();
         std::shared_ptr<sequencer::Event> getSelectedEvent();
         std::string getSelectedParameterLetter();
