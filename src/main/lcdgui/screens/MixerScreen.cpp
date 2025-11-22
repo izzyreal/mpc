@@ -15,7 +15,6 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/MixerEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
@@ -568,12 +567,12 @@ void MixerScreen::turnWheel(const int i)
 void MixerScreen::recordMixerEvent(const int pad, const int param,
                                    const int value) const
 {
-    // const auto event = std::make_shared<MixerEvent>();
-    // sequencer->getSelectedTrack()->addEvent(
-    //     sequencer->getTransport()->getTickPosition(), event);
-    // event->setPadNumber(pad);
-    // event->setParameter(param);
-    // event->setValue(value);
+    EventState e;
+    e.type = EventType::Mixer;
+    e.mixerParameter = param;
+    e.mixerPad = pad;
+    e.mixerValue = value;
+    sequencer->getSelectedTrack()->addEvent(e);
 }
 
 void MixerScreen::displayStereoFaders()
