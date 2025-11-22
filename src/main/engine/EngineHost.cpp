@@ -41,6 +41,7 @@
 
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
@@ -167,6 +168,14 @@ void EngineHost::start()
 void EngineHost::applyPendingStateChanges() const
 {
     mpc.getSequencer()->getStateManager()->drainQueue();
+
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
+    {
+        if (const auto seq = mpc.getSequencer()->getSequence(i))
+        {
+            seq->getStateManager()->drainQueue();
+        }
+    }
     mpc.performanceManager->drainQueue();
 }
 

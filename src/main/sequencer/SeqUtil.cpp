@@ -2,6 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
+#include "SequenceStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -328,6 +329,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     auto firstTickOfFromSequence = 0;
     auto lastTickOfFromSequence = 0;
 
+    const auto fromSeqSnapshot = fromSequence->getStateManager()->getSnapshot();
+
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyFirstBar)
@@ -335,12 +338,12 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
+        firstTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
     }
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        lastTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
+        lastTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
 
         if (i == copyLastBar)
         {
@@ -350,6 +353,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
     auto firstTickOfToSequence = 0;
 
+    const auto toSeqSnapshot = toSequence->getStateManager()->getSnapshot();
+
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyAfterBar)
@@ -357,14 +362,14 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfToSequence += toSequence->getBarLengthsInTicks()[i];
+        firstTickOfToSequence += toSeqSnapshot.getBarLength(i);
     }
 
     const auto segmentLengthTicks =
         lastTickOfFromSequence - firstTickOfFromSequence;
     const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
     {
         const auto t1 = fromSequence->getTrack(i);
 

@@ -1,6 +1,7 @@
 #include "Sequencer.hpp"
 
 #include "MpcSpecs.hpp"
+#include "SequenceStateManager.hpp"
 
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Transport.hpp"
@@ -534,7 +535,7 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setUsed(source->isUsed());
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
-    dest->setBarLengths(source->getBarLengthsInTicks());
+    dest->setBarLengths(source->getStateManager()->getSnapshot().getBarLengths());
     dest->setNumeratorsAndDenominators(source->getNumerators(),
                                        source->getDenominators());
     dest->setLoopStart(source->getLoopStart());

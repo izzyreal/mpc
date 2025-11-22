@@ -16,6 +16,7 @@ namespace mpc::sequencer
     struct TimeSignature;
     class TempoChangeEvent;
     class Sequencer;
+    class SequenceStateManager;
 } // namespace mpc::sequencer
 
 namespace mpc::lcdgui
@@ -70,6 +71,8 @@ namespace mpc::sequencer
                  std::function<bool()> isSoloEnabled,
                  std::function<int()> getCurrentBarIndex);
 
+        void setBarLengths(const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT>
+                               &barLengths) const;
         double getInitialTempo() const;
         void setInitialTempo(double newInitialTempo);
 
@@ -112,8 +115,6 @@ namespace mpc::sequencer
         std::shared_ptr<Track> purgeTrack(int i);
         int getDenominator(int i) const;
         int getNumerator(int i) const;
-        std::vector<int> &getBarLengthsInTicks();
-        void setBarLengths(const std::vector<int> &);
         void
         setNumeratorsAndDenominators(const std::vector<int> &newNumerators,
                                      const std::vector<int> &newDenominators);
@@ -137,7 +138,10 @@ namespace mpc::sequencer
 
         StartTime &getStartTime();
 
+        std::shared_ptr<SequenceStateManager> getStateManager();
+
     private:
+        std::shared_ptr<SequenceStateManager> stateManager;
         StartTime startTime{0, 0, 0, 0, 0};
         std::atomic_bool tempoTrackIsInitialized{false};
         double initialTempo = 120.0;
@@ -147,11 +151,9 @@ namespace mpc::sequencer
 
         std::vector<std::string> deviceNames = std::vector<std::string>(33);
 
-        std::vector<int> barLengthsInTicks = std::vector<int>(999);
         std::vector<int> numerators = std::vector<int>(999);
         std::vector<int> denominators = std::vector<int>(999);
 
-        std::vector<int> oldBarLengthsInTicks = std::vector<int>(999);
         std::vector<int> oldNumerators = std::vector<int>(999);
         std::vector<int> oldDenominators = std::vector<int>(999);
 

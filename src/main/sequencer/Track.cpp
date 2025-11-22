@@ -1,6 +1,7 @@
 #include "sequencer/Track.hpp"
 
 #include "EventStateToEventMapper.hpp"
+#include "SequenceStateManager.hpp"
 #include "sampler/Sampler.hpp"
 
 #include "sequencer/TrackEventStateManager.hpp"
@@ -779,9 +780,11 @@ void Track::correctTimeRange(const int startPos, const int endPos,
     auto fromBar = 0;
     auto toBar = 0;
 
+    const auto snapshot = s->getStateManager()->getSnapshot();
+
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        accumBarLengths += s->getBarLengthsInTicks()[i];
+        accumBarLengths += snapshot.getBarLength(i);
 
         if (accumBarLengths >= startPos)
         {
@@ -792,7 +795,7 @@ void Track::correctTimeRange(const int startPos, const int endPos,
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        accumBarLengths += s->getBarLengthsInTicks()[i];
+        accumBarLengths += snapshot.getBarLength(i);
 
         if (accumBarLengths > endPos)
         {
@@ -838,16 +841,18 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
     int segmentStart = 0;
     int segmentEnd = 0;
 
-    for (int i = 0; i < 999; i++)
+    const auto snapshot = sequence->getStateManager()->getSnapshot();
+
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i < fromBar)
         {
-            segmentStart += sequence->getBarLengthsInTicks()[i];
+            segmentStart += snapshot.getBarLength(i);
         }
 
         if (i <= toBar)
         {
-            segmentEnd += sequence->getBarLengthsInTicks()[i];
+            segmentEnd += snapshot.getBarLength(i);
         }
         else
         {
@@ -855,9 +860,9 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
         }
     }
 
-    for (int i = 0; i < 999; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        accumBarLengths += sequence->getBarLengthsInTicks()[i];
+        accumBarLengths += snapshot.getBarLength(i);
 
         if (tick < accumBarLengths && tick >= previousAccumBarLengths)
         {
@@ -870,7 +875,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 1; i < 1000; i++)
     {
-        if (sequence->getBarLengthsInTicks()[barNumber] - i * stepLength < 0)
+        if (snapshot.getBarLength(barNumber) - i * stepLength < 0)
         {
             numberOfSteps = i - 1;
             break;
@@ -881,7 +886,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 0; i < barNumber; i++)
     {
-        currentBarStart += sequence->getBarLengthsInTicks()[i];
+        currentBarStart += snapshot.getBarLength(i);
     }
 
     for (int i = 0; i <= numberOfSteps; i++)

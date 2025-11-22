@@ -6,6 +6,7 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -36,24 +37,10 @@ void ChangeTsigScreen::function(const int i)
 
     const auto sequence = sequencer->getSelectedSequence();
 
-    const auto barLengths = sequence->getBarLengthsInTicks();
-
     sequence->setTimeSignature(bar0, bar1, timesignature.numerator,
                                timesignature.denominator);
 
-    const auto &newBarLengths = sequence->getBarLengthsInTicks();
-
-    for (int j = 0; j < barLengths.size(); j++)
-    {
-        if (barLengths[j] != newBarLengths[j])
-        {
-            sequencer->getTransport()->setPosition(
-                0); // Only reset sequencer position when a
-                    // bar length has changed
-            break;
-        }
-    }
-
+    sequencer->getTransport()->setPosition(0);
     openScreenById(ScreenId::SequencerScreen);
 }
 
