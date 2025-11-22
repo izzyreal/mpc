@@ -9,7 +9,6 @@ namespace mpc::sequencer
     {
         // === BASE SECTION ===
         EventType type;
-        SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
         Tick tick;
 
@@ -63,7 +62,6 @@ namespace mpc::sequencer
         void resetToDefaultValues()
         {
             type = EventType::Unknown;
-            sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
 
             tick = NoTick;
@@ -80,7 +78,7 @@ namespace mpc::sequencer
 
         bool operator==(EventState const &other) const
         {
-            return type == other.type && sequenceIndex == other.sequenceIndex &&
+            return type == other.type &&
                    trackIndex == other.trackIndex &&
                    tick == other.tick &&
                    noteNumber == other.noteNumber &&
