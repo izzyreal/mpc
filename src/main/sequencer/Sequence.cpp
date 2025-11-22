@@ -231,8 +231,8 @@ void Sequence::init(const int newLastBarIndex)
 
     initLoop();
 
-    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(),
-                     userScreen->timeSig.getDenominator());
+    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.numerator,
+                     userScreen->timeSig.denominator);
     used = true;
 }
 
@@ -402,8 +402,8 @@ TimeSignature Sequence::getTimeSignature() const
         bar--;
     }
 
-    ts.setNumerator(numerators[bar]);
-    ts.setDenominator(denominators[bar]);
+    ts.numerator = TimeSigNumerator(numerators[bar]);
+    ts.denominator = TimeSigDenominator(denominators[bar]);
 
     return ts;
 }

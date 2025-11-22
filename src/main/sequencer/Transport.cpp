@@ -430,8 +430,7 @@ int Transport::getCurrentBeatIndex() const
         }
     }
 
-    const auto ts = s->getTimeSignature();
-    const auto den = ts.getDenominator();
+    const auto den = s->getTimeSignature().denominator;
     const auto denTicks = 96 * (4.0 / den);
 
     if (index == 0)
@@ -483,8 +482,7 @@ int Transport::getCurrentClockNumber() const
         }
     }
 
-    const auto ts = sequence->getTimeSignature();
-    const auto den = ts.getDenominator();
+    const auto den = sequence->getTimeSignature().denominator;
     const auto denTicks = 96 * (4.0 / den);
 
     if (clock == 0)
@@ -526,13 +524,13 @@ void Transport::setBarBeatClock(const int bar, const int beat,
 
     const auto s = sequencer.getSelectedSequence();
     const auto &barLengths = s->getBarLengthsInTicks();
-    const auto ts = s->getTimeSignature();
+    const auto [num, den] = s->getTimeSignature();
 
     const int clampedBar =
         std::clamp(bar, 0, static_cast<int>(barLengths.size()) - 1);
-    const int clampedBeat = std::clamp(beat, 0, ts.getNumerator() - 1);
+    const int clampedBeat = std::clamp(beat, 0, static_cast<int>(num) - 1);
 
-    const int denTicks = static_cast<int>(96 * (4.0 / ts.getDenominator()));
+    const int denTicks = static_cast<int>(96 * (4.0 / den));
     const int clampedClock = std::clamp(clock, 0, denTicks - 1);
 
     int pos = 0;
@@ -587,16 +585,16 @@ void Transport::setBeat(int i) const
         return;
     }
 
-    const auto ts = s->getTimeSignature();
+    const auto [num, den] = s->getTimeSignature();
 
-    if (const auto num = ts.getNumerator(); i >= num)
+    if (i >= num)
     {
         i = num - 1;
     }
 
     const auto difference = i - getCurrentBeatIndex();
 
-    const auto denTicks = 96 * (4.0 / ts.getDenominator());
+    const auto denTicks = 96 * (4.0 / den);
     pos += difference * denTicks;
     setPosition(Sequencer::ticksToQuarterNotes(pos));
 }
@@ -621,7 +619,7 @@ void Transport::setClock(int i) const
         return;
     }
 
-    const auto den = s->getTimeSignature().getDenominator();
+    const auto den = s->getTimeSignature().denominator;
 
     if (const auto denTicks = 96 * (4.0 / den); i > denTicks - 1)
     {
@@ -640,7 +638,7 @@ void Transport::setPosition(const double positionQuarterNotes,
 {
     const bool songMode = sequencer.isSongModeEnabled();
 
-    SequenceIndex songSequenceIndex{NoSequenceIndex};
+    SequenceIndex songSequenceIndex;
 
     if (songMode)
     {

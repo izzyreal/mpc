@@ -2,31 +2,6 @@
 
 using namespace mpc::sequencer;
 
-TimeSignature::TimeSignature(const TimeSignature &other)
-    : numerator(other.numerator), denominator(other.denominator)
-{
-}
-
-void TimeSignature::setNumerator(const int i)
-{
-    numerator = i;
-}
-
-int TimeSignature::getNumerator() const
-{
-    return numerator;
-}
-
-void TimeSignature::setDenominator(const int i)
-{
-    denominator = i;
-}
-
-int TimeSignature::getDenominator() const
-{
-    return denominator;
-}
-
 void TimeSignature::increase()
 {
     switch (denominator)
@@ -40,7 +15,7 @@ void TimeSignature::increase()
                 ++numerator;
                 break;
             }
-            numerator = 1;
+            numerator = TimeSigNumerator(1);
             denominator *= 2;
             break;
         }
@@ -50,6 +25,7 @@ void TimeSignature::increase()
                 ++numerator;
                 break;
             }
+        default:;
     }
 }
 
@@ -69,12 +45,13 @@ void TimeSignature::decrease()
         {
             if (numerator == 1)
             {
-                numerator = 16;
+                numerator = TimeSigNumerator(16);
                 denominator /= 2;
                 break;
             }
             --numerator;
             break;
         }
+        default:;
     }
 }

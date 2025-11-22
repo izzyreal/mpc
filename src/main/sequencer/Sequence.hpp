@@ -13,7 +13,7 @@ namespace mpc::sequencer
 {
     class Bus;
     class Track;
-    class TimeSignature;
+    struct TimeSignature;
     class TempoChangeEvent;
     class Sequencer;
 } // namespace mpc::sequencer
