@@ -616,7 +616,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         tickFrameOffset = frameIndex;
 
         triggerClickIfNeeded();
-        displayPunchRects();
+
+        layeredScreen->postToUiThread([this]{displayPunchRects();});
 
         if (sequencer->getTransport()->isCountingIn())
         {
