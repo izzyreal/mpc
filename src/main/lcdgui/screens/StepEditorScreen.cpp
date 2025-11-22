@@ -448,12 +448,11 @@ void StepEditorScreen::function(int i)
                     auto eventNumber = getActiveRow();
                     const auto visibleEvents = computeVisibleEvents();
                     auto event = visibleEvents[eventNumber];
-                    auto noteEvent =
-                        std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-                    if (noteEvent)
+                    if (auto noteEvent =
+                        std::dynamic_pointer_cast<NoteOnEvent>(event))
                     {
-                        adhocPlayNoteEvent(noteEvent);
+                        adhocPlayNoteEvent(noteEvent->getSnapshot().second);
                     }
                 }
             }
@@ -1468,11 +1467,10 @@ int StepEditorScreen::getYOffset() const
 }
 
 void StepEditorScreen::adhocPlayNoteEvent(
-    const std::shared_ptr<NoteOnEvent> &noteEvent) const
+    const EventState &noteEvent) const
 {
-    // const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
-    // const auto track = sequencer->getSelectedTrack();
-    // mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
+    const auto track = sequencer->getSelectedTrack();
+    mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
@@ -1546,9 +1544,9 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
     const auto track = sequencer->getSelectedTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {
-        if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+        if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            adhocPlayNoteEvent(noteEvent);
+            adhocPlayNoteEvent(noteEvent->getSnapshot().second);
         }
     }
 }

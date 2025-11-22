@@ -3,6 +3,7 @@
 #include "sequencer/EventState.hpp"
 
 #include <cstdint>
+#include <functional>
 #include <variant>
 
 namespace mpc::sequencer
@@ -26,6 +27,7 @@ namespace mpc::sequencer
     {
         EventState eventState;
         bool allowMultipleNoteEventsWithSameNoteOnSameTick;
+        std::function<void()> onComplete;
     };
 
     struct RemoveEvent

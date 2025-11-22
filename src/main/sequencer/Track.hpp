@@ -91,7 +91,8 @@ namespace mpc::sequencer
 
         void
         insertEvent(const EventState &event,
-                    bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
+                    bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
+            const std::function<void()> &onComplete = []{});
 
         EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick);
@@ -107,13 +108,6 @@ namespace mpc::sequencer
         void finalizeNoteEventLive(const EventState &) const;
 
         void finalizeNoteEventNonLive(const EventState &, Duration) const;
-
-        void
-        addEvent(const EventState &,
-                 bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
-
-        void cloneEventIntoTrack(const std::shared_ptr<Event> &, int tick,
-                                 bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i) const;
         void removeEvent(const std::shared_ptr<Event> &event) const;

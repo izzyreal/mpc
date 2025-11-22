@@ -518,10 +518,9 @@ Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 
     copy->getTempoChangeTrack()->removeEvents();
 
-    for (auto &event : source->getTempoChangeTrack()->getEvents())
+    for (const auto &event : source->getTempoChangeTrack()->getEvents())
     {
-        copy->getTempoChangeTrack()->cloneEventIntoTrack(event,
-                                                         event->getTick());
+        copy->getTempoChangeTrack()->insertEvent(event->getSnapshot().second);
     }
 
     return copy;
@@ -615,7 +614,7 @@ void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
 
     for (auto &e : src->getEvents())
     {
-        dest->cloneEventIntoTrack(e, e->getTick());
+        dest->insertEvent(e->getSnapshot().second);
     }
 
     copyTrackParameters(src, dest);

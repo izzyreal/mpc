@@ -319,30 +319,6 @@ void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent,
     eventStateManager->enqueue(FinalizeNonLiveNoteEvent{noteOnEvent, duration});
 }
 
-void Track::addEvent(const EventState &event,
-                     const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
-{
-    if (eventStateManager->getSnapshot().isEventsEmpty())
-    {
-        setUsed(true);
-    }
-
-    EventState eventToInsert = event;
-    eventToInsert.trackIndex = trackIndex;
-
-    insertEvent(eventToInsert, allowMultipleNoteEventsWithSameNoteOnSameTick);
-}
-
-void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
-                                const int tick,
-                                const bool allowMultipleNotesOnSameTick)
-{
-    auto event = src->getSnapshot();
-    event.second.tick = tick;
-    event.second.trackIndex = trackIndex;
-    insertEvent(event.second, allowMultipleNotesOnSameTick);
-}
-
 void Track::removeEvent(const int i) const
 {
     eventStateManager->enqueue(RemoveEventByIndex{EventIndex(i)});
@@ -997,15 +973,17 @@ std::string Track::getActualName()
 
 void Track::insertEvent(
     const EventState &event,
-    const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
+    const bool allowMultipleNoteEventsWithSameNoteOnSameTick,
+    const std::function<void()> &onComplete)
 {
     if (!isUsed())
     {
         setUsed(true);
     }
 
-    assert(event.trackIndex == trackIndex);
+    EventState eventToInsert = event;
+    eventToInsert.trackIndex = trackIndex;
 
     eventStateManager->enqueue(
-        InsertEvent{event, allowMultipleNoteEventsWithSameNoteOnSameTick});
+        InsertEvent{event, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete});
 }

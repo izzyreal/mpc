@@ -77,14 +77,15 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                     }
                     else
                     {
-                        auto insertedEvent =
-                            events.emplace(insertAt, m.eventState);
+                        events.emplace(insertAt, m.eventState);
                     }
                 }
                 else
                 {
                     events.emplace_back(m.eventState);
                 }
+
+                actions.push_back(m.onComplete);
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)
             {
