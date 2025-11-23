@@ -51,6 +51,7 @@ SCENARIO("A MidiFile can be written", "[file]")
 
         sequence->init(1);
         track0->removeEvents();
+        track0->getEventStateManager()->drainQueue();
         REQUIRE(track0->getEvents().empty());
 
         auto istream = std::make_shared<std::istringstream>(ostream->str());

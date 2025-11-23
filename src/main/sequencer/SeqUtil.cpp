@@ -318,6 +318,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
     }
 
+    toSequence->getStateManager()->drainQueue();
+
     int sourceBarCounter = 0;
 
     const auto numberOfSourceBars = copyLastBar + 1 - copyFirstBar;
@@ -328,6 +330,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             i + copyAfterBar,
             fromSequence->getNumerator(sourceBarCounter + copyFirstBar),
             fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
+
+        toSequence->getStateManager()->drainQueue();
 
         sourceBarCounter++;
 

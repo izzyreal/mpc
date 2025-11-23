@@ -16,12 +16,12 @@ namespace mpc::sequencer
         void start();
         void stop();
 
+        void work() const;
+
     private:
         std::atomic<bool> running;
         std::thread workerThread;
 
         Sequencer *sequencer;
-
-        void work() const;
     };
 } // namespace mpc::sequencer

@@ -703,6 +703,9 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         }
 
         toSequence->insertBars(1, afterBar);
+
+        toSequence->getStateManager()->drainQueue();
+
         toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
 
@@ -711,13 +714,13 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     if (!copyModeMerge)
     {
         const auto destTrackEvents = destTrack->getEvents();
-        for (auto &e : destTrackEvents)
+        for (auto it = destTrackEvents.end() - 1; it != destTrackEvents.begin(); --it)
         {
 
-            if (const auto tick = e->getTick();
+            if (const auto tick = (*it)->getTick();
                 tick >= destOffset && tick < destOffset + segLength * copyCount)
             {
-                destTrack->removeEvent(e);
+                destTrack->removeEvent(*it);
             }
         }
     }

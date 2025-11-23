@@ -9,6 +9,7 @@
 
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/TrackEventStateManager.hpp"
 
 using namespace mpc;
@@ -22,6 +23,7 @@ TEST_CASE("BARS1", "[bars-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -41,6 +43,8 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     tr->getEventStateManager()->drainQueue();
 
+    REQUIRE(tr->getEvents().size() == 8);
+
     auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;
@@ -51,6 +55,12 @@ TEST_CASE("BARS1", "[bars-screen]")
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
 
     auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
+    toSeq->getStateManager()->drainQueue();
+
+    for (auto &t : toSeq->getTracks())
+    {
+        t->getEventStateManager()->drainQueue();
+    }
 
     REQUIRE(toSeq->isUsed());
 
@@ -70,6 +80,7 @@ TEST_CASE("BARS2", "[bars-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 

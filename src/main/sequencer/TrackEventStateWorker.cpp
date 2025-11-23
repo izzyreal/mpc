@@ -42,7 +42,7 @@ void TrackEventStateWorker::start()
             while (running.load())
             {
                 work();
-                std::this_thread::sleep_for(std::chrono::milliseconds(3));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         });
 }
@@ -61,6 +61,7 @@ void TrackEventStateWorker::work() const
 {
     for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
     {
+        if (!sequencer->getSequence(i)->isUsed()) continue;
         for (const auto &t : sequencer->getSequence(i)->getTracks())
         {
             t->getEventStateManager()->drainQueue();

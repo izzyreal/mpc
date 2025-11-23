@@ -325,7 +325,7 @@ void Track::finalizeNoteEventNonLive(const EventState &noteOnEvent,
 
 void Track::removeEvent(const int i) const
 {
-    eventStateManager->enqueue(RemoveEventByIndex{EventIndex(i)});
+    eventStateManager->enqueue(RemoveEvent{EventIndex(i)});
 }
 
 void Track::removeEvents()
@@ -741,7 +741,7 @@ void Track::playNext()
 
     if (_delete)
     {
-        eventStateManager->enqueue(RemoveEventByIndex{playEventIndex});
+        eventStateManager->enqueue(RemoveEvent{playEventIndex});
         return;
     }
 

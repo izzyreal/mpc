@@ -35,11 +35,6 @@ namespace mpc::sequencer
         EventIndex eventIndex;
     };
 
-    struct RemoveEventByIndex
-    {
-        EventIndex eventIndex;
-    };
-
     struct UpdateEventTick
     {
         EventIndex eventIndex;
@@ -56,7 +51,7 @@ namespace mpc::sequencer
     };
 
     using TrackEventMessage =
-        std::variant<InsertEvent, ClearEvents, RemoveEvent, RemoveEventByIndex,
+        std::variant<InsertEvent, ClearEvents, RemoveEvent,
                      UpdateEventTick, RemoveDoubles,
                      UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent>;

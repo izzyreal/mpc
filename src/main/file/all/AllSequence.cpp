@@ -16,6 +16,7 @@
 #include "file/ByteUtil.hpp"
 #include "StrUtil.hpp"
 #include "Util.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -110,6 +111,8 @@ AllSequence::~AllSequence()
 void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
 {
     mpcSeq->init(barCount - 1);
+
+    mpcSeq->getStateManager()->drainQueue();
 
     for (int i = 0; i < barCount; i++)
     {

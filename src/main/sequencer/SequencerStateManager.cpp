@@ -203,7 +203,7 @@ void SequencerStateManager::applyPlayMessage(
 
         if (transport->isRecordingOrOverdubbing())
         {
-            // sequencer->storeSelectedSequenceInUndoPlaceHolder();
+            sequencer->storeSelectedSequenceInUndoPlaceHolder();
         }
     }
 

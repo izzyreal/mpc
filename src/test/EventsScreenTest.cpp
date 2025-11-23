@@ -28,7 +28,9 @@ TEST_CASE("COPY1", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    seq->getStateManager()->drainQueue();
 
     auto tr = seq->getTrack(0);
 
@@ -63,6 +65,8 @@ TEST_CASE("COPY1", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
+    seq->getStateManager()->drainQueue();
+
     tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
@@ -88,7 +92,9 @@ TEST_CASE("COPY2", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    seq->getStateManager()->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 23;
@@ -152,7 +158,9 @@ TEST_CASE("COPY3", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    seq->getStateManager()->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 23;
@@ -223,8 +231,11 @@ TEST_CASE("COPY4", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(1, 3, 4);
+    seq->getStateManager()->drainQueue();
 
     assert(seq->getLastTick() == 384 + 288);
 
@@ -266,7 +277,9 @@ TEST_CASE("COPY5", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    seq->getStateManager()->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 0;
@@ -300,6 +313,8 @@ TEST_CASE("COPY5", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
+    seq->getStateManager()->drainQueue();
+
     tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
@@ -328,6 +343,7 @@ TEST_CASE("COPY6", "[events-screen]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -361,6 +377,8 @@ TEST_CASE("COPY6", "[events-screen]")
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
+
+    seq->getStateManager()->drainQueue();
 
     tr->getEventStateManager()->drainQueue();
 
