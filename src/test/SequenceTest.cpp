@@ -7,6 +7,8 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 #include "sequencer/Event.hpp"
+#include "sequencer/SequenceStateManager.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
@@ -18,6 +20,7 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
 
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
+    seq->getStateManager()->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -29,7 +32,10 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     eventState.duration = mpc::Duration(42);
 
     tr->insertEvent(eventState);
+    tr->getEventStateManager()->drainQueue();
 
     seq->insertBars(1, 0);
+    seq->getStateManager()->drainQueue();
+    tr->getEventStateManager()->drainQueue();
     REQUIRE(tr->getEvent(0)->getTick() == 384);
 }
