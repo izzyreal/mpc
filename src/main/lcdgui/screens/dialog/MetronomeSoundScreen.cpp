@@ -80,7 +80,8 @@ void MetronomeSoundScreen::displayOutput() const
 
 void MetronomeSoundScreen::displayAccent() const
 {
-    const auto drumBus = sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
+    const auto drumBus =
+        sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgramIndex();
     const auto note =
         sampler.lock()->getProgram(program)->getPad(accentPad)->getNote();
@@ -90,7 +91,8 @@ void MetronomeSoundScreen::displayAccent() const
 
 void MetronomeSoundScreen::displayNormal() const
 {
-    const auto drumBus = sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
+    const auto drumBus =
+        sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgramIndex();
     const auto note =
         sampler.lock()->getProgram(program)->getPad(normalPad)->getNote();

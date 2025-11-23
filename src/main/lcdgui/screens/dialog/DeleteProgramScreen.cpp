@@ -35,7 +35,8 @@ void DeleteProgramScreen::function(const int i)
             }
             else
             {
-                sampler.lock()->deleteAllPrograms(/*createDefaultProgram=*/true);
+                sampler.lock()->deleteAllPrograms(
+                    /*createDefaultProgram=*/true);
             }
 
             openScreenById(ScreenId::ProgramScreen);

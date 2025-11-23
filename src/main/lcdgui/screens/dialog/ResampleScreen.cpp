@@ -15,7 +15,8 @@ ResampleScreen::ResampleScreen(Mpc &mpc, const int layerIndex)
 
 void ResampleScreen::open()
 {
-    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) &&
+        sampler.lock()->getSound())
     {
         newName = sampler.lock()->getSound()->getName();
         newName = sampler.lock()->addOrIncreaseNumber(newName);
@@ -79,7 +80,8 @@ void ResampleScreen::function(const int i)
             break;
         case 4:
         {
-            const auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex());
+            const auto snd =
+                sampler.lock()->getSound(sampler.lock()->getSoundIndex());
             const auto destSnd = sampler.lock()->addSound();
 
             if (destSnd == nullptr)

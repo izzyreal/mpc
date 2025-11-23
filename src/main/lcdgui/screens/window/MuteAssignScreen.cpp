@@ -128,7 +128,8 @@ void MuteAssignScreen::displayNote0() const
     }
 
     findField("note0")->setText(std::to_string(note0) + "/" +
-                                sampler.lock()->getPadName(pad) + "-" + soundName);
+                                sampler.lock()->getPadName(pad) + "-" +
+                                soundName);
 }
 
 void MuteAssignScreen::displayNote1() const
@@ -154,5 +155,6 @@ void MuteAssignScreen::displayNote1() const
     }
 
     findField("note1")->setText(std::to_string(note1) + "/" +
-                                sampler.lock()->getPadName(pad) + "-" + soundName);
+                                sampler.lock()->getPadName(pad) + "-" +
+                                soundName);
 }

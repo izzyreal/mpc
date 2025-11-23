@@ -57,7 +57,7 @@ void LoadASequenceFromAllScreen::function(const int i)
                 const auto loadASequenceScreen =
                     mpc.screens->get<ScreenId::LoadASequenceScreen>();
                 sequencer.lock()->setSequence(loadASequenceScreen->loadInto,
-                                       candidate);
+                                              candidate);
                 openScreenById(ScreenId::LoadScreen);
             }
             break;
@@ -87,9 +87,9 @@ void LoadASequenceFromAllScreen::displayLoadInto() const
     findField("load-into")
         ->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
     findLabel("load-into0")
-        ->setText(
-            "-" +
-            sequencer.lock()->getSequence(loadASequenceScreen->loadInto)->getName());
+        ->setText("-" + sequencer.lock()
+                            ->getSequence(loadASequenceScreen->loadInto)
+                            ->getName());
 }
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(const int i)

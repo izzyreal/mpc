@@ -26,7 +26,8 @@ void SongWindow::open()
         findField("default-name-first-letter");
 
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
+    const auto song =
+        sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
     defaultSongNameFirstLetterField->setText(

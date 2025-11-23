@@ -184,13 +184,13 @@ void AutoChromaticAssignmentScreen::displayOriginalKey() const
 
 void AutoChromaticAssignmentScreen::displaySnd() const
 {
-    const auto sampleName = sourceSoundIndex == -1
-                                ? "OFF"
-                                : sampler.lock()->getSoundName(sourceSoundIndex);
-    const std::string stereo = sourceSoundIndex == -1 ? ""
-                               : sampler.lock()->getSound(sourceSoundIndex)->isMono()
-                                   ? ""
-                                   : "(ST)";
+    const auto sampleName =
+        sourceSoundIndex == -1 ? "OFF"
+                               : sampler.lock()->getSoundName(sourceSoundIndex);
+    const std::string stereo =
+        sourceSoundIndex == -1                                 ? ""
+        : sampler.lock()->getSound(sourceSoundIndex)->isMono() ? ""
+                                                               : "(ST)";
     findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName() const

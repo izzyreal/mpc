@@ -91,7 +91,8 @@ void VmpcMidiScreen::open()
 
     screen->stayScreen = "vmpc-midi";
 
-    if (ls.lock()->isPreviousScreenNot({ScreenId::VmpcDiscardMappingChangesScreen}))
+    if
+    (ls.lock()->isPreviousScreenNot({ScreenId::VmpcDiscardMappingChangesScreen}))
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
 

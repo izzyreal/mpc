@@ -25,7 +25,8 @@ void SaveASequenceScreen::open()
     if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        nameScreen->setNameToEdit(sequencer.lock()->getSelectedSequence()->getName());
+        nameScreen->setNameToEdit(
+            sequencer.lock()->getSelectedSequence()->getName());
     }
 
     displaySaveAs();

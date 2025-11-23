@@ -399,7 +399,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         const auto t2 = toSequence->getTrack(i);
         t2->getEventStateManager()->drainQueue();
 
-
         if (!t2->isUsed())
         {
             t2->setUsed(true);

@@ -31,7 +31,7 @@ void deleteTestAllFile(const std::shared_ptr<AbstractDisk> &disk)
     {
         if (disk->getFileName(i) == filename)
         {
-            (void) disk->getFile(i)->del();
+            (void)disk->getFile(i)->del();
             disk->flush();
             disk->initFiles();
             break;
@@ -143,7 +143,8 @@ TEST_CASE("ALL file note event", "[allfile]")
     seq->getStateManager()->drainQueue();
     auto tr = seq->getTrack(63);
 
-    auto e = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60), mpc::Velocity(127), 0);
+    auto e = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60),
+                                        mpc::Velocity(127), 0);
     tr->finalizeNoteEventNonLive(e, mpc::Duration(1600));
     tr->getEventStateManager()->drainQueue();
     tr->getNoteEvents().front()->setVariationType(mpc::NoteVariationTypeFilter);

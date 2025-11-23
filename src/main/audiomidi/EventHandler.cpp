@@ -114,7 +114,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         audioServer->getSampleRate());
 
     auto performanceDrum =
-        mpc.getPerformanceManager().lock()->getSnapshot().getDrum(drumBus->getIndex());
+        mpc.getPerformanceManager().lock()->getSnapshot().getDrum(
+            drumBus->getIndex());
 
     const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, performanceDrum, drumBus, mpc.getSampler(),
@@ -278,7 +279,8 @@ void EventHandler::handleUnfinalizedNoteOn(
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
         const auto performanceDrum =
-            mpc.getPerformanceManager().lock()->getSnapshot().getDrum(drumBus->getIndex());
+            mpc.getPerformanceManager().lock()->getSnapshot().getDrum(
+                drumBus->getIndex());
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
             0, performanceDrum, drumBus, mpc.getSampler(),

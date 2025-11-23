@@ -86,7 +86,8 @@ void SaveASoundScreen::function(const int i)
 
                 disk->flush();
 
-                ls.lock()->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
+                ls.lock()->showPopupAndThenReturnToLayer("Saving " + fileName,
+                                                         700, 0);
             };
 
             if (disk->checkExists(fileName))

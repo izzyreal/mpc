@@ -27,7 +27,8 @@ MonoToStereoScreen::MonoToStereoScreen(Mpc &mpc, const int layerIndex)
 void MonoToStereoScreen::open()
 {
     if (sampler.lock()->getSound() &&
-        ls.lock()->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
+        ls.lock()->isPreviousScreenNot(
+            {ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         auto name = sampler.lock()->getSound()->getName();
         name = StrUtil::trim(name);
@@ -36,7 +37,8 @@ void MonoToStereoScreen::open()
         newStName = name + "-S";
     }
 
-    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot(
+            {ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         ls.lock()->setFocus("lsource");
     }
@@ -121,7 +123,8 @@ void MonoToStereoScreen::function(const int j)
             {
                 if (s->getName() == newStName)
                 {
-                    ls.lock()->showPopupAndAwaitInteraction("Name already used");
+                    ls.lock()->showPopupAndAwaitInteraction(
+                        "Name already used");
                     return;
                 }
             }
@@ -145,7 +148,8 @@ void MonoToStereoScreen::function(const int j)
                 *newSampleDataRight = *right->getSampleData();
             }
 
-            const auto newSound = sampler.lock()->addSound(left->getSampleRate());
+            const auto newSound =
+                sampler.lock()->addSound(left->getSampleRate());
 
             if (newSound == nullptr)
             {
@@ -171,7 +175,8 @@ void MonoToStereoScreen::displayLSource()
 
     findField("lsource")->setText(sampler.lock()->getSound()->getName());
 
-    if (sampler.lock()->getSound()->isMono() && sampler.lock()->getSound()->isMono())
+    if (sampler.lock()->getSound()->isMono() &&
+        sampler.lock()->getSound()->isMono())
     {
         ls.lock()->setFunctionKeysArrangement(0);
     }
@@ -214,6 +219,7 @@ void MonoToStereoScreen::displayNewStName() const
 
 void MonoToStereoScreen::setRSource(const int i)
 {
-    rSource = std::clamp(i, 0, std::max(0, sampler.lock()->getSoundCount() - 1));
+    rSource =
+        std::clamp(i, 0, std::max(0, sampler.lock()->getSoundCount() - 1));
     displayRSource();
 }

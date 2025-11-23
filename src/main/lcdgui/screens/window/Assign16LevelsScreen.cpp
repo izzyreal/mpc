@@ -154,8 +154,9 @@ void Assign16LevelsScreen::displayNote() const
         note == NoDrumNoteAssigned
             ? -1
             : program->getNoteParameters(note)->getSoundIndex();
-    const auto soundName =
-        soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+    const auto soundName = soundIndex == -1
+                               ? "(No sound)"
+                               : sampler.lock()->getSoundName(soundIndex);
 
     const auto noteName =
         note == NoDrumNoteAssigned ? "--" : std::to_string(note);

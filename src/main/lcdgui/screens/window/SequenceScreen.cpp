@@ -66,7 +66,8 @@ void SequenceScreen::openNameScreen()
     }
     else
     {
-        initialNameScreenName = sequencer.lock()->getSelectedSequence()->getName();
+        initialNameScreenName =
+            sequencer.lock()->getSelectedSequence()->getName();
 
         enterAction = [this](const std::string &nameScreenName)
         {

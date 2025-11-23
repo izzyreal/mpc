@@ -37,8 +37,8 @@ NoteRepeatProcessor::NoteRepeatProcessor(
     const std::function<bool()> &isSixteenLevelsEnabled)
     : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
       assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
-      performanceManager(performanceManager), hardwareSlider(std::move(h)), voices(v),
-      mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
+      performanceManager(performanceManager), hardwareSlider(std::move(h)),
+      voices(v), mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
 }
@@ -168,7 +168,8 @@ void NoteRepeatProcessor::process(
                     : noteParameters->getVoiceOverlapMode();
 
             auto performanceDrum =
-                performanceManager.lock()->getSnapshot().getDrum(drumBus->getIndex());
+                performanceManager.lock()->getSnapshot().getDrum(
+                    drumBus->getIndex());
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,

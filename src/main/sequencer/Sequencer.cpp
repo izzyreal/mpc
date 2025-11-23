@@ -121,8 +121,8 @@ void Sequencer::init()
     for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
          ++drumBusIndex)
     {
-        buses.emplace_back(std::make_shared<DrumBus>(DrumBusIndex(drumBusIndex),
-                                                     performanceManager.lock()));
+        buses.emplace_back(std::make_shared<DrumBus>(
+            DrumBusIndex(drumBusIndex), performanceManager.lock()));
     }
 
     lastTap = currentTimeMillis();

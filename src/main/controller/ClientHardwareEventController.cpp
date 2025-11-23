@@ -265,10 +265,12 @@ void ClientHardwareEventController::handlePadPress(
         if (*note >= 0)
         {
             constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
-            registryNoteOnEvent = mpc.getPerformanceManager().lock()->registerNoteOn(
-                PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
-                screenId, track->getIndex(), screen->getBus()->busType, *note,
-                Velocity(clampedVelocity), programIndex, [](void *) {});
+            registryNoteOnEvent =
+                mpc.getPerformanceManager().lock()->registerNoteOn(
+                    PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
+                    screenId, track->getIndex(), screen->getBus()->busType,
+                    *note, Velocity(clampedVelocity), programIndex,
+                    [](void *) {});
         }
     }
 
@@ -372,8 +374,7 @@ void ClientHardwareEventController::handlePadRelease(
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
 
-        const auto recordingNoteEventId =
-            recordingNoteOnEvent.noteEventId;
+        const auto recordingNoteEventId = recordingNoteOnEvent.noteEventId;
 
         if (p->noteNumber != NoNoteNumber)
         {
@@ -423,8 +424,9 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 
-    const std::function action = [performanceManager = mpc.getPerformanceManager(),
-                                  pressureToUse](void *userData)
+    const std::function action =
+        [performanceManager = mpc.getPerformanceManager(),
+         pressureToUse](void *userData)
     {
         const auto padPress = static_cast<PhysicalPadPressEvent *>(userData);
 

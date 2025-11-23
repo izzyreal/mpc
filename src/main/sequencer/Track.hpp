@@ -72,9 +72,7 @@ namespace mpc::sequencer
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
-        void timingCorrect(int fromBar, int toBar,
-                           EventId,
-                           Tick eventTick,
+        void timingCorrect(int fromBar, int toBar, EventId, Tick eventTick,
                            int stepLength, int swingPercentage) const;
 
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
@@ -146,11 +144,9 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventState
-            findRecordingNoteOnEventById(NoteEventId);
+        EventState findRecordingNoteOnEventById(NoteEventId);
 
-        EventState
-            findRecordingNoteOnEventByNoteNumber(NoteNumber);
+        EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
@@ -203,8 +199,7 @@ namespace mpc::sequencer
         std::vector<EventState> bulkNoteOns;
         std::vector<EventState> bulkNoteOffs;
 
-        void updateEventTick(EventId,
-                             int newTick) const;
+        void updateEventTick(EventId, int newTick) const;
 
         void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;

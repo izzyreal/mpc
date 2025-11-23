@@ -44,7 +44,8 @@ void EditSoundScreen::open()
 {
     findField("create-new-program")->setAlignment(Alignment::Centered);
 
-    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) &&
+        sampler.lock()->getSound())
     {
         auto newSoundName = sampler.lock()->getSound()->getName();
         newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
@@ -202,8 +203,9 @@ void EditSoundScreen::displayVariable() const
     }
     else if (edit == 3)
     {
-        const auto sampleName =
-            sampler.lock()->getSortedSounds()[insertSoundIndex].first->getName();
+        const auto sampleName = sampler.lock()
+                                    ->getSortedSounds()[insertSoundIndex]
+                                    .first->getName();
         findLabel("new-name")->setSize(11 * 6, 9);
         findLabel("new-name")->setText("Insert Snd:");
         findField("new-name")
@@ -339,7 +341,8 @@ void EditSoundScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "new-name" && edit == 3)
     {
-        setInsertSndNr(insertSoundIndex + increment, sampler.lock()->getSoundCount());
+        setInsertSndNr(insertSoundIndex + increment,
+                       sampler.lock()->getSoundCount());
     }
     else if (focusedFieldName == "ratio")
     {
@@ -500,15 +503,16 @@ void EditSoundScreen::handleSectionToNewSound() const
     }
 
     newSample->setMono(sound->isMono());
-    sampler.lock()->trimSample(sampler.lock()->getSoundCount() - 1, sound->getStart(),
-                        sound->getEnd());
+    sampler.lock()->trimSample(sampler.lock()->getSoundCount() - 1,
+                               sound->getStart(), sound->getEnd());
     sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 }
 
 void EditSoundScreen::handleInsertSoundSectionStart() const
 {
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    const auto source = sampler.lock()->getSortedSounds()[insertSoundIndex].first;
+    const auto source =
+        sampler.lock()->getSortedSounds()[insertSoundIndex].first;
     const auto destination = sampler.lock()->getSound();
 
     const int destinationStartFrame = getStartEndFromContext().first;
@@ -714,13 +718,15 @@ void EditSoundScreen::handleSliceSound() const
     {
         const auto start = zoneScreen->getZoneStart(i);
         const auto end = zoneScreen->getZoneEnd(i);
-        const auto zone = createZone(sampler.lock(), source, start, end, endMargin);
+        const auto zone =
+            createZone(sampler.lock(), source, start, end, endMargin);
         if (!zone)
         {
             return;
         }
 
-        zone->setName(i == 0 ? newName : sampler.lock()->addOrIncreaseNumber(newName));
+        zone->setName(i == 0 ? newName
+                             : sampler.lock()->addOrIncreaseNumber(newName));
     }
 
     if (!createNewProgram)
@@ -728,20 +734,23 @@ void EditSoundScreen::handleSliceSound() const
         return;
     }
 
-    const auto p = sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
+    const auto p =
+        sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
     p->setName(source->getName());
 
     for (int i = 0; i < zoneCount; i++)
     {
         const auto pad = p->getPad(i);
         const auto noteParams = p->getNoteParameters(pad->getNote());
-        noteParams->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount + i);
+        noteParams->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount +
+                                  i);
     }
 
     if (const auto drumBus = sequencer.lock()->getBus<DrumBus>(
             sequencer.lock()->getSelectedTrack()->getBusType()))
     {
-        drumBus->setProgramIndex(ProgramIndex(sampler.lock()->getProgramCount() - 1));
+        drumBus->setProgramIndex(
+            ProgramIndex(sampler.lock()->getProgramCount() - 1));
     }
 }
 

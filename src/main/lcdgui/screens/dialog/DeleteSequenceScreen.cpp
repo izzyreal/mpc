@@ -41,7 +41,8 @@ void DeleteSequenceScreen::function(const int i)
             break;
         case 4:
             sequencer.lock()->getTransport()->setPosition(0);
-            sequencer.lock()->purgeSequence(sequencer.lock()->getSelectedSequenceIndex());
+            sequencer.lock()->purgeSequence(
+                sequencer.lock()->getSelectedSequenceIndex());
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
@@ -49,9 +50,11 @@ void DeleteSequenceScreen::function(const int i)
 
 void DeleteSequenceScreen::displaySequenceNumberName() const
 {
-    const auto sequenceName = sequencer.lock()->getSelectedSequence()->getName();
+    const auto sequenceName =
+        sequencer.lock()->getSelectedSequence()->getName();
     findField("sq")->setText(
         StrUtil::padLeft(
-            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0", 2) +
+            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1),
+            "0", 2) +
         "-" + sequenceName);
 }

@@ -66,7 +66,8 @@ void DeleteSongScreen::function(const int i)
 void DeleteSongScreen::displaySong() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
+    const auto song =
+        sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(songScreen->getSelectedSongIndex() + 1),
                          "0", 2) +

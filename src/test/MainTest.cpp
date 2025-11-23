@@ -4,7 +4,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/Transport.hpp"
 
 using namespace mpc;
 
@@ -17,7 +16,6 @@ TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 
 SCENARIO("A Sequence initializes correctly", "[sequence]")
 {
-
     GIVEN("An initialized Sequence")
     {
         Mpc mpc;

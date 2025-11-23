@@ -51,8 +51,8 @@ void MidiOutputScreen::openNameScreen()
         const auto enterAction =
             [this, renameDeviceIndex](const std::string &nameScreenName)
         {
-            sequencer.lock()->getSelectedSequence()->setDeviceName(renameDeviceIndex,
-                                                            nameScreenName);
+            sequencer.lock()->getSelectedSequence()->setDeviceName(
+                renameDeviceIndex, nameScreenName);
             openScreenById(ScreenId::MidiOutputScreen);
         };
 

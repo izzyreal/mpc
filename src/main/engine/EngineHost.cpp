@@ -110,8 +110,9 @@ void EngineHost::start()
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
         mpc.getSequencer(), mpc.getSampler(), mixer,
         mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
-        mpc.screens->get<ScreenId::MixerSetupScreen>(), mpc.getPerformanceManager(),
-        mpc.getHardware()->getSlider(), &voices, mixerConnections,
+        mpc.screens->get<ScreenId::MixerSetupScreen>(),
+        mpc.getPerformanceManager(), mpc.getHardware()->getSlider(), &voices,
+        mixerConnections,
         [controller = mpc.clientEventController]
         {
             return controller->isFullLevelEnabled();

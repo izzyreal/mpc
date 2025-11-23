@@ -27,7 +27,9 @@ void SaveAProgramScreen::open()
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         const auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
         nameScreen->setNameToEdit(
-            sampler.lock()->getProgram(saveScreen->getProgramIndex())->getName());
+            sampler.lock()
+                ->getProgram(saveScreen->getProgramIndex())
+                ->getName());
     }
 
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);

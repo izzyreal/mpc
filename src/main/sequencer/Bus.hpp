@@ -77,8 +77,7 @@ namespace mpc::sequencer
 
     private:
         const DrumBusIndex drumIndex;
-        const std::weak_ptr<performance::PerformanceManager>
-            performanceManager;
+        const std::weak_ptr<performance::PerformanceManager> performanceManager;
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;
         std::vector<std::shared_ptr<engine::IndivFxMixer>> indivFxMixerChannels;

@@ -53,7 +53,7 @@ namespace mpc::concurrency
     public:
         virtual ~AtomicStateExchange()
         {
-//            printf("Deleting atomic state exchange\n");
+            //            printf("Deleting atomic state exchange\n");
         }
 
         virtual void enqueue(Message &&msg) const noexcept

@@ -70,7 +70,7 @@ Sequence::Sequence(
 
 Sequence::~Sequence()
 {
-//    printf("~Sequence\n");
+    //    printf("~Sequence\n");
 }
 
 void Sequence::setLoopStart(const int l)

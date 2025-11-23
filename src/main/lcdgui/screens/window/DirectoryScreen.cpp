@@ -117,7 +117,8 @@ void DirectoryScreen::function(const int f)
 
                 if (const auto success = file->setName(finalNewName); !success)
                 {
-                    ls.lock()->showPopupAndAwaitInteraction("File name exists !!");
+                    ls.lock()->showPopupAndAwaitInteraction(
+                        "File name exists !!");
                     return;
                 }
 
@@ -187,7 +188,8 @@ void DirectoryScreen::function(const int f)
                         msg = "Folder name exists !!";
                     }
 
-                    ls.lock()->showPopupAndThenOpen(ScreenId::NameScreen, msg, 1000);
+                    ls.lock()->showPopupAndThenOpen(ScreenId::NameScreen, msg,
+                                                    1000);
                     return;
                 }
 
@@ -262,8 +264,8 @@ void DirectoryScreen::function(const int f)
                             }
                             else
                             {
-                                ls.lock()->showPopupAndAwaitInteraction("Can't play " +
-                                                                 name);
+                                ls.lock()->showPopupAndAwaitInteraction(
+                                    "Can't play " + name);
                             }
                         });
                 };
@@ -663,7 +665,8 @@ void DirectoryScreen::refreshFocus() const
     else if (xPos == 1)
     {
         const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-        ls.lock()->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
+        ls.lock()->setFocus("b" +
+                            std::to_string(loadScreen->fileLoad - yOffset1));
     }
 }
 

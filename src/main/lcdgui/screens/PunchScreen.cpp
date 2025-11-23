@@ -29,7 +29,8 @@ void PunchScreen::open()
         return;
     }
 
-    const auto lastTick = sequencer.lock()->getSelectedSequence()->getLastTick();
+    const auto lastTick =
+        sequencer.lock()->getSelectedSequence()->getLastTick();
 
     if (lastTick < sequencer.lock()->getTransport()->getPunchInTime() ||
         lastTick < sequencer.lock()->getTransport()->getPunchOutTime() ||
@@ -48,7 +49,8 @@ void PunchScreen::open()
     displayBackground();
     displayAutoPunch();
 
-    ls.lock()->setFunctionKeysArrangement(sequencer.lock()->getTransport()->isPunchEnabled());
+    ls.lock()->setFunctionKeysArrangement(
+        sequencer.lock()->getTransport()->isPunchEnabled());
 }
 
 void PunchScreen::turnWheel(int i)
@@ -98,8 +100,8 @@ void PunchScreen::setAutoPunch(int i)
 void PunchScreen::displayAutoPunch() const
 {
     findField("auto-punch")
-        ->setText(
-            autoPunchNames[sequencer.lock()->getTransport()->getAutoPunchMode()]);
+        ->setText(autoPunchNames
+                      [sequencer.lock()->getTransport()->getAutoPunchMode()]);
 }
 
 void PunchScreen::displayTime()
@@ -118,8 +120,8 @@ void PunchScreen::displayTime()
             ->Hide(sequencer.lock()->getTransport()->getAutoPunchMode() == 0);
     }
 
-    findLabel("time3")->Hide(sequencer.lock()->getTransport()->getAutoPunchMode() !=
-                             2);
+    findLabel("time3")->Hide(
+        sequencer.lock()->getTransport()->getAutoPunchMode() != 2);
 
     findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1,
                                       "0");

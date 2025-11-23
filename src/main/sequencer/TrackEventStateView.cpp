@@ -66,8 +66,7 @@ int TrackEventStateView::getEventCount() const
     return state->events.size();
 }
 
-std::vector<EventState>
-TrackEventStateView::getNoteEvents() const
+std::vector<EventState> TrackEventStateView::getNoteEvents() const
 {
     std::vector<EventState> result;
 
@@ -82,8 +81,7 @@ TrackEventStateView::getNoteEvents() const
     return result;
 }
 
-EventState
-TrackEventStateView::findRecordingNoteOnByNoteNumber(
+EventState TrackEventStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
     for (auto &e : getNoteEvents())
@@ -96,8 +94,7 @@ TrackEventStateView::findRecordingNoteOnByNoteNumber(
     return {};
 }
 
-EventState
-TrackEventStateView::findRecordingNoteOnByNoteEventId(
+EventState TrackEventStateView::findRecordingNoteOnByNoteEventId(
     const NoteEventId id) const
 {
     for (auto &e : getNoteEvents())
@@ -110,8 +107,7 @@ TrackEventStateView::findRecordingNoteOnByNoteEventId(
     return {};
 }
 
-EventState
-TrackEventStateView::getEventById(const EventId eventId) const
+EventState TrackEventStateView::getEventById(const EventId eventId) const
 {
     for (auto &e : state->events)
     {

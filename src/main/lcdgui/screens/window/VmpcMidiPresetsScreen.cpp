@@ -46,7 +46,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
                 MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(
                     this->mpc);
                 ls.lock()->showPopupAndThenOpen(ScreenId::VmpcMidiPresetsScreen,
-                                         "Saving " + presetName, 1000);
+                                                "Saving " + presetName, 1000);
             };
 
             const auto initializeNameScreen = [this, presetName]
@@ -83,7 +83,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
             this->mpc.getDisk()->writeMidiControlPreset(preset);
             MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(this->mpc);
             ls.lock()->showPopupAndThenOpen(ScreenId::VmpcMidiPresetsScreen,
-                                     "Saving " + presetName, 1000);
+                                            "Saving " + presetName, 1000);
         }
     };
 }

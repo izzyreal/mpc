@@ -94,7 +94,8 @@ void LoadASoundScreen::function(const int i)
                         mpc.getEngineHost()
                             ->getPreviewSoundPlayer()
                             ->finishVoice();
-                        sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+                        sampler.lock()->deleteSound(
+                            sampler.lock()->getPreviewSound());
                     },
                     0);
 

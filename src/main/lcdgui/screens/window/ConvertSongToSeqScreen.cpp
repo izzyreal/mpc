@@ -147,14 +147,16 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
+    const auto song =
+        sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
 
     if (!song->isUsed())
     {
         return;
     }
 
-    const auto destinationSequence = sequencer.lock()->getSequence(toSequenceIndex);
+    const auto destinationSequence =
+        sequencer.lock()->getSequence(toSequenceIndex);
 
     destinationSequence->init(0);
     destinationSequence->setName(song->getName());
@@ -163,7 +165,8 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
     {
         const auto step = song->getStep(stepIndex).lock();
         const auto sourceSequenceIndex = step->getSequence();
-        const auto sourceSequence = sequencer.lock()->getSequence(sourceSequenceIndex);
+        const auto sourceSequence =
+            sequencer.lock()->getSequence(sourceSequenceIndex);
         const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
             destinationSequence->getLastBarIndex();
 

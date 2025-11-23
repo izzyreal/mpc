@@ -83,8 +83,8 @@ void LoadASequenceScreen::setLoadInto(const SequenceIndex i)
 void LoadASequenceScreen::displayLoadInto() const
 {
     findField("load-into")->setTextPadded(loadInto + 1, "0");
-    findLabel("name")->setText("-" +
-                               sequencer.lock()->getSequence(loadInto)->getName());
+    findLabel("name")->setText(
+        "-" + sequencer.lock()->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile() const

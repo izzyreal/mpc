@@ -143,8 +143,9 @@ void AssignmentViewScreen::displayPad(const int i) const
     {
         const auto sampleNumber =
             program->getNoteParameters(note)->getSoundIndex();
-        sampleName =
-            sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
+        sampleName = sampleNumber != -1
+                         ? sampler.lock()->getSoundName(sampleNumber)
+                         : "--";
 
         if (sampleName.length() > 8)
         {
@@ -188,8 +189,9 @@ void AssignmentViewScreen::displaySoundName() const
         soundIndex == -1 ? "OFF" : sampler.lock()->getSoundName(soundIndex);
 
     const std::string stereo =
-        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono() ? "(ST)"
-                                                                     : "";
+        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono()
+            ? "(ST)"
+            : "";
 
     findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) +
                                 stereo);

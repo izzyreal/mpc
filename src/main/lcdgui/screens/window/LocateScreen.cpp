@@ -58,8 +58,8 @@ void LocateScreen::function(const int i)
             }
             else
             {
-                sequencer.lock()->getTransport()->setBarBeatClock(barIndex, beatIndex,
-                                                           clock);
+                sequencer.lock()->getTransport()->setBarBeatClock(
+                    barIndex, beatIndex, clock);
             }
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -214,8 +214,8 @@ uint8_t LocateScreen::getMaxBeatIndexForThisBar() const
 
 uint8_t LocateScreen::getMaxClockForThisBar() const
 {
-    return 96 * (4.0 /
-                 sequencer.lock()->getSelectedSequence()->getDenominator(barIndex)) -
+    return 96 * (4.0 / sequencer.lock()->getSelectedSequence()->getDenominator(
+                           barIndex)) -
            1;
 }
 

@@ -51,13 +51,13 @@ void TrackScreen::openNameScreen()
 
     if (focusedFieldName.find("default") != std::string::npos)
     {
-        initialNameScreenName =
-            sequencer.lock()->getDefaultTrackName(sequencer.lock()->getSelectedTrackIndex());
+        initialNameScreenName = sequencer.lock()->getDefaultTrackName(
+            sequencer.lock()->getSelectedTrackIndex());
 
         enterAction = [this](const std::string &nameScreenName)
         {
-            sequencer.lock()->setDefaultTrackName(nameScreenName,
-                                           sequencer.lock()->getSelectedTrackIndex());
+            sequencer.lock()->setDefaultTrackName(
+                nameScreenName, sequencer.lock()->getSelectedTrackIndex());
             openScreenById(ScreenId::SequencerScreen);
         };
     }

@@ -118,7 +118,7 @@ TEST_CASE("BARS2", "[bars-screen]")
     {
         EventState eventState;
         eventState.type = EventType::NoteOn;
-        eventState.tick = i*24;
+        eventState.tick = i * 24;
         eventState.noteNumber = NoteNumber(35 + i);
         eventState.velocity = MaxVelocity;
         eventState.duration = Duration(42);

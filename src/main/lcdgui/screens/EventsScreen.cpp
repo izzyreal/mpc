@@ -203,7 +203,8 @@ void EventsScreen::turnWheel(const int i)
 {
     const auto toSequence = sequencer.lock()->getSequence(toSq);
 
-    if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getSelectedSequence().get(),
+    if (checkAllTimesAndNotes(mpc, i,
+                              sequencer.lock()->getSelectedSequence().get(),
                               sequencer.lock()->getSelectedTrack().get()))
     {
         return;
@@ -481,7 +482,8 @@ void EventsScreen::displayNotes()
     }
     else
     {
-        assert(isMidiBusType(sequencer.lock()->getSelectedTrack()->getBusType()));
+        assert(
+            isMidiBusType(sequencer.lock()->getSelectedTrack()->getBusType()));
         findField("note0")->setSize(47, 9);
         findField("note1")->Hide(false);
         findLabel("note1")->Hide(false);
@@ -509,9 +511,11 @@ void EventsScreen::displayDrumNotes()
     else
     {
         const auto track = sequencer.lock()->getSelectedTrack();
-        const auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
+        const auto drumBus =
+            sequencer.lock()->getBus<DrumBus>(track->getBusType());
         assert(drumBus);
-        const auto program = sampler.lock()->getProgram(drumBus->getProgramIndex());
+        const auto program =
+            sampler.lock()->getProgram(drumBus->getProgramIndex());
 
         const auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
         const auto padName = sampler.lock()->getPadName(
@@ -628,7 +632,8 @@ void EventsScreen::displayFromSq() const
 
 void EventsScreen::displayFromTr() const
 {
-    findField("from-tr")->setTextPadded(sequencer.lock()->getSelectedTrackIndex() + 1);
+    findField("from-tr")->setTextPadded(
+        sequencer.lock()->getSelectedTrackIndex() + 1);
 }
 
 void EventsScreen::displayToSq() const
@@ -714,7 +719,8 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     if (!copyModeMerge)
     {
         const auto destTrackEvents = destTrack->getEvents();
-        for (auto it = destTrackEvents.end() - 1; it != destTrackEvents.begin(); --it)
+        for (auto it = destTrackEvents.end() - 1; it != destTrackEvents.begin();
+             --it)
         {
 
             if (const auto tick = (*it)->getTick();

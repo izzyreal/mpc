@@ -193,11 +193,11 @@ void UserScreen::displayDeviceName()
     {
         if (device == 0)
         {
-            const auto programName =
-                sampler.lock()
-                    ->getProgram(
-                        sequencer.lock()->getDrumBus(busType)->getProgramIndex())
-                    ->getName();
+            const auto programName = sampler.lock()
+                                         ->getProgram(sequencer.lock()
+                                                          ->getDrumBus(busType)
+                                                          ->getProgramIndex())
+                                         ->getName();
             findLabel("devicename")->setText(programName);
         }
         else

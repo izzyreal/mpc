@@ -10,8 +10,7 @@ namespace mpc::sequencer
         int getProgram() const;
 
         explicit ProgramChangeEvent(
-            const std::function<EventState()>
-                &getSnapshot,
+            const std::function<EventState()> &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
 
         std::string getTypeName() const override

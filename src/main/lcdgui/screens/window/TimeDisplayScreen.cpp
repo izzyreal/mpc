@@ -20,7 +20,8 @@ void TimeDisplayScreen::open()
 
 void TimeDisplayScreen::turnWheel(const int i)
 {
-    const auto startTime = sequencer.lock()->getSelectedSequence()->getStartTime();
+    const auto startTime =
+        sequencer.lock()->getSelectedSequence()->getStartTime();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +62,8 @@ void TimeDisplayScreen::displayDisplayStyle() const
 
 void TimeDisplayScreen::displayStartTime() const
 {
-    const auto startTime = sequencer.lock()->getSelectedSequence()->getStartTime();
+    const auto startTime =
+        sequencer.lock()->getSelectedSequence()->getStartTime();
     findField("hours")->setText(
         StrUtil::padLeft(std::to_string(startTime.hours), "0", 2));
     findField("minutes")->setText(

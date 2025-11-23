@@ -104,11 +104,14 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
              }
 
              findField("now0")->setTextPadded(
-                 sequencer.lock()->getTransport()->getCurrentBarIndex() + 1, "0");
+                 sequencer.lock()->getTransport()->getCurrentBarIndex() + 1,
+                 "0");
              findField("now1")->setTextPadded(
-                 sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
+                 sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1,
+                 "0");
              findField("now2")->setTextPadded(
-                 sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
+                 sequencer.lock()->getTransport()->getCurrentClockNumber(),
+                 "0");
          }});
 }
 
@@ -176,7 +179,8 @@ void StepEditorScreen::open()
             else
             {
                 const auto row = eventCount - 1;
-                ls.lock()->setFocus(lastColumn[eventType] + std::to_string(row));
+                ls.lock()->setFocus(lastColumn[eventType] +
+                                    std::to_string(row));
             }
         }
     }
@@ -295,7 +299,8 @@ void StepEditorScreen::function(int i)
             const std::string newEventType =
                 visibleEvents[rowIndex]->getTypeName();
 
-            ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(rowIndex));
+            ls.lock()->setFocus(lastColumn[newEventType] +
+                                std::to_string(rowIndex));
             break;
         }
         case 3:
@@ -774,7 +779,8 @@ void StepEditorScreen::nextBarEnd()
                     ->isPressed())
             {
                 sequencer.lock()->getTransport()->setBar(
-                    sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1);
+                    sequencer.lock()->getSelectedSequence()->getLastBarIndex() +
+                    1);
             }
             else
             {
@@ -849,7 +855,8 @@ void StepEditorScreen::up()
 
             const auto newEventType = visibleEvents[srcNumber]->getTypeName();
 
-            ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
+            ls.lock()->setFocus(lastColumn[newEventType] +
+                                std::to_string(srcNumber));
 
             if (mpc.getHardware()
                     ->getButton(hardware::ComponentId::SHIFT)
@@ -949,7 +956,7 @@ void StepEditorScreen::downOrUp(const int increment)
                 const auto newEventType =
                     visibleEvents[srcNumber + increment]->getTypeName();
                 ls.lock()->setFocus(lastColumn[newEventType] +
-                             std::to_string(srcNumber + increment));
+                                    std::to_string(srcNumber + increment));
             }
         }
 
@@ -1051,7 +1058,8 @@ StepEditorScreen::computeEventsAtCurrentTick() const
     auto trackEvents = track->getEvents();
     for (auto &event : track->getEvents())
     {
-        if (event->getTick() == sequencer.lock()->getTransport()->getTickPosition())
+        if (event->getTick() ==
+            sequencer.lock()->getTransport()->getTickPosition())
         {
             if ((view == 0 || view == 1) &&
                 std::dynamic_pointer_cast<NoteOnEvent>(event))
@@ -1144,7 +1152,8 @@ void StepEditorScreen::refreshEventRows()
         if (event)
         {
             eventRow->Hide(false);
-            eventRow->setBus(sequencer.lock()->getSelectedTrack()->getBusType());
+            eventRow->setBus(
+                sequencer.lock()->getSelectedTrack()->getBusType());
         }
         else
         {
@@ -1207,8 +1216,8 @@ void StepEditorScreen::setViewNotesText() const
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padName =
-                sampler.lock()->getPadName(program->getPadIndexFromNote(fromNote));
+            const auto padName = sampler.lock()->getPadName(
+                program->getPadIndexFromNote(fromNote));
             findField("fromnote")
                 ->setText(std::to_string(fromNote) + "/" + padName);
         }

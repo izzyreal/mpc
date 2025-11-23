@@ -136,16 +136,16 @@ void TriggerLocalNoteOnCommand::execute()
         ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note, velo,
-            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
+            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note,
+            velo, ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
         ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note, velo,
-            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
+            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note,
+            velo, ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
 
@@ -156,7 +156,8 @@ void TriggerLocalNoteOnCommand::execute()
             const int bar =
                 ctx->sequencer.lock()->getTransport()->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
-                0, bar, ctx->sequencer.lock()->getTransport()->getTickPosition(),
+                0, bar,
+                ctx->sequencer.lock()->getTransport()->getTickPosition(),
                 stepLength, timingCorrectScreen->getSwing());
 
             if (ctx->sequencer.lock()->getTransport()->getTickPosition() !=

@@ -46,16 +46,17 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
                             displaySq();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getTransport()->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            displayNow0();
-                            displayNow1();
-                            displayNow2();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->getTickPosition();
+         },
+         [&](auto)
+         {
+             displayNow0();
+             displayNow1();
+             displayNow2();
+         }});
 
     addReactiveBinding({[&]
                         {
@@ -101,8 +102,9 @@ void NextSeqScreen::turnWheel(const int increment)
     {
         if (sequencer.lock()->getTransport()->isPlaying())
         {
-            sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() +
-                                 increment);
+            sequencer.lock()->setNextSq(
+                sequencer.lock()->getCurrentlyPlayingSequenceIndex() +
+                increment);
             ls.lock()->setFocus("nextsq");
         }
         else
@@ -180,16 +182,19 @@ void NextSeqScreen::displaySq() const
     if (sequencer.lock()->getTransport()->isPlaying())
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + 1),
+            std::to_string(
+                sequencer.lock()->getCurrentlyPlayingSequenceIndex() + 1),
             "0", 2));
         result.append("-");
-        result.append(sequencer.lock()->getCurrentlyPlayingSequence()->getName());
+        result.append(
+            sequencer.lock()->getCurrentlyPlayingSequence()->getName());
         findField("sq")->setText(result);
     }
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer.lock()->getSelectedSequenceIndex().get() + 1),
+            std::to_string(sequencer.lock()->getSelectedSequenceIndex().get() +
+                           1),
             "0", 2));
         result.append("-");
         result.append(sequencer.lock()->getSelectedSequence()->getName());
@@ -205,8 +210,8 @@ void NextSeqScreen::displayNextSq() const
     if (nextSq != NoSequenceIndex)
     {
         const auto seqName = sequencer.lock()->getSequence(nextSq)->getName();
-        res = StrUtil::padLeft(std::to_string(sequencer.lock()->getNextSq() + 1), "0",
-                               2) +
+        res = StrUtil::padLeft(
+                  std::to_string(sequencer.lock()->getNextSq() + 1), "0", 2) +
               "-" + seqName;
     }
 
@@ -267,9 +272,10 @@ void NextSeqScreen::displayTempoLabel() const
 void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
-                      ? "(SEQ)"
-                      : "(MAS)");
+        ->setText(
+            sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
+                ? "(SEQ)"
+                : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming() const

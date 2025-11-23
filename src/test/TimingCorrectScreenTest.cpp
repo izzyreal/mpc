@@ -26,7 +26,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     eventState.velocity = mpc::MaxVelocity;
     eventState.duration = mpc::Duration(1);
 
-    auto tr =  mpc.getSequencer()->getSelectedSequence()->getTrack(0);
+    auto tr = mpc.getSequencer()->getSelectedSequence()->getTrack(0);
 
     tr->insertEvent(eventState);
 

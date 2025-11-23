@@ -123,7 +123,8 @@ void SampleScreen::function(const int i)
             else if (mpc.getEngineHost()->getSoundRecorder()->isArmed())
             {
                 mpc.getEngineHost()->getSoundRecorder()->setArmed(false);
-                sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+                sampler.lock()->deleteSound(sampler.lock()->getSoundCount() -
+                                            1);
             }
             break;
         case 5:

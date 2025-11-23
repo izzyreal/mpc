@@ -38,8 +38,7 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
-    std::weak_ptr<Sequencer> sequencer,
-    const std::shared_ptr<Sampler> &sampler,
+    std::weak_ptr<Sequencer> sequencer, const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<MidiInputScreen> &midiInputScreen,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
     const std::shared_ptr<MultiRecordingSetupScreen> &multiRecordingSetupScreen,
@@ -283,7 +282,10 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
                 noteEventInfo->recordNoteEventId,
-                sequencer.lock()->getSelectedSequence()->getTrack(trackIndex).get(),
+                sequencer.lock()
+                    ->getSelectedSequence()
+                    ->getTrack(trackIndex)
+                    .get(),
                 noteEventInfo->busType, screen, programPadIndex, program,
                 sequencer, sequencerPlaybackEngine, performanceManager.lock(),
                 clientEventController, eventHandler, screens, hardware);
@@ -415,8 +417,12 @@ void ClientMidiEventController::handleProgramChange(
         {
             if (sequencer.lock()->getTransport()->isPlaying())
             {
-                if (!sequencer.lock()->getTransport()->isRecordingOrOverdubbing() &&
-                    sequencer.lock()->getSequence(e.getProgramNumber())->isUsed())
+                if (!sequencer.lock()
+                         ->getTransport()
+                         ->isRecordingOrOverdubbing() &&
+                    sequencer.lock()
+                        ->getSequence(e.getProgramNumber())
+                        ->isUsed())
                 {
                     if (clientEventController->getLayeredScreen()
                             ->isCurrentScreen({ScreenId::NextSeqScreen,

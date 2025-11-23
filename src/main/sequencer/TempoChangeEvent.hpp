@@ -29,8 +29,7 @@ namespace mpc::sequencer
         void setParent(Sequence *newParent);
 
         TempoChangeEvent(
-            const std::function<EventState()>
-                &getSnapshot,
+            const std::function<EventState()> &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch,
             Sequence *parent);
 

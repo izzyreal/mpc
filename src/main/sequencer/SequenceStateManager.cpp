@@ -11,7 +11,7 @@ SequenceStateManager::SequenceStateManager(Sequence *sequence)
 
 SequenceStateManager::~SequenceStateManager()
 {
-//    printf("~SequenceStateManager\n");
+    //    printf("~SequenceStateManager\n");
 }
 
 void SequenceStateManager::applyMessage(const SequenceMessage &msg) noexcept

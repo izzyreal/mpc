@@ -95,7 +95,8 @@ void LoadScreen::function(const int i)
                         mpc.getDisks()[device]->getVolume();
                     candidateVolume.mode == DISABLED)
                 {
-                    ls.lock()->showPopupForMs("Device is disabled in DISKS", 1000);
+                    ls.lock()->showPopupForMs("Device is disabled in DISKS",
+                                              1000);
                     return;
                 }
 
@@ -114,7 +115,8 @@ void LoadScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls.lock()->showPopupForMs("Error! Device seems in use", 2000);
+                        ls.lock()->showPopupForMs("Error! Device seems in use",
+                                                  2000);
                         return;
                     }
                 }
@@ -169,8 +171,8 @@ void LoadScreen::function(const int i)
                             }
                             else
                             {
-                                ls.lock()->showPopupAndAwaitInteraction("Can't play " +
-                                                                 name);
+                                ls.lock()->showPopupAndAwaitInteraction(
+                                    "Can't play " + name);
                             }
                         });
                 };
@@ -343,8 +345,8 @@ void LoadScreen::displayFreeSnd() const
 {
     findLabel("freesnd")->setText(
         " " +
-        StrUtil::padLeft(std::to_string(sampler.lock()->getFreeSampleSpace()), " ",
-                         5) +
+        StrUtil::padLeft(std::to_string(sampler.lock()->getFreeSampleSpace()),
+                         " ", 5) +
         "K");
 }
 

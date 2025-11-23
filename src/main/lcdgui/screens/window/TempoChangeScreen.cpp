@@ -35,7 +35,8 @@ TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer.lock()->getSelectedSequence()
+                            return sequencer.lock()
+                                ->getSelectedSequence()
                                 ->getTempoChangeTrack()
                                 ->getEvents();
                         },
@@ -392,7 +393,7 @@ void TempoChangeScreen::function(const int j)
                 }
 
                 ls.lock()->setFocus(focusedFieldName.substr(0, 1) +
-                             std::to_string(nowDetected - offset));
+                                    std::to_string(nowDetected - offset));
             }
         }
         break;
@@ -658,7 +659,8 @@ void TempoChangeScreen::up()
         return;
     }
 
-    ls.lock()->setFocus(focusedFieldName.substr(0, 1) + std::to_string(yPos - 1));
+    ls.lock()->setFocus(focusedFieldName.substr(0, 1) +
+                        std::to_string(yPos - 1));
 }
 
 void TempoChangeScreen::setOffset(int i)

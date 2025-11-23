@@ -9,7 +9,7 @@ TrackEventStateManager::TrackEventStateManager()
 
 TrackEventStateManager::~TrackEventStateManager()
 {
-//    printf("~TrackEventStateManager\n");
+    //    printf("~TrackEventStateManager\n");
 }
 
 void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
@@ -155,7 +155,12 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
                 auto &events = activeState.events;
-                auto it = std::find_if(events.begin(), events.end(), [eventId = m.eventId](const EventState &e){ return e.eventId == eventId;});
+                auto it =
+                    std::find_if(events.begin(), events.end(),
+                                 [eventId = m.eventId](const EventState &e)
+                                 {
+                                     return e.eventId == eventId;
+                                 });
                 assert(it != events.end());
                 const auto oldIndex = it - events.begin();
                 const Tick newTick = m.newTick;
@@ -178,7 +183,12 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
                 auto &events = activeState.events;
-                auto it = std::find_if(events.begin(), events.end(), [eventId = m.eventId](const EventState &e){ return e.eventId == eventId;});
+                auto it =
+                    std::find_if(events.begin(), events.end(),
+                                 [eventId = m.eventId](const EventState &e)
+                                 {
+                                     return e.eventId == eventId;
+                                 });
                 assert(it != events.end());
                 activeState.events.erase(it);
             }

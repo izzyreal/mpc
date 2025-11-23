@@ -87,10 +87,13 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 //     // Quantized positions: 0  , 24 , 48 , 72 , 96 , 120, 144, 168, 192, 216,
 //     // 240, 264, 288, 312, 336, 360, 384
 //
-//     // The event at tick 382 is expected to be quantized to tick 0, because the
-//     // sequence is one bar long. Event at tick 2 will also be quantized to tick
+//     // The event at tick 382 is expected to be quantized to tick 0, because
+//     the
+//     // sequence is one bar long. Event at tick 2 will also be quantized to
+//     tick
 //     // 0. Hence of the 17 ticks below, only 16 will survive.
-//     std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167, 194,
+//     std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167,
+//     194,
 //                                    218, 243, 264, 290, 310, 332, 361, 382};
 //
 //     std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
@@ -132,8 +135,8 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 //             {
 //                 mpc.getEngineHost()->applyPendingStateChanges();
 //                 mpc.getClock()->processBufferInternal(
-//                     seq->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
-//                     0);
+//                     seq->getTransport()->getTempo(), SAMPLE_RATE,
+//                     BUFFER_SIZE, 0);
 //                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
 //                 timeInSamples += BUFFER_SIZE;
 //

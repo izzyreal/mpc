@@ -33,7 +33,8 @@ DrumBus::DrumBus(
         const auto drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber);
         auto getStereoMixerSnapshot = [performanceManager, this, drumNoteNumber]
         {
-            return performanceManager.lock()->getSnapshot()
+            return performanceManager.lock()
+                ->getSnapshot()
                 .getDrum(drumIndex)
                 .getStereoMixer(drumNoteNumber);
         };
@@ -41,7 +42,8 @@ DrumBus::DrumBus(
         auto getIndivFxMixerSnapshot =
             [performanceManager, this, drumNoteNumber]
         {
-            return performanceManager.lock()->getSnapshot()
+            return performanceManager.lock()
+                ->getSnapshot()
                 .getDrum(drumIndex)
                 .getIndivFxMixer(drumNoteNumber);
         };
@@ -86,12 +88,16 @@ DrumBusIndex DrumBus::getIndex() const
 
 void DrumBus::setProgramIndex(const ProgramIndex programIndexToUse) const
 {
-    performanceManager.lock()->registerUpdateDrumProgram(drumIndex, programIndexToUse);
+    performanceManager.lock()->registerUpdateDrumProgram(drumIndex,
+                                                         programIndexToUse);
 }
 
 ProgramIndex DrumBus::getProgramIndex() const
 {
-    return performanceManager.lock()->getSnapshot().getDrum(drumIndex).programIndex;
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .programIndex;
 }
 
 bool DrumBus::receivesPgmChange() const
@@ -151,14 +157,18 @@ performance::Program DrumBus::getPerformanceProgram() const
 performance::StereoMixer
 DrumBus::getPerformanceStereoMixer(const DrumNoteNumber drumNoteNumber) const
 {
-    return performanceManager.lock()->getSnapshot().getDrum(drumIndex).getStereoMixer(
-        drumNoteNumber);
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .getStereoMixer(drumNoteNumber);
 }
 performance::IndivFxMixer
 DrumBus::getPerformanceIndivFxMixer(const DrumNoteNumber drumNoteNumber) const
 {
-    return performanceManager.lock()->getSnapshot().getDrum(drumIndex).getIndivFxMixer(
-        drumNoteNumber);
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .getIndivFxMixer(drumNoteNumber);
 }
 
 MidiBus::MidiBus() : Bus(BusType::MIDI) {}

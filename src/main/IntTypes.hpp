@@ -159,8 +159,7 @@ namespace mpc
     using EventId = uint32_t;
     constexpr EventId NoEventId = 0;
     constexpr EventId MinEventId{1};
-    constexpr EventId MaxEventId{
-        std::numeric_limits<EventId>::max()};
+    constexpr EventId MaxEventId{std::numeric_limits<EventId>::max()};
 
     inline EventId getNextEventId(const EventId current)
     {
@@ -168,7 +167,6 @@ namespace mpc
     }
 
     /////////
-
 
     using Tick = int64_t;
     constexpr Tick NoTick{-1};

@@ -56,16 +56,17 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
                             refreshSeqs();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getTransport()->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            displayNow0();
-                            displayNow1();
-                            displayNow2();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->getTickPosition();
+         },
+         [&](auto)
+         {
+             displayNow0();
+             displayNow1();
+             displayNow2();
+         }});
 }
 
 void NextSeqPadScreen::open()
@@ -149,15 +150,18 @@ void NextSeqPadScreen::displaySq() const
 {
     findField("sq")->setText(
         StrUtil::padLeft(
-            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0", 2) +
+            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1),
+            "0", 2) +
         "-" + sequencer.lock()->getSelectedSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(const int i) const
 {
     findField(std::to_string(i + 1))
-        ->setText(
-            sequencer.lock()->getSequence(i + bankOffset())->getName().substr(0, 8));
+        ->setText(sequencer.lock()
+                      ->getSequence(i + bankOffset())
+                      ->getName()
+                      .substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(const int i) const

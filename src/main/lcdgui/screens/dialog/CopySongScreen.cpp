@@ -41,7 +41,8 @@ void CopySongScreen::function(const int i)
         case 4:
         {
             const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-            sequencer.lock()->copySong(songScreen->getSelectedSongIndex(), song1);
+            sequencer.lock()->copySong(songScreen->getSelectedSongIndex(),
+                                       song1);
             openScreenById(ScreenId::SongScreen);
             break;
         }
@@ -86,7 +87,8 @@ void CopySongScreen::setSong1(const int i)
 void CopySongScreen::displaySong0() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
+    const auto song =
+        sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
     findField("song0")->setText(
         StrUtil::padLeft(std::to_string(songScreen->getSelectedSongIndex() + 1),
                          "0", 2) +

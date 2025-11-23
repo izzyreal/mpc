@@ -259,7 +259,8 @@ void PgmAssignScreen::turnWheel(const int i)
     {
         const auto currentSoundIndex = selectedNoteParameters->getSoundIndex();
 
-        if (currentSoundIndex == -1 && (i < 0 || sampler.lock()->getSoundCount() == 0))
+        if (currentSoundIndex == -1 &&
+            (i < 0 || sampler.lock()->getSoundCount() == 0))
         {
             return;
         }
@@ -542,8 +543,8 @@ void PgmAssignScreen::displayNote() const
 
 void PgmAssignScreen::displayPad() const
 {
-    findField("pad")->setText(
-        sampler.lock()->getPadName(mpc.clientEventController->getSelectedPad()));
+    findField("pad")->setText(sampler.lock()->getPadName(
+        mpc.clientEventController->getSelectedPad()));
 }
 
 void PgmAssignScreen::setPadAssign(const bool isMaster)

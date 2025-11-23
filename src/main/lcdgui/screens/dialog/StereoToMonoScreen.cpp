@@ -23,7 +23,8 @@ StereoToMonoScreen::StereoToMonoScreen(Mpc &mpc, const int layerIndex)
 
 void StereoToMonoScreen::open()
 {
-    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot(
+            {ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         updateNewNames();
         ls.lock()->setFocus("stereosource");
@@ -98,7 +99,8 @@ void StereoToMonoScreen::function(const int i)
             {
                 if (s->getName() == newLName || s->getName() == newRName)
                 {
-                    ls.lock()->showPopupAndAwaitInteraction("Name already used");
+                    ls.lock()->showPopupAndAwaitInteraction(
+                        "Name already used");
                     return;
                 }
             }

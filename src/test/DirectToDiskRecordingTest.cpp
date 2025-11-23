@@ -41,7 +41,10 @@ TEST_CASE("Direct to disk recording does not start with silence",
     sound->setStart(0);
     sound->setEnd(1000);
 
-    mpc.getSampler()->getProgram(0)->getNoteParameters(mpc::MinDrumNoteNumber)->setSoundIndex(0);
+    mpc.getSampler()
+        ->getProgram(0)
+        ->getNoteParameters(mpc::MinDrumNoteNumber)
+        ->setSoundIndex(0);
 
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);

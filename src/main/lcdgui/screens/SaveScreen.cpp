@@ -108,7 +108,8 @@ void SaveScreen::function(const int i)
 
                 if (candidateVolume.mode == disk::MountMode::DISABLED)
                 {
-                    ls.lock()->showPopupForMs("Device is disabled in DISKS", 1000);
+                    ls.lock()->showPopupForMs("Device is disabled in DISKS",
+                                              1000);
                     return;
                 }
 
@@ -126,7 +127,8 @@ void SaveScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls.lock()->showPopupForMs("Error! Device seems in use", 2000);
+                        ls.lock()->showPopupForMs("Error! Device seems in use",
+                                                  2000);
                         return;
                     }
                 }
@@ -264,7 +266,8 @@ void SaveScreen::turnWheel(const int i)
                 break;
             }
             case 4:
-                sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
+                sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() +
+                                              i);
                 break;
             default:;
         }
@@ -328,8 +331,9 @@ void SaveScreen::displayFile() const
         case 1:
         {
             const auto num = StrUtil::padLeft(
-                std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0",
-                2);
+                std::to_string(sequencer.lock()->getSelectedSequenceIndex() +
+                               1),
+                "0", 2);
             const auto sequenceName =
                 sequencer.lock()->getSelectedSequence()->getName();
             fileName = num + "-" + sequenceName;
@@ -381,10 +385,10 @@ void SaveScreen::displaySize() const
             size = 4;
             break;
         case 4:
-            size =
-                sampler.lock()->getSoundCount() == 0
-                    ? -1
-                    : sampler.lock()->getSound()->getSampleData()->size() * 2 * 0.001;
+            size = sampler.lock()->getSoundCount() == 0
+                       ? -1
+                       : sampler.lock()->getSound()->getSampleData()->size() *
+                             2 * 0.001;
             break;
         case 5:
             size = 512;

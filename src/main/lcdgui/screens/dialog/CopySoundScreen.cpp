@@ -15,7 +15,8 @@ CopySoundScreen::CopySoundScreen(Mpc &mpc, const int layerIndex)
 
 void CopySoundScreen::open()
 {
-    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) &&
+        sampler.lock()->getSound())
     {
         newName = sampler.lock()->getSound()->getName();
         newName = sampler.lock()->addOrIncreaseNumber(newName);
@@ -56,7 +57,8 @@ void CopySoundScreen::turnWheel(const int i)
         focusedFieldName == "snd")
     {
         sampler.lock()->nudgeSoundIndex(i > 0);
-        auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
+        auto newSampleName =
+            sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
         newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
         setNewName(newSampleName);
         displaySnd();

@@ -44,7 +44,8 @@ void LoadAProgramScreen::function(const int i)
             sampler.lock()->deleteAllPrograms(/*createDefaultProgram=*/true);
             sampler.lock()->deleteAllSamples();
 
-            mpc.getDisk()->readPgm2(selectedFile, sampler.lock()->getProgram(0), 0);
+            mpc.getDisk()->readPgm2(selectedFile, sampler.lock()->getProgram(0),
+                                    0);
             break;
         }
         case 3:

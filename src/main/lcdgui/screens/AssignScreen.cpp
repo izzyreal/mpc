@@ -102,8 +102,9 @@ void AssignScreen::displayAssignNote() const
 
     const auto soundIndex =
         note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    const auto soundName =
-        soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+    const auto soundName = soundIndex == -1
+                               ? "(No sound)"
+                               : sampler.lock()->getSoundName(soundIndex);
 
     const auto noteName = note == 34 ? "--" : std::to_string(note);
 

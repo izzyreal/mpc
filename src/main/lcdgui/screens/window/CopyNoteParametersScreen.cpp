@@ -65,8 +65,9 @@ void CopyNoteParametersScreen::function(const int i)
     {
         case 4:
         {
-            const auto source = sampler.lock()->getProgram(prog0)->getNoteParameters(
-                mpc.clientEventController->getSelectedNote());
+            const auto source =
+                sampler.lock()->getProgram(prog0)->getNoteParameters(
+                    mpc.clientEventController->getSelectedNote());
             const auto dest = sampler.lock()->getProgram(prog1);
             const auto clone = source->clone(note1);
             dest->setNoteParameters(note1, clone);
@@ -98,8 +99,9 @@ void CopyNoteParametersScreen::displayNote0() const
     const auto noteText =
         note0 == NoDrumNoteAssigned ? "--" : std::to_string(note0);
     const auto padName = sampler.lock()->getPadName(padIndex);
-    auto sampleName =
-        soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
+    auto sampleName = soundIndex != -1
+                          ? "-" + sampler.lock()->getSoundName(soundIndex)
+                          : "-OFF";
 
     if (note0 == NoDrumNoteAssigned)
     {
@@ -129,8 +131,9 @@ void CopyNoteParametersScreen::displayNote1() const
     const auto noteText =
         note1 == -1 ? "--" : std::to_string(note1 + MinDrumNoteNumber);
     const auto padName = sampler.lock()->getPadName(padIndex);
-    auto sampleName =
-        soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
+    auto sampleName = soundIndex != -1
+                          ? "-" + sampler.lock()->getSoundName(soundIndex)
+                          : "-OFF";
 
     if (note1 == -1)
     {

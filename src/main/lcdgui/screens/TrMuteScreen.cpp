@@ -44,16 +44,17 @@ TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
                             refreshTracks();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getTransport()->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            displayNow0();
-                            displayNow1();
-                            displayNow2();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->getTickPosition();
+         },
+         [&](auto)
+         {
+             displayNow0();
+             displayNow1();
+             displayNow2();
+         }});
 
     addReactiveBinding({[&]
                         {
@@ -75,7 +76,8 @@ TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
                             for (int i = 0; i < 16; ++i)
                             {
                                 const int trackIndex = bank * 16 + i;
-                                if (sequencer.lock()->getSelectedSequence()
+                                if (sequencer.lock()
+                                        ->getSelectedSequence()
                                         ->getTrack(trackIndex)
                                         ->isOn())
                                 {
@@ -142,7 +144,8 @@ void TrMuteScreen::turnWheel(int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "sq" && !sequencer.lock()->getTransport()->isPlaying())
+    if (focusedFieldName == "sq" &&
+        !sequencer.lock()->getTransport()->isPlaying())
     {
         sequencer.lock()->setSelectedSequenceIndex(
             sequencer.lock()->getSelectedSequenceIndex() + i, true);
@@ -193,15 +196,18 @@ void TrMuteScreen::displayTrackNumbers() const
 void TrMuteScreen::displaySq() const
 {
     const auto sequenceNumber = StrUtil::padLeft(
-        std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0", 2);
-    const auto sequenceName = sequencer.lock()->getSelectedSequence()->getName();
+        std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0",
+        2);
+    const auto sequenceName =
+        sequencer.lock()->getSelectedSequence()->getName();
     findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i) const
 {
     findField(std::to_string(i + 1))
-        ->setText(sequencer.lock()->getSelectedSequence()
+        ->setText(sequencer.lock()
+                      ->getSelectedSequence()
                       ->getTrack(i + bankoffset())
                       ->getName()
                       .substr(0, 8));
@@ -218,7 +224,8 @@ void TrMuteScreen::setTrackColor(int i) const
     else
     {
         findField(std::to_string(i + 1))
-            ->setInverted(sequencer.lock()->getSelectedSequence()
+            ->setInverted(sequencer.lock()
+                              ->getSelectedSequence()
                               ->getTrack(i + bankoffset())
                               ->isOn());
     }
