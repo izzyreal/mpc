@@ -299,8 +299,6 @@ disk::DiskController *Mpc::getDiskController() const
 Mpc::~Mpc()
 {
     printf("Deleting Mpc\n");
-    auto useCount = sequencer.use_count();
-    printf("Sequencer use count: %i\n", useCount);
     if (midiDeviceDetector)
     {
         midiDeviceDetector->stop();

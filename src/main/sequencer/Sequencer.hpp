@@ -107,7 +107,6 @@ namespace mpc::sequencer
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
-        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
@@ -132,6 +131,7 @@ namespace mpc::sequencer
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
         std::shared_ptr<Sequence> undoPlaceHolder;
+        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
