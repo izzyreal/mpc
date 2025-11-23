@@ -151,6 +151,8 @@ namespace mpc::sequencer
 
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
 
+        void printEvents();
+
     private:
         EventIndex playEventIndex{0};
         std::shared_ptr<TrackEventStateManager> eventStateManager;

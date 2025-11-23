@@ -174,6 +174,15 @@ std::shared_ptr<TrackEventStateManager> Track::getEventStateManager()
     return eventStateManager;
 }
 
+void Track::printEvents()
+{
+    for (auto &e : getEvents())
+    {
+        auto snapshot = e->getSnapshot();
+        printf("Track event at tick %lld with note number %i\n", snapshot.second.tick, snapshot.second.noteNumber.get());
+    }
+}
+
 void Track::syncEventIndex(const int currentTick, const int previousTick)
 {
     if (currentTick == 0)

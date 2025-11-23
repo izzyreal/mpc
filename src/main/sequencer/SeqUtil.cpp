@@ -3,6 +3,7 @@
 
 #include "Mpc.hpp"
 #include "SequenceStateManager.hpp"
+#include "TrackEventStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -396,6 +397,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         auto t1Events =
             t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
         const auto t2 = toSequence->getTrack(i);
+        t2->getEventStateManager()->drainQueue();
+
 
         if (!t2->isUsed())
         {
@@ -430,7 +433,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
                 eventToInsert.tick = tick;
 
-                t2->insertEvent(eventToInsert);
+                t2->insertEvent(eventToInsert, true);
             }
         }
     }

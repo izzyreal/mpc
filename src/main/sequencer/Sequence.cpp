@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "SequenceStateManager.hpp"
+#include "TrackEventStateManager.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -654,7 +655,8 @@ void Sequence::insertBars(int barCount, const int afterBar)
             {
                 if (e->getTick() >= barStart)
                 {
-                    e->setTick(e->getTick() + (newBarStart - barStart));
+                    const auto newTickPos = es.tick + (newBarStart - barStart);
+                    e->setTick(newTickPos);
                 }
             }
         }

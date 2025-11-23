@@ -147,11 +147,10 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                 const int oldIndex = m.eventIndex;
                 const Tick newTick = m.newTick;
 
-                // Extract the event
                 EventState ev = events[oldIndex];
+
                 events.erase(events.begin() + oldIndex);
 
-                // Find the first element with tick > newTick
                 auto it =
                     std::lower_bound(events.begin(), events.end(), newTick,
                                      [](const EventState &e, Tick t)
@@ -159,16 +158,14 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                                          return e.tick < t;
                                      });
 
-                // Insert at the right place
                 events.insert(it, ev);
-
-                // Update the tick after insertion
-                events[it - events.begin()].tick = newTick;
+                const auto newIndex = it - events.begin();
+                events[newIndex].tick = newTick;
             }
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
                 assert(m.eventIndex < activeState.events.size());
-                
+
                 activeState.events.erase(activeState.events.begin() +
                                          m.eventIndex);
             }
