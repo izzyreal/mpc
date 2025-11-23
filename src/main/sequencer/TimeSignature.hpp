@@ -16,5 +16,7 @@ namespace mpc::sequencer
 
         void increase();
         void decrease();
+
+        Tick getBarLength() const;
     };
 } // namespace mpc::sequencer

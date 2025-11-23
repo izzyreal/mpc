@@ -316,9 +316,9 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
         }
     }
 
-    stateManager->enqueue(UpdateBarLength{barIndex, newBarLength});
-    getNumerators()[barIndex] = num;
-    getDenominators()[barIndex] = den;
+    stateManager->enqueue(
+        UpdateTimeSignature{barIndex, TimeSignature{TimeSigNumerator(num),
+                                                    TimeSigDenominator(den)}});
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()
@@ -414,7 +414,6 @@ int Sequence::getLastTick() const
 
 TimeSignature Sequence::getTimeSignature() const
 {
-    auto ts = TimeSignature();
     int bar = getCurrentBarIndex();
 
     if (bar > lastBarIndex.load() && bar != 0)
@@ -422,15 +421,12 @@ TimeSignature Sequence::getTimeSignature() const
         bar--;
     }
 
-    ts.numerator = TimeSigNumerator(numerators[bar]);
-    ts.denominator = TimeSigDenominator(denominators[bar]);
-
-    return ts;
+    return stateManager->getSnapshot().getTimeSignature(bar);
 }
 
 void Sequence::purgeAllTracks()
 {
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
     {
         purgeTrack(i);
     }
@@ -444,12 +440,12 @@ std::shared_ptr<Track> Sequence::purgeTrack(const int i)
 
 int Sequence::getDenominator(const int i) const
 {
-    return denominators[i];
+    return stateManager->getSnapshot().getTimeSignature(i).denominator;
 }
 
 int Sequence::getNumerator(const int i) const
 {
-    return numerators[i];
+    return stateManager->getSnapshot().getTimeSignature(i).numerator;
 }
 
 void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
@@ -530,9 +526,7 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
         }
 
         stateManager->enqueue(
-            UpdateBarLength{i, snapshot.getBarLength(i + difference)});
-        numerators[i] = numerators[i + difference];
-        denominators[i] = denominators[i + difference];
+            UpdateTimeSignature{i, snapshot.getTimeSignature(i + difference)});
     }
 
     for (const auto &t : tracks)
@@ -592,9 +586,6 @@ void Sequence::insertBars(int barCount, const int afterBar)
 
     lastBarIndex.store(newLastBarIndex);
 
-    oldNumerators = numerators;
-    oldDenominators = denominators;
-
     for (int i = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX; i >= afterBar; i--)
     {
         if (i - barCount < 0)
@@ -602,10 +593,11 @@ void Sequence::insertBars(int barCount, const int afterBar)
             break;
         }
 
+        const auto newNum = snapshot.getTimeSignature(i - barCount).numerator;
+        const auto newDen = snapshot.getTimeSignature(i - barCount).denominator;
         stateManager->enqueue(
-            UpdateBarLength{i, snapshot.getBarLength(i - barCount)});
-        numerators[i] = oldNumerators[i - barCount];
-        denominators[i] = oldDenominators[i - barCount];
+            UpdateTimeSignature{i, TimeSignature{TimeSigNumerator(newNum),
+                                                 TimeSigDenominator(newDen)}});
     }
 
     // The below are sane defaults for the fresh bars, but the
@@ -613,9 +605,9 @@ void Sequence::insertBars(int barCount, const int afterBar)
     // should be, given the use case.
     for (int i = afterBar; i < afterBar + barCount; i++)
     {
-        stateManager->enqueue(UpdateBarLength{i, 384});
-        numerators[i] = 4;
-        denominators[i] = 4;
+        stateManager->enqueue(
+            UpdateTimeSignature{i, TimeSignature{TimeSigNumerator(4),
+                                                 TimeSigDenominator(4)}});
     }
 
     int barStart = 0;
@@ -769,28 +761,10 @@ void Sequence::initLoop()
     setLoopEnd(newLoopEnd);
 }
 
-std::vector<int> &Sequence::getNumerators()
-{
-    return numerators;
-}
-
-std::vector<int> &Sequence::getDenominators()
-{
-    return denominators;
-}
-
-void Sequence::setNumeratorsAndDenominators(
-    const std::vector<int> &newNumerators,
-    const std::vector<int> &newDenominators)
-{
-    numerators = newNumerators;
-    denominators = newDenominators;
-}
-
 int Sequence::getFirstTickOfBeat(const int bar, const int beat) const
 {
     const auto barStart = getFirstTickOfBar(bar);
-    const auto den = denominators[bar];
+    const auto den = stateManager->getSnapshot().getTimeSignature(bar).denominator;
     const auto beatTicks = static_cast<int>(96 * (4.0 / den));
     return barStart + beat * beatTicks;
 }

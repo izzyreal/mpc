@@ -552,8 +552,11 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setInitialTempo(source->getInitialTempo());
     dest->setBarLengths(
         source->getStateManager()->getSnapshot().getBarLengths());
-    dest->setNumeratorsAndDenominators(source->getNumerators(),
-                                       source->getDenominators());
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
+    {
+        auto ts = source->getStateManager()->getSnapshot().getTimeSignature(i);
+        dest->setTimeSignature(i, ts.numerator, ts.denominator);
+    }
     dest->setLoopStart(source->getLoopStart());
     dest->setLoopEnd(source->getLoopEnd());
     copyTempoChangeEvents(source, dest);

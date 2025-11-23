@@ -28,6 +28,11 @@ void SequenceStateManager::applyMessage(const SequenceMessage &msg) noexcept
             {
                 activeState.barLengths = m.barLengths;
             }
+            else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
+            {
+                activeState.timeSignatures[m.barIndex] = m.timeSignature;
+                activeState.barLengths[m.barIndex] = m.timeSignature.getBarLength();
+            }
         },
         msg);
 }

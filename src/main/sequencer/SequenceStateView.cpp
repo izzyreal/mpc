@@ -20,3 +20,8 @@ SequenceStateView::getBarLengths() const
 {
     return state->barLengths;
 }
+
+TimeSignature SequenceStateView::getTimeSignature(const int barIndex) const
+{
+    return state->timeSignatures[barIndex];
+}

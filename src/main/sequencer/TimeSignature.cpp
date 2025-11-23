@@ -55,3 +55,7 @@ void TimeSignature::decrease()
         default:;
     }
 }
+mpc::Tick TimeSignature::getBarLength() const
+{
+    return Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / denominator) * numerator;
+}

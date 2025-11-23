@@ -117,9 +117,6 @@ namespace mpc::sequencer
         std::shared_ptr<Track> purgeTrack(int i);
         int getDenominator(int i) const;
         int getNumerator(int i) const;
-        void
-        setNumeratorsAndDenominators(const std::vector<int> &newNumerators,
-                                     const std::vector<int> &newDenominators);
         void deleteBars(int firstBar, int lastBarToDelete);
         void insertBars(int barCount, int afterBar);
         void moveTrack(int source, int destination);
@@ -127,8 +124,6 @@ namespace mpc::sequencer
 
         int getEventCount() const;
         void initLoop();
-        std::vector<int> &getNumerators();
-        std::vector<int> &getDenominators();
 
         int getFirstTickOfBar(int index) const;
         int getLastTickOfBar(int index) const;
@@ -152,12 +147,6 @@ namespace mpc::sequencer
         std::shared_ptr<Track> tempoChangeTrack;
 
         std::vector<std::string> deviceNames = std::vector<std::string>(33);
-
-        std::vector<int> numerators = std::vector<int>(999);
-        std::vector<int> denominators = std::vector<int>(999);
-
-        std::vector<int> oldNumerators = std::vector<int>(999);
-        std::vector<int> oldDenominators = std::vector<int>(999);
 
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<int()> getCurrentBarIndex;
