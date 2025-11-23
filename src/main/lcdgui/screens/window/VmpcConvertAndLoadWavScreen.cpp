@@ -23,7 +23,7 @@ void VmpcConvertAndLoadWavScreen::function(const int i)
     switch (i)
     {
         case 3:
-            ls->closeCurrentScreen();
+            ls.lock()->closeCurrentScreen();
             break;
         case 4:
             loadRoutine();

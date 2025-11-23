@@ -33,12 +33,12 @@ using namespace mpc::engine;
 using namespace mpc::command::context;
 
 ClientMidiEventController::ClientMidiEventController(
-    const std::shared_ptr<PerformanceManager> &performanceManager,
+    const std::weak_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &clientEventController,
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
-    std::shared_ptr<Sequencer> sequencer,
+    std::weak_ptr<Sequencer> sequencer,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<MidiInputScreen> &midiInputScreen,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
@@ -74,7 +74,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         notifyObservers(notificationMessage);
     }
 
-    if (!sequencer->isRecordingModeMulti())
+    if (!sequencer.lock()->isRecordingModeMulti())
     {
         const int receiveCh = midiInputScreen->getReceiveCh();
 
@@ -194,7 +194,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
         if (programPadIndex != NoProgramIndex)
         {
-            performanceManager->registerProgramPadPress(
+            performanceManager.lock()->registerProgramPadPress(
                 PerformanceEventSource::MidiInput,
                 std::optional<MidiChannel>(e.getChannel()), screenId,
                 track->getIndex(), screen->getBus()->busType,
@@ -215,13 +215,13 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                 PerformanceEventSource::MidiInput, *registryNoteOnEvent,
                 NoteNumber(noteNumber), Velocity(velocity), track.get(),
                 screen->getBus(), screen, programPadIndex, program, sequencer,
-                sequencerPlaybackEngine, performanceManager,
+                sequencerPlaybackEngine, performanceManager.lock(),
                 clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
 
-    performanceManager->registerNoteOn(
+    performanceManager.lock()->registerNoteOn(
         PerformanceEventSource::MidiInput,
         std::optional<MidiChannel>(e.getChannel()), screenId, track->getIndex(),
         screen->getBus()->busType, NoteNumber(e.getNoteNumber()),
@@ -270,7 +270,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
             if (programPadIndex != NoProgramPadIndex)
             {
-                performanceManager->registerProgramPadRelease(
+                performanceManager.lock()->registerProgramPadRelease(
                     PerformanceEventSource::MidiInput,
                     ProgramPadIndex(programPadIndex), programIndex,
                     [](void *) {});
@@ -283,15 +283,15 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
                 noteEventInfo->recordNoteEventId,
-                sequencer->getSelectedSequence()->getTrack(trackIndex).get(),
+                sequencer.lock()->getSelectedSequence()->getTrack(trackIndex).get(),
                 noteEventInfo->busType, screen, programPadIndex, program,
-                sequencer, sequencerPlaybackEngine, performanceManager,
+                sequencer, sequencerPlaybackEngine, performanceManager.lock(),
                 clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };
 
-    performanceManager->registerNoteOff(
+    performanceManager.lock()->registerNoteOff(
         PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
         std::optional<MidiChannel>(midiChannel), action);
 }
@@ -302,8 +302,8 @@ void ClientMidiEventController::handleKeyAftertouch(
     const auto pressure = e.getAftertouchValue();
     const auto note = e.getAftertouchNote();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus(track->getBusType());
-    performanceManager->registerNoteAftertouch(
+    const auto bus = sequencer.lock()->getBus(track->getBusType());
+    performanceManager.lock()->registerNoteAftertouch(
         PerformanceEventSource::MidiInput, NoteNumber(note), Pressure(pressure),
         std::optional<MidiChannel>(e.getChannel()));
 
@@ -313,7 +313,7 @@ void ClientMidiEventController::handleKeyAftertouch(
                 program->getPadIndexFromNote(DrumNoteNumber(note));
             programPadIndex != -1)
         {
-            performanceManager->registerProgramPadAftertouch(
+            performanceManager.lock()->registerProgramPadAftertouch(
                 PerformanceEventSource::MidiInput, programPadIndex,
                 getProgramIndexForEvent(e), Pressure(pressure));
         }
@@ -325,7 +325,7 @@ void ClientMidiEventController::handleChannelAftertouch(
 {
     const auto pressure = e.getChannelPressure();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus(track->getBusType());
+    const auto bus = sequencer.lock()->getBus(track->getBusType());
 
     for (auto &p : sampler->getPrograms())
     {
@@ -336,7 +336,7 @@ void ClientMidiEventController::handleChannelAftertouch(
                  programPadIndex < Mpc2000XlSpecs::PROGRAM_PAD_COUNT;
                  ++programPadIndex)
             {
-                performanceManager->registerProgramPadAftertouch(
+                performanceManager.lock()->registerProgramPadAftertouch(
                     PerformanceEventSource::MidiInput,
                     ProgramPadIndex(programPadIndex), programIndex,
                     Pressure(pressure));
@@ -345,7 +345,7 @@ void ClientMidiEventController::handleChannelAftertouch(
                         ProgramPadIndex(programPadIndex));
                     note != NoDrumNoteAssigned)
                 {
-                    performanceManager->registerNoteAftertouch(
+                    performanceManager.lock()->registerNoteAftertouch(
                         PerformanceEventSource::MidiInput, NoteNumber(note),
                         Pressure(pressure),
                         std::optional<MidiChannel>(e.getChannel()));
@@ -385,7 +385,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
     else if (cc == 123)
     {
         // Should we do something else here? Trigger drum note offs for example?
-        performanceManager->clear();
+        performanceManager.lock()->clear();
     }
 
     const auto program = getProgramForEvent(e);
@@ -413,24 +413,24 @@ void ClientMidiEventController::handleProgramChange(
         if (e.getProgramNumber() >= 0 &&
             e.getProgramNumber() <= Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)
         {
-            if (sequencer->getTransport()->isPlaying())
+            if (sequencer.lock()->getTransport()->isPlaying())
             {
-                if (!sequencer->getTransport()->isRecordingOrOverdubbing() &&
-                    sequencer->getSequence(e.getProgramNumber())->isUsed())
+                if (!sequencer.lock()->getTransport()->isRecordingOrOverdubbing() &&
+                    sequencer.lock()->getSequence(e.getProgramNumber())->isUsed())
                 {
                     if (clientEventController->getLayeredScreen()
                             ->isCurrentScreen({ScreenId::NextSeqScreen,
                                                ScreenId::NextSeqPadScreen,
                                                ScreenId::SequencerScreen}))
                     {
-                        sequencer->setNextSq(
+                        sequencer.lock()->setNextSq(
                             SequenceIndex(e.getProgramNumber()));
                     }
                 }
             }
             else
             {
-                sequencer->setSelectedTrackIndex(e.getProgramNumber());
+                sequencer.lock()->setSelectedTrackIndex(e.getProgramNumber());
             }
         }
     }
@@ -551,7 +551,7 @@ void ClientMidiEventController::enforceMonoMode(int channel, int newNote)
 std::optional<int>
 ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
 {
-    if (sequencer->isRecordingModeMulti())
+    if (sequencer.lock()->isRecordingModeMulti())
     {
         if (const auto mrsLines = multiRecordingSetupScreen->getMrsLines();
             e.getChannel() < static_cast<int>(mrsLines.size()))
@@ -560,7 +560,7 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
         }
         return std::nullopt;
     }
-    return sequencer->getSelectedTrackIndex();
+    return sequencer.lock()->getSelectedTrackIndex();
 }
 
 std::shared_ptr<mpc::sequencer::Track>
@@ -568,9 +568,9 @@ ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 {
     if (const auto trackIndex = getTrackIndexForEvent(e); trackIndex)
     {
-        const auto seq = sequencer->getTransport()->isPlaying()
-                             ? sequencer->getCurrentlyPlayingSequence()
-                             : sequencer->getSelectedSequence();
+        const auto seq = sequencer.lock()->getTransport()->isPlaying()
+                             ? sequencer.lock()->getCurrentlyPlayingSequence()
+                             : sequencer.lock()->getSelectedSequence();
         return seq->getTrack(*trackIndex);
     }
 
@@ -582,7 +582,7 @@ ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
-        return sequencer->getDrumBus(*drumBusType);
+        return sequencer.lock()->getDrumBus(*drumBusType);
     }
     return {};
 }
@@ -593,7 +593,7 @@ ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
         return sampler->getProgram(
-            sequencer->getDrumBus(*drumBusType)->getProgramIndex());
+            sequencer.lock()->getDrumBus(*drumBusType)->getProgramIndex());
     }
 
     return {};
@@ -604,7 +604,7 @@ mpc::ProgramIndex ClientMidiEventController::getProgramIndexForEvent(
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
-        return sequencer->getDrumBus(*drumBusType)->getProgramIndex();
+        return sequencer.lock()->getDrumBus(*drumBusType)->getProgramIndex();
     }
 
     return NoProgramIndex;

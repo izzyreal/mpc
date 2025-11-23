@@ -40,7 +40,7 @@ void TransposePermanentScreen::function(const int i)
             tracks.push_back(transScreen->getTr());
         }
 
-        const auto seq = sequencer->getSelectedSequence();
+        const auto seq = sequencer.lock()->getSelectedSequence();
         const auto firstTick = seq->getFirstTickOfBar(transScreen->getBar0());
         const auto lastTick = seq->getLastTickOfBar(transScreen->getBar1());
 

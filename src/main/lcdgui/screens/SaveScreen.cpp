@@ -30,14 +30,14 @@ void SaveScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot({ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}))
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; i++)
     {
-        if (sampler->getProgram(i)->isUsed())
+        if (sampler.lock()->getProgram(i)->isUsed())
         {
             programIndex = i;
             break;
@@ -108,7 +108,7 @@ void SaveScreen::function(const int i)
 
                 if (candidateVolume.mode == disk::MountMode::DISABLED)
                 {
-                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
+                    ls.lock()->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
                 }
 
@@ -126,12 +126,12 @@ void SaveScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls->showPopupForMs("Error! Device seems in use", 2000);
+                        ls.lock()->showPopupForMs("Error! Device seems in use", 2000);
                         return;
                     }
                 }
 
-                ls->setFunctionKeysArrangement(0);
+                ls.lock()->setFunctionKeysArrangement(0);
 
                 newDisk->initFiles();
 
@@ -156,7 +156,7 @@ void SaveScreen::function(const int i)
                     break;
                 }
                 case 1:
-                    if (!sequencer->getSelectedSequence()->isUsed())
+                    if (!sequencer.lock()->getSelectedSequence()->isUsed())
                     {
                         return;
                     }
@@ -170,7 +170,7 @@ void SaveScreen::function(const int i)
                     openScreenById(ScreenId::SaveAProgramScreen);
                     break;
                 case 4:
-                    if (sampler->getSoundCount() == 0)
+                    if (sampler.lock()->getSoundCount() == 0)
                     {
                         break;
                     }
@@ -236,8 +236,8 @@ void SaveScreen::turnWheel(const int i)
         switch (type)
         {
             case 1:
-                sequencer->setSelectedSequenceIndex(
-                    sequencer->getSelectedSequenceIndex() + i, true);
+                sequencer.lock()->setSelectedSequenceIndex(
+                    sequencer.lock()->getSelectedSequenceIndex() + i, true);
                 break;
             case 3:
             {
@@ -247,7 +247,7 @@ void SaveScreen::turnWheel(const int i)
                      i < 0 ? idx >= 0 : idx < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
                      i < 0 ? idx-- : idx++)
                 {
-                    if (sampler->getProgram(idx)->isUsed())
+                    if (sampler.lock()->getProgram(idx)->isUsed())
                     {
                         programIndex = idx;
                     }
@@ -264,7 +264,7 @@ void SaveScreen::turnWheel(const int i)
                 break;
             }
             case 4:
-                sampler->setSoundIndex(sampler->getSoundIndex() + i);
+                sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
                 break;
             default:;
         }
@@ -281,7 +281,7 @@ void SaveScreen::turnWheel(const int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls->setFunctionKeysArrangement(
+        ls.lock()->setFunctionKeysArrangement(
             mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
     }
 }
@@ -294,7 +294,7 @@ void SaveScreen::setType(const int i)
     {
         for (int j = 0; j < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; j++)
         {
-            if (sampler->getProgram(j)->isUsed())
+            if (sampler.lock()->getProgram(j)->isUsed())
             {
                 programIndex = j;
                 break;
@@ -328,10 +328,10 @@ void SaveScreen::displayFile() const
         case 1:
         {
             const auto num = StrUtil::padLeft(
-                std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0",
+                std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0",
                 2);
             const auto sequenceName =
-                sequencer->getSelectedSequence()->getName();
+                sequencer.lock()->getSelectedSequence()->getName();
             fileName = num + "-" + sequenceName;
             break;
         }
@@ -343,12 +343,12 @@ void SaveScreen::displayFile() const
             break;
         }
         case 3:
-            fileName = sampler->getProgram(programIndex)->getName();
+            fileName = sampler.lock()->getProgram(programIndex)->getName();
             break;
         case 4:
-            fileName = std::string(sampler->getSoundCount() == 0
+            fileName = std::string(sampler.lock()->getSoundCount() == 0
                                        ? " (No sound)"
-                                       : sampler->getSound()->getName());
+                                       : sampler.lock()->getSound()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
@@ -361,13 +361,13 @@ void SaveScreen::displayFile() const
 
 void SaveScreen::displaySize() const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     auto size = 0;
 
     switch (type)
     {
         case 0:
-            size = sequencer->getUsedSequenceCount() * 25;
+            size = sequencer.lock()->getUsedSequenceCount() * 25;
             break;
         case 1:
             size = seq->isUsed()
@@ -375,16 +375,16 @@ void SaveScreen::displaySize() const
                        : -1;
             break;
         case 2:
-            size = sampler->getProgramCount() * 4;
+            size = sampler.lock()->getProgramCount() * 4;
             break;
         case 3:
             size = 4;
             break;
         case 4:
             size =
-                sampler->getSoundCount() == 0
+                sampler.lock()->getSoundCount() == 0
                     ? -1
-                    : sampler->getSound()->getSampleData()->size() * 2 * 0.001;
+                    : sampler.lock()->getSound()->getSampleData()->size() * 2 * 0.001;
             break;
         case 5:
             size = 512;
@@ -440,7 +440,7 @@ void SaveScreen::up()
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
-        ls->setFunctionKeysArrangement(0);
+        ls.lock()->setFunctionKeysArrangement(0);
     }
 
     ScreenComponent::up();

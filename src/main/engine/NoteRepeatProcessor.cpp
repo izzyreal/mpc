@@ -27,16 +27,17 @@ using namespace mpc::performance;
 using namespace mpc::engine::audio::mixer;
 
 NoteRepeatProcessor::NoteRepeatProcessor(
-    std::shared_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
+    std::weak_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
     std::shared_ptr<AudioMixer> m, std::shared_ptr<Assign16LevelsScreen> a,
-    std::shared_ptr<MixerSetupScreen> ms, std::shared_ptr<PerformanceManager> e,
+    std::shared_ptr<MixerSetupScreen> ms,
+    const std::weak_ptr<PerformanceManager> &performanceManager,
     std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
     std::vector<MixerInterconnection *> &mi,
     const std::function<bool()> &isFullLevelEnabled,
     const std::function<bool()> &isSixteenLevelsEnabled)
     : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
       assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
-      performanceManager(std::move(e)), hardwareSlider(std::move(h)), voices(v),
+      performanceManager(performanceManager), hardwareSlider(std::move(h)), voices(v),
       mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
@@ -48,8 +49,8 @@ void NoteRepeatProcessor::process(
     const unsigned short eventFrameOffset, const double tempo,
     const float sampleRate) const
 {
-    auto track = sequencer->getSelectedTrack();
-    auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
+    auto track = sequencer.lock()->getSelectedTrack();
+    auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
 
     std::shared_ptr<sampler::Program> program;
 
@@ -60,7 +61,7 @@ void NoteRepeatProcessor::process(
 
     DrumNoteNumber note = assign16LevelsScreen->getNote();
 
-    const auto snapshot = performanceManager->getSnapshot();
+    const auto snapshot = performanceManager.lock()->getSnapshot();
 
     static const std::vector sourcesToExclude{
         PerformanceEventSource::NoteRepeat, PerformanceEventSource::Sequence};
@@ -167,7 +168,7 @@ void NoteRepeatProcessor::process(
                     : noteParameters->getVoiceOverlapMode();
 
             auto performanceDrum =
-                performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+                performanceManager.lock()->getSnapshot().getDrum(drumBus->getIndex());
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
@@ -193,7 +194,7 @@ void NoteRepeatProcessor::process(
             // mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
         }
 
-        if (sequencer->getTransport()->isRecordingOrOverdubbing())
+        if (sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
         {
             noteEvent.velocity = velocityBeforeTrackVelocityRatioApplied;
             track->insertEvent(noteEvent);

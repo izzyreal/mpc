@@ -36,7 +36,7 @@ void TriggerLocalNoteOnCommand::execute()
     noteOnEvent.velocity = velo;
 
     if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
-        ctx->sequencer->getTransport()->isPlaying())
+        ctx->sequencer.lock()->getTransport()->isPlaying())
     {
         return;
     }
@@ -125,7 +125,7 @@ void TriggerLocalNoteOnCommand::execute()
 
     std::optional<sequencer::EventState> recordNoteOnEvent = std::nullopt;
 
-    if (ctx->sequencer->getTransport()->isRecordingOrOverdubbing())
+    if (ctx->sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
     {
         recordNoteOnEvent = ctx->track->recordNoteEventLive(ctx->note, velo);
     }
@@ -133,18 +133,18 @@ void TriggerLocalNoteOnCommand::execute()
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||
               isDrumNote(ctx->note)))
     {
-        ctx->sequencer->getTransport()->playMetronomeTrack();
+        ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo,
+            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note, velo,
             ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
-        ctx->sequencer->getTransport()->playMetronomeTrack();
+        ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo,
+            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note, velo,
             ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
@@ -154,15 +154,15 @@ void TriggerLocalNoteOnCommand::execute()
             stepLength != 1)
         {
             const int bar =
-                ctx->sequencer->getTransport()->getCurrentBarIndex() + 1;
+                ctx->sequencer.lock()->getTransport()->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
-                0, bar, ctx->sequencer->getTransport()->getTickPosition(),
+                0, bar, ctx->sequencer.lock()->getTransport()->getTickPosition(),
                 stepLength, timingCorrectScreen->getSwing());
 
-            if (ctx->sequencer->getTransport()->getTickPosition() !=
+            if (ctx->sequencer.lock()->getTransport()->getTickPosition() !=
                 correctedTick)
             {
-                ctx->sequencer->getTransport()->setPosition(
+                ctx->sequencer.lock()->getTransport()->setPosition(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));
             }
         }

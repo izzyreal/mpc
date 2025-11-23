@@ -67,6 +67,8 @@ namespace mpc::sequencer
             const std::function<int64_t()> &getPunchOutTime,
             const std::function<bool()> &isSoloEnabled);
 
+        ~Track();
+
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 

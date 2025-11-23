@@ -49,9 +49,9 @@ namespace mpc::lcdgui
 
     protected:
         Mpc &mpc;
-        std::shared_ptr<sampler::Sampler> sampler;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
-        std::shared_ptr<LayeredScreen> ls;
+        std::weak_ptr<sampler::Sampler> sampler;
+        std::weak_ptr<sequencer::Sequencer> sequencer;
+        std::weak_ptr<LayeredScreen> ls;
 
         std::shared_ptr<sequencer::DrumBus> getActiveDrumBus() const;
         std::shared_ptr<Field> getFocusedField() const;

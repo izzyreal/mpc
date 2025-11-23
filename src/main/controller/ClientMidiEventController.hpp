@@ -61,7 +61,7 @@ namespace mpc::controller
     class ClientEventController;
     class ClientHardwareEventController;
 
-    class ClientMidiEventController : public Observable
+    class ClientMidiEventController final : public Observable
     {
         using ClientMidiEvent = client::event::ClientMidiEvent;
         using MessageType = ClientMidiEvent::MessageType;
@@ -77,10 +77,11 @@ namespace mpc::controller
 
     public:
         ClientMidiEventController(
-            const std::shared_ptr<performance::PerformanceManager> &,
+            const std::weak_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<ClientEventController> &,
             std::shared_ptr<ClientHardwareEventController>,
-            std::shared_ptr<MidiSwScreen>, std::shared_ptr<Sequencer>,
+            std::shared_ptr<MidiSwScreen>,
+            std::weak_ptr<Sequencer>,
             const std::shared_ptr<Sampler> &,
             const std::shared_ptr<MidiInputScreen> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
@@ -122,10 +123,10 @@ namespace mpc::controller
         bool isOmniOn() const noexcept;
         bool isPolyMode() const noexcept;
 
-        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<performance::PerformanceManager> performanceManager;
         std::shared_ptr<MidiInputScreen> midiInputScreen;
         std::shared_ptr<EventHandler> eventHandler;
-        std::shared_ptr<Sequencer> sequencer;
+        std::weak_ptr<Sequencer> sequencer;
         std::shared_ptr<Sampler> sampler;
         std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen;
         std::shared_ptr<TimingCorrectScreen> timingCorrectScreen;

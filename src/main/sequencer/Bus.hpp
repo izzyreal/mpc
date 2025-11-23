@@ -44,7 +44,7 @@ namespace mpc::sequencer
     public:
         explicit DrumBus(
             DrumBusIndex,
-            const std::shared_ptr<performance::PerformanceManager> &);
+            const std::weak_ptr<performance::PerformanceManager> &);
         ~DrumBus() override = default;
 
         DrumBusIndex getIndex() const;
@@ -77,7 +77,7 @@ namespace mpc::sequencer
 
     private:
         const DrumBusIndex drumIndex;
-        const std::shared_ptr<performance::PerformanceManager>
+        const std::weak_ptr<performance::PerformanceManager>
             performanceManager;
 
         std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;

@@ -91,7 +91,7 @@ void VmpcMidiScreen::open()
 
     screen->stayScreen = "vmpc-midi";
 
-    if (ls->isPreviousScreenNot({ScreenId::VmpcDiscardMappingChangesScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::VmpcDiscardMappingChangesScreen}))
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
 
@@ -246,7 +246,7 @@ void VmpcMidiScreen::setLearning(bool b)
     learning = b;
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
-    ls->setFunctionKeysArrangement(learning ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
 bool VmpcMidiScreen::hasMappingChanged()
@@ -358,7 +358,7 @@ void VmpcMidiScreen::function(int i)
                 popupMsg = "MIDI mapping unchanged";
             }
 
-            ls->showPopupForMs(popupMsg, 1000);
+            ls.lock()->showPopupForMs(popupMsg, 1000);
             break;
         }
     }

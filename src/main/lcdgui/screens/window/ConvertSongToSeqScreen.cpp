@@ -27,7 +27,7 @@ void ConvertSongToSeqScreen::open()
     {
         toSequenceIndex = i;
 
-        if (!sequencer->getSequence(i)->isUsed())
+        if (!sequencer.lock()->getSequence(i)->isUsed())
         {
             break;
         }
@@ -97,7 +97,7 @@ void ConvertSongToSeqScreen::displayFromSong() const
 {
     const auto activeSongIndex =
         mpc.screens->get<ScreenId::SongScreen>()->getSelectedSongIndex();
-    const auto activeSong = sequencer->getSong(activeSongIndex);
+    const auto activeSong = sequencer.lock()->getSong(activeSongIndex);
     const auto songIndexString =
         StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
     const auto songName = activeSong->getName();
@@ -106,7 +106,7 @@ void ConvertSongToSeqScreen::displayFromSong() const
 
 void ConvertSongToSeqScreen::displayToSequence() const
 {
-    const auto activeSequence = sequencer->getSequence(toSequenceIndex);
+    const auto activeSequence = sequencer.lock()->getSequence(toSequenceIndex);
     const auto sequenceIndexString =
         StrUtil::padLeft(std::to_string(toSequenceIndex + 1), "0", 2);
     const auto sequenceName = activeSequence->getName();
@@ -147,14 +147,14 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
+    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
 
     if (!song->isUsed())
     {
         return;
     }
 
-    const auto destinationSequence = sequencer->getSequence(toSequenceIndex);
+    const auto destinationSequence = sequencer.lock()->getSequence(toSequenceIndex);
 
     destinationSequence->init(0);
     destinationSequence->setName(song->getName());
@@ -163,7 +163,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
     {
         const auto step = song->getStep(stepIndex).lock();
         const auto sourceSequenceIndex = step->getSequence();
-        const auto sourceSequence = sequencer->getSequence(sourceSequenceIndex);
+        const auto sourceSequence = sequencer.lock()->getSequence(sourceSequenceIndex);
         const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
             destinationSequence->getLastBarIndex();
 
@@ -301,7 +301,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
     {
         const auto referenceStep = song->getStep(0).lock();
         const auto referenceSequence =
-            sequencer->getSequence(referenceStep->getSequence());
+            sequencer.lock()->getSequence(referenceStep->getSequence());
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
         {

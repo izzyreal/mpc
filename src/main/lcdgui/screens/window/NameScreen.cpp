@@ -62,7 +62,7 @@ void NameScreen::close()
         ->getLed(FULL_LEVEL_OR_CASE_SWITCH_LED)
         ->setEnabled(mpc.clientEventController->isFullLevelEnabled());
 
-    ls->setLastFocus("name", "0");
+    ls.lock()->setLastFocus("name", "0");
     editing = false;
 
     enterAction = [](const std::string &) {};
@@ -150,7 +150,7 @@ void NameScreen::function(const int i)
     {
         case 3:
         {
-            ls->openScreen(cancelScreen);
+            ls.lock()->openScreen(cancelScreen);
             break;
         }
         case 4:
@@ -183,7 +183,7 @@ void NameScreen::drawUnderline()
 {
     if (editing)
     {
-        const std::string focus = ls->getFocusedFieldName();
+        const std::string focus = ls.lock()->getFocusedFieldName();
 
         if (focus.length() != 1 && focus.length() != 2)
         {

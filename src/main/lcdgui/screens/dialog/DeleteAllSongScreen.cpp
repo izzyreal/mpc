@@ -19,7 +19,7 @@ void DeleteAllSongScreen::function(const int i)
 
             for (int j = 0; j < 20; j++)
             {
-                sequencer->deleteSong(j);
+                sequencer.lock()->deleteSong(j);
             }
 
             openScreenById(ScreenId::SequencerScreen);

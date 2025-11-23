@@ -77,7 +77,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedSequenceIndex();
+                            return sequencer.lock()->getSelectedSequenceIndex();
                         },
                         [displaySequenceProps, displayTrackProps](auto)
                         {
@@ -87,7 +87,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedSequence()->isUsed();
+                            return sequencer.lock()->getSelectedSequence()->isUsed();
                         },
                         [displaySequenceProps, displayTrackProps](auto)
                         {
@@ -97,7 +97,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->isCountEnabled();
+                            return sequencer.lock()->getTransport()->isCountEnabled();
                         },
                         [&](auto)
                         {
@@ -107,7 +107,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedSequence()->isLoopEnabled();
+             return sequencer.lock()->getSelectedSequence()->isLoopEnabled();
          },
          [&](auto)
          {
@@ -116,7 +116,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->isRecordingModeMulti();
+                            return sequencer.lock()->isRecordingModeMulti();
                         },
                         [&](auto)
                         {
@@ -125,7 +125,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedTrack()->isOn();
+                            return sequencer.lock()->getSelectedTrack()->isOn();
                         },
                         [&](auto)
                         {
@@ -135,13 +135,13 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             if (sequencer->getTransport()->isCountingIn())
+             if (sequencer.lock()->getTransport()->isCountingIn())
              {
                  return static_cast<int>(Sequencer::quarterNotesToTicks(
-                     sequencer->getTransport()
+                     sequencer.lock()->getTransport()
                          ->getPlayStartPositionQuarterNotes()));
              }
-             return sequencer->getTransport()->getTickPosition();
+             return sequencer.lock()->getTransport()->getTickPosition();
          },
          [&](auto)
          {
@@ -152,7 +152,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->getTempo();
+                            return sequencer.lock()->getTransport()->getTempo();
                         },
                         [&](auto)
                         {
@@ -162,7 +162,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getTransport()->isTempoSourceSequenceEnabled();
+             return sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled();
          },
          [&](auto)
          {
@@ -172,7 +172,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedTrack()->getProgramChange();
+             return sequencer.lock()->getSelectedTrack()->getProgramChange();
          },
          [&](auto)
          {
@@ -182,7 +182,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedSequence()->getTimeSignature();
+             return sequencer.lock()->getSelectedSequence()->getTimeSignature();
          },
          [&](auto)
          {
@@ -192,7 +192,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedTrack()->getVelocityRatio();
+             return sequencer.lock()->getSelectedTrack()->getVelocityRatio();
          },
          [&](auto)
          {
@@ -201,7 +201,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedTrack()->getBusType();
+                            return sequencer.lock()->getSelectedTrack()->getBusType();
                         },
                         [&](auto)
                         {
@@ -211,7 +211,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedTrack()->getDeviceIndex();
+             return sequencer.lock()->getSelectedTrack()->getDeviceIndex();
          },
          [&](auto)
          {
@@ -221,7 +221,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedTrackIndex();
+                            return sequencer.lock()->getSelectedTrackIndex();
                         },
                         [displayTrackProps](auto)
                         {
@@ -230,7 +230,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedTrack()->isUsed();
+                            return sequencer.lock()->getSelectedTrack()->isUsed();
                         },
                         [displayTrackProps](auto)
                         {
@@ -250,14 +250,14 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getNextSq();
+                            return sequencer.lock()->getNextSq();
                         },
                         [&](auto nextSqIndex)
                         {
                             displayNextSq();
                             if (nextSqIndex != -1)
                             {
-                                ls->setFocus("nextsq");
+                                ls.lock()->setFocus("nextsq");
                             }
                         }});
 }
@@ -297,14 +297,14 @@ void SequencerScreen::open()
     displayDeviceNumber();
     displayNextSq();
 
-    findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
+    findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
 
-    if (sequencer->isSecondSequenceEnabled())
+    if (sequencer.lock()->isSecondSequenceEnabled())
     {
         findBackground()->setBackgroundName("sequencer-2nd");
     }
-    else if (sequencer->getTransport()->isPunchEnabled() &&
-             !sequencer->getTransport()->isRecordingOrOverdubbing())
+    else if (sequencer.lock()->getTransport()->isPunchEnabled() &&
+             !sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
     {
         findBackground()->setBackgroundName("sequencer-punch-active");
     }
@@ -313,13 +313,13 @@ void SequencerScreen::open()
         findBackground()->setBackgroundName("sequencer");
     }
 
-    if (sequencer->getNextSq() != -1)
+    if (sequencer.lock()->getNextSq() != -1)
     {
-        ls->setFocus("nextsq");
+        ls.lock()->setFocus("nextsq");
     }
 
     const bool sequencerIsRecordingOrOverdubbing =
-        sequencer->getTransport()->isRecordingOrOverdubbing();
+        sequencer.lock()->getTransport()->isRecordingOrOverdubbing();
 
     const auto footerIsInvisible =
         !mpc.clientEventController->clientHardwareEventController
@@ -333,7 +333,7 @@ void SequencerScreen::open()
 
     findChild("function-keys")
         ->Hide(!footerIsInvisible ||
-               sequencer->getTransport()->isPunchEnabled() ||
+               sequencer.lock()->getTransport()->isPunchEnabled() ||
                (mpc.getHardware()
                     ->getButton(hardware::ComponentId::ERASE)
                     ->isPressed() &&
@@ -350,7 +350,7 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
-    if (sequencer->getTransport()->isPlaying())
+    if (sequencer.lock()->getTransport()->isPlaying())
     {
         if (mpc.clientEventController->clientHardwareEventController
                 ->isNoteRepeatLocked())
@@ -379,20 +379,20 @@ void SequencerScreen::close()
     std::vector<std::string> screensThatDisablePunch{"song", "load", "save",
                                                      "others", "next-seq"};
 
-    if (const auto nextScreen = ls->getCurrentScreenName();
+    if (const auto nextScreen = ls.lock()->getCurrentScreenName();
         find(begin(screensThatDisablePunch), end(screensThatDisablePunch),
              nextScreen) != end(screensThatDisablePunch))
     {
-        sequencer->getTransport()->setPunchEnabled(false);
+        sequencer.lock()->getTransport()->setPunchEnabled(false);
     }
 
-    sequencer->resetUndo();
+    sequencer.lock()->resetUndo();
 }
 
 void SequencerScreen::displayVelo() const
 {
     findField("velo")->setTextPadded(
-        std::to_string(sequencer->getSelectedTrack()->getVelocityRatio()));
+        std::to_string(sequencer.lock()->getSelectedTrack()->getVelocityRatio()));
 }
 
 void SequencerScreen::displayDeviceNumber() const
@@ -420,14 +420,14 @@ void SequencerScreen::displayDeviceNumber() const
 void SequencerScreen::displayBus() const
 {
     findField("bus")->setText(
-        busTypeToString(sequencer->getSelectedTrack()->getBusType()));
+        busTypeToString(sequencer.lock()->getSelectedTrack()->getBusType()));
     displayDeviceName();
 }
 
 void SequencerScreen::displayBars() const
 {
     findField("bars")->setText(std::to_string(
-        sequencer->getSelectedSequence()->getLastBarIndex() + 1));
+        sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1));
 }
 
 void SequencerScreen::displayPgm() const
@@ -447,19 +447,19 @@ void SequencerScreen::displayDeviceName() const
 {
     const auto track = mpc.getSequencer()->getSelectedTrack();
 
-    if (const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
+    if (const auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
         drumBus)
     {
         if (track->getDeviceIndex() == 0)
         {
             const int pgm = drumBus->getProgramIndex();
-            const auto p = sampler->getProgram(pgm);
+            const auto p = sampler.lock()->getProgram(pgm);
             findLabel("devicename")->setText(p->getName());
         }
         else
         {
             findLabel("devicename")
-                ->setText(sequencer->getSelectedSequence()->getDeviceName(
+                ->setText(sequencer.lock()->getSelectedSequence()->getDeviceName(
                     track->getDeviceIndex()));
         }
     }
@@ -472,7 +472,7 @@ void SequencerScreen::displayDeviceName() const
         else
         {
             findLabel("devicename")
-                ->setText(sequencer->getSelectedSequence()->getDeviceName(
+                ->setText(sequencer.lock()->getSelectedSequence()->getDeviceName(
                     track->getDeviceIndex()));
         }
     }
@@ -482,13 +482,13 @@ void SequencerScreen::displayTempo() const
 {
     displayTempoLabel();
     findField("tempo")->setText(StrUtil::padLeft(
-        Util::tempoString(sequencer->getTransport()->getTempo()), " ", 6));
+        Util::tempoString(sequencer.lock()->getTransport()->getTempo()), " ", 6));
 }
 
 void SequencerScreen::displayTempoLabel() const
 {
     auto currentRatio = -1;
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     if (!seq->isUsed() || !seq->isTempoChangeOn())
     {
@@ -498,7 +498,7 @@ void SequencerScreen::displayTempoLabel() const
 
     for (const auto &tce : seq->getTempoChangeEvents())
     {
-        if (tce->getTick() > sequencer->getTransport()->getTickPosition())
+        if (tce->getTick() > sequencer.lock()->getTransport()->getTickPosition())
         {
             break;
         }
@@ -519,7 +519,7 @@ void SequencerScreen::displayTempoLabel() const
 void SequencerScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled()
+        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
                       ? "(SEQ)"
                       : "(MAS)");
 }
@@ -528,21 +528,21 @@ void SequencerScreen::displaySq() const
 {
     std::string result;
 
-    if (sequencer->getTransport()->isPlaying())
+    if (sequencer.lock()->getTransport()->isPlaying())
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1),
+            std::to_string(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + 1),
             "0", 2));
         result.append("-");
-        result.append(sequencer->getCurrentlyPlayingSequence()->getName());
+        result.append(sequencer.lock()->getCurrentlyPlayingSequence()->getName());
         findField("sq")->setText(result);
     }
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0", 2));
+            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0", 2));
         result.append("-");
-        result.append(sequencer->getSelectedSequence()->getName());
+        result.append(sequencer.lock()->getSelectedSequence()->getName());
         findField("sq")->setText(result);
     }
 }
@@ -550,31 +550,31 @@ void SequencerScreen::displaySq() const
 void SequencerScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(
-        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(
-        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(
-        sequencer->getTransport()->getCurrentClockNumber(), "0");
+        sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void SequencerScreen::displayRecordingMode() const
 {
     findField("recordingmode")
-        ->setText(sequencer->isRecordingModeMulti() ? "M" : "S");
+        ->setText(sequencer.lock()->isRecordingModeMulti() ? "M" : "S");
 }
 
 void SequencerScreen::displayTsig() const
 {
     std::string result;
-    const auto ts = sequencer->getSelectedSequence()->getTimeSignature();
+    const auto ts = sequencer.lock()->getSelectedSequence()->getTimeSignature();
     result.append(std::to_string(ts.numerator));
     result.append("/");
     result.append(std::to_string(ts.denominator));
@@ -584,12 +584,12 @@ void SequencerScreen::displayTsig() const
 void SequencerScreen::displayLoop() const
 {
     findField("loop")->setText(
-        sequencer->getSelectedSequence()->isLoopEnabled() ? "ON" : "OFF");
+        sequencer.lock()->getSelectedSequence()->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void SequencerScreen::displayOn() const
 {
-    findField("on")->setText(sequencer->getSelectedTrack()->isOn() ? "YES"
+    findField("on")->setText(sequencer.lock()->getSelectedTrack()->isOn() ? "YES"
                                                                    : "NO");
 }
 
@@ -597,16 +597,16 @@ void SequencerScreen::displayTr() const
 {
 
     auto result = StrUtil::padLeft(
-        std::to_string(sequencer->getSelectedTrackIndex() + 1), "0", 2);
+        std::to_string(sequencer.lock()->getSelectedTrackIndex() + 1), "0", 2);
     result.append("-");
-    result.append(sequencer->getSelectedTrack()->getName());
+    result.append(sequencer.lock()->getSelectedTrack()->getName());
     findField("tr")->setText(result);
 }
 
 void SequencerScreen::displayCount() const
 {
     findField("count")->setText(
-        sequencer->getTransport()->isCountEnabled() ? "ON" : "OFF");
+        sequencer.lock()->getTransport()->isCountEnabled() ? "ON" : "OFF");
 }
 
 std::vector<std::string> SequencerScreen::timingCorrectNames =
@@ -637,22 +637,22 @@ void SequencerScreen::pressEnter()
     {
         if (focusedFieldName == "now0")
         {
-            sequencer->getTransport()->setBar(candidate - 1);
+            sequencer.lock()->getTransport()->setBar(candidate - 1);
             setLastFocus("step-editor", "view");
         }
         else if (focusedFieldName == "now1")
         {
-            sequencer->getTransport()->setBeat(candidate - 1);
+            sequencer.lock()->getTransport()->setBeat(candidate - 1);
             setLastFocus("step-editor", "view");
         }
         else if (focusedFieldName == "now2")
         {
-            sequencer->getTransport()->setClock(candidate);
+            sequencer.lock()->getTransport()->setClock(candidate);
             setLastFocus("step-editor", "view");
         }
         else if (focusedFieldName == "tempo")
         {
-            sequencer->getTransport()->setTempo(candidate * 0.1);
+            sequencer.lock()->getTransport()->setTempo(candidate * 0.1);
         }
         else if (focusedFieldName == "velo")
         {
@@ -665,11 +665,11 @@ void SequencerScreen::pressEnter()
 void SequencerScreen::function(const int i)
 {
     ScreenComponent::function(i);
-    if (sequencer->getTransport()->isPunchEnabled())
+    if (sequencer.lock()->getTransport()->isPunchEnabled())
     {
-        if (!sequencer->getTransport()->isRecordingOrOverdubbing() && i == 5)
+        if (!sequencer.lock()->getTransport()->isRecordingOrOverdubbing() && i == 5)
         {
-            sequencer->getTransport()->setPunchEnabled(false);
+            sequencer.lock()->getTransport()->setPunchEnabled(false);
             findBackground()->setBackgroundName("sequencer");
             findChild("function-keys")->Hide(false);
         }
@@ -679,7 +679,7 @@ void SequencerScreen::function(const int i)
     switch (i)
     {
         case 0:
-            if (sequencer->getTransport()->isPlaying())
+            if (sequencer.lock()->getTransport()->isPlaying())
             {
                 return;
             }
@@ -690,7 +690,7 @@ void SequencerScreen::function(const int i)
             break;
         case 1:
         {
-            if (sequencer->getTransport()->isPlaying())
+            if (sequencer.lock()->getTransport()->isPlaying())
             {
                 return;
             }
@@ -706,15 +706,15 @@ void SequencerScreen::function(const int i)
         }
         case 3:
         {
-            sequencer->setSoloEnabled(!sequencer->isSoloEnabled());
-            findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
+            sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
+            findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
             break;
         }
         case 4:
-            sequencer->trackDown();
+            sequencer.lock()->trackDown();
             break;
         case 5:
-            sequencer->trackUp();
+            sequencer.lock()->trackUp();
             break;
         default:;
     }
@@ -740,7 +740,7 @@ void SequencerScreen::turnWheel(const int i)
     }
 
     if (focusedFieldName.substr(0, 3) == "now" &&
-        sequencer->getTransport()->isPlaying())
+        sequencer.lock()->getTransport()->isPlaying())
     {
         return;
     }
@@ -749,18 +749,18 @@ void SequencerScreen::turnWheel(const int i)
 
     if (focusedFieldName == "now0")
     {
-        sequencer->getTransport()->setBar(
-            sequencer->getTransport()->getCurrentBarIndex() + i);
+        sequencer.lock()->getTransport()->setBar(
+            sequencer.lock()->getTransport()->getCurrentBarIndex() + i);
     }
     else if (focusedFieldName == "now1")
     {
-        sequencer->getTransport()->setBeat(
-            sequencer->getTransport()->getCurrentBeatIndex() + i);
+        sequencer.lock()->getTransport()->setBeat(
+            sequencer.lock()->getTransport()->getCurrentBeatIndex() + i);
     }
     else if (focusedFieldName == "now2")
     {
-        sequencer->getTransport()->setClock(
-            sequencer->getTransport()->getCurrentClockNumber() + i);
+        sequencer.lock()->getTransport()->setClock(
+            sequencer.lock()->getTransport()->getCurrentClockNumber() + i);
     }
     else if (focusedFieldName == "devicenumber")
     {
@@ -771,11 +771,11 @@ void SequencerScreen::turnWheel(const int i)
     {
         if (i > 0)
         {
-            sequencer->trackUp();
+            sequencer.lock()->trackUp();
         }
         else if (i < 0)
         {
-            sequencer->trackDown();
+            sequencer.lock()->trackDown();
         }
     }
     else if (focusedFieldName == "bus")
@@ -825,51 +825,51 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "sq")
     {
-        if (sequencer->getTransport()->isPlaying())
+        if (sequencer.lock()->getTransport()->isPlaying())
         {
-            if (!sequencer->getTransport()->isPunchEnabled())
+            if (!sequencer.lock()->getTransport()->isPunchEnabled())
             {
                 const auto seqIndex =
-                    sequencer->getCurrentlyPlayingSequenceIndex();
+                    sequencer.lock()->getCurrentlyPlayingSequenceIndex();
 
                 if (seqIndex + i >= 0)
                 {
-                    sequencer->setNextSq(seqIndex + i);
+                    sequencer.lock()->setNextSq(seqIndex + i);
                 }
             }
         }
         else
         {
-            if (sequencer->getTransport()->isPunchEnabled())
+            if (sequencer.lock()->getTransport()->isPunchEnabled())
             {
-                sequencer->getTransport()->setPunchEnabled(false);
+                sequencer.lock()->getTransport()->setPunchEnabled(false);
                 findBackground()->setBackgroundName("sequencer");
                 findChild("function-keys")->Hide(false);
             }
 
-            sequencer->setSelectedSequenceIndex(
-                sequencer->getSelectedSequenceIndex() + i, true);
+            sequencer.lock()->setSelectedSequenceIndex(
+                sequencer.lock()->getSelectedSequenceIndex() + i, true);
         }
     }
     else if (focusedFieldName == "nextsq")
     {
-        if (sequencer->getNextSq() + i >= 0)
+        if (sequencer.lock()->getNextSq() + i >= 0)
         {
-            sequencer->setNextSq(sequencer->getNextSq() + i);
+            sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
         }
     }
     else if (focusedFieldName == "bars")
     {
-        if (!sequencer->getTransport()->isPlaying())
+        if (!sequencer.lock()->getTransport()->isPlaying())
         {
             openScreenById(ScreenId::ChangeBars2Screen);
         }
     }
     else if (focusedFieldName == "tempo")
     {
-        const double oldTempo = sequencer->getTransport()->getTempo();
+        const double oldTempo = sequencer.lock()->getTransport()->getTempo();
         const double newTempo = oldTempo + i * 0.1;
-        sequencer->getTransport()->setTempo(newTempo);
+        sequencer.lock()->getTransport()->setTempo(newTempo);
     }
     else if (focusedFieldName == "tsig")
     {
@@ -877,19 +877,19 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer->getTransport()->setTempoSourceSequence(i > 0);
+        sequencer.lock()->getTransport()->setTempoSourceSequence(i > 0);
     }
     else if (focusedFieldName == "count")
     {
-        sequencer->getTransport()->setCountEnabled(i > 0);
+        sequencer.lock()->getTransport()->setCountEnabled(i > 0);
     }
     else if (focusedFieldName == "loop")
     {
-        sequencer->getSelectedSequence()->setLoopEnabled(i > 0);
+        sequencer.lock()->getSelectedSequence()->setLoopEnabled(i > 0);
     }
     else if (focusedFieldName == "recordingmode")
     {
-        sequencer->setRecordingModeMulti(i > 0);
+        sequencer.lock()->setRecordingModeMulti(i > 0);
     }
     else if (focusedFieldName == "on")
     {
@@ -900,7 +900,7 @@ void SequencerScreen::turnWheel(const int i)
 
 void SequencerScreen::openWindow()
 {
-    if (sequencer->getTransport()->isPlaying())
+    if (sequencer.lock()->getTransport()->isPlaying())
     {
         return;
     }
@@ -995,7 +995,7 @@ void SequencerScreen::right()
 
 void SequencerScreen::moveCursor(const std::function<void()> &cursorCall)
 {
-    if (sequencer->getNextSq() == -1)
+    if (sequencer.lock()->getNextSq() == -1)
     {
         cursorCall();
         return;
@@ -1056,7 +1056,7 @@ void SequencerScreen::displayPunchWhileRecording()
         mpc.clientEventController->clientHardwareEventController
             ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
-    if (sequencer->getTransport()->isPunchEnabled() &&
+    if (sequencer.lock()->getTransport()->isPunchEnabled() &&
         (isRecPressedOrLocked || isOverdubPressedOrLocked))
     {
         findBackground()->setBackgroundName("sequencer");
@@ -1067,53 +1067,53 @@ void SequencerScreen::displayPunchWhileRecording()
                 findChild<PunchRect>("punch-rect-" + std::to_string(i));
             punchRect->Hide(
                 (i == 0 &&
-                 sequencer->getTransport()->getAutoPunchMode() == 1) ||
-                (i == 2 && sequencer->getTransport()->getAutoPunchMode() == 0));
+                 sequencer.lock()->getTransport()->getAutoPunchMode() == 1) ||
+                (i == 2 && sequencer.lock()->getTransport()->getAutoPunchMode() == 0));
             punchRect->setOn(
                 (i == 0 &&
-                 sequencer->getTransport()->getAutoPunchMode() != 1) ||
-                (i == 1 && sequencer->getTransport()->getAutoPunchMode() == 1));
+                 sequencer.lock()->getTransport()->getAutoPunchMode() != 1) ||
+                (i == 1 && sequencer.lock()->getTransport()->getAutoPunchMode() == 1));
         }
 
         auto time0 = findLabel("punch-time-0");
         auto time1 = findLabel("punch-time-1");
 
-        time0->Hide(sequencer->getTransport()->getAutoPunchMode() == 1);
-        time1->Hide(sequencer->getTransport()->getAutoPunchMode() == 0);
+        time0->Hide(sequencer.lock()->getTransport()->getAutoPunchMode() == 1);
+        time1->Hide(sequencer.lock()->getTransport()->getAutoPunchMode() == 0);
 
-        auto seq = sequencer->getSelectedSequence();
+        auto seq = sequencer.lock()->getSelectedSequence();
 
         auto text1 = StrUtil::padLeft(
             std::to_string(
                 SeqUtil::getBar(seq.get(),
-                                sequencer->getTransport()->getPunchInTime()) +
+                                sequencer.lock()->getTransport()->getPunchInTime()) +
                 1),
             "0", 3);
         auto text2 = StrUtil::padLeft(
             std::to_string(
                 SeqUtil::getBeat(seq.get(),
-                                 sequencer->getTransport()->getPunchInTime()) +
+                                 sequencer.lock()->getTransport()->getPunchInTime()) +
                 1),
             "0", 2);
         auto text3 = StrUtil::padLeft(
             std::to_string(SeqUtil::getClock(
-                seq.get(), sequencer->getTransport()->getPunchInTime())),
+                seq.get(), sequencer.lock()->getTransport()->getPunchInTime())),
             "0", 2);
         auto text4 = StrUtil::padLeft(
             std::to_string(
                 SeqUtil::getBar(seq.get(),
-                                sequencer->getTransport()->getPunchOutTime()) +
+                                sequencer.lock()->getTransport()->getPunchOutTime()) +
                 1),
             "0", 3);
         auto text5 = StrUtil::padLeft(
             std::to_string(
                 SeqUtil::getBeat(seq.get(),
-                                 sequencer->getTransport()->getPunchOutTime()) +
+                                 sequencer.lock()->getTransport()->getPunchOutTime()) +
                 1),
             "0", 2);
         auto text6 = StrUtil::padLeft(
             std::to_string(SeqUtil::getClock(
-                seq.get(), sequencer->getTransport()->getPunchOutTime())),
+                seq.get(), sequencer.lock()->getTransport()->getPunchOutTime())),
             "0", 2);
 
         time0->setText("IN:" + text1 + "." + text2 + "." + text3);
@@ -1123,9 +1123,9 @@ void SequencerScreen::displayPunchWhileRecording()
 
 void SequencerScreen::displayNextSq() const
 {
-    ls->setFunctionKeysArrangement(sequencer->getNextSq() == -1 ? 0 : 1);
+    ls.lock()->setFunctionKeysArrangement(sequencer.lock()->getNextSq() == -1 ? 0 : 1);
 
-    const auto noNextSq = sequencer->getNextSq() == -1;
+    const auto noNextSq = sequencer.lock()->getNextSq() == -1;
     findLabel("nextsq")->Hide(noNextSq);
     findField("nextsq")->Hide(noNextSq);
 
@@ -1134,7 +1134,7 @@ void SequencerScreen::displayNextSq() const
         return;
     }
 
-    findField("nextsq")->setTextPadded(sequencer->getNextSq() + 1);
+    findField("nextsq")->setTextPadded(sequencer.lock()->getNextSq() + 1);
 }
 
 void SequencerScreen::play()
@@ -1153,7 +1153,7 @@ void SequencerScreen::stop()
 {
     ScreenComponent::stop();
 
-    if (sequencer->getTransport()->isPunchEnabled())
+    if (sequencer.lock()->getTransport()->isPunchEnabled())
     {
         findBackground()->setBackgroundName("sequencer-punch-active");
 

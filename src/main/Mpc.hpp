@@ -92,6 +92,7 @@ namespace mpc
         std::unique_ptr<disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<sequencer::Clock> clock;
+        std::shared_ptr<performance::PerformanceManager> performanceManager;
 
     public:
         std::shared_ptr<lcdgui::Screens> screens;
@@ -104,7 +105,7 @@ namespace mpc
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled() const;
 
-        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<performance::PerformanceManager> getPerformanceManager() const;
 
         std::shared_ptr<input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<controller::ClientEventController>

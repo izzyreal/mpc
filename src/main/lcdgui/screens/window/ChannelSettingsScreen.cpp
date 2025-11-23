@@ -241,18 +241,18 @@ void ChannelSettingsScreen::displayNoteField() const
 
     if (const auto soundIndex =
             program->getNoteParameters(note)->getSoundIndex();
-        soundIndex >= 0 && soundIndex < sampler->getSoundCount())
+        soundIndex >= 0 && soundIndex < sampler.lock()->getSoundCount())
     {
-        soundName = sampler->getSoundName(soundIndex);
+        soundName = sampler.lock()->getSoundName(soundIndex);
 
-        if (!sampler->getSound(soundIndex)->isMono())
+        if (!sampler.lock()->getSound(soundIndex)->isMono())
         {
             soundName += StrUtil::padLeft("(ST)", " ", 19 - soundName.length());
         }
     }
 
     const auto padIndex = program->getPadIndexFromNote(note);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     findField("note")->setText(std::to_string(note) + "/" + padName + "-" +
                                soundName);
 }
@@ -310,7 +310,7 @@ void ChannelSettingsScreen::displayOutput() const
     const auto noteParameters = program->getNoteParameters(note);
     const auto soundIndex = noteParameters->getSoundIndex();
     const bool isStereo =
-        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono();
+        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono();
 
     if (isStereo)
     {

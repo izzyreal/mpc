@@ -82,6 +82,8 @@ namespace mpc::sequencer
                   const std::function<
                       std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
+        ~Sequencer();
+
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
         static double ticksToQuarterNotes(uint32_t ticks);
@@ -111,7 +113,7 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<engine::Voice>> *voices;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
-        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<performance::PerformanceManager> performanceManager;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;

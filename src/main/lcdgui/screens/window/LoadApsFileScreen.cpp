@@ -18,16 +18,16 @@ void LoadApsFileScreen::function(const int i)
     switch (i)
     {
         case 3:
-            ls->closeCurrentScreen();
+            ls.lock()->closeCurrentScreen();
             break;
         case 4:
         {
             const std::function on_success = [&]
             {
-                ls->postToUiThread(
+                ls.lock()->postToUiThread(
                     [ls = ls]
                     {
-                        ls->closeRecentScreensUntilReachingLayer(0);
+                        ls.lock()->closeRecentScreensUntilReachingLayer(0);
                     });
             };
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();

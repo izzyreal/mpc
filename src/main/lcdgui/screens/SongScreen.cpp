@@ -18,7 +18,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 {
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->getTickPosition();
+                            return sequencer.lock()->getTransport()->getTickPosition();
                         },
                         [&](auto)
                         {
@@ -29,7 +29,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->getTempo();
+                            return sequencer.lock()->getTransport()->getTempo();
                         },
                         [&](auto)
                         {
@@ -38,7 +38,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->isPlaying();
+                            return sequencer.lock()->getTransport()->isPlaying();
                         },
                         [&](auto isPlaying)
                         {
@@ -48,7 +48,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedSequenceIndex();
+                            return sequencer.lock()->getSelectedSequenceIndex();
                         },
                         [&](auto)
                         {
@@ -86,13 +86,13 @@ void SongScreen::up()
         focusedFieldName == "step1" || focusedFieldName == "sequence1" ||
         focusedFieldName == "reps1")
     {
-        if (offset == -1 || sequencer->getTransport()->isPlaying())
+        if (offset == -1 || sequencer.lock()->getTransport()->isPlaying())
         {
             return;
         }
 
         setOffset(offset - 1);
-        sequencer->setSelectedSequenceIndex(sequencer->getSongSequenceIndex(),
+        sequencer.lock()->setSelectedSequenceIndex(sequencer.lock()->getSongSequenceIndex(),
                                             true);
     }
     else
@@ -106,15 +106,15 @@ void SongScreen::left()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "sequence1")
     {
-        ls->setFocus("step1");
+        ls.lock()->setFocus("step1");
     }
     else if (focusedFieldName == "reps1")
     {
-        ls->setFocus("sequence1");
+        ls.lock()->setFocus("sequence1");
     }
     else if (focusedFieldName == "step1")
     {
-        ls->setFocus("loop");
+        ls.lock()->setFocus("loop");
     }
     else
     {
@@ -127,15 +127,15 @@ void SongScreen::right()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "sequence1")
     {
-        ls->setFocus("reps1");
+        ls.lock()->setFocus("reps1");
     }
     else if (focusedFieldName == "step1")
     {
-        ls->setFocus("sequence1");
+        ls.lock()->setFocus("sequence1");
     }
     else if (focusedFieldName == "loop")
     {
-        ls->setFocus("step1");
+        ls.lock()->setFocus("step1");
     }
     else
     {
@@ -145,12 +145,12 @@ void SongScreen::right()
 
 void SongScreen::openWindow()
 {
-    if (sequencer->getTransport()->isPlaying())
+    if (sequencer.lock()->getTransport()->isPlaying())
     {
         return;
     }
 
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -183,15 +183,15 @@ void SongScreen::down()
         focusedFieldName == "step1" || focusedFieldName == "sequence1" ||
         focusedFieldName == "reps1")
     {
-        if (const auto song = sequencer->getSong(selectedSongIndex);
+        if (const auto song = sequencer.lock()->getSong(selectedSongIndex);
             offset == song->getStepCount() - 1 ||
-            sequencer->getTransport()->isPlaying())
+            sequencer.lock()->getTransport()->isPlaying())
         {
             return;
         }
 
         setOffset(offset + 1);
-        sequencer->setSelectedSequenceIndex(sequencer->getSongSequenceIndex(),
+        sequencer.lock()->setSelectedSequenceIndex(sequencer.lock()->getSongSequenceIndex(),
                                             true);
     }
     else
@@ -202,7 +202,7 @@ void SongScreen::down()
 
 void SongScreen::turnWheel(const int increment)
 {
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.find("sequence") != std::string::npos)
@@ -230,7 +230,7 @@ void SongScreen::turnWheel(const int increment)
         const auto step = song->getStep(offset + 1).lock();
 
         step->setSequence(step->getSequence() + increment);
-        sequencer->setSelectedSequenceIndex(step->getSequence(), true);
+        sequencer.lock()->setSelectedSequenceIndex(step->getSequence(), true);
         displayNow0();
         displayNow1();
 
@@ -258,19 +258,19 @@ void SongScreen::turnWheel(const int increment)
 
         if (song->isUsed() && song->getStepCount() != 0)
         {
-            sequencer->setSelectedSequenceIndex(
+            sequencer.lock()->setSelectedSequenceIndex(
                 song->getStep(0).lock()->getSequence(), true);
         }
     }
     else if (focusedFieldName == "tempo" &&
-             !sequencer->getTransport()->isTempoSourceSequenceEnabled())
+             !sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled())
     {
-        sequencer->getTransport()->setTempo(
-            sequencer->getTransport()->getTempo() + increment * 0.1);
+        sequencer.lock()->getTransport()->setTempo(
+            sequencer.lock()->getTransport()->getTempo() + increment * 0.1);
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer->getTransport()->setTempoSourceSequence(increment > 0);
+        sequencer.lock()->getTransport()->setTempoSourceSequence(increment > 0);
         displayTempoSource();
         displayTempo();
     }
@@ -287,12 +287,12 @@ void SongScreen::turnWheel(const int increment)
 
 void SongScreen::function(const int i)
 {
-    if (sequencer->getTransport()->isPlaying())
+    if (sequencer.lock()->getTransport()->isPlaying())
     {
         return;
     }
 
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
 
     switch (i)
     {
@@ -300,7 +300,7 @@ void SongScreen::function(const int i)
             openScreenById(ScreenId::ConvertSongToSeqScreen);
             break;
         case 4:
-            if (sequencer->getTransport()->isPlaying())
+            if (sequencer.lock()->getTransport()->isPlaying())
             {
                 return;
             }
@@ -353,18 +353,18 @@ void SongScreen::function(const int i)
 void SongScreen::displayTempo() const
 {
     findField("tempo")->setText(
-        Util::tempoString(sequencer->getTransport()->getTempo()));
+        Util::tempoString(sequencer.lock()->getTransport()->getTempo()));
 }
 
 void SongScreen::displayLoop() const
 {
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
     findField("loop")->setText(song->isLoopEnabled() ? "YES" : "NO");
 }
 
 void SongScreen::displaySteps() const
 {
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
     const int steps = song->getStepCount();
 
     const auto stepArray =
@@ -381,7 +381,7 @@ void SongScreen::displaySteps() const
         {
             stepArray[i]->setText(std::to_string(stepIndex + 1));
             auto seqname =
-                sequencer
+                sequencer.lock()
                     ->getSequence(
                         song->getStep(stepIndex).lock()->getSequence())
                     ->getName();
@@ -407,7 +407,7 @@ void SongScreen::displaySteps() const
 void SongScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled()
+        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
                       ? "SEQ"
                       : "MAS");
 }
@@ -416,7 +416,7 @@ void SongScreen::displayNow0() const
 {
     int pastBars = 0;
 
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
 
     for (int i = 0; i < offset + 1; i++)
     {
@@ -426,7 +426,7 @@ void SongScreen::displayNow0() const
         }
 
         const auto step = song->getStep(i).lock();
-        const auto seq = sequencer->getSequence(step->getSequence());
+        const auto seq = sequencer.lock()->getSequence(step->getSequence());
 
         if (!seq->isUsed())
         {
@@ -438,28 +438,28 @@ void SongScreen::displayNow0() const
         pastBars += bars;
     }
 
-    pastBars += sequencer->getTransport()->getPlayedStepRepetitions() *
-                (sequencer->getSelectedSequence()->getLastBarIndex() + 1);
+    pastBars += sequencer.lock()->getTransport()->getPlayedStepRepetitions() *
+                (sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1);
 
     findField("now0")->setTextPadded(
-        sequencer->getTransport()->getCurrentBarIndex() + 1 + pastBars, "0");
+        sequencer.lock()->getTransport()->getCurrentBarIndex() + 1 + pastBars, "0");
 }
 
 void SongScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(
-        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void SongScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(
-        sequencer->getTransport()->getCurrentClockNumber(), "0");
+        sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void SongScreen::displaySongName() const
 {
-    const auto song = sequencer->getSong(selectedSongIndex);
+    const auto song = sequencer.lock()->getSong(selectedSongIndex);
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(selectedSongIndex + 1), "0", 2) + "-" +
         song->getName());
@@ -472,7 +472,7 @@ void SongScreen::setOffset(int i)
         i = -1;
     }
 
-    if (const auto song = sequencer->getSong(selectedSongIndex);
+    if (const auto song = sequencer.lock()->getSong(selectedSongIndex);
         i >= song->getStepCount() - 1)
     {
         i = song->getStepCount() - 1;

@@ -20,7 +20,7 @@ SaveAllFileScreen::SaveAllFileScreen(Mpc &mpc, const int layerIndex)
 
 void SaveAllFileScreen::open()
 {
-    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
     {
         fileName = "ALL_SEQ_SONG1";
     }

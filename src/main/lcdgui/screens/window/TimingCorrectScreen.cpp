@@ -23,7 +23,7 @@ TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void TimingCorrectScreen::open()
 {
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
 
     if (track->getBusType() != BusType::MIDI)
     {
@@ -33,7 +33,7 @@ void TimingCorrectScreen::open()
     findField("note1")->setAlignment(Alignment::Centered, 18);
     findField("note1")->setLocation(116, 40);
 
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -54,11 +54,11 @@ void TimingCorrectScreen::function(int i)
     {
         case 4:
         {
-            sequencer->storeSelectedSequenceInUndoPlaceHolder();
+            sequencer.lock()->storeSelectedSequenceInUndoPlaceHolder();
 
             std::vector<int> noteRange(2);
 
-            const auto track = sequencer->getSelectedTrack();
+            const auto track = sequencer.lock()->getSelectedTrack();
 
             if (track->getBusType() != BusType::MIDI)
             {
@@ -81,7 +81,7 @@ void TimingCorrectScreen::function(int i)
 
             const auto eventRange = track->getEventRange(time0, time1);
 
-            const auto sequence = sequencer->getSelectedSequence();
+            const auto sequence = sequencer.lock()->getSelectedSequence();
 
             for (auto &e : eventRange)
             {
@@ -149,7 +149,7 @@ void TimingCorrectScreen::displaySwing() const
 
 void TimingCorrectScreen::displayNotes()
 {
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
 
     if (track->getBusType() == BusType::MIDI)
     {
@@ -180,7 +180,7 @@ void TimingCorrectScreen::displayNotes()
             const auto program = getProgramOrThrow();
             const auto padIndex =
                 program->getPadIndexFromNote(DrumNoteNumber(note0));
-            const auto padName = sampler->getPadName(padIndex);
+            const auto padName = sampler.lock()->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 
@@ -201,7 +201,7 @@ void TimingCorrectScreen::displayAmount() const
 
 void TimingCorrectScreen::displayTime()
 {
-    const auto s = sequencer->getSelectedSequence().get();
+    const auto s = sequencer.lock()->getSelectedSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1,
                                       "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");

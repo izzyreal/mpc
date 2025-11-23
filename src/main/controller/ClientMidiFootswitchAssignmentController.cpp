@@ -19,7 +19,7 @@ ClientMidiFootswitchAssignmentController::
         const std::shared_ptr<ClientHardwareEventController>
             &clientHardwareEventController,
         const std::shared_ptr<MidiSwScreen> &midiSwScreen,
-        const std::shared_ptr<sequencer::Sequencer> &sequencer)
+        const std::weak_ptr<sequencer::Sequencer> &sequencer)
     : clientHardwareEventController(clientHardwareEventController),
       midiSwScreen(midiSwScreen), sequencer(sequencer)
 {
@@ -84,16 +84,16 @@ void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
 {
-    if (!sequencer->getTransport()->isPlaying())
+    if (!sequencer.lock()->getTransport()->isPlaying())
     {
         handleStopToPlay();
     }
-    else if (sequencer->getTransport()->isPlaying() &&
-             !sequencer->getTransport()->isRecordingOrOverdubbing())
+    else if (sequencer.lock()->getTransport()->isPlaying() &&
+             !sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(REC, PLAY);
     }
-    else if (sequencer->getTransport()->isRecording())
+    else if (sequencer.lock()->getTransport()->isRecording())
     {
         handleRecordingToPlay();
     }
@@ -101,16 +101,16 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
 
 void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 {
-    if (!sequencer->getTransport()->isPlaying())
+    if (!sequencer.lock()->getTransport()->isPlaying())
     {
         handleStopToPlay();
     }
-    else if (sequencer->getTransport()->isPlaying() &&
-             !sequencer->getTransport()->isRecordingOrOverdubbing())
+    else if (sequencer.lock()->getTransport()->isPlaying() &&
+             !sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(OVERDUB, PLAY);
     }
-    else if (sequencer->getTransport()->isOverdubbing())
+    else if (sequencer.lock()->getTransport()->isOverdubbing())
     {
         handleRecordingToPlay();
     }

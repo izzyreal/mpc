@@ -21,9 +21,9 @@ AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(
 
 void AutoChromaticAssignmentScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}))
     {
-        const auto letterNumber = sampler->getProgramCount() + 21;
+        const auto letterNumber = sampler.lock()->getProgramCount() + 21;
         newName = "NewPgm-" + Mpc::akaiAscii[letterNumber];
         originalKey = DrumNoteNumber(67);
         tune = 0;
@@ -56,7 +56,7 @@ void AutoChromaticAssignmentScreen::function(const int i)
         case 4:
         {
             const auto newProgram =
-                sampler->createNewProgramAddFirstAvailableSlot().lock();
+                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
 
             for (int j = MinDrumNoteNumber; j <= MaxDrumNoteNumber; j++)
@@ -74,7 +74,7 @@ void AutoChromaticAssignmentScreen::function(const int i)
                 noteParameters->setTune((j - originalKey) * 10 + tune);
             }
 
-            const auto programs = sampler->getPrograms();
+            const auto programs = sampler.lock()->getPrograms();
 
             for (int j = MinProgramIndex; j <= MaxProgramIndex; j++)
             {
@@ -141,7 +141,7 @@ void AutoChromaticAssignmentScreen::openNameScreen()
 void AutoChromaticAssignmentScreen::setSourceSoundIndex(const int i)
 {
     sourceSoundIndex =
-        std::clamp(i, -1, std::max(0, sampler->getSoundCount() - 1));
+        std::clamp(i, -1, std::max(0, sampler.lock()->getSoundCount() - 1));
     displaySnd();
 }
 
@@ -164,7 +164,7 @@ void AutoChromaticAssignmentScreen::displaySource() const
     const auto program = getProgramOrThrow();
     const auto note = mpc.clientEventController->getSelectedNote();
     const auto padIndex = program->getPadIndexFromNote(note);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     findField("source")->setText(std::to_string(note) + "/" + padName);
 }
 
@@ -177,7 +177,7 @@ void AutoChromaticAssignmentScreen::displayTune() const
 
 void AutoChromaticAssignmentScreen::displayOriginalKey() const
 {
-    const auto padName = sampler->getPadName(originalKey - 35);
+    const auto padName = sampler.lock()->getPadName(originalKey - 35);
     findField("original-key")
         ->setText(std::to_string(originalKey) + "/" + padName);
 }
@@ -186,9 +186,9 @@ void AutoChromaticAssignmentScreen::displaySnd() const
 {
     const auto sampleName = sourceSoundIndex == -1
                                 ? "OFF"
-                                : sampler->getSoundName(sourceSoundIndex);
+                                : sampler.lock()->getSoundName(sourceSoundIndex);
     const std::string stereo = sourceSoundIndex == -1 ? ""
-                               : sampler->getSound(sourceSoundIndex)->isMono()
+                               : sampler.lock()->getSound(sourceSoundIndex)->isMono()
                                    ? ""
                                    : "(ST)";
     findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);

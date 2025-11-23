@@ -33,7 +33,7 @@ void CopyNoteParametersScreen::turnWheel(const int increment)
         auto candidate = prog0;
         for (int i = 0; i < std::abs(increment); ++i)
         {
-            candidate = sampler->getUsedProgram(candidate, up);
+            candidate = sampler.lock()->getUsedProgram(candidate, up);
         }
         setProg0(candidate);
     }
@@ -47,7 +47,7 @@ void CopyNoteParametersScreen::turnWheel(const int increment)
         auto candidate = prog1;
         for (int i = 0; i < std::abs(increment); ++i)
         {
-            candidate = sampler->getUsedProgram(candidate, up);
+            candidate = sampler.lock()->getUsedProgram(candidate, up);
         }
         setProg1(candidate);
     }
@@ -65,9 +65,9 @@ void CopyNoteParametersScreen::function(const int i)
     {
         case 4:
         {
-            const auto source = sampler->getProgram(prog0)->getNoteParameters(
+            const auto source = sampler.lock()->getProgram(prog0)->getNoteParameters(
                 mpc.clientEventController->getSelectedNote());
-            const auto dest = sampler->getProgram(prog1);
+            const auto dest = sampler.lock()->getProgram(prog1);
             const auto clone = source->clone(note1);
             dest->setNoteParameters(note1, clone);
             openScreenById(ScreenId::PgmAssignScreen);
@@ -79,7 +79,7 @@ void CopyNoteParametersScreen::function(const int i)
 
 void CopyNoteParametersScreen::displayProg0() const
 {
-    const auto program = sampler->getProgram(prog0);
+    const auto program = sampler.lock()->getProgram(prog0);
     findField("prog0")->setText(
         StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" +
         program->getName());
@@ -87,19 +87,19 @@ void CopyNoteParametersScreen::displayProg0() const
 
 void CopyNoteParametersScreen::displayNote0() const
 {
-    const auto sourceProgram = sampler->getProgram(prog0);
+    const auto sourceProgram = sampler.lock()->getProgram(prog0);
     const auto note0 = mpc.clientEventController->getSelectedNote();
     const auto selectedNoteParameters = sourceProgram->getNoteParameters(note0);
-    const auto destProgram = sampler->getProgram(prog0);
+    const auto destProgram = sampler.lock()->getProgram(prog0);
     const auto padIndex = destProgram->getPadIndexFromNote(note0);
     const auto soundIndex = note0 != NoDrumNoteAssigned
                                 ? selectedNoteParameters->getSoundIndex()
                                 : -1;
     const auto noteText =
         note0 == NoDrumNoteAssigned ? "--" : std::to_string(note0);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     auto sampleName =
-        soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
+        soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
 
     if (note0 == NoDrumNoteAssigned)
     {
@@ -111,7 +111,7 @@ void CopyNoteParametersScreen::displayNote0() const
 
 void CopyNoteParametersScreen::displayProg1() const
 {
-    const auto program = sampler->getProgram(prog1);
+    const auto program = sampler.lock()->getProgram(prog1);
     findField("prog1")->setText(
         StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" +
         program->getName());
@@ -119,7 +119,7 @@ void CopyNoteParametersScreen::displayProg1() const
 
 void CopyNoteParametersScreen::displayNote1() const
 {
-    const auto program = sampler->getProgram(prog1);
+    const auto program = sampler.lock()->getProgram(prog1);
     const auto padIndex =
         program->getPadIndexFromNote(DrumNoteNumber(note1 + MinDrumNoteNumber));
     const auto soundIndex =
@@ -128,9 +128,9 @@ void CopyNoteParametersScreen::displayNote1() const
                     : -1;
     const auto noteText =
         note1 == -1 ? "--" : std::to_string(note1 + MinDrumNoteNumber);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     auto sampleName =
-        soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
+        soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
 
     if (note1 == -1)
     {

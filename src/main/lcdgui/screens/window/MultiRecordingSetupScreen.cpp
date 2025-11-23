@@ -85,7 +85,7 @@ void MultiRecordingSetupScreen::right()
 
 void MultiRecordingSetupScreen::turnWheel(const int increment)
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName[0] == 'a')
@@ -96,12 +96,12 @@ void MultiRecordingSetupScreen::turnWheel(const int increment)
             {
                 std::string res =
                     focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
-                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                ls.lock()->setFocus(focusedFieldName.substr(0, 1).append(
                     std::to_string(yPos + 1)));
             }
             else if (yPos == 1)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                ls.lock()->setFocus(focusedFieldName.substr(0, 1).append(
                     std::to_string(yPos + 1)));
             }
             else if (yPos == 2)
@@ -117,12 +117,12 @@ void MultiRecordingSetupScreen::turnWheel(const int increment)
             }
             else if (yPos == 1)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                ls.lock()->setFocus(focusedFieldName.substr(0, 1).append(
                     std::to_string(yPos - 1)));
             }
             else if (yPos == 2)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                ls.lock()->setFocus(focusedFieldName.substr(0, 1).append(
                     std::to_string(yPos - 1)));
             }
         }
@@ -153,13 +153,13 @@ void MultiRecordingSetupScreen::up()
     }
     else if (yPos == 1)
     {
-        ls->setFocus(
+        ls.lock()->setFocus(
             focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
         --yPos;
     }
     else if (yPos == 2)
     {
-        ls->setFocus(
+        ls.lock()->setFocus(
             focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
         --yPos;
     }
@@ -173,13 +173,13 @@ void MultiRecordingSetupScreen::down()
     {
         std::string res =
             focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
-        ls->setFocus(
+        ls.lock()->setFocus(
             focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
         ++yPos;
     }
     else if (yPos == 1)
     {
-        ls->setFocus(
+        ls.lock()->setFocus(
             focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
         ++yPos;
     }
@@ -191,7 +191,7 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(const int i) const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     const auto trackIndex = visibleMrsLines[i]->getTrack();
 
     const auto aField = findField("a" + std::to_string(i));

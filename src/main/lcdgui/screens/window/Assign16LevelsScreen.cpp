@@ -143,19 +143,19 @@ int Assign16LevelsScreen::getParameter() const
 void Assign16LevelsScreen::displayNote() const
 {
     const auto track = mpc.getSequencer()->getSelectedTrack();
-    const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
+    const auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
     assert(drumBus);
-    const auto program = sampler->getProgram(drumBus->getProgramIndex());
+    const auto program = sampler.lock()->getProgram(drumBus->getProgramIndex());
     const auto padIndex = program->getPadIndexFromNote(note);
 
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
 
     const auto soundIndex =
         note == NoDrumNoteAssigned
             ? -1
             : program->getNoteParameters(note)->getSoundIndex();
     const auto soundName =
-        soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
+        soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
 
     const auto noteName =
         note == NoDrumNoteAssigned ? "--" : std::to_string(note);

@@ -55,7 +55,7 @@ void DeleteSongScreen::function(const int i)
         case 4:
         {
             const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-            sequencer->deleteSong(songScreen->getSelectedSongIndex());
+            sequencer.lock()->deleteSong(songScreen->getSelectedSongIndex());
             openScreenById(ScreenId::SongScreen);
             break;
         }
@@ -66,7 +66,7 @@ void DeleteSongScreen::function(const int i)
 void DeleteSongScreen::displaySong() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
+    const auto song = sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(songScreen->getSelectedSongIndex() + 1),
                          "0", 2) +

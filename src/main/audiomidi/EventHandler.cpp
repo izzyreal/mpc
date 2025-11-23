@@ -114,7 +114,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         audioServer->getSampleRate());
 
     auto performanceDrum =
-        mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+        mpc.getPerformanceManager().lock()->getSnapshot().getDrum(drumBus->getIndex());
 
     const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, performanceDrum, drumBus, mpc.getSampler(),
@@ -130,14 +130,14 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
 
-    mpc.performanceManager->registerNoteOn(
+    mpc.getPerformanceManager().lock()->registerNoteOn(
         performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
         track->getIndex(), drumBusIndexToDrumBusType(ctx.drum.drumBusIndex),
         note, Velocity(velocityToUse), programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
-        mpc.performanceManager->registerProgramPadPress(
+        mpc.getPerformanceManager().lock()->registerProgramPadPress(
             performance::PerformanceEventSource::Sequence, std::nullopt,
             screenId, track->getIndex(),
             drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), programPadIndex,
@@ -150,18 +150,18 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             noteOnEvent.tick);
 
     auto noteOffEventFn = [note, programIndex,
-                           performanceManager = mpc.performanceManager,
+                           performanceManager = mpc.getPerformanceManager(),
                            programPadIndex, noteOffCtx]
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        performanceManager->registerNoteOff(
+        performanceManager.lock()->registerNoteOff(
             performance::PerformanceEventSource::Sequence, note, noMidiChannel,
             [](void *) {});
 
         if (programPadIndex != -1)
         {
-            performanceManager->registerProgramPadRelease(
+            performanceManager.lock()->registerProgramPadRelease(
                 performance::PerformanceEventSource::Sequence, programPadIndex,
                 programIndex, [](void *) {});
         }
@@ -278,7 +278,7 @@ void EventHandler::handleUnfinalizedNoteOn(
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
         const auto performanceDrum =
-            mpc.performanceManager->getSnapshot().getDrum(drumBus->getIndex());
+            mpc.getPerformanceManager().lock()->getSnapshot().getDrum(drumBus->getIndex());
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
             0, performanceDrum, drumBus, mpc.getSampler(),

@@ -47,7 +47,7 @@ SampleScreen::SampleScreen(Mpc &mpc, const int layerIndex)
 
 void SampleScreen::open()
 {
-    ls->getCurrentBackground()->setBackgroundName("sample");
+    ls.lock()->getCurrentBackground()->setBackgroundName("sample");
 
     displayInput();
     displayThreshold();
@@ -123,7 +123,7 @@ void SampleScreen::function(const int i)
             else if (mpc.getEngineHost()->getSoundRecorder()->isArmed())
             {
                 mpc.getEngineHost()->getSoundRecorder()->setArmed(false);
-                sampler->deleteSound(sampler->getSoundCount() - 1);
+                sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
             }
             break;
         case 5:
@@ -142,14 +142,14 @@ void SampleScreen::function(const int i)
             }
             else
             {
-                const auto sound = sampler->addSound();
+                const auto sound = sampler.lock()->addSound();
 
                 if (!sound)
                 {
                     return;
                 }
 
-                sound->setName(sampler->addOrIncreaseNumber("sound1"));
+                sound->setName(sampler.lock()->addOrIncreaseNumber("sound1"));
                 const auto lengthInFrames = time * (44100 * 0.1);
                 engineHost->getSoundRecorder()->prepare(
                     sound, lengthInFrames,

@@ -22,12 +22,12 @@ SaveAProgramScreen::SaveAProgramScreen(Mpc &mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
-    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         const auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
         nameScreen->setNameToEdit(
-            sampler->getProgram(saveScreen->getProgramIndex())->getName());
+            sampler.lock()->getProgram(saveScreen->getProgramIndex())->getName());
     }
 
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);

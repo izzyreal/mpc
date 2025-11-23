@@ -103,7 +103,7 @@ void VmpcDisksScreen::function(int i)
                 popupMsg = "Volume configurations unchanged";
             }
 
-            ls->showPopupForMs(popupMsg, 1000);
+            ls.lock()->showPopupForMs(popupMsg, 1000);
             break;
         }
     }
@@ -226,7 +226,7 @@ void VmpcDisksScreen::displayFunctionKeys() const
         midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
                                                                          : 0;
     newArrangement += hasConfigChanged() ? 0 : 1;
-    ls->setFunctionKeysArrangement(newArrangement);
+    ls.lock()->setFunctionKeysArrangement(newArrangement);
 }
 
 void VmpcDisksScreen::displayUpAndDown()

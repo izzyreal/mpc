@@ -20,7 +20,7 @@ void VmpcAutoSaveScreen::open()
     const auto vmpcSettingsScreen =
         mpc.screens->get<ScreenId::VmpcSettingsScreen>();
     const auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
-    ls->setFunctionKeysArrangement(
+    ls.lock()->setFunctionKeysArrangement(
         midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
                                                                          : 0);
 }

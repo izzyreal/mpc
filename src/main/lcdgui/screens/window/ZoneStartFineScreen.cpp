@@ -35,7 +35,7 @@ void ZoneStartFineScreen::displayFineWave()
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -66,7 +66,7 @@ void ZoneStartFineScreen::displayLngthLabel() const
 
 void ZoneStartFineScreen::displayPlayX() const
 {
-    findField("playx")->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void ZoneStartFineScreen::function(const int i)
@@ -82,7 +82,7 @@ void ZoneStartFineScreen::function(const int i)
             findWave()->zoomMinus();
             break;
         case 4:
-            sampler->playX();
+            sampler.lock()->playX();
             break;
         default:;
     }
@@ -90,7 +90,7 @@ void ZoneStartFineScreen::function(const int i)
 
 void ZoneStartFineScreen::turnWheel(const int i)
 {
-    auto sound = sampler->getSound();
+    auto sound = sampler.lock()->getSound();
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
 
     auto soundInc = getSoundIncrement(i);
@@ -120,7 +120,7 @@ void ZoneStartFineScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "playx")
     {
-        sampler->setPlayX(sampler->getPlayX() + i);
+        sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
         displayPlayX();
     }
 }

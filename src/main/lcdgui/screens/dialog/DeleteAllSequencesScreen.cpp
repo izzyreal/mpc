@@ -18,8 +18,8 @@ void DeleteAllSequencesScreen::function(const int i)
             openScreenById(ScreenId::DeleteSequenceScreen);
             break;
         case 4:
-            sequencer->getTransport()->setPosition(0);
-            sequencer->purgeAllSequences();
+            sequencer.lock()->getTransport()->setPosition(0);
+            sequencer.lock()->purgeAllSequences();
             openScreenById(ScreenId::SequencerScreen);
             break;
     }

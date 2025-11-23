@@ -318,15 +318,15 @@ void MixerScreen::displayFunctionKeys() const
 {
     if (tab == 0)
     {
-        ls->setFunctionKeysArrangement(selection.count() > 1 ? 3 : 0);
+        ls.lock()->setFunctionKeysArrangement(selection.count() > 1 ? 3 : 0);
     }
     else if (tab == 1)
     {
-        ls->setFunctionKeysArrangement(selection.count() > 1 ? 4 : 1);
+        ls.lock()->setFunctionKeysArrangement(selection.count() > 1 ? 4 : 1);
     }
     else if (tab == 2)
     {
-        ls->setFunctionKeysArrangement(selection.count() > 1 ? 5 : 2);
+        ls.lock()->setFunctionKeysArrangement(selection.count() > 1 ? 5 : 2);
     }
 }
 
@@ -510,7 +510,7 @@ void MixerScreen::turnWheel(const int i)
                 mpc.screens->get<ScreenId::MixerSetupScreen>();
 
             const bool record =
-                sequencer->getTransport()->isRecordingOrOverdubbing() &&
+                sequencer.lock()->getTransport()->isRecordingOrOverdubbing() &&
                 mixerSetupScreen->isRecordMixChangesEnabled();
 
             const int bank =
@@ -572,7 +572,7 @@ void MixerScreen::recordMixerEvent(const int pad, const int param,
     e.mixerParameter = param;
     e.mixerPad = pad;
     e.mixerValue = value;
-    sequencer->getSelectedTrack()->insertEvent(e);
+    sequencer.lock()->getSelectedTrack()->insertEvent(e);
 }
 
 void MixerScreen::displayStereoFaders()
@@ -826,7 +826,7 @@ bool MixerScreen::stripHasStereoSound(const int stripIndex) const
     const auto note = program->getNoteFromPad(ProgramPadIndex(pad));
     const auto noteParameters = program->getNoteParameters(note);
     const auto soundIndex = noteParameters->getSoundIndex();
-    return soundIndex != -1 && !sampler->getSound(soundIndex)->isMono();
+    return soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono();
 }
 
 void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)

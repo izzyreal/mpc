@@ -60,7 +60,7 @@ void PopupScreen::onTimerCallback()
     switch (config.behavior.action)
     {
         case PopupBehavior::OnTimeoutAction::Close:
-            ls->closeCurrentScreen();
+            ls.lock()->closeCurrentScreen();
             break;
 
         case PopupBehavior::OnTimeoutAction::OpenScreen:
@@ -73,7 +73,7 @@ void PopupScreen::onTimerCallback()
         case PopupBehavior::OnTimeoutAction::ReturnToLayer:
             if (config.behavior.targetLayer)
             {
-                ls->closeRecentScreensUntilReachingLayer(
+                ls.lock()->closeRecentScreensUntilReachingLayer(
                     *config.behavior.targetLayer);
             }
             break;

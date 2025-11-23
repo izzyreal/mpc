@@ -53,11 +53,11 @@ void DirectoryScreen::setFunctionKeys()
             fs::path(getSelectedFile()->getName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
-        ls->setFunctionKeysArrangement(playable ? 1 : 0);
+        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
     }
     else
     {
-        ls->setFunctionKeysArrangement(0);
+        ls.lock()->setFunctionKeysArrangement(0);
     }
 
     findBackground()->repaintUnobtrusive(
@@ -117,7 +117,7 @@ void DirectoryScreen::function(const int f)
 
                 if (const auto success = file->setName(finalNewName); !success)
                 {
-                    ls->showPopupAndAwaitInteraction("File name exists !!");
+                    ls.lock()->showPopupAndAwaitInteraction("File name exists !!");
                     return;
                 }
 
@@ -187,7 +187,7 @@ void DirectoryScreen::function(const int f)
                         msg = "Folder name exists !!";
                     }
 
-                    ls->showPopupAndThenOpen(ScreenId::NameScreen, msg, 1000);
+                    ls.lock()->showPopupAndThenOpen(ScreenId::NameScreen, msg, 1000);
                     return;
                 }
 
@@ -251,18 +251,18 @@ void DirectoryScreen::function(const int f)
                               : audiomidi::SoundPlayerFileFormat::WAV,
                         audioServerSampleRate);
 
-                    ls->postToUiThread(
+                    ls.lock()->postToUiThread(
                         [started, file, ls]
                         {
                             const auto name = file->getNameWithoutExtension();
 
                             if (started)
                             {
-                                ls->showPopup("Playing " + name);
+                                ls.lock()->showPopup("Playing " + name);
                             }
                             else
                             {
-                                ls->showPopupAndAwaitInteraction("Can't play " +
+                                ls.lock()->showPopupAndAwaitInteraction("Can't play " +
                                                                  name);
                             }
                         });
@@ -658,12 +658,12 @@ void DirectoryScreen::refreshFocus() const
 {
     if (xPos == 0)
     {
-        ls->setFocus("a" + std::to_string(yPos0));
+        ls.lock()->setFocus("a" + std::to_string(yPos0));
     }
     else if (xPos == 1)
     {
         const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-        ls->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
+        ls.lock()->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
     }
 }
 

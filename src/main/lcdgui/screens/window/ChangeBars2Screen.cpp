@@ -19,21 +19,21 @@ ChangeBars2Screen::ChangeBars2Screen(Mpc &mpc, const int layerIndex)
 void ChangeBars2Screen::open()
 {
     setNewBars(
-        std::max(sequencer->getSelectedSequence()->getLastBarIndex(), 0));
+        std::max(sequencer.lock()->getSelectedSequence()->getLastBarIndex(), 0));
     displayCurrent();
     displayNewBars();
 }
 
 void ChangeBars2Screen::displayCurrent() const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(const int i)
 {
     ScreenComponent::function(i);
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     switch (i)
     {
@@ -62,7 +62,7 @@ void ChangeBars2Screen::function(const int i)
 
             if (changed)
             {
-                sequencer->getTransport()->setPosition(0);
+                sequencer.lock()->getTransport()->setPosition(0);
             }
 
             openScreenById(ScreenId::SequencerScreen);
@@ -73,7 +73,7 @@ void ChangeBars2Screen::function(const int i)
 
 void ChangeBars2Screen::displayNewBars() const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     const auto message0 = findLabel("message0");
     const auto message1 = findLabel("message1");

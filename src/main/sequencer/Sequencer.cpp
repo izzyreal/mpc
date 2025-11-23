@@ -93,6 +93,10 @@ Sequencer::Sequencer(
     stateManager = std::make_shared<SequencerStateManager>(this);
     trackEventStateWorker = std::make_shared<TrackEventStateWorker>(this);
 }
+Sequencer::~Sequencer()
+{
+    printf("~Sequencer\n");
+}
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
@@ -118,7 +122,7 @@ void Sequencer::init()
          ++drumBusIndex)
     {
         buses.emplace_back(std::make_shared<DrumBus>(DrumBusIndex(drumBusIndex),
-                                                     performanceManager));
+                                                     performanceManager.lock()));
     }
 
     lastTap = currentTimeMillis();
@@ -444,7 +448,7 @@ std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
         [&](const ProgramPadIndex programPadIndex,
             const ProgramIndex programIndex)
         {
-            return performanceManager->getSnapshot().isProgramPadPressed(
+            return performanceManager.lock()->getSnapshot().isProgramPadPressed(
                 programPadIndex, programIndex);
         },
         sampler, eventHandler,

@@ -98,12 +98,12 @@ void AssignScreen::displayAssignNote() const
     const auto note = slider->getNote();
 
     const auto padIndex = program->getPadIndexFromNote(note);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
 
     const auto soundIndex =
         note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
     const auto soundName =
-        soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
+        soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
 
     const auto noteName = note == 34 ? "--" : std::to_string(note);
 

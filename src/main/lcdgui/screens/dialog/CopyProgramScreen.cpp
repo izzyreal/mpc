@@ -35,7 +35,7 @@ void CopyProgramScreen::function(const int i)
                 return;
             }
 
-            sampler->copyProgram(pgm0, pgm1);
+            sampler.lock()->copyProgram(pgm0, pgm1);
             getActiveDrumBus()->setProgramIndex(pgm1);
             openScreenById(ScreenId::ProgramScreen);
             break;
@@ -52,7 +52,7 @@ void CopyProgramScreen::turnWheel(const int increment)
         auto candidate = pgm0;
         for (int i = 0; i < std::abs(increment); ++i)
         {
-            candidate = sampler->getUsedProgram(candidate, up);
+            candidate = sampler.lock()->getUsedProgram(candidate, up);
         }
         setPgm0(candidate);
     }
@@ -78,14 +78,14 @@ void CopyProgramScreen::setPgm1(const ProgramIndex i)
 
 void CopyProgramScreen::displayPgm0() const
 {
-    const auto programName = sampler->getProgram(pgm0)->getName();
+    const auto programName = sampler.lock()->getProgram(pgm0)->getName();
     findField("pgm0")->setText(
         StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1() const
 {
-    const auto program1 = sampler->getProgram(pgm1);
+    const auto program1 = sampler.lock()->getProgram(pgm1);
 
     const auto programName =
         program1->isUsed() ? program1->getName() : "(no program)";
@@ -95,6 +95,6 @@ void CopyProgramScreen::displayPgm1() const
 
 void CopyProgramScreen::displayFunctionKeys()
 {
-    ls->setFunctionKeysArrangement(pgm0 == pgm1 ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(pgm0 == pgm1 ? 1 : 0);
     findBackground()->SetDirty();
 }

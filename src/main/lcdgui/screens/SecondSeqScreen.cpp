@@ -28,17 +28,17 @@ void SecondSeqScreen::function(int i)
         case 0: // Intentional fall-through
         case 1:
             punchScreen->setActiveTab(i);
-            ls->openScreen(punchScreen->getTabNames()[i]);
+            ls.lock()->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
-            if (sequencer->isSecondSequenceEnabled())
+            if (sequencer.lock()->isSecondSequenceEnabled())
             {
-                sequencer->setSecondSequenceEnabled(false);
+                sequencer.lock()->setSecondSequenceEnabled(false);
                 openScreenById(ScreenId::SequencerScreen);
                 return;
             }
 
-            sequencer->setSecondSequenceEnabled(true);
+            sequencer.lock()->setSecondSequenceEnabled(true);
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
@@ -64,19 +64,19 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq() const
 {
-    const auto sqName = sequencer->getSequence(sq)->getName();
+    const auto sqName = sequencer.lock()->getSequence(sq)->getName();
     findField("sq")->setTextPadded(sq + 1, "0");
     findLabel("sequence-name")->setText("-" + sqName);
 }
 
 void SecondSeqScreen::displayFunctionKeys() const
 {
-    if (sequencer->isSecondSequenceEnabled())
+    if (sequencer.lock()->isSecondSequenceEnabled())
     {
-        ls->setFunctionKeysArrangement(2);
+        ls.lock()->setFunctionKeysArrangement(2);
     }
     else
     {
-        ls->setFunctionKeysArrangement(0);
+        ls.lock()->setFunctionKeysArrangement(0);
     }
 }

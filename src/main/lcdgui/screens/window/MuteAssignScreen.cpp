@@ -91,13 +91,13 @@ void MuteAssignScreen::displayNote() const
     const auto pad = program->getPadIndexFromNote(selectedNote);
     std::string soundName = "OFF";
 
-    const auto padName = sampler->getPadName(pad);
+    const auto padName = sampler.lock()->getPadName(pad);
     const auto sound =
         program->getNoteParameters(selectedNote)->getSoundIndex();
 
     if (sound != -1)
     {
-        soundName = sampler->getSoundName(sound);
+        soundName = sampler.lock()->getSoundName(sound);
     }
 
     findField("note")->setText(std::to_string(selectedNote) + "/" + padName +
@@ -124,11 +124,11 @@ void MuteAssignScreen::displayNote0() const
     if (const auto sound = program->getNoteParameters(note0)->getSoundIndex();
         sound != -1)
     {
-        soundName = sampler->getSoundName(sound);
+        soundName = sampler.lock()->getSoundName(sound);
     }
 
     findField("note0")->setText(std::to_string(note0) + "/" +
-                                sampler->getPadName(pad) + "-" + soundName);
+                                sampler.lock()->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote1() const
@@ -150,9 +150,9 @@ void MuteAssignScreen::displayNote1() const
     if (const auto sound = program->getNoteParameters(note1)->getSoundIndex();
         sound != -1)
     {
-        soundName = sampler->getSoundName(sound);
+        soundName = sampler.lock()->getSoundName(sound);
     }
 
     findField("note1")->setText(std::to_string(note1) + "/" +
-                                sampler->getPadName(pad) + "-" + soundName);
+                                sampler.lock()->getPadName(pad) + "-" + soundName);
 }

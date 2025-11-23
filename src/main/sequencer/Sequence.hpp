@@ -71,6 +71,8 @@ namespace mpc::sequencer
                  std::function<bool()> isSoloEnabled,
                  std::function<int()> getCurrentBarIndex);
 
+        ~Sequence();
+
         void setBarLengths(const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT>
                                &barLengths) const;
         double getInitialTempo() const;

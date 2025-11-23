@@ -64,9 +64,9 @@ void ProgramScreen::function(const int i)
             break;
         case 2:
         {
-            if (sampler->getProgramCount() == 24)
+            if (sampler.lock()->getProgramCount() == 24)
             {
-                ls->showPopupAndAwaitInteraction(
+                ls.lock()->showPopupAndAwaitInteraction(
                     "Prog. directory full(24 max)");
                 return;
             }

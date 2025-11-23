@@ -35,7 +35,7 @@ void NumberOfZonesScreen::function(const int i)
         case 4:
         {
             const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-            auto sound = sampler->getSound();
+            auto sound = sampler.lock()->getSound();
             zoneScreen->setZoneCount(zoneCount);
             zoneScreen->initZones();
             openScreenById(ScreenId::ZoneScreen);

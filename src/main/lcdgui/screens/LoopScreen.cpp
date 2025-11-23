@@ -26,7 +26,7 @@ LoopScreen::LoopScreen(Mpc &mpc, const int layerIndex)
 void LoopScreen::open()
 {
     findField("loop")->setAlignment(Alignment::Centered);
-    const bool sound = sampler->getSound() ? true : false;
+    const bool sound = sampler.lock()->getSound() ? true : false;
 
     findField("snd")->setFocusable(sound);
     findField("playx")->setFocusable(sound);
@@ -46,14 +46,14 @@ void LoopScreen::open()
     displayTo();
     displayWave();
 
-    ls->setFunctionKeysArrangement(sound ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void LoopScreen::openWindow()
 {
 
     const auto focusedField = getFocusedField();
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!focusedField || !sound)
     {
@@ -64,7 +64,7 @@ void LoopScreen::openWindow()
 
     if (focusedFieldName == "snd")
     {
-        sampler->setPreviousScreenName("loop");
+        sampler.lock()->setPreviousScreenName("loop");
         openScreenById(ScreenId::SoundScreen);
     }
     else if (focusedFieldName == "to")
@@ -88,9 +88,9 @@ void LoopScreen::function(int f)
             break;
         case 1:
         {
-            sampler->switchToNextSoundSortType();
-            ls->showPopupForMs(
-                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            sampler.lock()->switchToNextSoundSortType();
+            ls.lock()->showPopupForMs(
+                "Sorting by " + sampler.lock()->getSoundSortingTypeName(), 200);
             break;
         }
         case 2:
@@ -101,7 +101,7 @@ void LoopScreen::function(int f)
             break;
         case 4:
         {
-            if (sampler->getSoundCount() == 0)
+            if (sampler.lock()->getSoundCount() == 0)
             {
                 return;
             }
@@ -120,7 +120,7 @@ void LoopScreen::function(int f)
                 return;
             }
 
-            sampler->playX();
+            sampler.lock()->playX();
             break;
     }
 }
@@ -129,7 +129,7 @@ void LoopScreen::turnWheel(int i)
 {
 
     auto soundInc = getSoundIncrement(i);
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     const auto focusedField = getFocusedField();
 
@@ -182,12 +182,12 @@ void LoopScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "playx")
     {
-        sampler->setPlayX(sampler->getPlayX() + i);
+        sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
         displayPlayX();
     }
     else if (focusedFieldName == "loop")
     {
-        sampler->getSound()->setLoopEnabled(i > 0);
+        sampler.lock()->getSound()->setLoopEnabled(i > 0);
         displayLoop();
     }
     else if (focusedFieldName == "endlength")
@@ -198,7 +198,7 @@ void LoopScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "snd" && i > 0)
     {
-        sampler->selectNextSound();
+        sampler.lock()->selectNextSound();
         displaySnd();
         displayPlayX();
         displayEndLength();
@@ -209,7 +209,7 @@ void LoopScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "snd" && i < 0)
     {
-        sampler->selectPreviousSound();
+        sampler.lock()->selectPreviousSound();
         displaySnd();
         displayPlayX();
         displayEndLength();
@@ -267,7 +267,7 @@ void LoopScreen::setSlider(int i)
 
 void LoopScreen::setSliderLoopTo(int i) const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
     const auto newLoopToValue =
         (int)(i / 124.0 *
@@ -281,7 +281,7 @@ void LoopScreen::setLoopTo(int newLoopToValue) const
     const auto loopLengthIsFixed = loopLngthFix;
     const auto soundLengthIsFixed =
         mpc.screens->get<ScreenId::TrimScreen>()->smplLngthFix;
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
     const auto oldLoopLength = sound->getEnd() - sound->getLoopTo();
@@ -339,7 +339,7 @@ void LoopScreen::setLength(int newLength) const
         newLength = 0;
     }
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (soundLengthIsFixed)
     {
@@ -354,7 +354,7 @@ void LoopScreen::setLength(int newLength) const
 
 void LoopScreen::setSliderLength(int i) const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     const auto newLength = (int)(i / 124.0 * sound->getFrameCount());
     setLength(newLength);
 }
@@ -385,7 +385,7 @@ void LoopScreen::pressEnter()
     }
 
     auto candidate = focusedField->enter();
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
 
@@ -463,18 +463,18 @@ void LoopScreen::pressEnter()
 
 void LoopScreen::displaySnd() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
         findField("snd")->setText("(no sound)");
-        ls->setFocus("dummy");
+        ls.lock()->setFocus("dummy");
         return;
     }
 
-    if (ls->getFocusedFieldName() == "dummy")
+    if (ls.lock()->getFocusedFieldName() == "dummy")
     {
-        ls->setFocus("snd");
+        ls.lock()->setFocus("snd");
     }
 
     auto sampleName = sound->getName();
@@ -489,14 +489,14 @@ void LoopScreen::displaySnd() const
 
 void LoopScreen::displayPlayX() const
 {
-    findField("playx")->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void LoopScreen::displayTo() const
 {
-    if (sampler->getSoundCount() != 0)
+    if (sampler.lock()->getSoundCount() != 0)
     {
-        const auto sound = sampler->getSound();
+        const auto sound = sampler.lock()->getSound();
         findField("to")->setTextPadded(sound->getLoopTo(), " ");
     }
     else
@@ -517,13 +517,13 @@ void LoopScreen::displayEndLength() const
 
 void LoopScreen::displayEndLengthValue() const
 {
-    if (sampler->getSoundCount() == 0)
+    if (sampler.lock()->getSoundCount() == 0)
     {
         findField("endlengthvalue")->setTextPadded("0", " ");
         return;
     }
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     const auto text = std::to_string(
         endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
@@ -532,19 +532,19 @@ void LoopScreen::displayEndLengthValue() const
 
 void LoopScreen::displayLoop() const
 {
-    if (sampler->getSoundCount() == 0)
+    if (sampler.lock()->getSoundCount() == 0)
     {
         findField("loop")->setText("OFF");
         return;
     }
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     findField("loop")->setText(sound->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void LoopScreen::displayWave()
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {

@@ -35,7 +35,7 @@ void InitPadAssignScreen::function(const int i)
         case 4:
             if (initPadAssignIsMaster)
             {
-                sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
+                sampler.lock()->setMasterPadAssign(*sampler.lock()->getInitMasterPadAssign());
             }
             else
             {

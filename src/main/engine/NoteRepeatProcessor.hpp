@@ -45,12 +45,12 @@ namespace mpc::engine
     {
     public:
         NoteRepeatProcessor(
-            std::shared_ptr<sequencer::Sequencer>,
+            std::weak_ptr<sequencer::Sequencer>,
             std::shared_ptr<sampler::Sampler>,
             std::shared_ptr<audio::mixer::AudioMixer>,
             std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>,
             std::shared_ptr<lcdgui::screens::MixerSetupScreen>,
-            std::shared_ptr<performance::PerformanceManager>,
+            const std::weak_ptr<performance::PerformanceManager> &,
             std::shared_ptr<hardware::Slider>,
             std::vector<std::shared_ptr<Voice>> *,
             std::vector<MixerInterconnection *> &,
@@ -62,14 +62,14 @@ namespace mpc::engine
                      double tempo, float sampleRate) const;
 
     private:
-        const std::shared_ptr<sequencer::Sequencer> sequencer;
+        const std::weak_ptr<sequencer::Sequencer> sequencer;
         const std::shared_ptr<sampler::Sampler> sampler;
         const std::shared_ptr<audio::mixer::AudioMixer> mixer;
         const std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
             assign16LevelsScreen;
         const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
             mixerSetupScreen;
-        const std::shared_ptr<performance::PerformanceManager>
+        const std::weak_ptr<performance::PerformanceManager>
             performanceManager;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<Voice>> *voices;

@@ -351,7 +351,7 @@ void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
         }
     }
 
-    mpc.performanceManager->enqueue(performance::PerformanceMessage(
+    mpc.getPerformanceManager().lock()->enqueue(performance::PerformanceMessage(
         performance::RepairProgramReferences{}));
 }
 
@@ -904,7 +904,7 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
         return;
     }
 
-    mpc.performanceManager->enqueue(performance::PerformanceMessage{
+    mpc.getPerformanceManager().lock()->enqueue(performance::PerformanceMessage{
         performance::DeleteSoundAndReindex{index}});
 
     sounds.erase(sounds.begin() + index);

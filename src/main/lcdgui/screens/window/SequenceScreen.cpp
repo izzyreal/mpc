@@ -23,14 +23,14 @@ void SequenceScreen::open()
     const auto defaultSequenceNameFirstLetterField =
         findField("defaultnamefirstletter");
 
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
     defaultSequenceNameFirstLetterField->setText(
-        sequencer->getDefaultSequenceName().substr(0, 1));
+        sequencer.lock()->getDefaultSequenceName().substr(0, 1));
     sequenceNameRestLabel->setText(seq->getName().substr(1));
     defaultSequenceNameRestLabel->setText(
-        sequencer->getDefaultSequenceName().substr(1));
+        sequencer.lock()->getDefaultSequenceName().substr(1));
 }
 
 void SequenceScreen::function(const int i)
@@ -56,21 +56,21 @@ void SequenceScreen::openNameScreen()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.find("default") != std::string::npos)
     {
-        initialNameScreenName = sequencer->getDefaultSequenceName();
+        initialNameScreenName = sequencer.lock()->getDefaultSequenceName();
 
         enterAction = [this](const std::string &nameScreenName)
         {
-            sequencer->setDefaultSequenceName(nameScreenName);
+            sequencer.lock()->setDefaultSequenceName(nameScreenName);
             openScreenById(ScreenId::SequenceScreen);
         };
     }
     else
     {
-        initialNameScreenName = sequencer->getSelectedSequence()->getName();
+        initialNameScreenName = sequencer.lock()->getSelectedSequence()->getName();
 
         enterAction = [this](const std::string &nameScreenName)
         {
-            sequencer->getSelectedSequence()->setName(nameScreenName);
+            sequencer.lock()->getSelectedSequence()->setName(nameScreenName);
             openScreenById(ScreenId::SequenceScreen);
         };
     }

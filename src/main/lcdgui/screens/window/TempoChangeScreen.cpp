@@ -35,7 +35,7 @@ TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedSequence()
+                            return sequencer.lock()->getSelectedSequence()
                                 ->getTempoChangeTrack()
                                 ->getEvents();
                         },
@@ -52,7 +52,7 @@ TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getSelectedSequence()->getInitialTempo();
+             return sequencer.lock()->getSelectedSequence()->getInitialTempo();
          },
          [this](auto)
          {
@@ -77,7 +77,7 @@ void TempoChangeScreen::open()
     findField("a2")->setAlignment(Alignment::Centered);
 
     const auto events =
-        sequencer->getSelectedSequence()->getTempoChangeEvents();
+        sequencer.lock()->getSelectedSequence()->getTempoChangeEvents();
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.length() == 2)
@@ -87,7 +87,7 @@ void TempoChangeScreen::open()
             if (row + offset >= events.size())
             {
                 offset = 0;
-                ls->setFocus("a0");
+                ls.lock()->setFocus("a0");
             }
         }
     }
@@ -107,7 +107,7 @@ void TempoChangeScreen::open()
 std::vector<std::shared_ptr<TempoChangeEvent>>
 TempoChangeScreen::getVisibleTempoChanges() const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     std::vector<std::shared_ptr<TempoChangeEvent>> result(3);
 
@@ -136,21 +136,21 @@ TempoChangeScreen::getVisibleTempoChanges() const
 
 void TempoChangeScreen::displayInitialTempo() const
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     findField("initial-tempo")
         ->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
 void TempoChangeScreen::displayTempoChangeOn() const
 {
-    const auto sequence = sequencer->getSelectedSequence();
+    const auto sequence = sequencer.lock()->getSelectedSequence();
     findField("tempo-change")
         ->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
 void TempoChangeScreen::displayTempoChange0() const
 {
-    const auto sequence = sequencer->getSelectedSequence();
+    const auto sequence = sequencer.lock()->getSelectedSequence();
     bars[0]->Hide(false);
 
     const auto tce = getVisibleTempoChanges()[0];
@@ -211,7 +211,7 @@ void TempoChangeScreen::displayTempoChange1() const
 
     findField("a1")->setText(std::to_string(offset + 2));
 
-    const auto sequence = sequencer->getSelectedSequence();
+    const auto sequence = sequencer.lock()->getSelectedSequence();
     const auto timeSig = sequence->getTimeSignature();
 
     findField("b1")->setTextPadded(
@@ -264,7 +264,7 @@ void TempoChangeScreen::displayTempoChange2() const
 
     findField("a2")->setText(std::to_string(offset + 3));
 
-    const auto sequence = sequencer->getSelectedSequence();
+    const auto sequence = sequencer.lock()->getSelectedSequence();
     const auto timeSig = sequence->getTimeSignature();
     findField("b2")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");
@@ -292,7 +292,7 @@ void TempoChangeScreen::left()
     {
         if (focusedFieldName[0] == 'a')
         {
-            ls->setFocus("tempo-change");
+            ls.lock()->setFocus("tempo-change");
             return;
         }
     }
@@ -307,7 +307,7 @@ void TempoChangeScreen::right()
     {
         if (focusedFieldName[0] == 'f')
         {
-            ls->setFocus("initial-tempo");
+            ls.lock()->setFocus("initial-tempo");
             return;
         }
     }
@@ -330,7 +330,7 @@ void TempoChangeScreen::function(const int j)
         yPos = stoi(focusedFieldName.substr(1, 2));
     }
 
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     auto tceList = seq->getTempoChangeEvents();
 
@@ -359,7 +359,7 @@ void TempoChangeScreen::function(const int j)
             displayTempoChange1();
             displayTempoChange2();
 
-            ls->setFocus("a" + std::to_string(yPos));
+            ls.lock()->setFocus("a" + std::to_string(yPos));
             break;
         case 2:
         {
@@ -367,7 +367,7 @@ void TempoChangeScreen::function(const int j)
             for (int i = 0; i < tceList.size(); i++)
             {
                 if (tceList[i]->getTick() ==
-                    sequencer->getTransport()->getTickPosition())
+                    sequencer.lock()->getTransport()->getTickPosition())
                 {
                     nowDetected = i;
                     break;
@@ -377,12 +377,12 @@ void TempoChangeScreen::function(const int j)
             if (nowDetected == -1)
             {
                 seq->addTempoChangeEvent(
-                    sequencer->getTransport()->getTickPosition(), 1000);
+                    sequencer.lock()->getTransport()->getTickPosition(), 1000);
                 displayTempoChange0();
                 displayTempoChange1();
                 displayTempoChange2();
 
-                ls->setFocus(std::string("a" + std::to_string(yPos)));
+                ls.lock()->setFocus(std::string("a" + std::to_string(yPos)));
             }
             else
             {
@@ -391,7 +391,7 @@ void TempoChangeScreen::function(const int j)
                     setOffset(nowDetected);
                 }
 
-                ls->setFocus(focusedFieldName.substr(0, 1) +
+                ls.lock()->setFocus(focusedFieldName.substr(0, 1) +
                              std::to_string(nowDetected - offset));
             }
         }
@@ -438,7 +438,7 @@ void TempoChangeScreen::function(const int j)
             displayTempoChange1();
             displayTempoChange2();
 
-            ls->setFocus(focusedFieldName);
+            ls.lock()->setFocus(focusedFieldName);
             break;
         }
         default:;
@@ -447,7 +447,7 @@ void TempoChangeScreen::function(const int j)
 
 void TempoChangeScreen::init()
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     const auto tceList = seq->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -487,7 +487,7 @@ void TempoChangeScreen::init()
 void TempoChangeScreen::turnWheel(const int j)
 {
     init();
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
     const auto tceList = seq->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -578,11 +578,11 @@ void TempoChangeScreen::down()
 
     if (focusedFieldName == "tempo-change")
     {
-        ls->setFocus("e0");
+        ls.lock()->setFocus("e0");
     }
     else if (focusedFieldName == "initial-tempo")
     {
-        ls->setFocus("f0");
+        ls.lock()->setFocus("f0");
     }
 
     if (focusedFieldName.length() != 2)
@@ -598,19 +598,19 @@ void TempoChangeScreen::down()
     }
     if (yPos == 1 && !tce2)
     {
-        ls->setFocus("a2");
+        ls.lock()->setFocus("a2");
         return;
     }
     if (yPos == 2)
     {
         setOffset(offset + 1);
 
-        const auto sequence = sequencer->getSelectedSequence();
+        const auto sequence = sequencer.lock()->getSelectedSequence();
 
         if (offset + yPos == sequence->getTempoChangeEvents().size() &&
             focusedFieldName[0] != 'a')
         {
-            ls->setFocus("a2");
+            ls.lock()->setFocus("a2");
         }
 
         return;
@@ -623,7 +623,7 @@ void TempoChangeScreen::down()
         paramToFocus = "a";
     }
 
-    ls->setFocus(std::string(paramToFocus + std::to_string(yPos + 1)));
+    ls.lock()->setFocus(std::string(paramToFocus + std::to_string(yPos + 1)));
 }
 
 void TempoChangeScreen::up()
@@ -645,11 +645,11 @@ void TempoChangeScreen::up()
         {
             if (focusedFieldName == "e0")
             {
-                ls->setFocus("tempo-change");
+                ls.lock()->setFocus("tempo-change");
             }
             else if (focusedFieldName == "f0")
             {
-                ls->setFocus("initial-tempo");
+                ls.lock()->setFocus("initial-tempo");
             }
 
             return;
@@ -658,7 +658,7 @@ void TempoChangeScreen::up()
         return;
     }
 
-    ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(yPos - 1));
+    ls.lock()->setFocus(focusedFieldName.substr(0, 1) + std::to_string(yPos - 1));
 }
 
 void TempoChangeScreen::setOffset(int i)

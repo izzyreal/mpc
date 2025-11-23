@@ -17,7 +17,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 {
     addReactiveBinding({[&]
                         {
-                            return sequencer->getNextSq();
+                            return sequencer.lock()->getNextSq();
                         },
                         [&](auto)
                         {
@@ -39,7 +39,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->isSoloEnabled();
+                            return sequencer.lock()->isSoloEnabled();
                         },
                         [&](auto)
                         {
@@ -48,7 +48,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getSelectedSequenceIndex();
+                            return sequencer.lock()->getSelectedSequenceIndex();
                         },
                         [&](auto)
                         {
@@ -58,7 +58,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->getTickPosition();
+                            return sequencer.lock()->getTransport()->getTickPosition();
                         },
                         [&](auto)
                         {
@@ -95,13 +95,13 @@ void NextSeqPadScreen::function(const int i)
 {
     if (i == 3 || i == 4)
     {
-        const auto nextSq = sequencer->getNextSq();
-        sequencer->setNextSq(NoSequenceIndex);
+        const auto nextSq = sequencer.lock()->getNextSq();
+        sequencer.lock()->setNextSq(NoSequenceIndex);
         displayNextSq();
 
         if (i == 3 && nextSq != NoSequenceIndex)
         {
-            sequencer->getStateManager()->enqueue(
+            sequencer.lock()->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{nextSq});
         }
     }
@@ -113,7 +113,7 @@ void NextSeqPadScreen::function(const int i)
 
 void NextSeqPadScreen::displayNextSq() const
 {
-    const auto nextSq = sequencer->getNextSq();
+    const auto nextSq = sequencer.lock()->getNextSq();
 
     if (nextSq == NoSequenceIndex)
     {
@@ -122,7 +122,7 @@ void NextSeqPadScreen::displayNextSq() const
     }
 
     const auto number = StrUtil::padLeft(std::to_string(nextSq + 1), "0", 2);
-    const auto name = sequencer->getSequence(nextSq)->getName();
+    const auto name = sequencer.lock()->getSequence(nextSq)->getName();
     findLabel("nextsq")->setText(number + "-" + name);
 }
 
@@ -149,39 +149,39 @@ void NextSeqPadScreen::displaySq() const
 {
     findField("sq")->setText(
         StrUtil::padLeft(
-            std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0", 2) +
-        "-" + sequencer->getSelectedSequence()->getName());
+            std::to_string(sequencer.lock()->getSelectedSequenceIndex() + 1), "0", 2) +
+        "-" + sequencer.lock()->getSelectedSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(const int i) const
 {
     findField(std::to_string(i + 1))
         ->setText(
-            sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
+            sequencer.lock()->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(const int i) const
 {
     findField(std::to_string(i + 1))
-        ->setInverted(i + bankOffset() == sequencer->getNextSq());
+        ->setInverted(i + bankOffset() == sequencer.lock()->getNextSq());
 }
 
 void NextSeqPadScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(
-        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(
-        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(
-        sequencer->getTransport()->getCurrentClockNumber(), "0");
+        sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void NextSeqPadScreen::refreshSeqs() const

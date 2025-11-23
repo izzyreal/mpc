@@ -19,7 +19,7 @@ void VmpcSettingsScreen::open()
     displayAutoConvertWavs();
     displayMidiControlMode();
     displayNameTypingWithKeyboard();
-    ls->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
 }
 
 void VmpcSettingsScreen::close()
@@ -89,7 +89,7 @@ void VmpcSettingsScreen::turnWheel(int i)
     else if (focusedFieldName == "midi-control-mode")
     {
         setMidiControlMode(midiControlMode + i);
-        ls->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
+        ls.lock()->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
     }
     else if (focusedFieldName == "name-typing-with-keyboard")
     {

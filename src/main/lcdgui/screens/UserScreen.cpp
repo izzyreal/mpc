@@ -45,7 +45,7 @@ void UserScreen::function(const int i)
             const auto eventsScreen =
                 mpc.screens->get<ScreenId::EventsScreen>();
             eventsScreen->tab = i;
-            ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
         default:;
@@ -194,9 +194,9 @@ void UserScreen::displayDeviceName()
         if (device == 0)
         {
             const auto programName =
-                sampler
+                sampler.lock()
                     ->getProgram(
-                        sequencer->getDrumBus(busType)->getProgramIndex())
+                        sequencer.lock()->getDrumBus(busType)->getProgramIndex())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }

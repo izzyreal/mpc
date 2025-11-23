@@ -21,7 +21,7 @@ SaveApsFileScreen::SaveApsFileScreen(Mpc &mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
-    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
     {
         fileName = "ALL_PGMS";
     }

@@ -21,10 +21,10 @@ SaveASoundScreen::SaveASoundScreen(Mpc &mpc, const int layerIndex)
 
 void SaveASoundScreen::open()
 {
-    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        nameScreen->setNameToEdit(sampler->getSound()->getName());
+        nameScreen->setNameToEdit(sampler.lock()->getSound()->getName());
     }
 
     displayFile();
@@ -38,12 +38,12 @@ void SaveASoundScreen::turnWheel(const int i)
 
     if (focusedFieldName == "file" && i > 0)
     {
-        sampler->selectPreviousSound();
+        sampler.lock()->selectPreviousSound();
         displayFile();
     }
     else if (focusedFieldName == "file" && i < 0)
     {
-        sampler->selectNextSound();
+        sampler.lock()->selectNextSound();
         displayFile();
     }
     else if (focusedFieldName == "file-type")
@@ -63,7 +63,7 @@ void SaveASoundScreen::function(const int i)
         case 4:
         {
             auto disk = mpc.getDisk();
-            auto s = sampler->getSound();
+            auto s = sampler.lock()->getSound();
             const auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
             auto fileName =
                 Util::getFileName(mpc.screens->get<ScreenId::NameScreen>()
@@ -86,7 +86,7 @@ void SaveASoundScreen::function(const int i)
 
                 disk->flush();
 
-                ls->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
+                ls.lock()->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
             };
 
             if (disk->checkExists(fileName))

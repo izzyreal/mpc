@@ -39,7 +39,7 @@ void LoopEndFineScreen::displayLoopLngth()
 
 void LoopEndFineScreen::displayLngthField()
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -54,7 +54,7 @@ void LoopEndFineScreen::displayFineWave()
 {
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -68,7 +68,7 @@ void LoopEndFineScreen::displayFineWave()
 
 void LoopEndFineScreen::displayEnd()
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -80,7 +80,7 @@ void LoopEndFineScreen::displayEnd()
 
 void LoopEndFineScreen::displayPlayX()
 {
-    findField("playx")->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void LoopEndFineScreen::function(const int i)
@@ -96,14 +96,14 @@ void LoopEndFineScreen::function(const int i)
             findWave()->zoomMinus();
             break;
         case 4:
-            sampler->playX();
+            sampler.lock()->playX();
             break;
     }
 }
 
 void LoopEndFineScreen::turnWheel(const int i)
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
@@ -148,7 +148,7 @@ void LoopEndFineScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "playx")
     {
-        sampler->setPlayX(sampler->getPlayX() + i);
+        sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
         displayPlayX();
     }
 }

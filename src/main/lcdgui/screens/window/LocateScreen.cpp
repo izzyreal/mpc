@@ -53,12 +53,12 @@ void LocateScreen::function(const int i)
                 const auto clampedClock = std::clamp<uint8_t>(
                     std::get<2>(location), 0, getMaxClockForThisBar());
 
-                sequencer->getTransport()->setBarBeatClock(
+                sequencer.lock()->getTransport()->setBarBeatClock(
                     clampedBarIndex, clampedBeatIndex, clampedClock);
             }
             else
             {
-                sequencer->getTransport()->setBarBeatClock(barIndex, beatIndex,
+                sequencer.lock()->getTransport()->setBarBeatClock(barIndex, beatIndex,
                                                            clock);
             }
             openScreenById(ScreenId::SequencerScreen);
@@ -89,9 +89,9 @@ void LocateScreen::turnWheel(const int i)
 
 void LocateScreen::open()
 {
-    barIndex = sequencer->getTransport()->getCurrentBarIndex();
-    beatIndex = sequencer->getTransport()->getCurrentBeatIndex();
-    clock = sequencer->getTransport()->getCurrentClockNumber();
+    barIndex = sequencer.lock()->getTransport()->getCurrentBarIndex();
+    beatIndex = sequencer.lock()->getTransport()->getCurrentBeatIndex();
+    clock = sequencer.lock()->getTransport()->getCurrentClockNumber();
 
     displayBar();
     displayBeat();
@@ -204,18 +204,18 @@ void LocateScreen::setClock(const int8_t newClock)
 uint16_t LocateScreen::getMaxBarIndexForThisSequence() const
 {
     return std::clamp<uint16_t>(
-        sequencer->getSelectedSequence()->getLastBarIndex() + 1, 0, 998);
+        sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1, 0, 998);
 }
 
 uint8_t LocateScreen::getMaxBeatIndexForThisBar() const
 {
-    return sequencer->getSelectedSequence()->getNumerator(barIndex) - 1;
+    return sequencer.lock()->getSelectedSequence()->getNumerator(barIndex) - 1;
 }
 
 uint8_t LocateScreen::getMaxClockForThisBar() const
 {
     return 96 * (4.0 /
-                 sequencer->getSelectedSequence()->getDenominator(barIndex)) -
+                 sequencer.lock()->getSelectedSequence()->getDenominator(barIndex)) -
            1;
 }
 

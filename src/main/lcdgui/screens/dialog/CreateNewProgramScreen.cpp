@@ -41,13 +41,13 @@ void CreateNewProgramScreen::openNameScreen()
 
 void CreateNewProgramScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}))
     {
         auto letterIndex = 21 + 24;
 
-        for (int i = 0; i < sampler->getPrograms().size(); i++)
+        for (int i = 0; i < sampler.lock()->getPrograms().size(); i++)
         {
-            if (!sampler->getProgram(i)->isUsed())
+            if (!sampler.lock()->getProgram(i)->isUsed())
             {
                 letterIndex = 21 + i;
                 midiProgramChange = i + 1;
@@ -72,15 +72,15 @@ void CreateNewProgramScreen::function(const int i)
         case 4:
         {
             const auto newProgram =
-                sampler->createNewProgramAddFirstAvailableSlot().lock();
+                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
             newProgram->setMidiProgramChange(midiProgramChange);
 
-            auto index = ProgramIndex(sampler->getProgramCount() - 1);
+            auto index = ProgramIndex(sampler.lock()->getProgramCount() - 1);
 
-            for (int j = 0; j < sampler->getPrograms().size(); j++)
+            for (int j = 0; j < sampler.lock()->getPrograms().size(); j++)
             {
-                if (sampler->getProgram(j) == newProgram)
+                if (sampler.lock()->getProgram(j) == newProgram)
                 {
                     index = ProgramIndex(j);
                     break;

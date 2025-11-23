@@ -14,7 +14,7 @@ KeepOrRetryScreen::KeepOrRetryScreen(Mpc &mpc, const int layerIndex)
 
 void KeepOrRetryScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}))
     {
         assignToNote = NoDrumNoteAssigned;
     }
@@ -33,16 +33,16 @@ void KeepOrRetryScreen::function(const int i)
     switch (i)
     {
         case 1:
-            sampler->deleteSound(sampler->getPreviewSound());
+            sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
             openScreenById(ScreenId::SampleScreen);
             break;
         case 3:
-            sampler->playPreviewSample(
-                0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
+            sampler.lock()->playPreviewSample(
+                0, sampler.lock()->getPreviewSound()->getLastFrameIndex(), 0);
             break;
         case 4:
         {
-            const auto index = sampler->getSoundCount() - 1;
+            const auto index = sampler.lock()->getSoundCount() - 1;
 
             if (assignToNote != NoDrumNoteAssigned)
             {
@@ -51,7 +51,7 @@ void KeepOrRetryScreen::function(const int i)
                     ->setSoundIndex(index);
             }
 
-            sampler->setSoundIndex(index);
+            sampler.lock()->setSoundIndex(index);
             openScreenById(ScreenId::SampleScreen);
             break;
         }
@@ -71,12 +71,12 @@ void KeepOrRetryScreen::openNameScreen()
                 return;
             }
 
-            sampler->getPreviewSound()->setName(nameScreenName);
+            sampler.lock()->getPreviewSound()->setName(nameScreenName);
             openScreenById(ScreenId::KeepOrRetryScreen);
         };
 
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        nameScreen->initialize(sampler->getPreviewSound()->getName(), 16,
+        nameScreen->initialize(sampler.lock()->getPreviewSound()->getName(), 16,
                                enterAction, "keep-or-retry");
         openScreenById(ScreenId::NameScreen);
     }
@@ -122,13 +122,13 @@ void KeepOrRetryScreen::turnWheel(const int increment)
 
 void KeepOrRetryScreen::displayNameForNewSound() const
 {
-    if (!sampler->getSound())
+    if (!sampler.lock()->getSound())
     {
         return;
     }
 
     findField("name-for-new-sound")
-        ->setText(sampler->getPreviewSound()->getName());
+        ->setText(sampler.lock()->getPreviewSound()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote() const
@@ -136,7 +136,7 @@ void KeepOrRetryScreen::displayAssignToNote() const
     const auto noteStr = assignToNote == NoDrumNoteAssigned
                              ? "--"
                              : std::to_string(assignToNote);
-    const auto padStr = sampler->getPadName(
+    const auto padStr = sampler.lock()->getPadName(
         getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }

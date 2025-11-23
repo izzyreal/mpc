@@ -118,7 +118,7 @@ void VmpcKeyboardScreen::setLearning(bool b)
     learning = b;
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
-    ls->setFunctionKeysArrangement(learning ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
 bool VmpcKeyboardScreen::hasMappingChanged()
@@ -237,7 +237,7 @@ void VmpcKeyboardScreen::function(int i)
                 popupMsg = "Keyboard mapping unchanged";
             }
 
-            ls->showPopupForMs(popupMsg, 1000);
+            ls.lock()->showPopupForMs(popupMsg, 1000);
 
             break;
     }

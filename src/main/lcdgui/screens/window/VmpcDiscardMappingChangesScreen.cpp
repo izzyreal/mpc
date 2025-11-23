@@ -26,17 +26,17 @@ void VmpcDiscardMappingChangesScreen::function(const int i)
     {
         case 3:
             // stay
-            ls->openScreen(stayScreen);
+            ls.lock()->openScreen(stayScreen);
             break;
         case 4:
             // discard and leave
             discardAndLeave();
-            ls->openScreen(nextScreen);
+            ls.lock()->openScreen(nextScreen);
             break;
         case 5:
             // save and leave
             saveAndLeave();
-            ls->openScreen(nextScreen);
+            ls.lock()->openScreen(nextScreen);
             break;
     }
 }

@@ -182,7 +182,7 @@ void PgmParamsScreen::turnWheel(const int i)
     else if (focusedFieldName == "voiceoverlap")
     {
         const auto s =
-            sampler->getSound(selectedNoteParameters->getSoundIndex());
+            sampler.lock()->getSound(selectedNoteParameters->getSoundIndex());
 
         if (s && s->isLoopEnabled())
         {
@@ -224,7 +224,7 @@ void PgmParamsScreen::turnWheel(const int i)
     {
         const auto pgm = getActiveDrumBus()->getProgramIndex();
 
-        if (const auto candidate = sampler->getUsedProgram(pgm, i > 0);
+        if (const auto candidate = sampler.lock()->getUsedProgram(pgm, i > 0);
             candidate != pgm)
         {
             getActiveDrumBus()->setProgramIndex(candidate);
@@ -310,11 +310,11 @@ void PgmParamsScreen::displayNote() const
     const auto soundIndex = selectedNoteParameters->getSoundIndex();
     const auto padIndex =
         program->getPadIndexFromNote(selectedNoteParameters->getNumber());
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     const auto sampleName =
-        soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
+        soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
     const std::string stereo =
-        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
+        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
     findField("note")->setText(
         std::to_string(selectedNoteParameters->getNumber()) + "/" + padName +
@@ -357,7 +357,7 @@ void PgmParamsScreen::displayVoiceOverlap() const
         selectedNoteParameters->getVoiceOverlapMode();
 
     const auto sound =
-        sampler->getSound(selectedNoteParameters->getSoundIndex());
+        sampler.lock()->getSound(selectedNoteParameters->getSoundIndex());
 
     if (sound && sound->isLoopEnabled())
     {

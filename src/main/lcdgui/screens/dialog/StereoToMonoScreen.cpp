@@ -23,10 +23,10 @@ StereoToMonoScreen::StereoToMonoScreen(Mpc &mpc, const int layerIndex)
 
 void StereoToMonoScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         updateNewNames();
-        ls->setFocus("stereosource");
+        ls.lock()->setFocus("stereosource");
     }
 
     displayNewLName();
@@ -41,7 +41,7 @@ void StereoToMonoScreen::turnWheel(const int i)
 
     if (focusedFieldName == "stereosource")
     {
-        sampler->nudgeSoundIndex(i > 0);
+        sampler.lock()->nudgeSoundIndex(i > 0);
         displayStereoSource();
     }
 }
@@ -83,38 +83,38 @@ void StereoToMonoScreen::function(const int i)
     switch (i)
     {
         case 3:
-            ls->closeCurrentScreen();
+            ls.lock()->closeCurrentScreen();
             break;
         case 4:
         {
-            const auto sound = sampler->getSound();
+            const auto sound = sampler.lock()->getSound();
 
             if (sound->isMono())
             {
                 return;
             }
 
-            for (const auto &s : sampler->getSounds())
+            for (const auto &s : sampler.lock()->getSounds())
             {
                 if (s->getName() == newLName || s->getName() == newRName)
                 {
-                    ls->showPopupAndAwaitInteraction("Name already used");
+                    ls.lock()->showPopupAndAwaitInteraction("Name already used");
                     return;
                 }
             }
 
-            const auto left = sampler->addSound(sound->getSampleRate());
+            const auto left = sampler.lock()->addSound(sound->getSampleRate());
 
             if (left == nullptr)
             {
                 return;
             }
 
-            const auto right = sampler->addSound(sound->getSampleRate());
+            const auto right = sampler.lock()->addSound(sound->getSampleRate());
 
             if (right == nullptr)
             {
-                sampler->deleteSound(left);
+                sampler.lock()->deleteSound(left);
                 return;
             }
 
@@ -147,12 +147,12 @@ void StereoToMonoScreen::function(const int i)
 
 void StereoToMonoScreen::updateNewNames()
 {
-    if (!sampler->getSound() || sampler->getSound()->isMono())
+    if (!sampler.lock()->getSound() || sampler.lock()->getSound()->isMono())
     {
         return;
     }
 
-    auto name = sampler->getSound()->getName();
+    auto name = sampler.lock()->getSound()->getName();
     name = StrUtil::trim(name);
     name = StrUtil::padRight(name, "_", 16);
     name = name.substr(0, 14);
@@ -163,7 +163,7 @@ void StereoToMonoScreen::updateNewNames()
 
 void StereoToMonoScreen::displayStereoSource()
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -174,13 +174,13 @@ void StereoToMonoScreen::displayStereoSource()
 
     if (sound->isMono())
     {
-        ls->setFunctionKeysArrangement(1);
+        ls.lock()->setFunctionKeysArrangement(1);
         findBackground()->repaintUnobtrusive(
             findChild<FunctionKey>("fk4")->getRect());
     }
     else
     {
-        ls->setFunctionKeysArrangement(0);
+        ls.lock()->setFunctionKeysArrangement(0);
     }
 }
 

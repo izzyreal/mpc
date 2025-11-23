@@ -15,11 +15,11 @@ ResampleScreen::ResampleScreen(Mpc &mpc, const int layerIndex)
 
 void ResampleScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}) && sampler->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
     {
-        newName = sampler->getSound()->getName();
-        newName = sampler->addOrIncreaseNumber(newName);
-        setNewFs(sampler->getSound()->getSampleRate());
+        newName = sampler.lock()->getSound()->getName();
+        newName = sampler.lock()->addOrIncreaseNumber(newName);
+        setNewFs(sampler.lock()->getSound()->getSampleRate());
     }
 
     displayNewBit();
@@ -79,8 +79,8 @@ void ResampleScreen::function(const int i)
             break;
         case 4:
         {
-            const auto snd = sampler->getSound(sampler->getSoundIndex());
-            const auto destSnd = sampler->addSound();
+            const auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex());
+            const auto destSnd = sampler.lock()->addSound();
 
             if (destSnd == nullptr)
             {
@@ -145,7 +145,7 @@ void ResampleScreen::function(const int i)
             destSnd->setEnd(snd->getEnd() * ratio);
             destSnd->setLoopTo(snd->getLoopTo() * ratio);
 
-            sampler->setSoundIndex(sampler->getSoundCount() - 1);
+            sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
             openScreenById(ScreenId::SoundScreen);
             break;
         }

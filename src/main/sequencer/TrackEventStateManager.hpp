@@ -15,6 +15,7 @@ namespace mpc::sequencer
     {
     public:
         explicit TrackEventStateManager();
+        ~TrackEventStateManager() override;
 
     protected:
         void applyMessage(const TrackEventMessage &msg) noexcept override;

@@ -29,13 +29,13 @@ void DeleteProgramScreen::function(const int i)
             openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
-            if (sampler->getProgramCount() > 1)
+            if (sampler.lock()->getProgramCount() > 1)
             {
-                sampler->deleteProgram(sampler->getProgram(pgm));
+                sampler.lock()->deleteProgram(sampler.lock()->getProgram(pgm));
             }
             else
             {
-                sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
+                sampler.lock()->deleteAllPrograms(/*createDefaultProgram=*/true);
             }
 
             openScreenById(ScreenId::ProgramScreen);
@@ -58,7 +58,7 @@ void DeleteProgramScreen::displayPgm() const
 {
     findField("pgm")->setText(
         StrUtil::padLeft(std::to_string(pgm + 1), " ", 2) + "-" +
-        sampler->getProgram(pgm)->getName());
+        sampler.lock()->getProgram(pgm)->getName());
 }
 
 void DeleteProgramScreen::setPgm(const int i)
@@ -72,11 +72,11 @@ void DeleteProgramScreen::setPgm(const int i)
     {
         candidate = up ? candidate + 1 : candidate - 1;
 
-        if (candidate < 0 || candidate >= sampler->getPrograms().size())
+        if (candidate < 0 || candidate >= sampler.lock()->getPrograms().size())
         {
             return;
         }
-    } while (!sampler->getProgram(candidate)->isUsed());
+    } while (!sampler.lock()->getProgram(candidate)->isUsed());
 
     pgm = candidate;
     displayPgm();

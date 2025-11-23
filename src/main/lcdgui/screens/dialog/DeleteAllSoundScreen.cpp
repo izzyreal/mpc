@@ -17,8 +17,8 @@ void DeleteAllSoundScreen::function(const int i)
             openScreenById(ScreenId::DeleteSoundScreen);
             break;
         case 4:
-            sampler->deleteAllSamples();
-            ls->openScreen(sampler->getPreviousScreenName());
+            sampler.lock()->deleteAllSamples();
+            ls.lock()->openScreen(sampler.lock()->getPreviousScreenName());
             break;
     }
 }

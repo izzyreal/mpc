@@ -25,20 +25,20 @@ void DeleteSoundScreen::function(const int i)
             openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
-            sampler->deleteSound(sampler->getSoundIndex());
+            sampler.lock()->deleteSound(sampler.lock()->getSoundIndex());
 
-            if (sampler->getSoundIndex() > sampler->getSoundCount() - 1)
+            if (sampler.lock()->getSoundIndex() > sampler.lock()->getSoundCount() - 1)
             {
-                sampler->setSoundIndex(sampler->getSoundCount() - 1);
+                sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
             }
 
-            if (sampler->getSoundCount() > 0)
+            if (sampler.lock()->getSoundCount() > 0)
             {
                 openScreenById(ScreenId::SoundScreen);
             }
             else
             {
-                ls->openScreen(sampler->getPreviousScreenName());
+                ls.lock()->openScreen(sampler.lock()->getPreviousScreenName());
             }
 
             break;
@@ -51,17 +51,17 @@ void DeleteSoundScreen::turnWheel(const int i)
 
     if (focusedFieldName == "snd")
     {
-        sampler->setSoundIndex(sampler->getSoundIndex() + i);
+        sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
         displaySnd();
     }
 }
 
 void DeleteSoundScreen::displaySnd() const
 {
-    if (!sampler->getSound())
+    if (!sampler.lock()->getSound())
     {
         return;
     }
 
-    findField("snd")->setText(sampler->getSound()->getName());
+    findField("snd")->setText(sampler.lock()->getSound()->getName());
 }

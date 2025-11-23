@@ -21,7 +21,7 @@ void AssignmentViewScreen::open()
     findField("note")->setFocusable(false);
     findField("note")->setInverted(true);
 
-    ls->setFocus(getFocusFromPadIndex());
+    ls.lock()->setFocus(getFocusFromPadIndex());
 
     displayAssignmentView();
     // Subscribe to "pad" and "bank" messages
@@ -42,7 +42,7 @@ void AssignmentViewScreen::up()
     }
 
     const auto padIndex = mpc.clientEventController->getSelectedPad() + 4;
-    ls->setFocus(padFocusNames[padIndex % 16]);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
@@ -55,7 +55,7 @@ void AssignmentViewScreen::down()
     }
 
     const auto padIndex = mpc.clientEventController->getSelectedPad() - 4;
-    ls->setFocus(padFocusNames[padIndex % 16]);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
@@ -70,7 +70,7 @@ void AssignmentViewScreen::left()
     ScreenComponent::left();
 
     const auto padIndex = mpc.clientEventController->getSelectedPad() - 1;
-    ls->setFocus(padFocusNames[padIndex % 16]);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
@@ -84,7 +84,7 @@ void AssignmentViewScreen::right()
 
     ScreenComponent::right();
     const auto padIndex = mpc.clientEventController->getSelectedPad() + 1;
-    ls->setFocus(padFocusNames[padIndex % 16]);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
@@ -107,7 +107,7 @@ void AssignmentViewScreen::update(Observable *o, const Message message)
     }
     else if (msg == "pad")
     {
-        ls->setFocus(getFocusFromPadIndex());
+        ls.lock()->setFocus(getFocusFromPadIndex());
         displayAssignmentView();
     }
     else if (msg == "note")
@@ -144,7 +144,7 @@ void AssignmentViewScreen::displayPad(const int i) const
         const auto sampleNumber =
             program->getNoteParameters(note)->getSoundIndex();
         sampleName =
-            sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
+            sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
 
         if (sampleName.length() > 8)
         {
@@ -185,10 +185,10 @@ void AssignmentViewScreen::displaySoundName() const
     const int soundIndex = program->getNoteParameters(note)->getSoundIndex();
 
     const std::string soundName =
-        soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
+        soundIndex == -1 ? "OFF" : sampler.lock()->getSoundName(soundIndex);
 
     const std::string stereo =
-        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
+        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
 
     findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) +

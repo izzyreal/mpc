@@ -106,7 +106,7 @@ void DrumScreen::displayPgm() const
 {
     const auto pn = getActiveDrumBus()->getProgramIndex();
     findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
-                              "-" + sampler->getProgram(pn)->getName());
+                              "-" + sampler.lock()->getProgram(pn)->getName());
 }
 
 void DrumScreen::displayPgmChange() const

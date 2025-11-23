@@ -19,7 +19,7 @@ void EraseAllOffTracksScreen::function(const int i)
     {
         case 4:
         {
-            const auto seq = sequencer->getSelectedSequence();
+            const auto seq = sequencer.lock()->getSelectedSequence();
             int trackCounter = 0;
 
             for (const auto &track : seq->getTracks())

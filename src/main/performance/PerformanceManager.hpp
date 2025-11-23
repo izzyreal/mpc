@@ -25,6 +25,7 @@ namespace mpc::performance
     {
     public:
         PerformanceManager();
+        ~PerformanceManager() override;
 
         void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex) const;
 

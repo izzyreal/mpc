@@ -34,7 +34,7 @@ void LoadScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot({ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}))
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
@@ -58,12 +58,12 @@ void LoadScreen::open()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
-        ls->setFunctionKeysArrangement(
+        ls.lock()->setFunctionKeysArrangement(
             device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 2);
     }
     else
     {
-        ls->setFunctionKeysArrangement(playable ? 1 : 0);
+        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
     }
 }
 
@@ -95,7 +95,7 @@ void LoadScreen::function(const int i)
                         mpc.getDisks()[device]->getVolume();
                     candidateVolume.mode == DISABLED)
                 {
-                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
+                    ls.lock()->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
                 }
 
@@ -114,12 +114,12 @@ void LoadScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls->showPopupForMs("Error! Device seems in use", 2000);
+                        ls.lock()->showPopupForMs("Error! Device seems in use", 2000);
                         return;
                     }
                 }
 
-                ls->setFunctionKeysArrangement(0);
+                ls.lock()->setFunctionKeysArrangement(0);
 
                 newDisk->initFiles();
 
@@ -158,18 +158,18 @@ void LoadScreen::function(const int i)
                               : audiomidi::SoundPlayerFileFormat::WAV,
                         audioServerSampleRate);
 
-                    ls->postToUiThread(
+                    ls.lock()->postToUiThread(
                         [started, file, ls]
                         {
                             const auto name = file->getNameWithoutExtension();
 
                             if (started)
                             {
-                                ls->showPopup("Playing " + name);
+                                ls.lock()->showPopup("Playing " + name);
                             }
                             else
                             {
-                                ls->showPopupAndAwaitInteraction("Can't play " +
+                                ls.lock()->showPopupAndAwaitInteraction("Can't play " +
                                                                  name);
                             }
                         });
@@ -211,7 +211,7 @@ void LoadScreen::function(const int i)
                         fs::path(getSelectedFileName()).extension().string();
                     const auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
                                           StrUtil::eqIgnoreCase(ext, ".wav");
-                    ls->setFunctionKeysArrangement(playable ? 1 : 0);
+                    ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
                 }
             }
             else if (StrUtil::eqIgnoreCase(ext, ".snd") ||
@@ -316,7 +316,7 @@ void LoadScreen::turnWheel(const int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls->setFunctionKeysArrangement(
+        ls.lock()->setFunctionKeysArrangement(
             mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 2);
         return;
     }
@@ -326,7 +326,7 @@ void LoadScreen::turnWheel(const int i)
     const auto playable =
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") ||
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
-    ls->setFunctionKeysArrangement(playable ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::displayView() const
@@ -343,7 +343,7 @@ void LoadScreen::displayFreeSnd() const
 {
     findLabel("freesnd")->setText(
         " " +
-        StrUtil::padLeft(std::to_string(sampler->getFreeSampleSpace()), " ",
+        StrUtil::padLeft(std::to_string(sampler.lock()->getFreeSampleSpace()), " ",
                          5) +
         "K");
 }
@@ -495,7 +495,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     SoundLoaderResult result;
 
-    auto sound = sampler->addSound();
+    auto sound = sampler.lock()->addSound();
 
     if (sound == nullptr)
     {
@@ -511,11 +511,11 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         const auto ext = path.extension().string();
         const std::string msg =
             "LOADING " + StrUtil::padRight(name, " ", 16) + ext;
-        ls->showPopupAndThenOpen(ScreenId::LoadASoundScreen, msg, 300);
+        ls.lock()->showPopupAndThenOpen(ScreenId::LoadASoundScreen, msg, 300);
         return;
     }
 
-    sampler->deleteSound(sound);
+    sampler.lock()->deleteSound(sound);
 
     if (result.canBeConverted)
     {
@@ -555,7 +555,7 @@ void LoadScreen::up()
         const auto ext = fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
-        ls->setFunctionKeysArrangement(playable ? 1 : 0);
+        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
     }
 
     ScreenComponent::up();

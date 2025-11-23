@@ -30,7 +30,7 @@ VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(
 
 void VmpcDirectToDiskRecorderScreen::open()
 {
-    setSq(sequencer->getSelectedSequenceIndex());
+    setSq(sequencer.lock()->getSelectedSequenceIndex());
     displayRecord();
     displaySong();
     displayTime();
@@ -41,7 +41,7 @@ void VmpcDirectToDiskRecorderScreen::open()
 
 void VmpcDirectToDiskRecorderScreen::turnWheel(const int i)
 {
-    const auto seq = sequencer->getSequence(sq).get();
+    const auto seq = sequencer.lock()->getSequence(sq).get();
 
     checkAllTimes(mpc, i, seq);
 
@@ -87,8 +87,8 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                 mpc.getEngineHost()->getAudioServer()->getSampleRate());
 
             constexpr bool setPositionTo0 = true;
-            sequencer->setSelectedSequenceIndex(sq, setPositionTo0);
-            const auto sequence = sequencer->getSequence(seq);
+            sequencer.lock()->setSelectedSequenceIndex(sq, setPositionTo0);
+            const auto sequence = sequencer.lock()->getSequence(seq);
             seqLoopWasEnabled = sequence->isLoopEnabled();
 
             switch (record)
@@ -119,7 +119,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     else
                     {
                         constexpr bool fromStart = true;
-                        sequencer->getTransport()->play(fromStart);
+                        sequencer.lock()->getTransport()->play(fromStart);
                     }
 
                     break;
@@ -143,7 +143,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         sequence->setLoopEnabled(false);
                     }
 
-                    sequencer->getTransport()->setPosition(
+                    sequencer.lock()->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(
                             sequence->getLoopStart()));
 
@@ -153,7 +153,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->getTransport()->play();
+                        sequencer.lock()->getTransport()->play();
                     }
 
                     break;
@@ -177,7 +177,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         sequence->setLoopEnabled(false);
                     }
 
-                    sequencer->getTransport()->setPosition(
+                    sequencer.lock()->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(time0));
 
                     if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
@@ -186,14 +186,14 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->getTransport()->play();
+                        sequencer.lock()->getTransport()->play();
                     }
 
                     break;
                 }
                 case 3:
                 {
-                    const auto mpcSong = sequencer->getSong(song);
+                    const auto mpcSong = sequencer.lock()->getSong(song);
 
                     if (!mpcSong->isUsed())
                     {
@@ -201,7 +201,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
 
                     const auto lengthInFrames = SeqUtil::songFrameLength(
-                        mpcSong.get(), sequencer.get(), rate);
+                        mpcSong.get(), sequencer.lock().get(), rate);
                     const auto recordingName =
                         mpcSong->getName() + "-" +
                         DirectToDiskSettings::getTimeStamp();
@@ -226,7 +226,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     else
                     {
                         constexpr bool fromStart = true;
-                        sequencer->getTransport()->play(fromStart);
+                        sequencer.lock()->getTransport()->play(fromStart);
                     }
 
                     break;
@@ -279,7 +279,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(const SequenceIndex i)
 
     setTime0(0);
 
-    if (const auto s = sequencer->getSequence(sq); s->isUsed())
+    if (const auto s = sequencer.lock()->getSequence(sq); s->isUsed())
     {
         setTime1(s->getLastTick());
     }
@@ -340,7 +340,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong() const
     {
         return;
     }
-    const auto songName = sequencer->getSong(song)->getName();
+    const auto songName = sequencer.lock()->getSong(song)->getName();
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
 }
@@ -379,7 +379,7 @@ void VmpcDirectToDiskRecorderScreen::displaySq() const
         return;
     }
 
-    const auto seqName = sequencer->getSequence(sq)->getName();
+    const auto seqName = sequencer.lock()->getSequence(sq)->getName();
     findField("sq")->setText(StrUtil::padLeft(std::to_string(sq + 1), "0", 2) +
                              "-" + seqName);
 }
@@ -399,7 +399,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
         return;
     }
 
-    const auto sequence = sequencer->getSequence(sq);
+    const auto sequence = sequencer.lock()->getSequence(sq);
 
     findField("time0")->setTextPadded(
         SeqUtil::getBar(sequence.get(), time0) + 1, "0");

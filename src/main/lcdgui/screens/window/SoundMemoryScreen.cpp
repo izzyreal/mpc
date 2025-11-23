@@ -27,7 +27,7 @@ void SoundMemoryScreen::displayFreeMemoryTime() const
 {
     auto total = 33374880;
 
-    for (const auto &s : sampler->getSounds())
+    for (const auto &s : sampler.lock()->getSounds())
     {
         total -= s->getSampleData()->size() * 2;
     }
@@ -39,7 +39,7 @@ void SoundMemoryScreen::displayFreeMemoryTime() const
 
 void SoundMemoryScreen::displayIndicator()
 {
-    const auto free = (32620.0 - sampler->getFreeSampleSpace()) / 32620.0;
+    const auto free = (32620.0 - sampler.lock()->getFreeSampleSpace()) / 32620.0;
     findChild<PunchRect>("free-memory")->setSize((int)floor(200.0 * free), 9);
 }
 

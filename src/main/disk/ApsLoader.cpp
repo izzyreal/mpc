@@ -257,7 +257,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
     }
 
     performance::UpdateProgramsBulk payload{perfPrograms};
-    mpc.performanceManager->enqueue(
+    mpc.getPerformanceManager().lock()->enqueue(
         performance::PerformanceMessage(std::move(payload)));
 
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)

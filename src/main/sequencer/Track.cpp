@@ -74,6 +74,11 @@ Track::Track(
     purge();
 }
 
+Track::~Track()
+{
+    printf("~Track\n");
+}
+
 void Track::purge()
 {
     removeEvents();

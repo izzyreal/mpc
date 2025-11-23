@@ -12,7 +12,7 @@ SyncScreen::SyncScreen(Mpc &mpc, const int layerIndex)
 
 void SyncScreen::open()
 {
-    if (tab == 2 && ls->isPreviousScreen({ScreenId::MidiSwScreen}))
+    if (tab == 2 && ls.lock()->isPreviousScreen({ScreenId::MidiSwScreen}))
     {
         tab = 0;
     }

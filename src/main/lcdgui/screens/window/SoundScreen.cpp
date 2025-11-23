@@ -29,17 +29,17 @@ void SoundScreen::openNameScreen()
     {
         const auto enterAction = [this](const std::string &nameScreenName)
         {
-            if (sampler->isSoundNameOccupied(nameScreenName))
+            if (sampler.lock()->isSoundNameOccupied(nameScreenName))
             {
                 return;
             }
 
-            sampler->getSound()->setName(nameScreenName);
+            sampler.lock()->getSound()->setName(nameScreenName);
             openScreenById(ScreenId::SoundScreen);
         };
 
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction,
+        nameScreen->initialize(sampler.lock()->getSound()->getName(), 16, enterAction,
                                "sound");
         openScreenById(ScreenId::NameScreen);
     }
@@ -65,7 +65,7 @@ void SoundScreen::function(const int i)
 
 void SoundScreen::displaySoundName() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -78,7 +78,7 @@ void SoundScreen::displaySoundName() const
 
 void SoundScreen::displayType() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -92,7 +92,7 @@ void SoundScreen::displayType() const
 
 void SoundScreen::displayRate() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {
@@ -106,7 +106,7 @@ void SoundScreen::displayRate() const
 
 void SoundScreen::displaySize() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!sound)
     {

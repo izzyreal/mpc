@@ -67,7 +67,7 @@ namespace mpc::controller
         ClientMidiFootswitchAssignmentController(
             const std::shared_ptr<ClientHardwareEventController> &,
             const std::shared_ptr<lcdgui::screens::MidiSwScreen> &,
-            const std::shared_ptr<sequencer::Sequencer> &);
+            const std::weak_ptr<sequencer::Sequencer> &);
 
         void handleEvent(const client::event::ClientMidiEvent &);
 
@@ -79,7 +79,7 @@ namespace mpc::controller
         std::shared_ptr<ClientHardwareEventController>
             clientHardwareEventController;
         std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
+        std::weak_ptr<sequencer::Sequencer> sequencer;
 
         void dispatchSequencerCommand(
             midi::input::MidiControlTarget::SequencerTarget::Command);

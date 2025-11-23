@@ -15,10 +15,10 @@ CopySoundScreen::CopySoundScreen(Mpc &mpc, const int layerIndex)
 
 void CopySoundScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}) && sampler->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
     {
-        newName = sampler->getSound()->getName();
-        newName = sampler->addOrIncreaseNumber(newName);
+        newName = sampler.lock()->getSound()->getName();
+        newName = sampler.lock()->addOrIncreaseNumber(newName);
     }
     displaySnd();
     displayNewName();
@@ -33,8 +33,8 @@ void CopySoundScreen::function(const int i)
             break;
         case 4:
         {
-            const auto sound = sampler->getSound();
-            const auto newSound = sampler->copySound(sound);
+            const auto sound = sampler.lock()->getSound();
+            const auto newSound = sampler.lock()->copySound(sound);
 
             if (newSound.lock() == nullptr)
             {
@@ -42,7 +42,7 @@ void CopySoundScreen::function(const int i)
             }
 
             newSound.lock()->setName(newName);
-            sampler->setSoundIndex(sampler->getSoundCount() - 1);
+            sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
             openScreenById(ScreenId::SoundScreen);
             break;
         }
@@ -55,9 +55,9 @@ void CopySoundScreen::turnWheel(const int i)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "snd")
     {
-        sampler->nudgeSoundIndex(i > 0);
-        auto newSampleName = sampler->getSoundName(sampler->getSoundIndex());
-        newSampleName = sampler->addOrIncreaseNumber(newSampleName);
+        sampler.lock()->nudgeSoundIndex(i > 0);
+        auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
+        newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
         setNewName(newSampleName);
         displaySnd();
     }
@@ -74,7 +74,7 @@ void CopySoundScreen::openNameScreen()
 
     const auto enterAction = [this](const std::string &nameScreenName)
     {
-        if (sampler->isSoundNameOccupied(nameScreenName))
+        if (sampler.lock()->isSoundNameOccupied(nameScreenName))
         {
             return;
         }
@@ -95,12 +95,12 @@ void CopySoundScreen::displayNewName() const
 
 void CopySoundScreen::displaySnd() const
 {
-    if (!sampler->getSound())
+    if (!sampler.lock()->getSound())
     {
         return;
     }
 
-    findField("snd")->setText(sampler->getSound()->getName());
+    findField("snd")->setText(sampler.lock()->getSound()->getName());
 }
 
 void CopySoundScreen::setNewName(const std::string &s)

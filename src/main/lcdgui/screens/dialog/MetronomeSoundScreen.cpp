@@ -80,22 +80,22 @@ void MetronomeSoundScreen::displayOutput() const
 
 void MetronomeSoundScreen::displayAccent() const
 {
-    const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
+    const auto drumBus = sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgramIndex();
     const auto note =
-        sampler->getProgram(program)->getPad(accentPad)->getNote();
+        sampler.lock()->getProgram(program)->getPad(accentPad)->getNote();
     findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) +
-                                 "/" + sampler->getPadName(accentPad));
+                                 "/" + sampler.lock()->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal() const
 {
-    const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
+    const auto drumBus = sequencer.lock()->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgramIndex();
     const auto note =
-        sampler->getProgram(program)->getPad(normalPad)->getNote();
+        sampler.lock()->getProgram(program)->getPad(normalPad)->getNote();
     findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) +
-                                 "/" + sampler->getPadName(normalPad));
+                                 "/" + sampler.lock()->getPadName(normalPad));
 }
 
 void MetronomeSoundScreen::displayAccentVelo() const

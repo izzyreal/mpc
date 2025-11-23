@@ -17,10 +17,10 @@ ChangeTsigScreen::ChangeTsigScreen(Mpc &mpc, const int layerIndex)
 
 void ChangeTsigScreen::open()
 {
-    timesignature = sequencer->getSelectedSequence()->getTimeSignature();
+    timesignature = sequencer.lock()->getSelectedSequence()->getTimeSignature();
 
     bar0 = 0;
-    bar1 = sequencer->getSelectedSequence()->getLastBarIndex();
+    bar1 = sequencer.lock()->getSelectedSequence()->getLastBarIndex();
 
     displayBars();
     displayNewTsig();
@@ -35,18 +35,18 @@ void ChangeTsigScreen::function(const int i)
         return;
     }
 
-    const auto sequence = sequencer->getSelectedSequence();
+    const auto sequence = sequencer.lock()->getSelectedSequence();
 
     sequence->setTimeSignature(bar0, bar1, timesignature.numerator,
                                timesignature.denominator);
 
-    sequencer->getTransport()->setPosition(0);
+    sequencer.lock()->getTransport()->setPosition(0);
     openScreenById(ScreenId::SequencerScreen);
 }
 
 void ChangeTsigScreen::turnWheel(const int i)
 {
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "bar0")
@@ -79,7 +79,7 @@ void ChangeTsigScreen::displayBars() const
 
 void ChangeTsigScreen::displayNewTsig() const
 {
-    if (ls->getCurrentScreenName() == "delete-sequence")
+    if (ls.lock()->getCurrentScreenName() == "delete-sequence")
     {
         return;
     }

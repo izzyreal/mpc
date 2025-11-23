@@ -38,7 +38,7 @@ ScreenComponent::ScreenComponent(Mpc &mpc, const std::string &name,
 
 void ScreenComponent::openScreenById(const ScreenId screenId) const
 {
-    ls->openScreenById(screenId);
+    ls.lock()->openScreenById(screenId);
 }
 
 void ScreenComponent::setTransferMap(
@@ -123,10 +123,10 @@ void ScreenComponent::openWindow()
 
 std::shared_ptr<Bus> ScreenComponent::getBus() const
 {
-    if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
+    if (screengroups::isSamplerScreen(ls.lock()->getCurrentScreen()))
     {
         const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-        return sequencer->getBus(drumScreen->getDrum());
+        return sequencer.lock()->getBus(drumScreen->getDrum());
     }
 
     return mpc.getSequencer()->getBus(

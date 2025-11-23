@@ -40,23 +40,23 @@ void PasteEventScreen::function(const int i)
         const auto event = stepEditorScreen->getPlaceHolder()[eventIndex];
         constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
         sequencer::EventState eventState = event->getSnapshot();
-        eventState.tick = sequencer->getTransport()->getTickPosition();
+        eventState.tick = sequencer.lock()->getTransport()->getTickPosition();
 
         std::function onComplete = [] {};
 
         if (eventIndex == stepEditorScreen->getPlaceHolder().size() - 1)
         {
-            onComplete = [ls = mpc.getLayeredScreen()]
+            onComplete = [ls = ls]
             {
-                ls->postToUiThread(
+                ls.lock()->postToUiThread(
                     [ls]
                     {
-                        ls->openScreenById(ScreenId::StepEditorScreen);
+                        ls.lock()->openScreenById(ScreenId::StepEditorScreen);
                     });
             };
         }
 
-        sequencer->getSelectedTrack()->insertEvent(
+        sequencer.lock()->getSelectedTrack()->insertEvent(
             eventState, allowMultipleNoteEventsWithSameNoteOnSameTick,
             onComplete);
     }

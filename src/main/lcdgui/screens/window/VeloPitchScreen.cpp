@@ -144,11 +144,11 @@ void VeloPitchScreen::displayNote() const
     const auto soundIndex = selectedNoteParameters->getSoundIndex();
     const auto padIndex =
         program->getPadIndexFromNote(selectedNoteParameters->getNumber());
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     const auto sampleName =
-        soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
+        soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
     const std::string stereo =
-        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
+        soundIndex != -1 && !sampler.lock()->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
     findField("note")->setText(
         std::to_string(selectedNoteParameters->getNumber()) + "/" + padName +

@@ -41,10 +41,10 @@ void LoadAProgramScreen::function(const int i)
     {
         case 2:
         {
-            sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
-            sampler->deleteAllSamples();
+            sampler.lock()->deleteAllPrograms(/*createDefaultProgram=*/true);
+            sampler.lock()->deleteAllSamples();
 
-            mpc.getDisk()->readPgm2(selectedFile, sampler->getProgram(0), 0);
+            mpc.getDisk()->readPgm2(selectedFile, sampler.lock()->getProgram(0), 0);
             break;
         }
         case 3:
@@ -53,24 +53,24 @@ void LoadAProgramScreen::function(const int i)
         case 4:
         {
             const auto newProgram =
-                sampler->createNewProgramAddFirstAvailableSlot().lock();
+                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
 
             for (int pi = 0; pi < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pi++)
             {
-                if (sampler->getProgram(pi) == newProgram)
+                if (sampler.lock()->getProgram(pi) == newProgram)
                 {
                     mpc.getDisk()->readPgm2(selectedFile, newProgram, pi);
                     break;
                 }
             }
 
-            if (const auto track = sequencer->getSelectedTrack();
+            if (const auto track = sequencer.lock()->getSelectedTrack();
                 sequencer::isDrumBusType(track->getBusType()))
             {
                 for (int pgmIndex = 0;
                      pgmIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pgmIndex++)
                 {
-                    if (sampler->getProgram(pgmIndex) == newProgram)
+                    if (sampler.lock()->getProgram(pgmIndex) == newProgram)
                     {
                         getActiveDrumBus()->setProgramIndex(
                             ProgramIndex(pgmIndex));

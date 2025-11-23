@@ -32,7 +32,7 @@ void EditVelocityScreen::setNote0(const NoteNumber noteNumber)
 
 void EditVelocityScreen::open()
 {
-    if (const auto busType = sequencer->getSelectedTrack()->getBusType();
+    if (const auto busType = sequencer.lock()->getSelectedTrack()->getBusType();
         isMidiBusType(busType))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
@@ -48,7 +48,7 @@ void EditVelocityScreen::open()
 
     findField("note1")->setLocation(116, 42);
 
-    const auto seq = sequencer->getSelectedSequence();
+    const auto seq = sequencer.lock()->getSelectedSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -63,7 +63,7 @@ void EditVelocityScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
 
     switch (i)
     {
@@ -119,7 +119,7 @@ void EditVelocityScreen::turnWheel(const int i)
 
 void EditVelocityScreen::displayTime()
 {
-    const auto sequence = sequencer->getSelectedSequence().get();
+    const auto sequence = sequencer.lock()->getSelectedSequence().get();
     findField("time0")->setTextPadded(
         SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
@@ -134,7 +134,7 @@ void EditVelocityScreen::displayTime()
 
 void EditVelocityScreen::displayNotes()
 {
-    if (const auto track = sequencer->getSelectedTrack();
+    if (const auto track = sequencer.lock()->getSelectedTrack();
         isDrumBusType(track->getBusType()))
     {
         findField("note0")->setSize(47, 9);
@@ -158,7 +158,7 @@ void EditVelocityScreen::displayNotes()
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padName = sampler->getPadName(
+            const auto padName = sampler.lock()->getPadName(
                 program->getPadIndexFromNote(DrumNoteNumber(note0)));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

@@ -71,7 +71,7 @@ void LoadASoundScreen::function(const int i)
     {
         case 2:
         {
-            const auto s = sampler->getPreviewSound();
+            const auto s = sampler.lock()->getPreviewSound();
             const auto start = s->getStart();
             const auto end = s->getLastFrameIndex();
             auto loopTo = -1;
@@ -81,7 +81,7 @@ void LoadASoundScreen::function(const int i)
                 loopTo = s->getLoopTo();
             }
 
-            sampler->playPreviewSample(start, end, loopTo);
+            sampler.lock()->playPreviewSample(start, end, loopTo);
             break;
         }
         case 3:
@@ -94,7 +94,7 @@ void LoadASoundScreen::function(const int i)
                         mpc.getEngineHost()
                             ->getPreviewSoundPlayer()
                             ->finishVoice();
-                        sampler->deleteSound(sampler->getPreviewSound());
+                        sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
                     },
                     0);
 
@@ -109,14 +109,14 @@ void LoadASoundScreen::function(const int i)
 
 void LoadASoundScreen::keepSound() const
 {
-    auto previewSound = sampler->getPreviewSound();
+    auto previewSound = sampler.lock()->getPreviewSound();
     const auto candidateSoundName = previewSound->getName();
 
     int existingSoundIndex = -1;
 
-    for (int i = 0; i < sampler->getSoundCount(); i++)
+    for (int i = 0; i < sampler.lock()->getSoundCount(); i++)
     {
-        auto s = sampler->getSound(i);
+        auto s = sampler.lock()->getSound(i);
         if (s == previewSound)
         {
             continue;
@@ -131,7 +131,7 @@ void LoadASoundScreen::keepSound() const
 
     auto actionAfterLoadingSound = [this](bool)
     {
-        const auto soundIndex = sampler->getSoundCount() - 1;
+        const auto soundIndex = sampler.lock()->getSoundCount() - 1;
 
         if (assignToNote != NoDrumNoteAssigned)
         {
@@ -140,16 +140,16 @@ void LoadASoundScreen::keepSound() const
                 ->setSoundIndex(soundIndex);
         }
 
-        sampler->setSoundIndex(soundIndex);
+        sampler.lock()->setSoundIndex(soundIndex);
     };
 
     if (existingSoundIndex >= 0)
     {
         auto replaceAction = [this, existingSoundIndex, actionAfterLoadingSound]
         {
-            const auto previewSound = sampler->getPreviewSound();
+            const auto previewSound = sampler.lock()->getPreviewSound();
             const auto isMono = previewSound->isMono();
-            sampler->replaceSound(existingSoundIndex, previewSound);
+            sampler.lock()->replaceSound(existingSoundIndex, previewSound);
             actionAfterLoadingSound(isMono);
             openScreenById(ScreenId::LoadScreen);
         };
@@ -162,7 +162,7 @@ void LoadASoundScreen::keepSound() const
             auto enterAction = [this, actionAfterLoadingSound,
                                 previewSound](const std::string &nameScreenName)
             {
-                if (sampler->checkExists(nameScreenName) >= 0)
+                if (sampler.lock()->checkExists(nameScreenName) >= 0)
                 {
                     return;
                 }
@@ -175,7 +175,7 @@ void LoadASoundScreen::keepSound() const
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             auto mainScreenAction = [&]
             {
-                sampler->deleteSound(sampler->getPreviewSound());
+                sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
             };
             nameScreen->initialize(
                 loadScreen->getSelectedFile()->getNameWithoutExtension(), 16,
@@ -187,8 +187,8 @@ void LoadASoundScreen::keepSound() const
         fileExistsScreen->initialize(replaceAction, initializeNameScreen,
                                      [this]
                                      {
-                                         sampler->deleteSound(
-                                             sampler->getPreviewSound());
+                                         sampler.lock()->deleteSound(
+                                             sampler.lock()->getPreviewSound());
                                          openScreenById(ScreenId::LoadScreen);
                                      });
         openScreenById(ScreenId::FileExistsScreen);
@@ -203,7 +203,7 @@ void LoadASoundScreen::displayAssignToNote() const
 {
     const auto padIndex =
         getProgramOrThrow()->getPadIndexFromNote(assignToNote);
-    const auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler.lock()->getPadName(padIndex);
     const auto noteName =
         std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
     findField("assign-to-note")->setText(noteName + "/" + padName);

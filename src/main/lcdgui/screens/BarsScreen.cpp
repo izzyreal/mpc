@@ -19,9 +19,9 @@ BarsScreen::BarsScreen(Mpc &mpc, const int layerIndex)
 
 void BarsScreen::open()
 {
-    const auto fromSequence = sequencer->getSelectedSequence();
+    const auto fromSequence = sequencer.lock()->getSelectedSequence();
     const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-    const auto toSequence = sequencer->getSequence(eventsScreen->toSq);
+    const auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
     const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     const auto userLastBar = userScreen->lastBar;
 
@@ -69,7 +69,7 @@ void BarsScreen::function(const int j)
         case 2:
         case 3:
             eventsScreen->tab = j;
-            ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         case 4:
             break;
@@ -77,7 +77,7 @@ void BarsScreen::function(const int j)
         {
             copyBars(eventsScreen->toSq, firstBar, lastBar,
                      eventsScreen->copies, afterBar);
-            sequencer->setSelectedSequenceIndex(eventsScreen->toSq, true);
+            sequencer.lock()->setSelectedSequenceIndex(eventsScreen->toSq, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
@@ -89,7 +89,7 @@ void BarsScreen::copyBars(const int toSeqIndex, const int copyFirstBar,
                           const int copyLastBar, const int copyCount,
                           const int copyAfterBar) const
 {
-    const auto fromSequenceIndex = sequencer->getSelectedSequenceIndex();
+    const auto fromSequenceIndex = sequencer.lock()->getSelectedSequenceIndex();
     sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex,
                                  copyFirstBar, copyLastBar, copyCount,
                                  copyAfterBar);
@@ -104,12 +104,12 @@ void BarsScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "fromsq")
     {
-        sequencer->setSelectedSequenceIndex(
-            sequencer->getSelectedSequenceIndex() + increment, true);
+        sequencer.lock()->setSelectedSequenceIndex(
+            sequencer.lock()->getSelectedSequenceIndex() + increment, true);
 
         displayFromSq();
 
-        const auto fromSequence = sequencer->getSelectedSequence();
+        const auto fromSequence = sequencer.lock()->getSelectedSequence();
         const auto lastBarIndex = fromSequence->isUsed()
                                       ? fromSequence->getLastBarIndex()
                                       : userLastBar;
@@ -130,7 +130,7 @@ void BarsScreen::turnWheel(const int increment)
 
         displayToSq();
 
-        const auto toSequence = sequencer->getSequence(eventsScreen->toSq);
+        const auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
         const auto maxAfterBarIndex =
             toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
 
@@ -141,7 +141,7 @@ void BarsScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "afterbar")
     {
-        const auto toSequence = sequencer->getSequence(eventsScreen->toSq);
+        const auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
 
         if (!toSequence->isUsed())
         {
@@ -152,7 +152,7 @@ void BarsScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "firstbar")
     {
-        const auto fromSequence = sequencer->getSelectedSequence();
+        const auto fromSequence = sequencer.lock()->getSelectedSequence();
         const auto lastBarIndex = fromSequence->isUsed()
                                       ? fromSequence->getLastBarIndex()
                                       : userLastBar;
@@ -161,7 +161,7 @@ void BarsScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "lastbar")
     {
-        const auto fromSequence = sequencer->getSelectedSequence();
+        const auto fromSequence = sequencer.lock()->getSelectedSequence();
         const auto lastBarIndex = fromSequence->isUsed()
                                       ? fromSequence->getLastBarIndex()
                                       : userLastBar;
@@ -170,7 +170,7 @@ void BarsScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "copies")
     {
-        if (const auto toSequence = sequencer->getSequence(eventsScreen->toSq);
+        if (const auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
             !toSequence->isUsed())
         {
             Util::initSequence(eventsScreen->toSq, mpc);
@@ -195,7 +195,7 @@ void BarsScreen::displayToSq() const
 void BarsScreen::displayFromSq() const
 {
     findField("fromsq")->setText(
-        std::to_string(sequencer->getSelectedSequenceIndex().get() + 1));
+        std::to_string(sequencer.lock()->getSelectedSequenceIndex().get() + 1));
 }
 
 void BarsScreen::displayAfterBar() const

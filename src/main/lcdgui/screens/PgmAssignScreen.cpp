@@ -153,7 +153,7 @@ void PgmAssignScreen::open()
     if (const auto soundIndex = selectedNoteParameters->getSoundIndex();
         soundIndex != -1)
     {
-        sampler->setSoundIndex(soundIndex);
+        sampler.lock()->setSoundIndex(soundIndex);
     }
 
     findField("pad-assign")->setAlignment(Alignment::Centered);
@@ -219,7 +219,7 @@ void PgmAssignScreen::turnWheel(const int i)
     {
         const auto pgm = getActiveDrumBus()->getProgramIndex();
 
-        if (const auto candidate = sampler->getUsedProgram(pgm, i > 0);
+        if (const auto candidate = sampler.lock()->getUsedProgram(pgm, i > 0);
             candidate != pgm)
         {
             getActiveDrumBus()->setProgramIndex(candidate);
@@ -259,7 +259,7 @@ void PgmAssignScreen::turnWheel(const int i)
     {
         const auto currentSoundIndex = selectedNoteParameters->getSoundIndex();
 
-        if (currentSoundIndex == -1 && (i < 0 || sampler->getSoundCount() == 0))
+        if (currentSoundIndex == -1 && (i < 0 || sampler.lock()->getSoundCount() == 0))
         {
             return;
         }
@@ -270,8 +270,8 @@ void PgmAssignScreen::turnWheel(const int i)
             return;
         }
 
-        const auto currentSound = sampler->getSound(currentSoundIndex);
-        const auto sortedSounds = sampler->getSortedSounds();
+        const auto currentSound = sampler.lock()->getSound(currentSoundIndex);
+        const auto sortedSounds = sampler.lock()->getSortedSounds();
 
         int indexInSortedSounds = -1;
 
@@ -303,7 +303,7 @@ void PgmAssignScreen::turnWheel(const int i)
 
         const auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
         selectedNoteParameters->setSoundIndex(nextMemoryIndex);
-        sampler->setSoundIndex(nextMemoryIndex);
+        sampler.lock()->setSoundIndex(nextMemoryIndex);
     }
     else if (focusedFieldName == "mode")
     {
@@ -360,8 +360,8 @@ void PgmAssignScreen::openWindow()
         if (const auto soundIndex = selectedNoteParameters->getSoundIndex();
             soundIndex != -1)
         {
-            sampler->setSoundIndex(soundIndex);
-            sampler->setPreviousScreenName("program-assign");
+            sampler.lock()->setSoundIndex(soundIndex);
+            sampler.lock()->setPreviousScreenName("program-assign");
             openScreenById(ScreenId::SoundScreen);
         }
     }
@@ -390,13 +390,13 @@ void PgmAssignScreen::displaySoundName() const
     }
     else
     {
-        const auto name = sampler->getSoundName(soundIndex);
+        const auto name = sampler.lock()->getSoundName(soundIndex);
         findField("snd")->setText(name);
     }
 
-    if (sampler->getSoundCount() != 0 && soundIndex != -1)
+    if (sampler.lock()->getSoundCount() != 0 && soundIndex != -1)
     {
-        if (sampler->getSound(soundIndex)->isMono())
+        if (sampler.lock()->getSound(soundIndex)->isMono())
         {
             findLabel("issoundstereo")->setText("    ");
         }
@@ -515,7 +515,7 @@ void PgmAssignScreen::displayOptionalNoteA() const
     const auto noteIntA = selectedNoteParameters->getOptionalNoteA();
     const auto padIntA = program->getPadIndexFromNote(noteIntA);
     const auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
-    const auto padA = sampler->getPadName(padIntA);
+    const auto padA = sampler.lock()->getPadName(padIntA);
     findField("optional-note-a")->setText(noteA + "/" + padA);
 }
 
@@ -527,7 +527,7 @@ void PgmAssignScreen::displayOptionalNoteB() const
     const auto noteIntB = selectedNoteParameters->getOptionalNoteB();
     const auto padIntB = program->getPadIndexFromNote(noteIntB);
     const auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
-    const auto padB = sampler->getPadName(padIntB);
+    const auto padB = sampler.lock()->getPadName(padIntB);
     findField("optional-note-b")->setText(noteB + "/" + padB);
 }
 
@@ -543,7 +543,7 @@ void PgmAssignScreen::displayNote() const
 void PgmAssignScreen::displayPad() const
 {
     findField("pad")->setText(
-        sampler->getPadName(mpc.clientEventController->getSelectedPad()));
+        sampler.lock()->getPadName(mpc.clientEventController->getSelectedPad()));
 }
 
 void PgmAssignScreen::setPadAssign(const bool isMaster)

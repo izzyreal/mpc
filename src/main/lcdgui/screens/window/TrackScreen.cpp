@@ -16,11 +16,11 @@ TrackScreen::TrackScreen(Mpc &mpc, const int layerIndex)
 
 void TrackScreen::open()
 {
-    const auto activeTrackIndex = sequencer->getSelectedTrackIndex();
+    const auto activeTrackIndex = sequencer.lock()->getSelectedTrackIndex();
     const auto defaultTrackName =
-        sequencer->getDefaultTrackName(activeTrackIndex);
+        sequencer.lock()->getDefaultTrackName(activeTrackIndex);
 
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
     findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
     findLabel("tracknamerest")->setText(track->getName().substr(1));
 
@@ -52,18 +52,18 @@ void TrackScreen::openNameScreen()
     if (focusedFieldName.find("default") != std::string::npos)
     {
         initialNameScreenName =
-            sequencer->getDefaultTrackName(sequencer->getSelectedTrackIndex());
+            sequencer.lock()->getDefaultTrackName(sequencer.lock()->getSelectedTrackIndex());
 
         enterAction = [this](const std::string &nameScreenName)
         {
-            sequencer->setDefaultTrackName(nameScreenName,
-                                           sequencer->getSelectedTrackIndex());
+            sequencer.lock()->setDefaultTrackName(nameScreenName,
+                                           sequencer.lock()->getSelectedTrackIndex());
             openScreenById(ScreenId::SequencerScreen);
         };
     }
     else
     {
-        auto track = sequencer->getSelectedTrack();
+        auto track = sequencer.lock()->getSelectedTrack();
 
         if (!track->isUsed())
         {

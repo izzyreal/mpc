@@ -298,6 +298,9 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
+    printf("Deleting Mpc\n");
+    auto useCount = sequencer.use_count();
+    printf("Sequencer use count: %i\n", useCount);
     if (midiDeviceDetector)
     {
         midiDeviceDetector->stop();
@@ -348,6 +351,12 @@ void Mpc::setPluginModeEnabled(const bool b)
 bool Mpc::isPluginModeEnabled() const
 {
     return pluginModeEnabled;
+}
+
+std::weak_ptr<performance::PerformanceManager>
+Mpc::getPerformanceManager() const
+{
+    return performanceManager;
 }
 
 void Mpc::startMidiDeviceDetector()

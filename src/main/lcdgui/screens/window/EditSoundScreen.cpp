@@ -44,22 +44,22 @@ void EditSoundScreen::open()
 {
     findField("create-new-program")->setAlignment(Alignment::Centered);
 
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen}) && sampler->getSound())
+    if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}) && sampler.lock()->getSound())
     {
-        auto newSoundName = sampler->getSound()->getName();
-        newSoundName = sampler->addOrIncreaseNumber(newSoundName);
+        auto newSoundName = sampler.lock()->getSound()->getName();
+        newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
         setNewName(newSoundName);
     }
 
-    if (ls->isPreviousScreen({ScreenId::ZoneScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::ZoneScreen}))
     {
         setEdit(9);
     }
-    else if (ls->isPreviousScreen({ScreenId::LoopScreen}))
+    else if (ls.lock()->isPreviousScreen({ScreenId::LoopScreen}))
     {
         setEdit(1);
     }
-    else if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
+    else if (ls.lock()->isPreviousScreenNot({ScreenId::NameScreen}))
     {
         setEdit(0);
     }
@@ -203,14 +203,14 @@ void EditSoundScreen::displayVariable() const
     else if (edit == 3)
     {
         const auto sampleName =
-            sampler->getSortedSounds()[insertSoundIndex].first->getName();
+            sampler.lock()->getSortedSounds()[insertSoundIndex].first->getName();
         findLabel("new-name")->setSize(11 * 6, 9);
         findLabel("new-name")->setText("Insert Snd:");
         findField("new-name")
             ->setLocation(findLabel("new-name")->getW() + 19, 20);
         std::string stereo;
 
-        if (!sampler->getSound(insertSoundIndex)->isMono())
+        if (!sampler.lock()->getSound(insertSoundIndex)->isMono())
         {
             stereo = "(ST)";
         }
@@ -339,7 +339,7 @@ void EditSoundScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "new-name" && edit == 3)
     {
-        setInsertSndNr(insertSoundIndex + increment, sampler->getSoundCount());
+        setInsertSndNr(insertSoundIndex + increment, sampler.lock()->getSoundCount());
     }
     else if (focusedFieldName == "ratio")
     {
@@ -415,7 +415,7 @@ void EditSoundScreen::function(const int j)
         return;
     }
 
-    if (const auto sound = sampler->getSound(); !sound)
+    if (const auto sound = sampler.lock()->getSound(); !sound)
     {
         return;
     }
@@ -455,16 +455,16 @@ void EditSoundScreen::function(const int j)
         default:;
     }
 
-    ls->openScreen(returnToScreenName);
+    ls.lock()->openScreen(returnToScreenName);
 }
 
 void EditSoundScreen::handleDiscardEdit() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto [start, end] = getStartEndFromContext();
     const auto newLoopTo = sound->getLoopTo() - start;
 
-    sampler->trimSample(sampler->getSoundIndex(), start, end);
+    sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), start, end);
 
     sound->setStart(0);
     sound->setEnd(sound->getEnd() - sound->getStart());
@@ -476,14 +476,14 @@ void EditSoundScreen::handleDiscardEdit() const
 
 void EditSoundScreen::handleLoopFromStartToEnd() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     sound->setLoopTo(sound->getStart());
 }
 
 void EditSoundScreen::handleSectionToNewSound() const
 {
-    const auto sound = sampler->getSound();
-    const auto newSample = sampler->addSound();
+    const auto sound = sampler.lock()->getSound();
+    const auto newSample = sampler.lock()->addSound();
     if (!newSample)
     {
         return;
@@ -500,16 +500,16 @@ void EditSoundScreen::handleSectionToNewSound() const
     }
 
     newSample->setMono(sound->isMono());
-    sampler->trimSample(sampler->getSoundCount() - 1, sound->getStart(),
+    sampler.lock()->trimSample(sampler.lock()->getSoundCount() - 1, sound->getStart(),
                         sound->getEnd());
-    sampler->setSoundIndex(sampler->getSoundCount() - 1);
+    sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 }
 
 void EditSoundScreen::handleInsertSoundSectionStart() const
 {
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    const auto source = sampler->getSortedSounds()[insertSoundIndex].first;
-    const auto destination = sampler->getSound();
+    const auto source = sampler.lock()->getSortedSounds()[insertSoundIndex].first;
+    const auto destination = sampler.lock()->getSound();
 
     const int destinationStartFrame = getStartEndFromContext().first;
 
@@ -566,9 +566,9 @@ void EditSoundScreen::handleInsertSoundSectionStart() const
 
 void EditSoundScreen::handleDeleteSection() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto [start, end] = getStartEndFromContext();
-    sampler->deleteSection(sampler->getSoundIndex(), start, end);
+    sampler.lock()->deleteSection(sampler.lock()->getSoundIndex(), start, end);
 
     sound->setStart(0);
     sound->setEnd(sound->getFrameCount());
@@ -579,7 +579,7 @@ void EditSoundScreen::handleDeleteSection() const
 
 void EditSoundScreen::handleSilenceSection() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto [start, end] = getStartEndFromContext();
     auto newData = *sound->getSampleData();
 
@@ -597,7 +597,7 @@ void EditSoundScreen::handleSilenceSection() const
 
 void EditSoundScreen::handleReverseSection() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto [start, end] = getStartEndFromContext();
     const auto sampleData = sound->getSampleData();
     auto reverseCounter = end - 1;
@@ -634,9 +634,9 @@ void EditSoundScreen::handleTimeStretch() const
 
     const float ratio = timeStretchRatio * 0.0001f;
 
-    if (const auto sound = sampler->getSound(); sound->isMono())
+    if (const auto sound = sampler.lock()->getSound(); sound->isMono())
     {
-        const auto newSample = sampler->addSound(sound->getSampleRate());
+        const auto newSample = sampler.lock()->addSound(sound->getSampleRate());
         if (!newSample)
         {
             return;
@@ -651,7 +651,7 @@ void EditSoundScreen::handleTimeStretch() const
     }
     else
     {
-        const auto newSound = sampler->addSound(sound->getSampleRate());
+        const auto newSound = sampler.lock()->addSound(sound->getSampleRate());
         if (!newSound)
         {
             return;
@@ -672,7 +672,7 @@ void EditSoundScreen::handleTimeStretch() const
 
 void EditSoundScreen::handleNormalizeSection() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     auto [start, end] = getStartEndFromContext();
     auto data = *sound->getSampleData();
 
@@ -706,7 +706,7 @@ void EditSoundScreen::handleNormalizeSection() const
 
 void EditSoundScreen::handleSliceSound() const
 {
-    const auto source = sampler->getSound();
+    const auto source = sampler.lock()->getSound();
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     const int zoneCount = zoneScreen->getZoneCount();
 
@@ -714,13 +714,13 @@ void EditSoundScreen::handleSliceSound() const
     {
         const auto start = zoneScreen->getZoneStart(i);
         const auto end = zoneScreen->getZoneEnd(i);
-        const auto zone = createZone(sampler, source, start, end, endMargin);
+        const auto zone = createZone(sampler.lock(), source, start, end, endMargin);
         if (!zone)
         {
             return;
         }
 
-        zone->setName(i == 0 ? newName : sampler->addOrIncreaseNumber(newName));
+        zone->setName(i == 0 ? newName : sampler.lock()->addOrIncreaseNumber(newName));
     }
 
     if (!createNewProgram)
@@ -728,26 +728,26 @@ void EditSoundScreen::handleSliceSound() const
         return;
     }
 
-    const auto p = sampler->createNewProgramAddFirstAvailableSlot().lock();
+    const auto p = sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
     p->setName(source->getName());
 
     for (int i = 0; i < zoneCount; i++)
     {
         const auto pad = p->getPad(i);
         const auto noteParams = p->getNoteParameters(pad->getNote());
-        noteParams->setSoundIndex(sampler->getSoundCount() - zoneCount + i);
+        noteParams->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount + i);
     }
 
-    if (const auto drumBus = sequencer->getBus<DrumBus>(
-            sequencer->getSelectedTrack()->getBusType()))
+    if (const auto drumBus = sequencer.lock()->getBus<DrumBus>(
+            sequencer.lock()->getSelectedTrack()->getBusType()))
     {
-        drumBus->setProgramIndex(ProgramIndex(sampler->getProgramCount() - 1));
+        drumBus->setProgramIndex(ProgramIndex(sampler.lock()->getProgramCount() - 1));
     }
 }
 
 std::pair<int, int> EditSoundScreen::getStartEndFromContext() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
     int start = sound->getStart();
     int end = sound->getEnd();
 

@@ -33,7 +33,7 @@ void DeleteFileScreen::function(const int i)
         {
             const auto directoryScreen =
                 mpc.screens->get<ScreenId::DirectoryScreen>();
-            ls->showPopupAndAwaitInteraction(
+            ls.lock()->showPopupAndAwaitInteraction(
                 "Delete: " + directoryScreen->getSelectedFile()->getName());
             std::thread(
                 [this]

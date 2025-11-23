@@ -187,7 +187,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                     performance::AddProgramSound payload{
                         ProgramIndex(programIndex), DrumNoteNumber(drumNote),
                         localTable, convertedTable};
-                    mpc.performanceManager->enqueue(
+                    mpc.getPerformanceManager().lock()->enqueue(
                         performance::PerformanceMessage{std::move(payload)});
                 }
 

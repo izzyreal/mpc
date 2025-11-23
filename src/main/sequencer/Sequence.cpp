@@ -68,6 +68,11 @@ Sequence::Sequence(
     }
 }
 
+Sequence::~Sequence()
+{
+    printf("~Sequence\n");
+}
+
 void Sequence::setLoopStart(const int l)
 {
     loopStart = l;

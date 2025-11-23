@@ -21,7 +21,7 @@ SndParamsScreen::SndParamsScreen(Mpc &mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
-    const auto sound = sampler->getSound() ? true : false;
+    const auto sound = sampler.lock()->getSound() ? true : false;
 
     findField("snd")->setFocusable(sound);
     findField("playx")->setFocusable(sound);
@@ -37,7 +37,7 @@ void SndParamsScreen::open()
     displayBeat();
     displaySampleAndNewTempo();
 
-    ls->setFunctionKeysArrangement(sound ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void SndParamsScreen::openWindow()
@@ -45,7 +45,7 @@ void SndParamsScreen::openWindow()
 
     const auto focusedField = getFocusedField();
 
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (!focusedField || !sound)
     {
@@ -56,7 +56,7 @@ void SndParamsScreen::openWindow()
 
     if (focusedFieldName == "snd")
     {
-        sampler->setPreviousScreenName("params");
+        sampler.lock()->setPreviousScreenName("params");
         openScreenById(ScreenId::SoundScreen);
     }
 }
@@ -77,14 +77,14 @@ void SndParamsScreen::function(int f)
             break;
         case 3:
         {
-            sampler->switchToNextSoundSortType();
-            ls->showPopupForMs(
-                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            sampler.lock()->switchToNextSoundSortType();
+            ls.lock()->showPopupForMs(
+                "Sorting by " + sampler.lock()->getSoundSortingTypeName(), 200);
             break;
         }
         case 4:
         {
-            if (sampler->getSoundCount() == 0)
+            if (sampler.lock()->getSoundCount() == 0)
             {
                 return;
             }
@@ -97,7 +97,7 @@ void SndParamsScreen::function(int f)
         }
         case 5:
         {
-            sampler->playX();
+            sampler.lock()->playX();
             break;
         }
     }
@@ -105,18 +105,18 @@ void SndParamsScreen::function(int f)
 
 void SndParamsScreen::turnWheel(int i)
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "playx")
     {
-        sampler->setPlayX(sampler->getPlayX() + i);
+        sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
         displayPlayX();
     }
     else if (focusedFieldName == "snd" && i > 0)
     {
-        sampler->selectNextSound();
+        sampler.lock()->selectNextSound();
         displayBeat();
         displayLevel();
         displaySampleAndNewTempo();
@@ -125,7 +125,7 @@ void SndParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "snd" && i < 0)
     {
-        sampler->selectPreviousSound();
+        sampler.lock()->selectPreviousSound();
         displayBeat();
         displayLevel();
         displaySampleAndNewTempo();
@@ -153,7 +153,7 @@ void SndParamsScreen::turnWheel(int i)
 
 void SndParamsScreen::displayLevel() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (sound)
     {
@@ -167,7 +167,7 @@ void SndParamsScreen::displayLevel() const
 
 void SndParamsScreen::displayTune() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (sound)
     {
@@ -181,7 +181,7 @@ void SndParamsScreen::displayTune() const
 
 void SndParamsScreen::displayBeat() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
     if (sound)
     {
@@ -195,7 +195,7 @@ void SndParamsScreen::displayBeat() const
 
 void SndParamsScreen::displaySampleAndNewTempo() const
 {
-    auto sound = sampler->getSound();
+    auto sound = sampler.lock()->getSound();
 
     if (!sound || !sound->isLoopEnabled())
     {
@@ -246,18 +246,18 @@ void SndParamsScreen::displaySampleAndNewTempo() const
 
 void SndParamsScreen::displaySnd() const
 {
-    const auto sound = sampler->getSound();
+    const auto sound = sampler.lock()->getSound();
 
-    if (sampler->getSoundCount() == 0)
+    if (sampler.lock()->getSoundCount() == 0)
     {
         findField("snd")->setText("(no sound)");
-        ls->setFocus("dummy");
+        ls.lock()->setFocus("dummy");
         return;
     }
 
-    if (ls->getFocusedFieldName() == "dummy")
+    if (ls.lock()->getFocusedFieldName() == "dummy")
     {
-        ls->setFocus("snd");
+        ls.lock()->setFocus("snd");
     }
 
     auto sampleName = sound->getName();
@@ -272,5 +272,5 @@ void SndParamsScreen::displaySnd() const
 
 void SndParamsScreen::displayPlayX() const
 {
-    findField("playx")->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }

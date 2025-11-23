@@ -45,7 +45,7 @@ void InsertEventScreen::function(const int i)
 void InsertEventScreen::insertEvent() const
 {
     EventState e;
-    e.tick = sequencer->getTransport()->getTickPosition();
+    e.tick = sequencer.lock()->getTransport()->getTickPosition();
 
     if (insertEventType == 0)
     {
@@ -99,15 +99,15 @@ void InsertEventScreen::insertEvent() const
     }
 
     constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
-    const auto onComplete = [ls = mpc.getLayeredScreen()]
+    const auto onComplete = [ls = ls]
     {
-        ls->postToUiThread(
+        ls.lock()->postToUiThread(
             [ls]
             {
-                ls->openScreenById(ScreenId::StepEditorScreen);
+                ls.lock()->openScreenById(ScreenId::StepEditorScreen);
             });
     };
-    sequencer->getSelectedTrack()->insertEvent(
+    sequencer.lock()->getSelectedTrack()->insertEvent(
         e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
 }
 

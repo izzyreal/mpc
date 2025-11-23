@@ -324,7 +324,7 @@ void EditMultipleScreen::updateEditMultiple() const
                 findField("value0")->setSize(6 * 6 + 1, 9);
 
                 const auto program = getProgramOrThrow();
-                const auto padName = sampler->getPadName(
+                const auto padName = sampler.lock()->getPadName(
                     program->getPadIndexFromNote(DrumNoteNumber(changeNoteTo)));
                 const auto noteName = changeNoteTo == NoDrumNoteAssigned
                                           ? "--"

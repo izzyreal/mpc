@@ -30,7 +30,7 @@ void LoadASequenceScreen::open()
             mpc.getDisk()->readMid2(midFile);
         parsedMidFile.has_value())
     {
-        auto usedSeqs = sequencer->getUsedSequenceIndexes();
+        auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
         int index;
 
         for (index = MinSequenceIndex; index <= MaxSequenceIndex; index += 1)
@@ -63,11 +63,11 @@ void LoadASequenceScreen::function(const int i)
     {
         case 3:
             mpc.getLayeredScreen()->closeCurrentScreen();
-            sequencer->clearPlaceHolder();
+            sequencer.lock()->clearPlaceHolder();
             break;
         case 4:
-            sequencer->movePlaceHolderTo(loadInto);
-            sequencer->setSelectedSequenceIndex(loadInto, true);
+            sequencer.lock()->movePlaceHolderTo(loadInto);
+            sequencer.lock()->setSelectedSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
         default:;
@@ -84,12 +84,12 @@ void LoadASequenceScreen::displayLoadInto() const
 {
     findField("load-into")->setTextPadded(loadInto + 1, "0");
     findLabel("name")->setText("-" +
-                               sequencer->getSequence(loadInto)->getName());
+                               sequencer.lock()->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile() const
 {
-    const auto s = sequencer->getPlaceHolder();
+    const auto s = sequencer.lock()->getPlaceHolder();
     findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +
                                ".MID");
 }

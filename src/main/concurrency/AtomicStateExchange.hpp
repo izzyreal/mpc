@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MpcMacros.hpp"
+
 #include <atomic>
 #include <memory>
 #include <functional>
@@ -20,11 +22,8 @@ namespace mpc::concurrency
             Message payload;
 
             SequencedMessage() = default;
-            SequencedMessage(const SequencedMessage &) = delete;
-            SequencedMessage &operator=(const SequencedMessage &) = delete;
 
-            SequencedMessage(SequencedMessage &&) = default;
-            SequencedMessage &operator=(SequencedMessage &&) = default;
+            MPC_NON_COPYABLE(SequencedMessage)
         };
 
         using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
@@ -33,7 +32,7 @@ namespace mpc::concurrency
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
-                                     size_t messageQueueCapacity = 512 * 8)
+                                     size_t messageQueueCapacity = 128)
         {
             actions.reserve(10);
             reserveFn(activeState);
@@ -52,7 +51,10 @@ namespace mpc::concurrency
         }
 
     public:
-        virtual ~AtomicStateExchange() = default;
+        virtual ~AtomicStateExchange()
+        {
+            printf("Deleting atomic state exchange\n");
+        }
 
         virtual void enqueue(Message &&msg) const noexcept
         {

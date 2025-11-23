@@ -86,7 +86,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getTransport()->getTickPosition();
+             return sequencer.lock()->getTransport()->getTickPosition();
          },
          [&](auto)
          {
@@ -96,7 +96,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
              }
              else
              {
-                 const auto track = sequencer->getSelectedTrack();
+                 const auto track = sequencer.lock()->getSelectedTrack();
                  track->removeDoubles();
                  resetYPosAndYOffset();
                  restoreColumnForEventAtActiveRow();
@@ -104,11 +104,11 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
              }
 
              findField("now0")->setTextPadded(
-                 sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+                 sequencer.lock()->getTransport()->getCurrentBarIndex() + 1, "0");
              findField("now1")->setTextPadded(
-                 sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+                 sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
              findField("now2")->setTextPadded(
-                 sequencer->getTransport()->getCurrentClockNumber(), "0");
+                 sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
          }});
 }
 
@@ -119,14 +119,14 @@ void StepEditorScreen::openWindow()
 
 void StepEditorScreen::open()
 {
-    sequencer->storeSelectedSequenceInUndoPlaceHolder();
+    sequencer.lock()->storeSelectedSequenceInUndoPlaceHolder();
 
     findField("tonote")->setLocation(115, 0);
     findLabel("fromnote")->Hide(true);
 
     lastRow = 0;
 
-    if (const auto track = sequencer->getSelectedTrack();
+    if (const auto track = sequencer.lock()->getSelectedTrack();
         isDrumBusType(track->getBusType()))
     {
         findField("fromnote")->setAlignment(Alignment::None);
@@ -148,15 +148,15 @@ void StepEditorScreen::open()
     displayView();
 
     findField("now0")->setTextPadded(
-        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBarIndex() + 1, "0");
     findField("now1")->setTextPadded(
-        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+        sequencer.lock()->getTransport()->getCurrentBeatIndex() + 1, "0");
     findField("now2")->setTextPadded(
-        sequencer->getTransport()->getCurrentClockNumber(), "0");
+        sequencer.lock()->getTransport()->getCurrentClockNumber(), "0");
 
     const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
-    if (ls->isPreviousScreen({ScreenId::InsertEventScreen}))
+    if (ls.lock()->isPreviousScreen({ScreenId::InsertEventScreen}))
     {
         const auto insertEventScreen =
             mpc.screens->get<ScreenId::InsertEventScreen>();
@@ -170,25 +170,25 @@ void StepEditorScreen::open()
 
             if (eventCount > 4)
             {
-                ls->setFocus(lastColumn[eventType] + "3");
+                ls.lock()->setFocus(lastColumn[eventType] + "3");
                 setyOffset(eventCount - 4);
             }
             else
             {
                 const auto row = eventCount - 1;
-                ls->setFocus(lastColumn[eventType] + std::to_string(row));
+                ls.lock()->setFocus(lastColumn[eventType] + std::to_string(row));
             }
         }
     }
 
     const auto visibleEvents = computeVisibleEvents(eventsAtCurrentTick);
 
-    if (ls->isPreviousScreenNot(
+    if (ls.lock()->isPreviousScreenNot(
             {ScreenId::StepTcScreen, ScreenId::InsertEventScreen,
              ScreenId::PasteEventScreen, ScreenId::EditMultipleScreen}))
     {
         const auto eventType = visibleEvents[0]->getTypeName();
-        ls->setFocus(lastColumn[eventType] + "0");
+        ls.lock()->setFocus(lastColumn[eventType] + "0");
     }
 
     refreshEventRows();
@@ -199,16 +199,16 @@ void StepEditorScreen::close()
 {
     isFirstTickPosChangeAfterScreenHasBeenOpened = true;
 
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
 
     storeColumnForEventAtActiveRow();
 
-    if (const auto nextScreen = ls->getCurrentScreenName();
+    if (const auto nextScreen = ls.lock()->getCurrentScreenName();
         nextScreen != "step-timing-correct" && nextScreen != "insert-event" &&
         nextScreen != "paste-event" && nextScreen != "edit-multiple")
     {
         track->removeDoubles();
-        sequencer->resetUndo();
+        sequencer.lock()->resetUndo();
     }
 
     clearSelection();
@@ -266,13 +266,13 @@ void StepEditorScreen::function(int i)
             if (selectionStartIndex != -1)
             {
                 removeEvents();
-                ls->setFocus("a0");
+                ls.lock()->setFocus("a0");
                 return;
             }
 
             if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
             {
-                auto track = sequencer->getSelectedTrack();
+                auto track = sequencer.lock()->getSelectedTrack();
                 for (int e = 0; e < track->getEvents().size(); e++)
                 {
                     if (eventsEqual(track->getEvents()[e],
@@ -295,14 +295,14 @@ void StepEditorScreen::function(int i)
             const std::string newEventType =
                 visibleEvents[rowIndex]->getTypeName();
 
-            ls->setFocus(lastColumn[newEventType] + std::to_string(rowIndex));
+            ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(rowIndex));
             break;
         }
         case 3:
         {
             bool posIsLastTick =
-                sequencer->getTransport()->getTickPosition() ==
-                sequencer->getSelectedSequence()->getLastTick();
+                sequencer.lock()->getTransport()->getTickPosition() ==
+                sequencer.lock()->getSelectedSequence()->getLastTick();
 
             if (selectionEndIndex == -1)
             {
@@ -358,7 +358,7 @@ void StepEditorScreen::function(int i)
                 auto editMultipleScreen =
                     mpc.screens->get<ScreenId::EditMultipleScreen>();
 
-                auto track = sequencer->getSelectedTrack();
+                auto track = sequencer.lock()->getSelectedTrack();
                 if (noteEvent && isDrumBusType(track->getBusType()))
                 {
                     if (isA)
@@ -468,14 +468,14 @@ void StepEditorScreen::function(int i)
 
 bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 {
-    auto focusedFieldName = ls->getFocusedFieldName();
+    auto focusedFieldName = ls.lock()->getFocusedFieldName();
     return focusedFieldName.find(letter) != std::string::npos;
 }
 
 void StepEditorScreen::turnWheel(const int increment)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
 
     if (focusedFieldName == "view")
     {
@@ -486,8 +486,8 @@ void StepEditorScreen::turnWheel(const int increment)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setBar(
-                    sequencer->getTransport()->getCurrentBarIndex() +
+                sequencer.lock()->getTransport()->setBar(
+                    sequencer.lock()->getTransport()->getCurrentBarIndex() +
                     increment);
             });
     }
@@ -496,8 +496,8 @@ void StepEditorScreen::turnWheel(const int increment)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setBeat(
-                    sequencer->getTransport()->getCurrentBeatIndex() +
+                sequencer.lock()->getTransport()->setBeat(
+                    sequencer.lock()->getTransport()->getCurrentBeatIndex() +
                     increment);
             });
     }
@@ -506,8 +506,8 @@ void StepEditorScreen::turnWheel(const int increment)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setClock(
-                    sequencer->getTransport()->getCurrentClockNumber() +
+                sequencer.lock()->getTransport()->setClock(
+                    sequencer.lock()->getTransport()->getCurrentClockNumber() +
                     increment);
             });
     }
@@ -718,11 +718,11 @@ void StepEditorScreen::prevStepEvent()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->goToPreviousEvent();
+                sequencer.lock()->goToPreviousEvent();
             }
             else
             {
-                sequencer->goToPreviousStep();
+                sequencer.lock()->goToPreviousStep();
             }
         });
 }
@@ -736,11 +736,11 @@ void StepEditorScreen::nextStepEvent()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->goToNextEvent();
+                sequencer.lock()->goToNextEvent();
             }
             else
             {
-                sequencer->goToNextStep();
+                sequencer.lock()->goToNextStep();
             }
         });
 }
@@ -754,12 +754,12 @@ void StepEditorScreen::prevBarStart()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->getTransport()->setPosition(0);
+                sequencer.lock()->getTransport()->setPosition(0);
             }
             else
             {
-                sequencer->getTransport()->setBar(
-                    sequencer->getTransport()->getCurrentBarIndex() - 1);
+                sequencer.lock()->getTransport()->setBar(
+                    sequencer.lock()->getTransport()->getCurrentBarIndex() - 1);
             }
         });
 }
@@ -773,13 +773,13 @@ void StepEditorScreen::nextBarEnd()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->getTransport()->setBar(
-                    sequencer->getSelectedSequence()->getLastBarIndex() + 1);
+                sequencer.lock()->getTransport()->setBar(
+                    sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1);
             }
             else
             {
-                sequencer->getTransport()->setBar(
-                    sequencer->getTransport()->getCurrentBarIndex() + 1);
+                sequencer.lock()->getTransport()->setBar(
+                    sequencer.lock()->getTransport()->getCurrentBarIndex() + 1);
             }
         });
 }
@@ -790,7 +790,7 @@ void StepEditorScreen::left()
         focusedFieldName.length() == 2 && getActiveColumn() == "a")
     {
         lastRow = getActiveRow();
-        ls->setFocus("view");
+        ls.lock()->setFocus("view");
     }
     else
     {
@@ -835,7 +835,7 @@ void StepEditorScreen::up()
             const auto eventType = visibleEvents[srcNumber]->getTypeName();
             lastColumn[eventType] = srcLetter;
             lastRow = 0;
-            ls->setFocus("view");
+            ls.lock()->setFocus("view");
             refreshSelection();
             return;
         }
@@ -849,7 +849,7 @@ void StepEditorScreen::up()
 
             const auto newEventType = visibleEvents[srcNumber]->getTypeName();
 
-            ls->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
+            ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
 
             if (mpc.getHardware()
                     ->getButton(hardware::ComponentId::SHIFT)
@@ -877,7 +877,7 @@ void StepEditorScreen::down()
         focusedFieldName == "fromnote" || focusedFieldName == "tonote")
     {
         auto eventType = visibleEvents[lastRow]->getTypeName();
-        ls->setFocus(lastColumn[eventType] + std::to_string(lastRow));
+        ls.lock()->setFocus(lastColumn[eventType] + std::to_string(lastRow));
         return;
     }
 
@@ -901,7 +901,7 @@ void StepEditorScreen::down()
             auto newEventType = visibleEvents[srcNumber]->getTypeName();
             auto newColumn = lastColumn[newEventType];
 
-            ls->setFocus(newColumn + "3");
+            ls.lock()->setFocus(newColumn + "3");
 
             if (mpc.getHardware()
                     ->getButton(hardware::ComponentId::SHIFT)
@@ -948,7 +948,7 @@ void StepEditorScreen::downOrUp(const int increment)
 
                 const auto newEventType =
                     visibleEvents[srcNumber + increment]->getTypeName();
-                ls->setFocus(lastColumn[newEventType] +
+                ls.lock()->setFocus(lastColumn[newEventType] +
                              std::to_string(srcNumber + increment));
             }
         }
@@ -1008,7 +1008,7 @@ void StepEditorScreen::refreshSelection()
 
     if (somethingSelected)
     {
-        ls->setFunctionKeysArrangement(1);
+        ls.lock()->setFunctionKeysArrangement(1);
     }
 }
 
@@ -1047,11 +1047,11 @@ StepEditorScreen::computeEventsAtCurrentTick() const
 {
     std::vector<std::shared_ptr<Event>> result;
 
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
     auto trackEvents = track->getEvents();
     for (auto &event : track->getEvents())
     {
-        if (event->getTick() == sequencer->getTransport()->getTickPosition())
+        if (event->getTick() == sequencer.lock()->getTransport()->getTickPosition())
         {
             if ((view == 0 || view == 1) &&
                 std::dynamic_pointer_cast<NoteOnEvent>(event))
@@ -1144,7 +1144,7 @@ void StepEditorScreen::refreshEventRows()
         if (event)
         {
             eventRow->Hide(false);
-            eventRow->setBus(sequencer->getSelectedTrack()->getBusType());
+            eventRow->setBus(sequencer.lock()->getSelectedTrack()->getBusType());
         }
         else
         {
@@ -1158,7 +1158,7 @@ void StepEditorScreen::refreshEventRows()
 
 void StepEditorScreen::updateComponents() const
 {
-    if (const auto track = sequencer->getSelectedTrack();
+    if (const auto track = sequencer.lock()->getSelectedTrack();
         view == 1 && isMidiBusType(track->getBusType()))
     {
         findField("fromnote")->Hide(false);
@@ -1197,7 +1197,7 @@ void StepEditorScreen::updateComponents() const
 
 void StepEditorScreen::setViewNotesText() const
 {
-    if (const auto track = sequencer->getSelectedTrack();
+    if (const auto track = sequencer.lock()->getSelectedTrack();
         view == 1 && isMidiBusType(track->getBusType()))
     {
         if (fromNote == NoDrumNoteAssigned)
@@ -1208,7 +1208,7 @@ void StepEditorScreen::setViewNotesText() const
         {
             const auto program = getProgramOrThrow();
             const auto padName =
-                sampler->getPadName(program->getPadIndexFromNote(fromNote));
+                sampler.lock()->getPadName(program->getPadIndexFromNote(fromNote));
             findField("fromnote")
                 ->setText(std::to_string(fromNote) + "/" + padName);
         }
@@ -1325,7 +1325,7 @@ void StepEditorScreen::setSelectionStartIndex(const int i)
     selectionStartIndex = i;
     selectionEndIndex = i;
 
-    ls->setFunctionKeysArrangement(1);
+    ls.lock()->setFunctionKeysArrangement(1);
     refreshSelection();
 }
 
@@ -1333,7 +1333,7 @@ void StepEditorScreen::clearSelection()
 {
     selectionStartIndex = -1;
     selectionEndIndex = -1;
-    ls->setFunctionKeysArrangement(0);
+    ls.lock()->setFunctionKeysArrangement(0);
     refreshSelection();
 }
 
@@ -1375,7 +1375,7 @@ void StepEditorScreen::setSelectedEvents()
 
 void StepEditorScreen::checkSelection()
 {
-    const std::string focus = ls->getFocusedFieldName();
+    const std::string focus = ls.lock()->getFocusedFieldName();
 
     if (focus.length() != 2)
     {
@@ -1427,7 +1427,7 @@ void StepEditorScreen::removeEvents()
             if (auto event = eventsAtCurrentTick[i];
                 !std::dynamic_pointer_cast<EmptyEvent>(event))
             {
-                const auto track = sequencer->getSelectedTrack();
+                const auto track = sequencer.lock()->getSelectedTrack();
                 track->removeEvent(event);
             }
         }
@@ -1469,7 +1469,7 @@ int StepEditorScreen::getYOffset() const
 
 void StepEditorScreen::adhocPlayNoteEvent(const EventState &noteEvent) const
 {
-    const auto track = sequencer->getSelectedTrack();
+    const auto track = sequencer.lock()->getSelectedTrack();
     mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
 }
 
@@ -1482,7 +1482,7 @@ void StepEditorScreen::resetYPosAndYOffset()
         return;
     }
 
-    ls->setFocus("a0");
+    ls.lock()->setFocus("a0");
 }
 
 std::string StepEditorScreen::getActiveColumn() const
@@ -1535,13 +1535,13 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
     const auto desiredColumn =
         lastColumn[computeVisibleEvents()[row]->getTypeName()];
 
-    ls->setFocus(desiredColumn + std::to_string(row));
+    ls.lock()->setFocus(desiredColumn + std::to_string(row));
 }
 
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
 {
-    const auto tick = sequencer->getTransport()->getTickPosition();
-    const auto track = sequencer->getSelectedTrack();
+    const auto tick = sequencer.lock()->getTransport()->getTickPosition();
+    const auto track = sequencer.lock()->getSelectedTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {
         if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))

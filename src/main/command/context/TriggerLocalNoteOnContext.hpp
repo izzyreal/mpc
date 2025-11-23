@@ -49,7 +49,7 @@ namespace mpc::command::context
     struct TriggerLocalNoteOnContext
     {
         performance::PerformanceEventSource source;
-        std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<performance::PerformanceManager> performanceManager;
         performance::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
         std::optional<ProgramPadIndex> programPadIndex;
@@ -70,7 +70,7 @@ namespace mpc::command::context
         bool isSamplerScreen;
 
         sequencer::Track *track;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
+        std::weak_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>
             timingCorrectScreen;
         std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
