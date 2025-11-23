@@ -453,7 +453,7 @@ void StepEditorScreen::function(int i)
                     if (auto noteEvent =
                             std::dynamic_pointer_cast<NoteOnEvent>(event))
                     {
-                        adhocPlayNoteEvent(noteEvent->getSnapshot().second);
+                        adhocPlayNoteEvent(noteEvent->getSnapshot());
                     }
                 }
             }
@@ -1546,7 +1546,7 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
     {
         if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            adhocPlayNoteEvent(noteEvent->getSnapshot().second);
+            adhocPlayNoteEvent(noteEvent->getSnapshot());
         }
     }
 }

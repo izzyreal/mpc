@@ -35,7 +35,13 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
-                activeState.events[m.payload.first] = m.payload.second;
+                for (auto &e : activeState.events)
+                {
+                    if (e.eventId == m.payload.eventId)
+                    {
+                        e = m.payload;
+                    }
+                }
             }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
@@ -146,7 +152,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                 auto &events = activeState.events;
                 auto it = std::find_if(events.begin(), events.end(), [eventId = m.eventId](const EventState &e){ return e.eventId == eventId;});
                 assert(it != events.end());
-                const auto oldIndex = events.begin() - it;
+                const auto oldIndex = it - events.begin();
                 const Tick newTick = m.newTick;
 
                 EventState ev = events[oldIndex];

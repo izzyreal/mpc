@@ -429,7 +429,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                     break;
                 }
 
-                EventState eventToInsert = event->getSnapshot().second;
+                EventState eventToInsert = event->getSnapshot();
 
                 eventToInsert.tick = tick;
                 t2->insertEvent(eventToInsert, true);

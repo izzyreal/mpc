@@ -492,7 +492,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq)
                 {
                     event->setTrack(track->getIndex());
                     ea.push_back(
-                        AllEvent::mpcEventToBytes(event->getSnapshot().second));
+                        AllEvent::mpcEventToBytes(event->getSnapshot()));
                 }
             }
         }

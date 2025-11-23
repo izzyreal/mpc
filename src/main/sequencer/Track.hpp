@@ -71,13 +71,14 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
         void timingCorrect(int fromBar, int toBar,
-                           const std::pair<EventId, EventState> &noteEvent,
+                           EventId,
+                           Tick eventTick,
                            int stepLength, int swingPercentage) const;
 
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
                               int swingPercentage) const;
 
-        void shiftTiming(const std::shared_ptr<Event> &, bool later, int amount,
+        void shiftTiming(EventId, Tick eventTick, bool later, int amount,
                          int lastTick) const;
 
         std::string getActualName();
@@ -90,7 +91,7 @@ namespace mpc::sequencer
         void setOn(bool b);
 
         void insertEvent(
-            const EventState &event,
+            EventState &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
             const std::function<void()> &onComplete = [] {});
 
@@ -143,10 +144,10 @@ namespace mpc::sequencer
 
         void purge();
 
-        std::pair<EventId, EventState>
+        EventState
             findRecordingNoteOnEventById(NoteEventId);
 
-        std::pair<EventId, EventState>
+        EventState
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         std::shared_ptr<TrackEventStateManager> getEventStateManager();
@@ -200,7 +201,7 @@ namespace mpc::sequencer
         std::vector<EventState> bulkNoteOns;
         std::vector<EventState> bulkNoteOffs;
 
-        void updateEventTick(const std::pair<EventId, EventState> &e,
+        void updateEventTick(EventId,
                              int newTick) const;
 
         void processRealtimeQueuedEvents();

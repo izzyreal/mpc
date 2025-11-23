@@ -12,7 +12,7 @@ namespace mpc::sequencer
         int getAmount() const;
 
         explicit PolyPressureEvent(
-            const std::function<std::pair<EventId, EventState>()>
+            const std::function<EventState()>
                 &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
 

@@ -3,7 +3,7 @@
 using namespace mpc::sequencer;
 
 MixerEvent::MixerEvent(
-    const std::function<std::pair<EventId, EventState>()> &getSnapshot,
+    const std::function<EventState()> &getSnapshot,
     const std::function<void(TrackEventMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch)
 {
@@ -12,35 +12,35 @@ MixerEvent::MixerEvent(
 void MixerEvent::setParameter(const int i) const
 {
     auto e = getSnapshot();
-    e.second.mixerParameter = i;
+    e.mixerParameter = i;
     dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getParameter() const
 {
-    return getSnapshot().second.mixerParameter;
+    return getSnapshot().mixerParameter;
 }
 
 void MixerEvent::setPadNumber(const int i) const
 {
     auto e = getSnapshot();
-    e.second.mixerPad = i;
+    e.mixerPad = i;
     dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getPad() const
 {
-    return getSnapshot().second.mixerPad;
+    return getSnapshot().mixerPad;
 }
 
 void MixerEvent::setValue(const int i) const
 {
     auto e = getSnapshot();
-    e.second.mixerValue = i;
+    e.mixerValue = i;
     dispatch(UpdateEvent{e});
 }
 
 int MixerEvent::getValue() const
 {
-    return getSnapshot().second.mixerValue;
+    return getSnapshot().mixerValue;
 }

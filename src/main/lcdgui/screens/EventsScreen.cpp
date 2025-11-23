@@ -765,7 +765,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
                     break;
                 }
 
-                EventState eventState = e->getSnapshot().second;
+                EventState eventState = e->getSnapshot();
                 eventState.tick = tickCandidate;
                 destTrack->insertEvent(eventState);
             }

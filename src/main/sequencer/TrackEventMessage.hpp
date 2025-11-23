@@ -47,7 +47,7 @@ namespace mpc::sequencer
 
     struct UpdateEvent
     {
-        std::pair<EventId, EventState> payload;
+        EventState payload;
     };
 
     using TrackEventMessage =

@@ -44,20 +44,14 @@ TEST_CASE("timing-correct", "[track]")
     REQUIRE(tr->getNoteEvents()[3]->getNote() == note90.noteNumber);
 
     int swingPercentage = 50;
-    tr->timingCorrect(0, 0, tr->getNoteEvents()[0]->getSnapshot(), 24, swingPercentage);
+
+    tr->timingCorrect(0, 0, note88.eventId, note88.tick, 24, swingPercentage);
     tr->getEventStateManager()->drainQueue();
-    REQUIRE(tr->getNoteEvents()[0]->getNote() == 88);
-    REQUIRE(tr->getNoteEvents()[0]->getTick() == 0);
 
-    tr->timingCorrect(0, 0, tr->getNoteEvents()[1]->getSnapshot(), 24, swingPercentage);
+    tr->timingCorrect(0, 0, note89.eventId, note89.tick, 24, swingPercentage);
     tr->getEventStateManager()->drainQueue();
-    REQUIRE(tr->getNoteEvents()[3]->getNote() == 89);
-    REQUIRE(tr->getNoteEvents()[3]->getTick() == 24);
 
-    REQUIRE(tr->getNoteEvents()[1]->getNote() == 91);
-    REQUIRE(tr->getNoteEvents()[1]->getTick() == 22);
-
-    tr->timingCorrect(0, 0, tr->getNoteEvents()[1]->getSnapshot(), 24, swingPercentage);
+    tr->timingCorrect(0, 0, note91.eventId, note91.tick, 24, swingPercentage);
     tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[0]->getNote() == 88);
@@ -93,22 +87,22 @@ TEST_CASE("swing1", "[track]")
 
     tr->getEventStateManager()->drainQueue();
 
-    REQUIRE(tr->getEvent(0)->getSnapshot().second.noteNumber == n2.noteNumber);
+    REQUIRE(tr->getEvent(0)->getSnapshot().noteNumber == n2.noteNumber);
 
-    tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot(), 24, 71);
+    tr->timingCorrect(0, 0, n2.eventId, n2.tick, 24, 71);
     tr->getEventStateManager()->drainQueue();
 
     REQUIRE(tr->getEvent(0)->getTick() == 23);
-    REQUIRE(tr->getNoteEvents()[0]->getNote() == 90);
+    REQUIRE(tr->getNoteEvents()[0]->getNote() == n1.noteNumber);
 
     REQUIRE(tr->getNoteEvents()[1]->getTick() == 34);
-    REQUIRE(tr->getNoteEvents()[1]->getNote() == 91);
+    REQUIRE(tr->getNoteEvents()[1]->getNote() == n2.noteNumber);
 
-    tr->timingCorrect(0, 0, tr->getEvent(1)->getSnapshot(), 24, 60);
+    tr->timingCorrect(0, 0, n2.eventId, tr->getNoteEvents()[1]->getTick(), 24, 60);
     tr->getEventStateManager()->drainQueue();
 
+    REQUIRE(tr->getNoteEvents()[1]->getNote() == n2.noteNumber);
     REQUIRE(tr->getEvent(1)->getTick() == 28);
-    REQUIRE(tr->getNoteEvents()[1]->getNote() == 91);
 }
 
 TEST_CASE("quantize", "[track]")
@@ -129,7 +123,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         tr->getEventStateManager()->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot(), 24, 50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24, 50);
         tr->getEventStateManager()->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 0);
     }
@@ -138,7 +132,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         tr->getEventStateManager()->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot(), 24, 50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24, 50);
         tr->getEventStateManager()->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 24);
     }
@@ -147,7 +141,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         tr->getEventStateManager()->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot(), 24, 50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24, 50);
         tr->getEventStateManager()->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 48);
     }

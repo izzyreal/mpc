@@ -655,7 +655,7 @@ void Sequence::insertBars(int barCount, const int afterBar)
             {
                 if (e->getTick() >= barStart)
                 {
-                    const auto es = e->getSnapshot().second;
+                    const auto es = e->getSnapshot();
                     const auto newTickPos = es.tick + (newBarStart - barStart);
                     e->setTick(newTickPos);
                 }

@@ -14,7 +14,7 @@ namespace mpc::sequencer
         int getValue() const;
 
         explicit MixerEvent(
-            const std::function<std::pair<EventId, EventState>()>
+            const std::function<EventState()>
                 &getSnapshot,
             const std::function<void(TrackEventMessage &&)> &dispatch);
 
