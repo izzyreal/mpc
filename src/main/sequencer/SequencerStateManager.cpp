@@ -21,6 +21,11 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 {
 }
 
+SequencerStateManager::~SequencerStateManager()
+{
+    printf("~SequencerStateManager\n");
+}
+
 void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 {
     std::visit(

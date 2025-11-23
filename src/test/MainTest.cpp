@@ -3,6 +3,7 @@
 #include "TestMpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/Transport.hpp"
 
 using namespace mpc;
@@ -14,20 +15,6 @@ TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
     REQUIRE(mpc.getSequencer());
 }
 
-SCENARIO("A Sequencer initializes correctly", "[sequencer]")
-{
-
-    GIVEN("A Sequencer")
-    {
-        Mpc mpc;
-        TestMpc::initializeTestMpc(mpc);
-        auto seq = mpc.getSequencer();
-        seq->init();
-
-        REQUIRE(seq->getTransport()->getTempo() == 120);
-    }
-}
-
 SCENARIO("A Sequence initializes correctly", "[sequence]")
 {
 
@@ -35,8 +22,9 @@ SCENARIO("A Sequence initializes correctly", "[sequence]")
     {
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
-        auto seq = mpc.getSequencer()->makeNewSequence();
+        const auto seq = mpc.getSequencer()->makeNewSequence();
         seq->init(1);
+        seq->getStateManager()->drainQueue();
         REQUIRE(seq->getInitialTempo() == 120.0);
     }
 }

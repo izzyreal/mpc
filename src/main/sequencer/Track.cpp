@@ -76,7 +76,7 @@ Track::Track(
 
 Track::~Track()
 {
-    printf("~Track\n");
+//    printf("~Track\n");
 }
 
 void Track::purge()

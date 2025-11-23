@@ -9,7 +9,7 @@ TrackEventStateManager::TrackEventStateManager()
 
 TrackEventStateManager::~TrackEventStateManager()
 {
-    printf("~TrackEventStateManager\n");
+//    printf("~TrackEventStateManager\n");
 }
 
 void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept

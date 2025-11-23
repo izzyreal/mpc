@@ -16,6 +16,8 @@ namespace mpc::sequencer
     public:
         explicit SequenceStateManager(Sequence *);
 
+        ~SequenceStateManager() override;
+
     protected:
         void applyMessage(const SequenceMessage &msg) noexcept override;
 
