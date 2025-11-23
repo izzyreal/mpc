@@ -11,6 +11,8 @@
 #include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
+#include "sequencer/SequenceStateManager.hpp"
+#include "sequencer/TrackEventStateManager.hpp"
 
 #include <thread>
 
@@ -43,6 +45,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
 
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);
+    seq->getStateManager()->drainQueue();
     seq->setInitialTempo(300);
     mpc::sequencer::EventState eventState;
     eventState.type = mpc::sequencer::EventType::NoteOn;
@@ -51,6 +54,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     eventState.velocity = mpc::MaxVelocity;
     eventState.duration = mpc::Duration(1);
     seq->getTrack(0)->insertEvent(eventState);
+    seq->getTrack(0)->getEventStateManager()->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);

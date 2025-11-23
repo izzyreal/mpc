@@ -67,4 +67,12 @@ void TrackEventStateWorker::work() const
             t->getEventStateManager()->drainQueue();
         }
     }
+
+    if (sequencer->getPlaceHolder())
+    {
+        for (const auto &t : sequencer->getPlaceHolder()->getTracks())
+        {
+            t->getEventStateManager()->drainQueue();
+        }
+    }
 }

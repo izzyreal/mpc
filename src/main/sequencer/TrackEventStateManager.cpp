@@ -168,6 +168,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
                 assert(m.eventIndex < activeState.events.size());
+                
                 activeState.events.erase(activeState.events.begin() +
                                          m.eventIndex);
             }

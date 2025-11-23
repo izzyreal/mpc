@@ -29,6 +29,7 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
+#include "TrackEventStateManager.hpp"
 #include "TrackEventStateWorker.hpp"
 
 #include <chrono>
@@ -362,8 +363,16 @@ void Sequencer::undoSeq()
     }
 
     auto s = copySequence(undoPlaceHolder);
+
     const auto selectedSequenceIndex = getSelectedSequenceIndex();
+
     auto copy = copySequence(sequences[selectedSequenceIndex]);
+    copy->getStateManager()->drainQueue();
+    for (const auto &t : copy->getTracks())
+    {
+        t->getEventStateManager()->drainQueue();
+    }
+
     undoPlaceHolder.swap(copy);
 
     sequences[selectedSequenceIndex].swap(s);
@@ -510,6 +519,7 @@ Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
     auto copy = makeNewSequence();
     copy->init(source->getLastBarIndex());
+    copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);
 
     for (int i = 0; i < 64; i++)

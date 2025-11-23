@@ -9,6 +9,7 @@
 
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
+#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/TrackEventStateManager.hpp"
 
 #include <vector>
@@ -29,11 +30,11 @@ SCENARIO("A MidiFile can be written", "[file]")
         auto sequencer = mpc.getSequencer();
         auto sequence = sequencer->getSequence(0);
         sequence->init(1);
+        sequence->getStateManager()->drainQueue();
         auto track0 = sequence->getTrack(0);
         auto track1 = sequence->getTrack(1);
         track0->setUsed(true);
         track0->setDeviceIndex(2);
-
 
         EventState eventState;
         eventState.type = EventType::NoteOn;
@@ -42,7 +43,6 @@ SCENARIO("A MidiFile can be written", "[file]")
         eventState.velocity = mpc::MaxVelocity;
         eventState.duration = mpc::Duration(10);
         track0->insertEvent(eventState);
-
         track0->getEventStateManager()->drainQueue();
 
         MidiWriter midiWriter(sequence.get());
@@ -50,6 +50,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         midiWriter.writeToOStream(ostream);
 
         sequence->init(1);
+        sequence->getStateManager()->drainQueue();
         track0->removeEvents();
         track0->getEventStateManager()->drainQueue();
         REQUIRE(track0->getEvents().empty());
@@ -57,6 +58,8 @@ SCENARIO("A MidiFile can be written", "[file]")
         auto istream = std::make_shared<std::istringstream>(ostream->str());
         MidiReader midiReader(istream, sequence);
         midiReader.parseSequence(mpc);
+        sequence->getStateManager()->drainQueue();
+        sequence->getTrack(0)->getEventStateManager()->drainQueue();
 
         REQUIRE(sequence->getTrack(0)->getEvents().size() == 1);
         REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
