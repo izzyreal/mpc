@@ -8,6 +8,7 @@ namespace mpc::sequencer
     struct EventState
     {
         // === BASE SECTION ===
+        EventId eventId;
         EventType type;
         TrackIndex trackIndex;
         Tick tick;
@@ -61,6 +62,7 @@ namespace mpc::sequencer
 
         void resetToDefaultValues()
         {
+            eventId = NoEventId;
             type = EventType::Unknown;
             trackIndex = NoTrackIndex;
 

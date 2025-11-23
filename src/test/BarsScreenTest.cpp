@@ -99,6 +99,8 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     seq->getTrack(0)->getEventStateManager()->drainQueue();
 
+    REQUIRE(seq->getTrack(0)->getEvents().size() == 8);
+
     auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;

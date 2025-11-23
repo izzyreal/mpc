@@ -39,6 +39,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
+                assert(m.eventState.eventId != NoEventId);
                 auto &events = activeState.events;
 
                 if (m.eventState.type == EventType::NoteOn &&
@@ -143,31 +144,32 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
                 auto &events = activeState.events;
-
-                const int oldIndex = m.eventIndex;
+                auto it = std::find_if(events.begin(), events.end(), [eventId = m.eventId](const EventState &e){ return e.eventId == eventId;});
+                assert(it != events.end());
+                const auto oldIndex = events.begin() - it;
                 const Tick newTick = m.newTick;
 
                 EventState ev = events[oldIndex];
 
                 events.erase(events.begin() + oldIndex);
 
-                auto it =
+                auto it2 =
                     std::lower_bound(events.begin(), events.end(), newTick,
                                      [](const EventState &e, Tick t)
                                      {
                                          return e.tick < t;
                                      });
 
-                events.insert(it, ev);
-                const auto newIndex = it - events.begin();
+                events.insert(it2, ev);
+                const auto newIndex = it2 - events.begin();
                 events[newIndex].tick = newTick;
             }
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
-                assert(m.eventIndex < activeState.events.size());
-
-                activeState.events.erase(activeState.events.begin() +
-                                         m.eventIndex);
+                auto &events = activeState.events;
+                auto it = std::find_if(events.begin(), events.end(), [eventId = m.eventId](const EventState &e){ return e.eventId == eventId;});
+                assert(it != events.end());
+                activeState.events.erase(it);
             }
         },
         msg);

@@ -10,7 +10,7 @@ TrackEventStateView::TrackEventStateView(
 {
 }
 
-std::optional<std::pair<mpc::EventIndex, EventState>>
+std::optional<std::pair<mpc::EventId, EventState>>
 TrackEventStateView::findNoteEvent(const int tick, const NoteNumber note) const
 {
     for (int i = 0; i < state->events.size(); ++i)
@@ -35,10 +35,10 @@ EventState TrackEventStateView::getEventByIndex(const EventIndex idx) const
     return {};
 }
 
-std::vector<std::pair<mpc::EventIndex, EventState>>
+std::vector<std::pair<mpc::EventId, EventState>>
 TrackEventStateView::getEventRange(const int startTick, const int endTick) const
 {
-    std::vector<std::pair<EventIndex, EventState>> result;
+    std::vector<std::pair<EventId, EventState>> result;
 
     for (int i = 0; i < state->events.size(); ++i)
     {
@@ -66,10 +66,10 @@ int TrackEventStateView::getEventCount() const
     return state->events.size();
 }
 
-std::vector<std::pair<mpc::EventIndex, EventState>>
+std::vector<std::pair<mpc::EventId, EventState>>
 TrackEventStateView::getNoteEvents() const
 {
-    std::vector<std::pair<EventIndex, EventState>> result;
+    std::vector<std::pair<EventId, EventState>> result;
 
     for (int i = 0; i < state->events.size(); ++i)
     {
@@ -82,7 +82,7 @@ TrackEventStateView::getNoteEvents() const
     return result;
 }
 
-std::pair<mpc::EventIndex, EventState>
+std::pair<mpc::EventId, EventState>
 TrackEventStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
@@ -96,7 +96,7 @@ TrackEventStateView::findRecordingNoteOnByNoteNumber(
     return {};
 }
 
-std::pair<mpc::EventIndex, EventState>
+std::pair<mpc::EventId, EventState>
 TrackEventStateView::findRecordingNoteOnByNoteEventId(
     const NoteEventId id) const
 {
@@ -107,5 +107,19 @@ TrackEventStateView::findRecordingNoteOnByNoteEventId(
             return e;
         }
     }
+    return {};
+}
+
+std::pair<mpc::EventId, EventState>
+TrackEventStateView::getEventById(EventId eventId) const
+{
+    for (auto &e : state->events)
+    {
+        if (e.eventId == eventId)
+        {
+            return {eventId, e};
+        }
+    }
+
     return {};
 }

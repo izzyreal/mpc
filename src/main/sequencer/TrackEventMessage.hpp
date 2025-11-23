@@ -32,12 +32,12 @@ namespace mpc::sequencer
 
     struct RemoveEvent
     {
-        EventIndex eventIndex;
+        EventId eventId;
     };
 
     struct UpdateEventTick
     {
-        EventIndex eventIndex;
+        EventId eventId;
         Tick newTick;
     };
 
@@ -47,7 +47,7 @@ namespace mpc::sequencer
 
     struct UpdateEvent
     {
-        std::pair<EventIndex, EventState> payload;
+        std::pair<EventId, EventState> payload;
     };
 
     using TrackEventMessage =

@@ -8,11 +8,13 @@
 
 namespace mpc::sequencer
 {
+    class TrackEventStateManager;
     class Event;
     class Sequence;
 
     std::shared_ptr<Event> mapEventStateToEvent(
+        std::shared_ptr<TrackEventStateManager>,
         const EventState &,
         const std::function<void(TrackEventMessage &&)> &dispatch,
-        EventIndex eventIndex, Sequence *parent);
+        Sequence *parent);
 } // namespace mpc::sequencer

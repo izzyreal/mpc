@@ -11,17 +11,20 @@
 #include "ProgramChangeEvent.hpp"
 #include "SystemExclusiveEvent.hpp"
 #include "TempoChangeEvent.hpp"
+#include "TrackEventStateManager.hpp"
 
 namespace mpc::sequencer
 {
+    class TrackEventStateManager;
     std::shared_ptr<Event> mapEventStateToEvent(
+        std::shared_ptr<TrackEventStateManager> stateManager,
         const EventState &e,
         const std::function<void(TrackEventMessage &&)> &dispatch,
-        const EventIndex eventIndex, Sequence *parent)
+        Sequence *parent)
     {
-        auto getSnapshot = [eventIndex, e]
+        auto getSnapshot = [eventId = e.eventId, stateManager]
         {
-            return std::pair{eventIndex, e};
+            return stateManager->getSnapshot().getEventById(eventId);
         };
 
         if (e.type == EventType::NoteOn)
