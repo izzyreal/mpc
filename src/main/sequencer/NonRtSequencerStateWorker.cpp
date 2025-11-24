@@ -44,7 +44,7 @@ void NonRtSequencerStateWorker::start()
             while (running.load())
             {
                 work();
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(std::chrono::milliseconds(3));
             }
         });
 }
@@ -61,25 +61,7 @@ void NonRtSequencerStateWorker::stop()
 
 void NonRtSequencerStateWorker::work() const
 {
-    // for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
-    // {
-    //     if (!sequencer->getSequence(i)->isUsed())
-    //     {
-    //         continue;
-    //     }
-    //     for (const auto &t : sequencer->getSequence(i)->getTracks())
-    //     {
-    //         t->getEventStateManager()->drainQueue();
-    //     }
-    // }
-    //
-    // if (sequencer->getPlaceHolder())
-    // {
-    //     for (const auto &t : sequencer->getPlaceHolder()->getTracks())
-    //     {
-    //         t->getEventStateManager()->drainQueue();
-    //     }
-    // }
+    sequencer->getNonRtStateManager()->drainQueue();
 }
 
 PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const

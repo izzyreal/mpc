@@ -133,8 +133,8 @@ namespace mpc::sequencer
             std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
-        std::shared_ptr<NonRtSequencerStateWorker> nonRtSequencerStateWorker;
         std::shared_ptr<NonRtSequencerStateManager> nonRtSequencerStateManager;
+        std::shared_ptr<NonRtSequencerStateWorker> nonRtSequencerStateWorker;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
