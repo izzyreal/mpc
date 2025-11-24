@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EventState.hpp"
+#include "PlaybackState.hpp"
 
 #include <thread>
 #include <atomic>
@@ -8,18 +9,6 @@
 namespace mpc::sequencer
 {
     class Sequencer;
-
-    struct RenderedEventState
-    {
-        EventState eventState;
-        TimeInSamples timeInSamples;
-    };
-
-    struct PlaybackState
-    {
-        TimeInSamples timeInSamples;
-        std::vector<RenderedEventState> events;
-    };
 
     class TrackEventStateWorker
     {

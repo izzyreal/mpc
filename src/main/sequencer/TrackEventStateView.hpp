@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PlaybackState.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <memory>
@@ -33,6 +34,8 @@ namespace mpc::sequencer
         EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
 
         EventState getEventById(EventId) const;
+
+        PlaybackState getPlaybackState() const;
 
     private:
         const std::shared_ptr<const TrackEventState> state;
