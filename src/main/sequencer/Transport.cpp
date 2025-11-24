@@ -8,7 +8,6 @@
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
-#include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
@@ -646,7 +645,6 @@ void Transport::setClock(int i) const
 }
 
 void Transport::setPosition(const double positionQuarterNotes,
-                            const bool shouldSyncTrackEventIndicesToNewPosition,
                             const bool shouldSetPlayStartPosition) const
 {
     const bool songMode = sequencer.isSongModeEnabled();
@@ -693,27 +691,12 @@ void Transport::setPosition(const double positionQuarterNotes,
             SetPlayStartPositionQuarterNotes{wrappedNewPosition});
     }
 
-    if (shouldSyncTrackEventIndicesToNewPosition)
-    {
-        sequence->syncTrackEventIndices(
-            Sequencer::quarterNotesToTicks(wrappedNewPosition));
-        if (sequencer.isSecondSequenceEnabled())
-        {
-            const auto secondSequenceScreen =
-                sequencer.getScreens()->get<ScreenId::SecondSeqScreen>();
-            sequencer.getSequence(secondSequenceScreen->getSq())
-                ->syncTrackEventIndices(
-                    Sequencer::quarterNotesToTicks(wrappedNewPosition));
-        }
-    }
-
     sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
 }
 
 void Transport::setPositionWithinSong(
     const double positionQuarterNotes,
-    const bool shouldSyncTrackEventIndicesToNewPosition,
-    const bool shouldSetPlayStartPosition)
+    const bool shouldSetPlayStartPosition) const
 {
     if (!screengroups::isSongScreen(
             sequencer.layeredScreen->getCurrentScreen()))
@@ -793,20 +776,7 @@ void Transport::setPositionWithinSong(
             }
 
             setPosition(finalPosQuarterNotes,
-                        shouldSyncTrackEventIndicesToNewPosition,
                         shouldSetPlayStartPosition);
-
-            if (shouldSyncTrackEventIndicesToNewPosition)
-            {
-                const auto offsetWithinStepTicks =
-                    Sequencer::quarterNotesToTicks(
-                        offsetWithinStepQuarterNotes);
-                playedStepRepetitions =
-                    std::floor(offsetWithinStepTicks /
-                               static_cast<float>(sequence->getLastTick()));
-                sequence->syncTrackEventIndices(offsetWithinStepTicks %
-                                                sequence->getLastTick());
-            }
             break;
         }
     }

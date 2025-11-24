@@ -136,8 +136,6 @@ namespace mpc::sequencer
         int getLastTickOfBar(int index) const;
         int getFirstTickOfBeat(int bar, int beat) const;
 
-        void syncTrackEventIndices(int tick) const;
-
         std::shared_ptr<Track> getTempoChangeTrack();
 
         StartTime &getStartTime();

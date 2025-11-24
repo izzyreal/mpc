@@ -809,22 +809,6 @@ int Sequence::getLastTickOfBar(const int index) const
     return getFirstTickOfBar(index) + snapshot.getBarLength(index) - 1;
 }
 
-void Sequence::syncTrackEventIndices(const int tick) const
-{
-    if (!isUsed() || tick > getLastTick())
-    {
-        return;
-    }
-
-    for (auto &t : tracks)
-    {
-        if (t->isUsed())
-        {
-            t->syncEventIndex(tick, tick);
-        }
-    }
-}
-
 Sequence::StartTime &Sequence::getStartTime()
 {
     return startTime;

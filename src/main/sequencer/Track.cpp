@@ -14,12 +14,9 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
-#include "lcdgui/screens/VmpcSettingsScreen.hpp"
-
 #include <concurrentqueue.h>
 
 #include <memory>
-#include <limits>
 
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
@@ -178,48 +175,6 @@ void Track::printEvents() const
     }
 }
 
-void Track::syncEventIndex(const int currentTick, const int previousTick)
-{
-    if (currentTick == 0)
-    {
-        playEventIndex = EventIndex(0);
-        return;
-    }
-
-    int startIndex = 0;
-
-    const auto snapshot = getSnapshot();
-    const auto eventCount = snapshot->getEventCount();
-
-    if (currentTick > previousTick)
-    {
-        if (playEventIndex == eventCount)
-        {
-            return;
-        }
-
-        startIndex = playEventIndex;
-    }
-
-    if (currentTick < previousTick && playEventIndex == 0)
-    {
-        return;
-    }
-
-    auto result{EventIndex(eventCount)};
-
-    for (int i = startIndex; i < eventCount; i++)
-    {
-        if (snapshot->getEventByIndex(EventIndex(i)).tick >= currentTick)
-        {
-            result = EventIndex(i);
-            break;
-        }
-    }
-
-    playEventIndex = result;
-}
-
 void Track::setTrackIndex(const TrackIndex i)
 {
     trackIndex = i;
@@ -334,10 +289,9 @@ void Track::removeEvent(const EventId eventId) const
     dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), eventId});
 }
 
-void Track::removeEvents()
+void Track::removeEvents() const
 {
     dispatch(ClearEvents{parent->getSequenceIndex(), getIndex()});
-    playEventIndex = EventIndex(0);
 }
 
 void Track::setVelocityRatio(int i)
@@ -543,12 +497,10 @@ void Track::processRealtimeQueuedEvents()
                 noteOff.tick = newTick;
 
                 auto duration = noteOff.tick - noteOn.tick;
-                bool fixEventIndex = false;
 
                 if (noteOff.tick < noteOn.tick)
                 {
                     duration = parent->getLastTick() - noteOn.tick;
-                    fixEventIndex = true;
                 }
 
                 if (duration < 1)
@@ -558,11 +510,6 @@ void Track::processRealtimeQueuedEvents()
 
                 noteOn.duration = Duration(duration);
                 insertEvent(noteOn);
-
-                if (fixEventIndex)
-                {
-                    playEventIndex = playEventIndex - 1;
-                }
 
                 needsToBeRequeued = false;
             }
@@ -577,227 +524,6 @@ void Track::processRealtimeQueuedEvents()
             queuedNoteOnEvents->enqueue(noteOn);
         }
     }
-}
-
-int Track::getNextEventTick()
-{
-    const auto snapshot = getSnapshot();
-
-    if (playEventIndex >= snapshot->getEventCount())
-    {
-        processRealtimeQueuedEvents();
-        return std::numeric_limits<int>::max();
-    }
-
-    processRealtimeQueuedEvents();
-    return snapshot->getEventByIndex(playEventIndex).tick;
-}
-
-std::optional<EventState> Track::getNextEventAndIncrementEventIndex()
-{
-    const auto snapshot = getSnapshot();
-    const auto eventCount = snapshot->getEventCount();
-
-    if (playEventIndex >= eventCount)
-    {
-        return std::nullopt;
-    }
-
-    auto event = snapshot->getEventByIndex(playEventIndex);
-
-    while (event.tick < getTickPosition())
-    {
-        playEventIndex = playEventIndex + 1;
-
-        if (playEventIndex >= eventCount)
-        {
-            return std::nullopt;
-        }
-
-        event = snapshot->getEventByIndex(playEventIndex);
-    }
-
-    if constexpr (constexpr bool shouldBeDeleted = false)
-    {
-        dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), event.eventId});
-        return std::nullopt;
-    }
-
-    if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
-    {
-        playEventIndex = playEventIndex + 1;
-        return event;
-    }
-
-    playEventIndex = playEventIndex + 1;
-    return std::nullopt;
-}
-
-void Track::playNext()
-{
-    const auto snapshot = getSnapshot();
-    const auto eventCount = snapshot->getEventCount();
-
-    if (playEventIndex >= eventCount)
-    {
-        return;
-    }
-
-    auto event = snapshot->getEventByIndex(playEventIndex);
-
-    while (event.tick < getTickPosition())
-    {
-        playEventIndex = playEventIndex + 1;
-
-        if (playEventIndex >= eventCount)
-        {
-            return;
-        }
-
-        event = snapshot->getEventByIndex(playEventIndex);
-    }
-
-    const auto recordingModeIsMulti = isRecordingModeMulti();
-    const auto isActiveTrackIndex = trackIndex == getActiveTrackIndex();
-    auto _delete = isRecording() &&
-                   (isActiveTrackIndex || recordingModeIsMulti) &&
-                   trackIndex < 64;
-
-    const auto pos = getTickPosition();
-
-    if (isRecording() && isPunchEnabled() && trackIndex < 64)
-    {
-        _delete = false;
-
-        if (getAutoPunchMode() == 0 && pos >= getPunchInTime())
-        {
-            _delete = true;
-        }
-
-        if (getAutoPunchMode() == 1 && pos < getPunchOutTime())
-        {
-            _delete = true;
-        }
-
-        if (getAutoPunchMode() == 2 && pos >= getPunchInTime() &&
-            pos < getPunchOutTime())
-        {
-            _delete = true;
-        }
-    }
-
-    if (event.type == EventType::NoteOn)
-    {
-        if (const auto drumBus =
-                std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busType));
-            drumBus && isOverdubbing() && isEraseButtonPressed() &&
-            (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
-            drumBus)
-        {
-            const auto programIndex = drumBus->getProgramIndex();
-            const auto program = sampler->getProgram(programIndex);
-
-            const auto noteNumber = event.noteNumber;
-
-            bool oneOrMorePadsArePressed = false;
-            bool noteIsPressed = false;
-
-            for (int programPadIndex = 0; programPadIndex < 64;
-                 ++programPadIndex)
-            {
-                if (isProgramPadPressed(ProgramPadIndex(programPadIndex),
-                                        programIndex))
-                {
-                    oneOrMorePadsArePressed = true;
-
-                    if (program->getNoteFromPad(
-                            ProgramPadIndex(programPadIndex)) == noteNumber)
-                    {
-                        noteIsPressed = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!_delete && oneOrMorePadsArePressed && isSixteenLevelsEnabled())
-            {
-                const auto vmpcSettingsScreen =
-                    getScreens()->get<ScreenId::VmpcSettingsScreen>();
-                const auto assign16LevelsScreen =
-                    getScreens()->get<ScreenId::Assign16LevelsScreen>();
-
-                if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
-                {
-                    _delete = true;
-                }
-                else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
-                {
-                    const auto varValue = event.noteVariationValue;
-                    const auto _16l_key =
-                        assign16LevelsScreen->getOriginalKeyPad();
-                    const auto _16l_type = assign16LevelsScreen->getType();
-
-                    for (int programPadIndex = 0; programPadIndex < 64;
-                         ++programPadIndex)
-                    {
-                        if (!isProgramPadPressed(
-                                ProgramPadIndex(programPadIndex), programIndex))
-                        {
-                            continue;
-                        }
-
-                        int wouldBeVarValue;
-                        const int padIndexWithoutBank = programPadIndex % 16;
-
-                        if (_16l_type == 0)
-                        {
-                            const auto diff = padIndexWithoutBank - _16l_key;
-                            auto candidate = 64 + diff * 5;
-
-                            if (candidate > 124)
-                            {
-                                candidate = 124;
-                            }
-                            else if (candidate < 4)
-                            {
-                                candidate = 4;
-                            }
-
-                            wouldBeVarValue = candidate;
-                        }
-                        else
-                        {
-                            wouldBeVarValue = static_cast<int>(
-                                floor(100 / 16.0) * padIndexWithoutBank);
-                        }
-
-                        if (varValue == wouldBeVarValue)
-                        {
-                            _delete = true;
-                        }
-                    }
-                }
-            }
-
-            if (!_delete && noteIsPressed)
-            {
-                _delete = true;
-            }
-        }
-    }
-
-    if (_delete)
-    {
-        dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), event.eventId});
-        return;
-    }
-
-    if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
-    {
-        eventHandler->handleFinalizedEvent(event, this, 0);
-    }
-
-    playEventIndex = playEventIndex + 1;
 }
 
 bool Track::isOn() const

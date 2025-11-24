@@ -36,12 +36,10 @@ namespace mpc::sequencer
         void setRecording(bool b);
         void setOverdubbing(bool b);
         void setPosition(double positionQuarterNotes,
-                         bool shouldSyncTrackEventIndicesToNewPosition = true,
                          bool shouldSetPlayStartPosition = true) const;
         void setPositionWithinSong(
             double positionQuarterNotes,
-            bool shouldSyncTrackEventIndicesToNewPosition = true,
-            bool shouldSetPlayStartPosition = true);
+            bool shouldSetPlayStartPosition = true) const;
         void bumpPositionByTicks(uint8_t tickCount) const;
         bool isPlaying() const;
         bool isRecording() const;

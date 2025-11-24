@@ -182,53 +182,6 @@ std::shared_ptr<Track> Sequencer::getSelectedTrack()
     return getSelectedSequence()->getTrack(selectedTrackIndex);
 }
 
-void Sequencer::playToTick(const int targetTick) const
-{
-    const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
-                                              : getSelectedSequenceIndex();
-    auto seq = sequences[seqIndex].get();
-    const auto secondSequenceScreen =
-        getScreens()->get<ScreenId::SecondSeqScreen>();
-
-    for (int i = 0; i < 2; i++)
-    {
-        if (i == 1)
-        {
-            if (!secondSequenceEnabled.load() ||
-                transport->isMetronomeOnlyEnabled() ||
-                secondSequenceScreen->sq ==
-                    seqIndex) // Real 2KXL would play all events twice (i.e.
-                              // double as loud as normal) for the last clause
-            {
-                break;
-            }
-
-            seq = sequences[secondSequenceScreen->sq].get();
-
-            if (!seq->isUsed())
-            {
-                break;
-            }
-        }
-
-        if (!transport->isMetronomeOnlyEnabled())
-        {
-            for (const auto &track : seq->getTracks())
-            {
-                while (track->getNextEventTick() <= targetTick)
-                {
-                    track->playNext();
-                }
-            }
-        }
-
-        while (seq->getTempoChangeTrack()->getNextEventTick() <= targetTick)
-        {
-            seq->getTempoChangeTrack()->playNext();
-        }
-    }
-}
-
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
     auto index = -1;
@@ -386,15 +339,7 @@ void Sequencer::undoSeq()
     }
 
     sequences[UndoSequenceIndex].swap(sequences[getSelectedSequenceIndex()]);
-
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-
-    sequences[getSelectedSequenceIndex()]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
-
     undoSeqAvailable = !undoSeqAvailable;
-
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
 }
@@ -403,10 +348,6 @@ void Sequencer::setSequence(const SequenceIndex sequenceIndex,
                             std::shared_ptr<Sequence> s)
 {
     sequences[sequenceIndex].swap(s);
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[sequenceIndex]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
 }
 
 void Sequencer::purgeAllSequences()
@@ -512,11 +453,6 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 void Sequencer::purgeSequence(const int i)
 {
     sequences[i] = makeNewSequence(SequenceIndex(i));
-
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[i]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
     sequences[i]->setName(res);
@@ -524,11 +460,7 @@ void Sequencer::purgeSequence(const int i)
 
 void Sequencer::copySequence(const int source, const int destination)
 {
-    auto copy = copySequence(sequences[source], SequenceIndex(destination));
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[destination]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
+    copySequence(sequences[source], SequenceIndex(destination));
     sequences[destination]->initLoop();
 }
 
@@ -1128,8 +1060,6 @@ void Sequencer::clearPlaceHolder() const
 void Sequencer::movePlaceHolderTo(const int destIndex)
 {
     sequences[destIndex].swap(sequences[PlaceholderSequenceIndex]);
-    sequences[destIndex]->syncTrackEventIndices(quarterNotesToTicks(
-        stateManager->getSnapshot().getPositionQuarterNotes()));
     clearPlaceHolder();
 }
 
