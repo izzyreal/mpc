@@ -12,7 +12,7 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 #include <thread>
 

@@ -10,7 +10,7 @@
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 #include <vector>
 

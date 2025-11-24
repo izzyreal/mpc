@@ -2,7 +2,8 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "TrackEventMessage.hpp"
+#include "NonRtSequencerMessage.hpp"
+#include "NonRtSequencerStateView.hpp"
 
 #include "sequencer/EventState.hpp"
 
@@ -35,7 +36,6 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
-    class TrackEventStateManager;
     class Sequence;
     class Event;
     class NoteOnEvent;
@@ -45,6 +45,8 @@ namespace mpc::sequencer
     {
     public:
         Track(
+            const std::function<std::shared_ptr<NonRtTrackStateView>()> &getSnapshot,
+            const std::function<void(NonRtSequencerMessage&&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -149,15 +151,13 @@ namespace mpc::sequencer
 
         EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
-        std::shared_ptr<TrackEventStateManager> getEventStateManager();
-
         void printEvents() const;
 
     private:
         EventId nextEventId = MinEventId;
         EventIndex playEventIndex{0};
-        std::shared_ptr<TrackEventStateManager> eventStateManager;
-        std::function<void(TrackEventMessage &&)> dispatch;
+        std::function<std::shared_ptr<NonRtTrackStateView>()> getSnapshot;
+        std::function<void(NonRtSequencerMessage &&)> dispatch;
         BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};

@@ -21,8 +21,8 @@
 
 #include "hardware/Component.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
-#include "sequencer/TrackEventStateWorker.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/NonRtSequencerStateWorker.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -107,7 +107,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 //
 //     auto seq = mpc.getSequencer();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//     seq->trackEventStateWorker->start();
+//     seq->NonRtSequencerStateWorker->start();
 //     seq->getTransport()->setCountEnabled(false);
 //
 //     auto sequence = seq->getSelectedSequence();
@@ -247,7 +247,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     sequencer->getTransport()->setTempo(119);
 
-    sequencer->trackEventStateWorker->work();
+    sequencer->NonRtSequencerStateWorker->work();
 
     REQUIRE(seq1->getInitialTempo() == 119);
 
@@ -257,7 +257,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     seq2->getStateManager()->drainQueue();
 
-    sequencer->trackEventStateWorker->work();
+    sequencer->NonRtSequencerStateWorker->work();
 
     REQUIRE(seq2->getTempoChangeEvents().size() == 1);
     REQUIRE(seq2->getInitialTempo() == 119);

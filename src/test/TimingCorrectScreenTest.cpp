@@ -7,7 +7,7 @@
 #include "TestMpc.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;

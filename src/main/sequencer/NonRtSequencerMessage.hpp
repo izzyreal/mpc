@@ -10,10 +10,13 @@ namespace mpc::sequencer
 {
     struct ClearEvents
     {
+        SequenceIndex sequence;
+        TrackIndex track;
     };
 
     struct UpdateTrackIndexOfAllEvents
     {
+        SequenceIndex sequence;
         TrackIndex trackIndex;
     };
 
@@ -32,17 +35,21 @@ namespace mpc::sequencer
 
     struct RemoveEvent
     {
+        SequenceIndex sequence;
+        TrackIndex track;
         EventId eventId;
     };
 
     struct UpdateEventTick
     {
-        EventId eventId;
+        EventState eventState;
         Tick newTick;
     };
 
     struct RemoveDoubles
     {
+        SequenceIndex sequence;
+        TrackIndex track;
     };
 
     struct UpdateEvent
@@ -50,7 +57,7 @@ namespace mpc::sequencer
         EventState payload;
     };
 
-    using TrackEventMessage =
+    using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent>;

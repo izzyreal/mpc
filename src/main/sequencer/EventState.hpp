@@ -10,6 +10,7 @@ namespace mpc::sequencer
         // === BASE SECTION ===
         EventId eventId;
         EventType type;
+        SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
         Tick tick;
 
@@ -64,6 +65,7 @@ namespace mpc::sequencer
         {
             eventId = NoEventId;
             type = EventType::Unknown;
+            sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
 
             tick = NoTick;

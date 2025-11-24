@@ -1,18 +1,18 @@
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
 
-TrackEventStateManager::TrackEventStateManager()
-    : AtomicStateExchange([](TrackEventState &) {})
+NonRtSequencerStateManager::NonRtSequencerStateManager()
+    : AtomicStateExchange([](NonRtSequencerState &) {})
 {
 }
 
-TrackEventStateManager::~TrackEventStateManager()
+NonRtSequencerStateManager::~NonRtSequencerStateManager()
 {
-    //    printf("~TrackEventStateManager\n");
+    //    printf("~NonRtSequencerStateManager\n");
 }
 
-void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
+void NonRtSequencerStateManager::applyMessage(const NonRtSequencerMessage &msg) noexcept
 {
     std::visit(
         [&](auto &&m)
@@ -20,14 +20,14 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             using T = std::decay_t<decltype(m)>;
             if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
             {
-                for (auto &e : activeState.events)
+                for (auto &e : activeState.sequences[m.sequence].tracks[m.trackIndex].events)
                 {
                     e.trackIndex = m.trackIndex;
                 }
             }
             else if constexpr (std::is_same_v<T, FinalizeNonLiveNoteEvent>)
             {
-                for (auto &e : activeState.events)
+                for (auto &e : activeState.sequences[m.noteOnEvent.sequenceIndex].tracks[m.noteOnEvent.trackIndex].events)
                 {
                     if (e.beingRecorded && e.duration == NoDuration &&
                         e.noteNumber == m.noteOnEvent.noteNumber)
@@ -40,7 +40,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
-                for (auto &e : activeState.events)
+                for (auto &e : activeState.sequences[m.payload.sequenceIndex].tracks[m.payload.trackIndex].events)
                 {
                     if (e.eventId == m.payload.eventId)
                     {
@@ -51,7 +51,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
                 assert(m.eventState.eventId != NoEventId);
-                auto &events = activeState.events;
+                auto &events = activeState.sequences[m.eventState.sequenceIndex].tracks[m.eventState.trackIndex].events;
 
                 if (m.eventState.type == EventType::NoteOn &&
                     !m.allowMultipleNoteEventsWithSameNoteOnSameTick)
@@ -100,7 +100,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)
             {
-                activeState.events.clear();
+                activeState.sequences[m.sequence].tracks[m.track].events.clear();
             }
             else if constexpr (std::is_same_v<T, RemoveDoubles>)
             {
@@ -109,7 +109,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                 std::vector<int> notesAtTick;
                 int lastTick = -100;
 
-                auto &events = activeState.events;
+                auto &events = activeState.sequences[m.sequence].tracks[m.track].events;
 
                 for (auto &e : events)
                 {
@@ -154,10 +154,10 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
-                auto &events = activeState.events;
+                auto &events = activeState.sequences[m.eventState.sequenceIndex].tracks[m.eventState.trackIndex].events;
                 auto it =
                     std::find_if(events.begin(), events.end(),
-                                 [eventId = m.eventId](const EventState &e)
+                                 [eventId = m.eventState.eventId](const EventState &e)
                                  {
                                      return e.eventId == eventId;
                                  });
@@ -182,7 +182,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
-                auto &events = activeState.events;
+                auto &events = activeState.sequences[m.sequence].tracks[m.track].events;
                 auto it =
                     std::find_if(events.begin(), events.end(),
                                  [eventId = m.eventId](const EventState &e)
@@ -190,7 +190,7 @@ void TrackEventStateManager::applyMessage(const TrackEventMessage &msg) noexcept
                                      return e.eventId == eventId;
                                  });
                 assert(it != events.end());
-                activeState.events.erase(it);
+                events.erase(it);
             }
         },
         msg);

@@ -9,7 +9,7 @@
 #include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;

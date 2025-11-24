@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 ControlChangeEvent::ControlChangeEvent(
     const std::function<EventState()> &getSnapshot,
-    const std::function<void(TrackEventMessage &&)> &dispatch)
+    const std::function<void(NonRtSequencerMessage &&)> &dispatch)
     : Event(getSnapshot, dispatch)
 {
 }

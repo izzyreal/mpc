@@ -8,7 +8,7 @@
 #include "lcdgui/screens/BarsScreen.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;

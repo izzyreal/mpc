@@ -8,7 +8,7 @@ EmptyEvent::EmptyEvent()
           {
               return EventState();
           },
-          [](TrackEventMessage &&) {})
+          [](NonRtSequencerMessage &&) {})
 {
     // very empty indeed.
 }

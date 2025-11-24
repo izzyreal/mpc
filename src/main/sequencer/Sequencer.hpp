@@ -2,6 +2,8 @@
 
 #include "BusType.hpp"
 #include "IntTypes.hpp"
+#include "NonRtSequencerMessage.hpp"
+#include "NonRtSequencerStateView.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -38,8 +40,9 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    class NonRtSequencerStateManager;
     class SequencerStateManager;
-    class TrackEventStateWorker;
+    class NonRtSequencerStateWorker;
     class Transport;
     class Sequence;
     class Bus;
@@ -131,7 +134,8 @@ namespace mpc::sequencer
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
         std::shared_ptr<Sequence> undoPlaceHolder;
-        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
+        std::shared_ptr<NonRtSequencerStateWorker> nonRtSequencerStateWorker;
+        std::shared_ptr<NonRtSequencerStateManager> nonRtSequencerStateManager;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
@@ -164,9 +168,14 @@ namespace mpc::sequencer
                                         const std::shared_ptr<Track> &dest);
 
         std::shared_ptr<SequencerStateManager> getStateManager() const;
+        std::shared_ptr<NonRtSequencerStateManager> getNonRtStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
-        std::shared_ptr<Sequence> makeNewSequence();
+        std::shared_ptr<Sequence> makeNewSequence(
+            SequenceIndex sequenceIndex,
+        std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt,
+        std::function<void(NonRtSequencerMessage&&)> dispatchNonRt
+        );
 
         void init();
         bool isSoloEnabled() const;

@@ -29,8 +29,8 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
-#include "TrackEventStateManager.hpp"
-#include "TrackEventStateWorker.hpp"
+#include "NonRtSequencerStateManager.hpp"
+#include "NonRtSequencerStateWorker.hpp"
 
 #include <chrono>
 
@@ -91,8 +91,10 @@ Sequencer::Sequencer(
       getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-    trackEventStateWorker = std::make_shared<TrackEventStateWorker>(this);
+    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
+    nonRtSequencerStateWorker = std::make_shared<NonRtSequencerStateWorker>(this);
 }
+
 Sequencer::~Sequencer()
 {
     printf("~Sequencer\n");
@@ -101,6 +103,12 @@ Sequencer::~Sequencer()
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
     return stateManager;
+}
+
+std::shared_ptr<NonRtSequencerStateManager>
+Sequencer::getNonRtStateManager() const
+{
+    return nonRtSequencerStateManager;
 }
 
 std::shared_ptr<Transport> Sequencer::getTransport()
@@ -151,7 +159,7 @@ void Sequencer::init()
         songs[i] = std::make_shared<Song>();
     }
 
-    trackEventStateWorker->start();
+    nonRtSequencerStateWorker->start();
 }
 
 void Sequencer::deleteSong(const int i)
@@ -288,7 +296,7 @@ void Sequencer::setSoloEnabled(const bool b)
     }
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getSequence(const int i)
+std::shared_ptr<Sequence> Sequencer::getSequence(const int i)
 {
     return sequences[i];
 }
@@ -372,10 +380,9 @@ void Sequencer::undoSeq()
 
     auto copy = copySequence(sequences[selectedSequenceIndex]);
     copy->getStateManager()->drainQueue();
-    for (const auto &t : copy->getTracks())
-    {
-        t->getEventStateManager()->drainQueue();
-    }
+
+    // TODO This should not happen on this thread
+    nonRtSequencerStateWorker->work();
 
     undoPlaceHolder.swap(copy);
 
@@ -413,9 +420,16 @@ void Sequencer::purgeAllSequences()
     setSelectedSequenceIndex(MinSequenceIndex, true);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
+std::shared_ptr<Sequence> Sequencer::makeNewSequence(
+    SequenceIndex sequenceIndex,
+    std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt,
+    std::function<void(NonRtSequencerMessage&&)> dispatchNonRt
+    )
 {
     return std::make_shared<Sequence>(
+        sequenceIndex,
+        getSnapshotNonRt,
+        dispatchNonRt,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -492,7 +506,17 @@ std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
 
 void Sequencer::purgeSequence(const int i)
 {
-    sequences[i] = makeNewSequence();
+    const std::function getSnapshotNonRt = [this, i]()
+    {
+        return nonRtSequencerStateManager->getSnapshot().getNonRtSequenceState(SequenceIndex(i));
+    };
+
+    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
+    {
+        nonRtSequencerStateManager->enqueue(std::move(m));
+    };
+
+    sequences[i] = makeNewSequence(SequenceIndex(i), getSnapshotNonRt, dispatchNonRt);
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[i]->syncTrackEventIndices(
@@ -518,10 +542,20 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
     copySequenceParameters(sequences[source], sequences[dest]);
 }
 
-std::shared_ptr<sequencer::Sequence>
+std::shared_ptr<Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
-    auto copy = makeNewSequence();
+    const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt = [this]()
+    {
+        return nullptr;
+    };
+
+    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
+    {
+        nonRtSequencerStateManager->enqueue(std::move(m));
+    };
+
+    auto copy = makeNewSequence(NoSequenceIndex, getSnapshotNonRt, dispatchNonRt);
     copy->init(source->getLastBarIndex());
     copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);
@@ -668,7 +702,7 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
     defaultTrackNames[i] = s;
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getSelectedSequence()
+std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
 {
     if (const bool songMode = isSongModeEnabled();
         songMode &&
@@ -688,7 +722,7 @@ int Sequencer::getUsedSequenceCount() const
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<sequencer::Sequence>>
+std::vector<std::shared_ptr<Sequence>>
 Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
@@ -901,7 +935,7 @@ void Sequencer::tap()
     transport->setTempo(newTempo);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getCurrentlyPlayingSequence()
+std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
     const auto seqIndex = getCurrentlyPlayingSequenceIndex();
 
@@ -1095,9 +1129,19 @@ void Sequencer::resetUndo()
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::createSeqInPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
-    placeHolder = makeNewSequence();
+    const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt = [this]()
+    {
+        return nullptr;
+    };
+
+    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
+    {
+        nonRtSequencerStateManager->enqueue(std::move(m));
+    };
+
+    placeHolder = makeNewSequence(NoSequenceIndex, getSnapshotNonRt, dispatchNonRt);
     return placeHolder;
 }
 
@@ -1114,7 +1158,7 @@ void Sequencer::movePlaceHolderTo(const int destIndex)
     clearPlaceHolder();
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
 {
     return placeHolder;
 }

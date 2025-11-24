@@ -43,6 +43,7 @@
 #include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -320,7 +321,18 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer()->makeNewSequence();
+        const std::function getSnapshotNonRt =
+            [manager = mpc.getSequencer()->getNonRtStateManager(), i]()
+        {
+            return manager->getSnapshot().getNonRtSequenceState(SequenceIndex(i));
+        };
+
+        const std::function dispatchNonRt = [manager = mpc.getSequencer()->getNonRtStateManager()](NonRtSequencerMessage&& m)
+        {
+            manager->enqueue(std::move(m));
+        };
+
+        auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i), getSnapshotNonRt, dispatchNonRt);
 
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
 

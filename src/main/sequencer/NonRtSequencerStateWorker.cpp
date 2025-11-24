@@ -1,20 +1,20 @@
-#include "sequencer/TrackEventStateWorker.hpp"
+#include "sequencer/NonRtSequencerStateWorker.hpp"
 
 #include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Track.hpp"
-#include "TrackEventStateManager.hpp"
+#include "NonRtSequencerStateManager.hpp"
 #include "Transport.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
 
-TrackEventStateWorker::TrackEventStateWorker(Sequencer *sequencer)
+NonRtSequencerStateWorker::NonRtSequencerStateWorker(Sequencer *sequencer)
     : running(false), sequencer(sequencer)
 {
 }
 
-TrackEventStateWorker::~TrackEventStateWorker()
+NonRtSequencerStateWorker::~NonRtSequencerStateWorker()
 {
     stop();
 
@@ -24,7 +24,7 @@ TrackEventStateWorker::~TrackEventStateWorker()
     }
 }
 
-void TrackEventStateWorker::start()
+void NonRtSequencerStateWorker::start()
 {
     if (running.load())
     {
@@ -49,7 +49,7 @@ void TrackEventStateWorker::start()
         });
 }
 
-void TrackEventStateWorker::stop()
+void NonRtSequencerStateWorker::stop()
 {
     if (!running.load())
     {
@@ -59,30 +59,30 @@ void TrackEventStateWorker::stop()
     running.store(false);
 }
 
-void TrackEventStateWorker::work() const
+void NonRtSequencerStateWorker::work() const
 {
-    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
-    {
-        if (!sequencer->getSequence(i)->isUsed())
-        {
-            continue;
-        }
-        for (const auto &t : sequencer->getSequence(i)->getTracks())
-        {
-            t->getEventStateManager()->drainQueue();
-        }
-    }
-
-    if (sequencer->getPlaceHolder())
-    {
-        for (const auto &t : sequencer->getPlaceHolder()->getTracks())
-        {
-            t->getEventStateManager()->drainQueue();
-        }
-    }
+    // for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
+    // {
+    //     if (!sequencer->getSequence(i)->isUsed())
+    //     {
+    //         continue;
+    //     }
+    //     for (const auto &t : sequencer->getSequence(i)->getTracks())
+    //     {
+    //         t->getEventStateManager()->drainQueue();
+    //     }
+    // }
+    //
+    // if (sequencer->getPlaceHolder())
+    // {
+    //     for (const auto &t : sequencer->getPlaceHolder()->getTracks())
+    //     {
+    //         t->getEventStateManager()->drainQueue();
+    //     }
+    // }
 }
 
-PlaybackState TrackEventStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
+PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
 {
     constexpr TimeInSamples snapshotWindowSizeSamples{30'000};
 

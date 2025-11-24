@@ -12,7 +12,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
 #include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file::all;

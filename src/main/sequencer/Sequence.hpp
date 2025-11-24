@@ -2,6 +2,8 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
+#include "NonRtSequencerMessage.hpp"
+#include "NonRtSequencerStateView.hpp"
 
 #include <vector>
 #include <memory>
@@ -49,7 +51,10 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(std::function<std::string(int)> getDefaultTrackName,
+        Sequence(SequenceIndex,
+                 const std::function<std::shared_ptr<NonRtSequenceStateView>()> &getSnapshotNonRt,
+                 const std::function<void(NonRtSequencerMessage &&)> &dispatchNonRt,
+                 std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
                  std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
                  std::function<bool()> isRecordingModeMulti,
@@ -72,6 +77,8 @@ namespace mpc::sequencer
                  std::function<int()> getCurrentBarIndex);
 
         ~Sequence();
+
+        SequenceIndex getSequenceIndex() const;
 
         void setBarLengths(const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT>
                                &barLengths) const;
@@ -138,6 +145,9 @@ namespace mpc::sequencer
         std::shared_ptr<SequenceStateManager> getStateManager();
 
     private:
+        SequenceIndex sequenceIndex;
+        const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt;
+        const std::function<void(NonRtSequencerMessage &&)> dispatchNonRt;
         std::shared_ptr<SequenceStateManager> stateManager;
         StartTime startTime{0, 0, 0, 0, 0};
         std::atomic_bool tempoTrackIsInitialized{false};

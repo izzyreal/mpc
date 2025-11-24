@@ -1,6 +1,7 @@
 #pragma once
 
-#include "sequencer/TrackEventMessage.hpp"
+#include "NonRtSequencerStateView.hpp"
+#include "sequencer/NonRtSequencerMessage.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <memory>
@@ -8,12 +9,12 @@
 
 namespace mpc::sequencer
 {
-    class TrackEventStateManager;
+    class NonRtSequencerStateManager;
     class Event;
     class Sequence;
 
     std::shared_ptr<Event> mapEventStateToEvent(
-        std::shared_ptr<TrackEventStateManager>, const EventState &,
-        const std::function<void(TrackEventMessage &&)> &dispatch,
+        std::function<std::shared_ptr<NonRtTrackStateView>()> getTrackSnapshot, const EventState &,
+        const std::function<void(NonRtSequencerMessage &&)> &dispatch,
         Sequence *parent);
 } // namespace mpc::sequencer

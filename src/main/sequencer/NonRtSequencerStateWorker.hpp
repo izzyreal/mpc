@@ -10,11 +10,11 @@ namespace mpc::sequencer
 {
     class Sequencer;
 
-    class TrackEventStateWorker
+    class NonRtSequencerStateWorker
     {
     public:
-        explicit TrackEventStateWorker(Sequencer *);
-        ~TrackEventStateWorker();
+        explicit NonRtSequencerStateWorker(Sequencer *);
+        ~NonRtSequencerStateWorker();
 
         void start();
         void stop();
