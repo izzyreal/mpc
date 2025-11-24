@@ -24,7 +24,7 @@ NonRtSequencerStateView::NonRtSequencerStateView(
 
 PlaybackState NonRtSequencerStateView::getPlaybackState() const
 {
-    return PlaybackState();
+    return state->playbackState;
 }
 
 std::shared_ptr<NonRtSequenceStateView>

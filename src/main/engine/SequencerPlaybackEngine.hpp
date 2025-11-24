@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "engine/EventAfterNFrames.hpp"
 
 #include "engine/audio/server/AudioClient.hpp"
@@ -69,6 +70,10 @@ namespace mpc::engine
 
         uint64_t getMetronomeOnlyTickPosition() const;
 
+        TimeInSamples getCurrentTimeInSamples() const;
+
+        const std::function<int()> getSampleRate;
+
     private:
         std::shared_ptr<EventQueue> eventQueue;
         std::vector<EventAfterNFrames> tempEventQueue;
@@ -78,7 +83,6 @@ namespace mpc::engine
         sequencer::Sequencer *sequencer;
         std::shared_ptr<sequencer::Clock> clock;
         std::function<bool()> isBouncing;
-        std::function<int()> getSampleRate;
         std::function<bool()> isRecMainWithoutPlaying;
         std::function<void(int velo, int frameOffset)> playMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
@@ -118,5 +122,7 @@ namespace mpc::engine
         void stopSequencer() const;
 
         uint64_t metronomeOnlyTickPosition = 0;
+
+        std::atomic<TimeInSamples> currentTimeInSamples{-1};
     };
 } // namespace mpc::engine

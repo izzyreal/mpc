@@ -18,7 +18,11 @@ void NonRtSequencerStateManager::applyMessage(const NonRtSequencerMessage &msg) 
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
+            if constexpr (std::is_same_v<T, UpdatePlaybackState>)
+            {
+                activeState.playbackState = m.playbackState;
+            }
+            else if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
             {
                 for (auto &e : activeState.sequences[m.sequence].tracks[m.trackIndex].events)
                 {

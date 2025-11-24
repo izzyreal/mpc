@@ -192,11 +192,11 @@ void Mpc::init()
     // avoiding memory allocations and I/O on the audio thread.
     screens->createAndCacheAllScreens();
 
-    sequencer->init();
-    MLOG("Sequencer initialized");
-
     engineHost->start();
     MLOG("EngineHost started");
+
+    sequencer->init();
+    MLOG("Sequencer initialized");
 
     clientEventController->init();
 
@@ -315,16 +315,6 @@ Mpc::~Mpc()
     nvram::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
-
-    if (layeredScreen)
-    {
-        layeredScreen.reset();
-    }
-
-    if (engineHost)
-    {
-        engineHost->destroyServices();
-    }
 }
 
 void Mpc::panic() const

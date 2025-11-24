@@ -1,5 +1,6 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 
+#include "audiomidi/EventHandler.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "engine/NoteRepeatProcessor.hpp"
@@ -19,6 +20,7 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 
 #include "sequencer/MidiClockOutput.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 #include <concurrentqueue.h>
 
@@ -72,6 +74,7 @@ void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 
     metronomeOnly = metronomeOnlyToUse;
     metronomeOnlyTickPosition = 0;
+    currentTimeInSamples.store(0);
 
     sequencerIsRunning.store(true);
 }
@@ -99,6 +102,7 @@ void SequencerPlaybackEngine::stop()
     }
 
     sequencerIsRunning.store(false);
+    currentTimeInSamples.store(0);
     tickFrameOffset = 0;
 }
 
@@ -501,6 +505,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
 
+    const auto playbackState = sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
+
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = getSampleRate();
 
@@ -663,7 +669,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (!songHasStopped && !normalPlayHasStopped)
         {
-            sequencer->playToTick(sequencer->getTransport()->getTickPosition());
+            // sequencer->playToTick(sequencer->getTransport()->getTickPosition());
+            for (auto &e : playbackState.events)
+            {
+                if (e.timeInSamples == currentTimeInSamples.load() + frameIndex)
+                {
+                    sequencer->getEventHandler()->handleFinalizedEvent(e.eventState, seq->getTrack(e.eventState.trackIndex).get());
+                }
+            }
             processNoteRepeat();
         }
 
@@ -671,10 +684,19 @@ void SequencerPlaybackEngine::work(const int nFrames)
         sequencer->getStateManager()->drainQueue();
     }
 
-    clock->clearTicks();
+    if (sequencerIsRunningAtStartOfBuffer)
+    {
+        clock->clearTicks();
+        currentTimeInSamples.store(currentTimeInSamples.load() + nFrames);
+    }
 }
 
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
 {
     return metronomeOnlyTickPosition;
+}
+
+mpc::TimeInSamples SequencerPlaybackEngine::getCurrentTimeInSamples() const
+{
+    return currentTimeInSamples.load();
 }

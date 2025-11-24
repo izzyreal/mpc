@@ -1,10 +1,12 @@
 #include "sequencer/NonRtSequencerStateWorker.hpp"
 
+#include "Event.hpp"
 #include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Track.hpp"
 #include "NonRtSequencerStateManager.hpp"
 #include "Transport.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
@@ -59,8 +61,26 @@ void NonRtSequencerStateWorker::stop()
     running.store(false);
 }
 
-void NonRtSequencerStateWorker::work() const
+void NonRtSequencerStateWorker::work()
 {
+    const auto currentTimeInSamples = sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
+
+    if (lastRenderedTimeInSamples != currentTimeInSamples)
+    {
+        lastRenderedTimeInSamples = currentTimeInSamples;
+        if (currentTimeInSamples >= 0)
+        {
+            const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
+            const auto sampleRate = playbackEngine->getSampleRate();
+            const auto playbackState = renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
+            sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{std::move(playbackState)});
+        }
+        else
+        {
+            sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{PlaybackState()});
+        }
+    }
+
     sequencer->getNonRtStateManager()->drainQueue();
 }
 
@@ -71,54 +91,28 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
     PlaybackState result;
     result.timeInSamples = timeInSamples;
 
-    const Tick currentTickPosition = sequencer->getTransport()->getTickPosition();
-
     const auto seqIndex = sequencer->isSongModeEnabled() ? sequencer->getSongSequenceIndex()
     : sequencer->getSelectedSequenceIndex();
     const auto seq = sequencer->getSequence(seqIndex);
 
-    const Tick snapshotWindowInTicks =
-        SeqUtil::getTickCountForFrames(
-            seq.get(),
-            currentTickPosition,
-            snapshotWindowSizeSamples,
-            sampleRate);
-
-    const Tick lastTickToIncludeInSnapshot = currentTickPosition + snapshotWindowInTicks;
-
-    std::vector<std::shared_ptr<Track>> tracksToProcess = seq->getTracks();
-
-    tracksToProcess.push_back(seq->getTempoChangeTrack());
-
-    for (const auto &track : tracksToProcess)
+    for (const auto &track : seq->getTracks())
     {
-        while (track->getNextEventTick() <= lastTickToIncludeInSnapshot)
+        for (const auto &event : track->getEvents())
         {
-            auto eventState = track->getNextEventAndIncrementEventIndex();
-
-            if (!eventState) continue;
+            const auto eventState = event->getSnapshot();
 
             const auto eventTimeInSamples =
-                SeqUtil::getEventTimeInSamples(seq.get(), eventState->tick, currentTickPosition, timeInSamples, sampleRate);
+                SeqUtil::getEventTimeInSamples(seq.get(), eventState.tick, timeInSamples, sampleRate);
 
             const auto renderedEventState = RenderedEventState
             {
-                std::move(*eventState),
+                eventState,
                 eventTimeInSamples
             };
 
+            printf("Event tick: %lld, timeInSamples: %i\n", eventState.tick, eventTimeInSamples);
+
             result.events.emplace_back(std::move(renderedEventState));
-        }
-
-        if (lastTickToIncludeInSnapshot > seq->getLastTick())
-        {
-            constexpr Tick loopStart = 0;
-            track->syncEventIndex(loopStart, seq->getLastTick());
-
-            while (track->getNextEventTick() <= lastTickToIncludeInSnapshot % seq->getLastTick())
-            {
-                track->getNextEventTick();
-            }
         }
     }
 

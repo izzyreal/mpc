@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PlaybackState.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <cstdint>
@@ -57,8 +58,13 @@ namespace mpc::sequencer
         EventState payload;
     };
 
+    struct UpdatePlaybackState
+    {
+        PlaybackState playbackState;
+    };
+
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent>;
+                     FinalizeNonLiveNoteEvent, UpdatePlaybackState>;
 } // namespace mpc::sequencer

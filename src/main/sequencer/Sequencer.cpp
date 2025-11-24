@@ -82,13 +82,14 @@ Sequencer::Sequencer(
         &getSequencerPlaybackEngine)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
-      stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
+      stopBouncing(stopBouncing), layeredScreen(layeredScreen),
+      getSequencerPlaybackEngine(getSequencerPlaybackEngine),
+      voices(voices),
       isAudioServerRunning(isAudioServerRunning),
-      isEraseButtonPressed(isEraseButtonPressed),
-      performanceManager(performanceManager), sampler(sampler),
+      isEraseButtonPressed(isEraseButtonPressed), performanceManager(performanceManager),
+      sampler(sampler),
       eventHandler(eventHandler),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-      getSequencerPlaybackEngine(getSequencerPlaybackEngine)
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
     nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
@@ -258,6 +259,11 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     }
 
     return s->getTempoChangeEvents()[index];
+}
+
+std::shared_ptr<audiomidi::EventHandler> Sequencer::getEventHandler()
+{
+    return eventHandler;
 }
 
 bool Sequencer::isSoloEnabled() const

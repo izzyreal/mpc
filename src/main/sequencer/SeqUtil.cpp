@@ -483,84 +483,108 @@ static double samplesPerTick(const double tempo, const int sampleRate)
 int SeqUtil::getEventTimeInSamples(
     const Sequence* seq,
     const int eventTick,
-    const int currentTimeTicks,     // modulo-sequence tick
-    const int currentTimeSamples,    // monotonic, does not loop
-    const SampleRate sampleRate
-)
+    const int currentTimeSamples,
+    const SampleRate sampleRate)
 {
     if (!seq)
-    {
         return currentTimeSamples;
-    }
 
     const int lastTick = seq->getLastTick();
     const auto& tces = seq->getTempoChangeEvents();
 
-    // ----- Compute deltaTicks with loop wrap -----
-    int deltaTicks = eventTick - currentTimeTicks;
+    const int seqLenSamples =
+        SeqUtil::sequenceFrameLength(seq, 0, lastTick, sampleRate);
+
+    const int seqPosSamples = currentTimeSamples % seqLenSamples;
+
+    int tickCursor = 0;
+    int sampleCursor = 0;
+
+    double tempo = seq->getInitialTempo();
+    size_t idx = 0;
+
+    auto segSamples = [&](int ticks, double t) {
+        double secPerTick = 60.0 / t / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+        return (int)std::ceil(ticks * secPerTick * sampleRate);
+    };
+
+    auto findTick = [&](int targetSamples) {
+        while (true)
+        {
+            int nextTick =
+                (idx + 1 < tces.size()) ? tces[idx + 1]->getTick()
+                                        : lastTick;
+
+            int ticks = nextTick - tickCursor;
+            int seg = segSamples(ticks, tempo);
+
+            if (sampleCursor + seg > targetSamples)
+            {
+                int remaining = targetSamples - sampleCursor;
+                double secPerTick = 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+                double spt = secPerTick * sampleRate;
+                int deltaTicks = (int)(remaining / spt);
+                return tickCursor + deltaTicks;
+            }
+
+            sampleCursor += seg;
+            tickCursor = nextTick;
+
+            if (tickCursor == lastTick)
+                return lastTick;
+
+            ++idx;
+            tempo = tces[idx]->getTempo();
+        }
+    };
+
+    const int currentTick = findTick(seqPosSamples);
+
+    int deltaTicks = eventTick - currentTick;
     if (deltaTicks < 0)
         deltaTicks += lastTick;
 
-    if (deltaTicks == 0)
-        return currentTimeSamples;
-
-    // ----- Convert deltaTicks → deltaSamples with tempo changes -----
-
     int samplesAccum = 0;
-    int tickCursor = currentTimeTicks;
     int remaining = deltaTicks;
+    tickCursor = currentTick;
 
-    // Find the initial tempo at tickCursor
-    double currentTempo = seq->getInitialTempo();
-    size_t tceIndex = 0;
+    idx = 0;
+    tempo = seq->getInitialTempo();
 
-    // Advance tceIndex to the tempo segment containing tickCursor
-    while (tceIndex + 1 < tces.size() &&
-           tces[tceIndex + 1]->getTick() <= tickCursor)
-    {
-        ++tceIndex;
-    }
+    while (idx + 1 < tces.size() &&
+           tces[idx + 1]->getTick() <= tickCursor)
+        ++idx;
 
-    if (!tces.empty()) {
-        if (tces[tceIndex]->getTick() <= tickCursor)
-            currentTempo = tces[tceIndex]->getTempo();
-    }
+    if (!tces.empty() && tces[idx]->getTick() <= tickCursor)
+        tempo = tces[idx]->getTempo();
 
-    // Main walk
     while (remaining > 0)
     {
-        // Determine next tempo boundary
-        int nextBoundaryTick =
-            (tceIndex + 1 < tces.size())
-                ? tces[tceIndex + 1]->getTick()
-                : lastTick;
+        int nextTick =
+            (idx + 1 < tces.size()) ? tces[idx + 1]->getTick()
+                                    : lastTick;
 
-        int ticksToBoundary = nextBoundaryTick - tickCursor;
+        int ticksToBoundary = nextTick - tickCursor;
         if (ticksToBoundary <= 0)
-            ticksToBoundary = remaining; // last segment
+            ticksToBoundary = remaining;
 
-        const int ticksNow = std::min(remaining, ticksToBoundary);
+        int step = std::min(remaining, ticksToBoundary);
 
-        samplesAccum += (int)std::ceil(
-            ticksNow * samplesPerTick(currentTempo, sampleRate)
-        );
+        samplesAccum += segSamples(step, tempo);
+        tickCursor += step;
+        remaining  -= step;
 
-        tickCursor += ticksNow;
-        remaining  -= ticksNow;
-
-        // Did we reach a new tempo change?
         if (remaining > 0 &&
-            tceIndex + 1 < tces.size() &&
-            tickCursor == tces[tceIndex + 1]->getTick())
+            idx + 1 < tces.size() &&
+            tickCursor == tces[idx + 1]->getTick())
         {
-            ++tceIndex;
-            currentTempo = tces[tceIndex]->getTempo();
+            ++idx;
+            tempo = tces[idx]->getTempo();
         }
     }
 
     return currentTimeSamples + samplesAccum;
 }
-
 
 int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,
                           const int frameCount, const int sr)

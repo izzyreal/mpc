@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EventState.hpp"
 #include "PlaybackState.hpp"
 
 #include <thread>
@@ -19,13 +18,15 @@ namespace mpc::sequencer
         void start();
         void stop();
 
-        void work() const;
+        void work();
 
     private:
         std::atomic<bool> running;
         std::thread workerThread;
 
         Sequencer *sequencer;
+
+        TimeInSamples lastRenderedTimeInSamples{-1};
 
         PlaybackState renderPlaybackState(SampleRate, TimeInSamples) const;
     };

@@ -78,7 +78,6 @@ namespace mpc::sequencer
                                          int frameCount, int sr);
 
         static int getEventTimeInSamples(const Sequence *seq, int eventTick,
-                                         int currentTimeTicks,
                                          int currentTimeSamples,
                                          SampleRate sampleRate);
     };

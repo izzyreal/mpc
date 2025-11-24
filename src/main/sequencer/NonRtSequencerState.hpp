@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sequencer/PlaybackState.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <array>
@@ -20,5 +21,6 @@ namespace mpc::sequencer
     struct NonRtSequencerState
     {
         std::array<NonRtSequenceState, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT> sequences{};
+        PlaybackState playbackState{};
     };
 } // namespace mpc::sequencer

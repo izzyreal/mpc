@@ -110,6 +110,10 @@ namespace mpc::sequencer
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
+        std::shared_ptr<audiomidi::EventHandler> getEventHandler();
+
+        const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+    getSequencerPlaybackEngine;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
@@ -121,8 +125,6 @@ namespace mpc::sequencer
         std::function<bool()> isSixteenLevelsEnabled;
 
         std::shared_ptr<SequencerStateManager> stateManager;
-        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-            getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
 
