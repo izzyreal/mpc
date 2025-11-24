@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <memory>
 #include <string>
 
@@ -71,5 +73,13 @@ namespace mpc::sequencer
 
         static bool isStepRecording(const std::string &currentScreenName,
                                     const std::shared_ptr<Sequencer> &);
+
+        static int getTickCountForFrames(const Sequence *seq, int firstTick,
+                                         int frameCount, int sr);
+
+        static int getEventTimeInSamples(const Sequence *seq, int eventTick,
+                                         int currentTimeTicks,
+                                         int currentTimeSamples,
+                                         SampleRate sampleRate);
     };
 } // namespace mpc::sequencer

@@ -8,7 +8,7 @@
 
 namespace mpc
 {
-    ///////////
+    /////////
 
     using PhysicalPadIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::HARDWARE_PAD_COUNT - 1>;
@@ -204,5 +204,11 @@ namespace mpc
 
     constexpr TimeSigNumerator DefaultTimeSigNumerator{4};
     constexpr TimeSigDenominator DefaultTimeSigDenominator{4};
+
+    /////////
+
+    using TimeInSamples = int64_t;
+    using SampleRate = ConstrainedInt<uint32_t, 1, 192'000>;
+    constexpr SampleRate DefaultSampleRate{44100};
 
 } // namespace mpc

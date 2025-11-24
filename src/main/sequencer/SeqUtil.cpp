@@ -472,3 +472,160 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
     };
     return currentScreenName == "step-editor" && !posIsLastTick();
 }
+
+static double samplesPerTick(const double tempo, const int sampleRate)
+{
+    const double secondsPerTick = 60.0 / tempo / mpc::Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+    return secondsPerTick * sampleRate;
+}
+
+int SeqUtil::getEventTimeInSamples(
+    const Sequence* seq,
+    const int eventTick,
+    const int currentTimeTicks,     // modulo-sequence tick
+    const int currentTimeSamples,    // monotonic, does not loop
+    const SampleRate sampleRate
+)
+{
+    if (!seq)
+    {
+        return currentTimeSamples;
+    }
+
+    const int lastTick = seq->getLastTick();
+    const auto& tces = seq->getTempoChangeEvents();
+
+    // ----- Compute deltaTicks with loop wrap -----
+    int deltaTicks = eventTick - currentTimeTicks;
+    if (deltaTicks < 0)
+        deltaTicks += lastTick;
+
+    if (deltaTicks == 0)
+        return currentTimeSamples;
+
+    // ----- Convert deltaTicks → deltaSamples with tempo changes -----
+
+    int samplesAccum = 0;
+    int tickCursor = currentTimeTicks;
+    int remaining = deltaTicks;
+
+    // Find the initial tempo at tickCursor
+    double currentTempo = seq->getInitialTempo();
+    size_t tceIndex = 0;
+
+    // Advance tceIndex to the tempo segment containing tickCursor
+    while (tceIndex + 1 < tces.size() &&
+           tces[tceIndex + 1]->getTick() <= tickCursor)
+    {
+        ++tceIndex;
+    }
+
+    if (!tces.empty()) {
+        if (tces[tceIndex]->getTick() <= tickCursor)
+            currentTempo = tces[tceIndex]->getTempo();
+    }
+
+    // Main walk
+    while (remaining > 0)
+    {
+        // Determine next tempo boundary
+        int nextBoundaryTick =
+            (tceIndex + 1 < tces.size())
+                ? tces[tceIndex + 1]->getTick()
+                : lastTick;
+
+        int ticksToBoundary = nextBoundaryTick - tickCursor;
+        if (ticksToBoundary <= 0)
+            ticksToBoundary = remaining; // last segment
+
+        const int ticksNow = std::min(remaining, ticksToBoundary);
+
+        samplesAccum += (int)std::ceil(
+            ticksNow * samplesPerTick(currentTempo, sampleRate)
+        );
+
+        tickCursor += ticksNow;
+        remaining  -= ticksNow;
+
+        // Did we reach a new tempo change?
+        if (remaining > 0 &&
+            tceIndex + 1 < tces.size() &&
+            tickCursor == tces[tceIndex + 1]->getTick())
+        {
+            ++tceIndex;
+            currentTempo = tces[tceIndex]->getTempo();
+        }
+    }
+
+    return currentTimeSamples + samplesAccum;
+}
+
+
+int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,
+                          const int frameCount, const int sr)
+{
+    const auto& tces = seq->getTempoChangeEvents();
+    const int n = tces.size();
+
+    auto secondsPerTick = [&](const double tempo) {
+        return 60.0 / tempo / mpc::Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+    };
+
+    int remainingFrames = frameCount;
+    int tick = firstTick;
+
+    double tempo = seq->getInitialTempo();
+
+    // Find starting tempo segment.
+    int i = 0;
+    while (i < n && tces[i]->getTick() <= firstTick)
+    {
+        tempo = tces[i]->getTempo();
+        i++;
+    }
+
+    // Process each tempo segment.
+    while (i < n && remainingFrames > 0)
+    {
+        const int segmentEndTick = tces[i]->getTick();
+        const int ticksAvailable = segmentEndTick - tick;
+
+        if (ticksAvailable > 0)
+        {
+            const double secsPerTick = secondsPerTick(tempo);
+            const double framesPerTick = secsPerTick * sr;
+
+            // Frames needed to traverse full segment.
+            const int framesForSegment = static_cast<int>(
+                ceil(ticksAvailable * framesPerTick));
+
+            if (framesForSegment > remainingFrames)
+            {
+                // We only advance partway through this segment.
+                const double ticksInSegment =
+                    remainingFrames / framesPerTick;
+
+                return static_cast<int>(floor(ticksInSegment));
+            }
+
+            // Consume whole segment.
+            remainingFrames -= framesForSegment;
+            tick = segmentEndTick;
+        }
+
+        tempo = tces[i]->getTempo();
+        i++;
+    }
+
+    // Final infinite segment (after last TCE).
+    if (remainingFrames > 0)
+    {
+        const double secsPerTick = secondsPerTick(tempo);
+        const double framesPerTick = secsPerTick * sr;
+
+        const double ticksHere = remainingFrames / framesPerTick;
+        return static_cast<int>(floor(ticksHere));
+    }
+
+    return 0;
+}

@@ -1,8 +1,10 @@
 #include "sequencer/TrackEventStateWorker.hpp"
 
+#include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Track.hpp"
 #include "TrackEventStateManager.hpp"
+#include "Transport.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
@@ -78,4 +80,65 @@ void TrackEventStateWorker::work() const
             t->getEventStateManager()->drainQueue();
         }
     }
+}
+
+PlaybackState TrackEventStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
+{
+    constexpr TimeInSamples snapshotWindowSizeSamples{30'000};
+
+    PlaybackState result;
+    result.timeInSamples = timeInSamples;
+
+    const Tick currentTickPosition = sequencer->getTransport()->getTickPosition();
+
+    const auto seqIndex = sequencer->isSongModeEnabled() ? sequencer->getSongSequenceIndex()
+    : sequencer->getSelectedSequenceIndex();
+    const auto seq = sequencer->getSequence(seqIndex);
+
+    const Tick snapshotWindowInTicks =
+        SeqUtil::getTickCountForFrames(
+            seq.get(),
+            currentTickPosition,
+            snapshotWindowSizeSamples,
+            sampleRate);
+
+    const Tick lastTickToIncludeInSnapshot = currentTickPosition + snapshotWindowInTicks;
+
+    std::vector<std::shared_ptr<Track>> tracksToProcess = seq->getTracks();
+
+    tracksToProcess.push_back(seq->getTempoChangeTrack());
+
+    for (const auto &track : tracksToProcess)
+    {
+        while (track->getNextEventTick() <= lastTickToIncludeInSnapshot)
+        {
+            auto eventState = track->getNextEventAndIncrementEventIndex();
+
+            if (!eventState) continue;
+
+            const auto eventTimeInSamples =
+                SeqUtil::getEventTimeInSamples(seq.get(), eventState->tick, currentTickPosition, timeInSamples, sampleRate);
+
+            const auto renderedEventState = RenderedEventState
+            {
+                std::move(*eventState),
+                eventTimeInSamples
+            };
+
+            result.events.emplace_back(std::move(renderedEventState));
+        }
+
+        if (lastTickToIncludeInSnapshot > seq->getLastTick())
+        {
+            constexpr Tick loopStart = 0;
+            track->syncEventIndex(loopStart, seq->getLastTick());
+
+            while (track->getNextEventTick() <= lastTickToIncludeInSnapshot % seq->getLastTick())
+            {
+                track->getNextEventTick();
+            }
+        }
+    }
+
+    return result;
 }
