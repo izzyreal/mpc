@@ -279,15 +279,7 @@ void StepEditorScreen::function(int i)
             if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
             {
                 auto track = sequencer.lock()->getSelectedTrack();
-                for (int e = 0; e < track->getEvents().size(); e++)
-                {
-                    if (eventsEqual(track->getEvents()[e],
-                                    visibleEvents[rowIndex]))
-                    {
-                        track->removeEvent(e);
-                        break;
-                    }
-                }
+                track->removeEvent(visibleEvents[rowIndex]);
 
                 if (rowIndex == 2 && yOffset > 0)
                 {
