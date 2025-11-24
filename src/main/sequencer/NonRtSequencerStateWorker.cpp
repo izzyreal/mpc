@@ -83,9 +83,18 @@ void NonRtSequencerStateWorker::work()
     sequencer->getNonRtStateManager()->drainQueue();
 }
 
+void NonRtSequencerStateWorker::refreshPlaybackState() const
+{
+    const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
+    const auto currentTimeInSamples =
+            playbackEngine->getCurrentTimeInSamples();
+    const auto sampleRate = playbackEngine->getSampleRate();
+    const auto playbackState = renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
+    sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{std::move(playbackState)});
+}
+
 PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
 {
-    printf("Rendering playback state for timeInSamples %i\n", timeInSamples);
     constexpr TimeInSamples snapshotWindowSizeSamples{44100 * 2};
 
     PlaybackState result;
@@ -114,8 +123,6 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
                 eventState,
                 eventTimeInSamples
             };
-
-            // printf("currentTimeInSamples: %i, event tick: %lld, eventTimeInSamples: %i\n", timeInSamples, eventState.tick, eventTimeInSamples);
 
             result.events.emplace_back(std::move(renderedEventState));
         }

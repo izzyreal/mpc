@@ -158,17 +158,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     if (!sequencerIsRunningAtStartOfBuffer)
     {
-        // printf("sequencer is not running\n");
         return;
     }
 
     currentTimeInSamples.store(currentTimeInSamplesAtStartOfBuffer +
                                nFrames);
-
-    if (playbackState.events.empty())
-    {
-        printf("Oh no! No events!\n");
-    }
 
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -177,16 +171,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (e.timeInSamples >= currentTimeInSamplesAtStartOfBuffer &&
             e.timeInSamples < currentTimeInSamplesAtStartOfBuffer + nFrames)
         {
-            // printf("Playing back event at tick %i at timeInSamples %i\n",
-            // e.eventState.tick, e.timeInSamples);
             sequencer->getEventHandler()->handleFinalizedEvent(
                 e.eventState, seq->getTrack(e.eventState.trackIndex).get(),
                 e.timeInSamples - currentTimeInSamplesAtStartOfBuffer);
-        }
-        else
-        {
-            // printf("Not playing back event at tick %i at timeInSamples %i\n",
-            // e.eventState.tick, e.timeInSamples);
         }
     }
 }

@@ -83,13 +83,11 @@ Sequencer::Sequencer(
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen),
-      getSequencerPlaybackEngine(getSequencerPlaybackEngine),
-      voices(voices),
+      getSequencerPlaybackEngine(getSequencerPlaybackEngine), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
-      isEraseButtonPressed(isEraseButtonPressed), performanceManager(performanceManager),
-      sampler(sampler),
-      eventHandler(eventHandler),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+      isEraseButtonPressed(isEraseButtonPressed),
+      performanceManager(performanceManager), sampler(sampler),
+      eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
     nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
@@ -261,9 +259,15 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     return s->getTempoChangeEvents()[index];
 }
 
-std::shared_ptr<audiomidi::EventHandler> Sequencer::getEventHandler()
+std::shared_ptr<EventHandler> Sequencer::getEventHandler()
 {
     return eventHandler;
+}
+
+std::shared_ptr<NonRtSequencerStateWorker>
+Sequencer::getNonRtSequencerStateWorker() const
+{
+    return nonRtSequencerStateWorker;
 }
 
 bool Sequencer::isSoloEnabled() const
@@ -534,7 +538,8 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
 }
 
 std::shared_ptr<Sequence>
-Sequencer::copySequence(const std::shared_ptr<Sequence> &source, SequenceIndex destinationIndex)
+Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
+                        SequenceIndex destinationIndex)
 {
     auto copy = makeNewSequence(destinationIndex);
     copy->init(source->getLastBarIndex());
@@ -1089,7 +1094,8 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
-    auto copy = copySequence(sequences[getSelectedSequenceIndex()], UndoSequenceIndex);
+    auto copy =
+        copySequence(sequences[getSelectedSequenceIndex()], UndoSequenceIndex);
 
     undoSeqAvailable = true;
 

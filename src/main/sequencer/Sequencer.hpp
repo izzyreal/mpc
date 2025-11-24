@@ -112,6 +112,8 @@ namespace mpc::sequencer
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
+        std::shared_ptr<NonRtSequencerStateWorker> getNonRtSequencerStateWorker() const;
+
         const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
     getSequencerPlaybackEngine;
 

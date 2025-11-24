@@ -20,6 +20,8 @@ namespace mpc::sequencer
 
         void work();
 
+        void refreshPlaybackState() const;
+
     private:
         std::atomic<bool> running;
         std::thread workerThread;

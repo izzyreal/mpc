@@ -1,5 +1,6 @@
 #include "Transport.hpp"
 
+#include "NonRtSequencerStateWorker.hpp"
 #include "SequenceStateManager.hpp"
 #include "Sequencer.hpp"
 #include "hardware/Hardware.hpp"
@@ -698,6 +699,8 @@ void Transport::setPosition(const double positionQuarterNotes,
                     Sequencer::quarterNotesToTicks(wrappedNewPosition));
         }
     }
+
+    sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
 }
 
 void Transport::setPositionWithinSong(
