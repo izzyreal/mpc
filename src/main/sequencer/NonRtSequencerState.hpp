@@ -19,6 +19,6 @@ namespace mpc::sequencer
 
     struct NonRtSequencerState
     {
-        std::array<NonRtSequenceState, Mpc2000XlSpecs::SEQUENCE_COUNT> sequences{};
+        std::array<NonRtSequenceState, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT> sequences{};
     };
 } // namespace mpc::sequencer

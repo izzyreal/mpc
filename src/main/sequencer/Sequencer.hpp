@@ -153,7 +153,8 @@ namespace mpc::sequencer
         SequenceIndex nextSq{NoSequenceIndex};
 
         std::shared_ptr<Sequence>
-        copySequence(const std::shared_ptr<Sequence> &source);
+        copySequence(const std::shared_ptr<Sequence> &source, SequenceIndex destinationIndex);
+
         static void
         copySequenceParameters(const std::shared_ptr<Sequence> &source,
                                const std::shared_ptr<Sequence> &dest);

@@ -375,24 +375,12 @@ void Sequencer::undoSeq()
         return;
     }
 
-    auto s = copySequence(sequences[UndoSequenceIndex]);
-
-    const auto selectedSequenceIndex = getSelectedSequenceIndex();
-
-    auto copy = copySequence(sequences[selectedSequenceIndex]);
-    copy->getStateManager()->drainQueue();
-
-    // TODO This should not happen on this thread
-    nonRtSequencerStateWorker->work();
-
-    sequences[UndoSequenceIndex].swap(copy);
-
-    sequences[selectedSequenceIndex].swap(s);
+    sequences[UndoSequenceIndex].swap(sequences[getSelectedSequenceIndex()]);
 
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
 
-    sequences[selectedSequenceIndex]->syncTrackEventIndices(
+    sequences[getSelectedSequenceIndex()]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 
     undoSeqAvailable = !undoSeqAvailable;
@@ -526,10 +514,9 @@ void Sequencer::purgeSequence(const int i)
 
 void Sequencer::copySequence(const int source, const int destination)
 {
-    auto copy = copySequence(sequences[source]);
+    auto copy = copySequence(sequences[source], SequenceIndex(destination));
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[destination].swap(copy);
     sequences[destination]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
     sequences[destination]->initLoop();
@@ -541,9 +528,9 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
 }
 
 std::shared_ptr<Sequence>
-Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
+Sequencer::copySequence(const std::shared_ptr<Sequence> &source, SequenceIndex destinationIndex)
 {
-    auto copy = makeNewSequence(source->getSequenceIndex());
+    auto copy = makeNewSequence(destinationIndex);
     copy->init(source->getLastBarIndex());
     copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);
@@ -1096,8 +1083,7 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
-    auto copy = copySequence(sequences[getSelectedSequenceIndex()]);
-    // undoPlaceHolder.swap(copy);
+    auto copy = copySequence(sequences[getSelectedSequenceIndex()], UndoSequenceIndex);
 
     undoSeqAvailable = true;
 
