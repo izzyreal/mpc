@@ -2,6 +2,7 @@
 
 #include "sequencer/EventState.hpp"
 
+#include <array>
 #include <vector>
 
 namespace mpc::sequencer
@@ -13,11 +14,11 @@ namespace mpc::sequencer
 
     struct NonRtSequenceState
     {
-        std::vector<NonRtTrackState> tracks;
+        std::array<NonRtTrackState, Mpc2000XlSpecs::TOTAL_TRACK_COUNT> tracks{};
     };
 
     struct NonRtSequencerState
     {
-        std::vector<NonRtSequenceState> sequences;
+        std::array<NonRtSequenceState, Mpc2000XlSpecs::SEQUENCE_COUNT> sequences{};
     };
 } // namespace mpc::sequencer

@@ -321,18 +321,7 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
             continue;
         }
 
-        const std::function getSnapshotNonRt =
-            [manager = mpc.getSequencer()->getNonRtStateManager(), i]()
-        {
-            return manager->getSnapshot().getNonRtSequenceState(SequenceIndex(i));
-        };
-
-        const std::function dispatchNonRt = [manager = mpc.getSequencer()->getNonRtStateManager()](NonRtSequencerMessage&& m)
-        {
-            manager->enqueue(std::move(m));
-        };
-
-        auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i), getSnapshotNonRt, dispatchNonRt);
+        auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i));
 
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
 

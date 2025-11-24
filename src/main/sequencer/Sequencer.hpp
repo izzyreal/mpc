@@ -95,7 +95,7 @@ namespace mpc::sequencer
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
-        void clearPlaceHolder();
+        void clearPlaceHolder() const;
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(BusType) const;
@@ -125,15 +125,14 @@ namespace mpc::sequencer
             getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
-        std::shared_ptr<Sequence> placeHolder;
 
         std::vector<std::shared_ptr<Sequence>> sequences =
-            std::vector<std::shared_ptr<Sequence>>(99);
+            std::vector<std::shared_ptr<Sequence>>(
+                Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT);
         std::vector<std::shared_ptr<Song>> songs =
             std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
-        std::shared_ptr<Sequence> undoPlaceHolder;
         std::shared_ptr<NonRtSequencerStateWorker> nonRtSequencerStateWorker;
         std::shared_ptr<NonRtSequencerStateManager> nonRtSequencerStateManager;
 
@@ -168,14 +167,11 @@ namespace mpc::sequencer
                                         const std::shared_ptr<Track> &dest);
 
         std::shared_ptr<SequencerStateManager> getStateManager() const;
-        std::shared_ptr<NonRtSequencerStateManager> getNonRtStateManager() const;
+        std::shared_ptr<NonRtSequencerStateManager>
+        getNonRtStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
-        std::shared_ptr<Sequence> makeNewSequence(
-            SequenceIndex sequenceIndex,
-        std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt,
-        std::function<void(NonRtSequencerMessage&&)> dispatchNonRt
-        );
+        std::shared_ptr<Sequence> makeNewSequence(SequenceIndex sequenceIndex);
 
         void init();
         bool isSoloEnabled() const;

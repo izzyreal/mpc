@@ -92,12 +92,15 @@ namespace mpc
     /////////
 
     using SequenceIndex =
-        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::LAST_SEQUENCE_INDEX>;
+        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT - 1>;
 
     constexpr SequenceIndex NoSequenceIndex{-1};
     constexpr SequenceIndex MinSequenceIndex{0};
     constexpr SequenceIndex MaxSequenceIndex{
         Mpc2000XlSpecs::LAST_SEQUENCE_INDEX};
+
+    constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
+    constexpr SequenceIndex PlaceholderSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
 
     /////////
 

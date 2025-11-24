@@ -92,7 +92,8 @@ Sequencer::Sequencer(
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
     nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
-    nonRtSequencerStateWorker = std::make_shared<NonRtSequencerStateWorker>(this);
+    nonRtSequencerStateWorker =
+        std::make_shared<NonRtSequencerStateWorker>(this);
 }
 
 Sequencer::~Sequencer()
@@ -369,12 +370,12 @@ void Sequencer::undoSeq()
         return;
     }
 
-    if (!undoPlaceHolder)
+    if (!sequences[UndoSequenceIndex]->isUsed())
     {
         return;
     }
 
-    auto s = copySequence(undoPlaceHolder);
+    auto s = copySequence(sequences[UndoSequenceIndex]);
 
     const auto selectedSequenceIndex = getSelectedSequenceIndex();
 
@@ -384,7 +385,7 @@ void Sequencer::undoSeq()
     // TODO This should not happen on this thread
     nonRtSequencerStateWorker->work();
 
-    undoPlaceHolder.swap(copy);
+    sequences[UndoSequenceIndex].swap(copy);
 
     sequences[selectedSequenceIndex].swap(s);
 
@@ -412,7 +413,7 @@ void Sequencer::setSequence(const SequenceIndex sequenceIndex,
 
 void Sequencer::purgeAllSequences()
 {
-    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT; i++)
     {
         purgeSequence(i);
     }
@@ -420,16 +421,22 @@ void Sequencer::purgeAllSequences()
     setSelectedSequenceIndex(MinSequenceIndex, true);
 }
 
-std::shared_ptr<Sequence> Sequencer::makeNewSequence(
-    SequenceIndex sequenceIndex,
-    std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt,
-    std::function<void(NonRtSequencerMessage&&)> dispatchNonRt
-    )
+std::shared_ptr<Sequence>
+Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 {
+    const std::function dispatchNonRt = [this](NonRtSequencerMessage &&m)
+    {
+        nonRtSequencerStateManager->enqueue(std::move(m));
+    };
+
+    const std::function getSnapshotNonRt = [this, sequenceIndex]()
+    {
+        return nonRtSequencerStateManager->getSnapshot().getNonRtSequenceState(
+            sequenceIndex);
+    };
+
     return std::make_shared<Sequence>(
-        sequenceIndex,
-        getSnapshotNonRt,
-        dispatchNonRt,
+        sequenceIndex, getSnapshotNonRt, dispatchNonRt,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -506,17 +513,8 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence(
 
 void Sequencer::purgeSequence(const int i)
 {
-    const std::function getSnapshotNonRt = [this, i]()
-    {
-        return nonRtSequencerStateManager->getSnapshot().getNonRtSequenceState(SequenceIndex(i));
-    };
+    sequences[i] = makeNewSequence(SequenceIndex(i));
 
-    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
-    {
-        nonRtSequencerStateManager->enqueue(std::move(m));
-    };
-
-    sequences[i] = makeNewSequence(SequenceIndex(i), getSnapshotNonRt, dispatchNonRt);
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[i]->syncTrackEventIndices(
@@ -545,17 +543,7 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
 std::shared_ptr<Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
-    const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt = [this]()
-    {
-        return nullptr;
-    };
-
-    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
-    {
-        nonRtSequencerStateManager->enqueue(std::move(m));
-    };
-
-    auto copy = makeNewSequence(NoSequenceIndex, getSnapshotNonRt, dispatchNonRt);
+    auto copy = makeNewSequence(NoSequenceIndex);
     copy->init(source->getLastBarIndex());
     copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);
@@ -722,8 +710,7 @@ int Sequencer::getUsedSequenceCount() const
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<Sequence>>
-Sequencer::getUsedSequences() const
+std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
@@ -1110,7 +1097,7 @@ void Sequencer::flushTrackNoteCache()
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
     auto copy = copySequence(sequences[getSelectedSequenceIndex()]);
-    undoPlaceHolder.swap(copy);
+    // undoPlaceHolder.swap(copy);
 
     undoSeqAvailable = true;
 
@@ -1124,35 +1111,25 @@ void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 
 void Sequencer::resetUndo()
 {
-    undoPlaceHolder.reset();
+    sequences[UndoSequenceIndex]->setUsed(false);
     undoSeqAvailable = false;
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
-    const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt = [this]()
-    {
-        return nullptr;
-    };
-
-    const std::function dispatchNonRt = [this](NonRtSequencerMessage&& m)
-    {
-        nonRtSequencerStateManager->enqueue(std::move(m));
-    };
-
-    placeHolder = makeNewSequence(NoSequenceIndex, getSnapshotNonRt, dispatchNonRt);
-    return placeHolder;
+    makeNewSequence(PlaceholderSequenceIndex);
+    return sequences[PlaceholderSequenceIndex];
 }
 
-void Sequencer::clearPlaceHolder()
+void Sequencer::clearPlaceHolder() const
 {
-    placeHolder.reset();
+    sequences[PlaceholderSequenceIndex]->setUsed(false);
 }
 
 void Sequencer::movePlaceHolderTo(const int destIndex)
 {
-    sequences[destIndex].swap(placeHolder);
+    sequences[destIndex].swap(sequences[PlaceholderSequenceIndex]);
     sequences[destIndex]->syncTrackEventIndices(quarterNotesToTicks(
         stateManager->getSnapshot().getPositionQuarterNotes()));
     clearPlaceHolder();
@@ -1160,7 +1137,7 @@ void Sequencer::movePlaceHolderTo(const int destIndex)
 
 std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
 {
-    return placeHolder;
+    return sequences[PlaceholderSequenceIndex];
 }
 
 template <typename T>
