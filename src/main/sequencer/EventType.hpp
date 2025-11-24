@@ -16,6 +16,7 @@ namespace mpc::sequencer
         ChannelPressure = 7,
         SystemExclusive = 8,
         TempoChange = 9,
+        MetronomeClick = 10,
         Unknown
     };
 }

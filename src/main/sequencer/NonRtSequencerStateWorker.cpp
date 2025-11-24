@@ -5,7 +5,12 @@
 #include "Sequence.hpp"
 #include "Track.hpp"
 #include "NonRtSequencerStateManager.hpp"
+#include "SequenceStateManager.hpp"
+#include "TimeSignature.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
+#include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/Screens.hpp"
+#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
@@ -126,6 +131,66 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
 
             result.events.emplace_back(std::move(renderedEventState));
         }
+    }
+
+    const auto seqSnapshot = seq->getStateManager()->getSnapshot();
+    const auto countMetronomeScreen = sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
+    const auto metronomeRate = countMetronomeScreen->getRate();
+
+    int barTickOffset = 0;
+
+    for (int i = 0; i < seq->getBarCount(); ++i)
+    {
+        const auto ts = seqSnapshot.getTimeSignature(i);
+        const auto den = ts.denominator;
+        auto denTicks = 96 * (4.0 / den);
+
+        switch (metronomeRate)
+        {
+            case 1:
+                denTicks *= 2.0f / 3.f;
+                break;
+            case 2:
+                denTicks *= 1.0f / 2;
+                break;
+            case 3:
+                denTicks *= 1.0f / 3;
+                break;
+            case 4:
+                denTicks *= 1.0f / 4;
+                break;
+            case 5:
+                denTicks *= 1.0f / 6;
+                break;
+            case 6:
+                denTicks *= 1.0f / 8;
+                break;
+            case 7:
+                denTicks *= 1.0f / 12;
+                break;
+            default:;
+        }
+
+        const auto barLength = ts.getBarLength();
+
+        for (int j = 0; j < barLength; j += denTicks)
+        {
+            const auto eventTimeInSamples =
+                SeqUtil::getEventTimeInSamples(seq.get(), j + barTickOffset, timeInSamples, sampleRate);
+
+            if (eventTimeInSamples > timeInSamples + snapshotWindowSizeSamples)
+            {
+                continue;
+            }
+
+            EventState eventState;
+            eventState.tick = j;
+            eventState.type = EventType::MetronomeClick;
+            eventState.velocity = j == 0 ? MaxVelocity : MediumVelocity;
+            result.events.emplace_back(RenderedEventState{std::move(eventState), eventTimeInSamples});
+        }
+
+        barTickOffset += barLength;
     }
 
     return result;

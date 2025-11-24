@@ -164,9 +164,17 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (e.timeInSamples >= currentTimeInSamplesAtStartOfBuffer &&
             e.timeInSamples < currentTimeInSamplesAtStartOfBuffer + nFrames)
         {
+            const auto frameOffsetInBuffer = e.timeInSamples - currentTimeInSamplesAtStartOfBuffer;
+
+            if (e.eventState.type == EventType::MetronomeClick)
+            {
+                playMetronome(e.eventState.velocity, frameOffsetInBuffer);
+                continue;
+            }
+
             sequencer->getEventHandler()->handleFinalizedEvent(
                 e.eventState, seq->getTrack(e.eventState.trackIndex).get(),
-                e.timeInSamples - currentTimeInSamplesAtStartOfBuffer);
+                frameOffsetInBuffer);
         }
     }
 

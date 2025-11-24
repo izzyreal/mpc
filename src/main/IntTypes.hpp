@@ -20,6 +20,7 @@ namespace mpc
     constexpr Velocity MinVelocity{0};
     constexpr Velocity Velocity1{1};
     constexpr Velocity MaxVelocity{127};
+    constexpr Velocity MediumVelocity{64};
 
     /////////
 
