@@ -52,6 +52,7 @@ namespace mpc::sequencer
 
     public:
         static double ticksToFrames(double ticks, double tempo, int sr);
+        static double framesToTicks(double frames, double tempo, int sr);
 
         static double sequenceFrameLength(const Sequence *, int firstTick,
                                           int lastTick, int sr);

@@ -89,7 +89,7 @@ namespace mpc::sequencer
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
-        static double ticksToQuarterNotes(uint32_t ticks);
+        static double ticksToQuarterNotes(double ticks);
 
         void playToTick(int targetTick) const;
         SequenceIndex getSelectedSequenceIndex() const;

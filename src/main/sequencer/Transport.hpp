@@ -63,6 +63,7 @@ namespace mpc::sequencer
         void stopMetronomeTrack();
 
         int getTickPosition() const;
+        double getPositionQuarterNotes() const;
         double getPlayStartPositionQuarterNotes() const;
         int getCurrentBarIndex() const;
         int getCurrentBeatIndex() const;

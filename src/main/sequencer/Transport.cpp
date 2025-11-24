@@ -238,6 +238,13 @@ double Transport::getPlayStartPositionQuarterNotes() const
         .getPlayStartPositionQuarterNotes();
 }
 
+double Transport::getPositionQuarterNotes() const
+{
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getPositionQuarterNotes();
+}
+
 void Transport::playMetronomeTrack()
 {
     if (isPlaying())

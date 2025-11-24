@@ -75,6 +75,11 @@ double SeqUtil::ticksToFrames(const double ticks, const double tempo,
     return ticks * secondsPerTick(tempo) * sr;
 }
 
+double SeqUtil::framesToTicks(double frames, double tempo, int sr)
+{
+    return frames / (secondsPerTick(tempo) * sr);
+}
+
 double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
                                     const int lastTick, const int sr)
 {

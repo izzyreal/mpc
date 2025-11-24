@@ -96,10 +96,6 @@ namespace mpc::engine
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames();
 
-        void setTickPositionEffectiveImmediately(int newTickPos) const;
-
-        void stopSequencer() const;
-
         uint64_t metronomeOnlyTickPosition = 0;
 
         std::atomic<TimeInSamples> currentTimeInSamples{-1};

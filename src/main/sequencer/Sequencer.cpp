@@ -51,7 +51,7 @@ uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
         std::floor(quarterNotes * static_cast<double>(TICKS_PER_QUARTER_NOTE)));
 }
 
-double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
+double Sequencer::ticksToQuarterNotes(const double ticks)
 {
     return ticks / static_cast<double>(TICKS_PER_QUARTER_NOTE);
 }

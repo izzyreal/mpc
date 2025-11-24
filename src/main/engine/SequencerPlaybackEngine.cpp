@@ -15,6 +15,7 @@
 
 #include "sequencer/MidiClockOutput.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SeqUtil.hpp"
 
 #include <concurrentqueue.h>
 
@@ -98,14 +99,6 @@ bool SequencerPlaybackEngine::isRunning() const
     return sequencerIsRunning.load();
 }
 
-void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
-    const int newTickPos) const
-{
-    sequencer->getTransport()->setPosition(
-        Sequencer::ticksToQuarterNotes(newTickPos));
-    sequencer->getStateManager()->drainQueue();
-}
-
 void SequencerPlaybackEngine::enqueueEventAfterNFrames(
     const std::function<void()> &event, const unsigned long nFrames) const
 {
@@ -176,6 +169,13 @@ void SequencerPlaybackEngine::work(const int nFrames)
                 e.timeInSamples - currentTimeInSamplesAtStartOfBuffer);
         }
     }
+
+    const double tempo = sequencer->getTransport()->getTempo();
+    const auto sampleRate = getSampleRate();
+    const double tickCountForThisBuffer = SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
+    const double quarterNoteCountForThisBuffer = Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
+    sequencer->getTransport()->setPosition(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer, false, false);
+    sequencer->getStateManager()->drainQueue();
 }
 
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
