@@ -174,7 +174,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto sampleRate = getSampleRate();
     const double tickCountForThisBuffer = SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
     const double quarterNoteCountForThisBuffer = Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
-    sequencer->getTransport()->setPosition(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer, false);
+    sequencer->getTransport()->setPosition(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer);
     sequencer->getStateManager()->drainQueue();
 }
 

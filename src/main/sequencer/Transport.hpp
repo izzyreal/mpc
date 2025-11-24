@@ -1,5 +1,7 @@
 #pragma once
 
+#include "FloatTypes.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <functional>
@@ -35,12 +37,19 @@ namespace mpc::sequencer
         void stop();
         void setRecording(bool b);
         void setOverdubbing(bool b);
-        void setPosition(double positionQuarterNotes,
-                         bool shouldSetPlayStartPosition = true) const;
-        void setPositionWithinSong(
-            double positionQuarterNotes,
-            bool shouldSetPlayStartPosition = true) const;
+
+        PositionQuarterNotes getWrappedPositionInSequence(PositionQuarterNotes) const;
+
+        PositionQuarterNotes getWrappedPositionInSong(PositionQuarterNotes) const;
+
+        void moveSongToStepThatContainsPosition(PositionQuarterNotes) const;
+
+        void setPosition(PositionQuarterNotes) const;
+
+        void setPlayStartPosition(PositionQuarterNotes) const;
+
         void bumpPositionByTicks(uint8_t tickCount) const;
+
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;
