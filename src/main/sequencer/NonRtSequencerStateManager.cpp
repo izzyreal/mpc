@@ -96,6 +96,9 @@ void NonRtSequencerStateManager::applyMessage(const NonRtSequencerMessage &msg) 
                     events.emplace_back(m.eventState);
                 }
 
+                // printf("Inserted event in sequence %i track %i tick %llu\n",
+                //     m.eventState.sequenceIndex.get(), m.eventState.trackIndex.get(), m.eventState.tick);
+
                 actions.push_back(m.onComplete);
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)

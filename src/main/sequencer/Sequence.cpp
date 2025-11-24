@@ -44,8 +44,6 @@ Sequence::Sequence(
 {
     stateManager = std::make_shared<SequenceStateManager>(this);
 
-    std::function dispatch = [](NonRtSequencerMessage &&) {};
-
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
         std::function getTrackSnapshot = [trackIndex, getSnapshotNonRt]
@@ -53,7 +51,7 @@ Sequence::Sequence(
             return getSnapshotNonRt()->getTrack(trackIndex);
         };
         tracks.emplace_back(std::make_shared<Track>(
-            getTrackSnapshot, dispatch, trackIndex, this, getDefaultTrackName,
+            getTrackSnapshot, dispatchNonRt, trackIndex, this, getDefaultTrackName,
             getTickPosition, getScreens, isRecordingModeMulti,
             getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
             isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
@@ -67,7 +65,7 @@ Sequence::Sequence(
     };
 
     tempoChangeTrack = std::make_shared<Track>(
-        getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this, getDefaultTrackName,
+        getTempoTrackSnapshot, dispatchNonRt, TempoChangeTrackIndex, this, getDefaultTrackName,
         getTickPosition, getScreens, isRecordingModeMulti, getActiveSequence,
         getAutoPunchMode, getBus, isEraseButtonPressed, isProgramPadPressed,
         sampler, eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex,

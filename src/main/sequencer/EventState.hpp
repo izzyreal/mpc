@@ -67,22 +67,29 @@ namespace mpc::sequencer
             type = EventType::Unknown;
             sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
-
             tick = NoTick;
-
+            metronomeOnlyTickPosition = 0;
+            beingRecorded = false;
+            wasMoved = 0;
             noteNumber = NoNoteNumber;
             noteEventId = NoNoteEventId;
-            beingRecorded = false;
-
             duration = NoDuration;
             velocity = NoVelocityOrPressure;
             noteVariationType = NoteVariationTypeTune;
             noteVariationValue = DefaultNoteVariationValue;
+            amount = 0;
+            controllerNumber = 0;
+            controllerValue = 0;
+            programChangeProgramIndex = NoProgramIndex;
+            mixerParameter = 0;
+            mixerPad = 0;
+            mixerValue = 0;
         }
 
         bool operator==(EventState const &other) const
         {
             return type == other.type && trackIndex == other.trackIndex &&
+                   sequenceIndex == other.sequenceIndex &&
                    tick == other.tick && noteNumber == other.noteNumber &&
                    noteEventId == other.noteEventId &&
                    beingRecorded == other.beingRecorded &&
@@ -99,6 +106,11 @@ namespace mpc::sequencer
                        other.programChangeProgramIndex &&
                    mixerParameter == other.mixerParameter &&
                    mixerPad == other.mixerPad && mixerValue == other.mixerValue;
+        }
+
+        bool operator!=(EventState const &other) const
+        {
+            return !(*this == other);
         }
     };
 } // namespace mpc::sequencer

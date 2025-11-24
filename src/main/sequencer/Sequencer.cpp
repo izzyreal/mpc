@@ -543,7 +543,7 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
 std::shared_ptr<Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
-    auto copy = makeNewSequence(NoSequenceIndex);
+    auto copy = makeNewSequence(source->getSequenceIndex());
     copy->init(source->getLastBarIndex());
     copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);

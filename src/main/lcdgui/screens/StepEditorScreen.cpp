@@ -66,11 +66,13 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding({[&]
                         {
                             const auto original = computeVisibleEvents();
-                            std::vector<std::shared_ptr<Event>> clones;
+                            std::vector<EventState> clones;
                             clones.reserve(original.size());
+
                             for (auto &e : original)
                             {
-                                clones.push_back(cloneEvent(e));
+                                if (!e) continue;
+                                clones.push_back(e->getSnapshot());
                             }
                             return clones;
                         },
