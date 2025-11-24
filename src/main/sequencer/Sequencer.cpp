@@ -207,14 +207,14 @@ void Sequencer::playToTick(const int targetTick) const
         {
             for (const auto &track : seq->getTracks())
             {
-                while (track->getNextTick() <= targetTick)
+                while (track->getNextEventTick() <= targetTick)
                 {
                     track->playNext();
                 }
             }
         }
 
-        while (seq->getTempoChangeTrack()->getNextTick() <= targetTick)
+        while (seq->getTempoChangeTrack()->getNextEventTick() <= targetTick)
         {
             seq->getTempoChangeTrack()->playNext();
         }

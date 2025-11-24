@@ -126,7 +126,8 @@ namespace mpc::sequencer
         std::string getName();
         std::vector<std::shared_ptr<Event>> getEvents() const;
 
-        int getNextTick();
+        int getNextEventTick();
+        std::optional<EventState> getNextEventAndIncrementEventIndex();
         void playNext();
         bool isOn() const;
         bool isUsed() const;

@@ -585,7 +585,7 @@ void Track::processRealtimeQueuedEvents()
     }
 }
 
-int Track::getNextTick()
+int Track::getNextEventTick()
 {
     const auto snapshot = eventStateManager->getSnapshot();
 
@@ -597,6 +597,46 @@ int Track::getNextTick()
 
     processRealtimeQueuedEvents();
     return snapshot.getEventByIndex(playEventIndex).tick;
+}
+
+std::optional<EventState> Track::getNextEventAndIncrementEventIndex()
+{
+    const auto snapshot = eventStateManager->getSnapshot();
+    const auto eventCount = snapshot.getEventCount();
+
+    if (playEventIndex >= eventCount)
+    {
+        return std::nullopt;
+    }
+
+    auto event = snapshot.getEventByIndex(playEventIndex);
+
+    while (event.tick < getTickPosition())
+    {
+        playEventIndex = playEventIndex + 1;
+
+        if (playEventIndex >= eventCount)
+        {
+            return std::nullopt;
+        }
+
+        event = snapshot.getEventByIndex(playEventIndex);
+    }
+
+    if constexpr (constexpr bool shouldBeDeleted = false)
+    {
+        eventStateManager->enqueue(RemoveEvent{event.eventId});
+        return std::nullopt;
+    }
+
+    if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
+    {
+        playEventIndex = playEventIndex + 1;
+        return event;
+    }
+
+    playEventIndex = playEventIndex + 1;
+    return std::nullopt;
 }
 
 void Track::playNext()
