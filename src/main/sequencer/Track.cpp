@@ -794,7 +794,7 @@ void Track::playNext()
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
-        eventHandler->handleFinalizedEvent(event, this);
+        eventHandler->handleFinalizedEvent(event, this, 0);
     }
 
     playEventIndex = playEventIndex + 1;

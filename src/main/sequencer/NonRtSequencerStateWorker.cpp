@@ -5,7 +5,6 @@
 #include "Sequence.hpp"
 #include "Track.hpp"
 #include "NonRtSequencerStateManager.hpp"
-#include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -46,7 +45,7 @@ void NonRtSequencerStateWorker::start()
             while (running.load())
             {
                 work();
-                std::this_thread::sleep_for(std::chrono::milliseconds(3));
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
             }
         });
 }
@@ -63,9 +62,9 @@ void NonRtSequencerStateWorker::stop()
 
 void NonRtSequencerStateWorker::work()
 {
-    const auto currentTimeInSamples = sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
-
-    if (lastRenderedTimeInSamples != currentTimeInSamples)
+    if (const auto currentTimeInSamples =
+            sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
+        lastRenderedTimeInSamples != currentTimeInSamples)
     {
         lastRenderedTimeInSamples = currentTimeInSamples;
         if (currentTimeInSamples >= 0)
@@ -86,7 +85,8 @@ void NonRtSequencerStateWorker::work()
 
 PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
 {
-    constexpr TimeInSamples snapshotWindowSizeSamples{30'000};
+    printf("Rendering playback state for timeInSamples %i\n", timeInSamples);
+    constexpr TimeInSamples snapshotWindowSizeSamples{44100 * 2};
 
     PlaybackState result;
     result.timeInSamples = timeInSamples;
@@ -104,13 +104,18 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
             const auto eventTimeInSamples =
                 SeqUtil::getEventTimeInSamples(seq.get(), eventState.tick, timeInSamples, sampleRate);
 
-            const auto renderedEventState = RenderedEventState
+            if (eventTimeInSamples > timeInSamples + snapshotWindowSizeSamples)
+            {
+                continue;
+            }
+
+            const RenderedEventState renderedEventState
             {
                 eventState,
                 eventTimeInSamples
             };
 
-            printf("Event tick: %lld, timeInSamples: %i\n", eventState.tick, eventTimeInSamples);
+            // printf("currentTimeInSamples: %i, event tick: %lld, eventTimeInSamples: %i\n", timeInSamples, eventState.tick, eventTimeInSamples);
 
             result.events.emplace_back(std::move(renderedEventState));
         }

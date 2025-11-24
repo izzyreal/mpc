@@ -484,106 +484,28 @@ int SeqUtil::getEventTimeInSamples(
     const Sequence* seq,
     const int eventTick,
     const int currentTimeSamples,
-    const SampleRate sampleRate)
+    const SampleRate sr)
 {
-    if (!seq)
-        return currentTimeSamples;
+    // 1. Loop length in samples
+    const int loopLen = static_cast<int>(
+        sequenceFrameLength(seq, 0, seq->getLastTick(), sr));
 
-    const int lastTick = seq->getLastTick();
-    const auto& tces = seq->getTempoChangeEvents();
+    if (loopLen <= 0)
+        return currentTimeSamples; // degenerate sequence
 
-    const int seqLenSamples =
-        SeqUtil::sequenceFrameLength(seq, 0, lastTick, sampleRate);
+    // 2. Where are we inside the loop?
+    const int phase = currentTimeSamples % loopLen;
 
-    const int seqPosSamples = currentTimeSamples % seqLenSamples;
+    // 3. Convert event tick → sample offset from start of loop
+    const int eventSample = static_cast<int>(
+        sequenceFrameLength(seq, 0, eventTick, sr));
 
-    int tickCursor = 0;
-    int sampleCursor = 0;
+    // 4. If event is still ahead in this loop: simple forward offset
+    if (eventSample >= phase)
+        return currentTimeSamples + (eventSample - phase);
 
-    double tempo = seq->getInitialTempo();
-    size_t idx = 0;
-
-    auto segSamples = [&](int ticks, double t) {
-        double secPerTick = 60.0 / t / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
-        return (int)std::ceil(ticks * secPerTick * sampleRate);
-    };
-
-    auto findTick = [&](int targetSamples) {
-        while (true)
-        {
-            int nextTick =
-                (idx + 1 < tces.size()) ? tces[idx + 1]->getTick()
-                                        : lastTick;
-
-            int ticks = nextTick - tickCursor;
-            int seg = segSamples(ticks, tempo);
-
-            if (sampleCursor + seg > targetSamples)
-            {
-                int remaining = targetSamples - sampleCursor;
-                double secPerTick = 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
-                double spt = secPerTick * sampleRate;
-                int deltaTicks = (int)(remaining / spt);
-                return tickCursor + deltaTicks;
-            }
-
-            sampleCursor += seg;
-            tickCursor = nextTick;
-
-            if (tickCursor == lastTick)
-                return lastTick;
-
-            ++idx;
-            tempo = tces[idx]->getTempo();
-        }
-    };
-
-    const int currentTick = findTick(seqPosSamples);
-
-    int deltaTicks = eventTick - currentTick;
-    if (deltaTicks < 0)
-        deltaTicks += lastTick;
-
-    int samplesAccum = 0;
-    int remaining = deltaTicks;
-    tickCursor = currentTick;
-
-    idx = 0;
-    tempo = seq->getInitialTempo();
-
-    while (idx + 1 < tces.size() &&
-           tces[idx + 1]->getTick() <= tickCursor)
-        ++idx;
-
-    if (!tces.empty() && tces[idx]->getTick() <= tickCursor)
-        tempo = tces[idx]->getTempo();
-
-    while (remaining > 0)
-    {
-        int nextTick =
-            (idx + 1 < tces.size()) ? tces[idx + 1]->getTick()
-                                    : lastTick;
-
-        int ticksToBoundary = nextTick - tickCursor;
-        if (ticksToBoundary <= 0)
-            ticksToBoundary = remaining;
-
-        int step = std::min(remaining, ticksToBoundary);
-
-        samplesAccum += segSamples(step, tempo);
-        tickCursor += step;
-        remaining  -= step;
-
-        if (remaining > 0 &&
-            idx + 1 < tces.size() &&
-            tickCursor == tces[idx + 1]->getTick())
-        {
-            ++idx;
-            tempo = tces[idx]->getTempo();
-        }
-    }
-
-    return currentTimeSamples + samplesAccum;
+    // 5. Otherwise event lies in the next loop iteration
+    return currentTimeSamples + (loopLen - (phase - eventSample));
 }
 
 int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,

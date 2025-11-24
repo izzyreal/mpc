@@ -48,7 +48,7 @@ EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
     const EventState &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
-    const Track *track)
+    const Track *track, const int eventFrameOffsetInBuffer)
 {
     const auto sampler = mpc.getSampler();
     const auto programIndex = drumBus->getProgramIndex();
@@ -105,8 +105,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const auto engineHost = mpc.getEngineHost();
     const auto sequencerPlaybackEngine =
         engineHost->getSequencerPlaybackEngine();
-    const auto eventFrameOffsetInBuffer =
-        sequencerPlaybackEngine->getEventFrameOffset();
     const auto durationTicks = noteOnEvent.duration;
     const auto audioServer = engineHost->getAudioServer();
     const auto durationFrames = SeqUtil::ticksToFrames(
@@ -175,7 +173,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 }
 
 void EventHandler::handleFinalizedEvent(const EventState &event,
-                                        Track *const track)
+                                        Track *const track, int eventFrameOffsetInBuffer)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
     {
@@ -198,7 +196,7 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
         {
             if (isDrumNote(event.noteNumber))
             {
-                handleFinalizedDrumNoteOnEvent(event, drumBus, track);
+                handleFinalizedDrumNoteOnEvent(event, drumBus, track, eventFrameOffsetInBuffer);
             }
         }
 
@@ -216,8 +214,6 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
         const auto engineHost = mpc.getEngineHost();
         const auto sequencerPlaybackEngine =
             engineHost->getSequencerPlaybackEngine();
-        const auto eventFrameOffsetInBuffer =
-            sequencerPlaybackEngine->getEventFrameOffset();
         const auto durationTicks = event.duration;
         const auto audioServer = engineHost->getAudioServer();
         const auto durationFrames = SeqUtil::ticksToFrames(

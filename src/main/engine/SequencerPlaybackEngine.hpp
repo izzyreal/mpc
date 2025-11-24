@@ -59,8 +59,6 @@ namespace mpc::engine
 
         void startMetronome();
 
-        unsigned short getEventFrameOffset() const;
-
         void stop();
 
         bool isRunning() const;
@@ -95,27 +93,8 @@ namespace mpc::engine
         bool metronomeOnly = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
-        // Offset of current tick within current buffer
-        unsigned short tickFrameOffset = 0;
-
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames();
-
-        void triggerClickIfNeeded() const;
-
-        void displayPunchRects() const;
-
-        void stopCountingInIfRequired() const;
-
-        std::shared_ptr<sequencer::Sequence> switchToNextSequence() const;
-
-        bool processSongMode() const;
-
-        bool processSeqLoopEnabled() const;
-
-        bool processSeqLoopDisabled() const;
-
-        void processNoteRepeat() const;
 
         void setTickPositionEffectiveImmediately(int newTickPos) const;
 

@@ -1473,7 +1473,7 @@ int StepEditorScreen::getYOffset() const
 void StepEditorScreen::adhocPlayNoteEvent(const EventState &noteEvent) const
 {
     const auto track = sequencer.lock()->getSelectedTrack();
-    mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
+    mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get(), 0);
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
