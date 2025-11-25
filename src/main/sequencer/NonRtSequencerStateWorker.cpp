@@ -65,21 +65,18 @@ void NonRtSequencerStateWorker::stop()
     running.store(false);
 }
 
-void NonRtSequencerStateWorker::work()
+void NonRtSequencerStateWorker::work() const
 {
-    if (const auto currentTimeInSamples =
+    const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
+
+    const auto currentTimeInSamples =
             sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
-        lastRenderedTimeInSamples != currentTimeInSamples)
+
+    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil)
     {
-        lastRenderedTimeInSamples = currentTimeInSamples;
         if (currentTimeInSamples >= 0)
         {
-            const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
-            const auto sampleRate = playbackEngine->getSampleRate();
-            const auto playbackState = renderPlaybackState(
-                SampleRate(sampleRate), currentTimeInSamples);
-            sequencer->getNonRtStateManager()->enqueue(
-                UpdatePlaybackState{std::move(playbackState)});
+            refreshPlaybackState();
         }
         else
         {

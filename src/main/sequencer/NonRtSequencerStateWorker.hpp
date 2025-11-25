@@ -18,7 +18,7 @@ namespace mpc::sequencer
         void start();
         void stop();
 
-        void work();
+        void work() const;
 
         void refreshPlaybackState() const;
 
@@ -27,8 +27,6 @@ namespace mpc::sequencer
         std::thread workerThread;
 
         Sequencer *sequencer;
-
-        TimeInSamples lastRenderedTimeInSamples{-1};
 
         PlaybackState renderPlaybackState(SampleRate, TimeInSamples) const;
     };
