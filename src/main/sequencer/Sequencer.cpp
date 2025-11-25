@@ -179,8 +179,6 @@ void Sequencer::init()
     {
         songs[i] = std::make_shared<Song>();
     }
-
-    nonRtSequencerStateWorker->start();
 }
 
 void Sequencer::deleteSong(const int i)

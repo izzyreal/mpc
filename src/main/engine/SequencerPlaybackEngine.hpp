@@ -98,6 +98,6 @@ namespace mpc::engine
 
         uint64_t metronomeOnlyTickPosition = 0;
 
-        std::atomic<TimeInSamples> currentTimeInSamples{-1};
+        std::atomic<TimeInSamples> currentTimeInSamples{0};
     };
 } // namespace mpc::engine
