@@ -4,12 +4,14 @@
 
 #include <cstdint>
 #include <variant>
+#include <functional>
 
 namespace mpc::sequencer
 {
     struct SetPositionQuarterNotes
     {
         double positionQuarterNotes;
+        std::function<void()> onComplete = []{};
     };
 
     struct SetPlayStartPositionQuarterNotes

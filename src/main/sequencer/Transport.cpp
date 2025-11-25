@@ -805,10 +805,14 @@ void Transport::setClock(int i) const
 
 void Transport::setPosition(const double positionQuarterNotes) const
 {
-    sequencer.getStateManager()->enqueue(
-        SetPositionQuarterNotes{positionQuarterNotes});
+    auto onComplete = [this]
+    {
+        if (!isPlaying())
+            sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
+    };
 
-    sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
+    sequencer.getStateManager()->enqueue(
+        SetPositionQuarterNotes{positionQuarterNotes, onComplete});
 }
 
 void Transport::setPlayStartPosition(

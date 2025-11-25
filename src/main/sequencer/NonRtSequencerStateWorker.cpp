@@ -90,6 +90,7 @@ void NonRtSequencerStateWorker::work() const
 
 void NonRtSequencerStateWorker::refreshPlaybackState() const
 {
+    printf("Refreshing playback state...\n");
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
     const auto currentTimeInSamples = playbackEngine->getCurrentTimeInSamples();
     const auto sampleRate = playbackEngine->getSampleRate();

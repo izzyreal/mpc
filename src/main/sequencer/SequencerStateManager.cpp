@@ -38,6 +38,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 t.positionQuarterNotes = m.positionQuarterNotes;
                 publishState();
+                actions.push_back(m.onComplete);
             }
             else if constexpr (std::is_same_v<T,
                                               SetPlayStartPositionQuarterNotes>)
