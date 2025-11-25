@@ -54,7 +54,7 @@ void NonRtSequencerStateWorker::start()
             while (running.load())
             {
                 work();
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(std::chrono::milliseconds(3));
             }
         });
 }
@@ -76,7 +76,9 @@ void NonRtSequencerStateWorker::work() const
     const auto currentTimeInSamples =
         sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
 
-    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil)
+    constexpr TimeInSamples playbackStateValiditySafetyMargin = 10000;
+
+    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil - playbackStateValiditySafetyMargin)
     {
         if (currentTimeInSamples >= 0)
         {

@@ -7,7 +7,6 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -357,6 +356,7 @@ void Transport::moveSongToStepThatContainsPosition(
 void Transport::setCountEnabled(const bool b)
 {
     countEnabled = b;
+    sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
 }
 
 bool Transport::isCountEnabled() const
