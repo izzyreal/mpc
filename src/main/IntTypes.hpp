@@ -212,7 +212,12 @@ namespace mpc
     /////////
 
     using TimeInSamples = int64_t;
-    using SampleRate = ConstrainedInt<uint32_t, 1, 192'000>;
+    constexpr TimeInSamples NoTimeInSamples{-1};
+
+    /////////
+
+    using SampleRate = ConstrainedInt<uint32_t, 0, 192'000>;
     constexpr SampleRate DefaultSampleRate{44100};
+    constexpr SampleRate NoSampleRate{0};
 
 } // namespace mpc

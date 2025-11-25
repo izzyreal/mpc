@@ -76,12 +76,15 @@ void NonRtSequencerStateWorker::work()
         {
             const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
             const auto sampleRate = playbackEngine->getSampleRate();
-            const auto playbackState = renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
-            sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{std::move(playbackState)});
+            const auto playbackState = renderPlaybackState(
+                SampleRate(sampleRate), currentTimeInSamples);
+            sequencer->getNonRtStateManager()->enqueue(
+                UpdatePlaybackState{std::move(playbackState)});
         }
         else
         {
-            sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{PlaybackState()});
+            sequencer->getNonRtStateManager()->enqueue(
+                UpdatePlaybackState{PlaybackState()});
         }
     }
 
@@ -91,57 +94,30 @@ void NonRtSequencerStateWorker::work()
 void NonRtSequencerStateWorker::refreshPlaybackState() const
 {
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
-    const auto currentTimeInSamples =
-            playbackEngine->getCurrentTimeInSamples();
+    const auto currentTimeInSamples = playbackEngine->getCurrentTimeInSamples();
     const auto sampleRate = playbackEngine->getSampleRate();
-    const auto playbackState = renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
-    sequencer->getNonRtStateManager()->enqueue(UpdatePlaybackState{std::move(playbackState)});
+    const auto playbackState =
+        renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
+    sequencer->getNonRtStateManager()->enqueue(
+        UpdatePlaybackState{std::move(playbackState)});
 }
 
-PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sampleRate, const TimeInSamples timeInSamples) const
+struct RenderContext
 {
-    constexpr TimeInSamples snapshotWindowSizeSamples{44100 * 2};
+    PlaybackState playbackState;
+    Sequence *seq;
+    SequenceStateView seqSnapshot;
+};
 
-    PlaybackState result;
-    result.timeInSamples = timeInSamples;
-
-    const auto seqIndex = sequencer->isSongModeEnabled() ? sequencer->getSongSequenceIndex()
-    : sequencer->getSelectedSequenceIndex();
-    const auto seq = sequencer->getSequence(seqIndex);
-
-    for (const auto &track : seq->getTracks())
-    {
-        for (const auto &event : track->getEvents())
-        {
-            const auto eventState = event->getSnapshot();
-
-            const auto eventTimeInSamples =
-                SeqUtil::getEventTimeInSamples(seq.get(), eventState.tick, timeInSamples, sampleRate);
-
-            if (eventTimeInSamples > timeInSamples + snapshotWindowSizeSamples)
-            {
-                continue;
-            }
-
-            const RenderedEventState renderedEventState
-            {
-                eventState,
-                eventTimeInSamples
-            };
-
-            result.events.emplace_back(std::move(renderedEventState));
-        }
-    }
-
-    const auto seqSnapshot = seq->getStateManager()->getSnapshot();
-    const auto countMetronomeScreen = sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
-    const auto metronomeRate = countMetronomeScreen->getRate();
+void renderMetronome(const CountMetronomeScreen *screen, RenderContext &ctx)
+{
+    const auto metronomeRate = screen->getRate();
 
     int barTickOffset = 0;
 
-    for (int i = 0; i < seq->getBarCount(); ++i)
+    for (int i = 0; i < ctx.seq->getBarCount(); ++i)
     {
-        const auto ts = seqSnapshot.getTimeSignature(i);
+        const auto ts = ctx.seqSnapshot.getTimeSignature(i);
         const auto den = ts.denominator;
         auto denTicks = 96 * (4.0 / den);
 
@@ -175,10 +151,11 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
 
         for (int j = 0; j < barLength; j += denTicks)
         {
-            const auto eventTimeInSamples =
-                SeqUtil::getEventTimeInSamples(seq.get(), j + barTickOffset, timeInSamples, sampleRate);
+            const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
+                ctx.seq, j + barTickOffset, ctx.playbackState.currentTime,
+                ctx.playbackState.sampleRate);
 
-            if (eventTimeInSamples > timeInSamples + snapshotWindowSizeSamples)
+            if (eventTimeInSamples > ctx.playbackState.validUntil)
             {
                 continue;
             }
@@ -186,12 +163,71 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(const SampleRate sa
             EventState eventState;
             eventState.tick = j;
             eventState.type = EventType::MetronomeClick;
-            eventState.velocity = j == 0 ? MaxVelocity : MediumVelocity;
-            result.events.emplace_back(RenderedEventState{std::move(eventState), eventTimeInSamples});
+            eventState.velocity =
+                j == 0 ? mpc::MaxVelocity : mpc::MediumVelocity;
+            ctx.playbackState.events.emplace_back(
+                RenderedEventState{std::move(eventState), eventTimeInSamples});
         }
 
         barTickOffset += barLength;
     }
+}
 
-    return result;
+void renderSeq(RenderContext &ctx)
+{
+    for (const auto &track : ctx.seq->getTracks())
+    {
+        for (const auto &event : track->getEvents())
+        {
+            const auto eventState = event->getSnapshot();
+
+            const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
+                ctx.seq, eventState.tick, ctx.playbackState.currentTime,
+                ctx.playbackState.sampleRate);
+
+            if (eventTime > ctx.playbackState.validUntil)
+            {
+                continue;
+            }
+
+            const RenderedEventState renderedEventState{eventState, eventTime};
+
+            ctx.playbackState.events.emplace_back(
+                std::move(renderedEventState));
+        }
+    }
+}
+
+PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
+    const SampleRate sampleRate, const TimeInSamples currentTime) const
+{
+    constexpr TimeInSamples snapshotWindowSize{44100 * 2};
+
+    const TimeInSamples validUntil = currentTime + snapshotWindowSize;
+
+    const auto seqIndex = sequencer->isSongModeEnabled()
+                          ? sequencer->getSongSequenceIndex()
+                          : sequencer->getSelectedSequenceIndex();
+
+    const auto seq = sequencer->getSequence(seqIndex);
+
+    const auto seqSnapshot = seq->getStateManager()->getSnapshot();
+
+    PlaybackState playbackState{sampleRate, currentTime, validUntil};
+
+    RenderContext renderCtx{
+        std::move(playbackState),
+        seq.get(), std::move(seqSnapshot)
+    };
+
+    renderSeq(renderCtx);
+
+    const auto countMetronomeScreen =
+        sequencer->getScreens()
+            ->get<lcdgui::ScreenId::CountMetronomeScreen>()
+            .get();
+
+    renderMetronome(countMetronomeScreen, renderCtx);
+
+    return renderCtx.playbackState;
 }

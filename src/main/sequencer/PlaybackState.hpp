@@ -15,7 +15,9 @@ namespace mpc::sequencer
 
     struct PlaybackState
     {
-        TimeInSamples timeInSamples;
-        std::vector<RenderedEventState> events;
+        SampleRate sampleRate{NoSampleRate};
+        TimeInSamples currentTime{NoTimeInSamples};
+        TimeInSamples validUntil{NoTimeInSamples};
+        std::vector<RenderedEventState> events{};
     };
 } // namespace mpc::sequencer
