@@ -3,6 +3,8 @@
 #include "IntTypes.hpp"
 
 #include <variant>
+#include <array>
+#include <functional>
 
 namespace mpc::sequencer
 {
@@ -21,6 +23,7 @@ namespace mpc::sequencer
     {
         int barIndex;
         TimeSignature timeSignature;
+        std::function<void()> onComplete = []{};
     };
 
     using SequenceMessage = std::variant<UpdateBarLength, UpdateBarLengths, UpdateTimeSignature>;

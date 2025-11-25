@@ -1,9 +1,11 @@
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
+#include "sequencer/NonRtSequencerStateWorker.hpp"
+
 using namespace mpc::sequencer;
 
-NonRtSequencerStateManager::NonRtSequencerStateManager()
-    : AtomicStateExchange([](NonRtSequencerState &) {})
+NonRtSequencerStateManager::NonRtSequencerStateManager(NonRtSequencerStateWorker *worker)
+    : AtomicStateExchange([](NonRtSequencerState &) {}), worker(worker)
 {
 }
 
@@ -18,7 +20,11 @@ void NonRtSequencerStateManager::applyMessage(const NonRtSequencerMessage &msg) 
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            if constexpr (std::is_same_v<T, UpdatePlaybackState>)
+            if constexpr (std::is_same_v<T, RequestRefreshPlaybackState>)
+            {
+                worker->refreshPlaybackState();
+            }
+            else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
                 activeState.playbackState = m.playbackState;
             }

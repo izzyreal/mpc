@@ -8,6 +8,11 @@
 
 namespace mpc::sequencer
 {
+    struct SetTimeInSamples
+    {
+        TimeInSamples timeInSamples;
+    };
+
     struct SetPositionQuarterNotes
     {
         double positionQuarterNotes;
@@ -45,7 +50,7 @@ namespace mpc::sequencer
     };
 
     using SequencerMessage =
-        std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
+        std::variant<SetTimeInSamples, SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
                      BumpPositionByTicks, SwitchToNextSequence,
                      SetSelectedSequenceIndex, Stop, Play>;
 } // namespace mpc::sequencer

@@ -32,6 +32,7 @@ void SequenceStateManager::applyMessage(const SequenceMessage &msg) noexcept
             {
                 activeState.timeSignatures[m.barIndex] = m.timeSignature;
                 activeState.barLengths[m.barIndex] = m.timeSignature.getBarLength();
+                actions.push_back(m.onComplete);
             }
         },
         msg);

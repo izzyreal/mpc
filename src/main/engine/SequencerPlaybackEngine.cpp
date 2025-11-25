@@ -151,6 +151,10 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     if (!sequencerIsRunningAtStartOfBuffer)
     {
+        const auto seq = sequencer->getSelectedSequence();
+        const auto pos = sequencer->getTransport()->getTickPosition();
+        const auto newTimeInSamples = SeqUtil::sequenceFrameLength(seq.get(), 0, pos, getSampleRate());
+        setCurrentTimeInSamples(newTimeInSamples);
         return;
     }
 
@@ -182,7 +186,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto sampleRate = getSampleRate();
     const double tickCountForThisBuffer = SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
     const double quarterNoteCountForThisBuffer = Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
-    sequencer->getTransport()->setPosition(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer);
+
+    const auto wrappedPosition = sequencer->getTransport()->getWrappedPositionInSequence(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer);
+    sequencer->getTransport()->setPosition(wrappedPosition);
     sequencer->getStateManager()->drainQueue();
 }
 
@@ -194,4 +200,15 @@ uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
 mpc::TimeInSamples SequencerPlaybackEngine::getCurrentTimeInSamples() const
 {
     return currentTimeInSamples.load();
+}
+
+void SequencerPlaybackEngine::setCurrentTimeInSamples(const TimeInSamples timeInSamples)
+{
+    if (currentTimeInSamples.load() == timeInSamples)
+    {
+        return;
+    }
+
+    currentTimeInSamples.store(timeInSamples);
+    sequencer->getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
 }

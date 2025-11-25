@@ -69,6 +69,7 @@ namespace mpc::engine
         uint64_t getMetronomeOnlyTickPosition() const;
 
         TimeInSamples getCurrentTimeInSamples() const;
+        void setCurrentTimeInSamples(TimeInSamples);
 
         const std::function<int()> getSampleRate;
 

@@ -7,6 +7,7 @@
 
 namespace mpc::sequencer
 {
+    class NonRtSequencerStateWorker;
     class TrackEvent;
 
     class NonRtSequencerStateManager final
@@ -14,10 +15,13 @@ namespace mpc::sequencer
               NonRtSequencerState, NonRtSequencerStateView, NonRtSequencerMessage>
     {
     public:
-        explicit NonRtSequencerStateManager();
+        explicit NonRtSequencerStateManager(NonRtSequencerStateWorker *);
         ~NonRtSequencerStateManager() override;
 
     protected:
         void applyMessage(const NonRtSequencerMessage &msg) noexcept override;
+
+    private:
+        NonRtSequencerStateWorker *worker;
     };
 } // namespace mpc::sequencer

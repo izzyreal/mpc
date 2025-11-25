@@ -63,8 +63,10 @@ namespace mpc::sequencer
         PlaybackState playbackState;
     };
 
+    struct RequestRefreshPlaybackState{};
+
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent, UpdatePlaybackState>;
+                     FinalizeNonLiveNoteEvent, UpdatePlaybackState, RequestRefreshPlaybackState>;
 } // namespace mpc::sequencer

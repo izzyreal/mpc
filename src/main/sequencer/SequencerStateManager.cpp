@@ -40,6 +40,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 publishState();
                 actions.push_back(m.onComplete);
             }
+            else if constexpr (std::is_same_v<T, SetTimeInSamples>)
+            {
+                sequencer->getSequencerPlaybackEngine()->setCurrentTimeInSamples(m.timeInSamples);
+            }
             else if constexpr (std::is_same_v<T,
                                               SetPlayStartPositionQuarterNotes>)
             {

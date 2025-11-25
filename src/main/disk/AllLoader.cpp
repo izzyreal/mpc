@@ -41,6 +41,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 #include "sequencer/NonRtSequencerStateWorker.hpp"
 
 using namespace mpc::lcdgui;
@@ -298,7 +299,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         }
     }
 
-    mpc.getSequencer()->getNonRtSequencerStateWorker()->refreshPlaybackState();
+    mpc.getSequencer()->getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
 }
 
 std::vector<std::shared_ptr<Sequence>>

@@ -94,7 +94,6 @@ Sequencer::Sequencer(
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
 
     const auto isCurrentScreen = [this](const std::initializer_list<ScreenId> &ids)
     {
@@ -114,6 +113,8 @@ Sequencer::Sequencer(
 
     nonRtSequencerStateWorker =
         std::make_shared<NonRtSequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
+
+    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>(nonRtSequencerStateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -300,6 +301,8 @@ void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
     stateManager->enqueue(SetSelectedSequenceIndex{
         std::clamp(sequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex),
         shouldSetPositionTo0});
+
+    nonRtSequencerStateManager->enqueue(RequestRefreshPlaybackState{});
 }
 
 void Sequencer::setTimeDisplayStyle(const int i)

@@ -39,8 +39,9 @@ Sequence::Sequence(
     std::function<int64_t()> getPunchOutTime,
     std::function<bool()> isSoloEnabled,
     std::function<int()> getCurrentBarIndex)
-    : sequenceIndex(sequenceIndex), getSnapshotNonRt(getSnapshotNonRt), dispatchNonRt(dispatchNonRt),
-      getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
+    : sequenceIndex(sequenceIndex), getSnapshotNonRt(getSnapshotNonRt),
+      dispatchNonRt(dispatchNonRt), getScreens(getScreens),
+      getCurrentBarIndex(getCurrentBarIndex)
 {
     stateManager = std::make_shared<SequenceStateManager>(this);
 
@@ -51,12 +52,13 @@ Sequence::Sequence(
             return getSnapshotNonRt()->getTrack(trackIndex);
         };
         tracks.emplace_back(std::make_shared<Track>(
-            getTrackSnapshot, dispatchNonRt, trackIndex, this, getDefaultTrackName,
-            getTickPosition, getScreens, isRecordingModeMulti,
-            getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
-            isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
-            getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
-            getPunchInTime, getPunchOutTime, isSoloEnabled));
+            getTrackSnapshot, dispatchNonRt, trackIndex, this,
+            getDefaultTrackName, getTickPosition, getScreens,
+            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
+            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
+            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
+            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
+            isSoloEnabled));
     }
 
     std::function getTempoTrackSnapshot = [getSnapshotNonRt]
@@ -65,12 +67,12 @@ Sequence::Sequence(
     };
 
     tempoChangeTrack = std::make_shared<Track>(
-        getTempoTrackSnapshot, dispatchNonRt, TempoChangeTrackIndex, this, getDefaultTrackName,
-        getTickPosition, getScreens, isRecordingModeMulti, getActiveSequence,
-        getAutoPunchMode, getBus, isEraseButtonPressed, isProgramPadPressed,
-        sampler, eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex,
-        isRecording, isOverdubbing, isPunchEnabled, getPunchInTime,
-        getPunchOutTime, isSoloEnabled);
+        getTempoTrackSnapshot, dispatchNonRt, TempoChangeTrackIndex, this,
+        getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
+        getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
+        isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
+        getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
+        getPunchInTime, getPunchOutTime, isSoloEnabled);
     tempoChangeTrack->setUsed(true);
 
     tracks.push_back(tempoChangeTrack);
@@ -230,6 +232,7 @@ std::shared_ptr<Track> Sequence::getTrack(const int i)
 void Sequence::setUsed(const bool b)
 {
     used = b;
+    dispatchNonRt(RequestRefreshPlaybackState{});
 }
 
 bool Sequence::isUsed() const
@@ -263,7 +266,7 @@ void Sequence::init(const int newLastBarIndex)
 
     initLoop();
 
-    used = true;
+    setUsed(true);
 }
 
 void Sequence::setBarLengths(
@@ -336,9 +339,14 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
         }
     }
 
-    stateManager->enqueue(
-        UpdateTimeSignature{barIndex, TimeSignature{TimeSigNumerator(num),
-                                                    TimeSigDenominator(den)}});
+    const auto onComplete = [this]
+    {
+        dispatchNonRt(RequestRefreshPlaybackState{});
+    };
+
+    const auto ts = TimeSignature{TimeSigNumerator(num), TimeSigDenominator(den)};
+
+    stateManager->enqueue(UpdateTimeSignature{barIndex, ts, onComplete});
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()

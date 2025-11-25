@@ -1,7 +1,9 @@
 #include "Transport.hpp"
 
 #include "FloatTypes.hpp"
+#include "NonRtSequencerStateManager.hpp"
 #include "NonRtSequencerStateWorker.hpp"
+#include "SeqUtil.hpp"
 #include "SequenceStateManager.hpp"
 #include "Sequencer.hpp"
 #include "hardware/Hardware.hpp"
@@ -356,7 +358,7 @@ void Transport::moveSongToStepThatContainsPosition(
 void Transport::setCountEnabled(const bool b)
 {
     countEnabled = b;
-    sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
+    sequencer.getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
 }
 
 bool Transport::isCountEnabled() const
@@ -808,7 +810,9 @@ void Transport::setPosition(const double positionQuarterNotes) const
     auto onComplete = [this]
     {
         if (!isPlaying())
-            sequencer.getNonRtSequencerStateWorker()->refreshPlaybackState();
+        {
+            sequencer.getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
+        }
     };
 
     sequencer.getStateManager()->enqueue(
