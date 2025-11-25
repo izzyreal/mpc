@@ -7,6 +7,7 @@
 #include "NonRtSequencerStateManager.hpp"
 #include "SequenceStateManager.hpp"
 #include "TimeSignature.hpp"
+#include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/Screens.hpp"
@@ -15,8 +16,11 @@
 
 using namespace mpc::sequencer;
 
-NonRtSequencerStateWorker::NonRtSequencerStateWorker(Sequencer *sequencer)
-    : running(false), sequencer(sequencer)
+NonRtSequencerStateWorker::NonRtSequencerStateWorker(
+    const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> &isCurrentScreen,
+    const std::function<bool()> &isRecMainWithoutPlaying, Sequencer *sequencer)
+    : running(false), isCurrentScreen(isCurrentScreen),
+      isRecMainWithoutPlaying(isRecMainWithoutPlaying), sequencer(sequencer)
 {
 }
 
@@ -70,7 +74,7 @@ void NonRtSequencerStateWorker::work() const
     const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
 
     const auto currentTimeInSamples =
-            sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
+        sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
 
     if (currentTimeInSamples > snapshot.getPlaybackState().validUntil)
     {
@@ -103,13 +107,44 @@ void NonRtSequencerStateWorker::refreshPlaybackState() const
 struct RenderContext
 {
     PlaybackState playbackState;
+    Sequencer *sequencer;
     Sequence *seq;
     SequenceStateView seqSnapshot;
 };
 
-void renderMetronome(const CountMetronomeScreen *screen, RenderContext &ctx)
+struct MetronomeRenderContext
 {
-    const auto metronomeRate = screen->getRate();
+    CountMetronomeScreen *countMetronomeScreen;
+    bool isStepEditor;
+    bool isRecMainWithoutPlaying;
+};
+
+void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
+{
+    if (!ctx.sequencer->getTransport()->isCountEnabled())
+    {
+        return;
+    }
+
+    if (ctx.sequencer->getTransport()->isRecordingOrOverdubbing())
+    {
+        if (!mctx.countMetronomeScreen->getInRec() &&
+            !ctx.sequencer->getTransport()->isCountingIn())
+        {
+            return;
+        }
+    }
+    else
+    {
+        if (!mctx.isStepEditor && !mctx.countMetronomeScreen->getInPlay() &&
+            !ctx.sequencer->getTransport()->isCountingIn() &&
+            !mctx.isRecMainWithoutPlaying)
+        {
+            return;
+        }
+    }
+
+    const auto metronomeRate = mctx.countMetronomeScreen->getRate();
 
     int barTickOffset = 0;
 
@@ -204,8 +239,8 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
     const TimeInSamples validUntil = currentTime + snapshotWindowSize;
 
     const auto seqIndex = sequencer->isSongModeEnabled()
-                          ? sequencer->getSongSequenceIndex()
-                          : sequencer->getSelectedSequenceIndex();
+                              ? sequencer->getSongSequenceIndex()
+                              : sequencer->getSelectedSequenceIndex();
 
     const auto seq = sequencer->getSequence(seqIndex);
 
@@ -213,10 +248,8 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
 
     PlaybackState playbackState{sampleRate, currentTime, validUntil};
 
-    RenderContext renderCtx{
-        std::move(playbackState),
-        seq.get(), std::move(seqSnapshot)
-    };
+    RenderContext renderCtx{std::move(playbackState), sequencer, seq.get(),
+                            std::move(seqSnapshot)};
 
     renderSeq(renderCtx);
 
@@ -225,7 +258,12 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
             ->get<lcdgui::ScreenId::CountMetronomeScreen>()
             .get();
 
-    renderMetronome(countMetronomeScreen, renderCtx);
+    const bool isStepEditor =
+        isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
+
+    const MetronomeRenderContext mctx{countMetronomeScreen, isStepEditor, isRecMainWithoutPlaying()};
+
+    renderMetronome(renderCtx, mctx);
 
     return renderCtx.playbackState;
 }

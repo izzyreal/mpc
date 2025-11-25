@@ -2,8 +2,6 @@
 
 #include "BusType.hpp"
 #include "IntTypes.hpp"
-#include "NonRtSequencerMessage.hpp"
-#include "NonRtSequencerStateView.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -11,6 +9,10 @@
 #include <string>
 #include <functional>
 
+namespace mpc::controller
+{
+    class ClientHardwareEventController;
+}
 namespace mpc::lcdgui
 {
     class LayeredScreen;
@@ -59,7 +61,7 @@ namespace mpc::performance
 
 namespace mpc::sequencer
 {
-    class Sequencer final
+    class Sequencer final : public std::enable_shared_from_this<Sequencer>
     {
     public:
         enum StopMode
@@ -68,22 +70,26 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(const std::shared_ptr<lcdgui::LayeredScreen> &,
-                  const std::function<std::shared_ptr<lcdgui::Screens>()> &,
-                  std::vector<std::shared_ptr<engine::Voice>> *,
-                  const std::function<bool()> &isAudioServerRunning,
-                  const std::shared_ptr<hardware::Hardware> &,
-                  const std::function<bool()> &isBouncePrepared,
-                  const std::function<void()> &startBouncing,
-                  const std::function<void()> &stopBouncing,
-                  const std::function<bool()> &isBouncing,
-                  const std::function<bool()> &isEraseButtonPressed,
-                  const std::shared_ptr<performance::PerformanceManager> &,
-                  const std::shared_ptr<sampler::Sampler> &,
-                  const std::shared_ptr<audiomidi::EventHandler> &,
-                  const std::function<bool()> &isSixteenLevelsEnabled,
-                  const std::function<
-                      std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
+        Sequencer(
+            const std::shared_ptr<lcdgui::LayeredScreen> &,
+            const std::function<std::shared_ptr<lcdgui::Screens>()> &,
+            std::vector<std::shared_ptr<engine::Voice>> *,
+            const std::function<bool()> &isAudioServerRunning,
+            const std::shared_ptr<hardware::Hardware> &,
+            const std::function<bool()> &isBouncePrepared,
+            const std::function<void()> &startBouncing,
+            const std::function<void()> &stopBouncing,
+            const std::function<bool()> &isBouncing,
+            const std::function<bool()> &isEraseButtonPressed,
+            const std::shared_ptr<performance::PerformanceManager> &,
+            const std::shared_ptr<sampler::Sampler> &,
+            const std::shared_ptr<audiomidi::EventHandler> &,
+            const std::function<bool()> &isSixteenLevelsEnabled,
+            const std::function<
+                std::shared_ptr<engine::SequencerPlaybackEngine>()> &,
+            const std::function<
+                std::shared_ptr<controller::ClientHardwareEventController>()>
+                &getClientHardwareEventController);
 
         ~Sequencer();
 
@@ -91,7 +97,6 @@ namespace mpc::sequencer
         static uint32_t quarterNotesToTicks(double quarterNotes);
         static double ticksToQuarterNotes(double ticks);
 
-        void playToTick(int targetTick) const;
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
@@ -112,10 +117,11 @@ namespace mpc::sequencer
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
-        std::shared_ptr<NonRtSequencerStateWorker> getNonRtSequencerStateWorker() const;
+        std::shared_ptr<NonRtSequencerStateWorker>
+        getNonRtSequencerStateWorker() const;
 
         const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-    getSequencerPlaybackEngine;
+            getSequencerPlaybackEngine;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
@@ -157,7 +163,8 @@ namespace mpc::sequencer
         SequenceIndex nextSq{NoSequenceIndex};
 
         std::shared_ptr<Sequence>
-        copySequence(const std::shared_ptr<Sequence> &source, SequenceIndex destinationIndex);
+        copySequence(const std::shared_ptr<Sequence> &source,
+                     SequenceIndex destinationIndex);
 
         static void
         copySequenceParameters(const std::shared_ptr<Sequence> &source,

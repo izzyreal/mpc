@@ -31,6 +31,7 @@
 #include "StrUtil.hpp"
 #include "NonRtSequencerStateManager.hpp"
 #include "NonRtSequencerStateWorker.hpp"
+#include "SeqUtil.hpp"
 
 #include <chrono>
 
@@ -79,7 +80,10 @@ Sequencer::Sequencer(
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled,
     const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
-        &getSequencerPlaybackEngine)
+        &getSequencerPlaybackEngine,
+    const std::function<
+        std::shared_ptr<controller::ClientHardwareEventController>()>
+        &getClientHardwareEventController)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen),
@@ -91,8 +95,25 @@ Sequencer::Sequencer(
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
     nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>();
+
+    const auto isCurrentScreen = [this](const std::initializer_list<ScreenId> &ids)
+    {
+        return this->layeredScreen->isCurrentScreen(ids);
+    };
+
+    const auto isRecMainWithoutPlaying =
+        [this, getClientHardwareEventController]
+    {
+        return SeqUtil::isRecMainWithoutPlaying(
+            shared_from_this(),
+            this->getScreens()->get<ScreenId::TimingCorrectScreen>(),
+            this->layeredScreen->getCurrentScreenName(),
+            this->hardware->getButton(hardware::REC),
+            getClientHardwareEventController());
+    };
+
     nonRtSequencerStateWorker =
-        std::make_shared<NonRtSequencerStateWorker>(this);
+        std::make_shared<NonRtSequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
 }
 
 Sequencer::~Sequencer()

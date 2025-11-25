@@ -1,7 +1,9 @@
 #pragma once
 
 #include "PlaybackState.hpp"
+#include "lcdgui/ScreenId.hpp"
 
+#include <functional>
 #include <thread>
 #include <atomic>
 
@@ -12,7 +14,10 @@ namespace mpc::sequencer
     class NonRtSequencerStateWorker
     {
     public:
-        explicit NonRtSequencerStateWorker(Sequencer *);
+        explicit NonRtSequencerStateWorker(
+            const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> &isCurrentScreen,
+            const std::function<bool()>& isRecMainWithoutPlaying,
+            Sequencer *);
         ~NonRtSequencerStateWorker();
 
         void start();
@@ -25,6 +30,9 @@ namespace mpc::sequencer
     private:
         std::atomic<bool> running;
         std::thread workerThread;
+
+        const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> isCurrentScreen;
+        const std::function<bool()> isRecMainWithoutPlaying;
 
         Sequencer *sequencer;
 

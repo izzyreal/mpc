@@ -22,7 +22,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 
@@ -40,10 +39,9 @@
 #include "lcdgui/screens/OthersScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/NonRtSequencerStateWorker.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -299,6 +297,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             mpcSong->setLoopEnabled(allSong->isLoopEnabled());
         }
     }
+
+    mpc.getSequencer()->getNonRtSequencerStateWorker()->refreshPlaybackState();
 }
 
 std::vector<std::shared_ptr<Sequence>>

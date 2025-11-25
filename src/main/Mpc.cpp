@@ -185,7 +185,12 @@ void Mpc::init()
         [&]
         {
             return engineHost->getSequencerPlaybackEngine();
+        },
+        [&]
+        {
+            return clientEventController->clientHardwareEventController;
         });
+
     MLOG("Sequencer created");
 
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
