@@ -6,7 +6,6 @@
 #include "Song.hpp"
 #include "Step.hpp"
 #include "Transport.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -27,12 +26,16 @@ NonRtSequencerStateManager::~NonRtSequencerStateManager()
     //    printf("~NonRtSequencerStateManager\n");
 }
 
-template<typename V, typename... Ts>
-bool isVariantAnyOf(const V& v, std::variant<Ts...> const&) {
-    return std::visit([](auto const& x) {
-        using X = std::decay_t<decltype(x)>;
-        return ((std::is_same_v<X, Ts>) || ...);
-    }, v);
+template <typename V, typename... Ts>
+bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
+{
+    return std::visit(
+        [](auto const &x)
+        {
+            using X = std::decay_t<decltype(x)>;
+            return ((std::is_same_v<X, Ts>) || ...);
+        },
+        v);
 }
 
 void NonRtSequencerStateManager::applyMessage(
@@ -110,7 +113,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
-                printf("Applying InsertEvent\n");
+                // printf("Applying InsertEvent\n");
                 assert(m.eventState.eventId != NoEventId);
                 auto &events = activeState.sequences[m.eventState.sequenceIndex]
                                    .tracks[m.eventState.trackIndex]
@@ -311,7 +314,7 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, Stop>)
             {
                 // printf("Applying Stop\n");
-                worker->getSequencer()->getTransport()->stop();
+                applyStopMessage();
             }
             else if constexpr (std::is_same_v<T, Play>)
             {
@@ -321,31 +324,38 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
                 // printf("Applying UpdateBarLength\n");
-                activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.length;
+                activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] =
+                    m.length;
             }
             else if constexpr (std::is_same_v<T, UpdateBarLengths>)
             {
                 // printf("Applying UpdateBarLengths\n");
-                activeState.sequences[m.sequenceIndex].barLengths = m.barLengths;
+                activeState.sequences[m.sequenceIndex].barLengths =
+                    m.barLengths;
             }
             else if constexpr (std::is_same_v<T, UpdateTimeSignatures>)
             {
                 // printf("Applying UpdateTimeSignatures\n");
-                activeState.sequences[m.sequenceIndex].timeSignatures = m.timeSignatures;
+                activeState.sequences[m.sequenceIndex].timeSignatures =
+                    m.timeSignatures;
             }
             else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
             {
                 // printf("Applying UpdateTimeSignature\n");
-                activeState.sequences[m.sequenceIndex].timeSignatures[m.barIndex] = m.timeSignature;
-                activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.timeSignature.getBarLength();
+                activeState.sequences[m.sequenceIndex]
+                    .timeSignatures[m.barIndex] = m.timeSignature;
+                activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] =
+                    m.timeSignature.getBarLength();
             }
             else if constexpr (std::is_same_v<T, UpdateEvents>)
             {
                 // printf("Applying UpdateEvents\n");
-                activeState.sequences[m.sequence].tracks[m.track].events = m.eventStates;
+                activeState.sequences[m.sequence].tracks[m.track].events =
+                    m.eventStates;
 
                 EventId eventId = MinEventId;
-                for (auto &e : activeState.sequences[m.sequence].tracks[m.track].events)
+                for (auto &e :
+                     activeState.sequences[m.sequence].tracks[m.track].events)
                 {
                     e.sequenceIndex = m.sequence;
                     e.trackIndex = m.track;
@@ -376,7 +386,8 @@ void NonRtSequencerStateManager::applyMessage(
         },
         msg);
 
-    if (isVariantAnyOf(msg, NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh{}))
+    if (isVariantAnyOf(
+            msg, NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh{}))
     {
         if (!sequencer->getTransport()->isPlaying())
         {
@@ -385,26 +396,24 @@ void NonRtSequencerStateManager::applyMessage(
     }
 }
 
-void NonRtSequencerStateManager::applyPlayMessage(
-    const bool fromStart) const noexcept
+void NonRtSequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
 {
-    const auto transport = worker->getSequencer()->getTransport();
-
-    if (transport->isPlaying())
+    if (activeState.transportState.sequencerRunning)
     {
         return;
     }
 
+    const auto transport = sequencer->getTransport();
+
     transport->setEndOfSong(false);
 
-    const auto songScreen = worker->getSequencer()
-                                ->getScreens()
-                                ->get<lcdgui::ScreenId::SongScreen>();
+    const auto songScreen =
+        sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
 
     const auto currentSong =
-        worker->getSequencer()->getSong(songScreen->getSelectedSongIndex());
+        sequencer->getSong(songScreen->getSelectedSongIndex());
 
-    const bool songMode = worker->getSequencer()->isSongModeEnabled();
+    const bool songMode = sequencer->isSongModeEnabled();
 
     if (songMode)
     {
@@ -415,14 +424,12 @@ void NonRtSequencerStateManager::applyPlayMessage(
 
         if (fromStart)
         {
-            const int oldSongSequenceIndex =
-                worker->getSequencer()->getSongSequenceIndex();
+            const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
             songScreen->setOffset(-1);
-            if (worker->getSequencer()->getSongSequenceIndex() !=
-                oldSongSequenceIndex)
+            if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
             {
-                worker->getSequencer()->setSelectedSequenceIndex(
-                    worker->getSequencer()->getSongSequenceIndex(), true);
+                sequencer->setSelectedSequenceIndex(
+                    sequencer->getSongSequenceIndex(), true);
             }
         }
 
@@ -440,18 +447,14 @@ void NonRtSequencerStateManager::applyPlayMessage(
 
         if (const std::shared_ptr<Step> currentStep =
                 currentSong->getStep(step).lock();
-            !worker->getSequencer()
-                 ->getSequence(currentStep->getSequence())
-                 ->isUsed())
+            !sequencer->getSequence(currentStep->getSequence())->isUsed())
         {
             return;
         }
     }
 
     const auto countMetronomeScreen =
-        worker->getSequencer()
-            ->getScreens()
-            ->get<lcdgui::ScreenId::CountMetronomeScreen>();
+        sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
 
     const auto countInMode = countMetronomeScreen->getCountInMode();
 
@@ -467,7 +470,7 @@ void NonRtSequencerStateManager::applyPlayMessage(
         }
     }
 
-    const auto activeSequence = worker->getSequencer()->getSelectedSequence();
+    const auto activeSequence = sequencer->getSelectedSequence();
 
     if (transport->isCountEnabled() && !songMode)
     {
@@ -499,7 +502,7 @@ void NonRtSequencerStateManager::applyPlayMessage(
 
     if (positionQuarterNotesToStartPlayingFrom)
     {
-        transport->setPosition(*positionQuarterNotesToStartPlayingFrom);
+        activeState.transportState.positionQuarterNotes = *positionQuarterNotesToStartPlayingFrom;
     }
 
     if (!songMode)
@@ -515,16 +518,79 @@ void NonRtSequencerStateManager::applyPlayMessage(
 
         if (transport->isRecordingOrOverdubbing())
         {
-            worker->getSequencer()->storeSelectedSequenceInUndoPlaceHolder();
+            sequencer->storeSelectedSequenceInUndoPlaceHolder();
         }
     }
 
-    if (worker->getSequencer()->isBouncePrepared())
+    if (sequencer->isBouncePrepared())
     {
-        worker->getSequencer()->startBouncing();
+        sequencer->startBouncing();
     }
     else
     {
-        transport->getSequencerPlaybackEngine()->start();
+        activeState.transportState.sequencerRunning = true;
     }
+}
+void NonRtSequencerStateManager::applyStopMessage() noexcept
+{
+    activeState.transportState.sequencerRunning = false;
+    // const bool bouncing = sequencer.isBouncing();
+    //
+    // if (!isPlaying() && !bouncing)
+    // {
+    //     if (const auto snapshot = sequencer.getNonRtStateManager()->getSnapshot();
+    //         snapshot.getPositionQuarterNotes() != 0.0)
+    //     {
+    //         setPosition(0); // real 2kxl doesn't do this
+    //     }
+    //
+    //     return;
+    // }
+    //
+    // playedStepRepetitions = 0;
+    // sequencer.setNextSq(NoSequenceIndex);
+    //
+    // const auto activeSequence = sequencer.getSelectedSequence();
+    // const auto pos = getTickPosition();
+    //
+    // int64_t newTickPosition = pos;
+    //
+    // if (pos > activeSequence->getLastTick())
+    // {
+    //     newTickPosition = activeSequence->getLastTick();
+    // }
+    //
+    // recording = false;
+    // overdubbing = false;
+    //
+    // if (countingIn)
+    // {
+    //     newTickPosition = countInStartPos;
+    //     resetCountInPositions();
+    //     countingIn = false;
+    // }
+    //
+    // setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
+    //
+    // const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    //
+    // if (endOfSong)
+    // {
+    //     songScreen->setOffset(songScreen->getOffset() + 1);
+    // }
+    //
+    // const auto vmpcDirectToDiskRecorderScreen =
+    //     sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
+    //
+    // if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
+    // {
+    //     sequencer.stopBouncing();
+    // }
+    //
+    // sequencer.hardware->getLed(hardware::ComponentId::PLAY_LED)
+    //     ->setEnabled(false);
+    // sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
+    //     ->setEnabled(false);
+    // sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
+    //     ->setEnabled(false);
 }

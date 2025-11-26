@@ -27,7 +27,7 @@ void ChangeBars2Screen::open()
 void ChangeBars2Screen::displayCurrent() const
 {
     const auto seq = sequencer.lock()->getSelectedSequence();
-    findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
+    findLabel("current")->setText(std::to_string(seq->getBarCount()));
 }
 
 void ChangeBars2Screen::function(const int i)

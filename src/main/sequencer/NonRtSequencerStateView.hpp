@@ -79,6 +79,8 @@ namespace mpc::sequencer
 
         int64_t getPositionTicks() const;
 
+        bool isSequencerRunning() const;
+
     private:
         const std::shared_ptr<const NonRtSequencerState> state;
     };

@@ -28,7 +28,7 @@ void BarsScreen::open()
     const auto lastBarIndexFrom =
         fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
     const auto maxAfterBarIndex =
-        toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+        toSequence->isUsed() ? toSequence->getBarCount() : 0;
 
     if (firstBar > lastBarIndexFrom)
     {
@@ -134,7 +134,7 @@ void BarsScreen::turnWheel(const int increment)
         const auto toSequence =
             sequencer.lock()->getSequence(eventsScreen->toSq);
         const auto maxAfterBarIndex =
-            toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+            toSequence->isUsed() ? toSequence->getBarCount() : 0;
 
         if (afterBar > maxAfterBarIndex)
         {
@@ -151,7 +151,7 @@ void BarsScreen::turnWheel(const int increment)
             return;
         }
 
-        setAfterBar(afterBar + increment, toSequence->getLastBarIndex() + 1);
+        setAfterBar(afterBar + increment, toSequence->getBarCount());
     }
     else if (focusedFieldName == "firstbar")
     {

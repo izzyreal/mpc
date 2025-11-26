@@ -203,7 +203,7 @@ AllSequence::AllSequence(Sequence *seq, int number)
         saveBytes[i] = PADDING2[i - PADDING2_OFFSET];
     }
 
-    setBarCount(seq->getLastBarIndex() + 1);
+    setBarCount(seq->getBarCount());
     setLastTick(seq);
     saveBytes[SEQUENCE_INDEX_OFFSET] = number;
     setUnknown32BitInt(seq);

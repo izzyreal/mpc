@@ -37,7 +37,7 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && getSequencerPlaybackEngine()->isRunning();
+    return !metronomeOnlyEnabled && sequencer.getNonRtStateManager()->getSnapshot().isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
@@ -109,69 +109,9 @@ void Transport::overdubFromStart()
     play(true);
 }
 
-void Transport::stop()
+void Transport::stop() const
 {
-    const bool bouncing = sequencer.isBouncing();
-
-    if (!isPlaying() && !bouncing)
-    {
-        if (const auto snapshot = sequencer.getNonRtStateManager()->getSnapshot();
-            snapshot.getPositionQuarterNotes() != 0.0)
-        {
-            setPosition(0); // real 2kxl doesn't do this
-        }
-
-        return;
-    }
-
-    playedStepRepetitions = 0;
-    sequencer.setNextSq(NoSequenceIndex);
-
-    const auto activeSequence = sequencer.getSelectedSequence();
-    const auto pos = getTickPosition();
-
-    int64_t newTickPosition = pos;
-
-    if (pos > activeSequence->getLastTick())
-    {
-        newTickPosition = activeSequence->getLastTick();
-    }
-
-    getSequencerPlaybackEngine()->stop();
-
-    recording = false;
-    overdubbing = false;
-
-    if (countingIn)
-    {
-        newTickPosition = countInStartPos;
-        resetCountInPositions();
-        countingIn = false;
-    }
-
-    setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
-
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-
-    if (endOfSong)
-    {
-        songScreen->setOffset(songScreen->getOffset() + 1);
-    }
-
-    const auto vmpcDirectToDiskRecorderScreen =
-        sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-
-    if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
-    {
-        sequencer.stopBouncing();
-    }
-
-    sequencer.hardware->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(false);
-    sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(false);
+    sequencer.getNonRtStateManager()->enqueue(Stop{});
 }
 
 void Transport::resetCountInPositions()
@@ -405,7 +345,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    getSequencerPlaybackEngine()->startMetronome();
+    // getSequencerPlaybackEngine()->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -415,7 +355,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    getSequencerPlaybackEngine()->stop();
+    // getSequencerPlaybackEngine()->stop();
     metronomeOnlyEnabled = false;
 }
 
@@ -541,7 +481,7 @@ int Transport::getCurrentBarIndex() const
 
     if (pos == seq->getLastTick())
     {
-        return seq->getLastBarIndex() + 1;
+        return seq->getBarCount();
     }
 
     int tickCounter = 0;

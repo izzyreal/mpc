@@ -74,6 +74,11 @@ namespace mpc::sequencer
     struct SetPositionQuarterNotes
     {
         double positionQuarterNotes;
+        explicit SetPositionQuarterNotes(double positionQuarterNotes)
+            :positionQuarterNotes(positionQuarterNotes)
+        {
+            printf("");
+        }
     };
 
     struct SetPlayStartPositionQuarterNotes

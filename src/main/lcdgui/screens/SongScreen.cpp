@@ -436,14 +436,14 @@ void SongScreen::displayNow0() const
             continue;
         }
 
-        const auto bars = (seq->getLastBarIndex() + 1) * step->getRepeats();
+        const auto bars = (seq->getBarCount()) * step->getRepeats();
 
         pastBars += bars;
     }
 
     pastBars +=
         sequencer.lock()->getTransport()->getPlayedStepRepetitions() *
-        (sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1);
+        (sequencer.lock()->getSelectedSequence()->getBarCount());
 
     findField("now0")->setTextPadded(
         sequencer.lock()->getTransport()->getCurrentBarIndex() + 1 + pastBars,

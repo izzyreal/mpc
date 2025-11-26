@@ -44,7 +44,7 @@ BarList::BarList(sequencer::Sequence *seq)
     auto ticksPerBeat = 0;
     auto lastTick = 0;
 
-    for (int i = 0; i < seq->getLastBarIndex() + 1; i++)
+    for (int i = 0; i < seq->getBarCount(); i++)
     {
         const auto barLength = seq->getBarLength(i);
         lastTick += barLength;
@@ -62,7 +62,7 @@ BarList::BarList(sequencer::Sequence *seq)
 
     for (int i = 0; i < 4; i++)
     {
-        saveBytes[(seq->getLastBarIndex() + 1) * 4 + i] = bar.getBytes()[i];
+        saveBytes[(seq->getBarCount()) * 4 + i] = bar.getBytes()[i];
     }
 }
 

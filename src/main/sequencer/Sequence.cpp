@@ -265,7 +265,7 @@ void Sequence::init(const int newLastBarIndex)
     std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
     std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
 
-    for (int i = 0; i < getLastBarIndex(); ++i)
+    for (int i = 0; i < getBarCount(); ++i)
     {
         timeSignatures[i] = userScreen->timeSig;
         barLengths[i] = timeSignatures[i].getBarLength();
@@ -444,7 +444,7 @@ int Sequence::getLastTick() const
 
     const auto snapshot = getSnapshotNonRt();
 
-    for (int i = 0; i < getLastBarIndex() + 1; i++)
+    for (int i = 0; i < getBarCount(); i++)
     {
         lastTick += snapshot->getBarLength(i);
     }

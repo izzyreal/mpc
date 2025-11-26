@@ -204,3 +204,8 @@ int64_t NonRtSequencerStateView::getPositionTicks() const
     return Sequencer::quarterNotesToTicks(
         state->transportState.positionQuarterNotes);
 }
+
+bool NonRtSequencerStateView::isSequencerRunning() const
+{
+    return state->transportState.sequencerRunning;
+}

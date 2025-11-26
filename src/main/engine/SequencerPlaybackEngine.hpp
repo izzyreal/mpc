@@ -1,6 +1,5 @@
 #pragma once
 
-#include "IntTypes.hpp"
 #include "engine/EventAfterNFrames.hpp"
 
 #include "engine/audio/server/AudioClient.hpp"
@@ -9,7 +8,6 @@
 #include <memory>
 #include <vector>
 #include <functional>
-#include <atomic>
 
 namespace moodycamel
 {
@@ -54,19 +52,10 @@ namespace mpc::engine
             const std::function<bool()> &isAudioServerCurrentlyRunningOffline);
 
         void work(int nFrames) override;
-
-        void start(bool metronomeOnlyToUse = false);
-
-        void startMetronome();
-
-        void stop();
-
-        bool isRunning() const;
+        uint64_t getMetronomeOnlyTickPosition() const;
 
         void enqueueEventAfterNFrames(const std::function<void()> &event,
                                       unsigned long nFrames) const;
-
-        uint64_t getMetronomeOnlyTickPosition() const;
 
         const std::function<int()> getSampleRate;
 
@@ -85,10 +74,8 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
-        std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;
-        bool metronomeOnly = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
         // Has to be called exactly once for each frameIndex

@@ -29,6 +29,7 @@ namespace mpc::sequencer
         NonRtSequencerStateWorker *worker;
         Sequencer *sequencer;
 
-        void applyPlayMessage(bool fromStart) const noexcept;
+        void applyPlayMessage(bool fromStart) noexcept;
+        void applyStopMessage() noexcept;
     };
 } // namespace mpc::sequencer

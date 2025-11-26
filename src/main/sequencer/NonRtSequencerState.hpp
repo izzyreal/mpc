@@ -26,6 +26,7 @@ namespace mpc::sequencer
     {
         double positionQuarterNotes = 0.0;
         double playStartPositionQuarterNotes = 0.0;
+        bool sequencerRunning = false;
     };
 
     struct NonRtSequencerState

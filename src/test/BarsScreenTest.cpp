@@ -66,7 +66,7 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
 
-    REQUIRE(toSeq->getLastBarIndex() + 1 == expectedBarCount);
+    REQUIRE(toSeq->getBarCount() == expectedBarCount);
 
     for (int i = 0; i < 8; i++)
     {
@@ -128,13 +128,13 @@ TEST_CASE("BARS2", "[bars-screen]")
     toSeq->getTrack(0)->getEventStateManager()->drainQueue();
 
     auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
-    expectedBarCount += toSeq->getLastBarIndex() + 1;
+    expectedBarCount += toSeq->getBarCount();
 
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
     toSeq->getStateManager()->drainQueue();
     toSeq->getTrack(0)->getEventStateManager()->drainQueue();
 
-    REQUIRE(toSeq->getLastBarIndex() + 1 == expectedBarCount);
+    REQUIRE(toSeq->getBarCount() == expectedBarCount);
     REQUIRE(toSeq->getTrack(0)->getEvents().size() == 24);
 
     for (int eventIndex = 0; eventIndex < 8; eventIndex++)

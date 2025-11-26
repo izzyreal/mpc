@@ -516,7 +516,7 @@ void EngineHost::changeBounceStateIfRequired()
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
+            // mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
 
             if (getAudioServer()->isRealTime())
             {
@@ -525,7 +525,7 @@ void EngineHost::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
+            // mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
         }
 
         for (const auto &diskRecorder : diskRecorders)

@@ -34,7 +34,7 @@ namespace mpc::sequencer
         void overdub();
         void overdubFromStart();
         void switchRecordToOverdub();
-        void stop();
+        void stop() const;
         void setRecording(bool b);
         void setOverdubbing(bool b);
 

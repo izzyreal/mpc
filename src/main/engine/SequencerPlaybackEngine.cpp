@@ -6,7 +6,6 @@
 #include "engine/NoteRepeatProcessor.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
-#include "lcdgui/screens/SyncScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Clock.hpp"
@@ -50,53 +49,6 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     tempEventQueue.reserve(100);
 }
 
-void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
-{
-    if (sequencerIsRunning.load())
-    {
-        return;
-    }
-
-    if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
-    {
-        // TODO Implement MIDI clock out
-        // shouldWaitForMidiClockLock = true;
-        shouldWaitForMidiClockLock = false;
-    }
-
-    clock->reset();
-
-    metronomeOnly = metronomeOnlyToUse;
-    metronomeOnlyTickPosition = 0;
-
-    sequencerIsRunning.store(true);
-}
-
-void SequencerPlaybackEngine::startMetronome()
-{
-    if (sequencerIsRunning.load())
-    {
-        return;
-    }
-
-    start(true);
-}
-
-void SequencerPlaybackEngine::stop()
-{
-    if (!sequencerIsRunning.load())
-    {
-        return;
-    }
-
-    sequencerIsRunning.store(false);
-}
-
-bool SequencerPlaybackEngine::isRunning() const
-{
-    return sequencerIsRunning.load();
-}
-
 void SequencerPlaybackEngine::enqueueEventAfterNFrames(
     const std::function<void()> &event, const unsigned long nFrames) const
 {
@@ -136,9 +88,12 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
 
+    const auto nonRtSnapshot = sequencer->getNonRtStateManager()->getSnapshot();
+
     const auto playbackState =
-        sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
-    const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
+        nonRtSnapshot.getPlaybackState();
+
+    const bool sequencerIsRunningAtStartOfBuffer = nonRtSnapshot.isSequencerRunning();
     const auto currentTimeInSamplesAtStartOfBuffer = sequencer->getStateManager()->getSnapshot().getTimeInSamples();
 
     for (int i = 0; i < nFrames; ++i)
@@ -182,8 +137,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto sampleRate = getSampleRate();
     const double tickCountForThisBuffer = SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
     const double quarterNoteCountForThisBuffer = Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
-
-    const auto wrappedPosition = sequencer->getTransport()->getWrappedPositionInSequence(sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer);
+    const auto unwrappedPosition = sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer;
+    const auto wrappedPosition = sequencer->getTransport()->getWrappedPositionInSequence(unwrappedPosition);
     sequencer->getTransport()->setPosition(wrappedPosition);
     sequencer->getStateManager()->drainQueue();
 }
