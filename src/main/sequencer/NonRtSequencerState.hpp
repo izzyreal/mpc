@@ -24,8 +24,8 @@ namespace mpc::sequencer
 
     struct TransportState
     {
-        double positionQuarterNotes = 0.0;
-        double playStartPositionQuarterNotes = 0.0;
+        PositionQuarterNotes positionQuarterNotes = NoPositionQuarterNotes;
+        PositionQuarterNotes playStartPositionQuarterNotes = NoPositionQuarterNotes;
         bool sequencerRunning = false;
     };
 

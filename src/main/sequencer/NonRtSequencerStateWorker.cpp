@@ -92,7 +92,8 @@ void NonRtSequencerStateWorker::work() const
      * But maybe we can always refresh after the non-rt-manager applies a message, which would
      * probably avoid the need here to check explicitly check for those conditions.
      */
-    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil -
+    if (snapshot.getPositionQuarterNotes() != NoPositionQuarterNotes &&
+        currentTimeInSamples > snapshot.getPlaybackState().validUntil -
                                    playbackStateValiditySafetyMargin)
     {
         if (currentTimeInSamples >= 0)

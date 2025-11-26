@@ -110,7 +110,6 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     // Direct state init — safe because sequencer is inactive
     mpcSequencer->setSelectedSequenceIndex(
         SequenceIndex(allParserSequencer->sequence), false);
-    mpcSequencer->getTransport()->setPosition(0);
     mpcSequencer->setSelectedTrackIndex(allParserSequencer->track);
     mpcSequencer->getTransport()->setTempoSourceSequence(false);
     mpcSequencer->getTransport()->setTempo(allParserSequencer->masterTempo);
@@ -297,6 +296,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             mpcSong->setLoopEnabled(allSong->isLoopEnabled());
         }
     }
+
+    mpcSequencer->getTransport()->setPosition(0);
 }
 
 std::vector<std::shared_ptr<Sequence>>
