@@ -42,7 +42,14 @@ bool Transport::isPlaying() const
 
 void Transport::play(const bool fromStart) const
 {
-    sequencer.getNonRtStateManager()->enqueue(Play{fromStart});
+    if (fromStart)
+    {
+        sequencer.getNonRtStateManager()->enqueue(PlayFromStart{});
+    }
+    else
+    {
+        sequencer.getNonRtStateManager()->enqueue(Play{});
+    }
 }
 
 void Transport::rec()

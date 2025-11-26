@@ -3,8 +3,6 @@
 #include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Sequencer.hpp"
-#include "Song.hpp"
-#include "Step.hpp"
 #include "Transport.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
@@ -45,14 +43,15 @@ void NonRtSequencerStateManager::applyMessage(
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            if constexpr (std::is_same_v<T, RequestRefreshPlaybackState>)
+            if constexpr (std::is_same_v<T, RefreshPlaybackStateWhileNotPlaying>)
             {
-                worker->refreshPlaybackState(activeState.transportState.positionQuarterNotes, 0);
+                worker->refreshPlaybackState(activeState.transportState.positionQuarterNotes, 0, m.onComplete);
             }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
                 // printf("Applying UpdatePlaybackState\n");
                 activeState.playbackState = m.playbackState;
+                actions.push_back(m.onComplete);
             }
             else if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
             {
@@ -281,8 +280,7 @@ void NonRtSequencerStateManager::applyMessage(
                 enqueue(
                     SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
                 enqueue(Stop{});
-                constexpr bool fromStart = true;
-                enqueue(Play{fromStart});
+                enqueue(PlayFromStart{});
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
@@ -302,7 +300,20 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, Play>)
             {
                 // printf("Applying Play\n");
-                applyPlayMessage(m.fromStart);
+                applyPlayMessage();
+            }
+            else if constexpr (std::is_same_v<T, PlayFromStart>)
+            {
+                if (activeState.transportState.positionQuarterNotes == 0)
+                {
+                        applyPlayMessage();
+                }
+                else
+                {
+                    activeState.transportState.positionQuarterNotes = 0;
+                    auto onComplete = [this]{enqueue(Play{});};
+                    enqueue(RefreshPlaybackStateWhileNotPlaying{onComplete});
+                }
             }
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
@@ -374,12 +385,12 @@ void NonRtSequencerStateManager::applyMessage(
     {
         if (!sequencer->getTransport()->isPlaying())
         {
-            applyMessage(RequestRefreshPlaybackState{CurrentTimeInSamples});
+            applyMessage(RefreshPlaybackStateWhileNotPlaying{});
         }
     }
 }
 
-void NonRtSequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
+void NonRtSequencerStateManager::applyPlayMessage() noexcept
 {
     if (activeState.transportState.sequencerRunning)
     {
@@ -398,95 +409,90 @@ void NonRtSequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
 
     const bool songMode = sequencer->isSongModeEnabled();
 
-    if (songMode)
-    {
-        if (!currentSong->isUsed())
-        {
-            return;
-        }
-
-        if (fromStart)
-        {
-            const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
-            songScreen->setOffset(-1);
-            if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
-            {
-                sequencer->setSelectedSequenceIndex(
-                    sequencer->getSongSequenceIndex(), true);
-            }
-        }
-
-        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
-        {
-            return;
-        }
-
-        int step = songScreen->getOffset() + 1;
-
-        if (step > currentSong->getStepCount())
-        {
-            step = currentSong->getStepCount() - 1;
-        }
-
-        if (const std::shared_ptr<Step> currentStep =
-                currentSong->getStep(step).lock();
-            !sequencer->getSequence(currentStep->getSequence())->isUsed())
-        {
-            return;
-        }
-    }
+    // if (songMode)
+    // {
+    //     if (!currentSong->isUsed())
+    //     {
+    //         return;
+    //     }
+    //
+    //     if (fromStart)
+    //     {
+    //         const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
+    //         songScreen->setOffset(-1);
+    //         if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
+    //         {
+    //             sequencer->setSelectedSequenceIndex(
+    //                 sequencer->getSongSequenceIndex(), true);
+    //         }
+    //     }
+    //
+    //     if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
+    //     {
+    //         return;
+    //     }
+    //
+    //     int step = songScreen->getOffset() + 1;
+    //
+    //     if (step > currentSong->getStepCount())
+    //     {
+    //         step = currentSong->getStepCount() - 1;
+    //     }
+    //
+    //     if (const std::shared_ptr<Step> currentStep =
+    //             currentSong->getStep(step).lock();
+    //         !sequencer->getSequence(currentStep->getSequence())->isUsed())
+    //     {
+    //         return;
+    //     }
+    // }
 
     const auto countMetronomeScreen =
         sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
 
     const auto countInMode = countMetronomeScreen->getCountInMode();
 
-    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
-        std::nullopt;
+    // std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
+    //     std::nullopt;
 
-    if (!transport->isCountEnabled() || countInMode == 0 ||
-        (countInMode == 1 && !transport->isRecordingOrOverdubbing()))
-    {
-        if (fromStart && activeState.transportState.positionQuarterNotes != 0)
-        {
-            positionQuarterNotesToStartPlayingFrom = 0;
-        }
-    }
-
+    // if (!transport->isCountEnabled() || countInMode == 0 ||
+    //     (countInMode == 1 && !transport->isRecordingOrOverdubbing()))
+    // {
+    //     if (fromStart && activeState.transportState.positionQuarterNotes != 0)
+    //     {
+    //         positionQuarterNotesToStartPlayingFrom = 0;
+    //     }
+    // }
+    //
     const auto activeSequence = sequencer->getSelectedSequence();
 
-    if (transport->isCountEnabled() && !songMode)
-    {
-        if (countInMode == 2 ||
-            (countInMode == 1 && transport->isRecordingOrOverdubbing()))
-        {
-            if (fromStart)
-            {
-                positionQuarterNotesToStartPlayingFrom =
-                    Sequencer::ticksToQuarterNotes(
-                        activeSequence->getLoopStart());
-            }
-            else
-            {
-                positionQuarterNotesToStartPlayingFrom =
-                    Sequencer::ticksToQuarterNotes(
-                        activeSequence->getFirstTickOfBar(
-                            transport->getCurrentBarIndex()));
-            }
-
-            transport->setCountInStartPosTicks(Sequencer::quarterNotesToTicks(
-                activeState.transportState.positionQuarterNotes));
-
-            transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(
-                transport->getCurrentBarIndex()));
-            transport->setCountingIn(true);
-        }
-    }
-
-    if (positionQuarterNotesToStartPlayingFrom)
-    {
-        activeState.transportState.positionQuarterNotes = *positionQuarterNotesToStartPlayingFrom;
-    }
+    // if (transport->isCountEnabled() && !songMode)
+    // {
+    //     if (countInMode == 2 ||
+    //         (countInMode == 1 && transport->isRecordingOrOverdubbing()))
+    //     {
+    //         if (fromStart)
+    //         {
+    //             positionQuarterNotesToStartPlayingFrom =
+    //                 Sequencer::ticksToQuarterNotes(
+    //                     activeSequence->getLoopStart());
+    //         }
+    //         else
+    //         {
+    //             positionQuarterNotesToStartPlayingFrom =
+    //                 Sequencer::ticksToQuarterNotes(
+    //                     activeSequence->getFirstTickOfBar(
+    //                         transport->getCurrentBarIndex()));
+    //         }
+    //
+    //         transport->setCountInStartPosTicks(Sequencer::quarterNotesToTicks(
+    //             activeState.transportState.positionQuarterNotes));
+    //
+    //         transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(
+    //             transport->getCurrentBarIndex()));
+    //         transport->setCountingIn(true);
+    //     }
+    // }
 
     if (!songMode)
     {
@@ -511,9 +517,19 @@ void NonRtSequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
     }
     else
     {
+        // if (positionQuarterNotesToStartPlayingFrom)
+        // {
+        //     if (*positionQuarterNotesToStartPlayingFrom != activeState.transportState.positionQuarterNotes)
+        //     {
+        //         activeState.transportState.positionQuarterNotes = *positionQuarterNotesToStartPlayingFrom;
+        //
+        //     }
+        // }
+
         activeState.transportState.sequencerRunning = true;
     }
 }
+
 void NonRtSequencerStateManager::applyStopMessage() noexcept
 {
     activeState.transportState.sequencerRunning = false;

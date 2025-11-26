@@ -69,6 +69,7 @@ namespace mpc::sequencer
     struct UpdatePlaybackState
     {
         PlaybackState playbackState;
+        std::function<void()> onComplete = []{};
     };
 
     struct SetPositionQuarterNotes
@@ -108,12 +109,15 @@ namespace mpc::sequencer
 
     struct Play
     {
-        bool fromStart;
     };
 
-    struct RequestRefreshPlaybackState
+    struct PlayFromStart
     {
-        TimeInSamples timeInSamples;
+    };
+
+    struct RefreshPlaybackStateWhileNotPlaying
+    {
+        std::function<void()> onComplete = []{};
     };
 
     struct UpdateBarLength
@@ -152,9 +156,10 @@ namespace mpc::sequencer
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
-                     RequestRefreshPlaybackState, SetPositionQuarterNotes,
+                     RefreshPlaybackStateWhileNotPlaying, SetPositionQuarterNotes,
                      SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
                      SwitchToNextSequence, SetSelectedSequenceIndex, Stop, Play,
+                     PlayFromStart,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 

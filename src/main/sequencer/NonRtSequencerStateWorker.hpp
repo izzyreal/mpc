@@ -26,7 +26,8 @@ namespace mpc::sequencer
 
         void work() const;
 
-        void refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples) const;
+        void refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples,
+                             const std::function<void()> &onComplete) const;
 
         Sequencer *getSequencer() const;
 

@@ -97,27 +97,30 @@ void NonRtSequencerStateWorker::work() const
     {
         if (currentTimeInSamples >= 0)
         {
-            refreshPlaybackState(snapshot.getPlaybackState().playOffset, currentTimeInSamples);
+            refreshPlaybackState(snapshot.getPlaybackState().playOffset, currentTimeInSamples, []{});
         }
         else
         {
             sequencer->getNonRtStateManager()->enqueue(
-                UpdatePlaybackState{PlaybackState()});
+                UpdatePlaybackState{PlaybackState(), []{}});
         }
     }
 
     sequencer->getNonRtStateManager()->drainQueue();
 }
 
-void NonRtSequencerStateWorker::refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples timeInSamples) const
+void NonRtSequencerStateWorker::refreshPlaybackState(
+    const PositionQuarterNotes playOffset, const TimeInSamples timeInSamples,
+    const std::function<void()> &onComplete) const
 {
     printf("Refreshing playback state for time in samples %lld...\n", timeInSamples);
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
     const auto sampleRate = playbackEngine->getSampleRate();
     const auto playbackState =
         renderPlaybackState(SampleRate(sampleRate), playOffset, timeInSamples);
+
     sequencer->getNonRtStateManager()->enqueue(
-        UpdatePlaybackState{std::move(playbackState)});
+        UpdatePlaybackState{std::move(playbackState), onComplete});
 }
 
 Sequencer *NonRtSequencerStateWorker::getSequencer() const
@@ -259,7 +262,7 @@ void renderSeq(RenderContext &ctx)
 }
 
 PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate, PositionQuarterNotes playOffset, const TimeInSamples currentTime) const
+    const SampleRate sampleRate, const PositionQuarterNotes playOffset, const TimeInSamples currentTime) const
 {
     constexpr TimeInSamples snapshotWindowSize{44100 * 2};
 
