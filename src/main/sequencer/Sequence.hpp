@@ -77,6 +77,8 @@ namespace mpc::sequencer
 
         ~Sequence();
 
+        void setEventStates(const std::vector<EventState> &) const;
+
         SequenceIndex getSequenceIndex() const;
 
         // Replace all bar lengths in bulk.

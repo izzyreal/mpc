@@ -63,7 +63,9 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
-    purge();
+    init();
+    bulkNoteOns.resize(20);
+    bulkNoteOffs.resize(20);
 }
 
 Track::~Track()
@@ -71,24 +73,31 @@ Track::~Track()
     //    printf("~Track\n");
 }
 
-void Track::purge()
+void Track::init()
 {
-    removeEvents();
     name = trackIndex == TempoChangeTrackIndex
-               ? "tempo"
-               : getDefaultTrackName(trackIndex);
+           ? "tempo"
+           : getDefaultTrackName(trackIndex);
     programChange = 0;
     velocityRatio = 100;
     used = false;
     on = true;
     device = 0;
     busType = BusType::DRUM1;
-    bulkNoteOns.resize(20);
-    bulkNoteOffs.resize(20);
     queuedNoteOnEvents =
         std::make_shared<moodycamel::ConcurrentQueue<EventState>>(20);
     queuedNoteOffEvents =
         std::make_shared<moodycamel::ConcurrentQueue<EventState>>(20);
+}
+
+void Track::purge()
+{
+    init();
+    bulkNoteOns.clear();
+    bulkNoteOns.resize(20);
+    bulkNoteOffs.clear();
+    bulkNoteOffs.resize(20);
+    removeEvents();
 }
 
 EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
@@ -172,6 +181,7 @@ void Track::printEvents() const
                snapshot.noteNumber.get());
     }
 }
+
 void Track::setEventStates(const std::vector<EventState> &eventStates) const
 {
     dispatch(UpdateEvents{parent->getSequenceIndex(), getIndex(), eventStates});
@@ -180,7 +190,7 @@ void Track::setEventStates(const std::vector<EventState> &eventStates) const
 void Track::setTrackIndex(const TrackIndex i)
 {
     trackIndex = i;
-    dispatch(UpdateTrackIndexOfAllEvents{i});
+    dispatch(UpdateTrackIndexOfAllEvents{parent->getSequenceIndex(), i});
 }
 
 mpc::TrackIndex Track::getIndex() const

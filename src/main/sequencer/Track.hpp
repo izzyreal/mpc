@@ -202,5 +202,7 @@ namespace mpc::sequencer
 
         void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;
+
+        void init();
     };
 } // namespace mpc::sequencer

@@ -236,6 +236,8 @@ void renderSeq(RenderContext &ctx)
         {
             const auto eventState = event->getSnapshot();
 
+            printf("Rendering event with seq %i track %i tick %i\n", eventState.sequenceIndex, eventState.trackIndex, eventState.tick);
+
             const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventState.tick, ctx.playbackState.currentTime,
                 ctx.playbackState.sampleRate);

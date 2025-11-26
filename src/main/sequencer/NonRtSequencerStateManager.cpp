@@ -27,6 +27,14 @@ NonRtSequencerStateManager::~NonRtSequencerStateManager()
     //    printf("~NonRtSequencerStateManager\n");
 }
 
+template<typename V, typename... Ts>
+bool isVariantAnyOf(const V& v, std::variant<Ts...> const&) {
+    return std::visit([](auto const& x) {
+        using X = std::decay_t<decltype(x)>;
+        return ((std::is_same_v<X, Ts>) || ...);
+    }, v);
+}
+
 void NonRtSequencerStateManager::applyMessage(
     const NonRtSequencerMessage &msg) noexcept
 {
@@ -36,6 +44,7 @@ void NonRtSequencerStateManager::applyMessage(
             using T = std::decay_t<decltype(m)>;
             if constexpr (std::is_same_v<T, RequestRefreshPlaybackState>)
             {
+                // printf("Applying RequestRefreshPlaybackState\n");
                 TimeInSamples timeToUse = m.timeInSamples;
 
                 if (m.timeInSamples == CurrentTimeInSamples)
@@ -43,7 +52,7 @@ void NonRtSequencerStateManager::applyMessage(
                     const auto seq = sequencer->getSelectedSequence();
                     const auto pos =
                         sequencer->getTransport()->getTickPosition();
-                    const auto newTimeInSamples =
+                    timeToUse =
                         static_cast<TimeInSamples>(SeqUtil::sequenceFrameLength(
                             seq.get(), 0, pos, getSampleRate()));
                 }
@@ -51,14 +60,17 @@ void NonRtSequencerStateManager::applyMessage(
                 {
                     throw std::invalid_argument("Invalid TimeInSamples");
                 }
+
                 worker->refreshPlaybackState(timeToUse);
             }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
+                // printf("Applying UpdatePlaybackState\n");
                 activeState.playbackState = m.playbackState;
             }
             else if constexpr (std::is_same_v<T, UpdateTrackIndexOfAllEvents>)
             {
+                // printf("Applying UpdateTrackIndexOfAllEvents\n");
                 for (auto &e : activeState.sequences[m.sequence]
                                    .tracks[m.trackIndex]
                                    .events)
@@ -68,6 +80,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, FinalizeNonLiveNoteEvent>)
             {
+                // printf("Applying FinalizeNonLiveNoteEvent\n");
                 for (auto &e :
                      activeState.sequences[m.noteOnEvent.sequenceIndex]
                          .tracks[m.noteOnEvent.trackIndex]
@@ -84,6 +97,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
+                // printf("Applying UpdateEvent\n");
                 for (auto &e : activeState.sequences[m.payload.sequenceIndex]
                                    .tracks[m.payload.trackIndex]
                                    .events)
@@ -96,6 +110,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, InsertEvent>)
             {
+                printf("Applying InsertEvent\n");
                 assert(m.eventState.eventId != NoEventId);
                 auto &events = activeState.sequences[m.eventState.sequenceIndex]
                                    .tracks[m.eventState.trackIndex]
@@ -152,12 +167,14 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, ClearEvents>)
             {
+                // printf("Applying ClearEvents\n");
                 activeState.sequences[m.sequence]
                     .tracks[m.track]
                     .events.clear();
             }
             else if constexpr (std::is_same_v<T, RemoveDoubles>)
             {
+                // printf("Applying RemoveDoubles\n");
                 auto eventCounter = 0;
                 std::vector<int> deleteIndexList;
                 std::vector<int> notesAtTick;
@@ -209,6 +226,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateEventTick>)
             {
+                // printf("Applying UpdateEventTick\n");
                 auto &events = activeState.sequences[m.eventState.sequenceIndex]
                                    .tracks[m.eventState.trackIndex]
                                    .events;
@@ -239,6 +257,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, RemoveEvent>)
             {
+                // printf("Applying RemoveEvent\n");
                 auto &events =
                     activeState.sequences[m.sequence].tracks[m.track].events;
                 auto it =
@@ -252,22 +271,26 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
             {
+                // printf("Applying SetPositionQuarterNotes\n");
                 activeState.transportState.positionQuarterNotes =
                     m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T,
                                               SetPlayStartPositionQuarterNotes>)
             {
+                // printf("Applying SetPlayStartPositionQuarterNotes\n");
                 activeState.transportState.playStartPositionQuarterNotes =
                     m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
             {
+                // printf("Applying BumpPositionByTicks\n");
                 const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
                 activeState.transportState.positionQuarterNotes += delta;
             }
             else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
             {
+                // printf("Applying SwitchToNextSequence\n");
                 constexpr bool setPositionTo0 = false;
                 enqueue(
                     SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
@@ -277,6 +300,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
+                // printf("Applying SetSelectedSequenceIndex\n");
                 activeState.selectedSequenceIndex = m.sequenceIndex;
 
                 if (m.setPositionTo0)
@@ -286,35 +310,79 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, Stop>)
             {
+                // printf("Applying Stop\n");
                 worker->getSequencer()->getTransport()->stop();
             }
             else if constexpr (std::is_same_v<T, Play>)
             {
+                // printf("Applying Play\n");
                 applyPlayMessage(m.fromStart);
             }
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
+                // printf("Applying UpdateBarLength\n");
                 activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.length;
             }
             else if constexpr (std::is_same_v<T, UpdateBarLengths>)
             {
+                // printf("Applying UpdateBarLengths\n");
                 activeState.sequences[m.sequenceIndex].barLengths = m.barLengths;
             }
             else if constexpr (std::is_same_v<T, UpdateTimeSignatures>)
             {
+                // printf("Applying UpdateTimeSignatures\n");
                 activeState.sequences[m.sequenceIndex].timeSignatures = m.timeSignatures;
             }
             else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
             {
+                // printf("Applying UpdateTimeSignature\n");
                 activeState.sequences[m.sequenceIndex].timeSignatures[m.barIndex] = m.timeSignature;
                 activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.timeSignature.getBarLength();
             }
             else if constexpr (std::is_same_v<T, UpdateEvents>)
             {
+                // printf("Applying UpdateEvents\n");
                 activeState.sequences[m.sequence].tracks[m.track].events = m.eventStates;
+
+                EventId eventId = MinEventId;
+                for (auto &e : activeState.sequences[m.sequence].tracks[m.track].events)
+                {
+                    e.sequenceIndex = m.sequence;
+                    e.trackIndex = m.track;
+                    e.eventId = eventId++;
+                }
+            }
+            else if constexpr (std::is_same_v<T, UpdateSequenceEvents>)
+            {
+                // printf("Applying UpdateSequenceEvents\n");
+
+                auto &sequence = activeState.sequences[m.sequenceIndex];
+
+                for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
+                {
+                    sequence.tracks[i].events.clear();
+                }
+
+                EventId eventId = MinEventId;
+
+                for (const auto &e : m.eventStates)
+                {
+                    auto &events = sequence.tracks[e.trackIndex].events;
+                    events.push_back(e);
+                    events.back().sequenceIndex = m.sequenceIndex;
+                    events.back().eventId = eventId++;
+                }
             }
         },
         msg);
+
+    if (isVariantAnyOf(msg, NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh{}))
+    {
+        if (!sequencer->getTransport()->isPlaying())
+        {
+            applyMessage(RequestRefreshPlaybackState{CurrentTimeInSamples});
+        }
+    }
 }
 
 void NonRtSequencerStateManager::applyPlayMessage(

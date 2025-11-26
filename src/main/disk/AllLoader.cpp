@@ -306,9 +306,9 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
 
     AllParser allParser(mpc, f->getBytes());
 
-    auto allSequences = allParser.getAllSequences();
+    const auto allSequences = allParser.getAllSequences();
 
-    auto allSeqNames = allParser.getSeqNames()->getNames();
+    const auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
     for (int i = 0; i < 99; i++)

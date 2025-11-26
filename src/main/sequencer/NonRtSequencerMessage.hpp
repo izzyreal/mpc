@@ -137,13 +137,30 @@ namespace mpc::sequencer
         TimeSignature timeSignature;
     };
 
+    struct UpdateSequenceEvents
+    {
+        SequenceIndex sequenceIndex;
+        std::vector<EventState> eventStates;
+    };
+
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
                      RequestRefreshPlaybackState, SetPositionQuarterNotes,
                      SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
-                     SwitchToNextSequence, SetSelectedSequenceIndex, Stop,
-                     Play, UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
-                     UpdateEvents>;
+                     SwitchToNextSequence, SetSelectedSequenceIndex, Stop, Play,
+                     UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
+                     UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
+
+    using NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh =
+        std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+                     RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     FinalizeNonLiveNoteEvent,
+                     SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
+                     BumpPositionByTicks, SwitchToNextSequence,
+                     SetSelectedSequenceIndex, UpdateBarLength,
+                     UpdateBarLengths, UpdateTimeSignatures,
+                     UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
+
 } // namespace mpc::sequencer

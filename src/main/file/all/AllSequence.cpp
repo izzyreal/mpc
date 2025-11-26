@@ -111,12 +111,19 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
 {
     mpcSeq->init(barCount - 1);
 
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
+    std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
+
     for (int i = 0; i < barCount; i++)
     {
         const auto num = barList->getBars()[i]->getNumerator();
         const auto den = barList->getBars()[i]->getDenominator();
-        mpcSeq->setTimeSignature(i, num, den);
+        timeSignatures[i] = { TimeSigNumerator(num), TimeSigDenominator(den) };
+        barLengths[i] = timeSignatures[i].getBarLength();
     }
+
+    mpcSeq->setTimeSignatures(timeSignatures);
+    mpcSeq->setBarLengths(barLengths);
 
     mpcSeq->setName(name);
     mpcSeq->setInitialTempo(tempo);
@@ -134,19 +141,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
         t->setVelocityRatio(at->getVelo(i));
     }
 
-    for (int j = 0; j < getEventAmount(); j++)
-    {
-        auto e = allEvents[j];
-
-        if (e.type == EventType::Unknown)
-        {
-            continue;
-        }
-
-        const int track = e.trackIndex;
-
-        mpcSeq->getTrack(track)->insertEvent(e);
-    }
+    mpcSeq->setEventStates(allEvents);
 
     for (int i = 0; i < 32; i++)
     {

@@ -87,6 +87,11 @@ Sequence::~Sequence()
     //    printf("~Sequence\n");
 }
 
+void Sequence::setEventStates(const std::vector<EventState> &eventStates) const
+{
+    dispatchNonRt(UpdateSequenceEvents{getSequenceIndex(), eventStates});
+}
+
 mpc::SequenceIndex Sequence::getSequenceIndex() const
 {
     return sequenceIndex;
@@ -257,8 +262,17 @@ void Sequence::init(const int newLastBarIndex)
     addTempoChangeEvent(0, 1000);
     tempoTrackIsInitialized.store(true);
 
-    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.numerator,
-                     userScreen->timeSig.denominator);
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
+    std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
+
+    for (int i = 0; i < getLastBarIndex(); ++i)
+    {
+        timeSignatures[i] = userScreen->timeSig;
+        barLengths[i] = timeSignatures[i].getBarLength();
+    }
+
+    setTimeSignatures(timeSignatures);
+    setBarLengths(barLengths);
 
     initLoop();
 
