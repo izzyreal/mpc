@@ -1,6 +1,7 @@
 #include "sequencer/Track.hpp"
 
 #include "EventStateToEventMapper.hpp"
+#include "NonRtTrackStateView.hpp"
 #include "sampler/Sampler.hpp"
 
 #include "sequencer/Bus.hpp"

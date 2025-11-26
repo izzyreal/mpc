@@ -1,6 +1,7 @@
 #include "Sequence.hpp"
 
 #include "Mpc.hpp"
+#include "NonRtSequenceStateView.hpp"
 #include "NonRtSequencerStateManager.hpp"
 
 #include "sequencer/Sequencer.hpp"

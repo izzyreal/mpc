@@ -12,6 +12,7 @@
 #include "SystemExclusiveEvent.hpp"
 #include "TempoChangeEvent.hpp"
 #include "NonRtSequencerStateManager.hpp"
+#include "NonRtTrackStateView.hpp"
 
 namespace mpc::sequencer
 {
