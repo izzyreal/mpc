@@ -15,13 +15,7 @@ namespace mpc::sequencer
         explicit SequencerStateView(
             const std::shared_ptr<const SequencerState> &s) noexcept;
 
-        SequenceIndex getSelectedSequenceIndex() const noexcept;
-
-        double getPositionQuarterNotes() const;
-
-        double getPlayStartPositionQuarterNotes() const;
-
-        int64_t getPositionTicks() const;
+        TimeInSamples getTimeInSamples() const noexcept;
 
     private:
         const std::shared_ptr<const SequencerState> state;

@@ -1,5 +1,6 @@
 #include "sequencer/NonRtSequencerStateView.hpp"
 
+#include "Sequencer.hpp"
 #include "sequencer/NonRtSequencerState.hpp"
 
 using namespace mpc::sequencer;
@@ -154,4 +155,26 @@ EventState NonRtTrackStateView::getEventById(const EventId eventId) const
     }
 
     return {};
+}
+
+
+mpc::SequenceIndex NonRtSequencerStateView::getSelectedSequenceIndex() const noexcept
+{
+    return state->selectedSequenceIndex;
+}
+
+double NonRtSequencerStateView::getPositionQuarterNotes() const
+{
+    return state->transportState.positionQuarterNotes;
+}
+
+double NonRtSequencerStateView::getPlayStartPositionQuarterNotes() const
+{
+    return state->transportState.playStartPositionQuarterNotes;
+}
+
+int64_t NonRtSequencerStateView::getPositionTicks() const
+{
+    return Sequencer::quarterNotesToTicks(
+        state->transportState.positionQuarterNotes);
 }

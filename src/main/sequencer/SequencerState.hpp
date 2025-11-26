@@ -1,19 +1,13 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "SequencerStateView.hpp"
 
 namespace mpc::sequencer
 {
-    struct TransportState
-    {
-        double positionQuarterNotes = 0.0;
-        double playStartPositionQuarterNotes = 0.0;
-    };
-
     struct SequencerState
     {
-        SequenceIndex selectedSequenceIndex{MinSequenceIndex};
-        TransportState transportState;
+        // Absolute time in samples without wrapping since playback started
+        TimeInSamples timeInSamples{NoTimeInSamples};
     };
-
 } // namespace mpc::sequencer

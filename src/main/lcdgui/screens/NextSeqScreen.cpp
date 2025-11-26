@@ -14,6 +14,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
@@ -109,7 +110,7 @@ void NextSeqScreen::turnWheel(const int increment)
         }
         else
         {
-            sequencer.lock()->getStateManager()->enqueue(
+            sequencer.lock()->getNonRtStateManager()->enqueue(
                 sequencer::SetSelectedSequenceIndex{
                     sequencer.lock()->getSelectedSequenceIndex() + increment});
         }
@@ -165,7 +166,7 @@ void NextSeqScreen::function(const int i)
 
         if (i == 3 && nextSq != NoSequenceIndex)
         {
-            sequencer.lock()->getStateManager()->enqueue(
+            sequencer.lock()->getNonRtStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{nextSq});
         }
     }

@@ -213,6 +213,7 @@ namespace mpc
 
     using TimeInSamples = int64_t;
     constexpr TimeInSamples NoTimeInSamples{-1};
+    constexpr TimeInSamples CurrentTimeInSamples{-2};
 
     /////////
 

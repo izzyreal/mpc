@@ -6,6 +6,7 @@
 #include "Track.hpp"
 #include "NonRtSequencerStateManager.hpp"
 #include "SequenceStateManager.hpp"
+#include "SequencerStateManager.hpp"
 #include "TimeSignature.hpp"
 #include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
@@ -17,7 +18,8 @@
 using namespace mpc::sequencer;
 
 NonRtSequencerStateWorker::NonRtSequencerStateWorker(
-    const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> &isCurrentScreen,
+    const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
+        &isCurrentScreen,
     const std::function<bool()> &isRecMainWithoutPlaying, Sequencer *sequencer)
     : running(false), isCurrentScreen(isCurrentScreen),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying), sequencer(sequencer)
@@ -74,15 +76,24 @@ void NonRtSequencerStateWorker::work() const
     const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
 
     const auto currentTimeInSamples =
-        sequencer->getSequencerPlaybackEngine()->getCurrentTimeInSamples();
+        sequencer->getStateManager()->getSnapshot().getTimeInSamples();
 
     constexpr TimeInSamples playbackStateValiditySafetyMargin = 10000;
 
-    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil - playbackStateValiditySafetyMargin)
+    /*
+     * Refresh conditions:
+     * - [DONE] currentTimeInSamples is beyond validUntil
+     * - positionQuarterNotes changed (and by implication when selected sequence index changed)
+     * - count enabled changed
+     * - selected sequence changes usedness
+     * -
+     */
+    if (currentTimeInSamples > snapshot.getPlaybackState().validUntil -
+                                   playbackStateValiditySafetyMargin)
     {
         if (currentTimeInSamples >= 0)
         {
-            refreshPlaybackState();
+            refreshPlaybackState(currentTimeInSamples);
         }
         else
         {
@@ -94,16 +105,20 @@ void NonRtSequencerStateWorker::work() const
     sequencer->getNonRtStateManager()->drainQueue();
 }
 
-void NonRtSequencerStateWorker::refreshPlaybackState() const
+void NonRtSequencerStateWorker::refreshPlaybackState(
+    const TimeInSamples timeInSamples) const
 {
-    printf("Refreshing playback state...\n");
+    printf("Refreshing playback state for time in samples %lld...\n", timeInSamples);
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
-    const auto currentTimeInSamples = playbackEngine->getCurrentTimeInSamples();
     const auto sampleRate = playbackEngine->getSampleRate();
     const auto playbackState =
-        renderPlaybackState(SampleRate(sampleRate), currentTimeInSamples);
+        renderPlaybackState(SampleRate(sampleRate), timeInSamples);
     sequencer->getNonRtStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState)});
+}
+Sequencer *NonRtSequencerStateWorker::getSequencer() const
+{
+    return sequencer;
 }
 
 struct RenderContext
@@ -210,7 +225,8 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
 void renderSeq(RenderContext &ctx)
 {
-    printf("Rendering seq %s for playback time %lld\n", ctx.seq->getName().c_str(), ctx.playbackState.currentTime);
+    printf("Rendering seq %s for playback time %lld\n",
+           ctx.seq->getName().c_str(), ctx.playbackState.currentTime);
     for (const auto &track : ctx.seq->getTracks())
     {
         for (const auto &event : track->getEvents())
@@ -264,7 +280,8 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
     const bool isStepEditor =
         isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
 
-    const MetronomeRenderContext mctx{countMetronomeScreen, isStepEditor, isRecMainWithoutPlaying()};
+    const MetronomeRenderContext mctx{countMetronomeScreen, isStepEditor,
+                                      isRecMainWithoutPlaying()};
 
     renderMetronome(renderCtx, mctx);
 

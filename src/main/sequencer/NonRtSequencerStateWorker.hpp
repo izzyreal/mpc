@@ -25,7 +25,9 @@ namespace mpc::sequencer
 
         void work() const;
 
-        void refreshPlaybackState() const;
+        void refreshPlaybackState(TimeInSamples) const;
+
+        Sequencer *getSequencer() const;
 
     private:
         std::atomic<bool> running;

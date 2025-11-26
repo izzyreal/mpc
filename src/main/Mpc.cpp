@@ -147,6 +147,10 @@ void Mpc::init()
     MLOG("EngineHost created");
 
     sequencer = std::make_shared<Sequencer>(
+        [&]
+        {
+            return SampleRate(engineHost->getAudioServer()->getSampleRate());
+        },
         layeredScreen,
         [&]
         {

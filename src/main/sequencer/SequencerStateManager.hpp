@@ -22,7 +22,5 @@ namespace mpc::sequencer
 
     private:
         Sequencer *sequencer;
-
-        void applyPlayMessage(bool fromStart) const noexcept;
     };
 } // namespace mpc::sequencer

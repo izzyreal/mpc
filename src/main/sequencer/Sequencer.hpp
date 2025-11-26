@@ -71,6 +71,7 @@ namespace mpc::sequencer
         };
 
         Sequencer(
+            const std::function<SampleRate()> &getSampleRate,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             const std::function<std::shared_ptr<lcdgui::Screens>()> &,
             std::vector<std::shared_ptr<engine::Voice>> *,

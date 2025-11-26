@@ -65,6 +65,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
+    const std::function<SampleRate()> &getSampleRate,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     std::vector<std::shared_ptr<Voice>> *voices,
@@ -114,7 +115,7 @@ Sequencer::Sequencer(
     nonRtSequencerStateWorker =
         std::make_shared<NonRtSequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
 
-    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>(nonRtSequencerStateWorker.get());
+    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>(getSampleRate, this, nonRtSequencerStateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -189,7 +190,7 @@ void Sequencer::deleteSong(const int i)
 
 SequenceIndex Sequencer::getSelectedSequenceIndex() const
 {
-    return stateManager->getSnapshot().getSelectedSequenceIndex();
+    return nonRtSequencerStateManager->getSnapshot().getSelectedSequenceIndex();
 }
 
 std::shared_ptr<Track> Sequencer::getSelectedTrack()
@@ -298,11 +299,9 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                          const bool shouldSetPositionTo0) const
 {
-    stateManager->enqueue(SetSelectedSequenceIndex{
+    nonRtSequencerStateManager->enqueue(SetSelectedSequenceIndex{
         std::clamp(sequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex),
         shouldSetPositionTo0});
-
-    nonRtSequencerStateManager->enqueue(RequestRefreshPlaybackState{});
 }
 
 void Sequencer::setTimeDisplayStyle(const int i)

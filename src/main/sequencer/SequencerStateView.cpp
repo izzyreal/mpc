@@ -1,7 +1,6 @@
 #include "sequencer/SequencerStateView.hpp"
 
-#include "sequencer/SequencerState.hpp"
-#include "sequencer/Sequencer.hpp"
+#include "SequencerState.hpp"
 
 using namespace mpc::sequencer;
 
@@ -10,23 +9,8 @@ SequencerStateView::SequencerStateView(
     : state(s)
 {
 }
-mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept
-{
-    return state->selectedSequenceIndex;
-}
 
-double SequencerStateView::getPositionQuarterNotes() const
+mpc::TimeInSamples SequencerStateView::getTimeInSamples() const noexcept
 {
-    return state->transportState.positionQuarterNotes;
-}
-
-double SequencerStateView::getPlayStartPositionQuarterNotes() const
-{
-    return state->transportState.playStartPositionQuarterNotes;
-}
-
-int64_t SequencerStateView::getPositionTicks() const
-{
-    return Sequencer::quarterNotesToTicks(
-        state->transportState.positionQuarterNotes);
+    return state->timeInSamples;
 }

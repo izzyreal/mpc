@@ -68,9 +68,6 @@ namespace mpc::engine
 
         uint64_t getMetronomeOnlyTickPosition() const;
 
-        TimeInSamples getCurrentTimeInSamples() const;
-        void setCurrentTimeInSamples(TimeInSamples);
-
         const std::function<int()> getSampleRate;
 
     private:
@@ -98,7 +95,5 @@ namespace mpc::engine
         void processEventsAfterNFrames();
 
         uint64_t metronomeOnlyTickPosition = 0;
-
-        std::atomic<TimeInSamples> currentTimeInSamples{0};
     };
 } // namespace mpc::engine

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PlaybackState.hpp"
+#include "TimeSignature.hpp"
 #include "sequencer/EventState.hpp"
 
 #include <cstdint>
@@ -63,10 +64,72 @@ namespace mpc::sequencer
         PlaybackState playbackState;
     };
 
-    struct RequestRefreshPlaybackState{};
+    struct SetPositionQuarterNotes
+    {
+        double positionQuarterNotes;
+    };
+
+    struct SetPlayStartPositionQuarterNotes
+    {
+        double positionQuarterNotes;
+    };
+
+    struct BumpPositionByTicks
+    {
+        uint8_t ticks;
+    };
+
+    struct SwitchToNextSequence
+    {
+        SequenceIndex sequenceIndex;
+    };
+
+    struct SetSelectedSequenceIndex
+    {
+        SequenceIndex sequenceIndex;
+        bool setPositionTo0 = true;
+    };
+
+    struct Stop
+    {
+    };
+
+    struct Play
+    {
+        bool fromStart;
+    };
+
+    struct RequestRefreshPlaybackState
+    {
+        TimeInSamples timeInSamples;
+    };
+
+    struct UpdateBarLength
+    {
+        SequenceIndex sequenceIndex;
+        int barIndex;
+        Tick length;
+    };
+
+    struct UpdateBarLengths
+    {
+        SequenceIndex sequenceIndex;
+        std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths;
+    };
+
+    struct UpdateTimeSignature
+    {
+        SequenceIndex sequenceIndex;
+        int barIndex;
+        TimeSignature timeSignature;
+    };
 
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent, UpdatePlaybackState, RequestRefreshPlaybackState>;
+                     FinalizeNonLiveNoteEvent, UpdatePlaybackState,
+                     RequestRefreshPlaybackState, SetPositionQuarterNotes,
+                     SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
+                     SwitchToNextSequence, SetSelectedSequenceIndex, Stop,
+                     Play, UpdateBarLength, UpdateBarLengths, UpdateTimeSignature>;
 } // namespace mpc::sequencer

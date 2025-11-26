@@ -16,7 +16,6 @@
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
@@ -44,7 +43,7 @@ bool Transport::isPlaying() const
 
 void Transport::play(const bool fromStart) const
 {
-    sequencer.getStateManager()->enqueue(Play{fromStart});
+    sequencer.getNonRtStateManager()->enqueue(Play{fromStart});
 }
 
 void Transport::rec()
@@ -117,7 +116,7 @@ void Transport::stop()
 
     if (!isPlaying() && !bouncing)
     {
-        if (const auto snapshot = sequencer.getStateManager()->getSnapshot();
+        if (const auto snapshot = sequencer.getNonRtStateManager()->getSnapshot();
             snapshot.getPositionQuarterNotes() != 0.0)
         {
             setPosition(0); // real 2kxl doesn't do this
@@ -138,11 +137,6 @@ void Transport::stop()
     {
         newTickPosition = activeSequence->getLastTick();
     }
-
-    // const int frameOffset = stopMode == AT_START_OF_BUFFER
-    //                             ? 0
-    //                             :
-    //                             getSequencerPlaybackEngine()->getEventFrameOffset();
 
     getSequencerPlaybackEngine()->stop();
 
@@ -358,7 +352,6 @@ void Transport::moveSongToStepThatContainsPosition(
 void Transport::setCountEnabled(const bool b)
 {
     countEnabled = b;
-    sequencer.getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
 }
 
 bool Transport::isCountEnabled() const
@@ -383,24 +376,24 @@ bool Transport::isCountingIn() const
 
 void Transport::bumpPositionByTicks(const uint8_t tickCount) const
 {
-    sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
+    sequencer.getNonRtStateManager()->enqueue(BumpPositionByTicks{tickCount});
 }
 
 int Transport::getTickPosition() const
 {
-    return sequencer.getStateManager()->getSnapshot().getPositionTicks();
+    return sequencer.getNonRtStateManager()->getSnapshot().getPositionTicks();
 }
 
 double Transport::getPlayStartPositionQuarterNotes() const
 {
-    return sequencer.getStateManager()
+    return sequencer.getNonRtStateManager()
         ->getSnapshot()
         .getPlayStartPositionQuarterNotes();
 }
 
 double Transport::getPositionQuarterNotes() const
 {
-    return sequencer.getStateManager()
+    return sequencer.getNonRtStateManager()
         ->getSnapshot()
         .getPositionQuarterNotes();
 }
@@ -807,22 +800,14 @@ void Transport::setClock(int i) const
 
 void Transport::setPosition(const double positionQuarterNotes) const
 {
-    auto onComplete = [this]
-    {
-        if (!isPlaying())
-        {
-            sequencer.getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
-        }
-    };
-
-    sequencer.getStateManager()->enqueue(
-        SetPositionQuarterNotes{positionQuarterNotes, onComplete});
+    sequencer.getNonRtStateManager()->enqueue(
+        SetPositionQuarterNotes{positionQuarterNotes});
 }
 
 void Transport::setPlayStartPosition(
     const double playStartPositionQuarterNotes) const
 {
-    sequencer.getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
+    sequencer.getNonRtStateManager()->enqueue(SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
 }
 
 void Transport::setTempo(double newTempo)

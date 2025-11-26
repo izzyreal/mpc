@@ -7,6 +7,7 @@
 #include "lcdgui/screens/NextSeqPadScreen.hpp"
 #include "lcdgui/screens/TrMuteScreen.hpp"
 #include "sampler/Program.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerMessage.hpp"
@@ -96,7 +97,7 @@ void PushPadScreenUpdateCommand::execute()
                 return;
             }
 
-            ctx.sequencer->getStateManager()->enqueue(
+            ctx.sequencer->getNonRtStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{padIndexWithBank});
             return;
         }

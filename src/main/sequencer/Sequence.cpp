@@ -232,7 +232,6 @@ std::shared_ptr<Track> Sequence::getTrack(const int i)
 void Sequence::setUsed(const bool b)
 {
     used = b;
-    dispatchNonRt(RequestRefreshPlaybackState{});
 }
 
 bool Sequence::isUsed() const
@@ -341,7 +340,7 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
 
     const auto onComplete = [this]
     {
-        dispatchNonRt(RequestRefreshPlaybackState{});
+        dispatchNonRt(RequestRefreshPlaybackState{CurrentTimeInSamples});
     };
 
     const auto ts = TimeSignature{TimeSigNumerator(num), TimeSigDenominator(den)};

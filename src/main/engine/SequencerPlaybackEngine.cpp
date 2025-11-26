@@ -68,7 +68,6 @@ void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 
     metronomeOnly = metronomeOnlyToUse;
     metronomeOnlyTickPosition = 0;
-    currentTimeInSamples.store(0);
 
     sequencerIsRunning.store(true);
 }
@@ -91,7 +90,6 @@ void SequencerPlaybackEngine::stop()
     }
 
     sequencerIsRunning.store(false);
-    currentTimeInSamples.store(0);
 }
 
 bool SequencerPlaybackEngine::isRunning() const
@@ -141,8 +139,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto playbackState =
         sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
-    const auto currentTimeInSamplesAtStartOfBuffer =
-        currentTimeInSamples.load();
+    const auto currentTimeInSamplesAtStartOfBuffer = sequencer->getStateManager()->getSnapshot().getTimeInSamples();
 
     for (int i = 0; i < nFrames; ++i)
     {
@@ -151,15 +148,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     if (!sequencerIsRunningAtStartOfBuffer)
     {
-        const auto seq = sequencer->getSelectedSequence();
-        const auto pos = sequencer->getTransport()->getTickPosition();
-        const auto newTimeInSamples = SeqUtil::sequenceFrameLength(seq.get(), 0, pos, getSampleRate());
-        setCurrentTimeInSamples(newTimeInSamples);
+        sequencer->getStateManager()->enqueue(SetTimeInSamples{CurrentTimeInSamples});
+        sequencer->getStateManager()->drainQueue();
         return;
     }
 
-    currentTimeInSamples.store(currentTimeInSamplesAtStartOfBuffer +
-                               nFrames);
+    sequencer->getStateManager()->enqueue(SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer +
+                               nFrames});
+    sequencer->getStateManager()->drainQueue();
 
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -195,20 +191,4 @@ void SequencerPlaybackEngine::work(const int nFrames)
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
 {
     return metronomeOnlyTickPosition;
-}
-
-mpc::TimeInSamples SequencerPlaybackEngine::getCurrentTimeInSamples() const
-{
-    return currentTimeInSamples.load();
-}
-
-void SequencerPlaybackEngine::setCurrentTimeInSamples(const TimeInSamples timeInSamples)
-{
-    if (currentTimeInSamples.load() == timeInSamples)
-    {
-        return;
-    }
-
-    currentTimeInSamples.store(timeInSamples);
-    sequencer->getNonRtStateManager()->enqueue(RequestRefreshPlaybackState{});
 }

@@ -64,6 +64,14 @@ namespace mpc::sequencer
 
         std::shared_ptr<NonRtTrackStateView> getNonRtTrackState(SequenceIndex, TrackIndex) const;
 
+        SequenceIndex getSelectedSequenceIndex() const noexcept;
+
+        double getPositionQuarterNotes() const;
+
+        double getPlayStartPositionQuarterNotes() const;
+
+        int64_t getPositionTicks() const;
+
     private:
         const std::shared_ptr<const NonRtSequencerState> state;
     };

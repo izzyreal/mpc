@@ -6,6 +6,7 @@
 #include "lcdgui/Label.hpp"
 
 #include "Mpc.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
@@ -102,7 +103,7 @@ void NextSeqPadScreen::function(const int i)
 
         if (i == 3 && nextSq != NoSequenceIndex)
         {
-            sequencer.lock()->getStateManager()->enqueue(
+            sequencer.lock()->getNonRtStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{nextSq});
         }
     }
