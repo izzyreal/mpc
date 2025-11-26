@@ -343,7 +343,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateEvents>)
             {
-                // printf("Applying UpdateEvents\n");
+                printf("Applying UpdateEvents\n");
                 activeState.sequences[m.sequence].tracks[m.track].events =
                     m.eventStates;
 
@@ -358,7 +358,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateSequenceEvents>)
             {
-                // printf("Applying UpdateSequenceEvents\n");
+                printf("Applying UpdateSequenceEvents\n");
 
                 auto &sequence = activeState.sequences[m.sequenceIndex];
 
@@ -385,6 +385,7 @@ void NonRtSequencerStateManager::applyMessage(
     {
         if (!sequencer->getTransport()->isPlaying())
         {
+            publishState();
             applyMessage(RefreshPlaybackStateWhileNotPlaying{});
         }
     }

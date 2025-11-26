@@ -100,11 +100,6 @@ void NonRtSequencerStateWorker::work() const
         {
             refreshPlaybackState(snapshot.getPlaybackState().playOffset, currentTimeInSamples, []{});
         }
-        else
-        {
-            sequencer->getNonRtStateManager()->enqueue(
-                UpdatePlaybackState{PlaybackState(), []{}});
-        }
     }
 
     sequencer->getNonRtStateManager()->drainQueue();

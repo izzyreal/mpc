@@ -312,7 +312,7 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
     const auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
-    for (int i = 0; i < 99; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
     {
         if (allSeqNames[i].find("(Unused)") != std::string::npos)
         {
