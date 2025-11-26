@@ -18,7 +18,7 @@ namespace mpc::sequencer
               NonRtSequencerState, NonRtSequencerStateView, NonRtSequencerMessage>
     {
     public:
-        explicit NonRtSequencerStateManager(const std::function<SampleRate()> &getSampleRate, Sequencer *,NonRtSequencerStateWorker *);
+        explicit NonRtSequencerStateManager(const std::function<SampleRate()> &getSampleRate, Sequencer *, NonRtSequencerStateWorker *);
         ~NonRtSequencerStateManager() override;
 
     protected:

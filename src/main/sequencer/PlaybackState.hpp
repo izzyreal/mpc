@@ -2,6 +2,7 @@
 
 #include "EventState.hpp"
 #include "IntTypes.hpp"
+#include "FloatTypes.hpp"
 
 #include <vector>
 
@@ -16,6 +17,7 @@ namespace mpc::sequencer
     struct PlaybackState
     {
         SampleRate sampleRate{NoSampleRate};
+        PositionQuarterNotes playOffset;
         TimeInSamples currentTime{NoTimeInSamples};
         TimeInSamples validUntil{NoTimeInSamples};
         std::vector<RenderedEventState> events{};

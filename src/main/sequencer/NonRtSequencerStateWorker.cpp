@@ -97,7 +97,7 @@ void NonRtSequencerStateWorker::work() const
     {
         if (currentTimeInSamples >= 0)
         {
-            refreshPlaybackState(currentTimeInSamples);
+            refreshPlaybackState(snapshot.getPlaybackState().playOffset, currentTimeInSamples);
         }
         else
         {
@@ -109,17 +109,17 @@ void NonRtSequencerStateWorker::work() const
     sequencer->getNonRtStateManager()->drainQueue();
 }
 
-void NonRtSequencerStateWorker::refreshPlaybackState(
-    const TimeInSamples timeInSamples) const
+void NonRtSequencerStateWorker::refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples timeInSamples) const
 {
     printf("Refreshing playback state for time in samples %lld...\n", timeInSamples);
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
     const auto sampleRate = playbackEngine->getSampleRate();
     const auto playbackState =
-        renderPlaybackState(SampleRate(sampleRate), timeInSamples);
+        renderPlaybackState(SampleRate(sampleRate), playOffset, timeInSamples);
     sequencer->getNonRtStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState)});
 }
+
 Sequencer *NonRtSequencerStateWorker::getSequencer() const
 {
     return sequencer;
@@ -228,8 +228,8 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
 void renderSeq(RenderContext &ctx)
 {
-    printf("Rendering seq %s for playback time %lld\n",
-           ctx.seq->getName().c_str(), ctx.playbackState.currentTime);
+    printf("Rendering seq %s for playback time %lld at tick offset %i\n",
+           ctx.seq->getName().c_str(), ctx.playbackState.currentTime, Sequencer::quarterNotesToTicks(ctx.playbackState.playOffset));
     for (const auto &track : ctx.seq->getTracks())
     {
         for (const auto &event : track->getEvents())
@@ -238,8 +238,11 @@ void renderSeq(RenderContext &ctx)
 
             // printf("Rendering event with seq %i track %i tick %i\n", eventState.sequenceIndex, eventState.trackIndex, eventState.tick);
 
+            const auto eventTickToUse =
+                eventState.tick - Sequencer::quarterNotesToTicks(ctx.playbackState.playOffset);
+
             const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
-                ctx.seq, eventState.tick, ctx.playbackState.currentTime,
+                ctx.seq, eventTickToUse, ctx.playbackState.currentTime,
                 ctx.playbackState.sampleRate);
 
             if (eventTime > ctx.playbackState.validUntil)
@@ -256,7 +259,7 @@ void renderSeq(RenderContext &ctx)
 }
 
 PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate, const TimeInSamples currentTime) const
+    const SampleRate sampleRate, PositionQuarterNotes playOffset, const TimeInSamples currentTime) const
 {
     constexpr TimeInSamples snapshotWindowSize{44100 * 2};
 
@@ -268,7 +271,7 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    PlaybackState playbackState{sampleRate, currentTime, validUntil};
+    PlaybackState playbackState{sampleRate, playOffset, currentTime, validUntil};
 
     RenderContext renderCtx{std::move(playbackState), sequencer, seq.get()};
 

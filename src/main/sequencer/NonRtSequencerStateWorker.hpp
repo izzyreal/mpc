@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FloatTypes.hpp"
 #include "PlaybackState.hpp"
 #include "lcdgui/ScreenId.hpp"
 
@@ -25,7 +26,7 @@ namespace mpc::sequencer
 
         void work() const;
 
-        void refreshPlaybackState(TimeInSamples) const;
+        void refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples) const;
 
         Sequencer *getSequencer() const;
 
@@ -38,6 +39,6 @@ namespace mpc::sequencer
 
         Sequencer *sequencer;
 
-        PlaybackState renderPlaybackState(SampleRate, TimeInSamples) const;
+        PlaybackState renderPlaybackState(SampleRate, PositionQuarterNotes playOffset, TimeInSamples) const;
     };
 } // namespace mpc::sequencer

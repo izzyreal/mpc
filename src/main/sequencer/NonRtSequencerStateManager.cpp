@@ -47,24 +47,7 @@ void NonRtSequencerStateManager::applyMessage(
             using T = std::decay_t<decltype(m)>;
             if constexpr (std::is_same_v<T, RequestRefreshPlaybackState>)
             {
-                // printf("Applying RequestRefreshPlaybackState\n");
-                TimeInSamples timeToUse = m.timeInSamples;
-
-                if (m.timeInSamples == CurrentTimeInSamples)
-                {
-                    const auto seq = sequencer->getSelectedSequence();
-                    const auto pos =
-                        sequencer->getTransport()->getTickPosition();
-                    timeToUse =
-                        static_cast<TimeInSamples>(SeqUtil::sequenceFrameLength(
-                            seq.get(), 0, pos, getSampleRate()));
-                }
-                else if (m.timeInSamples == NoTimeInSamples)
-                {
-                    throw std::invalid_argument("Invalid TimeInSamples");
-                }
-
-                worker->refreshPlaybackState(timeToUse);
+                worker->refreshPlaybackState(activeState.transportState.positionQuarterNotes, 0);
             }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
