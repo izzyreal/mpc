@@ -19,7 +19,6 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -675,13 +674,11 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     auto destDenominator = -1;
     auto destBarLength = -1;
 
-    const auto snapshot = toSequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
     {
         const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
 
-        if (const auto barLength = snapshot.getBarLength(i);
+        if (const auto barLength = toSequence->getBarLength(i);
             destStart >= firstTickOfBar &&
             destStart <= firstTickOfBar + barLength)
         {
@@ -708,9 +705,6 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         }
 
         toSequence->insertBars(1, afterBar);
-
-        toSequence->getStateManager()->drainQueue();
-
         toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
 

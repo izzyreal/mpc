@@ -30,6 +30,8 @@ namespace mpc::sequencer
 
         std::vector<EventState> getNoteEvents() const;
 
+        std::vector<EventState> getEvents() const;
+
         EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
         EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
@@ -47,6 +49,11 @@ namespace mpc::sequencer
             const NonRtSequenceState &s) noexcept;
 
         std::shared_ptr<NonRtTrackStateView> getTrack(int trackIndex) const;
+        Tick getBarLength(int barIndex) const;
+        std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> getTimeSignatures() const;
+
+        TimeSignature getTimeSignature(int barIndex) const;
 
     private:
         const NonRtSequenceState &state;

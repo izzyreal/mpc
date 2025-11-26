@@ -5,7 +5,6 @@
 #include "Sequence.hpp"
 #include "Track.hpp"
 #include "NonRtSequencerStateManager.hpp"
-#include "SequenceStateManager.hpp"
 #include "SequencerStateManager.hpp"
 #include "TimeSignature.hpp"
 #include "Transport.hpp"
@@ -86,7 +85,12 @@ void NonRtSequencerStateWorker::work() const
      * - positionQuarterNotes changed (and by implication when selected sequence index changed)
      * - count enabled changed
      * - selected sequence changes usedness
-     * -
+     * - selected sequence changes timesignature
+     * - selected sequence adds or removes bar
+     * - selected sequence adds, removes or modifies event
+     *
+     * But maybe we can always refresh after the non-rt-manager applies a message, which would
+     * probably avoid the need here to check explicitly check for those conditions.
      */
     if (currentTimeInSamples > snapshot.getPlaybackState().validUntil -
                                    playbackStateValiditySafetyMargin)
@@ -126,7 +130,6 @@ struct RenderContext
     PlaybackState playbackState;
     Sequencer *sequencer;
     Sequence *seq;
-    SequenceStateView seqSnapshot;
 };
 
 struct MetronomeRenderContext
@@ -167,7 +170,7 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
     for (int i = 0; i < ctx.seq->getBarCount(); ++i)
     {
-        const auto ts = ctx.seqSnapshot.getTimeSignature(i);
+        const auto ts = ctx.seq->getTimeSignature(i);
         const auto den = ts.denominator;
         auto denTicks = 96 * (4.0 / den);
 
@@ -263,12 +266,9 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    const auto seqSnapshot = seq->getStateManager()->getSnapshot();
-
     PlaybackState playbackState{sampleRate, currentTime, validUntil};
 
-    RenderContext renderCtx{std::move(playbackState), sequencer, seq.get(),
-                            std::move(seqSnapshot)};
+    RenderContext renderCtx{std::move(playbackState), sequencer, seq.get()};
 
     renderSeq(renderCtx);
 

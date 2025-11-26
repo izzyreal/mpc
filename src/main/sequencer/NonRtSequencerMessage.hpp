@@ -16,6 +16,13 @@ namespace mpc::sequencer
         TrackIndex track;
     };
 
+    struct UpdateEvents
+    {
+        SequenceIndex sequence;
+        TrackIndex track;
+        std::vector<EventState> eventStates;
+    };
+
     struct UpdateTrackIndexOfAllEvents
     {
         SequenceIndex sequence;
@@ -117,6 +124,12 @@ namespace mpc::sequencer
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths;
     };
 
+    struct UpdateTimeSignatures
+    {
+        SequenceIndex sequenceIndex;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures;
+    };
+
     struct UpdateTimeSignature
     {
         SequenceIndex sequenceIndex;
@@ -131,5 +144,6 @@ namespace mpc::sequencer
                      RequestRefreshPlaybackState, SetPositionQuarterNotes,
                      SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
                      SwitchToNextSequence, SetSelectedSequenceIndex, Stop,
-                     Play, UpdateBarLength, UpdateBarLengths, UpdateTimeSignature>;
+                     Play, UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
+                     UpdateEvents>;
 } // namespace mpc::sequencer

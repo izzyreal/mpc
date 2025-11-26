@@ -36,7 +36,6 @@
 #include <set>
 #include "file/mid/util/MidiUtil.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::file::mid::event;
 using namespace mpc::file::mid;
@@ -78,7 +77,7 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
     std::set<std::vector<int>> tSigs;
     auto tSigTick = 0;
     auto lastAdded = std::vector<int>(3);
-    const auto snapshot = sequence->getStateManager()->getSnapshot();
+
     for (int i = 0; i < sequence->getLastBarIndex() + 1; i++)
     {
         auto actualTick = tSigTick;
@@ -98,7 +97,7 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
             lastAdded[2] = actualTick;
         }
 
-        tSigTick += snapshot.getBarLength(i);
+        tSigTick += sequence->getBarLength(i);
     }
     previousTick = 0;
     for (auto &ia : tSigs)

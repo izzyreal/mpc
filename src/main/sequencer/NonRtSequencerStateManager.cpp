@@ -300,10 +300,18 @@ void NonRtSequencerStateManager::applyMessage(
             {
                 activeState.sequences[m.sequenceIndex].barLengths = m.barLengths;
             }
+            else if constexpr (std::is_same_v<T, UpdateTimeSignatures>)
+            {
+                activeState.sequences[m.sequenceIndex].timeSignatures = m.timeSignatures;
+            }
             else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
             {
                 activeState.sequences[m.sequenceIndex].timeSignatures[m.barIndex] = m.timeSignature;
                 activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.timeSignature.getBarLength();
+            }
+            else if constexpr (std::is_same_v<T, UpdateEvents>)
+            {
+                activeState.sequences[m.sequence].tracks[m.track].events = m.eventStates;
             }
         },
         msg);

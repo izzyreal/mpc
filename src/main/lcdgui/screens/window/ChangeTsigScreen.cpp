@@ -6,7 +6,6 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

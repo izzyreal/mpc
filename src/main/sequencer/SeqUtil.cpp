@@ -2,7 +2,6 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
-#include "SequenceStateManager.hpp"
 #include "NonRtSequencerStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
@@ -70,14 +69,15 @@ double SeqUtil::ticksPerSecond(const double tempo)
 }
 
 double SeqUtil::ticksToFrames(const double ticks, const double tempo,
-                              const int sr)
+                              const int sampleRate)
 {
-    return ticks * secondsPerTick(tempo) * sr;
+    return ticks * secondsPerTick(tempo) * sampleRate;
 }
 
-double SeqUtil::framesToTicks(double frames, double tempo, int sr)
+double SeqUtil::framesToTicks(const double frames, const double tempo,
+                              const int sampleRate)
 {
-    return frames / (secondsPerTick(tempo) * sr);
+    return frames / (secondsPerTick(tempo) * sampleRate);
 }
 
 double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
@@ -324,8 +324,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
     }
 
-    toSequence->getStateManager()->drainQueue();
-
     int sourceBarCounter = 0;
 
     const auto numberOfSourceBars = copyLastBar + 1 - copyFirstBar;
@@ -336,8 +334,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             i + copyAfterBar,
             fromSequence->getNumerator(sourceBarCounter + copyFirstBar),
             fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
-
-        toSequence->getStateManager()->drainQueue();
 
         sourceBarCounter++;
 
@@ -350,8 +346,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     auto firstTickOfFromSequence = 0;
     auto lastTickOfFromSequence = 0;
 
-    const auto fromSeqSnapshot = fromSequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyFirstBar)
@@ -359,12 +353,12 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
+        firstTickOfFromSequence += fromSequence->getBarLength(i);
     }
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        lastTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
+        lastTickOfFromSequence += fromSequence->getBarLength(i);
 
         if (i == copyLastBar)
         {
@@ -374,8 +368,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
     auto firstTickOfToSequence = 0;
 
-    const auto toSeqSnapshot = toSequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyAfterBar)
@@ -383,7 +375,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfToSequence += toSeqSnapshot.getBarLength(i);
+        firstTickOfToSequence += toSequence->getBarLength(i);
     }
 
     const auto segmentLengthTicks =
@@ -479,21 +471,15 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
     return currentScreenName == "step-editor" && !posIsLastTick();
 }
 
-static double samplesPerTick(const double tempo, const int sampleRate)
-{
-    const double secondsPerTick = 60.0 / tempo / mpc::Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
-    return secondsPerTick * sampleRate;
-}
-
 int SeqUtil::getEventTimeInSamples(
     const Sequence* seq,
     const int eventTick,
     const int currentTimeSamples,
-    const SampleRate sr)
+    const SampleRate sampleRate)
 {
     // 1. Loop length in samples
     const int loopLen = static_cast<int>(
-        sequenceFrameLength(seq, 0, seq->getLastTick(), sr));
+        sequenceFrameLength(seq, 0, seq->getLastTick(), sampleRate));
 
     if (loopLen <= 0)
         return currentTimeSamples; // degenerate sequence
@@ -503,7 +489,7 @@ int SeqUtil::getEventTimeInSamples(
 
     // 3. Convert event tick → sample offset from start of loop
     const int eventSample = static_cast<int>(
-        sequenceFrameLength(seq, 0, eventTick, sr));
+        sequenceFrameLength(seq, 0, eventTick, sampleRate));
 
     // 4. If event is still ahead in this loop: simple forward offset
     if (eventSample >= phase)
@@ -520,7 +506,7 @@ int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,
     const int n = tces.size();
 
     auto secondsPerTick = [&](const double tempo) {
-        return 60.0 / tempo / mpc::Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+        return 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
     };
 
     int remainingFrames = frameCount;

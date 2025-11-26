@@ -18,7 +18,6 @@ namespace mpc::sequencer
     struct TimeSignature;
     class TempoChangeEvent;
     class Sequencer;
-    class SequenceStateManager;
 } // namespace mpc::sequencer
 
 namespace mpc::lcdgui
@@ -80,8 +79,13 @@ namespace mpc::sequencer
 
         SequenceIndex getSequenceIndex() const;
 
+        // Replace all bar lengths in bulk.
+        // Unlike setBarLength and setTimeSignature, this method does not
+        // modify tick positions of events. It just replaces the bar lengths,
+        // nothing more.
         void setBarLengths(const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT>
                                &barLengths) const;
+
         double getInitialTempo() const;
         void setInitialTempo(double newInitialTempo);
 
@@ -106,8 +110,17 @@ namespace mpc::sequencer
         void setUsed(bool b);
         bool isUsed() const;
         void init(int newLastBarIndex);
+
         void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
         void setTimeSignature(int barIndex, int num, int den);
+
+        // Replace all time signatures in bulk.
+        // Unlike setBarLength and setTimeSignature, this method does not
+        // modify tick positions of events. And unlike setTimeSignature, it
+        // does not modify any bar lengths. It just replaces the time
+        // signatures, nothing more.
+        void setTimeSignatures(const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> &) const;
+
         std::vector<std::shared_ptr<Track>> getTracks();
         std::vector<std::string> &getDeviceNames();
         void setDeviceNames(const std::vector<std::string> &sa);
@@ -119,6 +132,7 @@ namespace mpc::sequencer
         bool isTempoChangeOn() const;
         void setTempoChangeOn(bool b);
         int getLastTick() const;
+        TimeSignature getTimeSignature(int barIndex) const;
         TimeSignature getTimeSignature() const;
         void purgeAllTracks();
         std::shared_ptr<Track> purgeTrack(int i);
@@ -132,21 +146,23 @@ namespace mpc::sequencer
         int getEventCount() const;
         void initLoop();
 
-        int getFirstTickOfBar(int index) const;
-        int getLastTickOfBar(int index) const;
-        int getFirstTickOfBeat(int bar, int beat) const;
+        int getFirstTickOfBar(int barIndex) const;
+        int getLastTickOfBar(int barIndex) const;
+        int getFirstTickOfBeat(int barIndex, int beat) const;
 
         std::shared_ptr<Track> getTempoChangeTrack();
 
         StartTime &getStartTime();
 
-        std::shared_ptr<SequenceStateManager> getStateManager();
+        Tick getBarLength(int barIndex) const;
+
+        std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> getTimeSignatures() const;
 
     private:
         SequenceIndex sequenceIndex;
         const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt;
         const std::function<void(NonRtSequencerMessage &&)> dispatchNonRt;
-        std::shared_ptr<SequenceStateManager> stateManager;
         StartTime startTime{0, 0, 0, 0, 0};
         std::atomic_bool tempoTrackIsInitialized{false};
         double initialTempo = 120.0;

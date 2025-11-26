@@ -17,6 +17,28 @@ NonRtSequenceStateView::getTrack(const int trackIndex) const
     return std::make_shared<NonRtTrackStateView>(state.tracks[trackIndex]);
 }
 
+mpc::Tick NonRtSequenceStateView::getBarLength(const int barIndex) const
+{
+    return state.barLengths[barIndex];
+}
+
+std::array<mpc::Tick, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
+NonRtSequenceStateView::getBarLengths() const
+{
+    return state.barLengths;
+}
+
+std::array<TimeSignature, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
+NonRtSequenceStateView::getTimeSignatures() const
+{
+    return state.timeSignatures;
+}
+
+TimeSignature NonRtSequenceStateView::getTimeSignature(const int barIndex) const
+{
+    return state.timeSignatures[barIndex];
+}
+
 NonRtSequencerStateView::NonRtSequencerStateView(
     const std::shared_ptr<const NonRtSequencerState> &s) noexcept
     : state(s)
@@ -116,6 +138,10 @@ std::vector<EventState> NonRtTrackStateView::getNoteEvents() const
     }
 
     return result;
+}
+
+std::vector<EventState> NonRtTrackStateView::getEvents() const {
+    return state.events;
 }
 
 EventState NonRtTrackStateView::findRecordingNoteOnByNoteNumber(

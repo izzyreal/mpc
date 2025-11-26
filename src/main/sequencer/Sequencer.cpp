@@ -1,7 +1,6 @@
 #include "Sequencer.hpp"
 
 #include "MpcSpecs.hpp"
-#include "SequenceStateManager.hpp"
 
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Transport.hpp"
@@ -389,7 +388,7 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
         nonRtSequencerStateManager->enqueue(std::move(m));
     };
 
-    const std::function getSnapshotNonRt = [this, sequenceIndex]()
+    const std::function getSnapshotNonRt = [this, sequenceIndex]
     {
         return nonRtSequencerStateManager->getSnapshot().getNonRtSequenceState(
             sequenceIndex);
@@ -492,11 +491,10 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
 
 std::shared_ptr<Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
-                        SequenceIndex destinationIndex)
+                        const SequenceIndex destinationIndex)
 {
     auto copy = makeNewSequence(destinationIndex);
     copy->init(source->getLastBarIndex());
-    copy->getStateManager()->drainQueue();
     copySequenceParameters(source, copy);
 
     for (int i = 0; i < 64; i++)
@@ -524,12 +522,8 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
     dest->setBarLengths(
-        source->getStateManager()->getSnapshot().getBarLengths());
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        auto ts = source->getStateManager()->getSnapshot().getTimeSignature(i);
-        dest->setTimeSignature(i, ts.numerator, ts.denominator);
-    }
+        source->getBarLengths());
+    dest->setTimeSignatures(source->getTimeSignatures());
     dest->setLoopStart(source->getLoopStart());
     dest->setLoopEnd(source->getLoopEnd());
     copyTempoChangeEvents(source, dest);
@@ -598,19 +592,8 @@ void Sequencer::copySong(const int source, const int dest)
 void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
                           const std::shared_ptr<Track> &dest)
 {
-    if (src == dest)
-    {
-        return;
-    }
-
     dest->setTrackIndex(src->getIndex());
-
-    for (auto &e : src->getEvents())
-    {
-        auto eventCopy = e->getSnapshot();
-        dest->insertEvent(eventCopy);
-    }
-
+    dest->setEventStates(src->getEventStates());
     copyTrackParameters(src, dest);
 }
 

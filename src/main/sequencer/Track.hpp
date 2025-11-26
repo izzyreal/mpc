@@ -126,6 +126,7 @@ namespace mpc::sequencer
         void setName(const std::string &s);
         std::string getName();
         std::vector<std::shared_ptr<Event>> getEvents() const;
+        std::vector<EventState> getEventStates() const;
 
         bool isOn() const;
         bool isUsed() const;
@@ -148,6 +149,8 @@ namespace mpc::sequencer
         EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         void printEvents() const;
+
+        void setEventStates(const std::vector<EventState> &eventStates) const;
 
     private:
         EventId nextEventId = MinEventId;

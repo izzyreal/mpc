@@ -4,7 +4,6 @@
 #include "NonRtSequencerStateManager.hpp"
 #include "NonRtSequencerStateWorker.hpp"
 #include "SeqUtil.hpp"
-#include "SequenceStateManager.hpp"
 #include "Sequencer.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -533,30 +532,28 @@ bool Transport::isOverdubbing() const
 
 int Transport::getCurrentBarIndex() const
 {
-    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+    const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
             : getTickPosition();
 
-    if (pos == s->getLastTick())
+    if (pos == seq->getLastTick())
     {
-        return s->getLastBarIndex() + 1;
+        return seq->getLastBarIndex() + 1;
     }
 
     int tickCounter = 0;
 
-    const auto snapshot = s->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        if (i > s->getLastBarIndex())
+        if (i > seq->getLastBarIndex())
         {
             return 0; // Should not happen
         }
 
-        tickCounter += snapshot.getBarLength(i);
+        tickCounter += seq->getBarLength(i);
 
         if (tickCounter > pos)
         {
@@ -569,14 +566,14 @@ int Transport::getCurrentBarIndex() const
 
 int Transport::getCurrentBeatIndex() const
 {
-    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+    const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
             : getTickPosition();
 
-    if (pos == s->getLastTick())
+    if (pos == seq->getLastTick())
     {
         return 0;
     }
@@ -587,13 +584,13 @@ int Transport::getCurrentBeatIndex() const
     {
         index = getTickPosition();
 
-        if (index > s->getLastTick())
+        if (index > seq->getLastTick())
         {
-            index %= s->getLastTick();
+            index %= seq->getLastTick();
         }
     }
 
-    const auto den = s->getTimeSignature().denominator;
+    const auto den = seq->getTimeSignature().denominator;
     const auto denTicks = 96 * (4.0 / den);
 
     if (index == 0)
@@ -605,8 +602,6 @@ int Transport::getCurrentBeatIndex() const
 
     const auto currentBarIndex = getCurrentBarIndex();
 
-    const auto snapshot = s->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
         if (i == currentBarIndex)
@@ -614,7 +609,7 @@ int Transport::getCurrentBeatIndex() const
             break;
         }
 
-        barStartPos += snapshot.getBarLength(i);
+        barStartPos += seq->getBarLength(i);
     }
 
     const auto beatIndex =
@@ -655,8 +650,6 @@ int Transport::getCurrentClockNumber() const
 
     const auto currentBarIndex = getCurrentBarIndex();
 
-    const auto snapshot = sequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
         if (i == currentBarIndex)
@@ -664,7 +657,7 @@ int Transport::getCurrentClockNumber() const
             break;
         }
 
-        clock -= snapshot.getBarLength(i);
+        clock -= sequence->getBarLength(i);
     }
 
     const auto currentBeatIndex = getCurrentBeatIndex();
@@ -685,10 +678,9 @@ void Transport::setBarBeatClock(const int bar, const int beat,
         return;
     }
 
-    const auto s = sequencer.getSelectedSequence();
-    const auto snapshot = s->getStateManager()->getSnapshot();
+    const auto seq = sequencer.getSelectedSequence();
 
-    const auto [num, den] = s->getTimeSignature();
+    const auto [num, den] = seq->getTimeSignature();
 
     const int clampedBar = std::clamp(
         bar, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
@@ -701,7 +693,7 @@ void Transport::setBarBeatClock(const int bar, const int beat,
     int pos = 0;
     for (int b = 0; b < clampedBar; ++b)
     {
-        pos += snapshot.getBarLength(b);
+        pos += seq->getBarLength(b);
     }
 
     pos += clampedBeat * denTicks + clampedClock;
@@ -716,8 +708,7 @@ void Transport::setBar(int i) const
         return;
     }
 
-    const auto s = sequencer.getSelectedSequence();
-    const auto snapshot = s->getStateManager()->getSnapshot();
+    const auto seq = sequencer.getSelectedSequence();
 
     i = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
 
@@ -725,7 +716,7 @@ void Transport::setBar(int i) const
 
     for (int b = 0; b < i; ++b)
     {
-        pos += snapshot.getBarLength(b);
+        pos += seq->getBarLength(b);
     }
 
     setPosition(Sequencer::ticksToQuarterNotes(pos));
