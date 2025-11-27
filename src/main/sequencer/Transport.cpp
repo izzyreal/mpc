@@ -286,14 +286,14 @@ void Transport::moveSongToStepThatContainsPosition(
     }
 }
 
-void Transport::setCountEnabled(const bool b)
+void Transport::setCountEnabled(const bool b) const
 {
-    countEnabled = b;
+    sequencer.getNonRtStateManager()->enqueue(UpdateCountEnabled{b});
 }
 
 bool Transport::isCountEnabled() const
 {
-    return countEnabled;
+    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().countEnabled;
 }
 
 void Transport::setCountingIn(const bool b)

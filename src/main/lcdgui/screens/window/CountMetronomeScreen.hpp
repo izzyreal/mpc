@@ -14,10 +14,10 @@ namespace mpc::lcdgui::screens::window
                                               "1/32",   "1/32(3)"};
 
         int countIn = 1;
-        bool inPlay = false;
+        std::atomic<bool> inPlay{false};
         int rate = 0;
         bool waitForKey = false;
-        bool inRec = true;
+        std::atomic<bool> inRec{true};
 
     public:
         int getCountInMode() const;

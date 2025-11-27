@@ -138,6 +138,8 @@ namespace mpc::sequencer
     struct UpdateRecording { bool recording; };
     struct UpdateOverdubbing { bool overdubbing; };
 
+    struct UpdateCountEnabled { bool enabled; };
+
     struct RefreshPlaybackStateWhileNotPlaying
     {
         std::function<void()> onComplete = [] {};
@@ -184,7 +186,7 @@ namespace mpc::sequencer
                      BumpPositionByTicks, SwitchToNextSequence,
                      SetSelectedSequenceIndex, Stop, Play, PlayFromStart,
                      Record, RecordFromStart, Overdub, OverdubFromStart, SwitchRecordToOverdub,
-                     UpdateRecording, UpdateOverdubbing,
+                     UpdateRecording, UpdateOverdubbing, UpdateCountEnabled,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 
@@ -195,6 +197,7 @@ namespace mpc::sequencer
                      SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
                      SwitchToNextSequence, SetSelectedSequenceIndex,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
+                     UpdateCountEnabled,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 
 } // namespace mpc::sequencer

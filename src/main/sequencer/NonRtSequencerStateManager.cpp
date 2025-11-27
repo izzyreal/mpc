@@ -45,7 +45,7 @@ void NonRtSequencerStateManager::applyMessage(
             using T = std::decay_t<decltype(m)>;
             if constexpr (std::is_same_v<T, RefreshPlaybackStateWhileNotPlaying>)
             {
-                worker->refreshPlaybackState(activeState.transportState.positionQuarterNotes, 0, m.onComplete);
+                worker->refreshPlaybackState(activeState.transport.positionQuarterNotes, 0, m.onComplete);
             }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
@@ -257,21 +257,21 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
             {
                 // printf("Applying SetPositionQuarterNotes\n");
-                activeState.transportState.positionQuarterNotes =
+                activeState.transport.positionQuarterNotes =
                     m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T,
                                               SetPlayStartPositionQuarterNotes>)
             {
                 // printf("Applying SetPlayStartPositionQuarterNotes\n");
-                activeState.transportState.playStartPositionQuarterNotes =
+                activeState.transport.playStartPositionQuarterNotes =
                     m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
             {
                 // printf("Applying BumpPositionByTicks\n");
                 const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
-                activeState.transportState.positionQuarterNotes += delta;
+                activeState.transport.positionQuarterNotes += delta;
             }
             else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
             {
@@ -289,7 +289,7 @@ void NonRtSequencerStateManager::applyMessage(
 
                 if (m.setPositionTo0)
                 {
-                    activeState.transportState.positionQuarterNotes = 0;
+                    activeState.transport.positionQuarterNotes = 0;
                 }
             }
             else if constexpr (std::is_same_v<T, Stop>)
@@ -300,54 +300,58 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, Play>)
             {
                 // printf("Applying Play\n");
-                applyMessage(Play{});
+                applyPlayMessage();
             }
             else if constexpr (std::is_same_v<T, Record>)
             {
-                activeState.transportState.recording = true;
+                activeState.transport.recording = true;
                 applyMessage(Play{});
             }
             else if constexpr (std::is_same_v<T, RecordFromStart>)
             {
-                activeState.transportState.recording = true;
+                activeState.transport.recording = true;
                 applyMessage(PlayFromStart{});
             }
             else if constexpr (std::is_same_v<T, Overdub>)
             {
-                activeState.transportState.overdubbing = true;
+                activeState.transport.overdubbing = true;
                 applyMessage(Play{});
             }
             else if constexpr (std::is_same_v<T, OverdubFromStart>)
             {
-                activeState.transportState.overdubbing = true;
+                activeState.transport.overdubbing = true;
                 applyMessage(PlayFromStart{});
             }
             else if constexpr (std::is_same_v<T, UpdateRecording>)
             {
-                activeState.transportState.recording = m.recording;
+                activeState.transport.recording = m.recording;
             }
             else if constexpr (std::is_same_v<T, UpdateOverdubbing>)
             {
-                activeState.transportState.overdubbing = m.overdubbing;
+                activeState.transport.overdubbing = m.overdubbing;
             }
             else if constexpr (std::is_same_v<T, SwitchRecordToOverdub>)
             {
-                activeState.transportState.recording = false;
-                activeState.transportState.overdubbing = true;
+                activeState.transport.recording = false;
+                activeState.transport.overdubbing = true;
                 applyMessage(Play{});
             }
             else if constexpr (std::is_same_v<T, PlayFromStart>)
             {
-                if (activeState.transportState.positionQuarterNotes == 0)
+                if (activeState.transport.positionQuarterNotes == 0)
                 {
                     applyMessage(Play{});
                 }
                 else
                 {
-                    activeState.transportState.positionQuarterNotes = 0;
+                    activeState.transport.positionQuarterNotes = 0;
                     auto onComplete = [this]{enqueue(Play{});};
                     enqueue(RefreshPlaybackStateWhileNotPlaying{onComplete});
                 }
+            }
+            else if constexpr (std::is_same_v<T, UpdateCountEnabled>)
+            {
+                activeState.transport.countEnabled = true;
             }
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
@@ -427,7 +431,7 @@ void NonRtSequencerStateManager::applyMessage(
 
 void NonRtSequencerStateManager::applyPlayMessage() noexcept
 {
-    if (activeState.transportState.sequencerRunning)
+    if (activeState.transport.sequencerRunning)
     {
         return;
     }
@@ -561,13 +565,13 @@ void NonRtSequencerStateManager::applyPlayMessage() noexcept
         //     }
         // }
 
-        activeState.transportState.sequencerRunning = true;
+        activeState.transport.sequencerRunning = true;
     }
 }
 
 void NonRtSequencerStateManager::applyStopMessage() noexcept
 {
-    activeState.transportState.sequencerRunning = false;
+    activeState.transport.sequencerRunning = false;
     // const bool bouncing = sequencer.isBouncing();
     //
     // if (!isPlaying() && !bouncing)

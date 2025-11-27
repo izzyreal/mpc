@@ -38,25 +38,25 @@ mpc::SequenceIndex NonRtSequencerStateView::getSelectedSequenceIndex() const noe
 
 double NonRtSequencerStateView::getPositionQuarterNotes() const
 {
-    return state->transportState.positionQuarterNotes;
+    return state->transport.positionQuarterNotes;
 }
 
 double NonRtSequencerStateView::getPlayStartPositionQuarterNotes() const
 {
-    return state->transportState.playStartPositionQuarterNotes;
+    return state->transport.playStartPositionQuarterNotes;
 }
 
 int64_t NonRtSequencerStateView::getPositionTicks() const
 {
     return Sequencer::quarterNotesToTicks(
-        state->transportState.positionQuarterNotes);
+        state->transport.positionQuarterNotes);
 }
 
 bool NonRtSequencerStateView::isSequencerRunning() const
 {
-    return state->transportState.sequencerRunning;
+    return state->transport.sequencerRunning;
 }
 TransportState NonRtSequencerStateView::getTransportState() const
 {
-    return state->transportState;
+    return state->transport;
 }

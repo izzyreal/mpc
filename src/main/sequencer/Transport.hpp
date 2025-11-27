@@ -81,7 +81,7 @@ namespace mpc::sequencer
         void setClock(int i) const;
 
         bool isCountEnabled() const;
-        void setCountEnabled(bool b);
+        void setCountEnabled(bool b) const;
         bool isCountingIn() const;
         void setCountingIn(bool b);
         void resetCountInPositions();
@@ -110,7 +110,6 @@ namespace mpc::sequencer
         bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         bool punchEnabled = false;
-        bool countEnabled = true;
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;

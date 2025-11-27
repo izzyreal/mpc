@@ -29,6 +29,7 @@ namespace mpc::sequencer
         bool sequencerRunning = false;
         bool recording = false;
         bool overdubbing = false;
+        bool countEnabled = true;
     };
 
     struct NonRtSequencerState
@@ -37,6 +38,6 @@ namespace mpc::sequencer
             sequences{};
         PlaybackState playbackState{};
         SequenceIndex selectedSequenceIndex{MinSequenceIndex};
-        TransportState transportState;
+        TransportState transport;
     };
 } // namespace mpc::sequencer

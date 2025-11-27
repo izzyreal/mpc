@@ -29,7 +29,7 @@ void CountMetronomeScreen::displayWaitForKey() const
 
 void CountMetronomeScreen::displayInRec() const
 {
-    findField("in-rec")->setText(inRec ? "YES" : "NO");
+    findField("in-rec")->setText(inRec.load() ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayRate() const
@@ -39,7 +39,7 @@ void CountMetronomeScreen::displayRate() const
 
 void CountMetronomeScreen::displayInPlay() const
 {
-    findField("in-play")->setText(inPlay ? "YES" : "NO");
+    findField("in-play")->setText(inPlay.load() ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayCountIn() const
@@ -105,18 +105,18 @@ void CountMetronomeScreen::setCountIn(const int i)
 
 void CountMetronomeScreen::setInPlay(const bool b)
 {
-    if (inPlay == b)
+    if (inPlay.load() == b)
     {
         return;
     }
 
-    inPlay = b;
+    inPlay.store(b);
     displayInPlay();
 }
 
 bool CountMetronomeScreen::getInPlay() const
 {
-    return inPlay;
+    return inPlay.load();
 }
 
 int CountMetronomeScreen::getRate() const
@@ -126,12 +126,7 @@ int CountMetronomeScreen::getRate() const
 
 void CountMetronomeScreen::setRate(const int i)
 {
-    if (i < 0 || i > 7)
-    {
-        return;
-    }
-
-    rate = i;
+    rate = std::clamp(i, 0, 7);
     displayRate();
 }
 
@@ -153,16 +148,16 @@ bool CountMetronomeScreen::isWaitForKeyEnabled() const
 
 void CountMetronomeScreen::setInRec(const bool b)
 {
-    if (inRec == b)
+    if (inRec.load() == b)
     {
         return;
     }
 
-    inRec = b;
+    inRec.store(b);
     displayInRec();
 }
 
 bool CountMetronomeScreen::getInRec() const
 {
-    return inRec;
+    return inRec.load();
 }
