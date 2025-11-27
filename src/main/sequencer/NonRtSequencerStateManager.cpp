@@ -47,6 +47,10 @@ void NonRtSequencerStateManager::applyMessage(
             {
                 worker->refreshPlaybackState(activeState.transport.positionQuarterNotes, 0, m.onComplete);
             }
+            else if constexpr (std::is_same_v<T, RefreshPlaybackStateWhilePlaying>)
+            {
+                worker->refreshPlaybackState(activeState.transport.positionQuarterNotes, CurrentTimeInSamples, m.onComplete);
+            }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
                 // printf("Applying UpdatePlaybackState\n");
@@ -418,14 +422,17 @@ void NonRtSequencerStateManager::applyMessage(
         },
         msg);
 
-    if (isVariantAnyOf(
-            msg, NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh{}))
+    if (sequencer->getTransport()->isPlaying()  && isVariantAnyOf(
+            msg, MessagesThatInvalidPlaybackStateWhilePlaying{}))
     {
-        if (!sequencer->getTransport()->isPlaying())
-        {
-            publishState();
-            applyMessage(RefreshPlaybackStateWhileNotPlaying{});
-        }
+        publishState();
+        applyMessage(RefreshPlaybackStateWhilePlaying{});
+    }
+    else if (!sequencer->getTransport()->isPlaying()  && isVariantAnyOf(
+            msg, MessagesThatInvalidPlaybackStateWhileNotPlaying{}))
+    {
+        publishState();
+        applyMessage(RefreshPlaybackStateWhileNotPlaying{});
     }
 }
 

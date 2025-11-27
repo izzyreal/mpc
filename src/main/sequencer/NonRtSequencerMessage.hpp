@@ -140,6 +140,11 @@ namespace mpc::sequencer
         std::function<void()> onComplete = [] {};
     };
 
+    struct RefreshPlaybackStateWhilePlaying
+    {
+        std::function<void()> onComplete = [] {};
+    };
+
     struct UpdateBarLength
     {
         SequenceIndex sequenceIndex;
@@ -176,7 +181,7 @@ namespace mpc::sequencer
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
-                     RefreshPlaybackStateWhileNotPlaying,
+                     RefreshPlaybackStateWhileNotPlaying, RefreshPlaybackStateWhilePlaying,
                      SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
                      BumpPositionByTicks, SwitchToNextSequence,
                      SetSelectedSequenceIndex, Stop, Play, PlayFromStart,
@@ -185,14 +190,21 @@ namespace mpc::sequencer
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 
-    using NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh =
+    using MessagesThatInvalidPlaybackStateWhileNotPlaying =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, SetPositionQuarterNotes,
                      SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
-                     SwitchToNextSequence, SetSelectedSequenceIndex,
+                     SetSelectedSequenceIndex,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateCountEnabled,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
+
+    using MessagesThatInvalidPlaybackStateWhilePlaying =
+        std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+                     RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     FinalizeNonLiveNoteEvent,
+                     SwitchToNextSequence, UpdateCountEnabled,
+                     UpdateTimeSignature>;
 
 } // namespace mpc::sequencer

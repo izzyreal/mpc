@@ -73,25 +73,10 @@ void NonRtSequencerStateWorker::stop()
 void NonRtSequencerStateWorker::work() const
 {
     const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
-    const auto transport = snapshot.getTransportState();
     const auto playbackState = snapshot.getPlaybackState();
 
     const auto currentTimeInSamples =
         sequencer->getStateManager()->getSnapshot().getTimeInSamples();
-
-    /*
-     * Refresh conditions:
-     * - [DONE] currentTimeInSamples is beyond validUntil
-     * - positionQuarterNotes changed (and by implication when selected sequence index changed)
-     * - count enabled changed
-     * - selected sequence changes usedness
-     * - selected sequence changes timesignature
-     * - selected sequence adds or removes bar
-     * - selected sequence adds, removes or modifies event
-     *
-     * But maybe we can always refresh after the non-rt-manager applies a message, which would
-     * probably avoid the need here to check explicitly check for those conditions.
-     */
 
     bool snapshotIsInvalid = false;
 
@@ -100,11 +85,6 @@ void NonRtSequencerStateWorker::work() const
     if (snapshot.getPositionQuarterNotes() != NoPositionQuarterNotes &&
         currentTimeInSamples > snapshot.getPlaybackState().validUntil -
                                    playbackStateValiditySafetyMargin)
-    {
-        snapshotIsInvalid = true;
-    }
-
-    if (playbackState.countEnabled != transport.countEnabled)
     {
         snapshotIsInvalid = true;
     }
@@ -124,11 +104,18 @@ void NonRtSequencerStateWorker::refreshPlaybackState(
     const PositionQuarterNotes playOffset, const TimeInSamples timeInSamples,
     const std::function<void()> &onComplete) const
 {
-    printf("Refreshing playback state for time in samples %lld...\n", timeInSamples);
+    TimeInSamples timeInSamplesToUse = timeInSamples;
+
+    if (timeInSamplesToUse == CurrentTimeInSamples)
+    {
+        timeInSamplesToUse = sequencer->getStateManager()->getSnapshot().getTimeInSamples();
+    }
+
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
     const auto sampleRate = playbackEngine->getSampleRate();
+
     const auto playbackState =
-        renderPlaybackState(SampleRate(sampleRate), playOffset, timeInSamples);
+        renderPlaybackState(SampleRate(sampleRate), playOffset, timeInSamplesToUse);
 
     sequencer->getNonRtStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState), onComplete});
@@ -219,7 +206,7 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
         for (int j = 0; j < barLength; j += denTicks)
         {
             const auto eventTickToUse =
-                    (j + barTickOffset) - Sequencer::quarterNotesToTicks(ctx.playbackState.playOffset);
+                    j + barTickOffset - Sequencer::quarterNotesToTicks(ctx.playbackState.playOffset);
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse, ctx.playbackState.currentTime,
