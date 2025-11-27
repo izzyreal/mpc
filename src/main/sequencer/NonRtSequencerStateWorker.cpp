@@ -234,10 +234,10 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
 void renderSeq(RenderContext &ctx)
 {
-    printf("Rendering seq %s for playback time %lld at tick offset %i\n",
-           ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
-           Sequencer::quarterNotesToTicks(
-               ctx.playbackState.playOffsetQuarterNotes));
+    // printf("Rendering seq %s for playback time %lld at tick offset %i\n",
+           // ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
+           // Sequencer::quarterNotesToTicks(
+               // ctx.playbackState.playOffsetQuarterNotes));
     for (const auto &track : ctx.seq->getTracks())
     {
         for (const auto &event : track->getEvents())

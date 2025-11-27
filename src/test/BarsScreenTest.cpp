@@ -9,7 +9,6 @@
 
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc;
@@ -21,9 +20,11 @@ TEST_CASE("BARS1", "[bars-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -41,7 +42,7 @@ TEST_CASE("BARS1", "[bars-screen]")
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 8);
 
@@ -55,12 +56,7 @@ TEST_CASE("BARS1", "[bars-screen]")
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
 
     auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
-    toSeq->getStateManager()->drainQueue();
-
-    for (auto &t : toSeq->getTracks())
-    {
-        t->getEventStateManager()->drainQueue();
-    }
+    stateManager->drainQueue();
 
     REQUIRE(toSeq->isUsed());
 
@@ -78,10 +74,13 @@ TEST_CASE("BARS2", "[bars-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
 
     int tickPos = 0;
 
@@ -97,7 +96,7 @@ TEST_CASE("BARS2", "[bars-screen]")
         tickPos += 24;
     }
 
-    seq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(seq->getTrack(0)->getEvents().size() == 8);
 
@@ -111,8 +110,9 @@ TEST_CASE("BARS2", "[bars-screen]")
     auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
 
     toSeq->init(0);
-    toSeq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     toSeq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
 
     for (int i = 0; i < 16; i++)
     {
@@ -125,14 +125,13 @@ TEST_CASE("BARS2", "[bars-screen]")
         toSeq->getTrack(0)->insertEvent(eventState);
     }
 
-    toSeq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
     expectedBarCount += toSeq->getBarCount();
 
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
-    toSeq->getStateManager()->drainQueue();
-    toSeq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(toSeq->getBarCount() == expectedBarCount);
     REQUIRE(toSeq->getTrack(0)->getEvents().size() == 24);

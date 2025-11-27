@@ -20,9 +20,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include "hardware/Component.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
-#include "sequencer/NonRtSequencerStateWorker.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -36,38 +34,41 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+
     auto pos = [&]
     {
-        return mpc.getSequencer()->getTransport()->getTickPosition();
+        return sequencer->getTransport()->getTickPosition();
     };
-    auto seq = mpc.getSequencer()->getSequence(0);
+    auto seq = sequencer->getSequence(0);
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 1, 32);
     seq->setTimeSignature(1, 4, 4);
     REQUIRE(pos() == 0);
-    mpc.getSequencer()->goToNextStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToNextStep();
+    sequencer->getStateManager()->drainQueue();
     // TODO User-friendlier would be if the next step starts at the beginning of
     // a bar, which is not the
     //  case with the above timesignatures (first bar 1/32, second bar 4/4) on
     //  the real MPC2000XL. So the below is according to spec, but maybe we can
     //  do the user-friendlier variety at some point.
     REQUIRE(pos() == 24);
-    mpc.getSequencer()->goToNextStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToNextStep();
+    sequencer->getStateManager()->drainQueue();
     REQUIRE(pos() == 48);
-    mpc.getSequencer()->goToNextStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToNextStep();
+    sequencer->getStateManager()->drainQueue();
     REQUIRE(pos() == 72);
-    mpc.getSequencer()->goToPreviousStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToPreviousStep();
+    sequencer->getStateManager()->drainQueue();
     REQUIRE(pos() == 48);
-    mpc.getSequencer()->goToPreviousStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToPreviousStep();
+    sequencer->getStateManager()->drainQueue();
     REQUIRE(pos() == 24);
-    mpc.getSequencer()->goToPreviousStep();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    sequencer->goToPreviousStep();
+    sequencer->getStateManager()->drainQueue();
     REQUIRE(pos() == 0);
 }
 
@@ -234,20 +235,20 @@ TEST_CASE("Copy sequence", "[sequencer]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
     sequencer->getTransport()->setTempo(121);
 
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
 
     auto seq1 = sequencer->getSelectedSequence();
     seq1->init(2);
-    seq1->getStateManager()->drainQueue();
-    seq1->getTempoChangeTrack()->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(seq1->getInitialTempo() == 120);
 
     sequencer->getTransport()->setTempo(119);
 
-    sequencer->NonRtSequencerStateWorker->work();
+    stateManager->drainQueue();
 
     REQUIRE(seq1->getInitialTempo() == 119);
 
@@ -255,9 +256,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     auto seq2 = sequencer->getSequence(1);
 
-    seq2->getStateManager()->drainQueue();
-
-    sequencer->NonRtSequencerStateWorker->work();
+    stateManager->drainQueue();
 
     REQUIRE(seq2->getTempoChangeEvents().size() == 1);
     REQUIRE(seq2->getInitialTempo() == 119);
@@ -284,6 +283,7 @@ TEST_CASE("Undo", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
     sequencer->getTransport()->setCountEnabled(false);
 
     auto timingCorrectScreen =
@@ -292,8 +292,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     auto seq = sequencer->getSelectedSequence();
     seq->init(2);
-    seq->getStateManager()->drainQueue();
-    seq->getTempoChangeTrack()->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     sequencer->getTransport()->setTempo(121);
 
     auto server = mpc.getEngineHost()->getAudioServer();
@@ -333,7 +332,7 @@ TEST_CASE("Undo", "[sequencer]")
                 std::nullopt,
                 std::nullopt};
             mpc.clientEventController->handleClientEvent(clientEvent);
-            seq->getTrack(0)->getEventStateManager()->drainQueue();
+            stateManager->drainQueue();
         }
 
         mpc.getEngineHost()->applyPendingStateChanges();
@@ -348,15 +347,15 @@ TEST_CASE("Undo", "[sequencer]")
     sequencer->getTransport()->stop();
 
     auto tr = seq->getTrack(0);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getEvents().size() == 10);
 
     sequencer->undoSeq();
 
     seq = sequencer->getSelectedSequence();
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr = seq->getTrack(0);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(seq->isUsed());
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
@@ -364,8 +363,8 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
     seq = sequencer->getSelectedSequence();
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr = seq->getTrack(0);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getEvents().size() == 10);
 }

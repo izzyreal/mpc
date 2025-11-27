@@ -11,7 +11,6 @@
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::disk;
@@ -68,9 +67,9 @@ TEST_CASE("ALL file song", "[allfile]")
     auto sequencer = mpc.getSequencer();
 
     sequencer->getSequence(0)->init(1);
-    sequencer->getSequence(0)->getStateManager()->drainQueue();
+    sequencer->getNonRtStateManager()->drainQueue();
     sequencer->getSequence(1)->init(1);
-    sequencer->getSequence(1)->getStateManager()->drainQueue();
+    sequencer->getNonRtStateManager()->drainQueue();
 
     auto song = sequencer->getSong(0);
 
@@ -106,7 +105,7 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    mpc.getSequencer()->getNonRtStateManager()->drainQueue();
     seq->getTrack(60)->setUsed(false);
     seq->getTrack(60)->setOn(true);
     seq->getTrack(61)->setUsed(false);
@@ -138,19 +137,21 @@ TEST_CASE("ALL file note event", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+    auto seq = sequencer->getSequence(0);
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    sequencer->getNonRtStateManager()->drainQueue();
     auto tr = seq->getTrack(63);
 
     auto e = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60),
                                         mpc::Velocity(127), 0);
     tr->finalizeNoteEventNonLive(e, mpc::Duration(1600));
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr->getNoteEvents().front()->setVariationType(mpc::NoteVariationTypeFilter);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr->getNoteEvents().front()->setVariationValue(mpc::NoteVariationValue(20));
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto disk = mpc.getDisk();
 
@@ -158,11 +159,11 @@ TEST_CASE("ALL file note event", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
-    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    assert(sequencer->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getSelectedSequence();
+    auto seq1 = sequencer->getSelectedSequence();
     auto tr1 = seq1->getTrack(63);
-    tr1->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto event1 = tr1->getEvent(0);
     REQUIRE(event1->getTypeName() == "note-on");
     auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event1);
@@ -181,7 +182,7 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    mpc.getSequencer()->getNonRtStateManager()->drainQueue();
     seq->getTrack(60)->setDeviceIndex(1);
     seq->getTrack(61)->setDeviceIndex(2);
     seq->getTrack(62)->setDeviceIndex(3);

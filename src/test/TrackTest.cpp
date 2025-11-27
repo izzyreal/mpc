@@ -6,9 +6,7 @@
 #include "lcdgui/screens/EventsScreen.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc;
@@ -17,11 +15,14 @@ using namespace mpc::lcdgui::screens;
 
 TEST_CASE("timing-correct", "[track]")
 {
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+
+    auto seq = sequencer->getSequence(0);
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     auto note88 = tr->recordNoteEventNonLive(12, NoteNumber(88), Velocity(127));
@@ -36,7 +37,7 @@ TEST_CASE("timing-correct", "[track]")
     auto note91 = tr->recordNoteEventNonLive(22, NoteNumber(91), Velocity(127));
     tr->finalizeNoteEventNonLive(note91, Duration(1));
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[0]->getNote() == note88.noteNumber);
     REQUIRE(tr->getNoteEvents()[1]->getNote() == note89.noteNumber);
@@ -46,13 +47,13 @@ TEST_CASE("timing-correct", "[track]")
     int swingPercentage = 50;
 
     tr->timingCorrect(0, 0, note88.eventId, note88.tick, 24, swingPercentage);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     tr->timingCorrect(0, 0, note89.eventId, note89.tick, 24, swingPercentage);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     tr->timingCorrect(0, 0, note91.eventId, note91.tick, 24, swingPercentage);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[0]->getNote() == 88);
     REQUIRE(tr->getNoteEvents()[0]->getTick() == 0);
@@ -69,28 +70,29 @@ TEST_CASE("timing-correct", "[track]")
 
 TEST_CASE("swing1", "[track]")
 {
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+    auto seq = sequencer->getSequence(0);
     seq->init(0);
-    seq->getStateManager()->drainQueue();
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     auto n1 = tr->recordNoteEventNonLive(23, NoteNumber(90), Velocity(127));
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr->finalizeNoteEventNonLive(n1, Duration(1));
 
     auto n2 = tr->recordNoteEventNonLive(22, NoteNumber(91), Velocity(127));
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     tr->finalizeNoteEventNonLive(n2, Duration(1));
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvent(0)->getSnapshot().noteNumber == n2.noteNumber);
 
     tr->timingCorrect(0, 0, n2.eventId, n2.tick, 24, 71);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvent(0)->getTick() == 23);
     REQUIRE(tr->getNoteEvents()[0]->getNote() == n1.noteNumber);
@@ -100,7 +102,7 @@ TEST_CASE("swing1", "[track]")
 
     tr->timingCorrect(0, 0, n2.eventId, tr->getNoteEvents()[1]->getTick(), 24,
                       60);
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[1]->getNote() == n2.noteNumber);
     REQUIRE(tr->getEvent(1)->getTick() == 28);
@@ -108,45 +110,47 @@ TEST_CASE("swing1", "[track]")
 
 TEST_CASE("quantize", "[track]")
 {
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+    auto seq = sequencer->getSequence(0);
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     auto n0 = tr->recordNoteEventNonLive(0, NoteNumber(60), Velocity(127));
     tr->finalizeNoteEventNonLive(n0, Duration(1));
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     for (int i = 0; i <= 12; i++)
     {
         tr->getEvent(0)->setTick(i);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24,
                           50);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 0);
     }
 
     for (int i = 13; i <= 36; i++)
     {
         tr->getEvent(0)->setTick(i);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24,
                           50);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 24);
     }
 
     for (int i = 37; i <= 60; i++)
     {
         tr->getEvent(0)->setTick(i);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         tr->timingCorrect(0, 0, tr->getEvent(0)->getSnapshot().eventId, i, 24,
                           50);
-        tr->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 48);
     }
 }

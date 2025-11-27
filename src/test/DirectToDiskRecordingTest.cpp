@@ -11,7 +11,6 @@
 #include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 #include <thread>
@@ -46,9 +45,11 @@ TEST_CASE("Direct to disk recording does not start with silence",
         ->getNoteParameters(mpc::MinDrumNoteNumber)
         ->setSoundIndex(0);
 
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setInitialTempo(300);
     mpc::sequencer::EventState eventState;
     eventState.type = mpc::sequencer::EventType::NoteOn;
@@ -57,7 +58,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     eventState.velocity = mpc::MaxVelocity;
     eventState.duration = mpc::Duration(1);
     seq->getTrack(0)->insertEvent(eventState);
-    seq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);
@@ -90,7 +91,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
                 engineHost->applyPendingStateChanges();
                 engineHost->changeBounceStateIfRequired();
                 mpc.getClock()->processBufferInternal(
-                    mpc.getSequencer()->getTransport()->getTempo(), SAMPLE_RATE,
+                    sequencer->getTransport()->getTempo(), SAMPLE_RATE,
                     BUFFER_SIZE, 0);
                 audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {},
                                   {0, 1}, {}, {0, 1});
@@ -126,7 +127,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
 
     auto wavOrError = mpc::file::wav::WavFile::readWavStream(wavInputStream);
 
-    assert(wavOrError.has_value());
+    REQUIRE(wavOrError.has_value());
 
     auto wav = wavOrError.value();
     std::vector<float> wavFrames(100);

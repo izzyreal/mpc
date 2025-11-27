@@ -9,7 +9,6 @@
 
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 #include <vector>
@@ -28,9 +27,10 @@ SCENARIO("A MidiFile can be written", "[file]")
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
         auto sequencer = mpc.getSequencer();
+        auto stateManager = sequencer->getNonRtStateManager();
         auto sequence = sequencer->getSequence(0);
         sequence->init(1);
-        sequence->getStateManager()->drainQueue();
+        stateManager->drainQueue();
         auto track0 = sequence->getTrack(0);
         auto track1 = sequence->getTrack(1);
         track0->setUsed(true);
@@ -40,26 +40,25 @@ SCENARIO("A MidiFile can be written", "[file]")
         eventState.type = EventType::NoteOn;
         eventState.tick = 0;
         eventState.noteNumber = NoteNumber(37);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(10);
+        eventState.velocity = MaxVelocity;
+        eventState.duration = Duration(10);
         track0->insertEvent(eventState);
-        track0->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
 
         MidiWriter midiWriter(sequence.get());
         auto ostream = std::make_shared<std::ostringstream>();
         midiWriter.writeToOStream(ostream);
 
         sequence->init(1);
-        sequence->getStateManager()->drainQueue();
+        stateManager->drainQueue();
         track0->removeEvents();
-        track0->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
         REQUIRE(track0->getEvents().empty());
 
         auto istream = std::make_shared<std::istringstream>(ostream->str());
         MidiReader midiReader(istream, sequence);
         midiReader.parseSequence(mpc);
-        sequence->getStateManager()->drainQueue();
-        sequence->getTrack(0)->getEventStateManager()->drainQueue();
+        stateManager->drainQueue();
 
         REQUIRE(sequence->getTrack(0)->getEvents().size() == 1);
         REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(

@@ -6,7 +6,6 @@
 #include "sequencer/Track.hpp"
 #include "TestMpc.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -16,8 +15,11 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.getSequencer()->getSelectedSequence()->init(1);
-    mpc.getSequencer()->getSelectedSequence()->getStateManager()->drainQueue();
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getNonRtStateManager();
+
+    sequencer->getSelectedSequence()->init(1);
+    stateManager->drainQueue();
 
     mpc::sequencer::EventState eventState;
     eventState.type = mpc::sequencer::EventType::NoteOn;
@@ -26,21 +28,21 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     eventState.velocity = mpc::MaxVelocity;
     eventState.duration = mpc::Duration(1);
 
-    auto tr = mpc.getSequencer()->getSelectedSequence()->getTrack(0);
+    auto tr = sequencer->getSelectedSequence()->getTrack(0);
 
     tr->insertEvent(eventState);
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     auto controls = mpc.getScreen();
     controls->function(4); // DO IT
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getNoteEvents().front()->getTick() == 0);
 
     tr->getNoteEvents().front()->setTick(1);
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     controls->down();
@@ -48,6 +50,6 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     controls->down();       // Move to 'Notes:' field.
     controls->turnWheel(1); // 'Notes:' was 'ALL', here we set it to '35/A01'.
     controls->function(4);  // DO IT
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getNoteEvents().front()->getTick() == 1);
 }
