@@ -89,7 +89,7 @@ namespace mpc::sequencer
                                &barLengths) const;
 
         double getInitialTempo() const;
-        void setInitialTempo(double newInitialTempo);
+        void setInitialTempo(double initialTempo) const;
 
         void setLoopStart(int l);
         int getLoopStart() const;
@@ -152,7 +152,7 @@ namespace mpc::sequencer
         int getLastTickOfBar(int barIndex) const;
         int getFirstTickOfBeat(int barIndex, int beat) const;
 
-        std::shared_ptr<Track> getTempoChangeTrack();
+        std::shared_ptr<Track> getTempoChangeTrack() const;
 
         StartTime &getStartTime();
 
@@ -166,11 +166,8 @@ namespace mpc::sequencer
         const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt;
         const std::function<void(NonRtSequencerMessage &&)> dispatchNonRt;
         StartTime startTime{0, 0, 0, 0, 0};
-        std::atomic_bool tempoTrackIsInitialized{false};
-        double initialTempo = 120.0;
 
         std::vector<std::shared_ptr<Track>> tracks;
-        std::shared_ptr<Track> tempoChangeTrack;
 
         std::vector<std::string> deviceNames = std::vector<std::string>(33);
 

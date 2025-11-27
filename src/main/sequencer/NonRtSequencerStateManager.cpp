@@ -98,6 +98,10 @@ void NonRtSequencerStateManager::myApplyMessage(
                     }
                 }
             }
+            else if constexpr (std::is_same_v<T, SetInitialTempo>)
+            {
+                activeState.sequences[m.sequenceIndex].initialTempo = m.initialTempo;
+            }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
                 // printf("Applying UpdateEvent\n");
@@ -300,7 +304,7 @@ void NonRtSequencerStateManager::myApplyMessage(
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
-                // printf("Applying SetSelectedSequenceIndex\n");
+                printf("Applying SetSelectedSequenceIndex with index %i\n", m.sequenceIndex.get());
                 activeState.selectedSequenceIndex = m.sequenceIndex;
 
                 if (m.setPositionTo0)
@@ -419,7 +423,7 @@ void NonRtSequencerStateManager::myApplyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateEvents>)
             {
-                printf("Applying UpdateEvents\n");
+                // printf("Applying UpdateEvents\n");
                 activeState.sequences[m.sequence].tracks[m.track].events =
                     m.eventStates;
 

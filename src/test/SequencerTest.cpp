@@ -41,14 +41,17 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     {
         return sequencer->getTransport()->getTickPosition();
     };
+
     auto seq = sequencer->getSequence(0);
     seq->init(1);
     stateManager->drainQueue();
     seq->setTimeSignature(0, 1, 32);
+    stateManager->drainQueue();
     seq->setTimeSignature(1, 4, 4);
+    stateManager->drainQueue();
     REQUIRE(pos() == 0);
     sequencer->goToNextStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     // TODO User-friendlier would be if the next step starts at the beginning of
     // a bar, which is not the
     //  case with the above timesignatures (first bar 1/32, second bar 4/4) on
@@ -56,19 +59,19 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     //  do the user-friendlier variety at some point.
     REQUIRE(pos() == 24);
     sequencer->goToNextStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(pos() == 48);
     sequencer->goToNextStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(pos() == 72);
     sequencer->goToPreviousStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(pos() == 48);
     sequencer->goToPreviousStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(pos() == 24);
     sequencer->goToPreviousStep();
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(pos() == 0);
 }
 
@@ -263,12 +266,16 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     sequencer->getTransport()->setTempo(122);
 
+    stateManager->drainQueue();
+
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 119);
 
     sequencer->setSelectedSequenceIndex(mpc::SequenceIndex(1), false);
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     sequencer->getTransport()->setTempo(123);
+
+    stateManager->drainQueue();
 
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 123);

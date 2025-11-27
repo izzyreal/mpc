@@ -31,6 +31,8 @@ namespace mpc::sequencer
 
         Tick getLastTick() const;
 
+        double getInitialTempo() const;
+
     private:
         const NonRtSequenceState &state;
     };

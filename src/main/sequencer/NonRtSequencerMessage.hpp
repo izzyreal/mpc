@@ -207,10 +207,16 @@ namespace mpc::sequencer
         std::function<void(BarIndex newLastBarIndex)> onComplete = [](const BarIndex){};
     };
 
+    struct SetInitialTempo
+    {
+        SequenceIndex sequenceIndex;
+        double initialTempo;
+    };
+
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, CopyEvents, SetLastBarIndex, InsertBars,
-                     UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     UpdateTrackIndexOfAllEvents, UpdateEvent, SetInitialTempo,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
                      RefreshPlaybackStateWhileNotPlaying, RefreshPlaybackStateWhilePlaying,
                      SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,

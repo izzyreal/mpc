@@ -21,6 +21,7 @@ namespace mpc::sequencer
             timeSignatures{};
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
         BarIndex lastBarIndex{NoBarIndex};
+        double initialTempo = 120.0;
     };
 
     struct TransportState

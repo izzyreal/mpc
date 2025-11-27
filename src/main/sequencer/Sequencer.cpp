@@ -493,21 +493,19 @@ std::shared_ptr<Sequence>
 Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
                         const SequenceIndex destinationIndex)
 {
-    auto copy = makeNewSequence(destinationIndex);
+    auto copy = sequences[destinationIndex];
+
+    if (!copy)
+    {
+        copy = makeNewSequence(destinationIndex);
+    }
+
     copy->init(source->getLastBarIndex());
     copySequenceParameters(source, copy);
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
     {
         copyTrack(source->getTrack(i), copy->getTrack(i));
-    }
-
-    copy->getTempoChangeTrack()->removeEvents();
-
-    for (const auto &event : source->getTempoChangeTrack()->getEvents())
-    {
-        auto eventCopy = event->getSnapshot();
-        copy->getTempoChangeTrack()->insertEvent(eventCopy);
     }
 
     return copy;

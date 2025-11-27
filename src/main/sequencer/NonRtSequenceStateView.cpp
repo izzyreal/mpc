@@ -72,3 +72,8 @@ mpc::Tick NonRtSequenceStateView::getLastTick() const
 
     return lastTick;
 }
+
+double NonRtSequenceStateView::getInitialTempo() const
+{
+    return state.initialTempo;
+}
