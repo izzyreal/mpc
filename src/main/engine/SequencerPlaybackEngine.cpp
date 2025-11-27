@@ -107,6 +107,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->getStateManager()->enqueue(SetTimeInSamples{0});
             sequencer->getStateManager()->drainQueue();
+            sequencer->getNonRtStateManager()->enqueue(RefreshPlaybackStateWhileNotPlaying{});
         }
         return;
     }
