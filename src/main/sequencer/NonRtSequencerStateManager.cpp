@@ -372,8 +372,14 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, UpdateTimeSignatures>)
             {
                 // printf("Applying UpdateTimeSignatures\n");
-                activeState.sequences[m.sequenceIndex].timeSignatures =
-                    m.timeSignatures;
+                auto &seq = activeState.sequences[m.sequenceIndex];
+
+                seq.timeSignatures = m.timeSignatures;
+
+                for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
+                {
+                    seq.barLengths[i] = seq.timeSignatures[i].getBarLength();
+                }
             }
             else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
             {

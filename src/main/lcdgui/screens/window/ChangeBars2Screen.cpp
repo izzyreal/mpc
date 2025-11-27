@@ -68,6 +68,7 @@ void ChangeBars2Screen::function(const int i)
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
+        default:;
     }
 }
 

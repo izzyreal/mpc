@@ -496,119 +496,74 @@ int Sequence::getNumerator(const int i) const
 
 void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 {
-    if (lastBarIndex.load() == -1)
-    {
-        return;
-    }
+    if (lastBarIndex.load() == -1) return;
 
     lastBarToDelete++;
 
-    int deleteFirstTick = 0;
-
     const auto snapshot = getSnapshotNonRt();
+    const auto &oldTs = snapshot->getTimeSignatures();
 
+    int deleteFirstTick = 0;
     for (int i = 0; i < firstBar; i++)
-    {
         deleteFirstTick += snapshot->getBarLength(i);
-    }
 
     int deleteLastTick = deleteFirstTick;
-
     for (int i = firstBar; i < lastBarToDelete; i++)
-    {
         deleteLastTick += snapshot->getBarLength(i);
-    }
 
     for (const auto &t : tracks)
     {
         auto events = t->getEvents();
-
         for (auto &e : events)
         {
-            if (e->getTick() >= deleteFirstTick &&
-                e->getTick() < deleteLastTick)
-            {
+            if (e->getTick() >= deleteFirstTick && e->getTick() < deleteLastTick)
                 t->removeEvent(e);
-            }
         }
     }
 
-    const auto difference = lastBarToDelete - firstBar;
+    const int difference = lastBarToDelete - firstBar;
+
     int oldBarStartPos = 0;
-    auto barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (i == lastBarToDelete)
-        {
-            break;
-        }
-
+    for (int i = 0; i < lastBarToDelete; ++i)
         oldBarStartPos += snapshot->getBarLength(i);
-        barCounter++;
-    }
 
     int newBarStartPos = 0;
-    barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (barCounter == firstBar)
-        {
-            break;
-        }
-
+    for (int i = 0; i < firstBar; ++i)
         newBarStartPos += snapshot->getBarLength(i);
-        barCounter++;
-    }
 
-    const auto tickDifference = oldBarStartPos - newBarStartPos;
-
-    for (int i = firstBar; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        if (i + difference > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-        {
-            break;
-        }
-
-        dispatchNonRt(UpdateTimeSignature{
-            getSequenceIndex(), i, snapshot->getTimeSignature(i + difference)});
-    }
+    const int tickDifference = oldBarStartPos - newBarStartPos;
 
     for (const auto &t : tracks)
     {
-        if (t->getIndex() >= TempoChangeTrackIndex)
-        {
-            continue;
-        }
-
+        if (t->getIndex() >= TempoChangeTrackIndex) continue;
         for (const auto &e : t->getEvents())
         {
             if (e->getTick() >= oldBarStartPos)
-            {
                 e->setTick(e->getTick() - tickDifference);
-            }
         }
     }
 
-    const int newLastBarIndex = lastBarIndex.load() - difference;
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
 
+    int out = 0;
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
+    {
+        if (i >= firstBar && i < lastBarToDelete) continue;
+        if (out >= Mpc2000XlSpecs::MAX_BAR_COUNT) break;
+        newTs[out++] = oldTs[i];
+    }
+    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
+        newTs[out] = TimeSignature{}; // or however an empty TS is represented
+
+    setTimeSignatures(newTs);
+
+    const int newLastBarIndex = lastBarIndex.load() - difference;
     lastBarIndex.store(newLastBarIndex);
 
-    if (firstLoopBarIndex > newLastBarIndex)
-    {
-        firstLoopBarIndex = newLastBarIndex;
-    }
+    if (firstLoopBarIndex > newLastBarIndex) firstLoopBarIndex = newLastBarIndex;
+    if (lastLoopBarIndex > newLastBarIndex) lastLoopBarIndex = newLastBarIndex;
 
-    if (lastLoopBarIndex > newLastBarIndex)
-    {
-        lastLoopBarIndex = newLastBarIndex;
-    }
-
-    if (newLastBarIndex == -1)
-    {
-        setUsed(false);
-    }
+    if (newLastBarIndex == -1) setUsed(false);
 }
 
 void Sequence::insertBars(int barCount, const int afterBar)
@@ -617,105 +572,60 @@ void Sequence::insertBars(int barCount, const int afterBar)
     const bool isAppending = afterBar - 1 == oldLastBarIndex;
 
     if (oldLastBarIndex + barCount > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-    {
         barCount = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
-    }
 
-    if (barCount == 0)
-    {
-        return;
-    }
+    if (barCount == 0) return;
 
     const auto newLastBarIndex = oldLastBarIndex + barCount;
 
     const auto snapshot = getSnapshotNonRt();
+    const auto &oldTs = snapshot->getTimeSignatures();
 
     lastBarIndex.store(newLastBarIndex);
 
-    for (int barIndex = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX;
-         barIndex >= afterBar; barIndex--)
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
+
+    int out = 0;
+    for (int i = 0; i <= oldLastBarIndex; ++i)
     {
-        if (barIndex - barCount < 0)
+        if (i == afterBar)
         {
-            break;
+            for (int j = 0; j < barCount && out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++j)
+                newTs[out++] = TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
         }
-
-        const auto newNum =
-            snapshot->getTimeSignature(barIndex - barCount).numerator;
-        const auto newDen =
-            snapshot->getTimeSignature(barIndex - barCount).denominator;
-
-        dispatchNonRt(
-            UpdateTimeSignature{getSequenceIndex(), barIndex,
-                                TimeSignature{TimeSigNumerator(newNum),
-                                              TimeSigDenominator(newDen)}});
+        if (out < Mpc2000XlSpecs::MAX_BAR_COUNT)
+            newTs[out++] = oldTs[i];
     }
 
-    // The below are sane defaults for the fresh bars, but the
-    // caller of this method is expected to set them to what they
-    // should be, given the use case.
-    for (int barIndex = afterBar; barIndex < afterBar + barCount; barIndex++)
-    {
-        dispatchNonRt(UpdateTimeSignature{
-            getSequenceIndex(), barIndex,
-            TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)}});
-    }
+    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
+        newTs[out] = TimeSignature{};
+
+    setTimeSignatures(newTs);
 
     int barStart = 0;
-    auto barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (barCounter == afterBar)
-        {
-            break;
-        }
-
+    for (int i = 0; i < afterBar; ++i)
         barStart += snapshot->getBarLength(i);
-        barCounter++;
-    }
-
-    barCounter = 0;
 
     if (!isAppending)
     {
         int newBarStart = 0;
-
-        for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-        {
-            if (barCounter == afterBar + barCount)
-            {
-                break;
-            }
-
+        for (int i = 0; i < afterBar + barCount; ++i)
             newBarStart += snapshot->getBarLength(i);
-            barCounter++;
-        }
 
         for (const auto &t : tracks)
         {
-            if (t->getIndex() == TempoChangeTrackIndex)
-            {
-                continue;
-            }
-
+            if (t->getIndex() == TempoChangeTrackIndex) continue;
             for (const auto &e : t->getEvents())
             {
                 if (e->getTick() >= barStart)
-                {
-                    const auto es = e->getSnapshot();
-                    const auto newTickPos = es.tick + (newBarStart - barStart);
-                    e->setTick(newTickPos);
-                }
+                    e->setTick(e->getTick() + (newBarStart - barStart));
             }
         }
     }
 
-    if (newLastBarIndex != -1 && !isUsed())
-    {
-        setUsed(true);
-    }
+    if (newLastBarIndex != -1 && !isUsed()) setUsed(true);
 }
+
 
 bool trackIndexComparator(const std::shared_ptr<Track> &t0,
                           const std::shared_ptr<Track> &t1)
