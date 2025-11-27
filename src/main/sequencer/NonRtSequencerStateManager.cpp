@@ -3,6 +3,8 @@
 #include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Sequencer.hpp"
+#include "SequencerMessage.hpp"
+#include "SequencerStateManager.hpp"
 #include "Transport.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
@@ -283,8 +285,6 @@ void NonRtSequencerStateManager::applyMessage(
                 constexpr bool setPositionTo0 = false;
                 enqueue(
                     SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
-                enqueue(Stop{});
-                enqueue(PlayFromStart{});
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {

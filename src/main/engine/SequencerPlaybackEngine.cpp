@@ -103,6 +103,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     if (!sequencerIsRunningAtStartOfBuffer)
     {
+        if (currentTimeInSamplesAtStartOfBuffer != 0)
+        {
+            sequencer->getStateManager()->enqueue(SetTimeInSamples{0});
+            sequencer->getStateManager()->drainQueue();
+        }
         return;
     }
 

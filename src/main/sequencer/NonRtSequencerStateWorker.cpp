@@ -109,6 +109,7 @@ void NonRtSequencerStateWorker::refreshPlaybackState(
     if (timeInSamplesToUse == CurrentTimeInSamples)
     {
         timeInSamplesToUse = sequencer->getStateManager()->getSnapshot().getTimeInSamples();
+        printf("Time in samples to use: %i\n", timeInSamplesToUse);
     }
 
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();

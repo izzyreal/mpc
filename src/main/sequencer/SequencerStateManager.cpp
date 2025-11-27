@@ -22,6 +22,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             if constexpr (std::is_same_v<T, SetTimeInSamples>)
             {
                 activeState.timeInSamples = m.timeInSamples;
+                printf("Time in samples set to %i\n", activeState.timeInSamples);
             }
         },
         msg);
