@@ -193,8 +193,8 @@ namespace mpc::sequencer
     using MessagesThatInvalidPlaybackStateWhileNotPlaying =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent, SetPositionQuarterNotes,
-                     SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
+                     FinalizeNonLiveNoteEvent, /*SetPositionQuarterNotes,*/
+                     /*SetPlayStartPositionQuarterNotes,*/ BumpPositionByTicks,
                      SetSelectedSequenceIndex,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateCountEnabled,

@@ -422,13 +422,34 @@ void NonRtSequencerStateManager::applyMessage(
         },
         msg);
 
-    if (sequencer->getTransport()->isPlaying()  && isVariantAnyOf(
+    const auto isPlaying = sequencer->getTransport()->isPlaying();
+    const auto playbackState = sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
+
+    if (std::holds_alternative<SetPositionQuarterNotes>(msg))
+    {
+        if (isPlaying)
+        {
+            return;
+        }
+
+        publishState();
+
+        if (activeState.transport.positionQuarterNotes > playbackState.safeValidUntilQuarterNote ||
+            activeState.transport.positionQuarterNotes < playbackState.safeValidFromQuarterNote)
+        {
+            applyMessage(RefreshPlaybackStateWhileNotPlaying{});
+        }
+
+        return;
+    }
+
+    if (isPlaying && isVariantAnyOf(
             msg, MessagesThatInvalidPlaybackStateWhilePlaying{}))
     {
         publishState();
         applyMessage(RefreshPlaybackStateWhilePlaying{});
     }
-    else if (!sequencer->getTransport()->isPlaying()  && isVariantAnyOf(
+    else if (!isPlaying && isVariantAnyOf(
             msg, MessagesThatInvalidPlaybackStateWhileNotPlaying{}))
     {
         publishState();

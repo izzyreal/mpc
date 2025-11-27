@@ -19,9 +19,19 @@ namespace mpc::sequencer
         bool countEnabled;
 
         SampleRate sampleRate{NoSampleRate};
-        PositionQuarterNotes playOffset;
-        TimeInSamples currentTime{NoTimeInSamples};
-        TimeInSamples validUntil{NoTimeInSamples};
+        PositionQuarterNotes playOffsetQuarterNotes;
+        TimeInSamples currentTimeInSamples{NoTimeInSamples};
+        TimeInSamples strictValidUntilTimeInSamples{NoTimeInSamples};
+
+
+        TimeInSamples safeValidFromTimeInSamples{NoTimeInSamples};
+        Tick safeValidFromTick{NoTick};
+        PositionQuarterNotes safeValidFromQuarterNote{NoPositionQuarterNotes};
+
+        TimeInSamples safeValidUntilTimeInSamples{NoTimeInSamples};
+        Tick safeValidUntilTick{NoTick};
+        PositionQuarterNotes safeValidUntilQuarterNote{NoPositionQuarterNotes};
+
         std::vector<RenderedEventState> events{};
     };
 } // namespace mpc::sequencer

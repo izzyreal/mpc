@@ -10,6 +10,8 @@
 
 namespace mpc::sequencer
 {
+    constexpr TimeInSamples playbackStateValiditySafetyMarginTimeInSamples = 10000;
+
     class Sequencer;
 
     class NonRtSequencerStateWorker
