@@ -29,14 +29,14 @@ namespace mpc::sequencer
                 std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
         void play(bool fromStart = false) const;
-        void rec();
-        void recFromStart();
-        void overdub();
-        void overdubFromStart();
-        void switchRecordToOverdub();
+        void rec() const;
+        void recFromStart() const;
+        void overdub() const;
+        void overdubFromStart() const;
+        void switchRecordToOverdub() const;
         void stop() const;
-        void setRecording(bool b);
-        void setOverdubbing(bool b);
+        void setRecording(bool b) const;
+        void setOverdubbing(bool b) const;
 
         PositionQuarterNotes getWrappedPositionInSequence(PositionQuarterNotes) const;
 
@@ -106,9 +106,6 @@ namespace mpc::sequencer
     private:
         Sequencer &sequencer;
 
-        bool playing = false;
-        bool recording = false;
-        bool overdubbing = false;
         bool countingIn = false;
         bool metronomeOnlyEnabled = false;
         bool endOfSong = false;

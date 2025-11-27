@@ -300,13 +300,47 @@ void NonRtSequencerStateManager::applyMessage(
             else if constexpr (std::is_same_v<T, Play>)
             {
                 // printf("Applying Play\n");
-                applyPlayMessage();
+                applyMessage(Play{});
+            }
+            else if constexpr (std::is_same_v<T, Record>)
+            {
+                activeState.transportState.recording = true;
+                applyMessage(Play{});
+            }
+            else if constexpr (std::is_same_v<T, RecordFromStart>)
+            {
+                activeState.transportState.recording = true;
+                applyMessage(PlayFromStart{});
+            }
+            else if constexpr (std::is_same_v<T, Overdub>)
+            {
+                activeState.transportState.overdubbing = true;
+                applyMessage(Play{});
+            }
+            else if constexpr (std::is_same_v<T, OverdubFromStart>)
+            {
+                activeState.transportState.overdubbing = true;
+                applyMessage(PlayFromStart{});
+            }
+            else if constexpr (std::is_same_v<T, UpdateRecording>)
+            {
+                activeState.transportState.recording = m.recording;
+            }
+            else if constexpr (std::is_same_v<T, UpdateOverdubbing>)
+            {
+                activeState.transportState.overdubbing = m.overdubbing;
+            }
+            else if constexpr (std::is_same_v<T, SwitchRecordToOverdub>)
+            {
+                activeState.transportState.recording = false;
+                activeState.transportState.overdubbing = true;
+                applyMessage(Play{});
             }
             else if constexpr (std::is_same_v<T, PlayFromStart>)
             {
                 if (activeState.transportState.positionQuarterNotes == 0)
                 {
-                        applyPlayMessage();
+                    applyMessage(Play{});
                 }
                 else
                 {

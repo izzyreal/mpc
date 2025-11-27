@@ -27,6 +27,8 @@ namespace mpc::sequencer
         PositionQuarterNotes positionQuarterNotes = NoPositionQuarterNotes;
         PositionQuarterNotes playStartPositionQuarterNotes = NoPositionQuarterNotes;
         bool sequencerRunning = false;
+        bool recording = false;
+        bool overdubbing = false;
     };
 
     struct NonRtSequencerState

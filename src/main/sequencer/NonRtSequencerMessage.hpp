@@ -69,14 +69,14 @@ namespace mpc::sequencer
     struct UpdatePlaybackState
     {
         PlaybackState playbackState;
-        std::function<void()> onComplete = []{};
+        std::function<void()> onComplete = [] {};
     };
 
     struct SetPositionQuarterNotes
     {
         double positionQuarterNotes;
         explicit SetPositionQuarterNotes(double positionQuarterNotes)
-            :positionQuarterNotes(positionQuarterNotes)
+            : positionQuarterNotes(positionQuarterNotes)
         {
             printf("");
         }
@@ -111,13 +111,36 @@ namespace mpc::sequencer
     {
     };
 
+    struct Record
+    {
+    };
+
+    struct RecordFromStart
+    {
+    };
+
+    struct Overdub
+    {
+    };
+
+    struct OverdubFromStart
+    {
+    };
+
+    struct SwitchRecordToOverdub
+    {
+    };
+
     struct PlayFromStart
     {
     };
 
+    struct UpdateRecording { bool recording; };
+    struct UpdateOverdubbing { bool overdubbing; };
+
     struct RefreshPlaybackStateWhileNotPlaying
     {
-        std::function<void()> onComplete = []{};
+        std::function<void()> onComplete = [] {};
     };
 
     struct UpdateBarLength
@@ -156,21 +179,22 @@ namespace mpc::sequencer
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
-                     RefreshPlaybackStateWhileNotPlaying, SetPositionQuarterNotes,
-                     SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
-                     SwitchToNextSequence, SetSelectedSequenceIndex, Stop, Play,
-                     PlayFromStart,
+                     RefreshPlaybackStateWhileNotPlaying,
+                     SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
+                     BumpPositionByTicks, SwitchToNextSequence,
+                     SetSelectedSequenceIndex, Stop, Play, PlayFromStart,
+                     Record, RecordFromStart, Overdub, OverdubFromStart, SwitchRecordToOverdub,
+                     UpdateRecording, UpdateOverdubbing,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 
     using NonRtSequencerMessagesThatShouldTriggerPlaybackStateRefresh =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent,
-                     SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks, SwitchToNextSequence,
-                     SetSelectedSequenceIndex, UpdateBarLength,
-                     UpdateBarLengths, UpdateTimeSignatures,
+                     FinalizeNonLiveNoteEvent, SetPositionQuarterNotes,
+                     SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
+                     SwitchToNextSequence, SetSelectedSequenceIndex,
+                     UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
 
 } // namespace mpc::sequencer

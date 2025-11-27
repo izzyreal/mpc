@@ -56,3 +56,7 @@ bool NonRtSequencerStateView::isSequencerRunning() const
 {
     return state->transportState.sequencerRunning;
 }
+TransportState NonRtSequencerStateView::getTransportState() const
+{
+    return state->transportState;
+}

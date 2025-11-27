@@ -35,6 +35,8 @@ namespace mpc::sequencer
 
         bool isSequencerRunning() const;
 
+        TransportState getTransportState() const;
+
     private:
         const std::shared_ptr<const NonRtSequencerState> state;
     };

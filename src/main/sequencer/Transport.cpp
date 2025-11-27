@@ -12,7 +12,6 @@
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
-#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
@@ -52,49 +51,42 @@ void Transport::play(const bool fromStart) const
     }
 }
 
-void Transport::rec()
+void Transport::rec() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    recording = true;
-
-    play(false);
+    sequencer.getNonRtStateManager()->enqueue(Record{});
 }
 
-void Transport::recFromStart()
+void Transport::recFromStart() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    recording = true;
-    play(true);
+    sequencer.getNonRtStateManager()->enqueue(RecordFromStart{});
 }
 
-void Transport::overdub()
+void Transport::overdub() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    overdubbing = true;
-    play(false);
+    sequencer.getNonRtStateManager()->enqueue(Overdub{});
 }
 
-void Transport::switchRecordToOverdub()
+void Transport::switchRecordToOverdub() const
 {
-    if (!recording)
+    if (!isRecording())
     {
         return;
     }
-
-    recording = false;
-    overdubbing = true;
 
     // Maybe we should give our Led GUI component knowledge of Transport
     // so it can figure this out itself. It's already polling other kinds
@@ -105,15 +97,14 @@ void Transport::switchRecordToOverdub()
         ->setEnabled(true);
 }
 
-void Transport::overdubFromStart()
+void Transport::overdubFromStart() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    overdubbing = true;
-    play(true);
+    sequencer.getNonRtStateManager()->enqueue(OverdubFromStart{});
 }
 
 void Transport::stop() const
@@ -127,14 +118,14 @@ void Transport::resetCountInPositions()
     countInEndPos = -1;
 }
 
-void Transport::setRecording(const bool b)
+void Transport::setRecording(const bool b) const
 {
-    recording = b;
+    sequencer.getNonRtStateManager()->enqueue(UpdateRecording{b});
 }
 
-void Transport::setOverdubbing(const bool b)
+void Transport::setOverdubbing(const bool b) const
 {
-    overdubbing = b;
+    sequencer.getNonRtStateManager()->enqueue(UpdateOverdubbing{b});
 }
 
 mpc::PositionQuarterNotes Transport::getWrappedPositionInSequence(
@@ -464,17 +455,17 @@ void Transport::setTempoSourceSequence(const bool b)
 
 bool Transport::isRecordingOrOverdubbing() const
 {
-    return recording || overdubbing;
+    return isRecording() || isOverdubbing();
 }
 
 bool Transport::isRecording() const
 {
-    return recording;
+    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().recording;
 }
 
 bool Transport::isOverdubbing() const
 {
-    return overdubbing;
+    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().overdubbing;
 }
 
 int Transport::getCurrentBarIndex() const
