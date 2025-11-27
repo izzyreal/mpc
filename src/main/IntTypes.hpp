@@ -45,6 +45,7 @@ namespace mpc
 
     using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
     constexpr DrumNoteNumber NoDrumNoteAssigned{34};
+    constexpr DrumNoteNumber AllDrumNotes{34};
     constexpr DrumNoteNumber MinDrumNoteNumber{Mpc2000XlSpecs::FIRST_DRUM_NOTE};
     constexpr DrumNoteNumber MaxDrumNoteNumber{Mpc2000XlSpecs::LAST_DRUM_NOTE};
 
@@ -93,12 +94,13 @@ namespace mpc
     /////////
 
     using SequenceIndex =
-        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT - 1>;
+        ConstrainedInt<int8_t, -2, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT - 1>;
 
     constexpr SequenceIndex NoSequenceIndex{-1};
     constexpr SequenceIndex MinSequenceIndex{0};
     constexpr SequenceIndex MaxSequenceIndex{
         Mpc2000XlSpecs::LAST_SEQUENCE_INDEX};
+    constexpr SequenceIndex SelectedSequenceIndex{-2};
 
     constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
     constexpr SequenceIndex PlaceholderSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
@@ -175,6 +177,11 @@ namespace mpc
     using Tick = int64_t;
     constexpr Tick NoTick{-1};
     constexpr Tick NoTickAssignedWhileRecording{-2};
+
+    /////////
+
+    using BarIndex = ConstrainedInt<int16_t, -1, Mpc2000XlSpecs::MAX_LAST_BAR_INDEX>;
+    constexpr BarIndex NoBarIndex{-1};
 
     /////////
 

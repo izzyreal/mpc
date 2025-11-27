@@ -128,6 +128,8 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<Event>> getEvents() const;
         std::vector<EventState> getEventStates() const;
 
+        EventId getAndIncrementNextEventId();
+
         bool isOn() const;
         bool isUsed() const;
 

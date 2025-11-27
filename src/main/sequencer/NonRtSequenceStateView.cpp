@@ -39,3 +39,36 @@ TimeSignature NonRtSequenceStateView::getTimeSignature(const int barIndex) const
 {
     return state.timeSignatures[barIndex];
 }
+
+mpc::BarIndex NonRtSequenceStateView::getLastBarIndex() const {
+    return state.lastBarIndex;
+}
+
+int NonRtSequenceStateView::getBarCount() const
+{
+    return getLastBarIndex() + 1;
+}
+
+mpc::Tick NonRtSequenceStateView::getFirstTickOfBar(const BarIndex barIndex) const
+{
+    int res = 0;
+
+    for (int i = 0; i < barIndex; i++)
+    {
+        res += getBarLength(i);
+    }
+
+    return res;
+}
+
+mpc::Tick NonRtSequenceStateView::getLastTick() const
+{
+    int lastTick = 0;
+
+    for (int i = 0; i < getBarCount(); i++)
+    {
+        lastTick += getBarLength(i);
+    }
+
+    return lastTick;
+}

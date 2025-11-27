@@ -15,6 +15,6 @@ void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
     fs::remove_all(testDocPath);
     fs::create_directories(testDocPath);
     mpc.init();
-    mpc.getSequencer()->getNonRtSequencerStateWorker()->stop();
+    mpc.getSequencer()->getNonRtSequencerStateWorker()->stopAndWaitUntilStopped();
     mpc.getEngineHost()->getAudioServer()->start();
 }

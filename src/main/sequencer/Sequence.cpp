@@ -140,7 +140,7 @@ void Sequence::setLastLoopBarIndex(int i)
         i = 0;
     }
 
-    const auto currentLastBarIndex = lastBarIndex.load();
+    const auto currentLastBarIndex = getLastBarIndex();
 
     if (lastLoopBarEnd)
     {
@@ -171,7 +171,7 @@ int Sequence::getLastLoopBarIndex() const
 {
     if (lastLoopBarEnd)
     {
-        return lastBarIndex.load();
+        return getLastBarIndex();
     }
 
     return lastLoopBarIndex;
@@ -207,19 +207,19 @@ std::string Sequence::getDeviceName(const int i)
     return deviceNames[i];
 }
 
-void Sequence::setLastBarIndex(const int i)
+void Sequence::setLastBarIndex(const int i) const
 {
-    lastBarIndex.store(std::clamp(i, 0, 998));
+    dispatchNonRt(SetLastBarIndex{getSequenceIndex(), BarIndex(i)});
 }
 
 int Sequence::getLastBarIndex() const
 {
-    return lastBarIndex.load();
+    return getSnapshotNonRt()->getLastBarIndex();
 }
 
 int Sequence::getBarCount() const
 {
-    return lastBarIndex.load() + 1;
+    return getLastBarIndex() + 1;
 }
 
 void Sequence::setLoopEnabled(const bool b)
@@ -441,16 +441,7 @@ void Sequence::setTempoChangeOn(const bool b)
 
 int Sequence::getLastTick() const
 {
-    int lastTick = 0;
-
-    const auto snapshot = getSnapshotNonRt();
-
-    for (int i = 0; i < getBarCount(); i++)
-    {
-        lastTick += snapshot->getBarLength(i);
-    }
-
-    return lastTick;
+    return getSnapshotNonRt()->getLastTick();
 }
 
 TimeSignature Sequence::getTimeSignature(const int barIndex) const
@@ -462,7 +453,7 @@ TimeSignature Sequence::getTimeSignature() const
 {
     int bar = getCurrentBarIndex();
 
-    if (bar > lastBarIndex.load() && bar != 0)
+    if (bar > getLastBarIndex() && bar != 0)
     {
         bar--;
     }
@@ -496,7 +487,7 @@ int Sequence::getNumerator(const int i) const
 
 void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 {
-    if (lastBarIndex.load() == -1) return;
+    if (getLastBarIndex() == NoBarIndex) return;
 
     lastBarToDelete++;
 
@@ -557,75 +548,27 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 
     setTimeSignatures(newTs);
 
-    const int newLastBarIndex = lastBarIndex.load() - difference;
-    lastBarIndex.store(newLastBarIndex);
+    const int newLastBarIndex = getLastBarIndex() - difference;
+    dispatchNonRt(SetLastBarIndex{getSequenceIndex(), BarIndex(newLastBarIndex)});
 
     if (firstLoopBarIndex > newLastBarIndex) firstLoopBarIndex = newLastBarIndex;
     if (lastLoopBarIndex > newLastBarIndex) lastLoopBarIndex = newLastBarIndex;
 
-    if (newLastBarIndex == -1) setUsed(false);
+    if (newLastBarIndex == NoBarIndex) setUsed(false);
 }
 
-void Sequence::insertBars(int barCount, const int afterBar)
+void Sequence::insertBars(const int barCount, const BarIndex afterBar)
 {
-    const auto oldLastBarIndex = lastBarIndex.load();
-    const bool isAppending = afterBar - 1 == oldLastBarIndex;
-
-    if (oldLastBarIndex + barCount > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-        barCount = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
-
-    if (barCount == 0) return;
-
-    const auto newLastBarIndex = oldLastBarIndex + barCount;
-
-    const auto snapshot = getSnapshotNonRt();
-    const auto &oldTs = snapshot->getTimeSignatures();
-
-    lastBarIndex.store(newLastBarIndex);
-
-    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
-
-    int out = 0;
-    for (int i = 0; i <= oldLastBarIndex; ++i)
+    auto onComplete = [this](const BarIndex newLastBarIndex)
     {
-        if (i == afterBar)
+        if (newLastBarIndex != NoBarIndex && !isUsed())
         {
-            for (int j = 0; j < barCount && out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++j)
-                newTs[out++] = TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
+            setUsed(true);
         }
-        if (out < Mpc2000XlSpecs::MAX_BAR_COUNT)
-            newTs[out++] = oldTs[i];
-    }
+    };
 
-    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
-        newTs[out] = TimeSignature{};
-
-    setTimeSignatures(newTs);
-
-    int barStart = 0;
-    for (int i = 0; i < afterBar; ++i)
-        barStart += snapshot->getBarLength(i);
-
-    if (!isAppending)
-    {
-        int newBarStart = 0;
-        for (int i = 0; i < afterBar + barCount; ++i)
-            newBarStart += snapshot->getBarLength(i);
-
-        for (const auto &t : tracks)
-        {
-            if (t->getIndex() == TempoChangeTrackIndex) continue;
-            for (const auto &e : t->getEvents())
-            {
-                if (e->getTick() >= barStart)
-                    e->setTick(e->getTick() + (newBarStart - barStart));
-            }
-        }
-    }
-
-    if (newLastBarIndex != -1 && !isUsed()) setUsed(true);
+    dispatchNonRt(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
 }
-
 
 bool trackIndexComparator(const std::shared_ptr<Track> &t0,
                           const std::shared_ptr<Track> &t1)
@@ -689,14 +632,14 @@ int Sequence::getEventCount() const
 
 void Sequence::initLoop()
 {
-    const auto currentLastBarIndex = lastBarIndex.load();
+    const auto currentLastBarIndex = getLastBarIndex();
 
-    if (firstLoopBarIndex == -1 && currentLastBarIndex >= 0)
+    if (firstLoopBarIndex == NoBarIndex && currentLastBarIndex >= 0)
     {
         firstLoopBarIndex = 0;
     }
 
-    if (lastLoopBarIndex == -1 && currentLastBarIndex >= 0)
+    if (lastLoopBarIndex == NoBarIndex && currentLastBarIndex >= 0)
     {
         lastLoopBarIndex = currentLastBarIndex;
     }
@@ -732,16 +675,7 @@ int Sequence::getFirstTickOfBeat(const int barIndex, const int beat) const
 
 int Sequence::getFirstTickOfBar(const int barIndex) const
 {
-    int res = 0;
-
-    const auto snapshot = getSnapshotNonRt();
-
-    for (int i = 0; i < barIndex; i++)
-    {
-        res += snapshot->getBarLength(i);
-    }
-
-    return res;
+    return getSnapshotNonRt()->getFirstTickOfBar(BarIndex(barIndex));
 }
 
 int Sequence::getLastTickOfBar(const int barIndex) const

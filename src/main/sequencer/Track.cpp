@@ -390,6 +390,13 @@ std::vector<EventState> Track::getEventStates() const
     return getSnapshot()->getEvents();
 }
 
+mpc::EventId Track::getAndIncrementNextEventId()
+{
+    const EventId eventIdToUse = nextEventId;
+    nextEventId = getNextEventId(nextEventId);
+    return eventIdToUse;
+}
+
 std::vector<std::shared_ptr<Event>> Track::getEvents() const
 {
     std::vector<std::shared_ptr<Event>> result;

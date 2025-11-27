@@ -23,6 +23,14 @@ namespace mpc::sequencer
 
         TimeSignature getTimeSignature(int barIndex) const;
 
+        BarIndex getLastBarIndex() const;
+
+        int getBarCount() const;
+
+        Tick getFirstTickOfBar(BarIndex) const;
+
+        Tick getLastTick() const;
+
     private:
         const NonRtSequenceState &state;
     };

@@ -26,6 +26,8 @@ namespace mpc::sequencer
         void start();
         void stop();
 
+        void stopAndWaitUntilStopped();
+
         void work() const;
 
         void refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples,

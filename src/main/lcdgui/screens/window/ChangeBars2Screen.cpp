@@ -56,7 +56,7 @@ void ChangeBars2Screen::function(const int i)
 
             if (newBars > lastBarIndex)
             {
-                seq->insertBars(newBars - lastBarIndex, lastBarIndex + 1);
+                seq->insertBars(newBars - lastBarIndex, BarIndex(lastBarIndex + 1));
                 changed = true;
             }
 

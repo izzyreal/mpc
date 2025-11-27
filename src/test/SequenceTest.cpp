@@ -36,7 +36,7 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     tr->insertEvent(eventState);
     stateManager->drainQueue();
 
-    seq->insertBars(1, 0);
+    seq->insertBars(1, mpc::BarIndex(0));
     stateManager->drainQueue();
     REQUIRE(tr->getEvent(0)->getTick() == 384);
 }

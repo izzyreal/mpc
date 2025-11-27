@@ -265,7 +265,7 @@ TEST_CASE("COPY4", "[events-screen]")
     auto seqSnapshot = stateManager->getSnapshot().getNonRtSequenceState(
         stateManager->getSnapshot().getSelectedSequenceIndex());
 
-    REQUIRE(seq->getLastTick() == 384 + 288 + 288 + 288);
+    REQUIRE(seqSnapshot->getLastTick() == 384 + 288 + 288 + 288);
     REQUIRE(seqSnapshot->getBarLength(0) == 384);
     REQUIRE(seqSnapshot->getBarLength(1) == 288);
     REQUIRE(seqSnapshot->getBarLength(2) == 288);

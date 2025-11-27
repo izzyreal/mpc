@@ -1,6 +1,6 @@
 #include "sequencer/NonRtSequencerStateManager.hpp"
 
-#include "SeqUtil.hpp"
+#include "NonRtSequenceStateView.hpp"
 #include "Sequence.hpp"
 #include "Sequencer.hpp"
 #include "SequencerMessage.hpp"
@@ -25,6 +25,11 @@ NonRtSequencerStateManager::~NonRtSequencerStateManager()
 {
     //    printf("~NonRtSequencerStateManager\n");
 }
+void NonRtSequencerStateManager::applyMessage(
+    const NonRtSequencerMessage &msg) noexcept
+{
+    myApplyMessage(msg);
+}
 
 template <typename V, typename... Ts>
 bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
@@ -38,20 +43,27 @@ bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
         v);
 }
 
-void NonRtSequencerStateManager::applyMessage(
-    const NonRtSequencerMessage &msg) noexcept
+void NonRtSequencerStateManager::myApplyMessage(
+    const NonRtSequencerMessage &msg,
+    const bool autoRefreshPlaybackState) noexcept
 {
     std::visit(
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
-            if constexpr (std::is_same_v<T, RefreshPlaybackStateWhileNotPlaying>)
+            if constexpr (std::is_same_v<T,
+                                         RefreshPlaybackStateWhileNotPlaying>)
             {
-                worker->refreshPlaybackState(activeState.transport.positionQuarterNotes, 0, m.onComplete);
+                worker->refreshPlaybackState(
+                    activeState.transport.positionQuarterNotes, 0,
+                    m.onComplete);
             }
-            else if constexpr (std::is_same_v<T, RefreshPlaybackStateWhilePlaying>)
+            else if constexpr (std::is_same_v<T,
+                                              RefreshPlaybackStateWhilePlaying>)
             {
-                worker->refreshPlaybackState(activeState.transport.positionQuarterNotes, CurrentTimeInSamples, m.onComplete);
+                worker->refreshPlaybackState(
+                    activeState.transport.positionQuarterNotes,
+                    CurrentTimeInSamples, m.onComplete);
             }
             else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
             {
@@ -349,7 +361,10 @@ void NonRtSequencerStateManager::applyMessage(
                 else
                 {
                     activeState.transport.positionQuarterNotes = 0;
-                    auto onComplete = [this]{enqueue(Play{});};
+                    auto onComplete = [this]
+                    {
+                        enqueue(Play{});
+                    };
                     enqueue(RefreshPlaybackStateWhileNotPlaying{onComplete});
                 }
             }
@@ -381,6 +396,10 @@ void NonRtSequencerStateManager::applyMessage(
                     seq.barLengths[i] = seq.timeSignatures[i].getBarLength();
                 }
             }
+            else if constexpr (std::is_same_v<T, CopyEvents>)
+            {
+                applyCopyEvents(m);
+            }
             else if constexpr (std::is_same_v<T, UpdateTimeSignature>)
             {
                 // printf("Applying UpdateTimeSignature\n");
@@ -388,6 +407,15 @@ void NonRtSequencerStateManager::applyMessage(
                     .timeSignatures[m.barIndex] = m.timeSignature;
                 activeState.sequences[m.sequenceIndex].barLengths[m.barIndex] =
                     m.timeSignature.getBarLength();
+            }
+            else if constexpr (std::is_same_v<T, SetLastBarIndex>)
+            {
+                activeState.sequences[m.sequenceIndex].lastBarIndex =
+                    m.barIndex;
+            }
+            else if constexpr (std::is_same_v<T, InsertBars>)
+            {
+                applyInsertBars(m);
             }
             else if constexpr (std::is_same_v<T, UpdateEvents>)
             {
@@ -428,8 +456,14 @@ void NonRtSequencerStateManager::applyMessage(
         },
         msg);
 
+    if (!autoRefreshPlaybackState)
+    {
+        return;
+    }
+
     const auto isPlaying = sequencer->getTransport()->isPlaying();
-    const auto playbackState = sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
+    const auto playbackState =
+        sequencer->getNonRtStateManager()->getSnapshot().getPlaybackState();
 
     if (std::holds_alternative<SetPositionQuarterNotes>(msg))
     {
@@ -440,8 +474,10 @@ void NonRtSequencerStateManager::applyMessage(
 
         publishState();
 
-        if (activeState.transport.positionQuarterNotes > playbackState.safeValidUntilQuarterNote ||
-            activeState.transport.positionQuarterNotes < playbackState.safeValidFromQuarterNote)
+        if (activeState.transport.positionQuarterNotes >
+                playbackState.safeValidUntilQuarterNote ||
+            activeState.transport.positionQuarterNotes <
+                playbackState.safeValidFromQuarterNote)
         {
             applyMessage(RefreshPlaybackStateWhileNotPlaying{});
         }
@@ -449,14 +485,15 @@ void NonRtSequencerStateManager::applyMessage(
         return;
     }
 
-    if (isPlaying && isVariantAnyOf(
-            msg, MessagesThatInvalidPlaybackStateWhilePlaying{}))
+    if (isPlaying &&
+        isVariantAnyOf(msg, MessagesThatInvalidPlaybackStateWhilePlaying{}))
     {
         publishState();
         applyMessage(RefreshPlaybackStateWhilePlaying{});
     }
-    else if (!isPlaying && isVariantAnyOf(
-            msg, MessagesThatInvalidPlaybackStateWhileNotPlaying{}))
+    else if (!isPlaying &&
+             isVariantAnyOf(msg,
+                            MessagesThatInvalidPlaybackStateWhileNotPlaying{}))
     {
         publishState();
         applyMessage(RefreshPlaybackStateWhileNotPlaying{});
@@ -491,9 +528,9 @@ void NonRtSequencerStateManager::applyPlayMessage() noexcept
     //
     //     if (fromStart)
     //     {
-    //         const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
-    //         songScreen->setOffset(-1);
-    //         if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
+    //         const int oldSongSequenceIndex =
+    //         sequencer->getSongSequenceIndex(); songScreen->setOffset(-1); if
+    //         (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
     //         {
     //             sequencer->setSelectedSequenceIndex(
     //                 sequencer->getSongSequenceIndex(), true);
@@ -531,7 +568,8 @@ void NonRtSequencerStateManager::applyPlayMessage() noexcept
     // if (!transport->isCountEnabled() || countInMode == 0 ||
     //     (countInMode == 1 && !transport->isRecordingOrOverdubbing()))
     // {
-    //     if (fromStart && activeState.transportState.positionQuarterNotes != 0)
+    //     if (fromStart && activeState.transportState.positionQuarterNotes !=
+    //     0)
     //     {
     //         positionQuarterNotesToStartPlayingFrom = 0;
     //     }
@@ -592,9 +630,11 @@ void NonRtSequencerStateManager::applyPlayMessage() noexcept
     {
         // if (positionQuarterNotesToStartPlayingFrom)
         // {
-        //     if (*positionQuarterNotesToStartPlayingFrom != activeState.transportState.positionQuarterNotes)
+        //     if (*positionQuarterNotesToStartPlayingFrom !=
+        //     activeState.transportState.positionQuarterNotes)
         //     {
-        //         activeState.transportState.positionQuarterNotes = *positionQuarterNotesToStartPlayingFrom;
+        //         activeState.transportState.positionQuarterNotes =
+        //         *positionQuarterNotesToStartPlayingFrom;
         //
         //     }
         // }
@@ -610,7 +650,8 @@ void NonRtSequencerStateManager::applyStopMessage() noexcept
     //
     // if (!isPlaying() && !bouncing)
     // {
-    //     if (const auto snapshot = sequencer.getNonRtStateManager()->getSnapshot();
+    //     if (const auto snapshot =
+    //     sequencer.getNonRtStateManager()->getSnapshot();
     //         snapshot.getPositionQuarterNotes() != 0.0)
     //     {
     //         setPosition(0); // real 2kxl doesn't do this
@@ -644,7 +685,8 @@ void NonRtSequencerStateManager::applyStopMessage() noexcept
     //
     // setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
     //
-    // const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    // const auto songScreen =
+    // sequencer.getScreens()->get<ScreenId::SongScreen>();
     //
     // if (endOfSong)
     // {
@@ -665,4 +707,230 @@ void NonRtSequencerStateManager::applyStopMessage() noexcept
     //     ->setEnabled(false);
     // sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
     //     ->setEnabled(false);
+}
+
+void NonRtSequencerStateManager::applyInsertBars(const InsertBars &m) noexcept
+{
+    constexpr bool autoRefreshPlaybackState = false;
+
+    const auto seq = activeState.sequences[m.sequenceIndex];
+    const NonRtSequenceStateView seqView(seq);
+    const auto oldLastBarIndex = seqView.getLastBarIndex();
+    const bool isAppending = m.afterBar - 1 == oldLastBarIndex;
+
+    auto barCountToUse = m.barCount;
+
+    if (oldLastBarIndex + barCountToUse > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
+    {
+        barCountToUse = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
+    }
+
+    if (barCountToUse == 0)
+    {
+        return;
+    }
+
+    const auto &oldTs = seqView.getTimeSignatures();
+
+    const auto newLastBarIndex = oldLastBarIndex + barCountToUse;
+
+    myApplyMessage(SetLastBarIndex{m.sequenceIndex, BarIndex(newLastBarIndex)},
+                   autoRefreshPlaybackState);
+
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
+
+    int out = 0;
+
+    for (int i = 0; i <= oldLastBarIndex; ++i)
+    {
+        if (i == m.afterBar)
+        {
+            for (int j = 0;
+                 j < barCountToUse && out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++j)
+            {
+                newTs[out++] =
+                    TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
+            }
+        }
+        if (out < Mpc2000XlSpecs::MAX_BAR_COUNT)
+        {
+            newTs[out++] = oldTs[i];
+        }
+    }
+
+    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
+    {
+        newTs[out] = TimeSignature{};
+    }
+
+    myApplyMessage(UpdateTimeSignatures{m.sequenceIndex, newTs},
+                   autoRefreshPlaybackState);
+
+    int barStart = 0;
+
+    for (int i = 0; i < m.afterBar; ++i)
+    {
+        barStart += seqView.getBarLength(i);
+    }
+
+    if (!isAppending)
+    {
+        int newBarStart = 0;
+        for (int i = 0; i < m.afterBar + barCountToUse; ++i)
+        {
+            newBarStart += seqView.getBarLength(i);
+        }
+
+        // TODO Tempo change track is excluded. We should double-check
+        // if that is the desired behaviour.
+        for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
+        {
+            for (auto &e : seq.tracks[i].events)
+            {
+                if (e.tick >= barStart)
+                {
+                    const Tick newTick = e.tick + (newBarStart - barStart);
+                    myApplyMessage(UpdateEventTick{e, newTick},
+                                   autoRefreshPlaybackState);
+                }
+            }
+        }
+    }
+
+    actions.push_back(
+        [a = m.onComplete, newLastBarIndex]
+        {
+            a(newLastBarIndex);
+        });
+
+    myApplyMessage(RefreshPlaybackStateWhileNotPlaying{});
+}
+
+void NonRtSequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
+{
+    constexpr bool autoRefreshPlaybackState = false;
+
+    const auto segLength = m.sourceEndTick - m.sourceStartTick;
+    const auto destOffset = m.destStartTick - m.sourceStartTick;
+
+    auto destNumerator = -1;
+    auto destDenominator = -1;
+    auto destBarLength = -1;
+
+    assert(m.sourceSequenceIndex >= 0 ||
+           m.sourceSequenceIndex == SelectedSequenceIndex);
+
+    const SequenceIndex sourceSequenceIndexToUse =
+        m.sourceSequenceIndex >= MinSequenceIndex
+            ? m.sourceSequenceIndex
+            : activeState.selectedSequenceIndex;
+
+    auto &destSeq = activeState.sequences[m.destSequenceIndex];
+    const NonRtSequenceStateView destSeqView(destSeq);
+    auto &destTrack = destSeq.tracks[m.destTrackIndex];
+
+    const NonRtSequenceStateView destSequenceView(destSeq);
+
+    const auto destSequenceBarCount = destSeq.lastBarIndex + 1;
+
+    for (int i = 0; i < destSequenceBarCount; i++)
+    {
+        const auto firstTickOfBar =
+            destSequenceView.getFirstTickOfBar(BarIndex(i));
+
+        if (const auto barLength = destSequenceView.getBarLength(i);
+            m.destStartTick >= firstTickOfBar &&
+            m.destStartTick <= firstTickOfBar + barLength)
+        {
+            const auto ts = destSequenceView.getTimeSignature(i);
+            destNumerator = ts.numerator;
+            destDenominator = ts.denominator;
+            destBarLength = barLength;
+            break;
+        }
+    }
+
+    const auto minimumRequiredNewSequenceLength = m.destStartTick + segLength;
+
+    const auto ticksToAdd =
+        minimumRequiredNewSequenceLength - destSequenceView.getLastTick();
+
+    const auto barsToAdd =
+        static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
+
+    const auto initialLastBarIndex = destSequenceView.getLastBarIndex();
+
+    for (int i = 0; i < barsToAdd; i++)
+    {
+        const auto afterBar = initialLastBarIndex + i + 1;
+
+        if (afterBar >= 998)
+        {
+            break;
+        }
+
+        myApplyMessage(InsertBars{m.destSequenceIndex, 1, afterBar},
+                       autoRefreshPlaybackState);
+        const TimeSignature ts{TimeSigNumerator(destNumerator),
+                               TimeSigDenominator(destDenominator)};
+        myApplyMessage(UpdateTimeSignature{m.destSequenceIndex, afterBar, ts},
+                       autoRefreshPlaybackState);
+    }
+
+    if (!m.copyModeMerge)
+    {
+        auto &destTrackEvents = destTrack.events;
+
+        for (auto it = destTrackEvents.begin(); it != destTrackEvents.end();)
+        {
+            if (it->tick >= destOffset &&
+                it->tick < destOffset + segLength * m.copyCount)
+            {
+                destTrackEvents.erase(it);
+                continue;
+            }
+            ++it;
+        }
+    }
+
+    const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
+    const auto sourceTrackEvents = sourceSeq.tracks[m.sourceTrackIndex].events;
+
+    for (auto &e : sourceTrackEvents)
+    {
+        if (e.type == EventType::NoteOn &&
+            !m.sourceNoteRange.contains(e.noteNumber))
+        {
+            continue;
+        }
+
+        if (e.tick >= m.sourceEndTick)
+        {
+            break;
+        }
+
+        if (e.tick >= m.sourceStartTick)
+        {
+            for (int copyIndex = 0; copyIndex < m.copyCount; copyIndex++)
+            {
+                const int tickCandidate =
+                    e.tick + destOffset + copyIndex * segLength;
+
+                if (tickCandidate >= destSeqView.getLastTick())
+                {
+                    break;
+                }
+
+                EventState eventCopy = e;
+                eventCopy.eventId = m.generateEventId();
+                eventCopy.sequenceIndex = m.destSequenceIndex;
+                eventCopy.trackIndex = m.destTrackIndex;
+                eventCopy.tick = tickCandidate;
+                myApplyMessage(InsertEvent{eventCopy},
+                               autoRefreshPlaybackState);
+            }
+        }
+    }
+
+    myApplyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }

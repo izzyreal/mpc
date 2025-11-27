@@ -321,7 +321,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                                       toSequence->getLastBarIndex();
         }
 
-        toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
+        toSequence->insertBars(numberOfDestinationBars, BarIndex(copyAfterBar));
     }
 
     int sourceBarCounter = 0;

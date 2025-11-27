@@ -70,6 +70,16 @@ void NonRtSequencerStateWorker::stop()
     running.store(false);
 }
 
+void NonRtSequencerStateWorker::stopAndWaitUntilStopped()
+{
+    stop();
+
+    if (workerThread.joinable())
+    {
+        workerThread.join();
+    }
+}
+
 void NonRtSequencerStateWorker::work() const
 {
     const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();

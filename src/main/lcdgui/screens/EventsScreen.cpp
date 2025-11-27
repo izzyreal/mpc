@@ -19,6 +19,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/NonRtSequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -651,126 +652,46 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
                                const bool copyModeMerge, const int copyCount,
                                const int copyNote0, const int copyNote1) const
 {
-    const auto segLength = sourceEnd - sourceStart;
-    const auto sourceTrack = sequencer.lock()->getSelectedTrack();
+    const auto seq = sequencer.lock();
 
-    const auto fromSequence = sequencer.lock()->getSelectedSequence();
+    const auto fromSequence = seq->getSelectedSequence();
 
     if (!fromSequence->isUsed())
     {
         return;
     }
 
-    const auto destOffset = destStart - sourceStart;
-
-    const auto toSequence = sequencer.lock()->getSequence(toSequenceIndex);
+    const auto toSequence = seq->getSequence(toSequenceIndex);
 
     if (!toSequence->isUsed())
     {
         toSequence->init(fromSequence->getLastBarIndex());
     }
 
-    auto destNumerator = -1;
-    auto destDenominator = -1;
-    auto destBarLength = -1;
+    CopyEvents copyEvents;
+    copyEvents.sourceStartTick = sourceStart;
+    copyEvents.sourceEndTick = sourceEnd;
+    copyEvents.destStartTick = destStart;
+    copyEvents.sourceSequenceIndex = SelectedSequenceIndex;
+    copyEvents.destSequenceIndex = toSequenceIndex;
+    copyEvents.sourceTrackIndex = TrackIndex(seq->getSelectedTrackIndex());
+    copyEvents.destTrackIndex = TrackIndex(toTrackIndex);
+    copyEvents.copyModeMerge = copyModeMerge;
+    copyEvents.copyCount = copyCount;
+    copyEvents.generateEventId = [t = toSequence->getTrack(toTrackIndex)] { return t->getAndIncrementNextEventId(); };
 
-    for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
+    const BusType sourceBusType = seq->getSelectedTrack()->getBusType();
+
+    if (isDrumBusType(sourceBusType))
     {
-        const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
-
-        if (const auto barLength = toSequence->getBarLength(i);
-            destStart >= firstTickOfBar &&
-            destStart <= firstTickOfBar + barLength)
-        {
-            destNumerator = toSequence->getNumerator(i);
-            destDenominator = toSequence->getDenominator(i);
-            destBarLength = barLength;
-            break;
-        }
+        copyEvents.sourceNoteRange = copyNote0 == AllDrumNotes
+                                         ? NoteRange::All()
+                                         : NoteRange(copyNote0, copyNote0);
+    }
+    else
+    {
+        copyEvents.sourceNoteRange = NoteRange(copyNote0, copyNote1);
     }
 
-    const auto minimumRequiredNewSequenceLength = destStart + segLength;
-    const auto ticksToAdd =
-        minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    const auto barsToAdd =
-        static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
-    const auto initialLastBarIndex = toSequence->getLastBarIndex();
-    for (int i = 0; i < barsToAdd; i++)
-    {
-        const auto afterBar = initialLastBarIndex + i + 1;
-
-        if (afterBar >= 998)
-        {
-            break;
-        }
-
-        toSequence->insertBars(1, afterBar);
-        toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
-    }
-
-    const auto destTrack = toSequence->getTrack(toTrackIndex);
-
-    if (!copyModeMerge)
-    {
-        const auto destTrackEvents = destTrack->getEvents();
-        for (auto it = destTrackEvents.end() - 1; it != destTrackEvents.begin();
-             --it)
-        {
-
-            if (const auto tick = (*it)->getTick();
-                tick >= destOffset && tick < destOffset + segLength * copyCount)
-            {
-                destTrack->removeEvent(*it);
-            }
-        }
-    }
-
-    const auto sourceTrackEvents = sourceTrack->getEvents();
-
-    for (auto &e : sourceTrackEvents)
-    {
-        if (const auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e))
-        {
-            if (isDrumBusType(sourceTrack->getBusType()))
-            {
-                if (copyNote0 != NoDrumNoteAssigned &&
-                    copyNote0 != ne->getNote())
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (ne->getNote() < copyNote0 || ne->getNote() > copyNote1)
-                {
-                    continue;
-                }
-            }
-        }
-
-        if (e->getTick() >= sourceEnd)
-        {
-            break;
-        }
-
-        if (e->getTick() >= sourceStart)
-        {
-            for (int copy = 0; copy < copyCount; copy++)
-            {
-                const int tickCandidate =
-                    e->getTick() + destOffset + copy * segLength;
-
-                if (tickCandidate >= toSequence->getLastTick())
-                {
-                    break;
-                }
-
-                EventState eventState = e->getSnapshot();
-                eventState.tick = tickCandidate;
-                destTrack->insertEvent(eventState);
-            }
-        }
-    }
-
-    sequencer.lock()->setSelectedSequenceIndex(toSequenceIndex, true);
+    seq->getNonRtStateManager()->enqueue(copyEvents);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NoteRange.hpp"
 #include "PlaybackState.hpp"
 #include "TimeSignature.hpp"
 #include "sequencer/EventState.hpp"
@@ -39,7 +40,7 @@ namespace mpc::sequencer
     {
         EventState eventState;
         bool allowMultipleNoteEventsWithSameNoteOnSameTick;
-        std::function<void()> onComplete;
+        std::function<void()> onComplete = []{};
     };
 
     struct RemoveEvent
@@ -177,9 +178,39 @@ namespace mpc::sequencer
         std::vector<EventState> eventStates;
     };
 
+    struct CopyEvents
+    {
+        Tick sourceStartTick;
+        Tick sourceEndTick;
+        SequenceIndex sourceSequenceIndex;
+        SequenceIndex destSequenceIndex;
+        TrackIndex sourceTrackIndex;
+        TrackIndex destTrackIndex;
+        Tick destStartTick;
+        bool copyModeMerge;
+        int copyCount;
+        NoteRange sourceNoteRange{};
+        std::function<EventId()> generateEventId;
+    };
+
+    struct SetLastBarIndex
+    {
+        SequenceIndex sequenceIndex;
+        BarIndex barIndex;
+    };
+
+    struct InsertBars
+    {
+        SequenceIndex sequenceIndex;
+        int barCount;
+        BarIndex afterBar;
+        std::function<void(BarIndex newLastBarIndex)> onComplete = [](const BarIndex){};
+    };
+
     using NonRtSequencerMessage =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
-                     RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     RemoveDoubles, CopyEvents, SetLastBarIndex, InsertBars,
+                     UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdatePlaybackState,
                      RefreshPlaybackStateWhileNotPlaying, RefreshPlaybackStateWhilePlaying,
                      SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
@@ -195,7 +226,7 @@ namespace mpc::sequencer
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, /*SetPositionQuarterNotes,*/
                      /*SetPlayStartPositionQuarterNotes,*/ BumpPositionByTicks,
-                     SetSelectedSequenceIndex,
+                     SetSelectedSequenceIndex, SetLastBarIndex, InsertBars,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateCountEnabled,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;

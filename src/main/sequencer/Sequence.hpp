@@ -104,7 +104,7 @@ namespace mpc::sequencer
         std::string getName();
         void setDeviceName(int i, const std::string &s);
         std::string getDeviceName(int i);
-        void setLastBarIndex(int i);
+        void setLastBarIndex(int i) const;
         int getLastBarIndex() const;
         int getBarCount() const;
         void setLoopEnabled(bool b);
@@ -141,7 +141,7 @@ namespace mpc::sequencer
         int getDenominator(int i) const;
         int getNumerator(int i) const;
         void deleteBars(int firstBar, int lastBarToDelete);
-        void insertBars(int barCount, int afterBar);
+        void insertBars(int barCount, BarIndex afterBar);
         void moveTrack(int source, int destination);
         bool isLastLoopBarEnd() const;
 
@@ -179,7 +179,6 @@ namespace mpc::sequencer
 
         std::string name;
         bool loopEnabled = true;
-        std::atomic<int> lastBarIndex{-1};
         bool used = false;
         bool tempoChangeOn = true;
         int loopStart = 0;

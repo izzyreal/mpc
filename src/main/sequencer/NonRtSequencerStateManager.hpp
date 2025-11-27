@@ -23,6 +23,7 @@ namespace mpc::sequencer
 
     protected:
         void applyMessage(const NonRtSequencerMessage &msg) noexcept override;
+        void myApplyMessage(const NonRtSequencerMessage &msg, bool autoRefreshPlaybackState = true) noexcept;
 
     private:
         const std::function<SampleRate()> getSampleRate;
@@ -31,5 +32,7 @@ namespace mpc::sequencer
 
         void applyPlayMessage() noexcept;
         void applyStopMessage() noexcept;
+        void applyInsertBars(const InsertBars&) noexcept;
+        void applyCopyEvents(const CopyEvents&) noexcept;
     };
 } // namespace mpc::sequencer
