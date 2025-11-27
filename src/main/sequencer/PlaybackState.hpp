@@ -16,6 +16,8 @@ namespace mpc::sequencer
 
     struct PlaybackState
     {
+        bool countEnabled;
+
         SampleRate sampleRate{NoSampleRate};
         PositionQuarterNotes playOffset;
         TimeInSamples currentTime{NoTimeInSamples};

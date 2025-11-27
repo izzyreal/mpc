@@ -73,11 +73,11 @@ void NonRtSequencerStateWorker::stop()
 void NonRtSequencerStateWorker::work() const
 {
     const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
+    const auto transport = snapshot.getTransportState();
+    const auto playbackState = snapshot.getPlaybackState();
 
     const auto currentTimeInSamples =
         sequencer->getStateManager()->getSnapshot().getTimeInSamples();
-
-    constexpr TimeInSamples playbackStateValiditySafetyMargin = 10000;
 
     /*
      * Refresh conditions:
@@ -92,14 +92,29 @@ void NonRtSequencerStateWorker::work() const
      * But maybe we can always refresh after the non-rt-manager applies a message, which would
      * probably avoid the need here to check explicitly check for those conditions.
      */
+
+    bool snapshotIsInvalid = false;
+
+    constexpr TimeInSamples playbackStateValiditySafetyMargin = 10000;
+
     if (snapshot.getPositionQuarterNotes() != NoPositionQuarterNotes &&
         currentTimeInSamples > snapshot.getPlaybackState().validUntil -
                                    playbackStateValiditySafetyMargin)
     {
-        if (currentTimeInSamples >= 0)
-        {
-            refreshPlaybackState(snapshot.getPlaybackState().playOffset, currentTimeInSamples, []{});
-        }
+        snapshotIsInvalid = true;
+    }
+
+    if (playbackState.countEnabled != transport.countEnabled)
+    {
+        snapshotIsInvalid = true;
+    }
+
+    if (snapshotIsInvalid)
+    {
+        constexpr auto onComplete = []{};
+        refreshPlaybackState(snapshot.getPlaybackState().playOffset,
+                             currentTimeInSamples,
+                             onComplete);
     }
 
     sequencer->getNonRtStateManager()->drainQueue();
@@ -273,19 +288,25 @@ PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    PlaybackState playbackState{sampleRate, playOffset, currentTime, validUntil};
+    PlaybackState playbackState{
+        sequencer->getTransport()->isCountEnabled(),
+        sampleRate,
+        playOffset,
+        currentTime,
+        validUntil
+    };
 
     RenderContext renderCtx{std::move(playbackState), sequencer, seq.get()};
 
     renderSeq(renderCtx);
 
-    const auto countMetronomeScreen =
-        sequencer->getScreens()
-            ->get<lcdgui::ScreenId::CountMetronomeScreen>()
-            .get();
-
     const bool isStepEditor =
         isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
+
+    const auto countMetronomeScreen =
+    sequencer->getScreens()
+        ->get<lcdgui::ScreenId::CountMetronomeScreen>()
+        .get();
 
     const MetronomeRenderContext mctx{countMetronomeScreen, isStepEditor,
                                       isRecMainWithoutPlaying()};

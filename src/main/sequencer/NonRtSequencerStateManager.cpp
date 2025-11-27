@@ -351,7 +351,7 @@ void NonRtSequencerStateManager::applyMessage(
             }
             else if constexpr (std::is_same_v<T, UpdateCountEnabled>)
             {
-                activeState.transport.countEnabled = true;
+                activeState.transport.countEnabled = m.enabled;
             }
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
