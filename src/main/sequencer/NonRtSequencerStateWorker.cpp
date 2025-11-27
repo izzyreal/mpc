@@ -203,8 +203,11 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
         for (int j = 0; j < barLength; j += denTicks)
         {
+            const auto eventTickToUse =
+                    (j + barTickOffset) - Sequencer::quarterNotesToTicks(ctx.playbackState.playOffset);
+
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
-                ctx.seq, j + barTickOffset, ctx.playbackState.currentTime,
+                ctx.seq, eventTickToUse, ctx.playbackState.currentTime,
                 ctx.playbackState.sampleRate);
 
             if (eventTimeInSamples > ctx.playbackState.validUntil)
