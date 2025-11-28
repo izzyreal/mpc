@@ -219,7 +219,7 @@ void Sequence::init(const int newLastBarIndex)
     std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
     std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
 
-    for (int i = 0; i < getBarCount(); ++i)
+    for (int i = 0; i <= newLastBarIndex; ++i)
     {
         timeSignatures[i] = userScreen->timeSig;
         barLengths[i] = timeSignatures[i].getBarLength();
