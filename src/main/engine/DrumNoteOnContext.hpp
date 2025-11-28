@@ -32,7 +32,7 @@ namespace mpc::engine::audio::mixer
 }
 namespace mpc::performance
 {
-    class Drum;
+    struct Drum;
 }
 
 namespace mpc::engine

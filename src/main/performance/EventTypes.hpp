@@ -8,7 +8,6 @@
 #include "sequencer/BusType.hpp"
 
 #include <vector>
-#include <cstdint>
 
 namespace mpc::performance
 {
@@ -76,7 +75,7 @@ namespace mpc::performance
         Velocity velocity;
         ProgramIndex programIndex;
         Pressure pressure;
-        NoteEventId recordNoteEventId = NoNoteEventId;
+        EventId recordNoteEventId = NoEventId;
     };
 
     struct NoteAftertouchEvent

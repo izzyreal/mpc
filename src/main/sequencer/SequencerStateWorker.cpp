@@ -106,6 +106,16 @@ void SequencerStateWorker::work() const
                              currentTimeInSamples, onComplete);
     }
 
+    if (transportState.isRecordingOrOverdubbing())
+    {
+        const auto seq = sequencer->getSelectedSequence();
+
+        for (const auto &t : seq->getTracks())
+        {
+            t->processRealtimeQueuedEvents();
+        }
+    }
+
     sequencer->getStateManager()->drainQueue();
 }
 

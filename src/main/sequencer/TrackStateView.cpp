@@ -97,11 +97,11 @@ EventState TrackStateView::findRecordingNoteOnByNoteNumber(
 }
 
 EventState
-TrackStateView::findRecordingNoteOnByNoteEventId(const NoteEventId id) const
+TrackStateView::findRecordingNoteOnByEventId(const EventId id) const
 {
     for (const auto &e : getNoteEvents())
     {
-        if (e.noteEventId == id && e.beingRecorded)
+        if (e.eventId == id && e.beingRecorded)
         {
             return e;
         }

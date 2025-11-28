@@ -107,7 +107,7 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(const EventState &) const;
+        void finalizeNoteEventLive(EventState &) const;
 
         void finalizeNoteEventNonLive(const EventState &, Duration) const;
 
@@ -146,13 +146,15 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventState findRecordingNoteOnEventById(NoteEventId);
+        EventState findRecordingNoteOnEventById(EventId);
 
         EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         void printEvents() const;
 
         void setEventStates(const std::vector<EventState> &eventStates) const;
+
+        void processRealtimeQueuedEvents();
 
     private:
         EventId nextEventId = MinEventId;
@@ -166,8 +168,6 @@ namespace mpc::sequencer
         int device = 0;
         TrackIndex trackIndex{0};
         bool used{false};
-
-        NoteEventId nextNoteEventId{MinNoteEventId};
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
             EventState, moodycamel::ConcurrentQueueDefaultTraits>>
@@ -202,7 +202,6 @@ namespace mpc::sequencer
 
         void updateEventTick(EventId, int newTick) const;
 
-        void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;
 
         void init();

@@ -2,6 +2,8 @@
 
 #include "IntTypes.hpp"
 
+#include <cstdint>
+
 namespace mpc::sequencer
 {
     class NoteRange
@@ -12,7 +14,8 @@ namespace mpc::sequencer
     public:
         NoteRange() {}
         NoteRange(const int startToUse, const int endToUse)
-            : start(NoteNumber(startToUse)), end(NoteNumber(endToUse))
+            : start(NoteNumber(static_cast<int8_t>(startToUse))),
+              end(NoteNumber(static_cast<int8_t>(endToUse)))
         {
         }
 

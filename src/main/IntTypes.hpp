@@ -150,19 +150,6 @@ namespace mpc
 
     /////////
 
-    using NoteEventId = uint32_t;
-    constexpr NoteEventId NoNoteEventId = 0;
-    constexpr NoteEventId MinNoteEventId{1};
-    constexpr NoteEventId MaxNoteEventId{
-        std::numeric_limits<NoteEventId>::max()};
-
-    inline NoteEventId getNextNoteEventId(const NoteEventId current)
-    {
-        return current >= MaxNoteEventId ? MinNoteEventId : current + 1;
-    }
-
-    /////////
-
     using EventId = uint32_t;
     constexpr EventId NoEventId = 0;
     constexpr EventId MinEventId{1};

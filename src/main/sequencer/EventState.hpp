@@ -37,7 +37,6 @@ namespace mpc::sequencer
         NoteNumber noteNumber;
 
         // NOTE ON SECTION
-        NoteEventId noteEventId;
         Duration duration;
         Velocity velocity;
         NoteVariationType noteVariationType;
@@ -72,7 +71,6 @@ namespace mpc::sequencer
             beingRecorded = false;
             wasMoved = 0;
             noteNumber = NoNoteNumber;
-            noteEventId = NoNoteEventId;
             duration = NoDuration;
             velocity = NoVelocityOrPressure;
             noteVariationType = NoteVariationTypeTune;
@@ -91,7 +89,7 @@ namespace mpc::sequencer
             return type == other.type && trackIndex == other.trackIndex &&
                    sequenceIndex == other.sequenceIndex && tick == other.tick &&
                    noteNumber == other.noteNumber &&
-                   noteEventId == other.noteEventId &&
+                   eventId == other.eventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
                    metronomeOnlyTickPosition ==

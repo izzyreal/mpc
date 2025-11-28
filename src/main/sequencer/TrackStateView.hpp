@@ -33,7 +33,7 @@ namespace mpc::sequencer
 
         EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
-        EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
+        EventState findRecordingNoteOnByEventId(EventId) const;
 
         EventState getEventById(EventId) const;
 

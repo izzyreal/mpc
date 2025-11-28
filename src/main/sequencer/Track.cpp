@@ -101,25 +101,22 @@ void Track::purge()
     removeEvents();
 }
 
-EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
+EventState Track::findRecordingNoteOnEventById(const EventId id)
 {
     EventState found;
-    EventState e;
-
-    size_t count = 0;
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
+    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), bulkNoteOns.size());
+
+    for (const auto &e : bulkNoteOns)
     {
-        if (e.noteEventId == id)
+        if (e.eventId == id)
         {
             found = e;
             foundInQueue = true;
+            break;
         }
-
-        assert(e.beingRecorded);
-        bulkNoteOns[count++] = e;
     }
 
     for (size_t i = 0; i < count; i++)
@@ -127,9 +124,12 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
     }
 
+    bulkNoteOns.clear();
+    bulkNoteOns.resize(20);
+
     if (!foundInQueue)
     {
-        found = getSnapshot()->findRecordingNoteOnByNoteEventId(id);
+        found = getSnapshot()->findRecordingNoteOnByEventId(id);
     }
 
     return found;
@@ -139,27 +139,28 @@ EventState
 Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
     EventState found;
-    EventState e;
-
-    size_t count = 0;
 
     bool foundInQueue = false;
 
-    while (count < bulkNoteOns.size() && queuedNoteOnEvents->try_dequeue(e))
+    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), bulkNoteOns.size());
+
+    for (const auto &e : bulkNoteOns)
     {
-        if (e.beingRecorded && e.noteNumber == noteNumber)
+        if (e.noteNumber == noteNumber)
         {
             found = e;
             foundInQueue = true;
+            break;
         }
-
-        bulkNoteOns[count++] = e;
     }
 
     for (size_t i = 0; i < count; i++)
     {
         queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
     }
+
+    bulkNoteOns.clear();
+    bulkNoteOns.resize(20);
 
     if (!foundInQueue)
     {
@@ -230,14 +231,14 @@ void Track::removeEvent(const std::shared_ptr<Event> &event) const
 EventState Track::recordNoteEventLive(const NoteNumber note,
                                       const Velocity velocity)
 {
-    const NoteEventId noteEventIdToUse = nextNoteEventId;
-    nextNoteEventId = getNextNoteEventId(nextNoteEventId);
+    const EventId eventIdToUse = nextEventId;
+    nextEventId = getNextEventId(nextEventId);
 
     EventState e;
+    e.eventId = eventIdToUse;
     e.type = EventType::NoteOn;
     e.noteNumber = note;
     e.velocity = velocity;
-    e.noteEventId = noteEventIdToUse;
     e.beingRecorded = true;
     e.sequenceIndex = parent->getSequenceIndex();
     e.trackIndex = trackIndex;
@@ -246,11 +247,8 @@ EventState Track::recordNoteEventLive(const NoteNumber note,
     return e;
 }
 
-void Track::finalizeNoteEventLive(const EventState &noteOnEvent) const
+void Track::finalizeNoteEventLive(EventState &e) const
 {
-    EventState e;
-    e.type = EventType::NoteOff;
-    e.noteNumber = noteOnEvent.noteNumber;
     e.tick = getTickPosition();
     queuedNoteOffEvents->enqueue(e);
 }
@@ -270,12 +268,12 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
         return noteEvent;
     }
 
-    const auto noteEventIdToUse = nextNoteEventId;
-    nextNoteEventId = getNextNoteEventId(nextNoteEventId);
+    const EventId eventIdToUse = nextEventId;
+    nextEventId = getNextEventId(nextEventId);
 
     EventState noteEvent;
+    noteEvent.eventId = eventIdToUse;
     noteEvent.type = EventType::NoteOn;
-    noteEvent.noteEventId = noteEventIdToUse;
     noteEvent.noteNumber = note;
     noteEvent.velocity = velocity;
     noteEvent.sequenceIndex = parent->getSequenceIndex();
@@ -774,13 +772,15 @@ void Track::insertEvent(
         setUsed(true);
     }
 
-    const EventId eventIdToUse = nextEventId;
-
-    nextEventId = getNextEventId(nextEventId);
+    if (event.eventId == NoEventId)
+    {
+        const EventId eventIdToUse = nextEventId;
+        nextEventId = getNextEventId(nextEventId);
+        event.eventId = eventIdToUse;
+    }
 
     event.sequenceIndex = parent->getSequenceIndex();
     event.trackIndex = trackIndex;
-    event.eventId = eventIdToUse;
 
     dispatch(InsertEvent{event, allowMultipleNoteEventsWithSameNoteOnSameTick,
                          onComplete});

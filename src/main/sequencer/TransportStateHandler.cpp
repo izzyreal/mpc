@@ -355,10 +355,4 @@ void TransportStateHandler::applyStopMessage(TransportState &state) noexcept
     //     sequencer.stopBouncing();
     // }
     //
-    // sequencer.hardware->getLed(hardware::ComponentId::PLAY_LED)
-    //     ->setEnabled(false);
-    // sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
-    //     ->setEnabled(false);
-    // sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
-    //     ->setEnabled(false);
 }
