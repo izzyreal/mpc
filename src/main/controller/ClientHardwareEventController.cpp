@@ -61,6 +61,16 @@ bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
            mpc.getHardware()->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 }
 
+bool ClientHardwareEventController::isRecLockedOrPressed() const
+{
+    return isRecLocked() || mpc.getHardware()->getButton(REC)->isPressed();
+}
+
+bool ClientHardwareEventController::isOverdubLockedOrPressed() const
+{
+    return isOverdubLocked() || mpc.getHardware()->getButton(OVERDUB)->isPressed();
+}
+
 mpc::TimeInMilliseconds
 ClientHardwareEventController::getMostRecentPhysicalPadPressTime() const
 {
@@ -901,14 +911,6 @@ void ClientHardwareEventController::handleButtonRelease(
     else if (id == F6)
     {
         ReleaseFunctionCommand(mpc, 5).execute();
-    }
-    else if (id == REC)
-    {
-        ReleaseRecCommand(mpc).execute();
-    }
-    else if (id == OVERDUB)
-    {
-        ReleaseOverdubCommand(mpc).execute();
     }
     else if (id == TAP_TEMPO_OR_NOTE_REPEAT)
     {

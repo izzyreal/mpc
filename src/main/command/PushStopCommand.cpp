@@ -42,14 +42,4 @@ void PushStopCommand::execute()
 
     const auto sequencerScreen = mpc.screens->get<ScreenId::SequencerScreen>();
     sequencerScreen->hideFooterLabelAndShowFunctionKeys();
-
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }

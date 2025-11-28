@@ -29,11 +29,25 @@ namespace mpc::controller
             return buttonLockTracker.isLocked(
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
+
+        bool isRecLocked() const
+        {
+            return buttonLockTracker.isLocked(
+                hardware::ComponentId::REC);
+        }
+
+        bool isOverdubLocked() const
+        {
+            return buttonLockTracker.isLocked(
+                hardware::ComponentId::OVERDUB);
+        }
+
         void lockNoteRepeat()
         {
             buttonLockTracker.lock(
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
+
         void unlockNoteRepeat()
         {
             buttonLockTracker.unlock(
@@ -41,6 +55,10 @@ namespace mpc::controller
         }
 
         bool isNoteRepeatLockedOrPressed() const;
+
+        bool isRecLockedOrPressed() const;
+
+        bool isOverdubLockedOrPressed() const;
 
         TimeInMilliseconds getMostRecentPhysicalPadPressTime() const;
         Velocity getMostRecentPhysicalPadPressVelocity() const;

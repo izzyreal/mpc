@@ -37,6 +37,4 @@ void PushRecCommand::execute()
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
-
-    mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);
 }

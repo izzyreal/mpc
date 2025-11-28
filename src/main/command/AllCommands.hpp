@@ -30,7 +30,5 @@
 #include "command/NoteInputScreenUpdateCommand.hpp"
 #include "command/TriggerLocalNoteOffCommand.hpp"
 #include "command/ReleaseEraseCommand.hpp"
-#include "command/ReleaseRecCommand.hpp"
 #include "command/ReleaseTapCommand.hpp"
-#include "command/ReleaseOverdubCommand.hpp"
 #include "command/ReleaseFunctionCommand.hpp"

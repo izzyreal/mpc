@@ -3,7 +3,6 @@
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -37,8 +36,4 @@ void PushOverdubCommand::execute()
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
-
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(true);
 }

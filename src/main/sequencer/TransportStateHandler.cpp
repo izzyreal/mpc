@@ -327,8 +327,8 @@ void TransportStateHandler::applyStopMessage(TransportState &state) noexcept
     //     newTickPosition = activeSequence->getLastTick();
     // }
     //
-    // recording = false;
-    // overdubbing = false;
+    state.recording = false;
+    state.overdubbing = false;
     //
     // if (countingIn)
     // {
