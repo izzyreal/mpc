@@ -26,83 +26,73 @@ SequencerStateManager::SequencerStateManager(
         std::make_unique<SequenceStateHandler>(this, sequencer);
 }
 
-SequencerStateManager::~SequencerStateManager()
-{
-    //    printf("~SequencerStateManager\n");
-}
+SequencerStateManager::~SequencerStateManager() {}
 
 void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 {
     myApplyMessage(msg);
 }
 
+template <class... Ts> struct Overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts> Overload(Ts...) -> Overload<Ts...>;
+
 void SequencerStateManager::myApplyMessage(
     const SequencerMessage &msg, const bool autoRefreshPlaybackState) noexcept
 {
-
     bool handledByAnotherHandler = false;
 
-    std::visit(
-        [&](auto &&m)
+    auto visitor = Overload{
+        [&](const TransportMessage &m)
         {
-            using T = std::decay_t<decltype(m)>;
+            transportStateHandler->applyMessage(activeState.transport, m,
+                                                autoRefreshPlaybackState);
+            handledByAnotherHandler = true;
+        },
+        [&](const SequenceMessage &m)
+        {
+            sequenceStateHandler->applyMessage(activeState, actions, m,
+                                               autoRefreshPlaybackState);
+            handledByAnotherHandler = true;
+        },
+        [&](const RefreshPlaybackStateWhileNotPlaying &m)
+        {
+            worker->refreshPlaybackState(
+                activeState.transport.positionQuarterNotes, 0, m.onComplete);
+        },
+        [&](const RefreshPlaybackStateWhilePlaying &m)
+        {
+            worker->refreshPlaybackState(
+                activeState.transport.positionQuarterNotes,
+                CurrentTimeInSamples, m.onComplete);
+        },
+        [&](const UpdatePlaybackState &m)
+        {
+            activeState.playbackState = m.playbackState;
+            actions.push_back(m.onComplete);
+        },
+        [&](const SwitchToNextSequence &m)
+        {
+            constexpr bool setPositionTo0 = false;
+            enqueue(SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
+        },
+        [&](const SetSelectedSequenceIndex &m)
+        {
+            activeState.selectedSequenceIndex = m.sequenceIndex;
 
-            if constexpr (std::is_same_v<T, TransportMessage>)
+            if (m.setPositionTo0)
             {
-                transportStateHandler->applyMessage(activeState.transport, m,
-                                                    autoRefreshPlaybackState);
-                handledByAnotherHandler = true;
-            }
-            else if constexpr (std::is_same_v<T, SequenceMessage>)
-            {
-                sequenceStateHandler->applyMessage(activeState, actions, m,
-                                                   autoRefreshPlaybackState);
-                handledByAnotherHandler = true;
-            }
-            else if constexpr (std::is_same_v<
-                                   T, RefreshPlaybackStateWhileNotPlaying>)
-            {
-                worker->refreshPlaybackState(
-                    activeState.transport.positionQuarterNotes, 0,
-                    m.onComplete);
-            }
-            else if constexpr (std::is_same_v<T,
-                                              RefreshPlaybackStateWhilePlaying>)
-            {
-                worker->refreshPlaybackState(
-                    activeState.transport.positionQuarterNotes,
-                    CurrentTimeInSamples, m.onComplete);
-            }
-            else if constexpr (std::is_same_v<T, UpdatePlaybackState>)
-            {
-                // printf("Applying UpdatePlaybackState\n");
-                activeState.playbackState = m.playbackState;
-                actions.push_back(m.onComplete);
-            }
-            else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
-            {
-                // printf("Applying SwitchToNextSequence\n");
-                constexpr bool setPositionTo0 = false;
-                enqueue(
-                    SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
-            }
-            else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
-            {
-                printf("Applying SetSelectedSequenceIndex with index %i\n",
-                       m.sequenceIndex.get());
-                activeState.selectedSequenceIndex = m.sequenceIndex;
-
-                if (m.setPositionTo0)
-                {
-                    activeState.transport.positionQuarterNotes = 0;
-                }
-            }
-            else if constexpr (std::is_same_v<T, CopyEvents>)
-            {
-                applyCopyEvents(m);
+                activeState.transport.positionQuarterNotes = 0;
             }
         },
-        msg);
+        [&](const CopyEvents &m)
+        {
+            applyCopyEvents(m);
+        }};
+
+    std::visit(visitor, msg);
 
     if (!autoRefreshPlaybackState || handledByAnotherHandler)
     {

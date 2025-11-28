@@ -9,8 +9,7 @@ namespace mpc::sequencer
     class TransportStateView
     {
     public:
-        explicit TransportStateView(
-            const TransportState &s) noexcept;
+        explicit TransportStateView(const TransportState &s) noexcept;
 
         double getPositionQuarterNotes() const;
 

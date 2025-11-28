@@ -66,17 +66,15 @@ namespace mpc::sequencer
         bool enabled;
     };
 
-    using TransportMessage = std::variant<
-        SetPositionQuarterNotes,
-        SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
-        Stop, Play,
-        PlayFromStart, Record, RecordFromStart, Overdub, OverdubFromStart,
-        SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
-        UpdateCountEnabled>;
+    using TransportMessage =
+        std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
+                     BumpPositionByTicks, Stop, Play, PlayFromStart, Record,
+                     RecordFromStart, Overdub, OverdubFromStart,
+                     SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
+                     UpdateCountEnabled>;
 
-    using TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying = std::variant<
-        BumpPositionByTicks,
-        UpdateCountEnabled>;
+    using TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying =
+        std::variant<BumpPositionByTicks, UpdateCountEnabled>;
 
     using TransportMessagesThatInvalidatePlaybackStateWhilePlaying =
         std::variant<UpdateCountEnabled>;

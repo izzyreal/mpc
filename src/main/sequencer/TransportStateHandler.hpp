@@ -16,8 +16,7 @@ namespace mpc::sequencer
         explicit TransportStateHandler(SequencerStateManager *, Sequencer *);
         ~TransportStateHandler();
 
-        void applyMessage(TransportState &,
-                          const TransportMessage &,
+        void applyMessage(TransportState &, const TransportMessage &,
                           bool autoRefreshPlaybackState = true);
 
         void applyPlayMessage(TransportState &) const noexcept;

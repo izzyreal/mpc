@@ -5,8 +5,7 @@
 
 using namespace mpc::sequencer;
 
-TransportStateView::TransportStateView(
-    const TransportState &s) noexcept
+TransportStateView::TransportStateView(const TransportState &s) noexcept
     : state(s)
 {
 }
@@ -23,8 +22,7 @@ double TransportStateView::getPlayStartPositionQuarterNotes() const
 
 int64_t TransportStateView::getPositionTicks() const
 {
-    return Sequencer::quarterNotesToTicks(
-        state.positionQuarterNotes);
+    return Sequencer::quarterNotesToTicks(state.positionQuarterNotes);
 }
 
 bool TransportStateView::isSequencerRunning() const
