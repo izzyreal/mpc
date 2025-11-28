@@ -27,7 +27,7 @@ constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
     const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
-    const std::function<void(SequencerMessage&&)> &dispatch,
+    const std::function<void(SequencerMessage &&)> &dispatch,
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,
@@ -49,8 +49,8 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : getSnapshot(getSnapshot), dispatch(dispatch), trackIndex(trackIndex), parent(parent),
-      getDefaultTrackName(getDefaultTrackName),
+    : getSnapshot(getSnapshot), dispatch(dispatch), trackIndex(trackIndex),
+      parent(parent), getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
       getActiveSequence(getActiveSequence), getAutoPunchMode(getAutoPunchMode),
@@ -77,8 +77,8 @@ Track::~Track()
 void Track::init()
 {
     name = trackIndex == TempoChangeTrackIndex
-           ? "tempo"
-           : getDefaultTrackName(trackIndex);
+               ? "tempo"
+               : getDefaultTrackName(trackIndex);
     programChange = 0;
     velocityRatio = 100;
     used = false;
@@ -129,9 +129,7 @@ EventState Track::findRecordingNoteOnEventById(const NoteEventId id)
 
     if (!foundInQueue)
     {
-        found =
-            getSnapshot()->findRecordingNoteOnByNoteEventId(
-                id);
+        found = getSnapshot()->findRecordingNoteOnByNoteEventId(id);
     }
 
     return found;
@@ -165,9 +163,7 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     if (!foundInQueue)
     {
-        found =
-            getSnapshot()->findRecordingNoteOnByNoteNumber(
-                noteNumber);
+        found = getSnapshot()->findRecordingNoteOnByNoteNumber(noteNumber);
     }
 
     return found;
@@ -227,7 +223,8 @@ void Track::setOn(const bool b)
 
 void Track::removeEvent(const std::shared_ptr<Event> &event) const
 {
-    dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), event->getSnapshot().eventId});
+    dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(),
+                         event->getSnapshot().eventId});
 }
 
 EventState Track::recordNoteEventLive(const NoteNumber note,
@@ -262,8 +259,7 @@ EventState Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
                                          const Velocity velocity,
                                          const int64_t metronomeOnlyTick)
 {
-    if (auto result =
-            getSnapshot()->findNoteEvent(tick, note))
+    if (auto result = getSnapshot()->findNoteEvent(tick, note))
     {
         auto &noteEvent = *result;
         noteEvent.beingRecorded = true;
@@ -365,10 +361,8 @@ int Track::getDeviceIndex() const
 
 std::shared_ptr<Event> Track::getEvent(const int i) const
 {
-    const auto eventState =
-        getSnapshot()->getEventByIndex(EventIndex(i));
-    return mapEventStateToEvent(getSnapshot, eventState, dispatch,
-                                parent);
+    const auto eventState = getSnapshot()->getEventByIndex(EventIndex(i));
+    return mapEventStateToEvent(getSnapshot, eventState, dispatch, parent);
 }
 
 void Track::setName(const std::string &s)
@@ -408,8 +402,8 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
     for (int i = 0; i < eventCount; ++i)
     {
         auto event = mapEventStateToEvent(
-            getSnapshot, snapshot->getEventByIndex(EventIndex(i)),
-            dispatch, parent);
+            getSnapshot, snapshot->getEventByIndex(EventIndex(i)), dispatch,
+            parent);
         result.emplace_back(event);
     }
 
@@ -565,8 +559,7 @@ std::vector<std::shared_ptr<Event>>
 Track::getEventRange(const int startTick, const int endTick) const
 {
     std::vector<std::shared_ptr<Event>> result;
-    for (const auto &e :
-         getSnapshot()->getEventRange(startTick, endTick))
+    for (const auto &e : getSnapshot()->getEventRange(startTick, endTick))
     {
         result.emplace_back(
             mapEventStateToEvent(getSnapshot, e, dispatch, parent));
@@ -789,6 +782,6 @@ void Track::insertEvent(
     event.trackIndex = trackIndex;
     event.eventId = eventIdToUse;
 
-    dispatch(InsertEvent{
-        event, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete});
+    dispatch(InsertEvent{event, allowMultipleNoteEventsWithSameNoteOnSameTick,
+                         onComplete});
 }

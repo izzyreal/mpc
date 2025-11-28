@@ -136,8 +136,8 @@ double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
 
 int SeqUtil::loopFrameLength(const Sequence *seq, const int sr)
 {
-    return static_cast<int>(
-        sequenceFrameLength(seq, seq->getLoopStartTick(), seq->getLoopEndTick(), sr));
+    return static_cast<int>(sequenceFrameLength(seq, seq->getLoopStartTick(),
+                                                seq->getLoopEndTick(), sr));
 }
 
 int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
@@ -471,41 +471,44 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
     return currentScreenName == "step-editor" && !posIsLastTick();
 }
 
-int SeqUtil::getEventTimeInSamples(
-    const Sequence* seq,
-    const int eventTick,
-    const int currentTimeSamples,
-    const SampleRate sampleRate)
+int SeqUtil::getEventTimeInSamples(const Sequence *seq, const int eventTick,
+                                   const int currentTimeSamples,
+                                   const SampleRate sampleRate)
 {
     // 1. Loop length in samples
     const int loopLen = static_cast<int>(
         sequenceFrameLength(seq, 0, seq->getLastTick(), sampleRate));
 
     if (loopLen <= 0)
+    {
         return currentTimeSamples; // degenerate sequence
+    }
 
     // 2. Where are we inside the loop?
     const int phase = currentTimeSamples % loopLen;
 
     // 3. Convert event tick → sample offset from start of loop
-    const int eventSample = static_cast<int>(
-        sequenceFrameLength(seq, 0, eventTick, sampleRate));
+    const int eventSample =
+        static_cast<int>(sequenceFrameLength(seq, 0, eventTick, sampleRate));
 
     // 4. If event is still ahead in this loop: simple forward offset
     if (eventSample >= phase)
+    {
         return currentTimeSamples + (eventSample - phase);
+    }
 
     // 5. Otherwise event lies in the next loop iteration
     return currentTimeSamples + (loopLen - (phase - eventSample));
 }
 
-int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,
-                          const int frameCount, const int sr)
+int SeqUtil::getTickCountForFrames(const Sequence *seq, const int firstTick,
+                                   const int frameCount, const int sr)
 {
-    const auto& tces = seq->getTempoChangeEvents();
+    const auto &tces = seq->getTempoChangeEvents();
     const int n = tces.size();
 
-    auto secondsPerTick = [&](const double tempo) {
+    auto secondsPerTick = [&](const double tempo)
+    {
         return 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
     };
 
@@ -534,14 +537,13 @@ int SeqUtil::getTickCountForFrames(const Sequence* seq, const int firstTick,
             const double framesPerTick = secsPerTick * sr;
 
             // Frames needed to traverse full segment.
-            const int framesForSegment = static_cast<int>(
-                ceil(ticksAvailable * framesPerTick));
+            const int framesForSegment =
+                static_cast<int>(ceil(ticksAvailable * framesPerTick));
 
             if (framesForSegment > remainingFrames)
             {
                 // We only advance partway through this segment.
-                const double ticksInSegment =
-                    remainingFrames / framesPerTick;
+                const double ticksInSegment = remainingFrames / framesPerTick;
 
                 return static_cast<int>(floor(ticksInSegment));
             }

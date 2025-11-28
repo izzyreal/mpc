@@ -224,7 +224,8 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
                 ctx.seq, eventTickToUse, ctx.playbackState.currentTimeInSamples,
                 ctx.playbackState.sampleRate);
 
-            if (eventTimeInSamples > ctx.playbackState.strictValidUntilTimeInSamples)
+            if (eventTimeInSamples >
+                ctx.playbackState.strictValidUntilTimeInSamples)
             {
                 continue;
             }
@@ -245,9 +246,9 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 void renderSeq(RenderContext &ctx)
 {
     // printf("Rendering seq %s for playback time %lld at tick offset %i\n",
-           // ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
-           // Sequencer::quarterNotesToTicks(
-               // ctx.playbackState.playOffsetQuarterNotes));
+    // ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
+    // Sequencer::quarterNotesToTicks(
+    // ctx.playbackState.playOffsetQuarterNotes));
     for (const auto &track : ctx.seq->getTracks())
     {
         for (const auto &event : track->getEvents())
@@ -279,16 +280,16 @@ void renderSeq(RenderContext &ctx)
     }
 }
 
-void computeSafeValidity(RenderContext& renderCtx,
+void computeSafeValidity(RenderContext &renderCtx,
                          const mpc::TimeInSamples safeValidUntilTimeInSamples,
                          const mpc::TimeInSamples safeValidFromTimeInSamples)
 {
-    const auto framesUntil =
-        safeValidUntilTimeInSamples - renderCtx.playbackState.currentTimeInSamples;
-    const auto framesFrom =
-        safeValidFromTimeInSamples - renderCtx.playbackState.currentTimeInSamples;
-    const int baseTick =
-        Sequencer::quarterNotesToTicks(renderCtx.playbackState.playOffsetQuarterNotes);
+    const auto framesUntil = safeValidUntilTimeInSamples -
+                             renderCtx.playbackState.currentTimeInSamples;
+    const auto framesFrom = safeValidFromTimeInSamples -
+                            renderCtx.playbackState.currentTimeInSamples;
+    const int baseTick = Sequencer::quarterNotesToTicks(
+        renderCtx.playbackState.playOffsetQuarterNotes);
     const int tickAdvanceUntil =
         SeqUtil::getTickCountForFrames(renderCtx.seq, baseTick, framesUntil,
                                        renderCtx.playbackState.sampleRate);
@@ -299,24 +300,28 @@ void computeSafeValidity(RenderContext& renderCtx,
     const mpc::Tick untilTick = baseTick + tickAdvanceUntil;
     const mpc::Tick fromTick = baseTick + tickAdvanceFrom;
 
-    renderCtx.playbackState.safeValidUntilTimeInSamples = safeValidUntilTimeInSamples;
+    renderCtx.playbackState.safeValidUntilTimeInSamples =
+        safeValidUntilTimeInSamples;
     renderCtx.playbackState.safeValidUntilTick = untilTick;
     renderCtx.playbackState.safeValidUntilQuarterNote =
         Sequencer::ticksToQuarterNotes(untilTick);
 
-    renderCtx.playbackState.safeValidFromTimeInSamples = safeValidFromTimeInSamples;
+    renderCtx.playbackState.safeValidFromTimeInSamples =
+        safeValidFromTimeInSamples;
     renderCtx.playbackState.safeValidFromTick = fromTick;
     renderCtx.playbackState.safeValidFromQuarterNote =
         Sequencer::ticksToQuarterNotes(fromTick);
 }
 
-PlaybackState SequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate, const PositionQuarterNotes playOffset,
-    const TimeInSamples currentTime) const
+PlaybackState
+SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
+                                          const PositionQuarterNotes playOffset,
+                                          const TimeInSamples currentTime) const
 {
     constexpr TimeInSamples snapshotWindowSize{44100 * 2};
 
-    const TimeInSamples strictValidUntilTimeInSamples = currentTime + snapshotWindowSize;
+    const TimeInSamples strictValidUntilTimeInSamples =
+        currentTime + snapshotWindowSize;
 
     const auto seqIndex = sequencer->isSongModeEnabled()
                               ? sequencer->getSongSequenceIndex()
@@ -346,11 +351,13 @@ PlaybackState SequencerStateWorker::renderPlaybackState(
     renderMetronome(renderCtx, mctx);
 
     const auto safeValidUntilTimeInSamples =
-    strictValidUntilTimeInSamples - playbackStateValiditySafetyMarginTimeInSamples;
+        strictValidUntilTimeInSamples -
+        playbackStateValiditySafetyMarginTimeInSamples;
     const auto safeValidFromTimeInSamples =
         currentTime + playbackStateValiditySafetyMarginTimeInSamples;
 
-    computeSafeValidity(renderCtx, safeValidUntilTimeInSamples, safeValidFromTimeInSamples);
+    computeSafeValidity(renderCtx, safeValidUntilTimeInSamples,
+                        safeValidFromTimeInSamples);
 
     return renderCtx.playbackState;
 }

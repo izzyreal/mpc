@@ -10,7 +10,8 @@
 
 namespace mpc::sequencer
 {
-    constexpr TimeInSamples playbackStateValiditySafetyMarginTimeInSamples = 10000;
+    constexpr TimeInSamples playbackStateValiditySafetyMarginTimeInSamples =
+        10000;
 
     class Sequencer;
 
@@ -18,9 +19,9 @@ namespace mpc::sequencer
     {
     public:
         explicit SequencerStateWorker(
-            const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> &isCurrentScreen,
-            const std::function<bool()>& isRecMainWithoutPlaying,
-            Sequencer *);
+            const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
+                &isCurrentScreen,
+            const std::function<bool()> &isRecMainWithoutPlaying, Sequencer *);
         ~SequencerStateWorker();
 
         void start();
@@ -30,7 +31,8 @@ namespace mpc::sequencer
 
         void work() const;
 
-        void refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples,
+        void
+        refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples,
                              const std::function<void()> &onComplete) const;
 
         Sequencer *getSequencer() const;
@@ -39,11 +41,14 @@ namespace mpc::sequencer
         std::atomic<bool> running;
         std::thread workerThread;
 
-        const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> isCurrentScreen;
+        const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
+            isCurrentScreen;
         const std::function<bool()> isRecMainWithoutPlaying;
 
         Sequencer *sequencer;
 
-        PlaybackState renderPlaybackState(SampleRate, PositionQuarterNotes playOffset, TimeInSamples) const;
+        PlaybackState renderPlaybackState(SampleRate,
+                                          PositionQuarterNotes playOffset,
+                                          TimeInSamples) const;
     };
 } // namespace mpc::sequencer

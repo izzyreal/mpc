@@ -432,8 +432,8 @@ void SequencerScreen::displayBus() const
 
 void SequencerScreen::displayBars() const
 {
-    findField("bars")->setText(std::to_string(
-        sequencer.lock()->getSelectedSequence()->getBarCount()));
+    findField("bars")->setText(
+        std::to_string(sequencer.lock()->getSelectedSequence()->getBarCount()));
 }
 
 void SequencerScreen::displayPgm() const

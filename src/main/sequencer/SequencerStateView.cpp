@@ -26,9 +26,10 @@ SequencerStateView::getSequenceState(const SequenceIndex i) const
 
 std::shared_ptr<TrackStateView>
 SequencerStateView::getTrackState(const SequenceIndex sequenceIndex,
-                                            const TrackIndex trackIndex) const
+                                  const TrackIndex trackIndex) const
 {
-    return std::make_shared<TrackStateView>(state->sequences[sequenceIndex].tracks[trackIndex]);
+    return std::make_shared<TrackStateView>(
+        state->sequences[sequenceIndex].tracks[trackIndex]);
 }
 
 mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept

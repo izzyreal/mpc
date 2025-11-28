@@ -26,4 +26,4 @@ namespace mpc::sequencer
             return NoteRange(MinNoteNumber, MaxNoteNumber);
         }
     };
-}
+} // namespace mpc::sequencer

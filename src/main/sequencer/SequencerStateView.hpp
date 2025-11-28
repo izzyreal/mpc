@@ -21,9 +21,11 @@ namespace mpc::sequencer
 
         PlaybackState getPlaybackState() const;
 
-        std::shared_ptr<SequenceStateView> getSequenceState(SequenceIndex) const;
+        std::shared_ptr<SequenceStateView>
+            getSequenceState(SequenceIndex) const;
 
-        std::shared_ptr<TrackStateView> getTrackState(SequenceIndex, TrackIndex) const;
+        std::shared_ptr<TrackStateView> getTrackState(SequenceIndex,
+                                                      TrackIndex) const;
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
 

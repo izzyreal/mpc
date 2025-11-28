@@ -6,4 +6,4 @@ namespace mpc
 
     constexpr PositionQuarterNotes NoPositionQuarterNotes = -1;
 
-}
+} // namespace mpc

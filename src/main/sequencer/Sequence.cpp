@@ -18,8 +18,7 @@ using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
     SequenceIndex sequenceIndex,
-    const std::function<std::shared_ptr<SequenceStateView>()>
-        &getSnapshot,
+    const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
     const std::function<void(SequencerMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
@@ -50,13 +49,12 @@ Sequence::Sequence(
             return getSnapshot()->getTrack(trackIndex);
         };
         tracks.emplace_back(std::make_shared<Track>(
-            getTrackSnapshot, dispatch, trackIndex, this,
-            getDefaultTrackName, getTickPosition, getScreens,
-            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
-            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
-            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
-            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
-            isSoloEnabled));
+            getTrackSnapshot, dispatch, trackIndex, this, getDefaultTrackName,
+            getTickPosition, getScreens, isRecordingModeMulti,
+            getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
+            isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
+            getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
+            getPunchInTime, getPunchOutTime, isSoloEnabled));
     }
 
     std::function getTempoTrackSnapshot = [getSnapshot]
@@ -365,7 +363,7 @@ double Sequence::getInitialTempo() const
 void Sequence::setInitialTempo(const double initialTempo) const
 {
     dispatch(SetInitialTempo{getSequenceIndex(),
-                                  std::clamp(initialTempo, 30.0, 300.0)});
+                             std::clamp(initialTempo, 30.0, 300.0)});
 }
 
 void Sequence::removeTempoChangeEvent(const int i) const
@@ -520,8 +518,7 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
     setTimeSignatures(newTs);
 
     const int newLastBarIndex = getLastBarIndex() - difference;
-    dispatch(
-        SetLastBarIndex{getSequenceIndex(), BarIndex(newLastBarIndex)});
+    dispatch(SetLastBarIndex{getSequenceIndex(), BarIndex(newLastBarIndex)});
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);
@@ -542,8 +539,7 @@ void Sequence::insertBars(const int barCount, const BarIndex afterBar) const
         }
     };
 
-    dispatch(
-        InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
+    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
 }
 
 bool trackIndexComparator(const std::shared_ptr<Track> &t0,

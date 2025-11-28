@@ -6,9 +6,7 @@
 
 using namespace mpc::sequencer;
 
-SequenceStateView::SequenceStateView(
-    const SequenceState &s) noexcept
-: state(s)
+SequenceStateView::SequenceStateView(const SequenceState &s) noexcept : state(s)
 {
 }
 
@@ -40,7 +38,8 @@ TimeSignature SequenceStateView::getTimeSignature(const int barIndex) const
     return state.timeSignatures[barIndex];
 }
 
-mpc::BarIndex SequenceStateView::getLastBarIndex() const {
+mpc::BarIndex SequenceStateView::getLastBarIndex() const
+{
     return state.lastBarIndex;
 }
 
@@ -98,7 +97,8 @@ mpc::BarIndex SequenceStateView::getFirstLoopBarIndex() const
     return state.firstLoopBarIndex;
 }
 
-mpc::BarIndex SequenceStateView::getLastLoopBarIndex() const {
+mpc::BarIndex SequenceStateView::getLastLoopBarIndex() const
+{
     return state.lastLoopBarIndex;
 }
 

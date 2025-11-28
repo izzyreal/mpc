@@ -103,7 +103,8 @@ namespace mpc
     constexpr SequenceIndex SelectedSequenceIndex{-2};
 
     constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
-    constexpr SequenceIndex PlaceholderSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
+    constexpr SequenceIndex PlaceholderSequenceIndex{
+        Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
 
     /////////
 
@@ -180,7 +181,8 @@ namespace mpc
 
     /////////
 
-    using BarIndex = ConstrainedInt<int16_t, -1, Mpc2000XlSpecs::MAX_LAST_BAR_INDEX>;
+    using BarIndex =
+        ConstrainedInt<int16_t, -1, Mpc2000XlSpecs::MAX_LAST_BAR_INDEX>;
     constexpr BarIndex NoBarIndex{-1};
     constexpr BarIndex EndOfSequence{-2};
 

@@ -118,8 +118,7 @@ namespace mpc::sequencer
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
-        std::shared_ptr<SequencerStateWorker>
-        getSequencerStateWorker() const;
+        std::shared_ptr<SequencerStateWorker> getSequencerStateWorker() const;
 
         const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
             getSequencerPlaybackEngine;
@@ -179,9 +178,9 @@ namespace mpc::sequencer
         static void copyTrackParameters(const std::shared_ptr<Track> &source,
                                         const std::shared_ptr<Track> &dest);
 
-        std::shared_ptr<SequencerAudioStateManager> getAudioStateManager() const;
-        std::shared_ptr<SequencerStateManager>
-        getStateManager() const;
+        std::shared_ptr<SequencerAudioStateManager>
+        getAudioStateManager() const;
+        std::shared_ptr<SequencerStateManager> getStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
         std::shared_ptr<Sequence> makeNewSequence(SequenceIndex sequenceIndex);

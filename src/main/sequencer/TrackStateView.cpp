@@ -5,10 +5,7 @@
 
 using namespace mpc::sequencer;
 
-TrackStateView::TrackStateView(const TrackState &s) noexcept
-: state(s)
-{
-}
+TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 
 std::optional<EventState>
 TrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
@@ -16,8 +13,8 @@ TrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
     for (int i = 0; i < state.events.size(); ++i)
     {
         if (const auto &e = state.events[i]; e.type == EventType::NoteOn &&
-                                              e.tick == tick &&
-                                              e.noteNumber == note)
+                                             e.tick == tick &&
+                                             e.noteNumber == note)
         {
             return e;
         }
@@ -35,8 +32,8 @@ EventState TrackStateView::getEventByIndex(const EventIndex idx) const
     return {};
 }
 
-std::vector<EventState>
-TrackStateView::getEventRange(const int startTick, const int endTick) const
+std::vector<EventState> TrackStateView::getEventRange(const int startTick,
+                                                      const int endTick) const
 {
     std::vector<EventState> result;
 
@@ -81,7 +78,8 @@ std::vector<EventState> TrackStateView::getNoteEvents() const
     return result;
 }
 
-std::vector<EventState> TrackStateView::getEvents() const {
+std::vector<EventState> TrackStateView::getEvents() const
+{
     return state.events;
 }
 
@@ -98,8 +96,8 @@ EventState TrackStateView::findRecordingNoteOnByNoteNumber(
     return {};
 }
 
-EventState TrackStateView::findRecordingNoteOnByNoteEventId(
-    const NoteEventId id) const
+EventState
+TrackStateView::findRecordingNoteOnByNoteEventId(const NoteEventId id) const
 {
     for (const auto &e : getNoteEvents())
     {

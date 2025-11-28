@@ -36,7 +36,8 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && sequencer.getStateManager()->getSnapshot().isSequencerRunning();
+    return !metronomeOnlyEnabled &&
+           sequencer.getStateManager()->getSnapshot().isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
@@ -158,8 +159,7 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSequence(
     {
         result = 0;
     }
-    else if (result < 0 ||
-             result >= seqLengthQuarterNotes)
+    else if (result < 0 || result >= seqLengthQuarterNotes)
     {
         result = fmod(result, seqLengthQuarterNotes);
         while (result < 0)
@@ -264,12 +264,11 @@ void Transport::moveSongToStepThatContainsPosition(
 
         const auto step = song->getStep(stepIndex).lock();
 
-        if (const auto sequence =
-                sequencer.getSequence(step->getSequence());
+        if (const auto sequence = sequencer.getSequence(step->getSequence());
             sequence->isUsed())
         {
-            stepEndTick = stepStartTick +
-                          sequence->getLastTick() * step->getRepeats();
+            stepEndTick =
+                stepStartTick + sequence->getLastTick() * step->getRepeats();
         }
 
         const auto stepStartPositionQuarterNotes =
@@ -293,7 +292,10 @@ void Transport::setCountEnabled(const bool b) const
 
 bool Transport::isCountEnabled() const
 {
-    return sequencer.getStateManager()->getSnapshot().getTransportState().countEnabled;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportState()
+        .countEnabled;
 }
 
 void Transport::setCountingIn(const bool b)
@@ -330,9 +332,7 @@ double Transport::getPlayStartPositionQuarterNotes() const
 
 double Transport::getPositionQuarterNotes() const
 {
-    return sequencer.getStateManager()
-        ->getSnapshot()
-        .getPositionQuarterNotes();
+    return sequencer.getStateManager()->getSnapshot().getPositionQuarterNotes();
 }
 
 void Transport::playMetronomeTrack()
@@ -460,18 +460,24 @@ bool Transport::isRecordingOrOverdubbing() const
 
 bool Transport::isRecording() const
 {
-    return sequencer.getStateManager()->getSnapshot().getTransportState().recording;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportState()
+        .recording;
 }
 
 bool Transport::isOverdubbing() const
 {
-    return sequencer.getStateManager()->getSnapshot().getTransportState().overdubbing;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportState()
+        .overdubbing;
 }
 
 int Transport::getCurrentBarIndex() const
 {
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getSelectedSequence();
+                                 : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -505,7 +511,7 @@ int Transport::getCurrentBarIndex() const
 int Transport::getCurrentBeatIndex() const
 {
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getSelectedSequence();
+                                 : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -736,7 +742,8 @@ void Transport::setPosition(const double positionQuarterNotes) const
 void Transport::setPlayStartPosition(
     const double playStartPositionQuarterNotes) const
 {
-    sequencer.getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
+    sequencer.getStateManager()->enqueue(
+        SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
 }
 
 void Transport::setTempo(double newTempo)

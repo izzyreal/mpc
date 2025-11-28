@@ -10,8 +10,9 @@ namespace mpc::sequencer
     class Sequencer;
 
     class SequencerAudioStateManager final
-        : public concurrency::AtomicStateExchange<
-              SequencerAudioState, SequencerAudioStateView, SequencerAudioMessage>
+        : public concurrency::AtomicStateExchange<SequencerAudioState,
+                                                  SequencerAudioStateView,
+                                                  SequencerAudioMessage>
     {
     public:
         explicit SequencerAudioStateManager(Sequencer *);

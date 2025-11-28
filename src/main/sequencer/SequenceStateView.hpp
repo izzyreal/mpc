@@ -13,13 +13,13 @@ namespace mpc::sequencer
     class SequenceStateView
     {
     public:
-        explicit SequenceStateView(
-            const SequenceState &s) noexcept;
+        explicit SequenceStateView(const SequenceState &s) noexcept;
 
         std::shared_ptr<TrackStateView> getTrack(int trackIndex) const;
         Tick getBarLength(int barIndex) const;
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
-        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> getTimeSignatures() const;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
+        getTimeSignatures() const;
 
         TimeSignature getTimeSignature(int barIndex) const;
 

@@ -89,8 +89,8 @@ namespace mpc::sequencer
         bool operator==(EventState const &other) const
         {
             return type == other.type && trackIndex == other.trackIndex &&
-                   sequenceIndex == other.sequenceIndex &&
-                   tick == other.tick && noteNumber == other.noteNumber &&
+                   sequenceIndex == other.sequenceIndex && tick == other.tick &&
+                   noteNumber == other.noteNumber &&
                    noteEventId == other.noteEventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&

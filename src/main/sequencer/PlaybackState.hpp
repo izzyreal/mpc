@@ -23,7 +23,6 @@ namespace mpc::sequencer
         TimeInSamples currentTimeInSamples{NoTimeInSamples};
         TimeInSamples strictValidUntilTimeInSamples{NoTimeInSamples};
 
-
         TimeInSamples safeValidFromTimeInSamples{NoTimeInSamples};
         Tick safeValidFromTick{NoTick};
         PositionQuarterNotes safeValidFromQuarterNote{NoPositionQuarterNotes};

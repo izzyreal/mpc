@@ -95,7 +95,8 @@ Sequencer::Sequencer(
 {
     stateManager = std::make_shared<SequencerAudioStateManager>(this);
 
-    const auto isCurrentScreen = [this](const std::initializer_list<ScreenId> &ids)
+    const auto isCurrentScreen =
+        [this](const std::initializer_list<ScreenId> &ids)
     {
         return this->layeredScreen->isCurrentScreen(ids);
     };
@@ -111,10 +112,11 @@ Sequencer::Sequencer(
             getClientHardwareEventController());
     };
 
-    nonRtSequencerStateWorker =
-        std::make_shared<SequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
+    nonRtSequencerStateWorker = std::make_shared<SequencerStateWorker>(
+        isCurrentScreen, isRecMainWithoutPlaying, this);
 
-    nonRtSequencerStateManager = std::make_shared<SequencerStateManager>(getSampleRate, this, nonRtSequencerStateWorker.get());
+    nonRtSequencerStateManager = std::make_shared<SequencerStateManager>(
+        getSampleRate, this, nonRtSequencerStateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -122,13 +124,13 @@ Sequencer::~Sequencer()
     printf("~Sequencer\n");
 }
 
-std::shared_ptr<SequencerAudioStateManager> Sequencer::getAudioStateManager() const
+std::shared_ptr<SequencerAudioStateManager>
+Sequencer::getAudioStateManager() const
 {
     return stateManager;
 }
 
-std::shared_ptr<SequencerStateManager>
-Sequencer::getStateManager() const
+std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
     return nonRtSequencerStateManager;
 }
@@ -237,8 +239,7 @@ std::shared_ptr<EventHandler> Sequencer::getEventHandler()
     return eventHandler;
 }
 
-std::shared_ptr<SequencerStateWorker>
-Sequencer::getSequencerStateWorker() const
+std::shared_ptr<SequencerStateWorker> Sequencer::getSequencerStateWorker() const
 {
     return nonRtSequencerStateWorker;
 }
@@ -518,8 +519,7 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setUsed(source->isUsed());
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
-    dest->setBarLengths(
-        source->getBarLengths());
+    dest->setBarLengths(source->getBarLengths());
     dest->setTimeSignatures(source->getTimeSignatures());
     dest->setFirstLoopBarIndex(source->getFirstLoopBarIndex());
     dest->setLastLoopBarIndex(source->getLastLoopBarIndex());

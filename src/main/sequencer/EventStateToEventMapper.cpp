@@ -39,7 +39,8 @@ namespace mpc::sequencer
         }
         if (e.type == EventType::ControlChange)
         {
-            return std::make_shared<ControlChangeEvent>(getEventSnapshot, dispatch);
+            return std::make_shared<ControlChangeEvent>(getEventSnapshot,
+                                                        dispatch);
         }
         if (e.type == EventType::Mixer)
         {
@@ -51,7 +52,8 @@ namespace mpc::sequencer
         }
         if (e.type == EventType::PolyPressure)
         {
-            return std::make_shared<PolyPressureEvent>(getEventSnapshot, dispatch);
+            return std::make_shared<PolyPressureEvent>(getEventSnapshot,
+                                                       dispatch);
         }
         if (e.type == EventType::SystemExclusive)
         {
@@ -60,12 +62,13 @@ namespace mpc::sequencer
         }
         if (e.type == EventType::ProgramChange)
         {
-            return std::make_shared<ProgramChangeEvent>(getEventSnapshot, dispatch);
+            return std::make_shared<ProgramChangeEvent>(getEventSnapshot,
+                                                        dispatch);
         }
         if (e.type == EventType::TempoChange)
         {
-            return std::make_shared<TempoChangeEvent>(getEventSnapshot, dispatch,
-                                                      parent);
+            return std::make_shared<TempoChangeEvent>(getEventSnapshot,
+                                                      dispatch, parent);
         }
         return {};
     }

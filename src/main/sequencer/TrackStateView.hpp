@@ -14,8 +14,7 @@ namespace mpc::sequencer
     class TrackStateView
     {
     public:
-        explicit TrackStateView(
-            const TrackState &s) noexcept;
+        explicit TrackStateView(const TrackState &s) noexcept;
 
         std::optional<EventState> findNoteEvent(int tick,
                                                 NoteNumber note) const;

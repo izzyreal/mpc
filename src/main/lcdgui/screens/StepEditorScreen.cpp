@@ -71,7 +71,10 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
 
                             for (auto &e : original)
                             {
-                                if (!e) continue;
+                                if (!e)
+                                {
+                                    continue;
+                                }
                                 clones.push_back(e->getSnapshot());
                             }
                             return clones;

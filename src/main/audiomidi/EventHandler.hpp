@@ -35,7 +35,8 @@ namespace mpc::audiomidi
 
     public:
         void handleFinalizedEvent(const sequencer::EventState &,
-                                  sequencer::Track *, int eventFrameOffsetInBuffer);
+                                  sequencer::Track *,
+                                  int eventFrameOffsetInBuffer);
 
         // Handles physical pad presses.
         //
@@ -113,8 +114,7 @@ namespace mpc::audiomidi
         void handleFinalizedDrumNoteOnEvent(
             const sequencer::EventState &,
             const std::shared_ptr<sequencer::DrumBus> &,
-            const sequencer::Track *,
-            int eventFrameOffsetInBuffer);
+            const sequencer::Track *, int eventFrameOffsetInBuffer);
 
         /**
          * The MPC2000XL supports realtime, non-destructive transposition of

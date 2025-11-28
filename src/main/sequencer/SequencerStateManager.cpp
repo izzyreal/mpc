@@ -25,8 +25,7 @@ SequencerStateManager::~SequencerStateManager()
 {
     //    printf("~SequencerStateManager\n");
 }
-void SequencerStateManager::applyMessage(
-    const SequencerMessage &msg) noexcept
+void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 {
     myApplyMessage(msg);
 }
@@ -44,8 +43,7 @@ bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
 }
 
 void SequencerStateManager::myApplyMessage(
-    const SequencerMessage &msg,
-    const bool autoRefreshPlaybackState) noexcept
+    const SequencerMessage &msg, const bool autoRefreshPlaybackState) noexcept
 {
     std::visit(
         [&](auto &&m)
@@ -87,7 +85,8 @@ void SequencerStateManager::myApplyMessage(
                 auto &seq = activeState.sequences[m.sequenceIndex];
                 seq.lastLoopBarIndex = m.barIndex;
 
-                if (m.barIndex != EndOfSequence && m.barIndex < seq.firstLoopBarIndex)
+                if (m.barIndex != EndOfSequence &&
+                    m.barIndex < seq.firstLoopBarIndex)
                 {
                     seq.firstLoopBarIndex = m.barIndex;
                 }
@@ -134,7 +133,8 @@ void SequencerStateManager::myApplyMessage(
             }
             else if constexpr (std::is_same_v<T, SetInitialTempo>)
             {
-                activeState.sequences[m.sequenceIndex].initialTempo = m.initialTempo;
+                activeState.sequences[m.sequenceIndex].initialTempo =
+                    m.initialTempo;
             }
             else if constexpr (std::is_same_v<T, UpdateEvent>)
             {
@@ -338,7 +338,8 @@ void SequencerStateManager::myApplyMessage(
             }
             else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
-                printf("Applying SetSelectedSequenceIndex with index %i\n", m.sequenceIndex.get());
+                printf("Applying SetSelectedSequenceIndex with index %i\n",
+                       m.sequenceIndex.get());
                 activeState.selectedSequenceIndex = m.sequenceIndex;
 
                 if (m.setPositionTo0)
@@ -530,8 +531,8 @@ void SequencerStateManager::myApplyMessage(
         applyMessage(RefreshPlaybackStateWhilePlaying{});
     }
     else if (!isPlaying &&
-             isVariantAnyOf(msg,
-                            MessagesThatInvalidatePlaybackStateWhileNotPlaying{}))
+             isVariantAnyOf(
+                 msg, MessagesThatInvalidatePlaybackStateWhileNotPlaying{}))
     {
         publishState();
         applyMessage(RefreshPlaybackStateWhileNotPlaying{});

@@ -46,7 +46,7 @@ namespace mpc::sequencer
     public:
         Track(
             const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
-            const std::function<void(SequencerMessage&&)> &dispatch,
+            const std::function<void(SequencerMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,

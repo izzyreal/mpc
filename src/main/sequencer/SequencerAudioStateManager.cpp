@@ -7,11 +7,10 @@ SequencerAudioStateManager::SequencerAudioStateManager(Sequencer *sequencer)
 {
 }
 
-SequencerAudioStateManager::~SequencerAudioStateManager()
-{
-}
+SequencerAudioStateManager::~SequencerAudioStateManager() {}
 
-void SequencerAudioStateManager::applyMessage(const SequencerAudioMessage &msg) noexcept
+void SequencerAudioStateManager::applyMessage(
+    const SequencerAudioMessage &msg) noexcept
 {
     std::visit(
         [&](auto &&m)
@@ -21,9 +20,9 @@ void SequencerAudioStateManager::applyMessage(const SequencerAudioMessage &msg) 
             if constexpr (std::is_same_v<T, SetTimeInSamples>)
             {
                 activeState.timeInSamples = m.timeInSamples;
-                // printf("Time in samples set to %i\n", activeState.timeInSamples);
+                // printf("Time in samples set to %i\n",
+                // activeState.timeInSamples);
             }
         },
         msg);
 }
-

@@ -678,7 +678,10 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     copyEvents.destTrackIndex = TrackIndex(toTrackIndex);
     copyEvents.copyModeMerge = copyModeMerge;
     copyEvents.copyCount = copyCount;
-    copyEvents.generateEventId = [t = toSequence->getTrack(toTrackIndex)] { return t->getAndIncrementNextEventId(); };
+    copyEvents.generateEventId = [t = toSequence->getTrack(toTrackIndex)]
+    {
+        return t->getAndIncrementNextEventId();
+    };
 
     const BusType sourceBusType = seq->getSelectedTrack()->getBusType();
 

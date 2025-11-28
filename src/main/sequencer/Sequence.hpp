@@ -50,7 +50,8 @@ namespace mpc::sequencer
         };
 
         Sequence(SequenceIndex,
-                 const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
+                 const std::function<std::shared_ptr<SequenceStateView>()>
+                     &getSnapshot,
                  const std::function<void(SequencerMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
@@ -118,7 +119,9 @@ namespace mpc::sequencer
         // modify tick positions of events. And unlike setTimeSignature, it
         // does not modify any bar lengths. It just replaces the time
         // signatures, nothing more.
-        void setTimeSignatures(const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> &) const;
+        void setTimeSignatures(
+            const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> &)
+            const;
 
         std::vector<std::shared_ptr<Track>> getTracks();
         std::vector<std::string> &getDeviceNames();
@@ -154,7 +157,8 @@ namespace mpc::sequencer
         Tick getBarLength(int barIndex) const;
 
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
-        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> getTimeSignatures() const;
+        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
+        getTimeSignatures() const;
 
     private:
         SequenceIndex sequenceIndex;

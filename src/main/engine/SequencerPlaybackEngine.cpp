@@ -90,11 +90,12 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     const auto nonRtSnapshot = sequencer->getStateManager()->getSnapshot();
 
-    const auto playbackState =
-        nonRtSnapshot.getPlaybackState();
+    const auto playbackState = nonRtSnapshot.getPlaybackState();
 
-    const bool sequencerIsRunningAtStartOfBuffer = nonRtSnapshot.isSequencerRunning();
-    const auto currentTimeInSamplesAtStartOfBuffer = sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
+    const bool sequencerIsRunningAtStartOfBuffer =
+        nonRtSnapshot.isSequencerRunning();
+    const auto currentTimeInSamplesAtStartOfBuffer =
+        sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
 
     for (int i = 0; i < nFrames; ++i)
     {
@@ -107,13 +108,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->getAudioStateManager()->enqueue(SetTimeInSamples{0});
             sequencer->getStateManager()->drainQueue();
-            sequencer->getStateManager()->enqueue(RefreshPlaybackStateWhileNotPlaying{});
+            sequencer->getStateManager()->enqueue(
+                RefreshPlaybackStateWhileNotPlaying{});
         }
         return;
     }
 
-    sequencer->getAudioStateManager()->enqueue(SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer +
-                               nFrames});
+    sequencer->getAudioStateManager()->enqueue(
+        SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer + nFrames});
     sequencer->getStateManager()->drainQueue();
 
     const auto seq = sequencer->getCurrentlyPlayingSequence();
@@ -123,7 +125,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (e.timeInSamples >= currentTimeInSamplesAtStartOfBuffer &&
             e.timeInSamples < currentTimeInSamplesAtStartOfBuffer + nFrames)
         {
-            const auto frameOffsetInBuffer = e.timeInSamples - currentTimeInSamplesAtStartOfBuffer;
+            const auto frameOffsetInBuffer =
+                e.timeInSamples - currentTimeInSamplesAtStartOfBuffer;
 
             if (e.eventState.type == EventType::MetronomeClick)
             {
@@ -139,10 +142,16 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     const double tempo = sequencer->getTransport()->getTempo();
     const auto sampleRate = getSampleRate();
-    const double tickCountForThisBuffer = SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
-    const double quarterNoteCountForThisBuffer = Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
-    const auto unwrappedPosition = sequencer->getTransport()->getPositionQuarterNotes() + quarterNoteCountForThisBuffer;
-    const auto wrappedPosition = sequencer->getTransport()->getWrappedPositionInSequence(unwrappedPosition);
+    const double tickCountForThisBuffer =
+        SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
+    const double quarterNoteCountForThisBuffer =
+        Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
+    const auto unwrappedPosition =
+        sequencer->getTransport()->getPositionQuarterNotes() +
+        quarterNoteCountForThisBuffer;
+    const auto wrappedPosition =
+        sequencer->getTransport()->getWrappedPositionInSequence(
+            unwrappedPosition);
     sequencer->getTransport()->setPosition(wrappedPosition);
     sequencer->getStateManager()->drainQueue();
 }

@@ -38,9 +38,11 @@ namespace mpc::sequencer
         void setRecording(bool b) const;
         void setOverdubbing(bool b) const;
 
-        PositionQuarterNotes getWrappedPositionInSequence(PositionQuarterNotes) const;
+        PositionQuarterNotes
+            getWrappedPositionInSequence(PositionQuarterNotes) const;
 
-        PositionQuarterNotes getWrappedPositionInSong(PositionQuarterNotes) const;
+        PositionQuarterNotes
+            getWrappedPositionInSong(PositionQuarterNotes) const;
 
         void moveSongToStepThatContainsPosition(PositionQuarterNotes) const;
 

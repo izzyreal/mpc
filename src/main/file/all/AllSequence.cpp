@@ -118,7 +118,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
     {
         const auto num = barList->getBars()[i]->getNumerator();
         const auto den = barList->getBars()[i]->getDenominator();
-        timeSignatures[i] = { TimeSigNumerator(num), TimeSigDenominator(den) };
+        timeSignatures[i] = {TimeSigNumerator(num), TimeSigDenominator(den)};
         barLengths[i] = timeSignatures[i].getBarLength();
     }
 
@@ -149,7 +149,8 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
     }
 
     mpcSeq->setFirstLoopBarIndex(BarIndex(loopFirst));
-    mpcSeq->setLastLoopBarIndex(loopLastEnd ? EndOfSequence : BarIndex(loopLast));
+    mpcSeq->setLastLoopBarIndex(loopLastEnd ? EndOfSequence
+                                            : BarIndex(loopLast));
 
     mpcSeq->setLoopEnabled(loop);
     mpcSeq->getStartTime().hours = startTime.hours;
@@ -202,9 +203,10 @@ AllSequence::AllSequence(Sequence *seq, int number)
     saveBytes[SEQUENCE_INDEX_OFFSET] = number;
     setUnknown32BitInt(seq);
     auto loopStartBytes = ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
-    auto loopEndBytes = seq->getLastLoopBarIndex() ==
-        EndOfSequence ? std::vector{'\xFF', '\xFF'} :
-        ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
+    auto loopEndBytes =
+        seq->getLastLoopBarIndex() == EndOfSequence
+            ? std::vector{'\xFF', '\xFF'}
+            : ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
 
     saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
     saveBytes[LOOP_FIRST_OFFSET + 1] = loopStartBytes[1];

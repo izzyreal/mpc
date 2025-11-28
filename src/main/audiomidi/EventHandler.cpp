@@ -173,7 +173,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 }
 
 void EventHandler::handleFinalizedEvent(const EventState &event,
-                                        Track *const track, int eventFrameOffsetInBuffer)
+                                        Track *const track,
+                                        int eventFrameOffsetInBuffer)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
     {
@@ -196,7 +197,8 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
         {
             if (isDrumNote(event.noteNumber))
             {
-                handleFinalizedDrumNoteOnEvent(event, drumBus, track, eventFrameOffsetInBuffer);
+                handleFinalizedDrumNoteOnEvent(event, drumBus, track,
+                                               eventFrameOffsetInBuffer);
             }
         }
 

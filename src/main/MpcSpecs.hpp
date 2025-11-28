@@ -37,10 +37,13 @@ namespace mpc
         // We use just one meta track in our sequences: tempo change.
         static constexpr int8_t META_TRACK_COUNT = 1; //
 
-        static constexpr int8_t TOTAL_TRACK_COUNT = TRACK_COUNT + META_TRACK_COUNT;
+        static constexpr int8_t TOTAL_TRACK_COUNT =
+            TRACK_COUNT + META_TRACK_COUNT;
 
-        static constexpr int8_t META_SEQUENCE_COUNT = 2; // Undo sequence placeholder and copy staging and load staging
+        static constexpr int8_t META_SEQUENCE_COUNT =
+            2; // Undo sequence placeholder and copy staging and load staging
 
-        static constexpr int8_t TOTAL_SEQUENCE_COUNT = SEQUENCE_COUNT + META_SEQUENCE_COUNT;
+        static constexpr int8_t TOTAL_SEQUENCE_COUNT =
+            SEQUENCE_COUNT + META_SEQUENCE_COUNT;
     };
 } // namespace mpc

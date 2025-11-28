@@ -441,9 +441,8 @@ void SongScreen::displayNow0() const
         pastBars += bars;
     }
 
-    pastBars +=
-        sequencer.lock()->getTransport()->getPlayedStepRepetitions() *
-        (sequencer.lock()->getSelectedSequence()->getBarCount());
+    pastBars += sequencer.lock()->getTransport()->getPlayedStepRepetitions() *
+                (sequencer.lock()->getSelectedSequence()->getBarCount());
 
     findField("now0")->setTextPadded(
         sequencer.lock()->getTransport()->getCurrentBarIndex() + 1 + pastBars,

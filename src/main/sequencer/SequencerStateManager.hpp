@@ -18,12 +18,15 @@ namespace mpc::sequencer
               SequencerState, SequencerStateView, SequencerMessage>
     {
     public:
-        explicit SequencerStateManager(const std::function<SampleRate()> &getSampleRate, Sequencer *, SequencerStateWorker *);
+        explicit SequencerStateManager(
+            const std::function<SampleRate()> &getSampleRate, Sequencer *,
+            SequencerStateWorker *);
         ~SequencerStateManager() override;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;
-        void myApplyMessage(const SequencerMessage &msg, bool autoRefreshPlaybackState = true) noexcept;
+        void myApplyMessage(const SequencerMessage &msg,
+                            bool autoRefreshPlaybackState = true) noexcept;
 
     private:
         const std::function<SampleRate()> getSampleRate;
@@ -32,7 +35,7 @@ namespace mpc::sequencer
 
         void applyPlayMessage() noexcept;
         void applyStopMessage() noexcept;
-        void applyInsertBars(const InsertBars&) noexcept;
-        void applyCopyEvents(const CopyEvents&) noexcept;
+        void applyInsertBars(const InsertBars &) noexcept;
+        void applyCopyEvents(const CopyEvents &) noexcept;
     };
 } // namespace mpc::sequencer
