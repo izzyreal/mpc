@@ -155,7 +155,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
     }
 }
 
-void TransportStateHandler::applyPlayMessage(TransportState &state) noexcept
+void TransportStateHandler::applyPlayMessage(TransportState &state) const noexcept
 {
     if (state.sequencerRunning)
     {

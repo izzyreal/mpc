@@ -20,7 +20,7 @@ namespace mpc::sequencer
                           const TransportMessage &,
                           bool autoRefreshPlaybackState = true);
 
-        void applyPlayMessage(TransportState &) noexcept;
+        void applyPlayMessage(TransportState &) const noexcept;
         void applyStopMessage(TransportState &) noexcept;
 
     private:

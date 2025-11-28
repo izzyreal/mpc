@@ -34,16 +34,18 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 void SequencerStateManager::myApplyMessage(
     const SequencerMessage &msg, const bool autoRefreshPlaybackState) noexcept
 {
-    if (isVariantAnyOf(msg, TransportMessage{}))
-    {
-        return;
-    }
-
     std::visit(
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
+
             if constexpr (std::is_same_v<T,
+                                         TransportMessage>)
+            {
+                transportStateHandler->applyMessage(activeState.transport, m, autoRefreshPlaybackState);
+                return;
+            }
+            else if constexpr (std::is_same_v<T,
                                          RefreshPlaybackStateWhileNotPlaying>)
             {
                 worker->refreshPlaybackState(
