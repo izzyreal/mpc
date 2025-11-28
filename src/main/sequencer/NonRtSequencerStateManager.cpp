@@ -58,6 +58,40 @@ void NonRtSequencerStateManager::myApplyMessage(
                     activeState.transport.positionQuarterNotes, 0,
                     m.onComplete);
             }
+            else if constexpr (std::is_same_v<T, SetLoopEnabled>)
+            {
+                auto &seq = activeState.sequences[m.sequenceIndex];
+                seq.loopEnabled = m.loopEnabled;
+            }
+            else if constexpr (std::is_same_v<T, SetUsed>)
+            {
+                auto &seq = activeState.sequences[m.sequenceIndex];
+                seq.used = m.used;
+            }
+            else if constexpr (std::is_same_v<T, SetTempoChangeEnabled>)
+            {
+                auto &seq = activeState.sequences[m.sequenceIndex];
+                seq.tempoChangeEnabled = m.tempoChangeEnabled;
+            }
+            else if constexpr (std::is_same_v<T, SetFirstLoopBarIndex>)
+            {
+                auto &seq = activeState.sequences[m.sequenceIndex];
+                seq.firstLoopBarIndex = m.barIndex;
+                if (m.barIndex > seq.lastLoopBarIndex)
+                {
+                    seq.lastLoopBarIndex = m.barIndex;
+                }
+            }
+            else if constexpr (std::is_same_v<T, SetLastLoopBarIndex>)
+            {
+                auto &seq = activeState.sequences[m.sequenceIndex];
+                seq.lastLoopBarIndex = m.barIndex;
+
+                if (m.barIndex != EndOfSequence && m.barIndex < seq.firstLoopBarIndex)
+                {
+                    seq.firstLoopBarIndex = m.barIndex;
+                }
+            }
             else if constexpr (std::is_same_v<T,
                                               RefreshPlaybackStateWhilePlaying>)
             {
@@ -617,8 +651,6 @@ void NonRtSequencerStateManager::applyPlayMessage() noexcept
             transport->setOverdubbing(false);
             return;
         }
-
-        activeSequence->initLoop();
 
         if (transport->isRecordingOrOverdubbing())
         {

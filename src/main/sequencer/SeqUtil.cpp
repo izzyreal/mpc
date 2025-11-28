@@ -137,7 +137,7 @@ double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
 int SeqUtil::loopFrameLength(const Sequence *seq, const int sr)
 {
     return static_cast<int>(
-        sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
+        sequenceFrameLength(seq, seq->getLoopStartTick(), seq->getLoopEndTick(), sr));
 }
 
 int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)

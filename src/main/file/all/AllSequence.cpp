@@ -148,14 +148,8 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
         mpcSeq->setDeviceName(i, devNames[i]);
     }
 
-    mpcSeq->setFirstLoopBarIndex(loopFirst);
-    mpcSeq->setLastLoopBarIndex(loopLast);
-    mpcSeq->setLastLoopBarIndex(loopLast);
-
-    if (loopLastEnd)
-    {
-        mpcSeq->setLastLoopBarIndex(INT_MAX);
-    }
+    mpcSeq->setFirstLoopBarIndex(BarIndex(loopFirst));
+    mpcSeq->setLastLoopBarIndex(loopLastEnd ? EndOfSequence : BarIndex(loopLast));
 
     mpcSeq->setLoopEnabled(loop);
     mpcSeq->getStartTime().hours = startTime.hours;
@@ -208,13 +202,9 @@ AllSequence::AllSequence(Sequence *seq, int number)
     saveBytes[SEQUENCE_INDEX_OFFSET] = number;
     setUnknown32BitInt(seq);
     auto loopStartBytes = ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
-    auto loopEndBytes = ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
-
-    if (seq->isLastLoopBarEnd())
-    {
-        loopEndBytes =
-            std::vector{static_cast<char>(255), static_cast<char>(255)};
-    }
+    auto loopEndBytes = seq->getLastLoopBarIndex() ==
+        EndOfSequence ? std::vector{'\xFF', '\xFF'} :
+        ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
 
     saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
     saveBytes[LOOP_FIRST_OFFSET + 1] = loopStartBytes[1];

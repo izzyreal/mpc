@@ -182,6 +182,7 @@ namespace mpc
 
     using BarIndex = ConstrainedInt<int16_t, -1, Mpc2000XlSpecs::MAX_LAST_BAR_INDEX>;
     constexpr BarIndex NoBarIndex{-1};
+    constexpr BarIndex EndOfSequence{-2};
 
     /////////
 

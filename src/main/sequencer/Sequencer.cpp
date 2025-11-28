@@ -481,7 +481,6 @@ void Sequencer::purgeSequence(const int i)
 void Sequencer::copySequence(const int source, const int destination)
 {
     copySequence(sequences[source], SequenceIndex(destination));
-    sequences[destination]->initLoop();
 }
 
 void Sequencer::copySequenceParameters(const int source, const int dest) const
@@ -522,8 +521,9 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setBarLengths(
         source->getBarLengths());
     dest->setTimeSignatures(source->getTimeSignatures());
-    dest->setLoopStart(source->getLoopStart());
-    dest->setLoopEnd(source->getLoopEnd());
+    dest->setFirstLoopBarIndex(source->getFirstLoopBarIndex());
+    dest->setLastLoopBarIndex(source->getLastLoopBarIndex());
+    dest->setTempoChangeOn(source->isTempoChangeOn());
     copyTempoChangeEvents(source, dest);
 }
 

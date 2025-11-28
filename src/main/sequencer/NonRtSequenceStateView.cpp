@@ -77,3 +77,42 @@ double NonRtSequenceStateView::getInitialTempo() const
 {
     return state.initialTempo;
 }
+
+mpc::Tick NonRtSequenceStateView::getLoopStartTick() const
+{
+    return getFirstTickOfBar(state.firstLoopBarIndex);
+}
+
+mpc::Tick NonRtSequenceStateView::getLoopEndTick() const
+{
+    if (state.lastLoopBarIndex == EndOfSequence)
+    {
+        return getLastTick();
+    }
+
+    return getFirstTickOfBar(state.lastLoopBarIndex + 1);
+}
+
+mpc::BarIndex NonRtSequenceStateView::getFirstLoopBarIndex() const
+{
+    return state.firstLoopBarIndex;
+}
+
+mpc::BarIndex NonRtSequenceStateView::getLastLoopBarIndex() const {
+    return state.lastLoopBarIndex;
+}
+
+bool NonRtSequenceStateView::isLoopEnabled() const
+{
+    return state.loopEnabled;
+}
+
+bool NonRtSequenceStateView::isUsed() const
+{
+    return state.used;
+}
+
+bool NonRtSequenceStateView::isTempoChangeEnabled() const
+{
+    return state.tempoChangeEnabled;
+}

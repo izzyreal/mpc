@@ -33,6 +33,20 @@ namespace mpc::sequencer
 
         double getInitialTempo() const;
 
+        Tick getLoopStartTick() const;
+
+        Tick getLoopEndTick() const;
+
+        BarIndex getFirstLoopBarIndex() const;
+
+        BarIndex getLastLoopBarIndex() const;
+
+        bool isLoopEnabled() const;
+
+        bool isUsed() const;
+
+        bool isTempoChangeEnabled() const;
+
     private:
         const NonRtSequenceState &state;
     };

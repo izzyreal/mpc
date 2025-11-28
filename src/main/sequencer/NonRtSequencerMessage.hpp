@@ -40,7 +40,7 @@ namespace mpc::sequencer
     {
         EventState eventState;
         bool allowMultipleNoteEventsWithSameNoteOnSameTick;
-        std::function<void()> onComplete = []{};
+        std::function<void()> onComplete = [] {};
     };
 
     struct RemoveEvent
@@ -131,10 +131,19 @@ namespace mpc::sequencer
     {
     };
 
-    struct UpdateRecording { bool recording; };
-    struct UpdateOverdubbing { bool overdubbing; };
+    struct UpdateRecording
+    {
+        bool recording;
+    };
+    struct UpdateOverdubbing
+    {
+        bool overdubbing;
+    };
 
-    struct UpdateCountEnabled { bool enabled; };
+    struct UpdateCountEnabled
+    {
+        bool enabled;
+    };
 
     struct RefreshPlaybackStateWhileNotPlaying
     {
@@ -204,7 +213,8 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
         int barCount;
         BarIndex afterBar;
-        std::function<void(BarIndex newLastBarIndex)> onComplete = [](const BarIndex){};
+        std::function<void(BarIndex newLastBarIndex)> onComplete =
+            [](const BarIndex) {};
     };
 
     struct SetInitialTempo
@@ -213,19 +223,46 @@ namespace mpc::sequencer
         double initialTempo;
     };
 
-    using NonRtSequencerMessage =
-        std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
-                     RemoveDoubles, CopyEvents, SetLastBarIndex, InsertBars,
-                     UpdateTrackIndexOfAllEvents, UpdateEvent, SetInitialTempo,
-                     FinalizeNonLiveNoteEvent, UpdatePlaybackState,
-                     RefreshPlaybackStateWhileNotPlaying, RefreshPlaybackStateWhilePlaying,
-                     SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks, SwitchToNextSequence,
-                     SetSelectedSequenceIndex, Stop, Play, PlayFromStart,
-                     Record, RecordFromStart, Overdub, OverdubFromStart, SwitchRecordToOverdub,
-                     UpdateRecording, UpdateOverdubbing, UpdateCountEnabled,
-                     UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
-                     UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
+    struct SetLoopEnabled
+    {
+        SequenceIndex sequenceIndex;
+        bool loopEnabled;
+    };
+    struct SetUsed
+    {
+        SequenceIndex sequenceIndex;
+        bool used;
+    };
+    struct SetTempoChangeEnabled
+    {
+        SequenceIndex sequenceIndex;
+        bool tempoChangeEnabled;
+    };
+    struct SetFirstLoopBarIndex
+    {
+        SequenceIndex sequenceIndex;
+        BarIndex barIndex;
+    };
+    struct SetLastLoopBarIndex
+    {
+        SequenceIndex sequenceIndex;
+        BarIndex barIndex;
+    };
+
+    using NonRtSequencerMessage = std::variant<
+        InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick, RemoveDoubles,
+        CopyEvents, SetLastBarIndex, InsertBars, UpdateTrackIndexOfAllEvents,
+        UpdateEvent, SetInitialTempo, FinalizeNonLiveNoteEvent,
+        UpdatePlaybackState, RefreshPlaybackStateWhileNotPlaying,
+        RefreshPlaybackStateWhilePlaying, SetPositionQuarterNotes,
+        SetPlayStartPositionQuarterNotes, BumpPositionByTicks,
+        SwitchToNextSequence, SetSelectedSequenceIndex, Stop, Play,
+        PlayFromStart, Record, RecordFromStart, Overdub, OverdubFromStart,
+        SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
+        UpdateCountEnabled, UpdateBarLength, UpdateBarLengths,
+        UpdateTimeSignatures, UpdateTimeSignature, UpdateEvents,
+        UpdateSequenceEvents, SetLoopEnabled, SetUsed, SetTempoChangeEnabled,
+        SetFirstLoopBarIndex, SetLastLoopBarIndex>;
 
     using MessagesThatInvalidPlaybackStateWhileNotPlaying =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
@@ -234,14 +271,15 @@ namespace mpc::sequencer
                      /*SetPlayStartPositionQuarterNotes,*/ BumpPositionByTicks,
                      SetSelectedSequenceIndex, SetLastBarIndex, InsertBars,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
-                     UpdateCountEnabled,
-                     UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents>;
+                     UpdateCountEnabled, UpdateTimeSignature, UpdateEvents,
+                     UpdateSequenceEvents, SetLoopEnabled, SetUsed,
+                     SetTempoChangeEnabled, SetFirstLoopBarIndex,
+                     SetLastLoopBarIndex>;
 
     using MessagesThatInvalidPlaybackStateWhilePlaying =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent,
-                     SwitchToNextSequence, UpdateCountEnabled,
-                     UpdateTimeSignature>;
+                     FinalizeNonLiveNoteEvent, SwitchToNextSequence,
+                     UpdateCountEnabled, UpdateTimeSignature>;
 
 } // namespace mpc::sequencer

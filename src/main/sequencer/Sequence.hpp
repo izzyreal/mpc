@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <memory>
-#include <atomic>
 #include <functional>
 #include <string>
 
@@ -91,14 +90,12 @@ namespace mpc::sequencer
         double getInitialTempo() const;
         void setInitialTempo(double initialTempo) const;
 
-        void setLoopStart(int l);
-        int getLoopStart() const;
-        void setLoopEnd(int l);
-        int getLoopEnd() const;
-        void setFirstLoopBarIndex(int i);
-        int getFirstLoopBarIndex() const;
-        void setLastLoopBarIndex(int i);
-        int getLastLoopBarIndex() const;
+        Tick getLoopStartTick() const;
+        Tick getLoopEndTick() const;
+        void setFirstLoopBarIndex(BarIndex) const;
+        BarIndex getFirstLoopBarIndex() const;
+        void setLastLoopBarIndex(BarIndex) const;
+        BarIndex getLastLoopBarIndex() const;
         bool isLoopEnabled() const;
         void setName(const std::string &s);
         std::string getName();
@@ -107,9 +104,9 @@ namespace mpc::sequencer
         void setLastBarIndex(int i) const;
         int getLastBarIndex() const;
         int getBarCount() const;
-        void setLoopEnabled(bool b);
+        void setLoopEnabled(bool b) const;
         std::shared_ptr<Track> getTrack(int i);
-        void setUsed(bool b);
+        void setUsed(bool b) const;
         bool isUsed() const;
         void init(int newLastBarIndex);
 
@@ -132,7 +129,7 @@ namespace mpc::sequencer
         void removeTempoChangeEvent(int i) const;
 
         bool isTempoChangeOn() const;
-        void setTempoChangeOn(bool b);
+        void setTempoChangeOn(bool b) const;
         int getLastTick() const;
         TimeSignature getTimeSignature(int barIndex) const;
         TimeSignature getTimeSignature() const;
@@ -140,13 +137,11 @@ namespace mpc::sequencer
         std::shared_ptr<Track> purgeTrack(int i);
         int getDenominator(int i) const;
         int getNumerator(int i) const;
-        void deleteBars(int firstBar, int lastBarToDelete);
-        void insertBars(int barCount, BarIndex afterBar);
+        void deleteBars(int firstBar, int lastBarToDelete) const;
+        void insertBars(int barCount, BarIndex afterBar) const;
         void moveTrack(int source, int destination);
-        bool isLastLoopBarEnd() const;
 
         int getEventCount() const;
-        void initLoop();
 
         int getFirstTickOfBar(int barIndex) const;
         int getLastTickOfBar(int barIndex) const;
@@ -175,13 +170,5 @@ namespace mpc::sequencer
         std::function<int()> getCurrentBarIndex;
 
         std::string name;
-        bool loopEnabled = true;
-        bool used = false;
-        bool tempoChangeOn = true;
-        int loopStart = 0;
-        int loopEnd = 0;
-        int firstLoopBarIndex = 0;
-        int lastLoopBarIndex = 0;
-        bool lastLoopBarEnd = true;
     };
 } // namespace mpc::sequencer
