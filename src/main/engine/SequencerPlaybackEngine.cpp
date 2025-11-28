@@ -86,7 +86,7 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
-    sequencer->getStateManager()->drainQueue();
+    sequencer->getAudioStateManager()->drainQueue();
 
     const auto sequencerState = sequencer->getStateManager()->getSnapshot();
     const auto transportState =
@@ -109,7 +109,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (currentTimeInSamplesAtStartOfBuffer != 0)
         {
             sequencer->getAudioStateManager()->enqueue(SetTimeInSamples{0});
-            sequencer->getStateManager()->drainQueue();
+            sequencer->getAudioStateManager()->drainQueue();
             sequencer->getStateManager()->enqueue(
                 RefreshPlaybackStateWhileNotPlaying{});
         }
@@ -118,7 +118,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     sequencer->getAudioStateManager()->enqueue(
         SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer + nFrames});
-    sequencer->getStateManager()->drainQueue();
+    sequencer->getAudioStateManager()->drainQueue();
 
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -155,7 +155,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
         sequencer->getTransport()->getWrappedPositionInSequence(
             unwrappedPosition);
     sequencer->getTransport()->setPosition(wrappedPosition);
-    sequencer->getStateManager()->drainQueue();
 }
 
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const

@@ -93,7 +93,7 @@ Sequencer::Sequencer(
       performanceManager(performanceManager), sampler(sampler),
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
-    stateManager = std::make_shared<SequencerAudioStateManager>(this);
+    audioStateManager = std::make_shared<SequencerAudioStateManager>(this);
 
     const auto isCurrentScreen =
         [this](const std::initializer_list<ScreenId> &ids)
@@ -112,11 +112,11 @@ Sequencer::Sequencer(
             getClientHardwareEventController());
     };
 
-    nonRtSequencerStateWorker = std::make_shared<SequencerStateWorker>(
+    stateWorker = std::make_shared<SequencerStateWorker>(
         isCurrentScreen, isRecMainWithoutPlaying, this);
 
-    nonRtSequencerStateManager = std::make_shared<SequencerStateManager>(
-        getSampleRate, this, nonRtSequencerStateWorker.get());
+    stateManager = std::make_shared<SequencerStateManager>(
+        getSampleRate, this, stateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -127,12 +127,12 @@ Sequencer::~Sequencer()
 std::shared_ptr<SequencerAudioStateManager>
 Sequencer::getAudioStateManager() const
 {
-    return stateManager;
+    return audioStateManager;
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
-    return nonRtSequencerStateManager;
+    return stateManager;
 }
 
 std::shared_ptr<Transport> Sequencer::getTransport()
@@ -191,7 +191,7 @@ void Sequencer::deleteSong(const int i)
 
 SequenceIndex Sequencer::getSelectedSequenceIndex() const
 {
-    return nonRtSequencerStateManager->getSnapshot().getSelectedSequenceIndex();
+    return stateManager->getSnapshot().getSelectedSequenceIndex();
 }
 
 std::shared_ptr<Track> Sequencer::getSelectedTrack()
@@ -241,7 +241,7 @@ std::shared_ptr<EventHandler> Sequencer::getEventHandler()
 
 std::shared_ptr<SequencerStateWorker> Sequencer::getSequencerStateWorker() const
 {
-    return nonRtSequencerStateWorker;
+    return stateWorker;
 }
 
 bool Sequencer::isSoloEnabled() const
@@ -299,7 +299,7 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                          const bool shouldSetPositionTo0) const
 {
-    nonRtSequencerStateManager->enqueue(SetSelectedSequenceIndex{
+    stateManager->enqueue(SetSelectedSequenceIndex{
         std::clamp(sequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex),
         shouldSetPositionTo0});
 }
@@ -386,12 +386,12 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 {
     const std::function dispatch = [this](SequencerMessage &&m)
     {
-        nonRtSequencerStateManager->enqueue(std::move(m));
+        stateManager->enqueue(std::move(m));
     };
 
     const std::function getSnapshot = [this, sequenceIndex]
     {
-        return nonRtSequencerStateManager->getSnapshot().getSequenceState(
+        return stateManager->getSnapshot().getSequenceState(
             sequenceIndex);
     };
 

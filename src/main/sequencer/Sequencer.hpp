@@ -132,7 +132,7 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
 
-        std::shared_ptr<SequencerAudioStateManager> stateManager;
+        std::shared_ptr<SequencerAudioStateManager> audioStateManager;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
 
@@ -143,8 +143,8 @@ namespace mpc::sequencer
             std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
-        std::shared_ptr<SequencerStateManager> nonRtSequencerStateManager;
-        std::shared_ptr<SequencerStateWorker> nonRtSequencerStateWorker;
+        std::shared_ptr<SequencerStateManager> stateManager;
+        std::shared_ptr<SequencerStateWorker> stateWorker;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
