@@ -118,7 +118,7 @@ void NonRtSequencerStateWorker::refreshPlaybackState(
     {
         timeInSamplesToUse =
             sequencer->getStateManager()->getSnapshot().getTimeInSamples();
-        printf("Time in samples to use: %i\n", timeInSamplesToUse);
+        // printf("Time in samples to use: %i\n", timeInSamplesToUse);
     }
 
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
