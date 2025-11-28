@@ -193,31 +193,28 @@ namespace mpc::sequencer
     };
 
     using SequencerMessage = std::variant<
-        TransportMessage,
-        InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick, RemoveDoubles,
-        CopyEvents, SetLastBarIndex, InsertBars, UpdateTrackIndexOfAllEvents,
-        UpdateEvent, SetInitialTempo, FinalizeNonLiveNoteEvent,
-        UpdatePlaybackState, RefreshPlaybackStateWhileNotPlaying,
-        RefreshPlaybackStateWhilePlaying,
-        SwitchToNextSequence, SetSelectedSequenceIndex, UpdateBarLength, UpdateBarLengths,
-        UpdateTimeSignatures, UpdateTimeSignature, UpdateEvents,
-        UpdateSequenceEvents, SetLoopEnabled, SetUsed, SetTempoChangeEnabled,
-        SetFirstLoopBarIndex, SetLastLoopBarIndex>;
+        TransportMessage, InsertEvent, ClearEvents, RemoveEvent,
+        UpdateEventTick, RemoveDoubles, CopyEvents, SetLastBarIndex, InsertBars,
+        UpdateTrackIndexOfAllEvents, UpdateEvent, SetInitialTempo,
+        FinalizeNonLiveNoteEvent, UpdatePlaybackState,
+        RefreshPlaybackStateWhileNotPlaying, RefreshPlaybackStateWhilePlaying,
+        SwitchToNextSequence, SetSelectedSequenceIndex, UpdateBarLength,
+        UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
+        UpdateEvents, UpdateSequenceEvents, SetLoopEnabled, SetUsed,
+        SetTempoChangeEnabled, SetFirstLoopBarIndex, SetLastLoopBarIndex>;
 
     using MessagesThatInvalidatePlaybackStateWhileNotPlaying = std::variant<
         TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying,
         InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick, RemoveDoubles,
         UpdateTrackIndexOfAllEvents, UpdateEvent, FinalizeNonLiveNoteEvent,
-        SetSelectedSequenceIndex, SetLastBarIndex,
-        InsertBars, UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
-        UpdateTimeSignature, UpdateEvents,
-        UpdateSequenceEvents, SetLoopEnabled, SetUsed, SetTempoChangeEnabled,
-        SetFirstLoopBarIndex, SetLastLoopBarIndex>;
+        SetSelectedSequenceIndex, SetLastBarIndex, InsertBars, UpdateBarLength,
+        UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
+        UpdateEvents, UpdateSequenceEvents, SetLoopEnabled, SetUsed,
+        SetTempoChangeEnabled, SetFirstLoopBarIndex, SetLastLoopBarIndex>;
 
     using MessagesThatInvalidatePlaybackStateWhilePlaying =
-        std::variant<
-            TransportMessagesThatInvalidatePlaybackStateWhilePlaying,
-            InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+        std::variant<TransportMessagesThatInvalidatePlaybackStateWhilePlaying,
+                     InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, SwitchToNextSequence,
                      UpdateTimeSignature>;

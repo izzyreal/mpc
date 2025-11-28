@@ -1,11 +1,12 @@
 #include "sequencer/SequencerStateManager.hpp"
 
-#include "SequenceStateView.hpp"
-#include "Sequence.hpp"
-#include "Sequencer.hpp"
-#include "SequencerAudioMessage.hpp"
-#include "SequencerAudioStateManager.hpp"
-#include "Transport.hpp"
+#include "sequencer/SequenceStateView.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerAudioMessage.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
+#include "sequencer/Transport.hpp"
+#include "sequencer/TransportStateHandler.hpp"
 #include "sequencer/SequencerStateWorker.hpp"
 #include "utils/VariantUtils.hpp"
 
@@ -17,6 +18,8 @@ SequencerStateManager::SequencerStateManager(
     : AtomicStateExchange([](SequencerState &) {}),
       getSampleRate(getSampleRate), worker(worker), sequencer(sequencer)
 {
+    transportStateHandler =
+        std::make_unique<TransportStateHandler>(this, sequencer);
 }
 
 SequencerStateManager::~SequencerStateManager()

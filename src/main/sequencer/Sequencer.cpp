@@ -115,8 +115,8 @@ Sequencer::Sequencer(
     stateWorker = std::make_shared<SequencerStateWorker>(
         isCurrentScreen, isRecMainWithoutPlaying, this);
 
-    stateManager = std::make_shared<SequencerStateManager>(
-        getSampleRate, this, stateWorker.get());
+    stateManager = std::make_shared<SequencerStateManager>(getSampleRate, this,
+                                                           stateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -391,8 +391,7 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 
     const std::function getSnapshot = [this, sequenceIndex]
     {
-        return stateManager->getSnapshot().getSequenceState(
-            sequenceIndex);
+        return stateManager->getSnapshot().getSequenceState(sequenceIndex);
     };
 
     return std::make_shared<Sequence>(

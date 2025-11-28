@@ -6,6 +6,7 @@
 #include "concurrency/AtomicStateExchange.hpp"
 
 #include <functional>
+#include <memory>
 
 namespace mpc::sequencer
 {
@@ -33,6 +34,7 @@ namespace mpc::sequencer
         const std::function<SampleRate()> getSampleRate;
         SequencerStateWorker *worker;
         Sequencer *sequencer;
+        std::unique_ptr<TransportStateHandler> transportStateHandler;
 
         void applyInsertBars(const InsertBars &) noexcept;
         void applyCopyEvents(const CopyEvents &) noexcept;

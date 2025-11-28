@@ -13,19 +13,17 @@
 
 using namespace mpc::sequencer;
 
-TransportStateHandler::TransportStateHandler(SequencerStateManager *manager, Sequencer *sequencer)
+TransportStateHandler::TransportStateHandler(SequencerStateManager *manager,
+                                             Sequencer *sequencer)
     : manager(manager), sequencer(sequencer)
 {
 }
 
-TransportStateHandler::~TransportStateHandler()
-{
-}
+TransportStateHandler::~TransportStateHandler() {}
 
-void TransportStateHandler::applyMessage(
-    TransportState &state,
-    const TransportMessage &msg,
-    const bool autoRefreshPlaybackState)
+void TransportStateHandler::applyMessage(TransportState &state,
+                                         const TransportMessage &msg,
+                                         const bool autoRefreshPlaybackState)
 {
     std::visit(
         [&](auto &&m)
@@ -34,14 +32,12 @@ void TransportStateHandler::applyMessage(
 
             if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
             {
-                state.positionQuarterNotes =
-                    m.positionQuarterNotes;
+                state.positionQuarterNotes = m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T,
                                               SetPlayStartPositionQuarterNotes>)
             {
-                state.playStartPositionQuarterNotes =
-                    m.positionQuarterNotes;
+                state.playStartPositionQuarterNotes = m.positionQuarterNotes;
             }
             else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
             {
@@ -103,7 +99,8 @@ void TransportStateHandler::applyMessage(
                     {
                         manager->enqueue(Play{});
                     };
-                    manager->enqueue(RefreshPlaybackStateWhileNotPlaying{onComplete});
+                    manager->enqueue(
+                        RefreshPlaybackStateWhileNotPlaying{onComplete});
                 }
             }
             else if constexpr (std::is_same_v<T, UpdateCountEnabled>)
@@ -133,8 +130,7 @@ void TransportStateHandler::applyMessage(
 
         if (state.positionQuarterNotes >
                 playbackState.safeValidUntilQuarterNote ||
-            state.positionQuarterNotes <
-                playbackState.safeValidFromQuarterNote)
+            state.positionQuarterNotes < playbackState.safeValidFromQuarterNote)
         {
             manager->applyMessage(RefreshPlaybackStateWhileNotPlaying{});
         }
@@ -143,14 +139,16 @@ void TransportStateHandler::applyMessage(
     }
 
     if (isPlaying &&
-        isVariantAnyOf(msg, TransportMessagesThatInvalidatePlaybackStateWhilePlaying{}))
+        isVariantAnyOf(
+            msg, TransportMessagesThatInvalidatePlaybackStateWhilePlaying{}))
     {
         manager->publishState();
         manager->applyMessage(RefreshPlaybackStateWhilePlaying{});
     }
     else if (!isPlaying &&
              isVariantAnyOf(
-                 msg, TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying{}))
+                 msg,
+                 TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying{}))
     {
         manager->publishState();
         manager->applyMessage(RefreshPlaybackStateWhileNotPlaying{});
