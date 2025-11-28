@@ -2,8 +2,8 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "NonRtSequencerMessage.hpp"
-#include "NonRtSequencerStateView.hpp"
+#include "SequencerMessage.hpp"
+#include "SequencerStateView.hpp"
 
 #include <vector>
 #include <memory>
@@ -50,8 +50,8 @@ namespace mpc::sequencer
         };
 
         Sequence(SequenceIndex,
-                 const std::function<std::shared_ptr<NonRtSequenceStateView>()> &getSnapshotNonRt,
-                 const std::function<void(NonRtSequencerMessage &&)> &dispatchNonRt,
+                 const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
+                 const std::function<void(SequencerMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
                  std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
@@ -158,8 +158,8 @@ namespace mpc::sequencer
 
     private:
         SequenceIndex sequenceIndex;
-        const std::function<std::shared_ptr<NonRtSequenceStateView>()> getSnapshotNonRt;
-        const std::function<void(NonRtSequencerMessage &&)> dispatchNonRt;
+        const std::function<std::shared_ptr<SequenceStateView>()> getSnapshot;
+        const std::function<void(SequencerMessage &&)> dispatch;
         StartTime startTime{0, 0, 0, 0, 0};
 
         std::vector<std::shared_ptr<Track>> tracks;

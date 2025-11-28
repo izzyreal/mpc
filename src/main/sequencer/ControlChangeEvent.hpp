@@ -13,7 +13,7 @@ namespace mpc::sequencer
 
         explicit ControlChangeEvent(
             const std::function<EventState()> &getSnapshot,
-            const std::function<void(NonRtSequencerMessage &&)> &dispatch);
+            const std::function<void(SequencerMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

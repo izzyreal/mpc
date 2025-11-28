@@ -8,15 +8,15 @@
 
 namespace mpc::sequencer
 {
-    class NonRtTrackStateView;
-    struct NonRtSequenceState;
-    class NonRtSequenceStateView
+    class TrackStateView;
+    struct SequenceState;
+    class SequenceStateView
     {
     public:
-        explicit NonRtSequenceStateView(
-            const NonRtSequenceState &s) noexcept;
+        explicit SequenceStateView(
+            const SequenceState &s) noexcept;
 
-        std::shared_ptr<NonRtTrackStateView> getTrack(int trackIndex) const;
+        std::shared_ptr<TrackStateView> getTrack(int trackIndex) const;
         Tick getBarLength(int barIndex) const;
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> getTimeSignatures() const;
@@ -48,6 +48,6 @@ namespace mpc::sequencer
         bool isTempoChangeEnabled() const;
 
     private:
-        const NonRtSequenceState &state;
+        const SequenceState &state;
     };
 } // namespace mpc::sequencer

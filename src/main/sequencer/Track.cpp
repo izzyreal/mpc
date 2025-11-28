@@ -1,7 +1,7 @@
 #include "sequencer/Track.hpp"
 
 #include "EventStateToEventMapper.hpp"
-#include "NonRtTrackStateView.hpp"
+#include "TrackStateView.hpp"
 #include "sampler/Sampler.hpp"
 
 #include "sequencer/Bus.hpp"
@@ -26,8 +26,8 @@ using namespace mpc::lcdgui::screens::window;
 constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
-    const std::function<std::shared_ptr<NonRtTrackStateView>()> &getSnapshot,
-    const std::function<void(NonRtSequencerMessage&&)> &dispatch,
+    const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
+    const std::function<void(SequencerMessage&&)> &dispatch,
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,

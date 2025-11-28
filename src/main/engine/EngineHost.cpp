@@ -42,7 +42,7 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
 #include "sequencer/Song.hpp"
 
 #include <string>
@@ -165,9 +165,10 @@ void EngineHost::start()
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
+
 void EngineHost::applyPendingStateChanges() const
 {
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    mpc.getSequencer()->getAudioStateManager()->drainQueue();
     mpc.getPerformanceManager().lock()->drainQueue();
 }
 

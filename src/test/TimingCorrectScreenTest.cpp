@@ -6,7 +6,7 @@
 #include "sequencer/Track.hpp"
 #include "TestMpc.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
@@ -16,7 +16,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
 
     sequencer->getSelectedSequence()->init(1);
     stateManager->drainQueue();

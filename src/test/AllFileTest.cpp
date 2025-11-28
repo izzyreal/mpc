@@ -11,7 +11,7 @@
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file::all;
@@ -67,9 +67,9 @@ TEST_CASE("ALL file song", "[allfile]")
     auto sequencer = mpc.getSequencer();
 
     sequencer->getSequence(0)->init(1);
-    sequencer->getNonRtStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueue();
     sequencer->getSequence(1)->init(1);
-    sequencer->getNonRtStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueue();
 
     auto song = sequencer->getSong(0);
 
@@ -105,7 +105,7 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
-    mpc.getSequencer()->getNonRtStateManager()->drainQueue();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     seq->getTrack(60)->setUsed(false);
     seq->getTrack(60)->setOn(true);
     seq->getTrack(61)->setUsed(false);
@@ -138,10 +138,10 @@ TEST_CASE("ALL file note event", "[allfile]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSequence(0);
     seq->init(1);
-    sequencer->getNonRtStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueue();
     auto tr = seq->getTrack(63);
 
     auto e = tr->recordNoteEventNonLive(0, mpc::NoteNumber(60),
@@ -182,7 +182,7 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
-    mpc.getSequencer()->getNonRtStateManager()->drainQueue();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     seq->getTrack(60)->setDeviceIndex(1);
     seq->getTrack(61)->setDeviceIndex(2);
     seq->getTrack(62)->setDeviceIndex(3);

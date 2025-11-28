@@ -2,7 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
-#include "NonRtSequencerStateManager.hpp"
+#include "SequencerStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -395,7 +395,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
         const auto t2 = toSequence->getTrack(i);
 
-        sequencer->getNonRtStateManager()->drainQueue();
+        sequencer->getStateManager()->drainQueue();
 
         if (!t2->isUsed())
         {

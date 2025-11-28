@@ -9,7 +9,7 @@
 
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #include <vector>
 
@@ -27,7 +27,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
         auto sequencer = mpc.getSequencer();
-        auto stateManager = sequencer->getNonRtStateManager();
+        auto stateManager = sequencer->getStateManager();
         auto sequence = sequencer->getSequence(0);
         sequence->init(1);
         stateManager->drainQueue();

@@ -9,7 +9,7 @@
 
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -21,7 +21,7 @@ TEST_CASE("BARS1", "[bars-screen]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
@@ -75,7 +75,7 @@ TEST_CASE("BARS2", "[bars-screen]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NonRtSequencerState.hpp"
+#include "SequencerState.hpp"
 #include "PlaybackState.hpp"
 #include "sequencer/EventState.hpp"
 
@@ -9,13 +9,13 @@
 
 namespace mpc::sequencer
 {
-    struct NonRtSequencerState;
+    struct SequencerState;
 
-    class NonRtTrackStateView
+    class TrackStateView
     {
     public:
-        explicit NonRtTrackStateView(
-            const NonRtTrackState &s) noexcept;
+        explicit TrackStateView(
+            const TrackState &s) noexcept;
 
         std::optional<EventState> findNoteEvent(int tick,
                                                 NoteNumber note) const;
@@ -39,6 +39,6 @@ namespace mpc::sequencer
         EventState getEventById(EventId) const;
 
     private:
-        const NonRtTrackState &state;
+        const TrackState &state;
     };
 } // namespace mpc::sequencer

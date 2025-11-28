@@ -8,9 +8,9 @@
 #include "lcdgui/screens/EventsScreen.hpp"
 
 #include "sequencer/Event.hpp"
-#include "sequencer/NonRtSequenceStateView.hpp"
+#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -27,7 +27,7 @@ TEST_CASE("COPY1", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
@@ -91,7 +91,7 @@ TEST_CASE("COPY2", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
@@ -159,7 +159,7 @@ TEST_CASE("COPY3", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
@@ -234,7 +234,7 @@ TEST_CASE("COPY4", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(1);
     stateManager->drainQueue();
@@ -262,7 +262,7 @@ TEST_CASE("COPY4", "[events-screen]")
 
     stateManager->drainQueue();
 
-    auto seqSnapshot = stateManager->getSnapshot().getNonRtSequenceState(
+    auto seqSnapshot = stateManager->getSnapshot().getSequenceState(
         stateManager->getSnapshot().getSelectedSequenceIndex());
 
     REQUIRE(seqSnapshot->getLastTick() == 384 + 288 + 288 + 288);
@@ -283,7 +283,7 @@ TEST_CASE("COPY5", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
@@ -349,7 +349,7 @@ TEST_CASE("COPY6", "[events-screen]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();

@@ -1,8 +1,8 @@
 #include "Transport.hpp"
 
 #include "FloatTypes.hpp"
-#include "NonRtSequencerStateManager.hpp"
-#include "NonRtSequencerStateWorker.hpp"
+#include "SequencerStateManager.hpp"
+#include "SequencerStateWorker.hpp"
 #include "SeqUtil.hpp"
 #include "Sequencer.hpp"
 #include "hardware/Hardware.hpp"
@@ -36,18 +36,18 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && sequencer.getNonRtStateManager()->getSnapshot().isSequencerRunning();
+    return !metronomeOnlyEnabled && sequencer.getStateManager()->getSnapshot().isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
 {
     if (fromStart)
     {
-        sequencer.getNonRtStateManager()->enqueue(PlayFromStart{});
+        sequencer.getStateManager()->enqueue(PlayFromStart{});
     }
     else
     {
-        sequencer.getNonRtStateManager()->enqueue(Play{});
+        sequencer.getStateManager()->enqueue(Play{});
     }
 }
 
@@ -58,7 +58,7 @@ void Transport::rec() const
         return;
     }
 
-    sequencer.getNonRtStateManager()->enqueue(Record{});
+    sequencer.getStateManager()->enqueue(Record{});
 }
 
 void Transport::recFromStart() const
@@ -68,7 +68,7 @@ void Transport::recFromStart() const
         return;
     }
 
-    sequencer.getNonRtStateManager()->enqueue(RecordFromStart{});
+    sequencer.getStateManager()->enqueue(RecordFromStart{});
 }
 
 void Transport::overdub() const
@@ -78,7 +78,7 @@ void Transport::overdub() const
         return;
     }
 
-    sequencer.getNonRtStateManager()->enqueue(Overdub{});
+    sequencer.getStateManager()->enqueue(Overdub{});
 }
 
 void Transport::switchRecordToOverdub() const
@@ -104,12 +104,12 @@ void Transport::overdubFromStart() const
         return;
     }
 
-    sequencer.getNonRtStateManager()->enqueue(OverdubFromStart{});
+    sequencer.getStateManager()->enqueue(OverdubFromStart{});
 }
 
 void Transport::stop() const
 {
-    sequencer.getNonRtStateManager()->enqueue(Stop{});
+    sequencer.getStateManager()->enqueue(Stop{});
 }
 
 void Transport::resetCountInPositions()
@@ -120,12 +120,12 @@ void Transport::resetCountInPositions()
 
 void Transport::setRecording(const bool b) const
 {
-    sequencer.getNonRtStateManager()->enqueue(UpdateRecording{b});
+    sequencer.getStateManager()->enqueue(UpdateRecording{b});
 }
 
 void Transport::setOverdubbing(const bool b) const
 {
-    sequencer.getNonRtStateManager()->enqueue(UpdateOverdubbing{b});
+    sequencer.getStateManager()->enqueue(UpdateOverdubbing{b});
 }
 
 mpc::PositionQuarterNotes Transport::getWrappedPositionInSequence(
@@ -288,12 +288,12 @@ void Transport::moveSongToStepThatContainsPosition(
 
 void Transport::setCountEnabled(const bool b) const
 {
-    sequencer.getNonRtStateManager()->enqueue(UpdateCountEnabled{b});
+    sequencer.getStateManager()->enqueue(UpdateCountEnabled{b});
 }
 
 bool Transport::isCountEnabled() const
 {
-    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().countEnabled;
+    return sequencer.getStateManager()->getSnapshot().getTransportState().countEnabled;
 }
 
 void Transport::setCountingIn(const bool b)
@@ -313,24 +313,24 @@ bool Transport::isCountingIn() const
 
 void Transport::bumpPositionByTicks(const uint8_t tickCount) const
 {
-    sequencer.getNonRtStateManager()->enqueue(BumpPositionByTicks{tickCount});
+    sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
 }
 
 int Transport::getTickPosition() const
 {
-    return sequencer.getNonRtStateManager()->getSnapshot().getPositionTicks();
+    return sequencer.getStateManager()->getSnapshot().getPositionTicks();
 }
 
 double Transport::getPlayStartPositionQuarterNotes() const
 {
-    return sequencer.getNonRtStateManager()
+    return sequencer.getStateManager()
         ->getSnapshot()
         .getPlayStartPositionQuarterNotes();
 }
 
 double Transport::getPositionQuarterNotes() const
 {
-    return sequencer.getNonRtStateManager()
+    return sequencer.getStateManager()
         ->getSnapshot()
         .getPositionQuarterNotes();
 }
@@ -460,12 +460,12 @@ bool Transport::isRecordingOrOverdubbing() const
 
 bool Transport::isRecording() const
 {
-    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().recording;
+    return sequencer.getStateManager()->getSnapshot().getTransportState().recording;
 }
 
 bool Transport::isOverdubbing() const
 {
-    return sequencer.getNonRtStateManager()->getSnapshot().getTransportState().overdubbing;
+    return sequencer.getStateManager()->getSnapshot().getTransportState().overdubbing;
 }
 
 int Transport::getCurrentBarIndex() const
@@ -729,14 +729,14 @@ void Transport::setClock(int i) const
 
 void Transport::setPosition(const double positionQuarterNotes) const
 {
-    sequencer.getNonRtStateManager()->enqueue(
+    sequencer.getStateManager()->enqueue(
         SetPositionQuarterNotes{positionQuarterNotes});
 }
 
 void Transport::setPlayStartPosition(
     const double playStartPositionQuarterNotes) const
 {
-    sequencer.getNonRtStateManager()->enqueue(SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
+    sequencer.getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
 }
 
 void Transport::setTempo(double newTempo)

@@ -17,10 +17,10 @@
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
 
 #include "hardware/Component.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -35,7 +35,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
 
     auto pos = [&]
     {
@@ -111,7 +111,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 //
 //     auto seq = mpc.getSequencer();
 //     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//     seq->NonRtSequencerStateWorker->start();
+//     seq->SequencerStateWorker->start();
 //     seq->getTransport()->setCountEnabled(false);
 //
 //     auto sequence = seq->getSelectedSequence();
@@ -238,7 +238,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     sequencer->getTransport()->setTempo(121);
 
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
@@ -290,7 +290,7 @@ TEST_CASE("Undo", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     sequencer->getTransport()->setCountEnabled(false);
 
     auto timingCorrectScreen =

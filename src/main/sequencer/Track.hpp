@@ -2,8 +2,8 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "NonRtSequencerMessage.hpp"
-#include "NonRtSequencerStateView.hpp"
+#include "SequencerMessage.hpp"
+#include "SequencerStateView.hpp"
 
 #include "sequencer/EventState.hpp"
 
@@ -45,8 +45,8 @@ namespace mpc::sequencer
     {
     public:
         Track(
-            const std::function<std::shared_ptr<NonRtTrackStateView>()> &getSnapshot,
-            const std::function<void(NonRtSequencerMessage&&)> &dispatch,
+            const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
+            const std::function<void(SequencerMessage&&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -156,8 +156,8 @@ namespace mpc::sequencer
 
     private:
         EventId nextEventId = MinEventId;
-        std::function<std::shared_ptr<NonRtTrackStateView>()> getSnapshot;
-        std::function<void(NonRtSequencerMessage &&)> dispatch;
+        std::function<std::shared_ptr<TrackStateView>()> getSnapshot;
+        std::function<void(SequencerMessage &&)> dispatch;
         BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};

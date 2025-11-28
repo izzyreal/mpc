@@ -19,7 +19,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -693,5 +693,5 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         copyEvents.sourceNoteRange = NoteRange(copyNote0, copyNote1);
     }
 
-    seq->getNonRtStateManager()->enqueue(copyEvents);
+    seq->getStateManager()->enqueue(copyEvents);
 }

@@ -14,14 +14,14 @@ namespace mpc::sequencer
 
     class Sequencer;
 
-    class NonRtSequencerStateWorker
+    class SequencerStateWorker
     {
     public:
-        explicit NonRtSequencerStateWorker(
+        explicit SequencerStateWorker(
             const std::function<bool(std::initializer_list<lcdgui::ScreenId>)> &isCurrentScreen,
             const std::function<bool()>& isRecMainWithoutPlaying,
             Sequencer *);
-        ~NonRtSequencerStateWorker();
+        ~SequencerStateWorker();
 
         void start();
         void stop();

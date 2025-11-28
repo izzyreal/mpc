@@ -41,7 +41,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
-#include "sequencer/NonRtSequencerStateWorker.hpp"
+#include "sequencer/SequencerStateWorker.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

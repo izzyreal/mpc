@@ -35,7 +35,7 @@
 #include <string>
 
 #include "Logger.hpp"
-#include "sequencer/NonRtSequencerStateWorker.hpp"
+#include "sequencer/SequencerStateWorker.hpp"
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -229,7 +229,7 @@ void Mpc::init()
 
     startMidiDeviceDetector();
     getEngineHost()->getAudioServer()->start();
-    sequencer->getNonRtSequencerStateWorker()->start();
+    sequencer->getSequencerStateWorker()->start();
 }
 
 std::shared_ptr<Hardware> Mpc::getHardware()

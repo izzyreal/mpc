@@ -42,9 +42,9 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
-    class NonRtSequencerStateManager;
     class SequencerStateManager;
-    class NonRtSequencerStateWorker;
+    class SequencerAudioStateManager;
+    class SequencerStateWorker;
     class Transport;
     class Sequence;
     class Bus;
@@ -118,8 +118,8 @@ namespace mpc::sequencer
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
-        std::shared_ptr<NonRtSequencerStateWorker>
-        getNonRtSequencerStateWorker() const;
+        std::shared_ptr<SequencerStateWorker>
+        getSequencerStateWorker() const;
 
         const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
             getSequencerPlaybackEngine;
@@ -133,7 +133,7 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
 
-        std::shared_ptr<SequencerStateManager> stateManager;
+        std::shared_ptr<SequencerAudioStateManager> stateManager;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
 
@@ -144,8 +144,8 @@ namespace mpc::sequencer
             std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
-        std::shared_ptr<NonRtSequencerStateManager> nonRtSequencerStateManager;
-        std::shared_ptr<NonRtSequencerStateWorker> nonRtSequencerStateWorker;
+        std::shared_ptr<SequencerStateManager> nonRtSequencerStateManager;
+        std::shared_ptr<SequencerStateWorker> nonRtSequencerStateWorker;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
@@ -179,9 +179,9 @@ namespace mpc::sequencer
         static void copyTrackParameters(const std::shared_ptr<Track> &source,
                                         const std::shared_ptr<Track> &dest);
 
-        std::shared_ptr<SequencerStateManager> getStateManager() const;
-        std::shared_ptr<NonRtSequencerStateManager>
-        getNonRtStateManager() const;
+        std::shared_ptr<SequencerAudioStateManager> getAudioStateManager() const;
+        std::shared_ptr<SequencerStateManager>
+        getStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
         std::shared_ptr<Sequence> makeNewSequence(SequenceIndex sequenceIndex);

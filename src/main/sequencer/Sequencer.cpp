@@ -2,7 +2,7 @@
 
 #include "MpcSpecs.hpp"
 
-#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
@@ -28,8 +28,8 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
-#include "NonRtSequencerStateManager.hpp"
-#include "NonRtSequencerStateWorker.hpp"
+#include "SequencerStateManager.hpp"
+#include "SequencerStateWorker.hpp"
 #include "SeqUtil.hpp"
 
 #include <chrono>
@@ -93,7 +93,7 @@ Sequencer::Sequencer(
       performanceManager(performanceManager), sampler(sampler),
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
-    stateManager = std::make_shared<SequencerStateManager>(this);
+    stateManager = std::make_shared<SequencerAudioStateManager>(this);
 
     const auto isCurrentScreen = [this](const std::initializer_list<ScreenId> &ids)
     {
@@ -112,9 +112,9 @@ Sequencer::Sequencer(
     };
 
     nonRtSequencerStateWorker =
-        std::make_shared<NonRtSequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
+        std::make_shared<SequencerStateWorker>(isCurrentScreen, isRecMainWithoutPlaying, this);
 
-    nonRtSequencerStateManager = std::make_shared<NonRtSequencerStateManager>(getSampleRate, this, nonRtSequencerStateWorker.get());
+    nonRtSequencerStateManager = std::make_shared<SequencerStateManager>(getSampleRate, this, nonRtSequencerStateWorker.get());
 }
 
 Sequencer::~Sequencer()
@@ -122,13 +122,13 @@ Sequencer::~Sequencer()
     printf("~Sequencer\n");
 }
 
-std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
+std::shared_ptr<SequencerAudioStateManager> Sequencer::getAudioStateManager() const
 {
     return stateManager;
 }
 
-std::shared_ptr<NonRtSequencerStateManager>
-Sequencer::getNonRtStateManager() const
+std::shared_ptr<SequencerStateManager>
+Sequencer::getStateManager() const
 {
     return nonRtSequencerStateManager;
 }
@@ -237,8 +237,8 @@ std::shared_ptr<EventHandler> Sequencer::getEventHandler()
     return eventHandler;
 }
 
-std::shared_ptr<NonRtSequencerStateWorker>
-Sequencer::getNonRtSequencerStateWorker() const
+std::shared_ptr<SequencerStateWorker>
+Sequencer::getSequencerStateWorker() const
 {
     return nonRtSequencerStateWorker;
 }
@@ -383,19 +383,19 @@ void Sequencer::purgeAllSequences()
 std::shared_ptr<Sequence>
 Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 {
-    const std::function dispatchNonRt = [this](NonRtSequencerMessage &&m)
+    const std::function dispatch = [this](SequencerMessage &&m)
     {
         nonRtSequencerStateManager->enqueue(std::move(m));
     };
 
-    const std::function getSnapshotNonRt = [this, sequenceIndex]
+    const std::function getSnapshot = [this, sequenceIndex]
     {
-        return nonRtSequencerStateManager->getSnapshot().getNonRtSequenceState(
+        return nonRtSequencerStateManager->getSnapshot().getSequenceState(
             sequenceIndex);
     };
 
     return std::make_shared<Sequence>(
-        sequenceIndex, getSnapshotNonRt, dispatchNonRt,
+        sequenceIndex, getSnapshot, dispatch,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];

@@ -7,7 +7,7 @@
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -18,7 +18,7 @@ TEST_CASE("timing-correct", "[track]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
 
     auto seq = sequencer->getSequence(0);
     seq->init(0);
@@ -73,7 +73,7 @@ TEST_CASE("swing1", "[track]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSequence(0);
     seq->init(0);
     stateManager->drainQueue();
@@ -113,7 +113,7 @@ TEST_CASE("quantize", "[track]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSequence(0);
     seq->init(0);
     stateManager->drainQueue();

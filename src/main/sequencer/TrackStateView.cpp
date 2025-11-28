@@ -1,17 +1,17 @@
-#include "sequencer/NonRtTrackStateView.hpp"
+#include "sequencer/TrackStateView.hpp"
 
 #include "Sequencer.hpp"
-#include "sequencer/NonRtSequencerState.hpp"
+#include "sequencer/SequencerState.hpp"
 
 using namespace mpc::sequencer;
 
-NonRtTrackStateView::NonRtTrackStateView(const NonRtTrackState &s) noexcept
+TrackStateView::TrackStateView(const TrackState &s) noexcept
 : state(s)
 {
 }
 
 std::optional<EventState>
-NonRtTrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
+TrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
 {
     for (int i = 0; i < state.events.size(); ++i)
     {
@@ -26,7 +26,7 @@ NonRtTrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
     return std::nullopt;
 }
 
-EventState NonRtTrackStateView::getEventByIndex(const EventIndex idx) const
+EventState TrackStateView::getEventByIndex(const EventIndex idx) const
 {
     if (idx >= 0 && idx < state.events.size())
     {
@@ -36,7 +36,7 @@ EventState NonRtTrackStateView::getEventByIndex(const EventIndex idx) const
 }
 
 std::vector<EventState>
-NonRtTrackStateView::getEventRange(const int startTick, const int endTick) const
+TrackStateView::getEventRange(const int startTick, const int endTick) const
 {
     std::vector<EventState> result;
 
@@ -56,17 +56,17 @@ NonRtTrackStateView::getEventRange(const int startTick, const int endTick) const
     return result;
 }
 
-bool NonRtTrackStateView::isEventsEmpty() const
+bool TrackStateView::isEventsEmpty() const
 {
     return state.events.empty();
 }
 
-int NonRtTrackStateView::getEventCount() const
+int TrackStateView::getEventCount() const
 {
     return state.events.size();
 }
 
-std::vector<EventState> NonRtTrackStateView::getNoteEvents() const
+std::vector<EventState> TrackStateView::getNoteEvents() const
 {
     std::vector<EventState> result;
 
@@ -81,11 +81,11 @@ std::vector<EventState> NonRtTrackStateView::getNoteEvents() const
     return result;
 }
 
-std::vector<EventState> NonRtTrackStateView::getEvents() const {
+std::vector<EventState> TrackStateView::getEvents() const {
     return state.events;
 }
 
-EventState NonRtTrackStateView::findRecordingNoteOnByNoteNumber(
+EventState TrackStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
     for (auto &e : getNoteEvents())
@@ -98,7 +98,7 @@ EventState NonRtTrackStateView::findRecordingNoteOnByNoteNumber(
     return {};
 }
 
-EventState NonRtTrackStateView::findRecordingNoteOnByNoteEventId(
+EventState TrackStateView::findRecordingNoteOnByNoteEventId(
     const NoteEventId id) const
 {
     for (const auto &e : getNoteEvents())
@@ -111,7 +111,7 @@ EventState NonRtTrackStateView::findRecordingNoteOnByNoteEventId(
     return {};
 }
 
-EventState NonRtTrackStateView::getEventById(const EventId eventId) const
+EventState TrackStateView::getEventById(const EventId eventId) const
 {
     for (auto &e : state.events)
     {

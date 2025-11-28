@@ -7,7 +7,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 #include "sequencer/Event.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
@@ -18,7 +18,7 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();

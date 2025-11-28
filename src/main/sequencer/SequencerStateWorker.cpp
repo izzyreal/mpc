@@ -1,11 +1,11 @@
-#include "sequencer/NonRtSequencerStateWorker.hpp"
+#include "sequencer/SequencerStateWorker.hpp"
 
 #include "Event.hpp"
 #include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "Track.hpp"
-#include "NonRtSequencerStateManager.hpp"
 #include "SequencerStateManager.hpp"
+#include "SequencerAudioStateManager.hpp"
 #include "TimeSignature.hpp"
 #include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
@@ -16,7 +16,7 @@
 
 using namespace mpc::sequencer;
 
-NonRtSequencerStateWorker::NonRtSequencerStateWorker(
+SequencerStateWorker::SequencerStateWorker(
     const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
         &isCurrentScreen,
     const std::function<bool()> &isRecMainWithoutPlaying, Sequencer *sequencer)
@@ -25,7 +25,7 @@ NonRtSequencerStateWorker::NonRtSequencerStateWorker(
 {
 }
 
-NonRtSequencerStateWorker::~NonRtSequencerStateWorker()
+SequencerStateWorker::~SequencerStateWorker()
 {
     stop();
 
@@ -35,7 +35,7 @@ NonRtSequencerStateWorker::~NonRtSequencerStateWorker()
     }
 }
 
-void NonRtSequencerStateWorker::start()
+void SequencerStateWorker::start()
 {
     if (running.load())
     {
@@ -60,7 +60,7 @@ void NonRtSequencerStateWorker::start()
         });
 }
 
-void NonRtSequencerStateWorker::stop()
+void SequencerStateWorker::stop()
 {
     if (!running.load())
     {
@@ -70,7 +70,7 @@ void NonRtSequencerStateWorker::stop()
     running.store(false);
 }
 
-void NonRtSequencerStateWorker::stopAndWaitUntilStopped()
+void SequencerStateWorker::stopAndWaitUntilStopped()
 {
     stop();
 
@@ -80,13 +80,13 @@ void NonRtSequencerStateWorker::stopAndWaitUntilStopped()
     }
 }
 
-void NonRtSequencerStateWorker::work() const
+void SequencerStateWorker::work() const
 {
-    const auto snapshot = sequencer->getNonRtStateManager()->getSnapshot();
+    const auto snapshot = sequencer->getStateManager()->getSnapshot();
     const auto playbackState = snapshot.getPlaybackState();
 
     const auto currentTimeInSamples =
-        sequencer->getStateManager()->getSnapshot().getTimeInSamples();
+        sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
 
     bool snapshotIsInvalid = false;
 
@@ -105,10 +105,10 @@ void NonRtSequencerStateWorker::work() const
                              currentTimeInSamples, onComplete);
     }
 
-    sequencer->getNonRtStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueue();
 }
 
-void NonRtSequencerStateWorker::refreshPlaybackState(
+void SequencerStateWorker::refreshPlaybackState(
     const PositionQuarterNotes playOffset, const TimeInSamples timeInSamples,
     const std::function<void()> &onComplete) const
 {
@@ -117,7 +117,7 @@ void NonRtSequencerStateWorker::refreshPlaybackState(
     if (timeInSamplesToUse == CurrentTimeInSamples)
     {
         timeInSamplesToUse =
-            sequencer->getStateManager()->getSnapshot().getTimeInSamples();
+            sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
         // printf("Time in samples to use: %i\n", timeInSamplesToUse);
     }
 
@@ -127,11 +127,11 @@ void NonRtSequencerStateWorker::refreshPlaybackState(
     const auto playbackState = renderPlaybackState(
         SampleRate(sampleRate), playOffset, timeInSamplesToUse);
 
-    sequencer->getNonRtStateManager()->enqueue(
+    sequencer->getStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState), onComplete});
 }
 
-Sequencer *NonRtSequencerStateWorker::getSequencer() const
+Sequencer *SequencerStateWorker::getSequencer() const
 {
     return sequencer;
 }
@@ -310,7 +310,7 @@ void computeSafeValidity(RenderContext& renderCtx,
         Sequencer::ticksToQuarterNotes(fromTick);
 }
 
-PlaybackState NonRtSequencerStateWorker::renderPlaybackState(
+PlaybackState SequencerStateWorker::renderPlaybackState(
     const SampleRate sampleRate, const PositionQuarterNotes playOffset,
     const TimeInSamples currentTime) const
 {

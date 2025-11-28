@@ -1,12 +1,16 @@
 #pragma once
 
-#include "IntTypes.hpp"
+#include "SequencerState.hpp"
+#include "PlaybackState.hpp"
 
 #include <memory>
-#include <cstdint>
+#include <vector>
 
 namespace mpc::sequencer
 {
+    class TrackStateView;
+    class SequenceStateView;
+
     struct SequencerState;
 
     class SequencerStateView
@@ -15,7 +19,23 @@ namespace mpc::sequencer
         explicit SequencerStateView(
             const std::shared_ptr<const SequencerState> &s) noexcept;
 
-        TimeInSamples getTimeInSamples() const noexcept;
+        PlaybackState getPlaybackState() const;
+
+        std::shared_ptr<SequenceStateView> getSequenceState(SequenceIndex) const;
+
+        std::shared_ptr<TrackStateView> getTrackState(SequenceIndex, TrackIndex) const;
+
+        SequenceIndex getSelectedSequenceIndex() const noexcept;
+
+        double getPositionQuarterNotes() const;
+
+        double getPlayStartPositionQuarterNotes() const;
+
+        int64_t getPositionTicks() const;
+
+        bool isSequencerRunning() const;
+
+        TransportState getTransportState() const;
 
     private:
         const std::shared_ptr<const SequencerState> state;

@@ -11,16 +11,16 @@
 #include "ProgramChangeEvent.hpp"
 #include "SystemExclusiveEvent.hpp"
 #include "TempoChangeEvent.hpp"
-#include "NonRtSequencerStateManager.hpp"
-#include "NonRtTrackStateView.hpp"
+#include "SequencerStateManager.hpp"
+#include "TrackStateView.hpp"
 
 namespace mpc::sequencer
 {
-    class NonRtSequencerStateManager;
+    class SequencerStateManager;
     std::shared_ptr<Event> mapEventStateToEvent(
-        std::function<std::shared_ptr<NonRtTrackStateView>()> getTrackSnapshot,
+        std::function<std::shared_ptr<TrackStateView>()> getTrackSnapshot,
         const EventState &e,
-        const std::function<void(NonRtSequencerMessage &&)> &dispatch,
+        const std::function<void(SequencerMessage &&)> &dispatch,
         Sequence *parent)
     {
         auto getEventSnapshot = [eventId = e.eventId, getTrackSnapshot]

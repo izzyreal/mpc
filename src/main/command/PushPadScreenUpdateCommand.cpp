@@ -7,11 +7,11 @@
 #include "lcdgui/screens/NextSeqPadScreen.hpp"
 #include "lcdgui/screens/TrMuteScreen.hpp"
 #include "sampler/Program.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequencerMessage.hpp"
-#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/SequencerAudioMessage.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 #include <memory>
@@ -97,7 +97,7 @@ void PushPadScreenUpdateCommand::execute()
                 return;
             }
 
-            ctx.sequencer->getNonRtStateManager()->enqueue(
+            ctx.sequencer->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{padIndexWithBank});
             return;
         }

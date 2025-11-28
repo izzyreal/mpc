@@ -8,7 +8,7 @@ EmptyEvent::EmptyEvent()
           {
               return EventState();
           },
-          [](NonRtSequencerMessage &&) {})
+          [](SequencerMessage &&) {})
 {
     // very empty indeed.
 }

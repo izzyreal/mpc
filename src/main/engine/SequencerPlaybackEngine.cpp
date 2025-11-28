@@ -7,13 +7,13 @@
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/SequencerAudioStateManager.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 #include "sequencer/MidiClockOutput.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include <concurrentqueue.h>
@@ -88,13 +88,13 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
 
-    const auto nonRtSnapshot = sequencer->getNonRtStateManager()->getSnapshot();
+    const auto nonRtSnapshot = sequencer->getStateManager()->getSnapshot();
 
     const auto playbackState =
         nonRtSnapshot.getPlaybackState();
 
     const bool sequencerIsRunningAtStartOfBuffer = nonRtSnapshot.isSequencerRunning();
-    const auto currentTimeInSamplesAtStartOfBuffer = sequencer->getStateManager()->getSnapshot().getTimeInSamples();
+    const auto currentTimeInSamplesAtStartOfBuffer = sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
 
     for (int i = 0; i < nFrames; ++i)
     {
@@ -105,14 +105,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
     {
         if (currentTimeInSamplesAtStartOfBuffer != 0)
         {
-            sequencer->getStateManager()->enqueue(SetTimeInSamples{0});
+            sequencer->getAudioStateManager()->enqueue(SetTimeInSamples{0});
             sequencer->getStateManager()->drainQueue();
-            sequencer->getNonRtStateManager()->enqueue(RefreshPlaybackStateWhileNotPlaying{});
+            sequencer->getStateManager()->enqueue(RefreshPlaybackStateWhileNotPlaying{});
         }
         return;
     }
 
-    sequencer->getStateManager()->enqueue(SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer +
+    sequencer->getAudioStateManager()->enqueue(SetTimeInSamples{currentTimeInSamplesAtStartOfBuffer +
                                nFrames});
     sequencer->getStateManager()->drainQueue();
 

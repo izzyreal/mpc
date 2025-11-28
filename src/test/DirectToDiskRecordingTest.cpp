@@ -11,7 +11,7 @@
 #include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
-#include "sequencer/NonRtSequencerStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #include <thread>
 
@@ -46,7 +46,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
         ->setSoundIndex(0);
 
     auto sequencer = mpc.getSequencer();
-    auto stateManager = sequencer->getNonRtStateManager();
+    auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSelectedSequence();
     seq->init(1);
     stateManager->drainQueue();
