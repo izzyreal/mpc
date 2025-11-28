@@ -12,7 +12,7 @@ namespace mpc::sequencer
     public:
         NoteRange() {}
         NoteRange(const int startToUse, const int endToUse)
-            : start(startToUse), end(endToUse)
+            : start(NoteNumber(startToUse)), end(NoteNumber(endToUse))
         {
         }
 
