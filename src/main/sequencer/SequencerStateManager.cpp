@@ -65,7 +65,7 @@ void SequencerStateManager::myApplyMessage(
         [&](const RefreshPlaybackStateWhilePlaying &m)
         {
             worker->refreshPlaybackState(
-                activeState.transport.positionQuarterNotes,
+                activeState.transport.playStartPositionQuarterNotes,
                 CurrentTimeInSamples, m.onComplete);
         },
         [&](const UpdatePlaybackState &m)

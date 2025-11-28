@@ -146,15 +146,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto sampleRate = getSampleRate();
     const double tickCountForThisBuffer =
         SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
-    const double quarterNoteCountForThisBuffer =
-        Sequencer::ticksToQuarterNotes(tickCountForThisBuffer);
-    const auto unwrappedPosition =
-        sequencer->getTransport()->getPositionQuarterNotes() +
-        quarterNoteCountForThisBuffer;
-    const auto wrappedPosition =
-        sequencer->getTransport()->getWrappedPositionInSequence(
-            unwrappedPosition);
-    sequencer->getTransport()->setPosition(wrappedPosition);
+    sequencer->getTransport()->bumpPositionByTicks(tickCountForThisBuffer);
 }
 
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const

@@ -156,7 +156,7 @@ namespace mpc::sequencer
         SetTempoChangeEnabled, SetFirstLoopBarIndex, SetLastLoopBarIndex>;
 
     using SequenceMessagesThatInvalidatePlaybackStateWhileNotPlaying =
-        std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+        std::variant<InsertEvent, /*ClearEvents, */RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, SetLastBarIndex, InsertBars,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,

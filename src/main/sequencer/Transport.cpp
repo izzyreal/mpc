@@ -315,7 +315,7 @@ bool Transport::isCountingIn() const
     return countingIn;
 }
 
-void Transport::bumpPositionByTicks(const uint8_t tickCount) const
+void Transport::bumpPositionByTicks(const double tickCount) const
 {
     sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
 }

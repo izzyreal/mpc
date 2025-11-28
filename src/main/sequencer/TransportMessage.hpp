@@ -17,7 +17,7 @@ namespace mpc::sequencer
 
     struct BumpPositionByTicks
     {
-        uint8_t ticks;
+        double ticks;
     };
 
     struct Stop

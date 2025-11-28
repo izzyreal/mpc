@@ -50,7 +50,7 @@ namespace mpc::sequencer
 
         void setPlayStartPosition(PositionQuarterNotes) const;
 
-        void bumpPositionByTicks(uint8_t tickCount) const;
+        void bumpPositionByTicks(double tickCount) const;
 
         bool isPlaying() const;
         bool isRecording() const;

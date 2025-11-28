@@ -266,6 +266,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                                 ls.lock()->setFocus("nextsq");
                             }
                         }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequence()->getBarCount();
+                        },
+                        [&](auto)
+                        {
+                            displayBars();
+                        }});
 }
 
 void SequencerScreen::open()

@@ -323,7 +323,7 @@ void SequenceStateHandler::applyMessage(
 
                 auto &sequence = state.sequences[m.sequenceIndex];
 
-                for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
+                for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
                 {
                     sequence.tracks[i].events.clear();
                 }

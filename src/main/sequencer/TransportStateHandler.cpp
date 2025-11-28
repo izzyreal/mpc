@@ -293,6 +293,7 @@ void TransportStateHandler::applyPlayMessage(
         //     }
         // }
 
+        state.playStartPositionQuarterNotes = state.positionQuarterNotes;
         state.sequencerRunning = true;
     }
 }
