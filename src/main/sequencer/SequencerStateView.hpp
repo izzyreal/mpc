@@ -1,7 +1,8 @@
 #pragma once
 
-#include "SequencerState.hpp"
-#include "PlaybackState.hpp"
+#include "sequencer/TransportStateView.hpp"
+#include "sequencer/SequencerState.hpp"
+#include "sequencer/PlaybackState.hpp"
 
 #include <memory>
 #include <vector>
@@ -29,15 +30,7 @@ namespace mpc::sequencer
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
 
-        double getPositionQuarterNotes() const;
-
-        double getPlayStartPositionQuarterNotes() const;
-
-        int64_t getPositionTicks() const;
-
-        bool isSequencerRunning() const;
-
-        TransportState getTransportState() const;
+        TransportStateView getTransportState() const;
 
     private:
         const std::shared_ptr<const SequencerState> state;

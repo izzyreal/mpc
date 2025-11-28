@@ -83,6 +83,7 @@ void SequencerStateWorker::stopAndWaitUntilStopped()
 void SequencerStateWorker::work() const
 {
     const auto snapshot = sequencer->getStateManager()->getSnapshot();
+    const auto transportState = snapshot.getTransportState();
     const auto playbackState = snapshot.getPlaybackState();
 
     const auto currentTimeInSamples =
@@ -90,7 +91,7 @@ void SequencerStateWorker::work() const
 
     bool snapshotIsInvalid = false;
 
-    if (snapshot.getPositionQuarterNotes() != NoPositionQuarterNotes &&
+    if (transportState.getPositionQuarterNotes() != NoPositionQuarterNotes &&
         currentTimeInSamples >
             snapshot.getPlaybackState().strictValidUntilTimeInSamples -
                 playbackStateValiditySafetyMarginTimeInSamples)

@@ -88,12 +88,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
 
-    const auto nonRtSnapshot = sequencer->getStateManager()->getSnapshot();
+    const auto sequencerState = sequencer->getStateManager()->getSnapshot();
+    const auto transportState =
+        sequencer->getStateManager()->getSnapshot().getTransportState();
 
-    const auto playbackState = nonRtSnapshot.getPlaybackState();
+    const auto playbackState = sequencerState.getPlaybackState();
 
     const bool sequencerIsRunningAtStartOfBuffer =
-        nonRtSnapshot.isSequencerRunning();
+        transportState.isSequencerRunning();
     const auto currentTimeInSamplesAtStartOfBuffer =
         sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
 

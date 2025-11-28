@@ -36,8 +36,10 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled &&
-           sequencer.getStateManager()->getSnapshot().isSequencerRunning();
+    return !metronomeOnlyEnabled && sequencer.getStateManager()
+                                        ->getSnapshot()
+                                        .getTransportState()
+                                        .isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
@@ -295,7 +297,7 @@ bool Transport::isCountEnabled() const
     return sequencer.getStateManager()
         ->getSnapshot()
         .getTransportState()
-        .countEnabled;
+        .isCountEnabled();
 }
 
 void Transport::setCountingIn(const bool b)
@@ -320,19 +322,26 @@ void Transport::bumpPositionByTicks(const uint8_t tickCount) const
 
 int Transport::getTickPosition() const
 {
-    return sequencer.getStateManager()->getSnapshot().getPositionTicks();
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportState()
+        .getPositionTicks();
 }
 
 double Transport::getPlayStartPositionQuarterNotes() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
+        .getTransportState()
         .getPlayStartPositionQuarterNotes();
 }
 
 double Transport::getPositionQuarterNotes() const
 {
-    return sequencer.getStateManager()->getSnapshot().getPositionQuarterNotes();
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportState()
+        .getPositionQuarterNotes();
 }
 
 void Transport::playMetronomeTrack()
@@ -463,7 +472,7 @@ bool Transport::isRecording() const
     return sequencer.getStateManager()
         ->getSnapshot()
         .getTransportState()
-        .recording;
+        .isRecording();
 }
 
 bool Transport::isOverdubbing() const
@@ -471,7 +480,7 @@ bool Transport::isOverdubbing() const
     return sequencer.getStateManager()
         ->getSnapshot()
         .getTransportState()
-        .overdubbing;
+        .isOverdubbing();
 }
 
 int Transport::getCurrentBarIndex() const
