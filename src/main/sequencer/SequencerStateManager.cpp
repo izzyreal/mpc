@@ -6,10 +6,8 @@
 #include "SequencerAudioMessage.hpp"
 #include "SequencerAudioStateManager.hpp"
 #include "Transport.hpp"
-#include "lcdgui/Screens.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
-#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "sequencer/SequencerStateWorker.hpp"
+#include "utils/VariantUtils.hpp"
 
 using namespace mpc::sequencer;
 
@@ -30,21 +28,14 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
     myApplyMessage(msg);
 }
 
-template <typename V, typename... Ts>
-bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
-{
-    return std::visit(
-        [](auto const &x)
-        {
-            using X = std::decay_t<decltype(x)>;
-            return ((std::is_same_v<X, Ts>) || ...);
-        },
-        v);
-}
-
 void SequencerStateManager::myApplyMessage(
     const SequencerMessage &msg, const bool autoRefreshPlaybackState) noexcept
 {
+    if (isVariantAnyOf(msg, TransportMessage{}))
+    {
+        return;
+    }
+
     std::visit(
         [&](auto &&m)
         {
@@ -310,25 +301,6 @@ void SequencerStateManager::myApplyMessage(
                 assert(it != events.end());
                 events.erase(it);
             }
-            else if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
-            {
-                // printf("Applying SetPositionQuarterNotes\n");
-                activeState.transport.positionQuarterNotes =
-                    m.positionQuarterNotes;
-            }
-            else if constexpr (std::is_same_v<T,
-                                              SetPlayStartPositionQuarterNotes>)
-            {
-                // printf("Applying SetPlayStartPositionQuarterNotes\n");
-                activeState.transport.playStartPositionQuarterNotes =
-                    m.positionQuarterNotes;
-            }
-            else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
-            {
-                // printf("Applying BumpPositionByTicks\n");
-                const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
-                activeState.transport.positionQuarterNotes += delta;
-            }
             else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
             {
                 // printf("Applying SwitchToNextSequence\n");
@@ -346,70 +318,6 @@ void SequencerStateManager::myApplyMessage(
                 {
                     activeState.transport.positionQuarterNotes = 0;
                 }
-            }
-            else if constexpr (std::is_same_v<T, Stop>)
-            {
-                // printf("Applying Stop\n");
-                applyStopMessage();
-            }
-            else if constexpr (std::is_same_v<T, Play>)
-            {
-                // printf("Applying Play\n");
-                applyPlayMessage();
-            }
-            else if constexpr (std::is_same_v<T, Record>)
-            {
-                activeState.transport.recording = true;
-                applyMessage(Play{});
-            }
-            else if constexpr (std::is_same_v<T, RecordFromStart>)
-            {
-                activeState.transport.recording = true;
-                applyMessage(PlayFromStart{});
-            }
-            else if constexpr (std::is_same_v<T, Overdub>)
-            {
-                activeState.transport.overdubbing = true;
-                applyMessage(Play{});
-            }
-            else if constexpr (std::is_same_v<T, OverdubFromStart>)
-            {
-                activeState.transport.overdubbing = true;
-                applyMessage(PlayFromStart{});
-            }
-            else if constexpr (std::is_same_v<T, UpdateRecording>)
-            {
-                activeState.transport.recording = m.recording;
-            }
-            else if constexpr (std::is_same_v<T, UpdateOverdubbing>)
-            {
-                activeState.transport.overdubbing = m.overdubbing;
-            }
-            else if constexpr (std::is_same_v<T, SwitchRecordToOverdub>)
-            {
-                activeState.transport.recording = false;
-                activeState.transport.overdubbing = true;
-                applyMessage(Play{});
-            }
-            else if constexpr (std::is_same_v<T, PlayFromStart>)
-            {
-                if (activeState.transport.positionQuarterNotes == 0)
-                {
-                    applyMessage(Play{});
-                }
-                else
-                {
-                    activeState.transport.positionQuarterNotes = 0;
-                    auto onComplete = [this]
-                    {
-                        enqueue(Play{});
-                    };
-                    enqueue(RefreshPlaybackStateWhileNotPlaying{onComplete});
-                }
-            }
-            else if constexpr (std::is_same_v<T, UpdateCountEnabled>)
-            {
-                activeState.transport.countEnabled = m.enabled;
             }
             else if constexpr (std::is_same_v<T, UpdateBarLength>)
             {
@@ -504,26 +412,6 @@ void SequencerStateManager::myApplyMessage(
     const auto playbackState =
         sequencer->getStateManager()->getSnapshot().getPlaybackState();
 
-    if (std::holds_alternative<SetPositionQuarterNotes>(msg))
-    {
-        if (isPlaying)
-        {
-            return;
-        }
-
-        publishState();
-
-        if (activeState.transport.positionQuarterNotes >
-                playbackState.safeValidUntilQuarterNote ||
-            activeState.transport.positionQuarterNotes <
-                playbackState.safeValidFromQuarterNote)
-        {
-            applyMessage(RefreshPlaybackStateWhileNotPlaying{});
-        }
-
-        return;
-    }
-
     if (isPlaying &&
         isVariantAnyOf(msg, MessagesThatInvalidatePlaybackStateWhilePlaying{}))
     {
@@ -537,213 +425,6 @@ void SequencerStateManager::myApplyMessage(
         publishState();
         applyMessage(RefreshPlaybackStateWhileNotPlaying{});
     }
-}
-
-void SequencerStateManager::applyPlayMessage() noexcept
-{
-    if (activeState.transport.sequencerRunning)
-    {
-        return;
-    }
-
-    const auto transport = sequencer->getTransport();
-
-    transport->setEndOfSong(false);
-
-    const auto songScreen =
-        sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
-
-    const auto currentSong =
-        sequencer->getSong(songScreen->getSelectedSongIndex());
-
-    const bool songMode = sequencer->isSongModeEnabled();
-
-    // if (songMode)
-    // {
-    //     if (!currentSong->isUsed())
-    //     {
-    //         return;
-    //     }
-    //
-    //     if (fromStart)
-    //     {
-    //         const int oldSongSequenceIndex =
-    //         sequencer->getSongSequenceIndex(); songScreen->setOffset(-1); if
-    //         (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
-    //         {
-    //             sequencer->setSelectedSequenceIndex(
-    //                 sequencer->getSongSequenceIndex(), true);
-    //         }
-    //     }
-    //
-    //     if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
-    //     {
-    //         return;
-    //     }
-    //
-    //     int step = songScreen->getOffset() + 1;
-    //
-    //     if (step > currentSong->getStepCount())
-    //     {
-    //         step = currentSong->getStepCount() - 1;
-    //     }
-    //
-    //     if (const std::shared_ptr<Step> currentStep =
-    //             currentSong->getStep(step).lock();
-    //         !sequencer->getSequence(currentStep->getSequence())->isUsed())
-    //     {
-    //         return;
-    //     }
-    // }
-
-    const auto countMetronomeScreen =
-        sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
-
-    const auto countInMode = countMetronomeScreen->getCountInMode();
-
-    // std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
-    //     std::nullopt;
-
-    // if (!transport->isCountEnabled() || countInMode == 0 ||
-    //     (countInMode == 1 && !transport->isRecordingOrOverdubbing()))
-    // {
-    //     if (fromStart && activeState.transportState.positionQuarterNotes !=
-    //     0)
-    //     {
-    //         positionQuarterNotesToStartPlayingFrom = 0;
-    //     }
-    // }
-    //
-    const auto activeSequence = sequencer->getSelectedSequence();
-
-    // if (transport->isCountEnabled() && !songMode)
-    // {
-    //     if (countInMode == 2 ||
-    //         (countInMode == 1 && transport->isRecordingOrOverdubbing()))
-    //     {
-    //         if (fromStart)
-    //         {
-    //             positionQuarterNotesToStartPlayingFrom =
-    //                 Sequencer::ticksToQuarterNotes(
-    //                     activeSequence->getLoopStart());
-    //         }
-    //         else
-    //         {
-    //             positionQuarterNotesToStartPlayingFrom =
-    //                 Sequencer::ticksToQuarterNotes(
-    //                     activeSequence->getFirstTickOfBar(
-    //                         transport->getCurrentBarIndex()));
-    //         }
-    //
-    //         transport->setCountInStartPosTicks(Sequencer::quarterNotesToTicks(
-    //             activeState.transportState.positionQuarterNotes));
-    //
-    //         transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(
-    //             transport->getCurrentBarIndex()));
-    //         transport->setCountingIn(true);
-    //     }
-    // }
-
-    if (!songMode)
-    {
-        if (!activeSequence->isUsed())
-        {
-            transport->setRecording(false);
-            transport->setOverdubbing(false);
-            return;
-        }
-
-        if (transport->isRecordingOrOverdubbing())
-        {
-            sequencer->storeSelectedSequenceInUndoPlaceHolder();
-        }
-    }
-
-    if (sequencer->isBouncePrepared())
-    {
-        sequencer->startBouncing();
-    }
-    else
-    {
-        // if (positionQuarterNotesToStartPlayingFrom)
-        // {
-        //     if (*positionQuarterNotesToStartPlayingFrom !=
-        //     activeState.transportState.positionQuarterNotes)
-        //     {
-        //         activeState.transportState.positionQuarterNotes =
-        //         *positionQuarterNotesToStartPlayingFrom;
-        //
-        //     }
-        // }
-
-        activeState.transport.sequencerRunning = true;
-    }
-}
-
-void SequencerStateManager::applyStopMessage() noexcept
-{
-    activeState.transport.sequencerRunning = false;
-    // const bool bouncing = sequencer.isBouncing();
-    //
-    // if (!isPlaying() && !bouncing)
-    // {
-    //     if (const auto snapshot =
-    //     sequencer.getStateManager()->getSnapshot();
-    //         snapshot.getPositionQuarterNotes() != 0.0)
-    //     {
-    //         setPosition(0); // real 2kxl doesn't do this
-    //     }
-    //
-    //     return;
-    // }
-    //
-    // playedStepRepetitions = 0;
-    // sequencer.setNextSq(NoSequenceIndex);
-    //
-    // const auto activeSequence = sequencer.getSelectedSequence();
-    // const auto pos = getTickPosition();
-    //
-    // int64_t newTickPosition = pos;
-    //
-    // if (pos > activeSequence->getLastTick())
-    // {
-    //     newTickPosition = activeSequence->getLastTick();
-    // }
-    //
-    // recording = false;
-    // overdubbing = false;
-    //
-    // if (countingIn)
-    // {
-    //     newTickPosition = countInStartPos;
-    //     resetCountInPositions();
-    //     countingIn = false;
-    // }
-    //
-    // setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
-    //
-    // const auto songScreen =
-    // sequencer.getScreens()->get<ScreenId::SongScreen>();
-    //
-    // if (endOfSong)
-    // {
-    //     songScreen->setOffset(songScreen->getOffset() + 1);
-    // }
-    //
-    // const auto vmpcDirectToDiskRecorderScreen =
-    //     sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-    //
-    // if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
-    // {
-    //     sequencer.stopBouncing();
-    // }
-    //
-    // sequencer.hardware->getLed(hardware::ComponentId::PLAY_LED)
-    //     ->setEnabled(false);
-    // sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
-    //     ->setEnabled(false);
-    // sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
-    //     ->setEnabled(false);
 }
 
 void SequencerStateManager::applyInsertBars(const InsertBars &m) noexcept

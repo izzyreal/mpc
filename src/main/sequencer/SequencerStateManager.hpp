@@ -12,6 +12,7 @@ namespace mpc::sequencer
     class SequencerStateWorker;
     class TrackEvent;
     class Sequencer;
+    class TransportStateHandler;
 
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
@@ -33,9 +34,9 @@ namespace mpc::sequencer
         SequencerStateWorker *worker;
         Sequencer *sequencer;
 
-        void applyPlayMessage() noexcept;
-        void applyStopMessage() noexcept;
         void applyInsertBars(const InsertBars &) noexcept;
         void applyCopyEvents(const CopyEvents &) noexcept;
+
+        friend class TransportStateHandler;
     };
 } // namespace mpc::sequencer
