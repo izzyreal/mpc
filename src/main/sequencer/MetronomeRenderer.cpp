@@ -79,7 +79,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx, const MetronomeRenderCo
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse,
-                ctx.playbackState.strictValidFromTimeInSamples,
+                ctx.playbackState.strictValidFrom,
                 ctx.playbackState.sampleRate);
 
             if (!ctx.playbackState.containsTimeInSamplesStrict(

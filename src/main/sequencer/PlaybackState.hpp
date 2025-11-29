@@ -18,32 +18,57 @@ namespace mpc::sequencer
 
     struct PlaybackState
     {
-        SampleRate sampleRate{NoSampleRate};
+        SampleRate sampleRate;
+        std::vector<RenderedEventState> events;
 
-        TimeInSamples originSampleTime{NoTimeInSamples};
-        PositionQuarterNotes originQuarterNotes{NoPositionQuarterNotes};
-        Tick originTicks{NoTick};
+        TimeInSamples originSampleTime;
+        PositionQuarterNotes originQuarterNotes;
+        Tick originTicks;
 
-        TimeInSamples strictValidFromTimeInSamples{NoTimeInSamples};
-        TimeInSamples strictValidUntilTimeInSamples{NoTimeInSamples};
+        TimeInSamples strictValidFrom;
+        TimeInSamples strictValidUntil;
 
-        TimeInSamples safeValidFromTimeInSamples{NoTimeInSamples};
-        Tick safeValidFromTick{NoTick};
-        PositionQuarterNotes safeValidFromQuarterNote{NoPositionQuarterNotes};
+        TimeInSamples safeValidFrom;
+        Tick safeValidFromTick;
+        PositionQuarterNotes safeValidFromQuarterNote;
 
-        TimeInSamples safeValidUntilTimeInSamples{NoTimeInSamples};
-        Tick safeValidUntilTick{NoTick};
-        PositionQuarterNotes safeValidUntilQuarterNote{NoPositionQuarterNotes};
+        TimeInSamples safeValidUntil;
+        Tick safeValidUntilTick;
+        PositionQuarterNotes safeValidUntilQuarterNote;
 
-        std::vector<RenderedEventState> events{};
+        PlaybackState()
+        {
+            initializeDefaults();
+        }
 
         bool containsTimeInSamplesStrict(const TimeInSamples &t) const
         {
-            return t >= strictValidFromTimeInSamples &&
-                   t < strictValidUntilTimeInSamples;
+            return t >= strictValidFrom &&
+                   t < strictValidUntil;
         }
 
         Tick getCurrentTick(const Sequence *, TimeInSamples now) const;
+
+        void initializeDefaults()
+        {
+            sampleRate = NoSampleRate;
+            events = {};
+
+            originSampleTime = NoTimeInSamples;
+            originQuarterNotes = NoPositionQuarterNotes;
+            originTicks = NoTick;
+
+            strictValidFrom = NoTimeInSamples;
+            strictValidUntil = NoTimeInSamples;
+
+            safeValidFrom = NoTimeInSamples;
+            safeValidFromTick = NoTick;
+            safeValidFromQuarterNote = NoPositionQuarterNotes;
+
+            safeValidUntil = NoTimeInSamples;
+            safeValidUntilTick = NoTick;
+            safeValidUntilQuarterNote = NoPositionQuarterNotes;
+        }
 
         void printOrigin() const
         {

@@ -9,9 +9,6 @@
 
 namespace mpc::sequencer
 {
-    constexpr TimeInSamples playbackStateValiditySafetyMarginTimeInSamples =
-        10000;
-
     class Sequencer;
 
     class SequencerStateWorker
@@ -38,6 +35,8 @@ namespace mpc::sequencer
         Sequencer *getSequencer() const;
 
     private:
+        static constexpr TimeInSamples snapshotWindowSize{44100 * 2};
+
         std::atomic<bool> running;
         std::thread workerThread;
 
