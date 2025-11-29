@@ -12,8 +12,6 @@
 #include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/ScreenComponent.hpp"
-#include "lcdgui/Screens.hpp"
-#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
@@ -148,18 +146,38 @@ Sequencer *SequencerStateWorker::getSequencer() const
     return sequencer;
 }
 
-void printRenderDebugInfo(const PlaybackState &s)
+void printRenderDebugInfo(const PlaybackState &prev, const PlaybackState &current)
 {
     static int counter = 0;
     printf("===================\n");
-    printf("%i Rendering with previous PlaybackState:\n", counter++);
-    s.printOrigin();
+    printf("%i Rendering with previous PlaybackState:\n", counter);
+    prev.printOrigin();
+    prev.transition.printInfo();
     printf("===================\n");
+    printf("%i New PlaybackState:\n", counter);
+    current.printOrigin();
+    current.transition.printInfo();
+    counter++;
 }
 
 void installTransition(RenderContext &ctx)
 {
+    if (!ctx.seq->isLoopEnabled())
+    {
+        return;
+    }
 
+    const auto transitionTick = ctx.seq->getLoopEndTick();
+    const auto &state = ctx.playbackState;
+
+    const auto origin = state.originTicks;
+    const auto currentTick = state.getCurrentTick(ctx.seq, ctx.currentTime);
+
+    if (currentTick >= transitionTick)
+    {
+        const auto toTick = ctx.seq->getLoopStartTick();
+        ctx.playbackState.transition.activate(transitionTick, toTick);
+    }
 }
 
 PlaybackState initPlaybackState(const PlaybackState &prev,
@@ -169,6 +187,7 @@ PlaybackState initPlaybackState(const PlaybackState &prev,
     constexpr mpc::TimeInSamples snapshotWindowSize{44100 * 2};
 
     PlaybackState playbackState = prev;
+    playbackState.transition.deactivate();
     playbackState.sampleRate = sampleRate;
     playbackState.strictValidFrom = currentTime;
     playbackState.strictValidUntil = currentTime + snapshotWindowSize;
@@ -183,8 +202,12 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
     PlaybackState playbackState =
         initPlaybackState(prevState, sampleRate, currentTime);
 
-    RenderContext renderCtx{std::move(playbackState), sequencer,
-                            sequencer->getCurrentlyPlayingSequence().get()};
+    RenderContext renderCtx{
+        std::move(playbackState),
+        sequencer,
+        sequencer->getCurrentlyPlayingSequence().get(),
+        currentTime
+    };
 
     computeSafeValidity(renderCtx, currentTime);
 
@@ -196,25 +219,18 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
                                           const PlaybackState &prevState,
                                           const TimeInSamples currentTime) const
 {
-    printRenderDebugInfo(prevState);
-
     auto renderCtx =
         initRenderCtx(prevState, sampleRate, currentTime, sequencer);
 
+    installTransition(renderCtx);
+
     renderSeq(renderCtx);
 
-    const bool isStepEditor =
-        isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
-
-    const auto countMetronomeScreen =
-        sequencer->getScreens()
-            ->get<lcdgui::ScreenId::CountMetronomeScreen>()
-            .get();
-
-    const MetronomeRenderContext mctx{countMetronomeScreen, isStepEditor,
-                                      isRecMainWithoutPlaying()};
+    const auto mctx = initMetronomeRenderContext(isCurrentScreen, isRecMainWithoutPlaying, sequencer);
 
     renderMetronome(renderCtx, mctx);
+
+    printRenderDebugInfo(prevState, renderCtx.playbackState);
 
     return renderCtx.playbackState;
 }

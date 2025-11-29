@@ -8,7 +8,26 @@
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 
-void mpc::sequencer::renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
+mpc::sequencer::MetronomeRenderContext
+mpc::sequencer::initMetronomeRenderContext(
+    const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
+        &isCurrentScreen,
+    const std::function<bool()> &isRecMainWithoutPlaying,
+    const Sequencer *sequencer)
+{
+    const bool isStepEditor =
+        isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
+
+    const auto countMetronomeScreen =
+        sequencer->getScreens()
+            ->get<lcdgui::ScreenId::CountMetronomeScreen>()
+            .get();
+
+    return {countMetronomeScreen, isStepEditor, isRecMainWithoutPlaying()};
+}
+
+void mpc::sequencer::renderMetronome(RenderContext &ctx,
+                                     const MetronomeRenderContext &mctx)
 {
     if (!ctx.sequencer->getTransport()->isCountEnabled())
     {
@@ -78,8 +97,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx, const MetronomeRenderCo
                 eventTick - ctx.playbackState.originTicks;
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
-                ctx.seq, eventTickToUse,
-                ctx.playbackState.strictValidFrom,
+                ctx.seq, eventTickToUse, ctx.playbackState.strictValidFrom,
                 ctx.playbackState.sampleRate);
 
             if (!ctx.playbackState.containsTimeInSamplesStrict(
@@ -91,8 +109,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx, const MetronomeRenderCo
             EventState eventState;
             eventState.tick = j;
             eventState.type = EventType::MetronomeClick;
-            eventState.velocity =
-                j == 0 ? MaxVelocity : MediumVelocity;
+            eventState.velocity = j == 0 ? MaxVelocity : MediumVelocity;
             ctx.playbackState.events.emplace_back(
                 RenderedEventState{std::move(eventState), eventTimeInSamples});
         }

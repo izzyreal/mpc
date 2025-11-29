@@ -12,5 +12,6 @@ namespace mpc::sequencer
         PlaybackState playbackState;
         Sequencer *sequencer;
         Sequence *seq;
+        TimeInSamples currentTime;
     };
 }
