@@ -226,8 +226,9 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
         for (int j = 0; j < barLength; j += denTicks)
         {
+            const auto eventTick = j + barTickOffset;
             const auto eventTickToUse =
-                j + barTickOffset -
+                eventTick -
                     ctx.playbackState.playOffsetTicks;
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
