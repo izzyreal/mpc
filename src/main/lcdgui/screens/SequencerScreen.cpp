@@ -142,8 +142,9 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                  return static_cast<int>(Sequencer::quarterNotesToTicks(
                      sequencer.lock()
                          ->getTransport()
-                         ->getPlayStartPositionQuarterNotes()));
+                         ->getPositionQuarterNotes()));
              }
+
              return sequencer.lock()->getTransport()->getTickPosition();
          },
          [&](auto)

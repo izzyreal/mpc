@@ -30,15 +30,6 @@ void TransportStateHandler::applyMessage(TransportState &state,
         {
             state.positionQuarterNotes = m.positionQuarterNotes;
         },
-        [&](const SetPlayStartPositionQuarterNotes &m)
-        {
-            state.playStartPositionQuarterNotes = m.positionQuarterNotes;
-        },
-        [&](const BumpPositionByTicks &m)
-        {
-            const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
-            state.positionQuarterNotes += delta;
-        },
         [&](const Stop &)
         {
             applyStopMessage(state);
@@ -288,13 +279,13 @@ void TransportStateHandler::applyPlayMessage(
         //     }
         // }
 
-        state.playStartPositionQuarterNotes = state.positionQuarterNotes;
         state.sequencerRunning = true;
     }
 }
 
 void TransportStateHandler::applyStopMessage(TransportState &state) noexcept
 {
+    state.positionQuarterNotes = Sequencer::ticksToQuarterNotes(sequencer->getTransport()->getTickPosition());
     state.sequencerRunning = false;
     // const bool bouncing = sequencer.isBouncing();
     //

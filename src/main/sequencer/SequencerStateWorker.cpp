@@ -80,36 +80,59 @@ void SequencerStateWorker::stopAndWaitUntilStopped()
     }
 }
 
+bool SequencerStateWorker::willLoopWithinSafetyMargin(
+    const PlaybackState &ps, const TimeInSamples now) const
+{
+    const auto seq = sequencer->getSelectedSequence().get();
+    const int lastTick = seq->getLastTick();
+
+    const int currentTick = ps.getCurrentTick(seq, now);
+    const int ticksRemaining = lastTick - currentTick;
+
+    // convert safety margin to ticks
+    const int ticksMargin = SeqUtil::getTickCountForFrames(
+        seq, currentTick, playbackStateValiditySafetyMarginTimeInSamples,
+        ps.sampleRate);
+
+    return ticksRemaining < ticksMargin;
+}
+
 void SequencerStateWorker::work() const
 {
     const auto snapshot = sequencer->getStateManager()->getSnapshot();
     const auto transportState = snapshot.getTransportState();
-    const auto playbackState = snapshot.getPlaybackState();
 
-    const auto currentTimeInSamples =
-        sequencer->getAudioStateManager()->getSnapshot().getTimeInSamples();
+    const auto audioSnapshot = sequencer->getAudioStateManager()->getSnapshot();
+    const auto currentTimeInSamples = audioSnapshot.getTimeInSamples();
+
+    auto playbackState = snapshot.getPlaybackState();
+
+    const auto seq = sequencer->getSelectedSequence();
+
+    const bool impendingLoop =
+        seq->isLoopEnabled() &&
+        willLoopWithinSafetyMargin(playbackState, currentTimeInSamples);
 
     bool snapshotIsInvalid = false;
 
     if (transportState.getPositionQuarterNotes() != NoPositionQuarterNotes &&
         currentTimeInSamples >
-            snapshot.getPlaybackState().strictValidUntilTimeInSamples -
+            playbackState.strictValidUntilTimeInSamples -
                 playbackStateValiditySafetyMarginTimeInSamples)
     {
         snapshotIsInvalid = true;
     }
 
-    if (snapshotIsInvalid)
+    if (snapshotIsInvalid || impendingLoop)
     {
+        if (impendingLoop) printf("impending loop!\n");
         constexpr auto onComplete = [] {};
-        refreshPlaybackState(snapshot.getPlaybackState().playOffsetQuarterNotes,
-                             currentTimeInSamples, onComplete);
+        playbackState.events.clear();
+        refreshPlaybackState(playbackState, currentTimeInSamples, onComplete);
     }
 
     if (transportState.isRecordingOrOverdubbing())
     {
-        const auto seq = sequencer->getSelectedSequence();
-
         for (const auto &t : seq->getTracks())
         {
             t->processRealtimeQueuedEvents();
@@ -120,7 +143,8 @@ void SequencerStateWorker::work() const
 }
 
 void SequencerStateWorker::refreshPlaybackState(
-    const PositionQuarterNotes playOffset, const TimeInSamples timeInSamples,
+    const PlaybackState &previousPlaybackState,
+    const TimeInSamples timeInSamples,
     const std::function<void()> &onComplete) const
 {
     TimeInSamples timeInSamplesToUse = timeInSamples;
@@ -136,7 +160,7 @@ void SequencerStateWorker::refreshPlaybackState(
     const auto sampleRate = playbackEngine->getSampleRate();
 
     const auto playbackState = renderPlaybackState(
-        SampleRate(sampleRate), playOffset, timeInSamplesToUse);
+        SampleRate(sampleRate), previousPlaybackState, timeInSamplesToUse);
 
     sequencer->getStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState), onComplete});
@@ -228,8 +252,7 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
         {
             const auto eventTick = j + barTickOffset;
             const auto eventTickToUse =
-                eventTick -
-                    ctx.playbackState.playOffsetTicks;
+                eventTick - ctx.playbackState.originTicks;
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse,
@@ -270,7 +293,8 @@ void renderSeq(RenderContext &ctx)
                 continue;
             }
 
-            const auto eventTickToUse = event.tick - ctx.playbackState.playOffsetTicks;
+            const auto eventTickToUse =
+                event.tick - ctx.playbackState.originTicks;
 
             const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse,
@@ -302,8 +326,7 @@ void computeSafeValidity(RenderContext &renderCtx,
     const auto framesFrom =
         safeValidFromTimeInSamples -
         renderCtx.playbackState.strictValidFromTimeInSamples;
-    const int baseTick = Sequencer::quarterNotesToTicks(
-        renderCtx.playbackState.playOffsetQuarterNotes);
+    const int baseTick = renderCtx.playbackState.originTicks;
     const int tickAdvanceUntil =
         SeqUtil::getTickCountForFrames(renderCtx.seq, baseTick, framesUntil,
                                        renderCtx.playbackState.sampleRate);
@@ -328,8 +351,7 @@ void computeSafeValidity(RenderContext &renderCtx,
 }
 
 PlaybackState SequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate,
-    const PositionQuarterNotes playOffsetQuarterNotes,
+    const SampleRate sampleRate, const PlaybackState &previousPlaybackState,
     const TimeInSamples currentTime) const
 {
     constexpr TimeInSamples snapshotWindowSize{44100 * 2};
@@ -343,11 +365,46 @@ PlaybackState SequencerStateWorker::renderPlaybackState(
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    PlaybackState playbackState;
+    const auto lastTick = seq->getLastTick();
+
+    PlaybackState playbackState = previousPlaybackState;
     playbackState.sampleRate = sampleRate;
-    playbackState.playOffsetQuarterNotes = playOffsetQuarterNotes;
-    playbackState.playOffsetTicks =
-        Sequencer::quarterNotesToTicks(playOffsetQuarterNotes);
+
+    // --- Derive musical position from samples ---
+    const auto originQN = playbackState.originQuarterNotes;
+    const auto originTicks = Sequencer::quarterNotesToTicks(originQN);
+
+    const auto deltaSamples = currentTime - playbackState.originSampleTime;
+
+    // If initial call (start of playback): originSampleTime is uninitialized.
+    // Detect this and set cleanly:
+    if (playbackState.originSampleTime == NoTimeInSamples)
+    {
+        playbackState.originSampleTime = currentTime;
+        playbackState.originQuarterNotes = originQN;
+        playbackState.originTicks = originTicks;
+    }
+
+    // Compute tickNow from continuous time
+    const int tickAdvance =
+        SeqUtil::getTickCountForFrames(seq.get(), playbackState.originTicks,
+                                       deltaSamples, playbackState.sampleRate);
+
+    int tickNow = playbackState.originTicks + tickAdvance;
+
+    printf("tickNow: %i\n", tickNow);
+    if (tickNow >= lastTick)
+    {
+        tickNow %= lastTick;
+
+        // Reset musical origin to wrapped position
+        playbackState.originTicks = tickNow;
+        playbackState.originQuarterNotes =
+            Sequencer::ticksToQuarterNotes(tickNow);
+        playbackState.originSampleTime = currentTime;
+    }
+
+    // Validity boundaries
     playbackState.strictValidFromTimeInSamples = currentTime;
     playbackState.strictValidUntilTimeInSamples = strictValidUntilTimeInSamples;
 

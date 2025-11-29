@@ -53,13 +53,20 @@ void SequencerStateManager::myApplyMessage(
         },
         [&](const RefreshPlaybackStateWhileNotPlaying &m)
         {
+            auto &playbackState = activeState.playbackState;
+            playbackState.originQuarterNotes = activeState.transport.positionQuarterNotes;
+            playbackState.originTicks = Sequencer::quarterNotesToTicks(playbackState.originQuarterNotes);
+            playbackState.originSampleTime = 0;
+
+            playbackState.events.clear();
             worker->refreshPlaybackState(
-                activeState.transport.positionQuarterNotes, 0, m.onComplete);
+                playbackState, 0, m.onComplete);
         },
         [&](const RefreshPlaybackStateWhilePlaying &m)
         {
+            activeState.playbackState.events.clear();
             worker->refreshPlaybackState(
-                activeState.transport.playStartPositionQuarterNotes,
+                activeState.playbackState,
                 CurrentTimeInSamples, m.onComplete);
         },
         [&](const UpdatePlaybackState &m)

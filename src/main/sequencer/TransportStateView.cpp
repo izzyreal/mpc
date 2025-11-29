@@ -15,11 +15,6 @@ double TransportStateView::getPositionQuarterNotes() const
     return state.positionQuarterNotes;
 }
 
-double TransportStateView::getPlayStartPositionQuarterNotes() const
-{
-    return state.playStartPositionQuarterNotes;
-}
-
 int64_t TransportStateView::getPositionTicks() const
 {
     return Sequencer::quarterNotesToTicks(state.positionQuarterNotes);

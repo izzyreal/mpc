@@ -8,6 +8,8 @@
 
 namespace mpc::sequencer
 {
+    class Sequence;
+
     struct RenderedEventState
     {
         EventState eventState;
@@ -18,8 +20,9 @@ namespace mpc::sequencer
     {
         SampleRate sampleRate{NoSampleRate};
 
-        PositionQuarterNotes playOffsetQuarterNotes;
-        Tick playOffsetTicks;
+        TimeInSamples originSampleTime{NoTimeInSamples};
+        PositionQuarterNotes originQuarterNotes{NoPositionQuarterNotes};
+        Tick originTicks{NoTick};
 
         TimeInSamples strictValidFromTimeInSamples{NoTimeInSamples};
         TimeInSamples strictValidUntilTimeInSamples{NoTimeInSamples};
@@ -39,5 +42,7 @@ namespace mpc::sequencer
             return t >= strictValidFromTimeInSamples &&
                    t < strictValidUntilTimeInSamples;
         }
+
+        Tick getCurrentTick(const Sequence *, TimeInSamples now) const;
     };
 } // namespace mpc::sequencer

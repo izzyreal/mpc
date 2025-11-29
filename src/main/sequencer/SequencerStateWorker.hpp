@@ -32,7 +32,8 @@ namespace mpc::sequencer
         void work() const;
 
         void
-        refreshPlaybackState(PositionQuarterNotes playOffset, TimeInSamples,
+        refreshPlaybackState(const PlaybackState &previousPlaybackState,
+                             TimeInSamples,
                              const std::function<void()> &onComplete) const;
 
         Sequencer *getSequencer() const;
@@ -47,8 +48,12 @@ namespace mpc::sequencer
 
         Sequencer *sequencer;
 
-        PlaybackState renderPlaybackState(SampleRate,
-                                          PositionQuarterNotes playOffsetQuarterNotes,
-                                          TimeInSamples) const;
+        bool willLoopWithinSafetyMargin(const PlaybackState &,
+                                        TimeInSamples now) const;
+
+        PlaybackState
+        renderPlaybackState(SampleRate,
+                            const PlaybackState &previousPlaybackState,
+                            TimeInSamples) const;
     };
 } // namespace mpc::sequencer

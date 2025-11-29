@@ -141,12 +141,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
                 frameOffsetInBuffer);
         }
     }
-
-    const double tempo = sequencer->getTransport()->getTempo();
-    const auto sampleRate = getSampleRate();
-    const double tickCountForThisBuffer =
-        SeqUtil::framesToTicks(nFrames, tempo, sampleRate);
-    sequencer->getTransport()->bumpPositionByTicks(tickCountForThisBuffer);
 }
 
 uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const

@@ -48,10 +48,6 @@ namespace mpc::sequencer
 
         void setPosition(PositionQuarterNotes) const;
 
-        void setPlayStartPosition(PositionQuarterNotes) const;
-
-        void bumpPositionByTicks(double tickCount) const;
-
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;
@@ -73,7 +69,6 @@ namespace mpc::sequencer
 
         int getTickPosition() const;
         double getPositionQuarterNotes() const;
-        double getPlayStartPositionQuarterNotes() const;
         int getCurrentBarIndex() const;
         int getCurrentBeatIndex() const;
         int getCurrentClockNumber() const;

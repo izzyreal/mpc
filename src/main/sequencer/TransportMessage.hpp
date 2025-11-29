@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <variant>
 
 namespace mpc::sequencer
@@ -8,16 +7,6 @@ namespace mpc::sequencer
     struct SetPositionQuarterNotes
     {
         double positionQuarterNotes;
-    };
-
-    struct SetPlayStartPositionQuarterNotes
-    {
-        double positionQuarterNotes;
-    };
-
-    struct BumpPositionByTicks
-    {
-        double ticks;
     };
 
     struct Stop
@@ -67,14 +56,14 @@ namespace mpc::sequencer
     };
 
     using TransportMessage =
-        std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks, Stop, Play, PlayFromStart, Record,
+        std::variant<SetPositionQuarterNotes,
+                     Stop, Play, PlayFromStart, Record,
                      RecordFromStart, Overdub, OverdubFromStart,
                      SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
                      UpdateCountEnabled>;
 
     using TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying =
-        std::variant<BumpPositionByTicks, UpdateCountEnabled>;
+        std::variant<UpdateCountEnabled>;
 
     using TransportMessagesThatInvalidatePlaybackStateWhilePlaying =
         std::variant<UpdateCountEnabled>;

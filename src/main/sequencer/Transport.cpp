@@ -5,6 +5,7 @@
 #include "SequencerStateWorker.hpp"
 #include "SeqUtil.hpp"
 #include "Sequencer.hpp"
+#include "SequencerAudioStateManager.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
@@ -315,25 +316,24 @@ bool Transport::isCountingIn() const
     return countingIn;
 }
 
-void Transport::bumpPositionByTicks(const double tickCount) const
-{
-    sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
-}
-
 int Transport::getTickPosition() const
 {
-    return sequencer.getStateManager()
-        ->getSnapshot()
-        .getTransportState()
-        .getPositionTicks();
-}
+    const auto snapshot = sequencer.getStateManager()
+        ->getSnapshot();
+    const auto transportState = snapshot.getTransportState();
 
-double Transport::getPlayStartPositionQuarterNotes() const
-{
-    return sequencer.getStateManager()
-        ->getSnapshot()
-        .getTransportState()
-        .getPlayStartPositionQuarterNotes();
+    if (transportState.isSequencerRunning())
+    {
+        const auto playbackState = snapshot.getPlaybackState();
+        const auto audioState = sequencer.getAudioStateManager()->getSnapshot();
+        const auto seq = sequencer.getSelectedSequence().get();
+        const TimeInSamples now = audioState.getTimeInSamples();
+        return playbackState.getCurrentTick(seq, now);
+    }
+
+    return
+        transportState
+        .getPositionTicks();
 }
 
 double Transport::getPositionQuarterNotes() const
@@ -489,7 +489,7 @@ int Transport::getCurrentBarIndex() const
                                  : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
+            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
             : getTickPosition();
 
     if (pos == seq->getLastTick())
@@ -523,7 +523,7 @@ int Transport::getCurrentBeatIndex() const
                                  : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
+            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
             : getTickPosition();
 
     if (pos == seq->getLastTick())
@@ -577,7 +577,7 @@ int Transport::getCurrentClockNumber() const
 
     auto clock =
         isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
+            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
             : getTickPosition();
 
     if (clock == sequence->getLastTick())
@@ -746,13 +746,6 @@ void Transport::setPosition(const double positionQuarterNotes) const
 {
     sequencer.getStateManager()->enqueue(
         SetPositionQuarterNotes{positionQuarterNotes});
-}
-
-void Transport::setPlayStartPosition(
-    const double playStartPositionQuarterNotes) const
-{
-    sequencer.getStateManager()->enqueue(
-        SetPlayStartPositionQuarterNotes{playStartPositionQuarterNotes});
 }
 
 void Transport::setTempo(double newTempo)
