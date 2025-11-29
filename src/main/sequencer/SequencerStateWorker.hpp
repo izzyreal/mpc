@@ -48,7 +48,7 @@ namespace mpc::sequencer
         Sequencer *sequencer;
 
         PlaybackState renderPlaybackState(SampleRate,
-                                          PositionQuarterNotes playOffset,
+                                          PositionQuarterNotes playOffsetQuarterNotes,
                                           TimeInSamples) const;
     };
 } // namespace mpc::sequencer

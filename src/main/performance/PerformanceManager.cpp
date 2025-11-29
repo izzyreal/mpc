@@ -20,7 +20,6 @@ PerformanceManager::PerformanceManager()
 
 PerformanceManager::~PerformanceManager()
 {
-    printf("Deleting performance manager\n");
 }
 
 void PerformanceManager::reserveState(PerformanceState &s)

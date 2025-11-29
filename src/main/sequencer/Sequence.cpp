@@ -83,7 +83,6 @@ Sequence::Sequence(
 
 Sequence::~Sequence()
 {
-    //    printf("~Sequence\n");
 }
 
 void Sequence::setEventStates(const std::vector<EventState> &eventStates) const

@@ -121,7 +121,6 @@ Sequencer::Sequencer(
 
 Sequencer::~Sequencer()
 {
-    printf("~Sequencer\n");
 }
 
 std::shared_ptr<SequencerAudioStateManager>

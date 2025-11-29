@@ -228,15 +228,15 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
         {
             const auto eventTickToUse =
                 j + barTickOffset -
-                Sequencer::quarterNotesToTicks(
-                    ctx.playbackState.playOffsetQuarterNotes);
+                    ctx.playbackState.playOffsetTicks;
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
-                ctx.seq, eventTickToUse, ctx.playbackState.currentTimeInSamples,
+                ctx.seq, eventTickToUse,
+                ctx.playbackState.strictValidFromTimeInSamples,
                 ctx.playbackState.sampleRate);
 
-            if (eventTimeInSamples >
-                ctx.playbackState.strictValidUntilTimeInSamples)
+            if (!ctx.playbackState.containsTimeInSamplesStrict(
+                    eventTimeInSamples))
             {
                 continue;
             }
@@ -256,30 +256,34 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
 void renderSeq(RenderContext &ctx)
 {
-    const auto playOffsetTicks = Sequencer::quarterNotesToTicks(
-                                      ctx.playbackState.playOffsetQuarterNotes);
-
     // printf("Rendering seq %s for playback time %lld at tick offset %i\n",
-    //        ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
-    //        playOffsetTicks);
+    //        ctx.seq->getName().c_str(),
+    //        ctx.playbackState.currentTimeInSamples, ctx.playOffsetTicks);
 
     for (const auto &track : ctx.seq->getTracks())
     {
-        for (const auto &eventState : track->getEventStates())
+        for (const auto &event : track->getEventStates())
         {
-            const auto eventTickToUse =
-                eventState.tick - playOffsetTicks;
-
-            const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
-                ctx.seq, eventTickToUse, ctx.playbackState.currentTimeInSamples,
-                ctx.playbackState.sampleRate);
-
-            if (eventTime > ctx.playbackState.strictValidUntilTimeInSamples)
+            if (event.type == EventType::TempoChange)
             {
                 continue;
             }
 
-            const RenderedEventState renderedEventState{eventState, eventTime};
+            const auto eventTickToUse = event.tick - ctx.playbackState.playOffsetTicks;
+
+            const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
+                ctx.seq, eventTickToUse,
+                ctx.playbackState.strictValidFromTimeInSamples,
+                ctx.playbackState.sampleRate);
+
+            if (!ctx.playbackState.containsTimeInSamplesStrict(eventTime))
+            {
+                continue;
+            }
+
+            event.printInfo();
+
+            const RenderedEventState renderedEventState{event, eventTime};
 
             ctx.playbackState.events.emplace_back(
                 std::move(renderedEventState));
@@ -291,10 +295,12 @@ void computeSafeValidity(RenderContext &renderCtx,
                          const mpc::TimeInSamples safeValidUntilTimeInSamples,
                          const mpc::TimeInSamples safeValidFromTimeInSamples)
 {
-    const auto framesUntil = safeValidUntilTimeInSamples -
-                             renderCtx.playbackState.currentTimeInSamples;
-    const auto framesFrom = safeValidFromTimeInSamples -
-                            renderCtx.playbackState.currentTimeInSamples;
+    const auto framesUntil =
+        safeValidUntilTimeInSamples -
+        renderCtx.playbackState.strictValidFromTimeInSamples;
+    const auto framesFrom =
+        safeValidFromTimeInSamples -
+        renderCtx.playbackState.strictValidFromTimeInSamples;
     const int baseTick = Sequencer::quarterNotesToTicks(
         renderCtx.playbackState.playOffsetQuarterNotes);
     const int tickAdvanceUntil =
@@ -320,10 +326,10 @@ void computeSafeValidity(RenderContext &renderCtx,
         Sequencer::ticksToQuarterNotes(fromTick);
 }
 
-PlaybackState
-SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
-                                          const PositionQuarterNotes playOffset,
-                                          const TimeInSamples currentTime) const
+PlaybackState SequencerStateWorker::renderPlaybackState(
+    const SampleRate sampleRate,
+    const PositionQuarterNotes playOffsetQuarterNotes,
+    const TimeInSamples currentTime) const
 {
     constexpr TimeInSamples snapshotWindowSize{44100 * 2};
 
@@ -336,9 +342,13 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    PlaybackState playbackState{sequencer->getTransport()->isCountEnabled(),
-                                sampleRate, playOffset, currentTime,
-                                strictValidUntilTimeInSamples};
+    PlaybackState playbackState;
+    playbackState.sampleRate = sampleRate;
+    playbackState.playOffsetQuarterNotes = playOffsetQuarterNotes;
+    playbackState.playOffsetTicks =
+        Sequencer::quarterNotesToTicks(playOffsetQuarterNotes);
+    playbackState.strictValidFromTimeInSamples = currentTime;
+    playbackState.strictValidUntilTimeInSamples = strictValidUntilTimeInSamples;
 
     RenderContext renderCtx{std::move(playbackState), sequencer, seq.get()};
 

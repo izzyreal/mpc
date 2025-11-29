@@ -16,11 +16,12 @@ namespace mpc::sequencer
 
     struct PlaybackState
     {
-        bool countEnabled;
-
         SampleRate sampleRate{NoSampleRate};
+
         PositionQuarterNotes playOffsetQuarterNotes;
-        TimeInSamples currentTimeInSamples{NoTimeInSamples};
+        Tick playOffsetTicks;
+
+        TimeInSamples strictValidFromTimeInSamples{NoTimeInSamples};
         TimeInSamples strictValidUntilTimeInSamples{NoTimeInSamples};
 
         TimeInSamples safeValidFromTimeInSamples{NoTimeInSamples};
@@ -32,5 +33,11 @@ namespace mpc::sequencer
         PositionQuarterNotes safeValidUntilQuarterNote{NoPositionQuarterNotes};
 
         std::vector<RenderedEventState> events{};
+
+        bool containsTimeInSamplesStrict(const TimeInSamples &t) const
+        {
+            return t >= strictValidFromTimeInSamples &&
+                   t < strictValidUntilTimeInSamples;
+        }
     };
 } // namespace mpc::sequencer
