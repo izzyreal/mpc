@@ -48,7 +48,7 @@ namespace mpc::sequencer
 
         PlaybackState
         renderPlaybackState(SampleRate,
-                            const PlaybackState &previousPlaybackState,
+                            const PlaybackState &prevState,
                             TimeInSamples) const;
     };
 } // namespace mpc::sequencer

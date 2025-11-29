@@ -148,10 +148,21 @@ Sequencer *SequencerStateWorker::getSequencer() const
     return sequencer;
 }
 
+void printRenderDebugInfo(const PlaybackState &s)
+{
+    static int counter = 0;
+    printf("===================\n");
+    printf("%i Rendering with previous PlaybackState:\n", counter++);
+    s.printOrigin();
+    printf("===================\n");
+}
+
 PlaybackState SequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate, const PlaybackState &previousPlaybackState,
+    const SampleRate sampleRate, const PlaybackState &prevState,
     const TimeInSamples currentTime) const
 {
+    printRenderDebugInfo(prevState);
+
     const TimeInSamples strictValidUntil = currentTime + snapshotWindowSize;
 
     const auto seqIndex = sequencer->isSongModeEnabled()
@@ -160,7 +171,7 @@ PlaybackState SequencerStateWorker::renderPlaybackState(
 
     const auto seq = sequencer->getSequence(seqIndex);
 
-    PlaybackState playbackState = previousPlaybackState;
+    PlaybackState playbackState = prevState;
     playbackState.sampleRate = sampleRate;
 
     playbackState.strictValidFrom = currentTime;
