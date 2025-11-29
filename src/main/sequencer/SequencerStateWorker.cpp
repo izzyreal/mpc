@@ -4,7 +4,6 @@
 #include "MetronomeRenderer.hpp"
 #include "PlaybackStateValidity.hpp"
 #include "RenderContext.hpp"
-#include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "SequenceRenderer.hpp"
 #include "Track.hpp"
@@ -14,6 +13,7 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "utils/SequencerTiming.hpp"
 
 using namespace mpc::sequencer;
 
@@ -182,8 +182,10 @@ void installTransition(RenderContext &ctx)
         const auto toTick = ctx.seq->getLoopStartTick();
         const double ticksUntilTransition = transitionTick - currentTick;
 
-        int transitionFrame = SeqUtil::getFrameCountForTicks(
-            ctx.seq, currentTick, ticksUntilTransition,
+        const auto sequenceTimingData = mpc::utils::getSequenceTimingData(ctx.seq);
+
+        int transitionFrame = mpc::utils::getFrameCountForTicks(
+            sequenceTimingData, currentTick, ticksUntilTransition,
             ctx.playbackState.sampleRate);
 
         transitionFrame += ctx.currentTime;

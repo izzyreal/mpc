@@ -36,4 +36,9 @@ namespace mpc::utils
                              double firstTick,
                              int frameCount,
                              int sr);
+
+    int getFrameCountForTicks(const SequenceTimingData &s,
+                                   double firstTick,
+                                   double tickCount,
+                                   int sr);
 }
