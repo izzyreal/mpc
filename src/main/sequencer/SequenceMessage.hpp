@@ -162,12 +162,13 @@ namespace mpc::sequencer
                      FinalizeNonLiveNoteEvent, SetLastBarIndex, InsertBars,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      UpdateTimeSignature, UpdateEvents, UpdateSequenceEvents,
-                     SetLoopEnabled, SetUsed, SetTempoChangeEnabled,
+                     SetLoopEnabled, SetUsed, SetTempoChangeEnabled, SetInitialTempo,
                      SetFirstLoopBarIndex, SetLastLoopBarIndex>;
 
     using SequenceMessagesThatInvalidatePlaybackStateWhilePlaying =
         std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+                     SetInitialTempo,
                      FinalizeNonLiveNoteEvent, UpdateTimeSignature>;
 
 } // namespace mpc::sequencer

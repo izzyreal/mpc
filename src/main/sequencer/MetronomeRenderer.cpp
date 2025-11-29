@@ -94,7 +94,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx,
         {
             const auto eventTick = j + barTickOffset;
             const auto eventTickToUse =
-                eventTick - ctx.playbackState.originTicks;
+                eventTick - ctx.playbackState.lastTransitionTick;
 
             const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse, ctx.playbackState.strictValidFrom,

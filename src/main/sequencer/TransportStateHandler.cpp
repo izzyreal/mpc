@@ -25,74 +25,74 @@ void TransportStateHandler::applyMessage(TransportState &state,
                                          const TransportMessage &msg,
                                          const bool autoRefreshPlaybackState)
 {
-    const auto visitor = Overload{
-        [&](const SetPositionQuarterNotes &m)
-        {
-            state.positionQuarterNotes = m.positionQuarterNotes;
-        },
-        [&](const Stop &)
-        {
-            applyStopMessage(state);
-        },
-        [&](const Play &)
-        {
-            applyPlayMessage(state);
-        },
-        [&](const Record &)
-        {
-            state.recording = true;
-            applyMessage(state, Play{});
-        },
-        [&](const RecordFromStart &)
-        {
-            state.recording = true;
-            applyMessage(state, PlayFromStart{});
-        },
-        [&](const Overdub &)
-        {
-            state.overdubbing = true;
-            applyMessage(state, Play{});
-        },
-        [&](const OverdubFromStart &)
-        {
-            state.overdubbing = true;
-            applyMessage(state, PlayFromStart{});
-        },
-        [&](const UpdateRecording &m)
-        {
-            state.recording = m.recording;
-        },
-        [&](const UpdateOverdubbing &m)
-        {
-            state.overdubbing = m.overdubbing;
-        },
-        [&](const SwitchRecordToOverdub &)
-        {
-            state.recording = false;
-            state.overdubbing = true;
-            applyMessage(state, Play{});
-        },
-        [&](const PlayFromStart &)
-        {
-            if (state.positionQuarterNotes == 0)
-            {
-                applyMessage(state, Play{});
-            }
-            else
-            {
-                state.positionQuarterNotes = 0;
-                auto onComplete = [this]
-                {
-                    manager->enqueue(Play{});
-                };
-                manager->enqueue(
-                    RefreshPlaybackStateWhileNotPlaying{onComplete});
-            }
-        },
-        [&](const UpdateCountEnabled &m)
-        {
-            state.countEnabled = m.enabled;
-        }};
+    const auto visitor =
+        Overload{[&](const SetPositionQuarterNotes &m)
+                 {
+                     state.positionQuarterNotes = m.positionQuarterNotes;
+                 },
+                 [&](const Stop &)
+                 {
+                     applyStopMessage(state);
+                 },
+                 [&](const Play &)
+                 {
+                     applyPlayMessage(state);
+                 },
+                 [&](const Record &)
+                 {
+                     state.recording = true;
+                     applyMessage(state, Play{});
+                 },
+                 [&](const RecordFromStart &)
+                 {
+                     state.recording = true;
+                     applyMessage(state, PlayFromStart{});
+                 },
+                 [&](const Overdub &)
+                 {
+                     state.overdubbing = true;
+                     applyMessage(state, Play{});
+                 },
+                 [&](const OverdubFromStart &)
+                 {
+                     state.overdubbing = true;
+                     applyMessage(state, PlayFromStart{});
+                 },
+                 [&](const UpdateRecording &m)
+                 {
+                     state.recording = m.recording;
+                 },
+                 [&](const UpdateOverdubbing &m)
+                 {
+                     state.overdubbing = m.overdubbing;
+                 },
+                 [&](const SwitchRecordToOverdub &)
+                 {
+                     state.recording = false;
+                     state.overdubbing = true;
+                     applyMessage(state, Play{});
+                 },
+                 [&](const PlayFromStart &)
+                 {
+                     if (state.positionQuarterNotes == 0)
+                     {
+                         applyMessage(state, Play{});
+                     }
+                     else
+                     {
+                         state.positionQuarterNotes = 0;
+                         auto onComplete = [this]
+                         {
+                             manager->enqueue(Play{});
+                         };
+                         manager->enqueue(
+                             RefreshPlaybackStateWhileNotPlaying{onComplete});
+                     }
+                 },
+                 [&](const UpdateCountEnabled &m)
+                 {
+                     state.countEnabled = m.enabled;
+                 }};
 
     std::visit(visitor, msg);
 
@@ -114,9 +114,8 @@ void TransportStateHandler::applyMessage(TransportState &state,
 
         manager->publishState();
 
-        if (state.positionQuarterNotes >
-                playbackState.safeValidUntilQuarterNote ||
-            state.positionQuarterNotes < playbackState.safeValidFromQuarterNote)
+        if (state.positionQuarterNotes > playbackState.getSafeValidUntilQN() ||
+            state.positionQuarterNotes < playbackState.getSafeValidFromQN())
         {
             manager->applyMessage(RefreshPlaybackStateWhileNotPlaying{});
         }
@@ -285,7 +284,8 @@ void TransportStateHandler::applyPlayMessage(
 
 void TransportStateHandler::applyStopMessage(TransportState &state) noexcept
 {
-    state.positionQuarterNotes = Sequencer::ticksToQuarterNotes(sequencer->getTransport()->getTickPosition());
+    state.positionQuarterNotes = Sequencer::ticksToQuarterNotes(
+        sequencer->getTransport()->getTickPosition());
     state.sequencerRunning = false;
     // const bool bouncing = sequencer.isBouncing();
     //

@@ -501,71 +501,107 @@ int SeqUtil::getEventTimeInSamples(const Sequence *seq, const int eventTick,
     return currentTimeSamples + (loopLen - (phase - eventSample));
 }
 
-int SeqUtil::getTickCountForFrames(const Sequence *seq, const int firstTick,
-                                   const int frameCount, const int sr)
+double SeqUtil::getTickCountForFrames(const Sequence* seq, double firstTick,
+                                      int frameCount, int sr)
 {
-    const auto &tces = seq->getTempoChangeEvents();
+    const auto& tces = seq->getTempoChangeEvents();
     const int n = tces.size();
 
-    auto secondsPerTick = [&](const double tempo)
-    {
+    auto secondsPerTick = [&](double tempo) {
         return 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
     };
 
-    int remainingFrames = frameCount;
-    int tick = firstTick;
+    auto findTempoAt = [&](double tick) {
+        double tempo = seq->getInitialTempo();
+        for (int i = 0; i < n && tces[i]->getTick() <= tick; i++)
+            tempo = tces[i]->getTempo();
+        return tempo;
+    };
 
-    double tempo = seq->getInitialTempo();
+    auto advanceThroughTempoMap = [&](double tick, double frames) -> double {
+        double remaining = frames;
+        double t = tick;
+        double tempo = findTempoAt(t);
 
-    // Find starting tempo segment.
-    int i = 0;
-    while (i < n && tces[i]->getTick() <= firstTick)
-    {
-        tempo = tces[i]->getTempo();
-        i++;
-    }
+        int i = 0;
+        while (i < n && tces[i]->getTick() <= t) i++;
 
-    // Process each tempo segment.
-    while (i < n && remainingFrames > 0)
-    {
-        const int segmentEndTick = tces[i]->getTick();
-        const int ticksAvailable = segmentEndTick - tick;
-
-        if (ticksAvailable > 0)
-        {
-            const double secsPerTick = secondsPerTick(tempo);
-            const double framesPerTick = secsPerTick * sr;
-
-            // Frames needed to traverse full segment.
-            const int framesForSegment =
-                static_cast<int>(ceil(ticksAvailable * framesPerTick));
-
-            if (framesForSegment > remainingFrames)
-            {
-                // We only advance partway through this segment.
-                const double ticksInSegment = remainingFrames / framesPerTick;
-
-                return static_cast<int>(floor(ticksInSegment));
+        while (i < n && remaining > 0.0) {
+            double segEnd = tces[i]->getTick();
+            double avail = segEnd - t;
+            if (avail > 0.0) {
+                double spt = secondsPerTick(tempo);
+                double fpt = spt * sr;
+                double framesSeg = avail * fpt;
+                if (framesSeg > remaining) {
+                    return remaining / fpt;
+                }
+                remaining -= framesSeg;
+                t = segEnd;
             }
-
-            // Consume whole segment.
-            remainingFrames -= framesForSegment;
-            tick = segmentEndTick;
+            tempo = tces[i]->getTempo();
+            i++;
         }
 
-        tempo = tces[i]->getTempo();
-        i++;
+        if (remaining > 0.0) {
+            double spt = secondsPerTick(tempo);
+            double fpt = spt * sr;
+            return remaining / fpt;
+        }
+
+        return 0.0;
+    };
+
+    const bool loop = seq->isLoopEnabled();
+    const double loopStart = loop ? seq->getLoopStartTick() : 0.0;
+    const double loopEnd   = loop ? seq->getLoopEndTick()  : seq->getLastTick();
+
+    double framesLeft = (double)frameCount;
+    double currentTick = firstTick;
+    double totalTicks = 0.0;
+
+    if (!loop) {
+        return advanceThroughTempoMap(currentTick, framesLeft);
     }
 
-    // Final infinite segment (after last TCE).
-    if (remainingFrames > 0)
+    if (loopEnd - loopStart == 0)
     {
-        const double secsPerTick = secondsPerTick(tempo);
-        const double framesPerTick = secsPerTick * sr;
-
-        const double ticksHere = remainingFrames / framesPerTick;
-        return static_cast<int>(floor(ticksHere));
+        return 0;
     }
 
-    return 0;
+    if (currentTick < loopStart) {
+        double toLoopStart = loopStart - currentTick;
+        double ticks = advanceThroughTempoMap(currentTick, framesLeft);
+        if (ticks < toLoopStart) return ticks;
+        double spt = secondsPerTick(findTempoAt(currentTick));
+        double fpt = spt * sr;
+        double framesUsed = toLoopStart * fpt;
+        framesLeft -= framesUsed;
+        totalTicks += toLoopStart;
+        currentTick = loopStart;
+    } else if (currentTick > loopEnd) {
+        double toEnd = seq->getLastTick() - currentTick;
+        double ticks = advanceThroughTempoMap(currentTick, framesLeft);
+        if (ticks < toEnd) return ticks;
+        double spt = secondsPerTick(findTempoAt(currentTick));
+        double fpt = spt * sr;
+        double framesUsed = toEnd * fpt;
+        framesLeft -= framesUsed;
+        totalTicks += toEnd;
+        currentTick = loopStart;
+    }
+
+    while (framesLeft > 0.0) {
+        double toLoopEnd = loopEnd - currentTick;
+        double ticks = advanceThroughTempoMap(currentTick, framesLeft);
+        if (ticks < toLoopEnd) return totalTicks + ticks;
+        double spt = secondsPerTick(findTempoAt(currentTick));
+        double fpt = spt * sr;
+        double framesUsed = toLoopEnd * fpt;
+        framesLeft -= framesUsed;
+        totalTicks += toLoopEnd;
+        currentTick = loopStart;
+    }
+
+    return totalTicks;
 }

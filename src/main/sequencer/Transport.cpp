@@ -328,7 +328,12 @@ int Transport::getTickPosition() const
         const auto audioState = sequencer.getAudioStateManager()->getSnapshot();
         const auto seq = sequencer.getSelectedSequence().get();
         const TimeInSamples now = audioState.getTimeInSamples();
-        return playbackState.getCurrentTick(seq, now);
+        auto currentTick = playbackState.getCurrentTick(seq, now);
+        if (currentTick >= seq->getLastTick())
+        {
+            currentTick = seq->getLastTick() - 1;
+        }
+        return currentTick;
     }
 
     return

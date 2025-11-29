@@ -5,6 +5,6 @@ namespace mpc::sequencer
 {
     struct RenderContext;
     void
-    computeSafeValidity(RenderContext &renderCtx,
+    computeValidity(RenderContext &renderCtx,
                         TimeInSamples currentTime);
 } // namespace mpc::sequencer

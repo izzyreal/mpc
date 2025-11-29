@@ -1,29 +1,50 @@
 #include "sequencer/PlaybackState.hpp"
 
 #include "SeqUtil.hpp"
+#include "Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 
 using namespace mpc::sequencer;
 
-mpc::Tick PlaybackState::getCurrentTick(const Sequence *seq,
+mpc::PositionQuarterNotes PlaybackState::getSafeValidFromQN() const
+{
+    return Sequencer::ticksToQuarterNotes(safeValidFromTick);
+}
+
+mpc::PositionQuarterNotes PlaybackState::getSafeValidUntilQN() const
+{
+    return Sequencer::ticksToQuarterNotes(safeValidUntilTick);
+}
+
+mpc::PositionQuarterNotes PlaybackState::getLastTransitionQN() const
+{
+    return Sequencer::ticksToQuarterNotes(lastTransitionTick);
+}
+
+mpc::PositionQuarterNotes PlaybackState::getStrictValidFromQN() const
+{
+    return Sequencer::ticksToQuarterNotes(strictValidFromTick);
+}
+
+mpc::PositionQuarterNotes PlaybackState::getStrictValidUntilQN() const
+{
+    return Sequencer::ticksToQuarterNotes(strictValidUntilTick);
+}
+
+double PlaybackState::getCurrentTick(const Sequence *seq,
                                         const TimeInSamples now) const
 {
     const auto currentTimeInSamples = now;
-    const TimeInSamples deltaSamples =  currentTimeInSamples - originSampleTime;
+    const TimeInSamples deltaSamples =  currentTimeInSamples - lastTransitionTime;
 
-    const int deltaTicks = SeqUtil::getTickCountForFrames(
+    const double deltaTicks = SeqUtil::getTickCountForFrames(
         seq,
-        originTicks,
+        lastTransitionTick,
         deltaSamples,
         sampleRate
     );
 
-    int currentTick = originTicks + deltaTicks;
-
-    if (currentTick >= seq->getLastTick())
-    {
-        currentTick = seq->getLastTick() - 1;
-    }
+    const double currentTick = lastTransitionTick + deltaTicks;
 
     return currentTick;
 }

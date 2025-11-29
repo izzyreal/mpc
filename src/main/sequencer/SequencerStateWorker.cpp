@@ -170,10 +170,11 @@ void installTransition(RenderContext &ctx)
     const auto transitionTick = ctx.seq->getLoopEndTick();
     const auto &state = ctx.playbackState;
 
-    const auto origin = state.originTicks;
     const auto currentTick = state.getCurrentTick(ctx.seq, ctx.currentTime);
 
-    if (currentTick >= transitionTick)
+    const auto blockSizeTicks = state.strictLengthInTicks();
+
+    if (currentTick + blockSizeTicks >= transitionTick)
     {
         const auto toTick = ctx.seq->getLoopStartTick();
         ctx.playbackState.transition.activate(transitionTick, toTick);
@@ -181,16 +182,11 @@ void installTransition(RenderContext &ctx)
 }
 
 PlaybackState initPlaybackState(const PlaybackState &prev,
-                                const mpc::SampleRate sampleRate,
-                                const mpc::TimeInSamples currentTime)
+                                const mpc::SampleRate sampleRate)
 {
-    constexpr mpc::TimeInSamples snapshotWindowSize{44100 * 2};
-
     PlaybackState playbackState = prev;
     playbackState.transition.deactivate();
     playbackState.sampleRate = sampleRate;
-    playbackState.strictValidFrom = currentTime;
-    playbackState.strictValidUntil = currentTime + snapshotWindowSize;
     return playbackState;
 }
 
@@ -200,7 +196,7 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
                             Sequencer *sequencer)
 {
     PlaybackState playbackState =
-        initPlaybackState(prevState, sampleRate, currentTime);
+        initPlaybackState(prevState, sampleRate);
 
     RenderContext renderCtx{
         std::move(playbackState),
@@ -209,7 +205,7 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
         currentTime
     };
 
-    computeSafeValidity(renderCtx, currentTime);
+    computeValidity(renderCtx, currentTime);
 
     return renderCtx;
 }

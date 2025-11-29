@@ -17,7 +17,7 @@ void mpc::sequencer::renderSeq(RenderContext &ctx)
             }
 
             const auto eventTickToUse =
-                event.tick - ctx.playbackState.originTicks;
+                event.tick - ctx.playbackState.lastTransitionTick;
 
             const TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse,

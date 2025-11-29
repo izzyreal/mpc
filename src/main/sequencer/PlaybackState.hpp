@@ -23,25 +23,31 @@ namespace mpc::sequencer
         std::vector<RenderedEventState> events;
         PlaybackTransition transition;
 
-        TimeInSamples originSampleTime;
-        PositionQuarterNotes originQuarterNotes;
-        Tick originTicks;
+        TimeInSamples lastTransitionTime;
+        double lastTransitionTick;
 
         TimeInSamples strictValidFrom;
+        double strictValidFromTick;
+
         TimeInSamples strictValidUntil;
+        double strictValidUntilTick;
 
         TimeInSamples safeValidFrom;
-        Tick safeValidFromTick;
-        PositionQuarterNotes safeValidFromQuarterNote;
+        double safeValidFromTick;
 
         TimeInSamples safeValidUntil;
-        Tick safeValidUntilTick;
-        PositionQuarterNotes safeValidUntilQuarterNote;
+        double safeValidUntilTick;
 
         PlaybackState()
         {
             initializeDefaults();
         }
+
+        PositionQuarterNotes getSafeValidFromQN() const;
+        PositionQuarterNotes getSafeValidUntilQN() const;
+        PositionQuarterNotes getLastTransitionQN() const;
+        PositionQuarterNotes getStrictValidFromQN() const;
+        PositionQuarterNotes getStrictValidUntilQN() const;
 
         bool containsTimeInSamplesStrict(const TimeInSamples &t) const
         {
@@ -49,7 +55,17 @@ namespace mpc::sequencer
                    t < strictValidUntil;
         }
 
-        Tick getCurrentTick(const Sequence *, TimeInSamples now) const;
+        TimeInSamples strictLengthInSamples() const
+        {
+            return strictValidUntil - strictValidFrom;
+        }
+
+        double strictLengthInTicks() const
+        {
+            return strictValidUntilTick - strictValidFromTick;
+        }
+
+        double getCurrentTick(const Sequence *, TimeInSamples now) const;
 
         void initializeDefaults()
         {
@@ -57,28 +73,28 @@ namespace mpc::sequencer
             events = {};
             transition.deactivate();
 
-            originSampleTime = NoTimeInSamples;
-            originQuarterNotes = NoPositionQuarterNotes;
-            originTicks = NoTick;
+            lastTransitionTime = NoTimeInSamples;
+            lastTransitionTick = NoTick;
 
             strictValidFrom = NoTimeInSamples;
+            strictValidFromTick = NoTick;
+
             strictValidUntil = NoTimeInSamples;
+            strictValidUntilTick = NoTick;
 
             safeValidFrom = NoTimeInSamples;
             safeValidFromTick = NoTick;
-            safeValidFromQuarterNote = NoPositionQuarterNotes;
 
             safeValidUntil = NoTimeInSamples;
             safeValidUntilTick = NoTick;
-            safeValidUntilQuarterNote = NoPositionQuarterNotes;
         }
 
         void printOrigin() const
         {
             printf("== PlaybackState origin ==\n");
-            printf("originSampleTime: %lld\n", originSampleTime);
-            printf("originTicks: %lld\n", originTicks);
-            printf("originQuarterNotes: %f\n", originQuarterNotes);
+            printf("lastTransitionTime: %lld\n", lastTransitionTime);
+            printf("lastTransitionTicks: %f\n", lastTransitionTick);
+            printf("lastTransitionQN: %f\n", getLastTransitionQN());
         }
     };
 } // namespace mpc::sequencer

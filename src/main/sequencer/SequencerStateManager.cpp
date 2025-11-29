@@ -54,9 +54,8 @@ void SequencerStateManager::myApplyMessage(
         [&](const RefreshPlaybackStateWhileNotPlaying &m)
         {
             auto &playbackState = activeState.playbackState;
-            playbackState.originQuarterNotes = activeState.transport.positionQuarterNotes;
-            playbackState.originTicks = Sequencer::quarterNotesToTicks(playbackState.originQuarterNotes);
-            playbackState.originSampleTime = 0;
+            playbackState.lastTransitionTick = Sequencer::quarterNotesToTicks(activeState.transport.positionQuarterNotes);
+            playbackState.lastTransitionTime = 0;
 
             playbackState.events.clear();
             worker->refreshPlaybackState(

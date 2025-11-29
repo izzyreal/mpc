@@ -2,43 +2,46 @@
 
 #include "RenderContext.hpp"
 #include "SeqUtil.hpp"
-#include "Sequencer.hpp"
 
 constexpr mpc::TimeInSamples safetyMargin = 10000;
 
-void mpc::sequencer::computeSafeValidity(RenderContext &renderCtx,
-                                         const TimeInSamples currentTime)
+void mpc::sequencer::computeValidity(RenderContext &renderCtx,
+                                     const TimeInSamples currentTime)
 {
-    const TimeInSamples safeValidUntil =
-        renderCtx.playbackState.strictValidUntil - safetyMargin;
+    constexpr float renderBlockSizeSeconds = 2.0;
 
-    const TimeInSamples safeValidFrom = currentTime + safetyMargin;
+    auto &state = renderCtx.playbackState;
+    const auto seq = renderCtx.seq;
+    const auto sampleRate = state.sampleRate;
 
-    const auto framesUntil =
-        safeValidUntil - renderCtx.playbackState.strictValidFrom;
+    const TimeInSamples renderBlockSizeSamples{sampleRate * renderBlockSizeSeconds};
 
-    const auto framesFrom =
-        safeValidFrom - renderCtx.playbackState.strictValidFrom;
+    state.strictValidFrom = currentTime;
+    state.strictValidUntil = currentTime + renderBlockSizeSamples;
 
-    const Tick baseTick = renderCtx.playbackState.originTicks;
+    const TimeInSamples sinceTransition = currentTime - state.lastTransitionTime;
 
-    const Tick tickAdvanceUntil =
-        SeqUtil::getTickCountForFrames(renderCtx.seq, baseTick, framesUntil,
-                                       renderCtx.playbackState.sampleRate);
-    const Tick tickAdvanceFrom =
-        SeqUtil::getTickCountForFrames(renderCtx.seq, baseTick, framesFrom,
-                                       renderCtx.playbackState.sampleRate);
+    state.strictValidFromTick = SeqUtil::getTickCountForFrames(
+        seq, state.lastTransitionTick, sinceTransition, sampleRate);
 
-    const Tick untilTick = baseTick + tickAdvanceUntil;
-    const Tick fromTick = baseTick + tickAdvanceFrom;
+    const double ticksInBlock = SeqUtil::getTickCountForFrames(
+        seq, state.strictValidFromTick, renderBlockSizeSamples, sampleRate);
 
-    renderCtx.playbackState.safeValidUntil = safeValidUntil;
-    renderCtx.playbackState.safeValidUntilTick = untilTick;
-    renderCtx.playbackState.safeValidUntilQuarterNote =
-        Sequencer::ticksToQuarterNotes(untilTick);
+    state.strictValidUntilTick = state.strictValidFromTick + ticksInBlock;
 
-    renderCtx.playbackState.safeValidFrom = safeValidFrom;
-    renderCtx.playbackState.safeValidFromTick = fromTick;
-    renderCtx.playbackState.safeValidFromQuarterNote =
-        Sequencer::ticksToQuarterNotes(fromTick);
+    state.safeValidFrom = state.strictValidFrom + safetyMargin;
+    state.safeValidUntil = state.strictValidUntil - safetyMargin;
+
+    const TimeInSamples safeFromDelta = state.safeValidFrom - state.strictValidFrom;
+    const TimeInSamples safeUntilDelta = state.strictValidUntil - state.safeValidUntil;
+
+    state.safeValidFromTick =
+        state.strictValidFromTick +
+        SeqUtil::getTickCountForFrames(
+            seq, state.strictValidFromTick, safeFromDelta, sampleRate);
+
+    state.safeValidUntilTick =
+        state.strictValidUntilTick -
+        SeqUtil::getTickCountForFrames(
+            seq, state.safeValidUntilTick, safeUntilDelta, sampleRate);
 }
