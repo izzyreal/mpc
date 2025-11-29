@@ -199,7 +199,6 @@ PlaybackState initPlaybackState(const PlaybackState &prev,
                                 const mpc::SampleRate sampleRate)
 {
     PlaybackState playbackState = prev;
-    playbackState.transition.deactivate();
     playbackState.sampleRate = sampleRate;
     return playbackState;
 }
@@ -211,10 +210,12 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
 {
     PlaybackState playbackState = initPlaybackState(prevState, sampleRate);
 
-    if (prevState.transition.isActive())
+    if (playbackState.transition.isActive() &&
+        playbackState.transition.timeInSamples < currentTime)
     {
         playbackState.lastTransitionTick = prevState.transition.toTick;
         playbackState.lastTransitionTime = prevState.transition.timeInSamples;
+        playbackState.transition.deactivate();
     }
 
     RenderContext renderCtx{std::move(playbackState), sequencer,
@@ -236,7 +237,7 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
 
     installTransition(renderCtx);
 
-    // printRenderDebugInfo(prevState, renderCtx.playbackState);
+    printRenderDebugInfo(prevState, renderCtx.playbackState);
 
     renderSeq(renderCtx);
 
