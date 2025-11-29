@@ -1,8 +1,6 @@
 #include "sequencer/MetronomeRenderer.hpp"
 
 #include "SequenceStateView.hpp"
-#include "Sequencer.hpp"
-#include "Transport.hpp"
 #include "sequencer/RenderContext.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -13,15 +11,13 @@ mpc::sequencer::initMetronomeRenderContext(
     const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
         &isCurrentScreen,
     const std::function<bool()> &isRecMainWithoutPlaying,
-    const Sequencer *sequencer)
+    const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens)
 {
     const bool isStepEditor =
         isCurrentScreen({lcdgui::ScreenId::StepEditorScreen});
 
     const auto countMetronomeScreen =
-        sequencer->getScreens()
-            ->get<lcdgui::ScreenId::CountMetronomeScreen>()
-            .get();
+        getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>().get();
 
     return {countMetronomeScreen, isStepEditor, isRecMainWithoutPlaying()};
 }
@@ -29,15 +25,15 @@ mpc::sequencer::initMetronomeRenderContext(
 void mpc::sequencer::renderMetronome(RenderContext &ctx,
                                      const MetronomeRenderContext &mctx)
 {
-    if (!ctx.sequencer->getTransport()->isCountEnabled())
+    if (!ctx.transportStateView.isCountEnabled())
     {
         return;
     }
 
-    if (ctx.sequencer->getTransport()->isRecordingOrOverdubbing())
+    if (ctx.transportStateView.isRecordingOrOverdubbing())
     {
         if (!mctx.countMetronomeScreen->getInRec() &&
-            !ctx.sequencer->getTransport()->isCountingIn())
+            !ctx.transportStateView.isCountingIn())
         {
             return;
         }
@@ -45,7 +41,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx,
     else
     {
         if (!mctx.isStepEditor && !mctx.countMetronomeScreen->getInPlay() &&
-            !ctx.sequencer->getTransport()->isCountingIn() &&
+            !ctx.transportStateView.isCountingIn() &&
             !mctx.isRecMainWithoutPlaying)
         {
             return;

@@ -92,6 +92,10 @@ void TransportStateHandler::applyMessage(TransportState &state,
                  [&](const UpdateCountEnabled &m)
                  {
                      state.countEnabled = m.enabled;
+                 },
+                 [&](const SetCountingIn &m)
+                 {
+                     state.countingIn = m.countingIn;
                  }};
 
     std::visit(visitor, msg);

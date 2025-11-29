@@ -9,6 +9,11 @@ namespace mpc::sequencer
         double positionQuarterNotes;
     };
 
+    struct SetCountingIn
+    {
+        bool countingIn;
+    };
+
     struct Stop
     {
     };
@@ -60,10 +65,10 @@ namespace mpc::sequencer
                      Stop, Play, PlayFromStart, Record,
                      RecordFromStart, Overdub, OverdubFromStart,
                      SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
-                     UpdateCountEnabled>;
+                     UpdateCountEnabled, SetCountingIn>;
 
     using TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying =
-        std::variant<UpdateCountEnabled>;
+        std::variant<UpdateCountEnabled, SetCountingIn>;
 
     using TransportMessagesThatInvalidatePlaybackStateWhilePlaying =
         std::variant<UpdateCountEnabled>;

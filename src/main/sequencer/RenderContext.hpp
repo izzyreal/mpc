@@ -1,17 +1,16 @@
 #pragma once
 
 #include "PlaybackState.hpp"
+#include "TransportStateView.hpp"
 
 namespace mpc::sequencer
 {
     class SequenceStateView;
-    class Sequence;
-    class Sequencer;
 
     struct RenderContext
     {
         PlaybackState playbackState;
-        Sequencer *sequencer;
+        TransportStateView transportStateView;
         std::shared_ptr<SequenceStateView> seq;
         TimeInSamples currentTime;
     };

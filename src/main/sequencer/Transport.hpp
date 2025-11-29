@@ -103,7 +103,6 @@ namespace mpc::sequencer
     private:
         Sequencer &sequencer;
 
-        bool countingIn = false;
         bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         bool punchEnabled = false;

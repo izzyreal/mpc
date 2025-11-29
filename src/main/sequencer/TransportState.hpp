@@ -11,5 +11,6 @@ namespace mpc::sequencer
         bool recording = false;
         bool overdubbing = false;
         bool countEnabled = true;
+        bool countingIn = false;
     };
 } // namespace mpc::sequencer

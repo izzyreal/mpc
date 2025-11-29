@@ -30,7 +30,7 @@ namespace mpc::sequencer
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
 
-        TransportStateView getTransportState() const;
+        TransportStateView getTransportStateView() const;
 
     private:
         const std::shared_ptr<const SequencerState> state;

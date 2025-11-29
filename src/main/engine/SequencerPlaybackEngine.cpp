@@ -90,7 +90,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     const auto sequencerState = sequencer->getStateManager()->getSnapshot();
     const auto transportState =
-        sequencer->getStateManager()->getSnapshot().getTransportState();
+        sequencer->getStateManager()->getSnapshot().getTransportStateView();
 
     const auto playbackState = sequencerState.getPlaybackState();
 

@@ -44,3 +44,8 @@ bool TransportStateView::isRecordingOrOverdubbing() const
 {
     return state.recording || state.overdubbing;
 }
+
+bool TransportStateView::isCountingIn() const
+{
+    return state.countingIn;
+}

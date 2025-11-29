@@ -38,7 +38,7 @@ mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept
     return state->selectedSequenceIndex;
 }
 
-TransportStateView SequencerStateView::getTransportState() const
+TransportStateView SequencerStateView::getTransportStateView() const
 {
     return TransportStateView(state->transport);
 }

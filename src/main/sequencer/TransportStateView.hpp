@@ -25,6 +25,8 @@ namespace mpc::sequencer
 
         bool isRecordingOrOverdubbing() const;
 
+        bool isCountingIn() const;
+
     private:
         const TransportState state;
     };

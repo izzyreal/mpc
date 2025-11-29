@@ -40,7 +40,7 @@ bool Transport::isPlaying() const
 {
     return !metronomeOnlyEnabled && sequencer.getStateManager()
                                         ->getSnapshot()
-                                        .getTransportState()
+                                        .getTransportStateView()
                                         .isSequencerRunning();
 }
 
@@ -298,15 +298,15 @@ bool Transport::isCountEnabled() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
-        .getTransportState()
+        .getTransportStateView()
         .isCountEnabled();
 }
 
 void Transport::setCountingIn(const bool b)
 {
-    countingIn = b;
+    sequencer.getStateManager()->enqueue(SetCountingIn{b});
 
-    if (!countingIn)
+    if (!b)
     {
         resetCountInPositions();
     }
@@ -314,20 +314,23 @@ void Transport::setCountingIn(const bool b)
 
 bool Transport::isCountingIn() const
 {
-    return countingIn;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isCountingIn();
 }
 
 int Transport::getTickPosition() const
 {
-    const auto snapshot = sequencer.getStateManager()
-        ->getSnapshot();
-    const auto transportState = snapshot.getTransportState();
+    const auto snapshot = sequencer.getStateManager()->getSnapshot();
+    const auto transportState = snapshot.getTransportStateView();
 
     if (transportState.isSequencerRunning())
     {
         const auto playbackState = snapshot.getPlaybackState();
         const auto audioState = sequencer.getAudioStateManager()->getSnapshot();
-        const auto seq = snapshot.getSequenceState(snapshot.getSelectedSequenceIndex());
+        const auto seq =
+            snapshot.getSequenceState(snapshot.getSelectedSequenceIndex());
         const TimeInSamples now = audioState.getTimeInSamples();
         auto currentTick = playbackState.getCurrentTick(*seq, now);
 
@@ -338,16 +341,14 @@ int Transport::getTickPosition() const
         return currentTick;
     }
 
-    return
-        transportState
-        .getPositionTicks();
+    return transportState.getPositionTicks();
 }
 
 double Transport::getPositionQuarterNotes() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
-        .getTransportState()
+        .getTransportStateView()
         .getPositionQuarterNotes();
 }
 
@@ -478,7 +479,7 @@ bool Transport::isRecording() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
-        .getTransportState()
+        .getTransportStateView()
         .isRecording();
 }
 
@@ -486,7 +487,7 @@ bool Transport::isOverdubbing() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
-        .getTransportState()
+        .getTransportStateView()
         .isOverdubbing();
 }
 
@@ -540,7 +541,7 @@ int Transport::getCurrentBeatIndex() const
 
     auto index = pos;
 
-    if (isPlaying() && !countingIn)
+    if (isPlaying() && !isCountingIn())
     {
         index = getTickPosition();
 
@@ -582,17 +583,16 @@ int Transport::getCurrentClockNumber() const
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                       : sequencer.getSelectedSequence();
 
-    auto clock =
-        isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
-            : getTickPosition();
+    auto clock = isCountingIn()
+                     ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
+                     : getTickPosition();
 
     if (clock == sequence->getLastTick())
     {
         return 0;
     }
 
-    if (isPlaying() && !countingIn)
+    if (isPlaying() && !isCountingIn())
     {
         if (clock > sequence->getLastTick())
         {

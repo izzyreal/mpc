@@ -4,6 +4,10 @@
 
 #include <functional>
 
+namespace mpc::lcdgui
+{
+    class Screens;
+}
 namespace mpc::lcdgui::screens::window
 {
     class CountMetronomeScreen;
@@ -11,11 +15,10 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::sequencer
 {
-    class Sequencer;
     struct RenderContext;
     struct MetronomeRenderContext
     {
-        lcdgui::screens::window::CountMetronomeScreen *countMetronomeScreen;
+        CountMetronomeScreen *countMetronomeScreen;
         bool isStepEditor;
         bool isRecMainWithoutPlaying;
     };
@@ -24,7 +27,7 @@ namespace mpc::sequencer
         const std::function<bool(std::initializer_list<lcdgui::ScreenId>)>
             &isCurrentScreen,
         const std::function<bool()> &isRecMainWithoutPlaying,
-        const Sequencer *);
+        const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens);
 
     void renderMetronome(RenderContext &ctx,
                          const MetronomeRenderContext &mctx);
