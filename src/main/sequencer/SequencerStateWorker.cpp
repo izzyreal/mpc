@@ -157,6 +157,40 @@ void printRenderDebugInfo(const PlaybackState &s)
     printf("===================\n");
 }
 
+void installTransition(RenderContext &ctx)
+{
+
+}
+
+PlaybackState initPlaybackState(const PlaybackState &prev,
+                                const mpc::SampleRate sampleRate,
+                                const mpc::TimeInSamples currentTime)
+{
+    constexpr mpc::TimeInSamples snapshotWindowSize{44100 * 2};
+
+    PlaybackState playbackState = prev;
+    playbackState.sampleRate = sampleRate;
+    playbackState.strictValidFrom = currentTime;
+    playbackState.strictValidUntil = currentTime + snapshotWindowSize;
+    return playbackState;
+}
+
+RenderContext initRenderCtx(const PlaybackState &prevState,
+                            const mpc::SampleRate sampleRate,
+                            const mpc::TimeInSamples currentTime,
+                            Sequencer *sequencer)
+{
+    PlaybackState playbackState =
+        initPlaybackState(prevState, sampleRate, currentTime);
+
+    RenderContext renderCtx{std::move(playbackState), sequencer,
+                            sequencer->getCurrentlyPlayingSequence().get()};
+
+    computeSafeValidity(renderCtx, currentTime);
+
+    return renderCtx;
+}
+
 PlaybackState
 SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
                                           const PlaybackState &prevState,
@@ -164,16 +198,8 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
 {
     printRenderDebugInfo(prevState);
 
-    const TimeInSamples strictValidUntil = currentTime + snapshotWindowSize;
-
-    PlaybackState playbackState = prevState;
-    playbackState.sampleRate = sampleRate;
-
-    playbackState.strictValidFrom = currentTime;
-    playbackState.strictValidUntil = strictValidUntil;
-
-    RenderContext renderCtx{std::move(playbackState), sequencer,
-                            sequencer->getCurrentlyPlayingSequence().get()};
+    auto renderCtx =
+        initRenderCtx(prevState, sampleRate, currentTime, sequencer);
 
     renderSeq(renderCtx);
 
@@ -189,8 +215,6 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
                                       isRecMainWithoutPlaying()};
 
     renderMetronome(renderCtx, mctx);
-
-    computeSafeValidity(renderCtx, currentTime, strictValidUntil);
 
     return renderCtx.playbackState;
 }

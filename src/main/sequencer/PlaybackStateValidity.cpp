@@ -7,10 +7,10 @@
 constexpr mpc::TimeInSamples safetyMargin = 10000;
 
 void mpc::sequencer::computeSafeValidity(RenderContext &renderCtx,
-                                         const TimeInSamples currentTime,
-                                         const TimeInSamples strictValidUntil)
+                                         const TimeInSamples currentTime)
 {
-    const TimeInSamples safeValidUntil = strictValidUntil - safetyMargin;
+    const TimeInSamples safeValidUntil =
+        renderCtx.playbackState.strictValidUntil - safetyMargin;
 
     const TimeInSamples safeValidFrom = currentTime + safetyMargin;
 
