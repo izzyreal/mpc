@@ -109,5 +109,23 @@ namespace mpc::sequencer
         {
             return !(*this == other);
         }
+
+        void printInfo() const
+        {
+            printf("== EventState ==\n");
+            printf("     type: %s\n", eventTypeToString(type).c_str());
+            printf("  eventId: %i\n", eventId);
+            printf(" sequence: %i\n", sequenceIndex.get());
+            printf("    track: %i\n", trackIndex.get());
+            printf("     tick: %lld\n", tick);
+
+            if (type == EventType::NoteOn)
+            {
+                printf("     note: %i\n", noteNumber.get());
+                printf(" velocity: %i\n", velocity.get());
+                printf(" duration: %i\n", duration.get());
+            }
+            printf("================\n");
+        }
     };
 } // namespace mpc::sequencer

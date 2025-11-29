@@ -256,22 +256,19 @@ void renderMetronome(RenderContext &ctx, const MetronomeRenderContext &mctx)
 
 void renderSeq(RenderContext &ctx)
 {
-    printf("Rendering seq %s for playback time %lld at tick offset %i\n",
-           ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
-           Sequencer::quarterNotesToTicks(
-               ctx.playbackState.playOffsetQuarterNotes));
+    const auto playOffsetTicks = Sequencer::quarterNotesToTicks(
+                                      ctx.playbackState.playOffsetQuarterNotes);
+
+    // printf("Rendering seq %s for playback time %lld at tick offset %i\n",
+    //        ctx.seq->getName().c_str(), ctx.playbackState.currentTimeInSamples,
+    //        playOffsetTicks);
 
     for (const auto &track : ctx.seq->getTracks())
     {
         for (const auto &eventState : track->getEventStates())
         {
-            // printf("Rendering event with seq %i track %i tick %i\n",
-            // eventState.sequenceIndex, eventState.trackIndex,
-            // eventState.tick);
-
             const auto eventTickToUse =
-                eventState.tick - Sequencer::quarterNotesToTicks(
-                                      ctx.playbackState.playOffsetQuarterNotes);
+                eventState.tick - playOffsetTicks;
 
             const mpc::TimeInSamples eventTime = SeqUtil::getEventTimeInSamples(
                 ctx.seq, eventTickToUse, ctx.playbackState.currentTimeInSamples,
