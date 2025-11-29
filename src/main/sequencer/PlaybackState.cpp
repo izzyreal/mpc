@@ -1,8 +1,8 @@
 #include "sequencer/PlaybackState.hpp"
 
-#include "SeqUtil.hpp"
 #include "Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "utils/SequencerTiming.hpp"
 
 using namespace mpc::sequencer;
 
@@ -32,20 +32,20 @@ mpc::PositionQuarterNotes PlaybackState::getStrictValidUntilQN() const
 }
 
 double PlaybackState::getCurrentTick(const Sequence *seq,
-                                        const TimeInSamples now) const
+                                     const TimeInSamples now) const
 {
-    const TimeInSamples deltaSamples =  now - lastTransitionTime;
+    const TimeInSamples deltaSamples = now - lastTransitionTime;
 
-    const double deltaTicks = SeqUtil::getTickCountForFrames(
-        seq,
-        lastTransitionTick,
-        deltaSamples,
-        sampleRate
-    );
+    const auto sequenceTimingData = utils::getSequenceTimingData(seq);
 
-    const double currentTick = fmod(lastTransitionTick + deltaTicks, static_cast<double>(seq->getLastTick()));
+    const double deltaTicks = utils::getTickCountForFrames(
+        sequenceTimingData, lastTransitionTick, deltaSamples, sampleRate);
 
-    // printf("now: %lld, lastTransitionTime: %lld, deltaSamples: %lld, currenTick: %f\n", now, lastTransitionTime, deltaSamples, currentTick);
+    const double currentTick = fmod(lastTransitionTick + deltaTicks,
+                                    static_cast<double>(seq->getLastTick()));
+
+    // printf("now: %lld, lastTransitionTime: %lld, deltaSamples: %lld,
+    // currenTick: %f\n", now, lastTransitionTime, deltaSamples, currentTick);
 
     return currentTick;
 }

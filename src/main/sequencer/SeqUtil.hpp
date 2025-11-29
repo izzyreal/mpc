@@ -76,9 +76,6 @@ namespace mpc::sequencer
         static bool isStepRecording(const std::string &currentScreenName,
                                     const std::shared_ptr<Sequencer> &);
 
-        static double getTickCountForFrames(const Sequence *seq, double firstTick,
-                                         int frameCount, int sr);
-
         static int getFrameCountForTicks(const Sequence* seq,
                                            double firstTick,
                                            double tickCount,
