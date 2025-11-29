@@ -48,9 +48,6 @@ namespace mpc::sequencer
 
         Sequencer *sequencer;
 
-        bool willLoopWithinSafetyMargin(const PlaybackState &,
-                                        TimeInSamples now) const;
-
         PlaybackState
         renderPlaybackState(SampleRate,
                             const PlaybackState &previousPlaybackState,
