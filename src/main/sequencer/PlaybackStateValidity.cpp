@@ -1,8 +1,6 @@
 #include "sequencer/PlaybackStateValidity.hpp"
 
 #include "RenderContext.hpp"
-#include "SeqUtil.hpp"
-#include "Sequence.hpp"
 #include "TempoChangeEvent.hpp"
 #include "utils/SequencerTiming.hpp"
 
@@ -26,7 +24,7 @@ void mpc::sequencer::computeValidity(RenderContext &renderCtx,
     const TimeInSamples sinceTransition =
         currentTime - state.lastTransitionTime;
 
-    const auto sequenceTimingData = utils::getSequenceTimingData(seq);
+    const auto sequenceTimingData = utils::getSequenceTimingData(*seq);
 
     state.strictValidFromTick = utils::getTickCountForFrames(
         sequenceTimingData, state.lastTransitionTick, sinceTransition, sampleRate);

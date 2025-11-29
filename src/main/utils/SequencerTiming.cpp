@@ -1,22 +1,23 @@
 #include "utils/SequencerTiming.hpp"
 
 #include "sequencer/Sequence.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/SequenceStateView.hpp"
 
 mpc::utils::SequenceTimingData
-mpc::utils::getSequenceTimingData(const sequencer::Sequence *seq)
+mpc::utils::getSequenceTimingData(const sequencer::SequenceStateView &seq)
 {
     SequenceTimingData result;
-    result.initialTempo = seq->getInitialTempo();
-    result.lastTick = seq->getLastTick();
-    result.loopEnabled = seq->isLoopEnabled();
-    result.loopStartTick = seq->getLoopStartTick();
-    result.loopEndTick = seq->getLoopEndTick();
+    result.initialTempo = seq.getInitialTempo();
+    result.lastTick = seq.getLastTick();
+    result.loopEnabled = seq.isLoopEnabled();
+    result.loopStartTick = seq.getLoopStartTick();
+    result.loopEndTick = seq.getLoopEndTick();
 
-    for (const auto e : seq->getTempoChangeEvents())
+    for (const auto e : seq.getTempoChangeEvents())
     {
-        result.tempoChanges.push_back(TempoChangeEventData{
-            static_cast<double>(e->getTick()), e->getTempo()});
+        const auto tempo = result.initialTempo * e.amount * 0.001;
+        result.tempoChanges.push_back(
+            TempoChangeEventData{static_cast<double>(e.tick), tempo});
     }
 
     return result;
@@ -211,4 +212,30 @@ int mpc::utils::getFrameCountForTicks(const SequenceTimingData &s,
     }
 
     return static_cast<int>(std::ceil(frames));
+}
+
+int mpc::utils::getEventTimeInSamples(const sequencer::SequenceStateView &seq,
+                                      const int eventTick,
+                                      const int currentTimeSamples,
+                                      const SampleRate sampleRate)
+{
+    const auto seqTimingData = getSequenceTimingData(seq);
+    const auto seqFrameLength = getFrameCountForTicks(seqTimingData, 0, seq.getLastTick(), sampleRate);
+    const int loopLen = seqFrameLength;
+
+    if (loopLen <= 0)
+    {
+        return currentTimeSamples;
+    }
+
+    const int phase = currentTimeSamples % loopLen;
+
+    const int eventSample = getFrameCountForTicks(seqTimingData, 0, eventTick, sampleRate);
+
+    if (eventSample >= phase)
+    {
+        return currentTimeSamples + (eventSample - phase);
+    }
+
+    return currentTimeSamples + (loopLen - (phase - eventSample));
 }

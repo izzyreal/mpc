@@ -75,9 +75,5 @@ namespace mpc::sequencer
 
         static bool isStepRecording(const std::string &currentScreenName,
                                     const std::shared_ptr<Sequencer> &);
-
-        static int getEventTimeInSamples(const Sequence *seq, int eventTick,
-                                         int currentTimeSamples,
-                                         SampleRate sampleRate);
     };
 } // namespace mpc::sequencer

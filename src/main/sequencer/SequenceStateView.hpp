@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EventState.hpp"
 #include "IntTypes.hpp"
 #include "TimeSignature.hpp"
 
@@ -46,6 +47,8 @@ namespace mpc::sequencer
         bool isUsed() const;
 
         bool isTempoChangeEnabled() const;
+
+        std::vector<EventState> getTempoChangeEvents() const;
 
     private:
         const SequenceState &state;

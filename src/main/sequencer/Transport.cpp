@@ -4,6 +4,7 @@
 #include "SequencerStateManager.hpp"
 #include "SequencerStateWorker.hpp"
 #include "SeqUtil.hpp"
+#include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
 #include "SequencerAudioStateManager.hpp"
 #include "hardware/Hardware.hpp"
@@ -326,9 +327,9 @@ int Transport::getTickPosition() const
     {
         const auto playbackState = snapshot.getPlaybackState();
         const auto audioState = sequencer.getAudioStateManager()->getSnapshot();
-        const auto seq = sequencer.getSelectedSequence().get();
+        const auto seq = snapshot.getSequenceState(snapshot.getSelectedSequenceIndex());
         const TimeInSamples now = audioState.getTimeInSamples();
-        auto currentTick = playbackState.getCurrentTick(seq, now);
+        auto currentTick = playbackState.getCurrentTick(*seq, now);
 
         if (currentTick >= seq->getLastTick())
         {

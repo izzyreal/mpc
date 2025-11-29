@@ -470,33 +470,3 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
     };
     return currentScreenName == "step-editor" && !posIsLastTick();
 }
-
-int SeqUtil::getEventTimeInSamples(const Sequence *seq, const int eventTick,
-                                   const int currentTimeSamples,
-                                   const SampleRate sampleRate)
-{
-    // 1. Loop length in samples
-    const int loopLen = static_cast<int>(
-        sequenceFrameLength(seq, 0, seq->getLastTick(), sampleRate));
-
-    if (loopLen <= 0)
-    {
-        return currentTimeSamples; // degenerate sequence
-    }
-
-    // 2. Where are we inside the loop?
-    const int phase = currentTimeSamples % loopLen;
-
-    // 3. Convert event tick → sample offset from start of loop
-    const int eventSample =
-        static_cast<int>(sequenceFrameLength(seq, 0, eventTick, sampleRate));
-
-    // 4. If event is still ahead in this loop: simple forward offset
-    if (eventSample >= phase)
-    {
-        return currentTimeSamples + (eventSample - phase);
-    }
-
-    // 5. Otherwise event lies in the next loop iteration
-    return currentTimeSamples + (loopLen - (phase - eventSample));
-}

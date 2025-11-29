@@ -1,12 +1,12 @@
 #include "sequencer/MetronomeRenderer.hpp"
 
-#include "SeqUtil.hpp"
-#include "Sequence.hpp"
+#include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
 #include "Transport.hpp"
 #include "sequencer/RenderContext.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
+#include "utils/SequencerTiming.hpp"
 
 mpc::sequencer::MetronomeRenderContext
 mpc::sequencer::initMetronomeRenderContext(
@@ -90,18 +90,19 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx,
 
         const auto barLength = ts.getBarLength();
 
+        auto seqTimingData = utils::getSequenceTimingData(*ctx.seq);
+
         for (int j = 0; j < barLength; j += denTicks)
         {
             const auto eventTick = j + barTickOffset;
             const auto eventTickToUse =
                 eventTick - ctx.playbackState.lastTransitionTick;
 
-            const auto eventTimeInSamples = SeqUtil::getEventTimeInSamples(
-                ctx.seq, eventTickToUse, ctx.playbackState.strictValidFrom,
+            const auto eventTime = utils::getEventTimeInSamples(
+                *ctx.seq, eventTickToUse, ctx.playbackState.strictValidFrom,
                 ctx.playbackState.sampleRate);
 
-            if (!ctx.playbackState.containsTimeInSamplesStrict(
-                    eventTimeInSamples))
+            if (!ctx.playbackState.containsTimeInSamplesStrict(eventTime))
             {
                 continue;
             }
@@ -111,7 +112,7 @@ void mpc::sequencer::renderMetronome(RenderContext &ctx,
             eventState.type = EventType::MetronomeClick;
             eventState.velocity = j == 0 ? MaxVelocity : MediumVelocity;
             ctx.playbackState.events.emplace_back(
-                RenderedEventState{std::move(eventState), eventTimeInSamples});
+                RenderedEventState{std::move(eventState), eventTime});
         }
 
         barTickOffset += barLength;

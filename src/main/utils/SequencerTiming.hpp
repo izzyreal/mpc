@@ -1,11 +1,14 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 
 namespace mpc::sequencer
 {
     class Sequence;
-}
+    class SequenceStateView;
+} // namespace mpc::sequencer
 
 namespace mpc::utils
 {
@@ -26,19 +29,19 @@ namespace mpc::utils
         double loopStartTick = 0.0;
         double loopEndTick = 0.0;
 
-        double lastTick = 0.0;   // total sequence length in ticks
+        double lastTick = 0.0; // total sequence length in ticks
     };
 
-    SequenceTimingData getSequenceTimingData(const sequencer::Sequence *seq);
+    SequenceTimingData
+    getSequenceTimingData(const sequencer::SequenceStateView &);
 
+    double getTickCountForFrames(const SequenceTimingData &s, double firstTick,
+                                 int frameCount, int sr);
 
-    double getTickCountForFrames(const SequenceTimingData& s,
-                             double firstTick,
-                             int frameCount,
-                             int sr);
+    int getFrameCountForTicks(const SequenceTimingData &s, double firstTick,
+                              double tickCount, int sr);
 
-    int getFrameCountForTicks(const SequenceTimingData &s,
-                                   double firstTick,
-                                   double tickCount,
-                                   int sr);
-}
+    int getEventTimeInSamples(const sequencer::SequenceStateView &,
+                              int eventTick, int currentTimeSamples,
+                              SampleRate);
+} // namespace mpc::utils

@@ -1,5 +1,6 @@
 #include "sequencer/PlaybackState.hpp"
 
+#include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "utils/SequencerTiming.hpp"
@@ -31,7 +32,7 @@ mpc::PositionQuarterNotes PlaybackState::getStrictValidUntilQN() const
     return Sequencer::ticksToQuarterNotes(strictValidUntilTick);
 }
 
-double PlaybackState::getCurrentTick(const Sequence *seq,
+double PlaybackState::getCurrentTick(const SequenceStateView &seq,
                                      const TimeInSamples now) const
 {
     const TimeInSamples deltaSamples = now - lastTransitionTime;
@@ -42,7 +43,7 @@ double PlaybackState::getCurrentTick(const Sequence *seq,
         sequenceTimingData, lastTransitionTick, deltaSamples, sampleRate);
 
     const double currentTick = fmod(lastTransitionTick + deltaTicks,
-                                    static_cast<double>(seq->getLastTick()));
+                                    static_cast<double>(seq.getLastTick()));
 
     // printf("now: %lld, lastTransitionTime: %lld, deltaSamples: %lld,
     // currenTick: %f\n", now, lastTransitionTime, deltaSamples, currentTick);

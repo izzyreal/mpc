@@ -9,6 +9,7 @@
 
 namespace mpc::sequencer
 {
+    class SequenceStateView;
     class Sequence;
 
     struct RenderedEventState
@@ -65,7 +66,7 @@ namespace mpc::sequencer
             return strictValidUntilTick - strictValidFromTick;
         }
 
-        double getCurrentTick(const Sequence *, TimeInSamples now) const;
+        double getCurrentTick(const SequenceStateView &, TimeInSamples now) const;
 
         void initializeDefaults()
         {

@@ -6,6 +6,7 @@
 #include "RenderContext.hpp"
 #include "Sequence.hpp"
 #include "SequenceRenderer.hpp"
+#include "SequenceStateView.hpp"
 #include "Track.hpp"
 #include "SequencerStateManager.hpp"
 #include "SequencerAudioStateManager.hpp"
@@ -83,13 +84,13 @@ void SequencerStateWorker::stopAndWaitUntilStopped()
 
 void SequencerStateWorker::work() const
 {
-    const auto snapshot = sequencer->getStateManager()->getSnapshot();
-    const auto transportState = snapshot.getTransportState();
+    const auto sequencerStateView = sequencer->getStateManager()->getSnapshot();
+    const auto transportState = sequencerStateView.getTransportState();
 
     const auto audioSnapshot = sequencer->getAudioStateManager()->getSnapshot();
     const auto currentTimeInSamples = audioSnapshot.getTimeInSamples();
 
-    auto playbackState = snapshot.getPlaybackState();
+    auto playbackState = sequencerStateView.getPlaybackState();
 
     const auto seq = sequencer->getSelectedSequence();
 
@@ -135,8 +136,9 @@ void SequencerStateWorker::refreshPlaybackState(
     const auto playbackEngine = sequencer->getSequencerPlaybackEngine();
     const auto sampleRate = playbackEngine->getSampleRate();
 
+    const auto sequencerStateView = sequencer->getStateManager()->getSnapshot();
     const auto playbackState = renderPlaybackState(
-        SampleRate(sampleRate), previousPlaybackState, timeInSamplesToUse);
+        SampleRate(sampleRate), previousPlaybackState, timeInSamplesToUse, sequencerStateView);
 
     sequencer->getStateManager()->enqueue(
         UpdatePlaybackState{std::move(playbackState), onComplete});
@@ -173,7 +175,7 @@ void installTransition(RenderContext &ctx)
     const auto transitionTick = ctx.seq->getLoopEndTick();
     const auto &state = ctx.playbackState;
 
-    const auto currentTick = state.getCurrentTick(ctx.seq, ctx.currentTime);
+    const auto currentTick = state.getCurrentTick(*ctx.seq, ctx.currentTime);
 
     const auto blockSizeTicks = state.strictLengthInTicks();
 
@@ -182,7 +184,7 @@ void installTransition(RenderContext &ctx)
         const auto toTick = ctx.seq->getLoopStartTick();
         const double ticksUntilTransition = transitionTick - currentTick;
 
-        const auto sequenceTimingData = mpc::utils::getSequenceTimingData(ctx.seq);
+        const auto sequenceTimingData = mpc::utils::getSequenceTimingData(*ctx.seq);
 
         int transitionFrame = mpc::utils::getFrameCountForTicks(
             sequenceTimingData, currentTick, ticksUntilTransition,
@@ -206,7 +208,8 @@ PlaybackState initPlaybackState(const PlaybackState &prev,
 RenderContext initRenderCtx(const PlaybackState &prevState,
                             const mpc::SampleRate sampleRate,
                             const mpc::TimeInSamples currentTime,
-                            Sequencer *sequencer)
+                            Sequencer *sequencer,
+                            const SequencerStateView& sequencerStateView)
 {
     PlaybackState playbackState = initPlaybackState(prevState, sampleRate);
 
@@ -218,8 +221,11 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
         playbackState.transition.deactivate();
     }
 
+    const auto seqIndex = sequencerStateView.getSelectedSequenceIndex();
+    const auto seqState = sequencerStateView.getSequenceState(seqIndex);
+
     RenderContext renderCtx{std::move(playbackState), sequencer,
-                            sequencer->getCurrentlyPlayingSequence().get(),
+                            seqState,
                             currentTime};
 
     computeValidity(renderCtx, currentTime);
@@ -230,10 +236,11 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
 PlaybackState
 SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
                                           const PlaybackState &prevState,
-                                          const TimeInSamples currentTime) const
+                                          const TimeInSamples currentTime,
+    const SequencerStateView &sequencerStateView) const
 {
     auto renderCtx =
-        initRenderCtx(prevState, sampleRate, currentTime, sequencer);
+        initRenderCtx(prevState, sampleRate, currentTime, sequencer, sequencerStateView);
 
     installTransition(renderCtx);
 

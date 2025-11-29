@@ -9,6 +9,7 @@
 
 namespace mpc::sequencer
 {
+    class SequencerStateView;
     class Sequencer;
 
     class SequencerStateWorker
@@ -44,9 +45,9 @@ namespace mpc::sequencer
 
         Sequencer *sequencer;
 
-        PlaybackState
-        renderPlaybackState(SampleRate,
-                            const PlaybackState &prevState,
-                            TimeInSamples) const;
+        PlaybackState renderPlaybackState(SampleRate,
+                                          const PlaybackState &prevState,
+                                          TimeInSamples,
+                                          const SequencerStateView&) const;
     };
 } // namespace mpc::sequencer

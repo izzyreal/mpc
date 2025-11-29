@@ -4,6 +4,7 @@
 
 namespace mpc::sequencer
 {
+    class SequenceStateView;
     class Sequence;
     class Sequencer;
 
@@ -11,7 +12,7 @@ namespace mpc::sequencer
     {
         PlaybackState playbackState;
         Sequencer *sequencer;
-        Sequence *seq;
+        std::shared_ptr<SequenceStateView> seq;
         TimeInSamples currentTime;
     };
 }
