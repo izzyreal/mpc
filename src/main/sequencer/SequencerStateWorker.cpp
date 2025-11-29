@@ -157,19 +157,14 @@ void printRenderDebugInfo(const PlaybackState &s)
     printf("===================\n");
 }
 
-PlaybackState SequencerStateWorker::renderPlaybackState(
-    const SampleRate sampleRate, const PlaybackState &prevState,
-    const TimeInSamples currentTime) const
+PlaybackState
+SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
+                                          const PlaybackState &prevState,
+                                          const TimeInSamples currentTime) const
 {
     printRenderDebugInfo(prevState);
 
     const TimeInSamples strictValidUntil = currentTime + snapshotWindowSize;
-
-    const auto seqIndex = sequencer->isSongModeEnabled()
-                              ? sequencer->getSongSequenceIndex()
-                              : sequencer->getSelectedSequenceIndex();
-
-    const auto seq = sequencer->getSequence(seqIndex);
 
     PlaybackState playbackState = prevState;
     playbackState.sampleRate = sampleRate;
@@ -177,7 +172,8 @@ PlaybackState SequencerStateWorker::renderPlaybackState(
     playbackState.strictValidFrom = currentTime;
     playbackState.strictValidUntil = strictValidUntil;
 
-    RenderContext renderCtx{std::move(playbackState), sequencer, seq.get()};
+    RenderContext renderCtx{std::move(playbackState), sequencer,
+                            sequencer->getCurrentlyPlayingSequence().get()};
 
     renderSeq(renderCtx);
 

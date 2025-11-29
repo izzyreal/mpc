@@ -3,6 +3,7 @@
 #include "EventState.hpp"
 #include "IntTypes.hpp"
 #include "FloatTypes.hpp"
+#include "PlaybackTransition.hpp"
 
 #include <vector>
 
@@ -20,6 +21,7 @@ namespace mpc::sequencer
     {
         SampleRate sampleRate;
         std::vector<RenderedEventState> events;
+        PlaybackTransition transition;
 
         TimeInSamples originSampleTime;
         PositionQuarterNotes originQuarterNotes;
@@ -53,6 +55,7 @@ namespace mpc::sequencer
         {
             sampleRate = NoSampleRate;
             events = {};
+            transition.deactivate();
 
             originSampleTime = NoTimeInSamples;
             originQuarterNotes = NoPositionQuarterNotes;
