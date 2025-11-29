@@ -32,14 +32,12 @@ namespace mpc::controller
 
         bool isRecLocked() const
         {
-            return buttonLockTracker.isLocked(
-                hardware::ComponentId::REC);
+            return buttonLockTracker.isLocked(hardware::ComponentId::REC);
         }
 
         bool isOverdubLocked() const
         {
-            return buttonLockTracker.isLocked(
-                hardware::ComponentId::OVERDUB);
+            return buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
         }
 
         void lockNoteRepeat()

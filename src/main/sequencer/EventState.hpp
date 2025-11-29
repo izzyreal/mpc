@@ -88,8 +88,7 @@ namespace mpc::sequencer
         {
             return type == other.type && trackIndex == other.trackIndex &&
                    sequenceIndex == other.sequenceIndex && tick == other.tick &&
-                   noteNumber == other.noteNumber &&
-                   eventId == other.eventId &&
+                   noteNumber == other.noteNumber && eventId == other.eventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
                    metronomeOnlyTickPosition ==

@@ -4,6 +4,13 @@
 
 namespace mpc
 {
+    template <class... Ts> struct Overload : Ts...
+    {
+        using Ts::operator()...;
+    };
+
+    template <class... Ts> Overload(Ts...) -> Overload<Ts...>;
+
     template <typename V, typename... Ts>
     bool isVariantAnyOf(const V &v, std::variant<Ts...> const &)
     {

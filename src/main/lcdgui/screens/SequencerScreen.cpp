@@ -267,14 +267,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             }
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getSelectedSequence()->getBarCount();
-                        },
-                        [&](auto)
-                        {
-                            displayBars();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSequence()->getBarCount();
+         },
+         [&](auto)
+         {
+             displayBars();
+         }});
 }
 
 void SequencerScreen::open()

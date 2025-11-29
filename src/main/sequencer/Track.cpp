@@ -107,7 +107,8 @@ EventState Track::findRecordingNoteOnEventById(const EventId id)
 
     bool foundInQueue = false;
 
-    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), bulkNoteOns.size());
+    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(),
+                                                            bulkNoteOns.size());
 
     for (const auto &e : bulkNoteOns)
     {
@@ -142,7 +143,8 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     bool foundInQueue = false;
 
-    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), bulkNoteOns.size());
+    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(),
+                                                            bulkNoteOns.size());
 
     for (const auto &e : bulkNoteOns)
     {

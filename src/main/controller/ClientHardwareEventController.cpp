@@ -68,7 +68,8 @@ bool ClientHardwareEventController::isRecLockedOrPressed() const
 
 bool ClientHardwareEventController::isOverdubLockedOrPressed() const
 {
-    return isOverdubLocked() || mpc.getHardware()->getButton(OVERDUB)->isPressed();
+    return isOverdubLocked() ||
+           mpc.getHardware()->getButton(OVERDUB)->isPressed();
 }
 
 mpc::TimeInMilliseconds

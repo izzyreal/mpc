@@ -33,12 +33,6 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
     myApplyMessage(msg);
 }
 
-template <class... Ts> struct Overload : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts> Overload(Ts...) -> Overload<Ts...>;
-
 void SequencerStateManager::myApplyMessage(
     const SequencerMessage &msg, const bool autoRefreshPlaybackState) noexcept
 {

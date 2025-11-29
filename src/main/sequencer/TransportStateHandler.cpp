@@ -25,90 +25,85 @@ void TransportStateHandler::applyMessage(TransportState &state,
                                          const TransportMessage &msg,
                                          const bool autoRefreshPlaybackState)
 {
-    std::visit(
-        [&](auto &&m)
+    const auto visitor = Overload{
+        [&](const SetPositionQuarterNotes &m)
         {
-            using T = std::decay_t<decltype(m)>;
-
-            if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
+            state.positionQuarterNotes = m.positionQuarterNotes;
+        },
+        [&](const SetPlayStartPositionQuarterNotes &m)
+        {
+            state.playStartPositionQuarterNotes = m.positionQuarterNotes;
+        },
+        [&](const BumpPositionByTicks &m)
+        {
+            const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
+            state.positionQuarterNotes += delta;
+        },
+        [&](const Stop &)
+        {
+            applyStopMessage(state);
+        },
+        [&](const Play &)
+        {
+            applyPlayMessage(state);
+        },
+        [&](const Record &)
+        {
+            state.recording = true;
+            applyMessage(state, Play{});
+        },
+        [&](const RecordFromStart &)
+        {
+            state.recording = true;
+            applyMessage(state, PlayFromStart{});
+        },
+        [&](const Overdub &)
+        {
+            state.overdubbing = true;
+            applyMessage(state, Play{});
+        },
+        [&](const OverdubFromStart &)
+        {
+            state.overdubbing = true;
+            applyMessage(state, PlayFromStart{});
+        },
+        [&](const UpdateRecording &m)
+        {
+            state.recording = m.recording;
+        },
+        [&](const UpdateOverdubbing &m)
+        {
+            state.overdubbing = m.overdubbing;
+        },
+        [&](const SwitchRecordToOverdub &)
+        {
+            state.recording = false;
+            state.overdubbing = true;
+            applyMessage(state, Play{});
+        },
+        [&](const PlayFromStart &)
+        {
+            if (state.positionQuarterNotes == 0)
             {
-                state.positionQuarterNotes = m.positionQuarterNotes;
-            }
-            else if constexpr (std::is_same_v<T,
-                                              SetPlayStartPositionQuarterNotes>)
-            {
-                state.playStartPositionQuarterNotes = m.positionQuarterNotes;
-            }
-            else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
-            {
-                const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
-                state.positionQuarterNotes += delta;
-            }
-            else if constexpr (std::is_same_v<T, Stop>)
-            {
-                applyStopMessage(state);
-            }
-            else if constexpr (std::is_same_v<T, Play>)
-            {
-                applyPlayMessage(state);
-            }
-            else if constexpr (std::is_same_v<T, Record>)
-            {
-                state.recording = true;
                 applyMessage(state, Play{});
             }
-            else if constexpr (std::is_same_v<T, RecordFromStart>)
+            else
             {
-                state.recording = true;
-                applyMessage(state, PlayFromStart{});
-            }
-            else if constexpr (std::is_same_v<T, Overdub>)
-            {
-                state.overdubbing = true;
-                applyMessage(state, Play{});
-            }
-            else if constexpr (std::is_same_v<T, OverdubFromStart>)
-            {
-                state.overdubbing = true;
-                applyMessage(state, PlayFromStart{});
-            }
-            else if constexpr (std::is_same_v<T, UpdateRecording>)
-            {
-                state.recording = m.recording;
-            }
-            else if constexpr (std::is_same_v<T, UpdateOverdubbing>)
-            {
-                state.overdubbing = m.overdubbing;
-            }
-            else if constexpr (std::is_same_v<T, SwitchRecordToOverdub>)
-            {
-                state.recording = false;
-                state.overdubbing = true;
-                applyMessage(state, Play{});
-            }
-            else if constexpr (std::is_same_v<T, PlayFromStart>)
-            {
-                if (state.positionQuarterNotes == 0)
+                state.positionQuarterNotes = 0;
+                auto onComplete = [this]
                 {
-                    applyMessage(state, Play{});
-                }
-                else
-                {
-                    state.positionQuarterNotes = 0;
-                    auto onComplete = [this]
-                    {
-                        manager->enqueue(Play{});
-                    };
-                    manager->enqueue(
-                        RefreshPlaybackStateWhileNotPlaying{onComplete});
-                }
-            }
-            else if constexpr (std::is_same_v<T, UpdateCountEnabled>)
-            {
-                state.countEnabled = m.enabled;
+                    manager->enqueue(Play{});
+                };
+                manager->enqueue(
+                    RefreshPlaybackStateWhileNotPlaying{onComplete});
             }
         },
-        msg);
+        [&](const UpdateCountEnabled &m)
+        {
+            state.countEnabled = m.enabled;
+        }};
+
+    std::visit(visitor, msg);
 
     if (!autoRefreshPlaybackState)
     {

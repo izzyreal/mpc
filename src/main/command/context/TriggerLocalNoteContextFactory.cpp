@@ -121,8 +121,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const PerformanceEventSource source, const NoteNumber noteNumber,
-    const EventId recordedNoteOnEventId, Track *track,
-    const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
+    const EventId recordedNoteOnEventId, Track *track, const BusType busType,
+    const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
     const std::weak_ptr<Sequencer> &sequencer,

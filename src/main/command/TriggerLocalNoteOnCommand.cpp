@@ -175,7 +175,6 @@ void TriggerLocalNoteOnCommand::execute()
         // construct the whole Event before enqueueing it.
         apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
 
-        ctx->registryNoteOnEvent.recordNoteEventId =
-            recordNoteOnEvent->eventId;
+        ctx->registryNoteOnEvent.recordNoteEventId = recordNoteOnEvent->eventId;
     }
 }

@@ -19,7 +19,8 @@ void PushPlayCommand::execute()
     const auto sequencer = mpc.getSequencer();
     const auto hardware = mpc.getHardware();
     const auto recButton = hardware->getButton(hardware::ComponentId::REC);
-    const auto overdubButton = hardware->getButton(hardware::ComponentId::OVERDUB);
+    const auto overdubButton =
+        hardware->getButton(hardware::ComponentId::OVERDUB);
 
     if (sequencer->getTransport()->isPlaying())
     {

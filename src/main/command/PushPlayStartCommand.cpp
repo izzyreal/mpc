@@ -46,7 +46,9 @@ void PushPlayStartCommand::execute()
     }
     else
     {
-        if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (mpc.getHardware()
+                ->getButton(hardware::ComponentId::SHIFT)
+                ->isPressed())
         {
             mpc.getLayeredScreen()->openScreenById(
                 ScreenId::VmpcDirectToDiskRecorderScreen);
