@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FloatTypes.hpp"
 #include "PlaybackState.hpp"
 #include "lcdgui/ScreenId.hpp"
 

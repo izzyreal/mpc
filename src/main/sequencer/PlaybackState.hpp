@@ -44,5 +44,13 @@ namespace mpc::sequencer
         }
 
         Tick getCurrentTick(const Sequence *, TimeInSamples now) const;
+
+        void printOrigin() const
+        {
+            printf("== PlaybackState origin ==\n");
+            printf("originSampleTime: %lld\n", originSampleTime);
+            printf("originTicks: %lld\n", originTicks);
+            printf("originQuarterNotes: %f\n", originQuarterNotes);
+        }
     };
 } // namespace mpc::sequencer
