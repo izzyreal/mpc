@@ -34,8 +34,7 @@ mpc::PositionQuarterNotes PlaybackState::getStrictValidUntilQN() const
 double PlaybackState::getCurrentTick(const Sequence *seq,
                                         const TimeInSamples now) const
 {
-    const auto currentTimeInSamples = now;
-    const TimeInSamples deltaSamples =  currentTimeInSamples - lastTransitionTime;
+    const TimeInSamples deltaSamples =  now - lastTransitionTime;
 
     const double deltaTicks = SeqUtil::getTickCountForFrames(
         seq,
@@ -44,7 +43,9 @@ double PlaybackState::getCurrentTick(const Sequence *seq,
         sampleRate
     );
 
-    const double currentTick = lastTransitionTick + deltaTicks;
+    const double currentTick = fmod(lastTransitionTick + deltaTicks, static_cast<double>(seq->getLastTick()));
+
+    // printf("now: %lld, lastTransitionTime: %lld, deltaSamples: %lld, currenTick: %f\n", now, lastTransitionTime, deltaSamples, currentTick);
 
     return currentTick;
 }

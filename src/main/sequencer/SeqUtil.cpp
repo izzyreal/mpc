@@ -605,3 +605,52 @@ double SeqUtil::getTickCountForFrames(const Sequence* seq, double firstTick,
 
     return totalTicks;
 }
+
+int SeqUtil::getFrameCountForTicks(const Sequence* seq,
+                                   double firstTick,
+                                   double tickCount,
+                                   int sr)
+{
+    const auto& tces = seq->getTempoChangeEvents();
+    const int n = tces.size();
+
+    auto secondsPerTick = [&](double tempo) {
+        return 60.0 / tempo / Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ;
+    };
+
+    auto findTempoAt = [&](double tick) {
+        double tempo = seq->getInitialTempo();
+        for (int i = 0; i < n && tces[i]->getTick() <= tick; i++)
+            tempo = tces[i]->getTempo();
+        return tempo;
+    };
+
+    double remaining = tickCount;
+    double t = firstTick;
+    double frames = 0.0;
+    double tempo = findTempoAt(t);
+
+    int i = 0;
+    while (i < n && tces[i]->getTick() <= t) i++;
+
+    while (i < n && remaining > 0.0) {
+        double segEnd = tces[i]->getTick();
+        double avail = segEnd - t;
+        if (avail > 0.0) {
+            double used = std::min(avail, remaining);
+            double spt = secondsPerTick(tempo);
+            frames += used * (spt * sr);
+            remaining -= used;
+            t += used;
+        }
+        tempo = tces[i]->getTempo();
+        i++;
+    }
+
+    if (remaining > 0.0) {
+        double spt = secondsPerTick(tempo);
+        frames += remaining * (spt * sr);
+    }
+
+    return (int)std::ceil(frames);
+}

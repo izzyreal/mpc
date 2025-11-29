@@ -9,28 +9,35 @@ namespace mpc::sequencer
     {
         Tick fromTick{NoTick};
         Tick toTick{NoTick};
+        TimeInSamples timeInSamples{NoTimeInSamples};
 
         bool isActive() const
         {
-            return fromTick != NoTick && toTick != NoTick;
+            return fromTick != NoTick && toTick != NoTick &&
+                   timeInSamples != NoTimeInSamples;
         }
 
         bool isInactive() const
         {
-            return fromTick == NoTick && toTick == NoTick;
+            return fromTick == NoTick && toTick == NoTick &&
+                   timeInSamples == NoTimeInSamples;
         }
 
-        void activate(const Tick fromTickToUse, const Tick toTickToUse)
+        void activate(const Tick fromTickToUse, const Tick toTickToUse,
+                      const TimeInSamples timeInSamplesToUse)
         {
-            assert(fromTickToUse != NoTick && toTickToUse != NoTick);
+            assert(fromTickToUse != NoTick && toTickToUse != NoTick &&
+                   timeInSamplesToUse != NoTimeInSamples);
             fromTick = fromTickToUse;
             toTick = toTickToUse;
+            timeInSamples = timeInSamplesToUse;
         }
 
         void deactivate()
         {
             fromTick = NoTick;
             toTick = NoTick;
+            timeInSamples = NoTimeInSamples;
         }
 
         void printInfo() const
@@ -40,7 +47,9 @@ namespace mpc::sequencer
                 printf("Transition inactive\n");
                 return;
             }
-            printf("Transition fromTick: %lld, toTick: %lld\n", fromTick, toTick);
+            printf(
+                "Transition fromTick: %lld, toTick: %lld, timeInSamples: %lld\n",
+                fromTick, toTick, timeInSamples);
         }
     };
 } // namespace mpc::sequencer

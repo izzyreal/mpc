@@ -4,6 +4,7 @@
 #include "MetronomeRenderer.hpp"
 #include "PlaybackStateValidity.hpp"
 #include "RenderContext.hpp"
+#include "SeqUtil.hpp"
 #include "Sequence.hpp"
 #include "SequenceRenderer.hpp"
 #include "Track.hpp"
@@ -146,15 +147,17 @@ Sequencer *SequencerStateWorker::getSequencer() const
     return sequencer;
 }
 
-void printRenderDebugInfo(const PlaybackState &prev, const PlaybackState &current)
+void printRenderDebugInfo(const PlaybackState &prev,
+                          const PlaybackState &current)
 {
     static int counter = 0;
     printf("===================\n");
-    printf("%i Rendering with previous PlaybackState:\n", counter);
-    prev.printOrigin();
-    prev.transition.printInfo();
-    printf("===================\n");
-    printf("%i New PlaybackState:\n", counter);
+    printf("Current time: %lld\n", current.strictValidFrom);
+    // printf("%i Rendering with previous PlaybackState:\n", counter);
+    // prev.printOrigin();
+    // prev.transition.printInfo();
+    // printf("===================\n");
+    printf("%i PlaybackState for this block:\n", counter);
     current.printOrigin();
     current.transition.printInfo();
     counter++;
@@ -177,7 +180,16 @@ void installTransition(RenderContext &ctx)
     if (currentTick + blockSizeTicks >= transitionTick)
     {
         const auto toTick = ctx.seq->getLoopStartTick();
-        ctx.playbackState.transition.activate(transitionTick, toTick);
+        const double ticksUntilTransition = transitionTick - currentTick;
+
+        int transitionFrame = SeqUtil::getFrameCountForTicks(
+            ctx.seq, currentTick, ticksUntilTransition,
+            ctx.playbackState.sampleRate);
+
+        transitionFrame += ctx.currentTime;
+
+        ctx.playbackState.transition.activate(transitionTick, toTick,
+                                              transitionFrame);
     }
 }
 
@@ -195,15 +207,17 @@ RenderContext initRenderCtx(const PlaybackState &prevState,
                             const mpc::TimeInSamples currentTime,
                             Sequencer *sequencer)
 {
-    PlaybackState playbackState =
-        initPlaybackState(prevState, sampleRate);
+    PlaybackState playbackState = initPlaybackState(prevState, sampleRate);
 
-    RenderContext renderCtx{
-        std::move(playbackState),
-        sequencer,
-        sequencer->getCurrentlyPlayingSequence().get(),
-        currentTime
-    };
+    if (prevState.transition.isActive())
+    {
+        playbackState.lastTransitionTick = prevState.transition.toTick;
+        playbackState.lastTransitionTime = prevState.transition.timeInSamples;
+    }
+
+    RenderContext renderCtx{std::move(playbackState), sequencer,
+                            sequencer->getCurrentlyPlayingSequence().get(),
+                            currentTime};
 
     computeValidity(renderCtx, currentTime);
 
@@ -220,13 +234,14 @@ SequencerStateWorker::renderPlaybackState(const SampleRate sampleRate,
 
     installTransition(renderCtx);
 
+    // printRenderDebugInfo(prevState, renderCtx.playbackState);
+
     renderSeq(renderCtx);
 
-    const auto mctx = initMetronomeRenderContext(isCurrentScreen, isRecMainWithoutPlaying, sequencer);
+    const auto mctx = initMetronomeRenderContext(
+        isCurrentScreen, isRecMainWithoutPlaying, sequencer);
 
     renderMetronome(renderCtx, mctx);
-
-    printRenderDebugInfo(prevState, renderCtx.playbackState);
 
     return renderCtx.playbackState;
 }

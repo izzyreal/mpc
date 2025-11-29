@@ -91,9 +91,9 @@ namespace mpc::sequencer
 
         void printOrigin() const
         {
-            printf("== PlaybackState origin ==\n");
+            printf("== PlaybackState ==\n");
             printf("lastTransitionTime: %lld\n", lastTransitionTime);
-            printf("lastTransitionTicks: %f\n", lastTransitionTick);
+            printf("lastTransitionTick: %f\n", lastTransitionTick);
             printf("lastTransitionQN: %f\n", getLastTransitionQN());
         }
     };

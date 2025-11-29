@@ -3,12 +3,12 @@
 #include "RenderContext.hpp"
 #include "SeqUtil.hpp"
 
-constexpr mpc::TimeInSamples safetyMargin = 10000;
+constexpr mpc::TimeInSamples safetyMargin = 5000;
 
 void mpc::sequencer::computeValidity(RenderContext &renderCtx,
                                      const TimeInSamples currentTime)
 {
-    constexpr float renderBlockSizeSeconds = 2.0;
+    constexpr float renderBlockSizeSeconds = 1.0;
 
     auto &state = renderCtx.playbackState;
     const auto seq = renderCtx.seq;

@@ -79,6 +79,11 @@ namespace mpc::sequencer
         static double getTickCountForFrames(const Sequence *seq, double firstTick,
                                          int frameCount, int sr);
 
+        static int getFrameCountForTicks(const Sequence* seq,
+                                           double firstTick,
+                                           double tickCount,
+                                           int sr);
+
         static int getEventTimeInSamples(const Sequence *seq, int eventTick,
                                          int currentTimeSamples,
                                          SampleRate sampleRate);
