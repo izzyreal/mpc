@@ -35,7 +35,6 @@ namespace mpc::sequencer
     };
 
     using SequencerMessage = std::variant<TransportMessage, SequenceMessage,
-
                                           CopyEvents, SwitchToNextSequence,
                                           SetSelectedSequenceIndex>;
 } // namespace mpc::sequencer

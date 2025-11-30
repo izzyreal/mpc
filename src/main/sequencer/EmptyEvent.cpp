@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-EmptyEvent::EmptyEvent() : Event(nullptr, [](SequenceMessage){})
+EmptyEvent::EmptyEvent() : Event(nullptr, [](TrackMessage&&){})
 {
     // very empty indeed.
 }

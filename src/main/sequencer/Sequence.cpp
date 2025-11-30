@@ -183,7 +183,7 @@ std::shared_ptr<Track> Sequence::getTrack(const int i)
 
 void Sequence::setUsed(const bool b) const
 {
-    dispatch(SetUsed{getSequenceIndex(), b});
+    dispatch(SetSequenceUsed{getSequenceIndex(), b});
 }
 
 bool Sequence::isUsed() const

@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 ChannelPressureEvent::ChannelPressureEvent(
     EventState *eventState,
-    const std::function<void(SequenceMessage &&)> &dispatch)
+    const std::function<void(TrackMessage &&)> &dispatch)
     : Event(eventState, dispatch)
 {
 }

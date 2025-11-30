@@ -1,70 +1,13 @@
 #pragma once
 
 #include "sequencer/TimeSignature.hpp"
-#include "sequencer/EventState.hpp"
+#include "sequencer/TrackMessage.hpp"
 
 #include <functional>
 #include <variant>
 
 namespace mpc::sequencer
 {
-    struct ClearEvents
-    {
-        SequenceIndex sequence;
-        TrackIndex track;
-    };
-
-    struct UpdateEvents
-    {
-        SequenceIndex sequence;
-        TrackIndex track;
-        std::vector<EventState> snapshot;
-    };
-
-    struct UpdateTrackIndexOfAllEvents
-    {
-        SequenceIndex sequence;
-        TrackIndex trackIndex;
-    };
-
-    struct FinalizeNonLiveNoteEvent
-    {
-        EventState *noteOnEvent;
-        Duration duration;
-    };
-
-    struct InsertEvent
-    {
-        EventState *eventState;
-        bool allowMultipleNoteEventsWithSameNoteOnSameTick;
-        std::function<void()> onComplete = [] {};
-    };
-
-    struct RemoveEvent
-    {
-        SequenceIndex sequence;
-        TrackIndex track;
-        EventState *eventState;
-    };
-
-    struct UpdateEventTick
-    {
-        EventState *eventState;
-        Tick newTick;
-    };
-
-    struct RemoveDoubles
-    {
-        SequenceIndex sequence;
-        TrackIndex track;
-    };
-
-    struct UpdateEvent
-    {
-        EventState *event;
-        EventState payload;
-    };
-
     struct UpdateBarLength
     {
         SequenceIndex sequenceIndex;
@@ -118,7 +61,7 @@ namespace mpc::sequencer
         bool loopEnabled;
     };
 
-    struct SetUsed
+    struct SetSequenceUsed
     {
         SequenceIndex sequenceIndex;
         bool used;
@@ -142,14 +85,14 @@ namespace mpc::sequencer
         BarIndex barIndex;
     };
 
-    struct SyncTrackEventIndices{};
+    struct SyncTrackEventIndices
+    {
+    };
 
-    using SequenceMessage = std::variant<
-        InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick, RemoveDoubles,
-        SetLastBarIndex, InsertBars, UpdateTrackIndexOfAllEvents, UpdateEvent,
-        SetInitialTempo, FinalizeNonLiveNoteEvent, UpdateBarLength,
-        UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
-        UpdateEvents, SetLoopEnabled, SetUsed,
-        SetTempoChangeEnabled, SetFirstLoopBarIndex, SetLastLoopBarIndex,
-        SyncTrackEventIndices>;
+    using SequenceMessage =
+        std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
+                     UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
+                     UpdateTimeSignature, SetLoopEnabled, SetSequenceUsed,
+                     SetTempoChangeEnabled, SetFirstLoopBarIndex,
+                     SetLastLoopBarIndex, SyncTrackEventIndices>;
 } // namespace mpc::sequencer

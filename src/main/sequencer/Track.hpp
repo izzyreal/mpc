@@ -2,8 +2,8 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "SequenceMessage.hpp"
 #include "SequencerStateView.hpp"
+#include "TrackMessage.hpp"
 
 #include "sequencer/EventState.hpp"
 
@@ -48,7 +48,7 @@ namespace mpc::sequencer
         Track(
             const std::shared_ptr<SequencerStateManager> &,
             const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
-            const std::function<void(SequenceMessage &&)> &dispatch,
+            const std::function<void(TrackMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -87,13 +87,13 @@ namespace mpc::sequencer
 
         std::string getActualName();
 
-        void syncEventIndex(int currentTick, int previousTick);
+        void syncEventIndex(int currentTick, int previousTick) const;
 
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
         void flushNoteCache() const;
         void setUsed(bool b);
-        void setOn(bool b);
+        void setOn(bool b) const;
 
         void insertEvent(
             EventState *event,
@@ -123,13 +123,13 @@ namespace mpc::sequencer
         void removeEvent(EventState *) const;
         void removeEvent(const std::shared_ptr<Event> &event) const;
         void removeEvents() const;
-        void setVelocityRatio(int i);
+        void setVelocityRatio(int i) const;
         int getVelocityRatio() const;
-        void setProgramChange(int i);
+        void setProgramChange(int i) const;
         int getProgramChange() const;
-        void setBusType(BusType);
+        void setBusType(BusType) const;
         BusType getBusType() const;
-        void setDeviceIndex(int i);
+        void setDeviceIndex(int i) const;
         int getDeviceIndex() const;
         std::shared_ptr<Event> getEvent(int i) const;
         void setName(const std::string &s);
@@ -138,7 +138,7 @@ namespace mpc::sequencer
         std::vector<EventState> getEventStates() const;
 
         int getNextTick();
-        void playNext();
+        void playNext() const;
 
         bool isOn() const;
         bool isUsed() const;
@@ -168,17 +168,10 @@ namespace mpc::sequencer
 
     private:
         std::shared_ptr<SequencerStateManager> manager;
-        EventIndex playEventIndex{0};
         std::function<std::shared_ptr<TrackStateView>()> getSnapshot;
-        std::function<void(SequenceMessage &&)> dispatch;
-        BusType busType = BusType::DRUM1;
+        std::function<void(TrackMessage &&)> dispatch;
         std::string name;
-        bool on{false};
-        int velocityRatio = 0;
-        int programChange = 0;
-        int device = 0;
         TrackIndex trackIndex{0};
-        bool used{false};
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
             EventState *, moodycamel::ConcurrentQueueDefaultTraits>>

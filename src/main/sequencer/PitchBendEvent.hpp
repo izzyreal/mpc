@@ -11,7 +11,7 @@ namespace mpc::sequencer
 
         explicit PitchBendEvent(
             EventState *eventState,
-            const std::function<void(SequenceMessage &&)> &dispatch);
+            const std::function<void(TrackMessage &&)> &dispatch);
 
         std::string getTypeName() const override
         {

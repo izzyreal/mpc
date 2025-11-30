@@ -1,13 +1,14 @@
 #pragma once
 
-#include "SequencerState.hpp"
-#include "sequencer/EventState.hpp"
+#include "IntTypes.hpp"
+#include "sequencer/BusType.hpp"
 
 #include <vector>
 
 namespace mpc::sequencer
 {
-    struct SequencerState;
+    struct EventState;
+    struct TrackState;
 
     class TrackStateView
     {
@@ -34,6 +35,20 @@ namespace mpc::sequencer
         EventState *findRecordingNoteOn(const EventState *) const;
 
         EventState *getEvent(const EventState *) const;
+
+        EventIndex getPlayEventIndex() const;
+
+        uint8_t getVelocityRatio() const;
+
+        uint8_t getProgramChange() const;
+
+        uint8_t getDeviceIndex() const;
+
+        BusType getBusType() const;
+
+        bool isOn() const;
+
+        bool isUsed() const;
 
     private:
         const TrackState &state;

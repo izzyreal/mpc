@@ -1,23 +1,23 @@
 #include "sequencer/EventStateToEventMapper.hpp"
 
-#include "ControlChangeEvent.hpp"
-#include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/EventType.hpp"
 
-#include "EventType.hpp"
-#include "MixerEvent.hpp"
-#include "PitchBendEvent.hpp"
-#include "PolyPressureEvent.hpp"
-#include "ProgramChangeEvent.hpp"
-#include "SystemExclusiveEvent.hpp"
-#include "TempoChangeEvent.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/PitchBendEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
 
 namespace mpc::sequencer
 {
     class SequencerStateManager;
     std::shared_ptr<Event> mapEventStateToEvent(
         EventState *eventState,
-        const std::function<void(SequenceMessage &&)> &dispatch,
+        const std::function<void(TrackMessage &&)> &dispatch,
         Sequence *parent)
     {
         if (eventState->type == EventType::NoteOn)

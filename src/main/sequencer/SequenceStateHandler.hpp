@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Sequencer.hpp"
 #include "SequenceMessage.hpp"
 
 namespace mpc::sequencer

@@ -9,14 +9,14 @@ namespace mpc::sequencer
     public:
         explicit NoteOnEvent(
             EventState *eventState,
-            const std::function<void(SequenceMessage &&)> &dispatch,
+            const std::function<void(TrackMessage &&)> &dispatch,
             NoteNumber, Velocity vel = MaxVelocity);
         explicit NoteOnEvent(
             EventState *eventState,
-            const std::function<void(SequenceMessage &&)> &dispatch);
+            const std::function<void(TrackMessage &&)> &dispatch);
         explicit NoteOnEvent(
             EventState *eventState,
-            const std::function<void(SequenceMessage &&)> &dispatch,
+            const std::function<void(TrackMessage &&)> &dispatch,
             DrumNoteNumber);
 
         void setNote(NoteNumber) const;

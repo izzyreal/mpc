@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 NoteOnEvent::NoteOnEvent(
     EventState *eventState,
-    const std::function<void(SequenceMessage &&)> &dispatch,
+    const std::function<void(TrackMessage &&)> &dispatch,
     const NoteNumber noteNumber, const Velocity vel)
     : Event(eventState, dispatch)
 {
@@ -14,14 +14,14 @@ NoteOnEvent::NoteOnEvent(
 
 NoteOnEvent::NoteOnEvent(
     EventState *eventState,
-    const std::function<void(SequenceMessage &&)> &dispatch)
+    const std::function<void(TrackMessage &&)> &dispatch)
     : Event(eventState, dispatch)
 {
 }
 
 NoteOnEvent::NoteOnEvent(
     EventState *eventState,
-    const std::function<void(SequenceMessage &&)> &dispatch,
+    const std::function<void(TrackMessage &&)> &dispatch,
     const DrumNoteNumber drumNoteNumber)
     : Event(eventState, dispatch)
 {

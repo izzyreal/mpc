@@ -1,21 +1,20 @@
 #include "sequencer/TrackStateView.hpp"
 
-#include "Sequencer.hpp"
-#include "sequencer/SequencerState.hpp"
+#include "EventState.hpp"
+#include "TrackState.hpp"
 
 using namespace mpc::sequencer;
 
 TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 
-EventState *
-TrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
+EventState *TrackStateView::findNoteEvent(const int tick,
+                                          const NoteNumber note) const
 {
     const auto noteEvents = getNoteEvents();
 
     for (const auto e : noteEvents)
     {
-        if (e->tick == tick &&
-            e->noteNumber == note)
+        if (e->tick == tick && e->noteNumber == note)
         {
             return e;
         }
@@ -32,7 +31,10 @@ EventState *TrackStateView::getEventByIndex(const EventIndex idx) const
 
     while (it)
     {
-        if (counter++ == idx) return it;
+        if (counter++ == idx)
+        {
+            return it;
+        }
         it = it->next;
     }
 
@@ -40,7 +42,7 @@ EventState *TrackStateView::getEventByIndex(const EventIndex idx) const
 }
 
 std::vector<EventState *> TrackStateView::getEventRange(const int startTick,
-                                                      const int endTick) const
+                                                        const int endTick) const
 {
     std::vector<EventState *> result;
 
@@ -128,7 +130,8 @@ EventState *TrackStateView::findRecordingNoteOnByNoteNumber(
     return nullptr;
 }
 
-EventState *TrackStateView::findRecordingNoteOn(const EventState *eventState) const
+EventState *
+TrackStateView::findRecordingNoteOn(const EventState *eventState) const
 {
     for (const auto &e : getNoteEvents())
     {
@@ -147,9 +150,47 @@ EventState *TrackStateView::getEvent(const EventState *eventState) const
 
     while (it)
     {
-        if (it == eventState) return it;
+        if (it == eventState)
+        {
+            return it;
+        }
         it = it->next;
     }
 
     return nullptr;
+}
+
+mpc::EventIndex TrackStateView::getPlayEventIndex() const
+{
+    return state.playEventIndex;
+}
+
+uint8_t TrackStateView::getVelocityRatio() const
+{
+    return state.velocityRatio;
+}
+
+uint8_t TrackStateView::getProgramChange() const
+{
+    return state.programChange;
+}
+
+uint8_t TrackStateView::getDeviceIndex() const
+{
+    return state.device;
+}
+
+BusType TrackStateView::getBusType() const
+{
+    return state.busType;
+}
+
+bool TrackStateView::isOn() const
+{
+    return state.on;
+}
+
+bool TrackStateView::isUsed() const
+{
+    return state.used;
 }

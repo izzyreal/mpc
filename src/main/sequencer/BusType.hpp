@@ -3,7 +3,6 @@
 #include "MpcSpecs.hpp"
 
 #include <cstdint>
-#include <type_traits>
 #include <string>
 #include <cassert>
 

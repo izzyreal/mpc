@@ -7,7 +7,7 @@ using namespace mpc::sequencer;
 
 TempoChangeEvent::TempoChangeEvent(
     EventState *eventState,
-    const std::function<void(SequenceMessage &&)> &dispatch, Sequence *parent)
+    const std::function<void(TrackMessage &&)> &dispatch, Sequence *parent)
     : Event(eventState, dispatch), parent(parent)
 {
 }

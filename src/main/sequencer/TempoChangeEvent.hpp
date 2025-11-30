@@ -30,7 +30,7 @@ namespace mpc::sequencer
 
         TempoChangeEvent(
             EventState *eventState,
-            const std::function<void(SequenceMessage &&)> &dispatch,
+            const std::function<void(TrackMessage &&)> &dispatch,
             Sequence *parent);
 
         std::string getTypeName() const override

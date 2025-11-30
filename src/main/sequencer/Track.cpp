@@ -30,8 +30,8 @@ constexpr int TickUnassignedWhileRecording = -2;
 Track::Track(
     const std::shared_ptr<SequencerStateManager> &manager,
     const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
-    const std::function<void(SequenceMessage &&)> &dispatch,
-    const int trackIndex, Sequence *parent,
+    const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
+    Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::function<int64_t()> &getTickPosition,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
@@ -52,8 +52,9 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : manager(manager), getSnapshot(getSnapshot), dispatch(dispatch), trackIndex(trackIndex),
-      parent(parent), getDefaultTrackName(getDefaultTrackName),
+    : manager(manager), getSnapshot(getSnapshot), dispatch(dispatch),
+      trackIndex(trackIndex), parent(parent),
+      getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
       getActiveSequence(getActiveSequence), getAutoPunchMode(getAutoPunchMode),
@@ -72,22 +73,13 @@ Track::Track(
     bulkNoteOffs.resize(20);
 }
 
-Track::~Track()
-{
-    //    printf("~Track\n");
-}
+Track::~Track() {}
 
 void Track::init()
 {
     name = trackIndex == TempoChangeTrackIndex
                ? "tempo"
                : getDefaultTrackName(trackIndex);
-    programChange = 0;
-    velocityRatio = 100;
-    used = false;
-    on = true;
-    device = 0;
-    busType = BusType::DRUM1;
     queuedNoteOnEvents =
         std::make_shared<moodycamel::ConcurrentQueue<EventState *>>(20);
     queuedNoteOffEvents =
@@ -210,24 +202,25 @@ void Track::flushNoteCache() const
 
 void Track::setUsed(const bool b)
 {
-    if (!used && b && trackIndex < 64)
+    if (!isUsed() && b && trackIndex < 64)
     {
         name = getDefaultTrackName(trackIndex);
     }
 
-    used = b;
+    dispatch(SetTrackUsed{parent->getSequenceIndex(), getIndex(), b});
 }
 
-void Track::setOn(const bool b)
+void Track::setOn(const bool b) const
 {
-    on = b;
+    dispatch(SetTrackOn{parent->getSequenceIndex(), getIndex(), b});
 }
 
-void Track::syncEventIndex(const int currentTick, const int previousTick)
+void Track::syncEventIndex(const int currentTick, const int previousTick) const
 {
     if (currentTick == 0)
     {
-        playEventIndex = EventIndex(0);
+        dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(),
+                                   EventIndex(0)});
         return;
     }
 
@@ -235,18 +228,19 @@ void Track::syncEventIndex(const int currentTick, const int previousTick)
 
     const auto snapshot = getSnapshot();
     const auto eventCount = snapshot->getEventCount();
+    const auto currentPlayEventIndex = snapshot->getPlayEventIndex();
 
     if (currentTick > previousTick)
     {
-        if (playEventIndex == eventCount)
+        if (currentPlayEventIndex == eventCount)
         {
             return;
         }
 
-        startIndex = playEventIndex;
+        startIndex = currentPlayEventIndex;
     }
 
-    if (currentTick < previousTick && playEventIndex == 0)
+    if (currentTick < previousTick && currentPlayEventIndex == 0)
     {
         return;
     }
@@ -262,7 +256,7 @@ void Track::syncEventIndex(const int currentTick, const int previousTick)
         }
     }
 
-    playEventIndex = result;
+    dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(), result});
 }
 
 void Track::removeEvent(const std::shared_ptr<Event> &event) const
@@ -336,7 +330,7 @@ void Track::removeEvents() const
     dispatch(ClearEvents{parent->getSequenceIndex(), getIndex()});
 }
 
-void Track::setVelocityRatio(int i)
+void Track::setVelocityRatio(int i) const
 {
     if (i < 1)
     {
@@ -347,25 +341,28 @@ void Track::setVelocityRatio(int i)
         i = 200;
     }
 
-    velocityRatio = i;
+    dispatch(SetTrackVelocityRatio{parent->getSequenceIndex(), getIndex(),
+                                   static_cast<uint8_t>(i)});
 }
 
 int Track::getVelocityRatio() const
 {
-    return velocityRatio;
+    return getSnapshot()->getVelocityRatio();
 }
 
-void Track::setProgramChange(const int i)
+void Track::setProgramChange(const int i) const
 {
-    programChange = std::clamp(i, 0, 128);
+    dispatch(
+        SetTrackProgramChange{parent->getSequenceIndex(), getIndex(),
+                              static_cast<uint8_t>(std::clamp(i, 0, 128))});
 }
 
 int Track::getProgramChange() const
 {
-    return programChange;
+    return getSnapshot()->getProgramChange();
 }
 
-void Track::setBusType(BusType bt)
+void Track::setBusType(BusType bt) const
 {
     using U = std::underlying_type_t<BusType>;
     constexpr U MIN = static_cast<U>(BusType::MIDI);
@@ -374,22 +371,25 @@ void Track::setBusType(BusType bt)
     const U raw = static_cast<U>(bt);
     const U clamped = std::clamp(raw, MIN, MAX);
 
-    busType = static_cast<BusType>(clamped);
+    dispatch(SetTrackBusType{parent->getSequenceIndex(), getIndex(),
+                             static_cast<BusType>(clamped)});
 }
 
 BusType Track::getBusType() const
 {
-    return busType;
+    return getSnapshot()->getBusType();
 }
 
-void Track::setDeviceIndex(const int i)
+void Track::setDeviceIndex(const int i) const
 {
-    device = std::clamp(i, 0, 32);
+
+    dispatch(SetTrackDeviceIndex{parent->getSequenceIndex(), getIndex(),
+                                 static_cast<uint8_t>(std::clamp(i, 0, 32))});
 }
 
 int Track::getDeviceIndex() const
 {
-    return device;
+    return getSnapshot()->getDeviceIndex();
 }
 
 std::shared_ptr<Event> Track::getEvent(const int i) const
@@ -405,7 +405,7 @@ void Track::setName(const std::string &s)
 
 std::string Track::getName()
 {
-    if (!used)
+    if (!isUsed())
     {
         return "(Unused)";
     }
@@ -433,8 +433,7 @@ std::vector<std::shared_ptr<Event>> Track::getEvents() const
     for (int i = 0; i < eventCount; ++i)
     {
         auto event = mapEventStateToEvent(
-            snapshot->getEventByIndex(EventIndex(i)), dispatch,
-            parent);
+            snapshot->getEventByIndex(EventIndex(i)), dispatch, parent);
         result.emplace_back(event);
     }
 
@@ -578,12 +577,12 @@ void Track::processRealtimeQueuedEvents()
 
 bool Track::isOn() const
 {
-    return on;
+    return getSnapshot()->isOn();
 }
 
 bool Track::isUsed() const
 {
-    return used;
+    return getSnapshot()->isUsed();
 }
 
 std::vector<std::shared_ptr<Event>>
@@ -797,6 +796,7 @@ std::string Track::getActualName()
 int Track::getNextTick()
 {
     const auto snapshot = getSnapshot();
+    const auto playEventIndex = snapshot->getPlayEventIndex();
 
     if (playEventIndex >= snapshot->getEventCount())
     {
@@ -808,29 +808,18 @@ int Track::getNextTick()
     return snapshot->getEventByIndex(playEventIndex)->tick;
 }
 
-void Track::playNext()
+void Track::playNext() const
 {
     const auto snapshot = getSnapshot();
     const auto eventCount = snapshot->getEventCount();
+    auto playEventIndex = snapshot->getPlayEventIndex();
 
     if (playEventIndex >= eventCount)
     {
         return;
     }
 
-    auto event = snapshot->getEventByIndex(playEventIndex);
-
-    while (event->tick < getTickPosition())
-    {
-        playEventIndex = playEventIndex + 1;
-
-        if (playEventIndex >= eventCount)
-        {
-            return;
-        }
-
-        event = snapshot->getEventByIndex(playEventIndex);
-    }
+    const auto event = snapshot->getEventByIndex(playEventIndex);
 
     const auto recordingModeIsMulti = isRecordingModeMulti();
     const auto isActiveTrackIndex = trackIndex == getActiveTrackIndex();
@@ -863,8 +852,8 @@ void Track::playNext()
 
     if (event->type == EventType::NoteOn)
     {
-        if (const auto drumBus =
-                std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busType));
+        if (const auto drumBus = std::dynamic_pointer_cast<DrumBus>(
+                getSequencerBus(getBusType()));
             drumBus && isOverdubbing() && isEraseButtonPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
@@ -964,6 +953,7 @@ void Track::playNext()
     if (_delete)
     {
         dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), event});
+        manager->drainQueue();
         return;
     }
 
@@ -973,6 +963,9 @@ void Track::playNext()
     }
 
     playEventIndex = playEventIndex + 1;
+    dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(),
+                               playEventIndex});
+    manager->drainQueue();
 }
 
 void Track::insertEvent(

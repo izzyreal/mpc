@@ -5,7 +5,7 @@
 using namespace mpc::sequencer;
 
 Event::Event(EventState *eventState,
-             const std::function<void(SequenceMessage &&)> &dispatch)
+             const std::function<void(TrackMessage &&)> &dispatch)
     : eventState(eventState), dispatch(dispatch)
 {
 }

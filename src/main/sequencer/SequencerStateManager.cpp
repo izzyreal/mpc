@@ -1,6 +1,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include "SequenceStateHandler.hpp"
+#include "TrackStateHandler.hpp"
 #include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TransportStateHandler.hpp"
@@ -19,6 +20,9 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 
     sequenceStateHandler =
         std::make_unique<SequenceStateHandler>(this, sequencer);
+
+    trackStateHandler =
+        std::make_unique<TrackStateHandler>(this, sequencer);
 }
 
 SequencerStateManager::~SequencerStateManager() {}
@@ -73,6 +77,10 @@ void SequencerStateManager::applyMessage(
         [&](const SequenceMessage &m)
         {
             sequenceStateHandler->applyMessage(activeState, actions, m);
+        },
+        [&](const TrackMessage &m)
+        {
+            trackStateHandler->applyMessage(activeState, actions, m);
         },
         [&](const SwitchToNextSequence &m)
         {

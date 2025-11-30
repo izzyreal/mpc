@@ -14,6 +14,7 @@ namespace mpc::sequencer
     class Sequencer;
     class TransportStateHandler;
     class SequenceStateHandler;
+    class TrackStateHandler;
 
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
@@ -43,6 +44,7 @@ namespace mpc::sequencer
         Sequencer *sequencer;
         std::unique_ptr<TransportStateHandler> transportStateHandler;
         std::unique_ptr<SequenceStateHandler> sequenceStateHandler;
+        std::unique_ptr<TrackStateHandler> trackStateHandler;
 
         void applyCopyEvents(const CopyEvents &) noexcept;
 
