@@ -27,7 +27,7 @@ void ChangeBars2Screen::open()
 void ChangeBars2Screen::displayCurrent() const
 {
     const auto seq = sequencer.lock()->getSelectedSequence();
-    findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
+    findLabel("current")->setText(std::to_string(seq->getBarCount()));
 }
 
 void ChangeBars2Screen::function(const int i)
@@ -56,7 +56,8 @@ void ChangeBars2Screen::function(const int i)
 
             if (newBars > lastBarIndex)
             {
-                seq->insertBars(newBars - lastBarIndex, lastBarIndex + 1);
+                seq->insertBars(newBars - lastBarIndex,
+                                BarIndex(lastBarIndex + 1));
                 changed = true;
             }
 
@@ -68,6 +69,7 @@ void ChangeBars2Screen::function(const int i)
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
+        default:;
     }
 }
 

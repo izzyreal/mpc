@@ -320,7 +320,7 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer()->makeNewSequence();
+        auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i));
 
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
 

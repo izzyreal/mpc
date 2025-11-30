@@ -62,8 +62,6 @@ namespace mpc::engine
 
         void stop();
 
-        bool isRunning() const;
-
         void enqueueEventAfterNFrames(const std::function<void()> &event,
                                       unsigned long nFrames) const;
 
@@ -85,7 +83,6 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
-        std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;
         bool metronomeOnly = false;

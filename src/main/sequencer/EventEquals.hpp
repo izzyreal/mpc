@@ -22,6 +22,8 @@ namespace mpc::sequencer
 
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
+        printf("duration a: %i, b: %i\n", a.getDuration().get(),
+               b.getDuration().get());
         return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
                a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&
@@ -208,6 +210,25 @@ namespace mpc::sequencer
             }
 
             if (!eventsEqual(a[i], b[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    inline bool eventsEqual(const std::vector<EventState> &a,
+                            const std::vector<EventState> &b)
+    {
+        if (a.size() != b.size())
+        {
+            return false;
+        }
+
+        for (size_t i = 0; i < a.size(); ++i)
+        {
+            if (a[i] != b[i])
             {
                 return false;
             }

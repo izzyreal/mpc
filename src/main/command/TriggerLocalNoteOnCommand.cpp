@@ -176,6 +176,6 @@ void TriggerLocalNoteOnCommand::execute()
         apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
 
         ctx->registryNoteOnEvent.recordNoteEventId =
-            recordNoteOnEvent->noteEventId;
+            recordNoteOnEvent->eventId;
     }
 }

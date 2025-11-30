@@ -1,8 +1,8 @@
 #include "Sequence.hpp"
 
 #include "Mpc.hpp"
-#include "SequenceStateManager.hpp"
-#include "TrackEventStateManager.hpp"
+#include "SequenceStateView.hpp"
+#include "SequencerStateManager.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -17,6 +17,9 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
+    SequenceIndex sequenceIndex,
+    const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
+    const std::function<void(SequencerMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
     std::function<std::shared_ptr<Screens>()> getScreens,
@@ -35,27 +38,37 @@ Sequence::Sequence(
     std::function<int64_t()> getPunchOutTime,
     std::function<bool()> isSoloEnabled,
     std::function<int()> getCurrentBarIndex)
-    : getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
+    : sequenceIndex(sequenceIndex), getSnapshot(getSnapshot),
+      dispatch(dispatch), getScreens(getScreens),
+      getCurrentBarIndex(getCurrentBarIndex)
 {
-    stateManager = std::make_shared<SequenceStateManager>(this);
-
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
+        std::function getTrackSnapshot = [trackIndex, getSnapshot]
+        {
+            return getSnapshot()->getTrack(trackIndex);
+        };
         tracks.emplace_back(std::make_shared<Track>(
-            trackIndex, this, getDefaultTrackName, getTickPosition, getScreens,
-            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
-            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
-            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
-            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
-            isSoloEnabled));
+            getTrackSnapshot, dispatch, trackIndex, this, getDefaultTrackName,
+            getTickPosition, getScreens, isRecordingModeMulti,
+            getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
+            isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
+            getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
+            getPunchInTime, getPunchOutTime, isSoloEnabled));
     }
 
-    tempoChangeTrack = std::make_shared<Track>(
-        64, this, getDefaultTrackName, getTickPosition, getScreens,
-        isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
-        isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
-        isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing,
-        isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled);
+    std::function getTempoTrackSnapshot = [getSnapshot]
+    {
+        return getSnapshot()->getTrack(TempoChangeTrackIndex);
+    };
+
+    auto tempoChangeTrack = std::make_shared<Track>(
+        getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
+        getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
+        getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
+        isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
+        getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
+        getPunchInTime, getPunchOutTime, isSoloEnabled);
     tempoChangeTrack->setUsed(true);
 
     tracks.push_back(tempoChangeTrack);
@@ -70,91 +83,57 @@ Sequence::Sequence(
 
 Sequence::~Sequence()
 {
-    //    printf("~Sequence\n");
 }
 
-void Sequence::setLoopStart(const int l)
+void Sequence::setEventStates(const std::vector<EventState> &eventStates) const
 {
-    loopStart = l;
+    dispatch(UpdateSequenceEvents{getSequenceIndex(), eventStates});
 }
 
-int Sequence::getLoopStart() const
+mpc::SequenceIndex Sequence::getSequenceIndex() const
 {
-    return loopStart;
+    return sequenceIndex;
 }
 
-void Sequence::setLoopEnd(const int l)
+mpc::Tick Sequence::getLoopStartTick() const
 {
-    loopEnd = l;
+    return getSnapshot()->getLoopStartTick();
 }
 
-int Sequence::getLoopEnd() const
+mpc::Tick Sequence::getLoopEndTick() const
 {
-    return loopEnd;
+    return getSnapshot()->getLoopEndTick();
 }
 
-void Sequence::setFirstLoopBarIndex(const int i)
+void Sequence::setFirstLoopBarIndex(const BarIndex i) const
 {
-    firstLoopBarIndex = std::clamp(i, 0, lastLoopBarIndex);
+    dispatch(SetFirstLoopBarIndex{getSequenceIndex(), i});
+}
 
-    if (i > lastLoopBarIndex)
+mpc::BarIndex Sequence::getFirstLoopBarIndex() const
+{
+    return getSnapshot()->getFirstLoopBarIndex();
+}
+
+void Sequence::setLastLoopBarIndex(const BarIndex i) const
+{
+    if (i >= getBarCount())
     {
-        lastLoopBarIndex = i;
-    }
-}
-
-int Sequence::getFirstLoopBarIndex() const
-{
-    return firstLoopBarIndex;
-}
-
-void Sequence::setLastLoopBarIndex(int i)
-{
-    if (i < 0)
-    {
-        i = 0;
-    }
-
-    const auto currentLastBarIndex = lastBarIndex.load();
-
-    if (lastLoopBarEnd)
-    {
-        if (i < currentLastBarIndex)
-        {
-            lastLoopBarEnd = false;
-            lastLoopBarIndex = currentLastBarIndex;
-            return;
-        }
+        dispatch(SetLastLoopBarIndex{getSequenceIndex(), EndOfSequence});
         return;
     }
-    if (i > currentLastBarIndex)
-    {
-        lastLoopBarEnd = true;
-    }
-    else
-    {
-        if (i < firstLoopBarIndex)
-        {
-            firstLoopBarIndex = i;
-        }
-    }
 
-    lastLoopBarIndex = i;
+    dispatch(SetLastLoopBarIndex{getSequenceIndex(), i});
 }
 
-int Sequence::getLastLoopBarIndex() const
+mpc::BarIndex Sequence::getLastLoopBarIndex() const
 {
-    if (lastLoopBarEnd)
-    {
-        return lastBarIndex.load();
-    }
-
-    return lastLoopBarIndex;
+    return getSnapshot()->getLastLoopBarIndex();
 }
 
 bool Sequence::isLoopEnabled() const
 {
-    return loopEnabled;
+    return getSnapshot()->isLoopEnabled();
 }
 
 void Sequence::setName(const std::string &s)
@@ -164,7 +143,7 @@ void Sequence::setName(const std::string &s)
 
 std::string Sequence::getName()
 {
-    if (!used)
+    if (!isUsed())
     {
         return std::string("(Unused)");
     }
@@ -182,24 +161,24 @@ std::string Sequence::getDeviceName(const int i)
     return deviceNames[i];
 }
 
-void Sequence::setLastBarIndex(const int i)
+void Sequence::setLastBarIndex(const int i) const
 {
-    lastBarIndex.store(std::clamp(i, 0, 998));
+    dispatch(SetLastBarIndex{getSequenceIndex(), BarIndex(i)});
 }
 
 int Sequence::getLastBarIndex() const
 {
-    return lastBarIndex.load();
+    return getSnapshot()->getLastBarIndex();
 }
 
 int Sequence::getBarCount() const
 {
-    return lastBarIndex.load() + 1;
+    return getLastBarIndex() + 1;
 }
 
-void Sequence::setLoopEnabled(const bool b)
+void Sequence::setLoopEnabled(const bool b) const
 {
-    loopEnabled = b;
+    dispatch(SetLoopEnabled{getSequenceIndex(), b});
 }
 
 std::shared_ptr<Track> Sequence::getTrack(const int i)
@@ -207,21 +186,23 @@ std::shared_ptr<Track> Sequence::getTrack(const int i)
     return tracks[i];
 }
 
-void Sequence::setUsed(const bool b)
+void Sequence::setUsed(const bool b) const
 {
-    used = b;
+    dispatch(SetUsed{getSequenceIndex(), b});
 }
 
 bool Sequence::isUsed() const
 {
-    return used;
+    return getSnapshot()->isUsed();
 }
 
 void Sequence::init(const int newLastBarIndex)
 {
     const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
-    initialTempo = userScreen->tempo;
-    loopEnabled = userScreen->loop;
+    setInitialTempo(userScreen->tempo);
+    setLoopEnabled(userScreen->loop);
+
+    purgeAllTracks();
 
     for (const auto &t : tracks)
     {
@@ -232,24 +213,30 @@ void Sequence::init(const int newLastBarIndex)
     }
 
     setLastBarIndex(newLastBarIndex);
-
-    tempoTrackIsInitialized.store(false);
-    tempoChangeTrack->removeEvents();
     addTempoChangeEvent(0, 1000);
-    tempoTrackIsInitialized.store(true);
 
-    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.numerator,
-                     userScreen->timeSig.denominator);
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
+    std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
 
-    initLoop();
+    for (int i = 0; i <= newLastBarIndex; ++i)
+    {
+        timeSignatures[i] = userScreen->timeSig;
+        barLengths[i] = timeSignatures[i].getBarLength();
+    }
 
-    used = true;
+    setTimeSignatures(timeSignatures);
+    setBarLengths(barLengths);
+
+    setFirstLoopBarIndex(BarIndex(0));
+    setLastLoopBarIndex(EndOfSequence);
+
+    setUsed(true);
 }
 
 void Sequence::setBarLengths(
     const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> &barLengths) const
 {
-    stateManager->enqueue(UpdateBarLengths{barLengths});
+    dispatch(UpdateBarLengths{getSequenceIndex(), barLengths});
 }
 
 void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
@@ -267,9 +254,9 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
     const auto newDenTicks = 96 * (4.0 / den);
 
     const auto barStart = getFirstTickOfBar(barIndex);
-    const auto snapshot = stateManager->getSnapshot();
+    const auto snapshot = getSnapshot();
 
-    const auto oldBarLength = snapshot.getBarLength(barIndex);
+    const auto oldBarLength = snapshot->getBarLength(barIndex);
     const auto newBarLength = static_cast<int>(newDenTicks * num);
     const auto tickShift = newBarLength - oldBarLength;
 
@@ -316,9 +303,17 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
         }
     }
 
-    stateManager->enqueue(
-        UpdateTimeSignature{barIndex, TimeSignature{TimeSigNumerator(num),
-                                                    TimeSigDenominator(den)}});
+    const auto ts =
+        TimeSignature{TimeSigNumerator(num), TimeSigDenominator(den)};
+
+    dispatch(UpdateTimeSignature{getSequenceIndex(), barIndex, ts});
+}
+
+void Sequence::setTimeSignatures(
+    const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
+        &timeSignatures) const
+{
+    dispatch(UpdateTimeSignatures{getSequenceIndex(), timeSignatures});
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()
@@ -339,14 +334,9 @@ void Sequence::setDeviceNames(const std::vector<std::string> &sa)
 std::vector<std::shared_ptr<TempoChangeEvent>>
 Sequence::getTempoChangeEvents() const
 {
-    if (!tempoTrackIsInitialized.load())
-    {
-        return {};
-    }
-
     std::vector<std::shared_ptr<TempoChangeEvent>> res;
 
-    for (auto t : tempoChangeTrack->getEvents())
+    for (auto t : getTempoChangeTrack()->getEvents())
     {
         res.push_back(std::dynamic_pointer_cast<TempoChangeEvent>(t));
     }
@@ -361,72 +351,60 @@ void Sequence::addTempoChangeEvent(const int tick, const int amount) const
     e.tick = tick;
     e.amount = amount;
     e.trackIndex = TempoChangeTrackIndex;
-    tempoChangeTrack->insertEvent(e);
+    getTempoChangeTrack()->insertEvent(e);
 }
 
 double Sequence::getInitialTempo() const
 {
-    return initialTempo;
+    return getSnapshot()->getInitialTempo();
 }
 
-void Sequence::setInitialTempo(const double newInitialTempo)
+void Sequence::setInitialTempo(const double initialTempo) const
 {
-    this->initialTempo = newInitialTempo;
-
-    if (newInitialTempo < 30.0)
-    {
-        this->initialTempo = 30.0;
-    }
-    else if (newInitialTempo > 300.0)
-    {
-        this->initialTempo = 300.0;
-    }
+    dispatch(SetInitialTempo{getSequenceIndex(),
+                             std::clamp(initialTempo, 30.0, 300.0)});
 }
 
 void Sequence::removeTempoChangeEvent(const int i) const
 {
-    tempoChangeTrack->removeEvent(i);
+    getTempoChangeTrack()->removeEvent(i);
 }
 
 bool Sequence::isTempoChangeOn() const
 {
-    return tempoChangeOn;
+    return getSnapshot()->isTempoChangeEnabled();
 }
 
-void Sequence::setTempoChangeOn(const bool b)
+void Sequence::setTempoChangeOn(const bool b) const
 {
-    tempoChangeOn = b;
+    dispatch(SetTempoChangeEnabled{getSequenceIndex(), b});
 }
 
 int Sequence::getLastTick() const
 {
-    int lastTick = 0;
+    return getSnapshot()->getLastTick();
+}
 
-    const auto snapshot = stateManager->getSnapshot();
-
-    for (int i = 0; i < getLastBarIndex() + 1; i++)
-    {
-        lastTick += snapshot.getBarLength(i);
-    }
-
-    return lastTick;
+TimeSignature Sequence::getTimeSignature(const int barIndex) const
+{
+    return getSnapshot()->getTimeSignature(barIndex);
 }
 
 TimeSignature Sequence::getTimeSignature() const
 {
     int bar = getCurrentBarIndex();
 
-    if (bar > lastBarIndex.load() && bar != 0)
+    if (bar > getLastBarIndex() && bar != 0)
     {
         bar--;
     }
 
-    return stateManager->getSnapshot().getTimeSignature(bar);
+    return getSnapshot()->getTimeSignature(bar);
 }
 
 void Sequence::purgeAllTracks()
 {
-    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
     {
         purgeTrack(i);
     }
@@ -440,43 +418,41 @@ std::shared_ptr<Track> Sequence::purgeTrack(const int i)
 
 int Sequence::getDenominator(const int i) const
 {
-    return stateManager->getSnapshot().getTimeSignature(i).denominator;
+    return getSnapshot()->getTimeSignature(i).denominator;
 }
 
 int Sequence::getNumerator(const int i) const
 {
-    return stateManager->getSnapshot().getTimeSignature(i).numerator;
+    return getSnapshot()->getTimeSignature(i).numerator;
 }
 
-void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
+void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
 {
-    if (lastBarIndex.load() == -1)
+    if (getLastBarIndex() == NoBarIndex)
     {
         return;
     }
 
     lastBarToDelete++;
 
+    const auto snapshot = getSnapshot();
+    const auto &oldTs = snapshot->getTimeSignatures();
+
     int deleteFirstTick = 0;
-
-    const auto snapshot = stateManager->getSnapshot();
-
     for (int i = 0; i < firstBar; i++)
     {
-        deleteFirstTick += snapshot.getBarLength(i);
+        deleteFirstTick += snapshot->getBarLength(i);
     }
 
     int deleteLastTick = deleteFirstTick;
-
     for (int i = firstBar; i < lastBarToDelete; i++)
     {
-        deleteLastTick += snapshot.getBarLength(i);
+        deleteLastTick += snapshot->getBarLength(i);
     }
 
     for (const auto &t : tracks)
     {
         auto events = t->getEvents();
-
         for (auto &e : events)
         {
             if (e->getTick() >= deleteFirstTick &&
@@ -487,47 +463,21 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
         }
     }
 
-    const auto difference = lastBarToDelete - firstBar;
+    const int difference = lastBarToDelete - firstBar;
+
     int oldBarStartPos = 0;
-    auto barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
+    for (int i = 0; i < lastBarToDelete; ++i)
     {
-        if (i == lastBarToDelete)
-        {
-            break;
-        }
-
-        oldBarStartPos += snapshot.getBarLength(i);
-        barCounter++;
+        oldBarStartPos += snapshot->getBarLength(i);
     }
 
     int newBarStartPos = 0;
-    barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
+    for (int i = 0; i < firstBar; ++i)
     {
-        if (barCounter == firstBar)
-        {
-            break;
-        }
-
-        newBarStartPos += snapshot.getBarLength(i);
-        barCounter++;
+        newBarStartPos += snapshot->getBarLength(i);
     }
 
-    const auto tickDifference = oldBarStartPos - newBarStartPos;
-
-    for (int i = firstBar; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        if (i + difference > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-        {
-            break;
-        }
-
-        stateManager->enqueue(
-            UpdateTimeSignature{i, snapshot.getTimeSignature(i + difference)});
-    }
+    const int tickDifference = oldBarStartPos - newBarStartPos;
 
     for (const auto &t : tracks)
     {
@@ -535,7 +485,6 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
         {
             continue;
         }
-
         for (const auto &e : t->getEvents())
         {
             if (e->getTick() >= oldBarStartPos)
@@ -545,125 +494,51 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
         }
     }
 
-    const int newLastBarIndex = lastBarIndex.load() - difference;
+    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
 
-    lastBarIndex.store(newLastBarIndex);
-
-    if (firstLoopBarIndex > newLastBarIndex)
+    int out = 0;
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
-        firstLoopBarIndex = newLastBarIndex;
+        if (i >= firstBar && i < lastBarToDelete)
+        {
+            continue;
+        }
+        if (out >= Mpc2000XlSpecs::MAX_BAR_COUNT)
+        {
+            break;
+        }
+        newTs[out++] = oldTs[i];
+    }
+    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
+    {
+        newTs[out] = TimeSignature{};
     }
 
-    if (lastLoopBarIndex > newLastBarIndex)
-    {
-        lastLoopBarIndex = newLastBarIndex;
-    }
+    setTimeSignatures(newTs);
 
-    if (newLastBarIndex == -1)
+    const int newLastBarIndex = getLastBarIndex() - difference;
+    dispatch(SetLastBarIndex{getSequenceIndex(), BarIndex(newLastBarIndex)});
+
+    setFirstLoopBarIndex(BarIndex(0));
+    setLastLoopBarIndex(EndOfSequence);
+
+    if (newLastBarIndex == NoBarIndex)
     {
         setUsed(false);
     }
 }
 
-void Sequence::insertBars(int barCount, const int afterBar)
+void Sequence::insertBars(const int barCount, const BarIndex afterBar) const
 {
-    const auto oldLastBarIndex = lastBarIndex.load();
-    const bool isAppending = afterBar - 1 == oldLastBarIndex;
-
-    if (oldLastBarIndex + barCount > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
+    auto onComplete = [this](const BarIndex newLastBarIndex)
     {
-        barCount = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
-    }
-
-    if (barCount == 0)
-    {
-        return;
-    }
-
-    const auto newLastBarIndex = oldLastBarIndex + barCount;
-
-    const auto snapshot = stateManager->getSnapshot();
-
-    lastBarIndex.store(newLastBarIndex);
-
-    for (int i = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX; i >= afterBar; i--)
-    {
-        if (i - barCount < 0)
+        if (newLastBarIndex != NoBarIndex && !isUsed())
         {
-            break;
+            setUsed(true);
         }
+    };
 
-        const auto newNum = snapshot.getTimeSignature(i - barCount).numerator;
-        const auto newDen = snapshot.getTimeSignature(i - barCount).denominator;
-        stateManager->enqueue(
-            UpdateTimeSignature{i, TimeSignature{TimeSigNumerator(newNum),
-                                                 TimeSigDenominator(newDen)}});
-    }
-
-    // The below are sane defaults for the fresh bars, but the
-    // caller of this method is expected to set them to what they
-    // should be, given the use case.
-    for (int i = afterBar; i < afterBar + barCount; i++)
-    {
-        stateManager->enqueue(
-            UpdateTimeSignature{i, TimeSignature{TimeSigNumerator(4),
-                                                 TimeSigDenominator(4)}});
-    }
-
-    int barStart = 0;
-    auto barCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (barCounter == afterBar)
-        {
-            break;
-        }
-
-        barStart += snapshot.getBarLength(i);
-        barCounter++;
-    }
-
-    barCounter = 0;
-
-    if (!isAppending)
-    {
-        int newBarStart = 0;
-
-        for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-        {
-            if (barCounter == afterBar + barCount)
-            {
-                break;
-            }
-
-            newBarStart += snapshot.getBarLength(i);
-            barCounter++;
-        }
-
-        for (const auto &t : tracks)
-        {
-            if (t->getIndex() == TempoChangeTrackIndex)
-            {
-                continue;
-            }
-
-            for (const auto &e : t->getEvents())
-            {
-                if (e->getTick() >= barStart)
-                {
-                    const auto es = e->getSnapshot();
-                    const auto newTickPos = es.tick + (newBarStart - barStart);
-                    e->setTick(newTickPos);
-                }
-            }
-        }
-    }
-
-    if (newLastBarIndex != -1 && !isUsed())
-    {
-        setUsed(true);
-    }
+    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
 }
 
 bool trackIndexComparator(const std::shared_ptr<Track> &t0,
@@ -704,11 +579,6 @@ void Sequence::moveTrack(const int source, const int destination)
     sort(begin(tracks), end(tracks), trackIndexComparator);
 }
 
-bool Sequence::isLastLoopBarEnd() const
-{
-    return lastLoopBarEnd;
-}
-
 int Sequence::getEventCount() const
 {
     auto counter = 0;
@@ -726,67 +596,50 @@ int Sequence::getEventCount() const
     return counter;
 }
 
-void Sequence::initLoop()
+int Sequence::getFirstTickOfBeat(const int barIndex, const int beat) const
 {
-    const auto currentLastBarIndex = lastBarIndex.load();
-
-    if (firstLoopBarIndex == -1 && currentLastBarIndex >= 0)
-    {
-        firstLoopBarIndex = 0;
-    }
-
-    if (lastLoopBarIndex == -1 && currentLastBarIndex >= 0)
-    {
-        lastLoopBarIndex = currentLastBarIndex;
-    }
-
-    const auto firstBar = getFirstLoopBarIndex();
-    const auto lastBar = getLastLoopBarIndex() + 1;
-    int newLoopStart = 0;
-    int newLoopEnd = 0;
-
-    const auto snapshot = stateManager->getSnapshot();
-
-    for (int i = 0; i < lastBar; i++)
-    {
-        if (i < firstBar)
-        {
-            newLoopStart += snapshot.getBarLength(i);
-        }
-
-        newLoopEnd += snapshot.getBarLength(i);
-    }
-
-    setLoopStart(newLoopStart);
-    setLoopEnd(newLoopEnd);
-}
-
-int Sequence::getFirstTickOfBeat(const int bar, const int beat) const
-{
-    const auto barStart = getFirstTickOfBar(bar);
-    const auto den = stateManager->getSnapshot().getTimeSignature(bar).denominator;
+    const auto barStart = getFirstTickOfBar(barIndex);
+    const auto den = getSnapshot()->getTimeSignature(barIndex).denominator;
     const auto beatTicks = static_cast<int>(96 * (4.0 / den));
     return barStart + beat * beatTicks;
 }
 
-int Sequence::getFirstTickOfBar(const int index) const
+int Sequence::getFirstTickOfBar(const int barIndex) const
 {
-    int res = 0;
-
-    const auto snapshot = stateManager->getSnapshot();
-
-    for (int i = 0; i < index; i++)
-    {
-        res += snapshot.getBarLength(i);
-    }
-
-    return res;
+    return getSnapshot()->getFirstTickOfBar(BarIndex(barIndex));
 }
 
-int Sequence::getLastTickOfBar(const int index) const
+int Sequence::getLastTickOfBar(const int barIndex) const
 {
-    const auto snapshot = stateManager->getSnapshot();
-    return getFirstTickOfBar(index) + snapshot.getBarLength(index) - 1;
+    const auto snapshot = getSnapshot();
+    return getFirstTickOfBar(barIndex) + snapshot->getBarLength(barIndex) - 1;
+}
+
+Sequence::StartTime &Sequence::getStartTime()
+{
+    return startTime;
+}
+
+mpc::Tick Sequence::getBarLength(const int barIndex) const
+{
+    return getSnapshot()->getBarLength(barIndex);
+}
+
+std::array<mpc::Tick, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
+Sequence::getBarLengths() const
+{
+    return getSnapshot()->getBarLengths();
+}
+
+std::array<TimeSignature, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
+Sequence::getTimeSignatures() const
+{
+    return getSnapshot()->getTimeSignatures();
+}
+
+std::shared_ptr<Track> Sequence::getTempoChangeTrack() const
+{
+    return tracks[TempoChangeTrackIndex];
 }
 
 void Sequence::syncTrackEventIndices(const int tick) const
@@ -803,19 +656,4 @@ void Sequence::syncTrackEventIndices(const int tick) const
             t->syncEventIndex(tick, tick);
         }
     }
-}
-
-Sequence::StartTime &Sequence::getStartTime()
-{
-    return startTime;
-}
-
-std::shared_ptr<SequenceStateManager> Sequence::getStateManager()
-{
-    return stateManager;
-}
-
-std::shared_ptr<Track> Sequence::getTempoChangeTrack()
-{
-    return tempoChangeTrack;
 }

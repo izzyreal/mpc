@@ -1,19 +1,17 @@
 #pragma once
 
-#include "IntTypes.hpp"
+#include "sequencer/SequenceState.hpp"
+#include "sequencer/TransportState.hpp"
+
+#include <array>
 
 namespace mpc::sequencer
 {
-    struct TransportState
-    {
-        double positionQuarterNotes = 0.0;
-        double playStartPositionQuarterNotes = 0.0;
-    };
-
     struct SequencerState
     {
+        std::array<SequenceState, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
+            sequences{};
         SequenceIndex selectedSequenceIndex{MinSequenceIndex};
-        TransportState transportState;
+        TransportState transport;
     };
-
 } // namespace mpc::sequencer

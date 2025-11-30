@@ -6,7 +6,7 @@
 
 namespace mpc::sequencer
 {
-    struct TrackEventState
+    struct TrackState
     {
         std::vector<EventState> events;
     };

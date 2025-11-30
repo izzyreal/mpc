@@ -38,8 +38,8 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    class Clock;
     class SequencerStateManager;
-    class TrackEventStateWorker;
     class Transport;
     class Sequence;
     class Bus;
@@ -56,7 +56,7 @@ namespace mpc::performance
 
 namespace mpc::sequencer
 {
-    class Sequencer final
+    class Sequencer final : public std::enable_shared_from_this<Sequencer>
     {
     public:
         enum StopMode
@@ -65,34 +65,37 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(const std::shared_ptr<lcdgui::LayeredScreen> &,
-                  const std::function<std::shared_ptr<lcdgui::Screens>()> &,
-                  std::vector<std::shared_ptr<engine::Voice>> *,
-                  const std::function<bool()> &isAudioServerRunning,
-                  const std::shared_ptr<hardware::Hardware> &,
-                  const std::function<bool()> &isBouncePrepared,
-                  const std::function<void()> &startBouncing,
-                  const std::function<void()> &stopBouncing,
-                  const std::function<bool()> &isBouncing,
-                  const std::function<bool()> &isEraseButtonPressed,
-                  const std::shared_ptr<performance::PerformanceManager> &,
-                  const std::shared_ptr<sampler::Sampler> &,
-                  const std::shared_ptr<audiomidi::EventHandler> &,
-                  const std::function<bool()> &isSixteenLevelsEnabled,
-                  const std::function<
-                      std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
+        Sequencer(
+            std::shared_ptr<Clock>,
+            const std::shared_ptr<lcdgui::LayeredScreen> &,
+            const std::function<std::shared_ptr<lcdgui::Screens>()> &,
+            std::vector<std::shared_ptr<engine::Voice>> *,
+            const std::function<bool()> &isAudioServerRunning,
+            const std::shared_ptr<hardware::Hardware> &,
+            const std::function<bool()> &isBouncePrepared,
+            const std::function<void()> &startBouncing,
+            const std::function<void()> &stopBouncing,
+            const std::function<bool()> &isBouncing,
+            const std::function<bool()> &isEraseButtonPressed,
+            const std::shared_ptr<performance::PerformanceManager> &,
+            const std::shared_ptr<sampler::Sampler> &,
+            const std::shared_ptr<audiomidi::EventHandler> &,
+            const std::function<bool()> &isSixteenLevelsEnabled,
+            const std::function<
+                std::shared_ptr<engine::SequencerPlaybackEngine>()> &
+            );
 
         ~Sequencer();
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
-        static double ticksToQuarterNotes(uint32_t ticks);
+        static double ticksToQuarterNotes(double ticks);
 
         void playToTick(int targetTick) const;
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
-        void clearPlaceHolder();
+        void clearPlaceHolder() const;
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(BusType) const;
@@ -107,6 +110,12 @@ namespace mpc::sequencer
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
+        std::shared_ptr<audiomidi::EventHandler> getEventHandler();
+
+        const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
+
+        std::shared_ptr<Clock> clock;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
@@ -117,21 +126,17 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
 
-        std::shared_ptr<SequencerStateManager> stateManager;
-        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-            getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
-        std::shared_ptr<Sequence> placeHolder;
 
         std::vector<std::shared_ptr<Sequence>> sequences =
-            std::vector<std::shared_ptr<Sequence>>(99);
+            std::vector<std::shared_ptr<Sequence>>(
+                Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT);
         std::vector<std::shared_ptr<Song>> songs =
             std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
-        std::shared_ptr<Sequence> undoPlaceHolder;
-        std::shared_ptr<TrackEventStateWorker> trackEventStateWorker;
+        std::shared_ptr<SequencerStateManager> stateManager;
 
         std::atomic<bool> secondSequenceEnabled{false};
         bool undoSeqAvailable = false;
@@ -150,7 +155,9 @@ namespace mpc::sequencer
         SequenceIndex nextSq{NoSequenceIndex};
 
         std::shared_ptr<Sequence>
-        copySequence(const std::shared_ptr<Sequence> &source);
+        copySequence(const std::shared_ptr<Sequence> &source,
+                     SequenceIndex destinationIndex);
+
         static void
         copySequenceParameters(const std::shared_ptr<Sequence> &source,
                                const std::shared_ptr<Sequence> &dest);
@@ -166,7 +173,7 @@ namespace mpc::sequencer
         std::shared_ptr<SequencerStateManager> getStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
-        std::shared_ptr<Sequence> makeNewSequence();
+        std::shared_ptr<Sequence> makeNewSequence(SequenceIndex sequenceIndex);
 
         void init();
         bool isSoloEnabled() const;

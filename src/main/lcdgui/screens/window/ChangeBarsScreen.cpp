@@ -33,7 +33,7 @@ void ChangeBarsScreen::function(const int i)
                 sequencer.lock()->getTransport()->setPosition(0);
             }
 
-            seq->insertBars(numberOfBars, afterBar);
+            seq->insertBars(numberOfBars, BarIndex(afterBar));
 
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -49,6 +49,7 @@ void ChangeBarsScreen::function(const int i)
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
+        default:;
     }
 }
 

@@ -142,8 +142,9 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                  return static_cast<int>(Sequencer::quarterNotesToTicks(
                      sequencer.lock()
                          ->getTransport()
-                         ->getPlayStartPositionQuarterNotes()));
+                         ->getPositionQuarterNotes()));
              }
+
              return sequencer.lock()->getTransport()->getTickPosition();
          },
          [&](auto)
@@ -266,6 +267,16 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                                 ls.lock()->setFocus("nextsq");
                             }
                         }});
+
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSequence()->getBarCount();
+         },
+         [&](auto)
+         {
+             displayBars();
+         }});
 }
 
 void SequencerScreen::open()
@@ -432,8 +443,8 @@ void SequencerScreen::displayBus() const
 
 void SequencerScreen::displayBars() const
 {
-    findField("bars")->setText(std::to_string(
-        sequencer.lock()->getSelectedSequence()->getLastBarIndex() + 1));
+    findField("bars")->setText(
+        std::to_string(sequencer.lock()->getSelectedSequence()->getBarCount()));
 }
 
 void SequencerScreen::displayPgm() const

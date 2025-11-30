@@ -35,29 +35,37 @@ void LoopBarsScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "lastbar")
     {
-        seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
+        if (seq->getLastLoopBarIndex() == EndOfSequence)
+        {
+            seq->setLastLoopBarIndex(BarIndex(seq->getBarCount() - i));
+        }
+        else
+        {
+            seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - i);
+        }
         displayLastBar();
         displayFirstBar();
         displayNumberOfBars();
     }
     else if (focusedFieldName == "numberofbars" && i < 0)
     {
-        if (seq->isLastLoopBarEnd())
+        if (seq->getLastLoopBarIndex() == EndOfSequence)
         {
-            seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - 2);
-            displayLastBar();
-            displayNumberOfBars();
+            seq->setLastLoopBarIndex(BarIndex(seq->getBarCount() - i));
         }
-        else if (seq->getLastLoopBarIndex() >= seq->getFirstLoopBarIndex())
+        else
         {
-            seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - 1);
-            displayLastBar();
-            displayNumberOfBars();
+            seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - i);
         }
+
+        displayFirstBar();
+        displayLastBar();
+        displayNumberOfBars();
     }
     else if (focusedFieldName == "numberofbars")
     {
         seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
+        displayFirstBar();
         displayLastBar();
         displayNumberOfBars();
     }
@@ -67,7 +75,7 @@ void LoopBarsScreen::displayLastBar() const
 {
     const auto seq = sequencer.lock()->getSelectedSequence();
 
-    if (seq->isLastLoopBarEnd())
+    if (seq->getLastLoopBarIndex() == EndOfSequence)
     {
         findField("lastbar")->setText("END");
     }

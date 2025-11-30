@@ -106,7 +106,7 @@ namespace mpc::file::all
     public:
         static int
         getNumberOfEventSegmentsForThisSeq(const std::vector<char> &seqBytes);
-        int getEventAmount();
+        int getEventAmount() const;
 
     private:
         static int getSegmentCount(sequencer::Sequence *seq);

@@ -1,9 +1,7 @@
 #include "Sequencer.hpp"
 
 #include "MpcSpecs.hpp"
-#include "SequenceStateManager.hpp"
 
-#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
@@ -29,8 +27,7 @@
 #include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
-#include "TrackEventStateManager.hpp"
-#include "TrackEventStateWorker.hpp"
+#include "SequencerStateManager.hpp"
 
 #include <chrono>
 
@@ -51,7 +48,7 @@ uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
         std::floor(quarterNotes * static_cast<double>(TICKS_PER_QUARTER_NOTE)));
 }
 
-double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
+double Sequencer::ticksToQuarterNotes(const double ticks)
 {
     return ticks / static_cast<double>(TICKS_PER_QUARTER_NOTE);
 }
@@ -64,6 +61,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
+    std::shared_ptr<Clock> clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     std::vector<std::shared_ptr<Voice>> *voices,
@@ -80,22 +78,20 @@ Sequencer::Sequencer(
     const std::function<bool()> &isSixteenLevelsEnabled,
     const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
         &getSequencerPlaybackEngine)
-    : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
-      startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
-      stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
+    : getScreens(getScreens), isBouncePrepared(isBouncePrepared), startBouncing(startBouncing),
+      hardware(hardware), isBouncing(isBouncing), stopBouncing(stopBouncing),
+      layeredScreen(layeredScreen), getSequencerPlaybackEngine(getSequencerPlaybackEngine),
+      clock(clock), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed),
       performanceManager(performanceManager), sampler(sampler),
-      eventHandler(eventHandler),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-      getSequencerPlaybackEngine(getSequencerPlaybackEngine)
+      eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-    trackEventStateWorker = std::make_shared<TrackEventStateWorker>(this);
 }
+
 Sequencer::~Sequencer()
 {
-    printf("~Sequencer\n");
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
@@ -150,8 +146,6 @@ void Sequencer::init()
     {
         songs[i] = std::make_shared<Song>();
     }
-
-    trackEventStateWorker->start();
 }
 
 void Sequencer::deleteSong(const int i)
@@ -172,53 +166,6 @@ std::shared_ptr<Track> Sequencer::getSelectedTrack()
     }
 
     return getSelectedSequence()->getTrack(selectedTrackIndex);
-}
-
-void Sequencer::playToTick(const int targetTick) const
-{
-    const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
-                                              : getSelectedSequenceIndex();
-    auto seq = sequences[seqIndex].get();
-    const auto secondSequenceScreen =
-        getScreens()->get<ScreenId::SecondSeqScreen>();
-
-    for (int i = 0; i < 2; i++)
-    {
-        if (i == 1)
-        {
-            if (!secondSequenceEnabled.load() ||
-                transport->isMetronomeOnlyEnabled() ||
-                secondSequenceScreen->sq ==
-                    seqIndex) // Real 2KXL would play all events twice (i.e.
-                              // double as loud as normal) for the last clause
-            {
-                break;
-            }
-
-            seq = sequences[secondSequenceScreen->sq].get();
-
-            if (!seq->isUsed())
-            {
-                break;
-            }
-        }
-
-        if (!transport->isMetronomeOnlyEnabled())
-        {
-            for (const auto &track : seq->getTracks())
-            {
-                while (track->getNextTick() <= targetTick)
-                {
-                    track->playNext();
-                }
-            }
-        }
-
-        while (seq->getTempoChangeTrack()->getNextTick() <= targetTick)
-        {
-            seq->getTempoChangeTrack()->playNext();
-        }
-    }
 }
 
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
@@ -249,6 +196,58 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     }
 
     return s->getTempoChangeEvents()[index];
+}
+
+std::shared_ptr<EventHandler> Sequencer::getEventHandler()
+{
+    return eventHandler;
+}
+
+void Sequencer::playToTick(const int targetTick) const
+{
+    const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
+                                              : getSelectedSequenceIndex();
+    auto seq = sequences[seqIndex].get();
+    const auto secondSequenceScreen =
+        getScreens()->get<ScreenId::SecondSeqScreen>();
+
+    for (int i = 0; i < 2; i++)
+    {
+        if (i == 1)
+        {
+            if (!secondSequenceEnabled.load() ||
+                transport->isMetronomeOnlyEnabled() ||
+                secondSequenceScreen->sq ==
+                    seqIndex) // Real 2KXL would play all events twice (i.e.
+                        // double as loud as normal) for the last clause
+            {
+                break;
+            }
+
+            seq = sequences[secondSequenceScreen->sq].get();
+
+            if (!seq->isUsed())
+            {
+                break;
+            }
+        }
+
+        if (!transport->isMetronomeOnlyEnabled())
+        {
+            for (const auto &track : seq->getTracks())
+            {
+                while (track->getNextTick() <= targetTick)
+                {
+                    track->playNext();
+                }
+            }
+        }
+
+        while (seq->getTempoChangeTrack()->getNextTick() <= targetTick)
+        {
+            seq->getTempoChangeTrack()->playNext();
+        }
+    }
 }
 
 bool Sequencer::isSoloEnabled() const
@@ -288,7 +287,7 @@ void Sequencer::setSoloEnabled(const bool b)
     }
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getSequence(const int i)
+std::shared_ptr<Sequence> Sequencer::getSequence(const int i)
 {
     return sequences[i];
 }
@@ -361,34 +360,13 @@ void Sequencer::undoSeq()
         return;
     }
 
-    if (!undoPlaceHolder)
+    if (!sequences[UndoSequenceIndex]->isUsed())
     {
         return;
     }
 
-    auto s = copySequence(undoPlaceHolder);
-
-    const auto selectedSequenceIndex = getSelectedSequenceIndex();
-
-    auto copy = copySequence(sequences[selectedSequenceIndex]);
-    copy->getStateManager()->drainQueue();
-    for (const auto &t : copy->getTracks())
-    {
-        t->getEventStateManager()->drainQueue();
-    }
-
-    undoPlaceHolder.swap(copy);
-
-    sequences[selectedSequenceIndex].swap(s);
-
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-
-    sequences[selectedSequenceIndex]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
-
+    sequences[UndoSequenceIndex].swap(sequences[getSelectedSequenceIndex()]);
     undoSeqAvailable = !undoSeqAvailable;
-
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
 }
@@ -397,15 +375,11 @@ void Sequencer::setSequence(const SequenceIndex sequenceIndex,
                             std::shared_ptr<Sequence> s)
 {
     sequences[sequenceIndex].swap(s);
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[sequenceIndex]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
 }
 
 void Sequencer::purgeAllSequences()
 {
-    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT; i++)
     {
         purgeSequence(i);
     }
@@ -413,9 +387,21 @@ void Sequencer::purgeAllSequences()
     setSelectedSequenceIndex(MinSequenceIndex, true);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
+std::shared_ptr<Sequence>
+Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
 {
+    const std::function dispatch = [this](SequencerMessage &&m)
+    {
+        stateManager->enqueue(std::move(m));
+    };
+
+    const std::function getSnapshot = [this, sequenceIndex]
+    {
+        return stateManager->getSnapshot().getSequenceState(sequenceIndex);
+    };
+
     return std::make_shared<Sequence>(
+        sequenceIndex, getSnapshot, dispatch,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -492,11 +478,7 @@ std::shared_ptr<sequencer::Sequence> Sequencer::makeNewSequence()
 
 void Sequencer::purgeSequence(const int i)
 {
-    sequences[i] = makeNewSequence();
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[i]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
+    sequences[i] = makeNewSequence(SequenceIndex(i));
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
     sequences[i]->setName(res);
@@ -504,13 +486,7 @@ void Sequencer::purgeSequence(const int i)
 
 void Sequencer::copySequence(const int source, const int destination)
 {
-    auto copy = copySequence(sequences[source]);
-    const auto snapshot = stateManager->getSnapshot();
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[destination].swap(copy);
-    sequences[destination]->syncTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
-    sequences[destination]->initLoop();
+    copySequence(sequences[source], SequenceIndex(destination));
 }
 
 void Sequencer::copySequenceParameters(const int source, const int dest) const
@@ -518,25 +494,23 @@ void Sequencer::copySequenceParameters(const int source, const int dest) const
     copySequenceParameters(sequences[source], sequences[dest]);
 }
 
-std::shared_ptr<sequencer::Sequence>
-Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
+std::shared_ptr<Sequence>
+Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
+                        const SequenceIndex destinationIndex)
 {
-    auto copy = makeNewSequence();
-    copy->init(source->getLastBarIndex());
-    copy->getStateManager()->drainQueue();
-    copySequenceParameters(source, copy);
+    auto copy = sequences[destinationIndex];
 
-    for (int i = 0; i < 64; i++)
+    if (!copy)
     {
-        copyTrack(source->getTrack(i), copy->getTrack(i));
+        copy = makeNewSequence(destinationIndex);
     }
 
-    copy->getTempoChangeTrack()->removeEvents();
+    copy->init(source->getLastBarIndex());
+    copySequenceParameters(source, copy);
 
-    for (const auto &event : source->getTempoChangeTrack()->getEvents())
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
     {
-        auto eventCopy = event->getSnapshot();
-        copy->getTempoChangeTrack()->insertEvent(eventCopy);
+        copyTrack(source->getTrack(i), copy->getTrack(i));
     }
 
     return copy;
@@ -550,15 +524,11 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setUsed(source->isUsed());
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
-    dest->setBarLengths(
-        source->getStateManager()->getSnapshot().getBarLengths());
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        auto ts = source->getStateManager()->getSnapshot().getTimeSignature(i);
-        dest->setTimeSignature(i, ts.numerator, ts.denominator);
-    }
-    dest->setLoopStart(source->getLoopStart());
-    dest->setLoopEnd(source->getLoopEnd());
+    dest->setBarLengths(source->getBarLengths());
+    dest->setTimeSignatures(source->getTimeSignatures());
+    dest->setFirstLoopBarIndex(source->getFirstLoopBarIndex());
+    dest->setLastLoopBarIndex(source->getLastLoopBarIndex());
+    dest->setTempoChangeOn(source->isTempoChangeOn());
     copyTempoChangeEvents(source, dest);
 }
 
@@ -625,19 +595,8 @@ void Sequencer::copySong(const int source, const int dest)
 void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
                           const std::shared_ptr<Track> &dest)
 {
-    if (src == dest)
-    {
-        return;
-    }
-
     dest->setTrackIndex(src->getIndex());
-
-    for (auto &e : src->getEvents())
-    {
-        auto eventCopy = e->getSnapshot();
-        dest->insertEvent(eventCopy);
-    }
-
+    dest->setEventStates(src->getEventStates());
     copyTrackParameters(src, dest);
 }
 
@@ -668,7 +627,7 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
     defaultTrackNames[i] = s;
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getSelectedSequence()
+std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
 {
     if (const bool songMode = isSongModeEnabled();
         songMode &&
@@ -688,8 +647,7 @@ int Sequencer::getUsedSequenceCount() const
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<sequencer::Sequence>>
-Sequencer::getUsedSequences() const
+std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
@@ -901,7 +859,7 @@ void Sequencer::tap()
     transport->setTempo(newTempo);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getCurrentlyPlayingSequence()
+std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
     const auto seqIndex = getCurrentlyPlayingSequenceIndex();
 
@@ -1075,8 +1033,8 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
-    auto copy = copySequence(sequences[getSelectedSequenceIndex()]);
-    undoPlaceHolder.swap(copy);
+    auto copy =
+        copySequence(sequences[getSelectedSequenceIndex()], UndoSequenceIndex);
 
     undoSeqAvailable = true;
 
@@ -1090,33 +1048,31 @@ void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 
 void Sequencer::resetUndo()
 {
-    undoPlaceHolder.reset();
+    sequences[UndoSequenceIndex]->setUsed(false);
     undoSeqAvailable = false;
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::createSeqInPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
-    placeHolder = makeNewSequence();
-    return placeHolder;
+    makeNewSequence(PlaceholderSequenceIndex);
+    return sequences[PlaceholderSequenceIndex];
 }
 
-void Sequencer::clearPlaceHolder()
+void Sequencer::clearPlaceHolder() const
 {
-    placeHolder.reset();
+    sequences[PlaceholderSequenceIndex]->setUsed(false);
 }
 
 void Sequencer::movePlaceHolderTo(const int destIndex)
 {
-    sequences[destIndex].swap(placeHolder);
-    sequences[destIndex]->syncTrackEventIndices(quarterNotesToTicks(
-        stateManager->getSnapshot().getPositionQuarterNotes()));
+    sequences[destIndex].swap(sequences[PlaceholderSequenceIndex]);
     clearPlaceHolder();
 }
 
-std::shared_ptr<sequencer::Sequence> Sequencer::getPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
 {
-    return placeHolder;
+    return sequences[PlaceholderSequenceIndex];
 }
 
 template <typename T>

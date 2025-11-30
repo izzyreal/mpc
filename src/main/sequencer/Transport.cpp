@@ -1,20 +1,18 @@
 #include "Transport.hpp"
 
-#include "SequenceStateManager.hpp"
+#include "FloatTypes.hpp"
+#include "SequencerStateManager.hpp"
+#include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
-#include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
-#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
@@ -37,57 +35,60 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && getSequencerPlaybackEngine()->isRunning();
+    return !metronomeOnlyEnabled && sequencer.getStateManager()
+                                        ->getSnapshot()
+                                        .getTransportStateView()
+                                        .isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
 {
-    sequencer.getStateManager()->enqueue(Play{fromStart});
+    if (fromStart)
+    {
+        sequencer.getStateManager()->enqueue(PlayFromStart{});
+    }
+    else
+    {
+        sequencer.getStateManager()->enqueue(Play{});
+    }
 }
 
-void Transport::rec()
+void Transport::rec() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    recording = true;
-
-    play(false);
+    sequencer.getStateManager()->enqueue(Record{});
 }
 
-void Transport::recFromStart()
+void Transport::recFromStart() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    recording = true;
-    play(true);
+    sequencer.getStateManager()->enqueue(RecordFromStart{});
 }
 
-void Transport::overdub()
+void Transport::overdub() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    overdubbing = true;
-    play(false);
+    sequencer.getStateManager()->enqueue(Overdub{});
 }
 
-void Transport::switchRecordToOverdub()
+void Transport::switchRecordToOverdub() const
 {
-    if (!recording)
+    if (!isRecording())
     {
         return;
     }
-
-    recording = false;
-    overdubbing = true;
 
     // Maybe we should give our Led GUI component knowledge of Transport
     // so it can figure this out itself. It's already polling other kinds
@@ -98,85 +99,19 @@ void Transport::switchRecordToOverdub()
         ->setEnabled(true);
 }
 
-void Transport::overdubFromStart()
+void Transport::overdubFromStart() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    overdubbing = true;
-    play(true);
+    sequencer.getStateManager()->enqueue(OverdubFromStart{});
 }
 
-void Transport::stop()
+void Transport::stop() const
 {
-    const bool bouncing = sequencer.isBouncing();
-
-    if (!isPlaying() && !bouncing)
-    {
-        if (const auto snapshot = sequencer.getStateManager()->getSnapshot();
-            snapshot.getPositionQuarterNotes() != 0.0)
-        {
-            setPosition(0); // real 2kxl doesn't do this
-        }
-
-        return;
-    }
-
-    playedStepRepetitions = 0;
-    sequencer.setNextSq(NoSequenceIndex);
-
-    const auto activeSequence = sequencer.getSelectedSequence();
-    const auto pos = getTickPosition();
-
-    int64_t newTickPosition = pos;
-
-    if (pos > activeSequence->getLastTick())
-    {
-        newTickPosition = activeSequence->getLastTick();
-    }
-
-    // const int frameOffset = stopMode == AT_START_OF_BUFFER
-    //                             ? 0
-    //                             :
-    //                             getSequencerPlaybackEngine()->getEventFrameOffset();
-
-    getSequencerPlaybackEngine()->stop();
-
-    recording = false;
-    overdubbing = false;
-
-    if (countingIn)
-    {
-        newTickPosition = countInStartPos;
-        resetCountInPositions();
-        countingIn = false;
-    }
-
-    setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
-
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-
-    if (endOfSong)
-    {
-        songScreen->setOffset(songScreen->getOffset() + 1);
-    }
-
-    const auto vmpcDirectToDiskRecorderScreen =
-        sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-
-    if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
-    {
-        sequencer.stopBouncing();
-    }
-
-    sequencer.hardware->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(false);
-    sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(false);
+    sequencer.getStateManager()->enqueue(Stop{});
 }
 
 void Transport::resetCountInPositions()
@@ -185,31 +120,190 @@ void Transport::resetCountInPositions()
     countInEndPos = -1;
 }
 
-void Transport::setRecording(const bool b)
+void Transport::setRecording(const bool b) const
 {
-    recording = b;
+    sequencer.getStateManager()->enqueue(UpdateRecording{b});
 }
 
-void Transport::setOverdubbing(const bool b)
+void Transport::setOverdubbing(const bool b) const
 {
-    overdubbing = b;
+    sequencer.getStateManager()->enqueue(UpdateOverdubbing{b});
 }
 
-void Transport::setCountEnabled(const bool b)
+mpc::PositionQuarterNotes Transport::getWrappedPositionInSequence(
+    const PositionQuarterNotes positionQuarterNotes) const
 {
-    countEnabled = b;
+    const bool songMode = sequencer.isSongModeEnabled();
+
+    SequenceIndex songSequenceIndex;
+
+    if (songMode)
+    {
+        songSequenceIndex = sequencer.getSongSequenceIndex();
+
+        if (songSequenceIndex == NoSequenceIndex)
+        {
+            return NoPositionQuarterNotes;
+        }
+    }
+
+    const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+                          : songMode  ? sequencer.getSequence(songSequenceIndex)
+                                      : sequencer.getSelectedSequence();
+
+    const auto seqLengthQuarterNotes =
+        Sequencer::ticksToQuarterNotes(sequence->getLastTick());
+
+    PositionQuarterNotes result = positionQuarterNotes;
+
+    if (seqLengthQuarterNotes == 0)
+    {
+        result = 0;
+    }
+    else if (result < 0 || result >= seqLengthQuarterNotes)
+    {
+        result = fmod(result, seqLengthQuarterNotes);
+        while (result < 0)
+        {
+            result += seqLengthQuarterNotes;
+        }
+    }
+
+    return result;
+}
+
+mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
+    const PositionQuarterNotes positionQuarterNotes) const
+{
+    PositionQuarterNotes result = NoPositionQuarterNotes;
+
+    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
+    uint32_t stepStartTick = 0;
+    uint32_t stepEndTick = 0;
+    uint64_t songEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+        const auto step = song->getStep(stepIndex);
+
+        if (const auto sequence =
+                sequencer.getSequence(step.lock()->getSequence());
+            sequence->isUsed())
+        {
+            stepEndTick = stepStartTick +
+                          sequence->getLastTick() * step.lock()->getRepeats();
+        }
+        songEndTick = stepEndTick;
+    }
+
+    const double songLengthQuarterNotes =
+        Sequencer::ticksToQuarterNotes(songEndTick);
+    auto wrappedNewPosition = positionQuarterNotes;
+
+    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
+    {
+        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
+        while (wrappedNewPosition < 0)
+        {
+            wrappedNewPosition += songLengthQuarterNotes;
+        }
+    }
+
+    stepEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+
+        const auto step = song->getStep(stepIndex);
+        const auto sequence = sequencer.getSequence(step.lock()->getSequence());
+
+        if (sequence->isUsed())
+        {
+            stepEndTick = stepStartTick +
+                          sequence->getLastTick() * step.lock()->getRepeats();
+        }
+
+        const auto stepStartPositionQuarterNotes =
+            Sequencer::ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes =
+            Sequencer::ticksToQuarterNotes(stepEndTick);
+
+        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
+            wrappedNewPosition < stepEndPositionQuarterNotes)
+        {
+            songScreen->setOffset(stepIndex - 1);
+
+            const auto offsetWithinStepQuarterNotes =
+                wrappedNewPosition - stepStartPositionQuarterNotes;
+
+            const double finalPosQuarterNotes =
+                fmod(offsetWithinStepQuarterNotes,
+                     Sequencer::ticksToQuarterNotes(sequence->getLastTick()));
+
+            result = finalPosQuarterNotes;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void Transport::moveSongToStepThatContainsPosition(
+    const PositionQuarterNotes positionQuarterNotes) const
+{
+    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
+
+    uint32_t stepStartTick = 0, stepEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+
+        const auto step = song->getStep(stepIndex).lock();
+
+        if (const auto sequence = sequencer.getSequence(step->getSequence());
+            sequence->isUsed())
+        {
+            stepEndTick =
+                stepStartTick + sequence->getLastTick() * step->getRepeats();
+        }
+
+        const auto stepStartPositionQuarterNotes =
+            Sequencer::ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes =
+            Sequencer::ticksToQuarterNotes(stepEndTick);
+
+        if (positionQuarterNotes >= stepStartPositionQuarterNotes &&
+            positionQuarterNotes < stepEndPositionQuarterNotes)
+        {
+            songScreen->setOffset(stepIndex - 1);
+            break;
+        }
+    }
+}
+
+void Transport::setCountEnabled(const bool b) const
+{
+    sequencer.getStateManager()->enqueue(UpdateCountEnabled{b});
 }
 
 bool Transport::isCountEnabled() const
 {
-    return countEnabled;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isCountEnabled();
 }
 
 void Transport::setCountingIn(const bool b)
 {
-    countingIn = b;
+    sequencer.getStateManager()->enqueue(SetCountingIn{b});
 
-    if (!countingIn)
+    if (!b)
     {
         resetCountInPositions();
     }
@@ -217,23 +311,32 @@ void Transport::setCountingIn(const bool b)
 
 bool Transport::isCountingIn() const
 {
-    return countingIn;
-}
-
-void Transport::bumpPositionByTicks(const uint8_t tickCount) const
-{
-    sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isCountingIn();
 }
 
 int Transport::getTickPosition() const
 {
-    return sequencer.getStateManager()->getSnapshot().getPositionTicks();
+    const auto snapshot = sequencer.getStateManager()->getSnapshot();
+    const auto transportState = snapshot.getTransportStateView();
+    return transportState.getPositionTicks();
+}
+
+double Transport::getPositionQuarterNotes() const
+{
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .getPositionQuarterNotes();
 }
 
 double Transport::getPlayStartPositionQuarterNotes() const
 {
     return sequencer.getStateManager()
         ->getSnapshot()
+        .getTransportStateView()
         .getPlayStartPositionQuarterNotes();
 }
 
@@ -245,7 +348,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    getSequencerPlaybackEngine()->startMetronome();
+    // getSequencerPlaybackEngine()->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -255,7 +358,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    getSequencerPlaybackEngine()->stop();
+    // getSequencerPlaybackEngine()->stop();
     metronomeOnlyEnabled = false;
 }
 
@@ -282,6 +385,13 @@ void Transport::incrementPlayedStepRepetitions()
 void Transport::resetPlayedStepRepetitions()
 {
     playedStepRepetitions = 0;
+}
+void Transport::bumpPositionByTicks(const Tick ticks) const
+{
+    const auto snapshot = sequencer.getStateManager()->getSnapshot().getTransportStateView();
+    const auto pos = snapshot.getPositionTicks();
+    const auto newPos = Sequencer::ticksToQuarterNotes(pos + ticks);
+    setPosition(newPos);
 }
 
 bool Transport::isPunchEnabled() const
@@ -357,45 +467,49 @@ void Transport::setTempoSourceSequence(const bool b)
 
 bool Transport::isRecordingOrOverdubbing() const
 {
-    return recording || overdubbing;
+    return isRecording() || isOverdubbing();
 }
 
 bool Transport::isRecording() const
 {
-    return recording;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isRecording();
 }
 
 bool Transport::isOverdubbing() const
 {
-    return overdubbing;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isOverdubbing();
 }
 
 int Transport::getCurrentBarIndex() const
 {
-    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getSelectedSequence();
+    const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+                                 : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
+            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
             : getTickPosition();
 
-    if (pos == s->getLastTick())
+    if (pos == seq->getLastTick())
     {
-        return s->getLastBarIndex() + 1;
+        return seq->getBarCount();
     }
 
     int tickCounter = 0;
 
-    const auto snapshot = s->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        if (i > s->getLastBarIndex())
+        if (i > seq->getLastBarIndex())
         {
             return 0; // Should not happen
         }
 
-        tickCounter += snapshot.getBarLength(i);
+        tickCounter += seq->getBarLength(i);
 
         if (tickCounter > pos)
         {
@@ -408,31 +522,31 @@ int Transport::getCurrentBarIndex() const
 
 int Transport::getCurrentBeatIndex() const
 {
-    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getSelectedSequence();
+    const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+                                 : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
+            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
             : getTickPosition();
 
-    if (pos == s->getLastTick())
+    if (pos == seq->getLastTick())
     {
         return 0;
     }
 
     auto index = pos;
 
-    if (isPlaying() && !countingIn)
+    if (isPlaying() && !isCountingIn())
     {
         index = getTickPosition();
 
-        if (index > s->getLastTick())
+        if (index > seq->getLastTick())
         {
-            index %= s->getLastTick();
+            index %= seq->getLastTick();
         }
     }
 
-    const auto den = s->getTimeSignature().denominator;
+    const auto den = seq->getTimeSignature().denominator;
     const auto denTicks = 96 * (4.0 / den);
 
     if (index == 0)
@@ -444,8 +558,6 @@ int Transport::getCurrentBeatIndex() const
 
     const auto currentBarIndex = getCurrentBarIndex();
 
-    const auto snapshot = s->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
         if (i == currentBarIndex)
@@ -453,7 +565,7 @@ int Transport::getCurrentBeatIndex() const
             break;
         }
 
-        barStartPos += snapshot.getBarLength(i);
+        barStartPos += seq->getBarLength(i);
     }
 
     const auto beatIndex =
@@ -466,17 +578,16 @@ int Transport::getCurrentClockNumber() const
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                       : sequencer.getSelectedSequence();
 
-    auto clock =
-        isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
-            : getTickPosition();
+    auto clock = isCountingIn()
+                     ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
+                     : getTickPosition();
 
     if (clock == sequence->getLastTick())
     {
         return 0;
     }
 
-    if (isPlaying() && !countingIn)
+    if (isPlaying() && !isCountingIn())
     {
         if (clock > sequence->getLastTick())
         {
@@ -494,8 +605,6 @@ int Transport::getCurrentClockNumber() const
 
     const auto currentBarIndex = getCurrentBarIndex();
 
-    const auto snapshot = sequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
     {
         if (i == currentBarIndex)
@@ -503,7 +612,7 @@ int Transport::getCurrentClockNumber() const
             break;
         }
 
-        clock -= snapshot.getBarLength(i);
+        clock -= sequence->getBarLength(i);
     }
 
     const auto currentBeatIndex = getCurrentBeatIndex();
@@ -524,10 +633,9 @@ void Transport::setBarBeatClock(const int bar, const int beat,
         return;
     }
 
-    const auto s = sequencer.getSelectedSequence();
-    const auto snapshot = s->getStateManager()->getSnapshot();
+    const auto seq = sequencer.getSelectedSequence();
 
-    const auto [num, den] = s->getTimeSignature();
+    const auto [num, den] = seq->getTimeSignature();
 
     const int clampedBar = std::clamp(
         bar, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
@@ -540,7 +648,7 @@ void Transport::setBarBeatClock(const int bar, const int beat,
     int pos = 0;
     for (int b = 0; b < clampedBar; ++b)
     {
-        pos += snapshot.getBarLength(b);
+        pos += seq->getBarLength(b);
     }
 
     pos += clampedBeat * denTicks + clampedClock;
@@ -555,8 +663,7 @@ void Transport::setBar(int i) const
         return;
     }
 
-    const auto s = sequencer.getSelectedSequence();
-    const auto snapshot = s->getStateManager()->getSnapshot();
+    const auto seq = sequencer.getSelectedSequence();
 
     i = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
 
@@ -564,7 +671,7 @@ void Transport::setBar(int i) const
 
     for (int b = 0; b < i; ++b)
     {
-        pos += snapshot.getBarLength(b);
+        pos += seq->getBarLength(b);
     }
 
     setPosition(Sequencer::ticksToQuarterNotes(pos));
@@ -637,168 +744,15 @@ void Transport::setClock(int i) const
     setPosition(Sequencer::ticksToQuarterNotes(pos));
 }
 
-void Transport::setPosition(const double positionQuarterNotes,
-                            const bool shouldSyncTrackEventIndicesToNewPosition,
-                            const bool shouldSetPlayStartPosition) const
+void Transport::setPosition(const double positionQuarterNotes) const
 {
-    const bool songMode = sequencer.isSongModeEnabled();
-
-    SequenceIndex songSequenceIndex;
-
-    if (songMode)
-    {
-        songSequenceIndex = sequencer.getSongSequenceIndex();
-        if (songSequenceIndex == NoSequenceIndex)
-        {
-            return;
-        }
-    }
-
-    const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                          : songMode  ? sequencer.getSequence(songSequenceIndex)
-                                      : sequencer.getSelectedSequence();
-
-    const auto seqLengthQuarterNotes =
-        Sequencer::ticksToQuarterNotes(sequence->getLastTick());
-    auto wrappedNewPosition = positionQuarterNotes;
-
-    if (seqLengthQuarterNotes == 0)
-    {
-        wrappedNewPosition = 0;
-    }
-    else if (wrappedNewPosition < 0 ||
-             wrappedNewPosition >= seqLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += seqLengthQuarterNotes;
-        }
-    }
-
     sequencer.getStateManager()->enqueue(
-        SetPositionQuarterNotes{wrappedNewPosition});
+        SetPositionQuarterNotes{positionQuarterNotes});
 
-    if (shouldSetPlayStartPosition)
+    if (!isPlaying())
     {
         sequencer.getStateManager()->enqueue(
-            SetPlayStartPositionQuarterNotes{wrappedNewPosition});
-    }
-
-    if (shouldSyncTrackEventIndicesToNewPosition)
-    {
-        sequence->syncTrackEventIndices(
-            Sequencer::quarterNotesToTicks(wrappedNewPosition));
-        if (sequencer.isSecondSequenceEnabled())
-        {
-            const auto secondSequenceScreen =
-                sequencer.getScreens()->get<ScreenId::SecondSeqScreen>();
-            sequencer.getSequence(secondSequenceScreen->getSq())
-                ->syncTrackEventIndices(
-                    Sequencer::quarterNotesToTicks(wrappedNewPosition));
-        }
-    }
-}
-
-void Transport::setPositionWithinSong(
-    const double positionQuarterNotes,
-    const bool shouldSyncTrackEventIndicesToNewPosition,
-    const bool shouldSetPlayStartPosition)
-{
-    if (!screengroups::isSongScreen(
-            sequencer.layeredScreen->getCurrentScreen()))
-    {
-        return;
-    }
-
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
-    uint32_t stepStartTick = 0;
-    uint32_t stepEndTick = 0;
-    uint64_t songEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-        const auto step = song->getStep(stepIndex);
-
-        if (const auto sequence =
-                sequencer.getSequence(step.lock()->getSequence());
-            sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          sequence->getLastTick() * step.lock()->getRepeats();
-        }
-        songEndTick = stepEndTick;
-    }
-
-    const double songLengthQuarterNotes =
-        Sequencer::ticksToQuarterNotes(songEndTick);
-    auto wrappedNewPosition = positionQuarterNotes;
-
-    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += songLengthQuarterNotes;
-        }
-    }
-
-    stepEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = sequencer.getSequence(step.lock()->getSequence());
-
-        if (sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          sequence->getLastTick() * step.lock()->getRepeats();
-        }
-
-        const auto stepStartPositionQuarterNotes =
-            Sequencer::ticksToQuarterNotes(stepStartTick);
-        const auto stepEndPositionQuarterNotes =
-            Sequencer::ticksToQuarterNotes(stepEndTick);
-
-        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
-            wrappedNewPosition < stepEndPositionQuarterNotes)
-        {
-            songScreen->setOffset(stepIndex - 1);
-            const auto offsetWithinStepQuarterNotes =
-                wrappedNewPosition - stepStartPositionQuarterNotes;
-            const double finalPosQuarterNotes =
-                fmod(offsetWithinStepQuarterNotes,
-                     Sequencer::ticksToQuarterNotes(sequence->getLastTick()));
-
-            if (finalPosQuarterNotes == sequencer.getStateManager()
-                                            ->getSnapshot()
-                                            .getPositionQuarterNotes())
-            {
-                return;
-            }
-
-            setPosition(finalPosQuarterNotes,
-                        shouldSyncTrackEventIndicesToNewPosition,
-                        shouldSetPlayStartPosition);
-
-            if (shouldSyncTrackEventIndicesToNewPosition)
-            {
-                const auto offsetWithinStepTicks =
-                    Sequencer::quarterNotesToTicks(
-                        offsetWithinStepQuarterNotes);
-                playedStepRepetitions =
-                    std::floor(offsetWithinStepTicks /
-                               static_cast<float>(sequence->getLastTick()));
-                sequence->syncTrackEventIndices(offsetWithinStepTicks %
-                                                sequence->getLastTick());
-            }
-            break;
-        }
+            SyncTrackEventIndices{});
     }
 }
 

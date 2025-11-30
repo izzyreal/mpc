@@ -2,8 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
-#include "SequenceStateManager.hpp"
-#include "TrackEventStateManager.hpp"
+#include "SequencerStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -70,9 +69,15 @@ double SeqUtil::ticksPerSecond(const double tempo)
 }
 
 double SeqUtil::ticksToFrames(const double ticks, const double tempo,
-                              const int sr)
+                              const int sampleRate)
 {
-    return ticks * secondsPerTick(tempo) * sr;
+    return ticks * secondsPerTick(tempo) * sampleRate;
+}
+
+double SeqUtil::framesToTicks(const double frames, const double tempo,
+                              const int sampleRate)
+{
+    return frames / (secondsPerTick(tempo) * sampleRate);
 }
 
 double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
@@ -131,8 +136,8 @@ double SeqUtil::sequenceFrameLength(const Sequence *seq, const int firstTick,
 
 int SeqUtil::loopFrameLength(const Sequence *seq, const int sr)
 {
-    return static_cast<int>(
-        sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
+    return static_cast<int>(sequenceFrameLength(seq, seq->getLoopStartTick(),
+                                                seq->getLoopEndTick(), sr));
 }
 
 int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
@@ -316,10 +321,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                                       toSequence->getLastBarIndex();
         }
 
-        toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
+        toSequence->insertBars(numberOfDestinationBars, BarIndex(copyAfterBar));
     }
-
-    toSequence->getStateManager()->drainQueue();
 
     int sourceBarCounter = 0;
 
@@ -332,8 +335,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             fromSequence->getNumerator(sourceBarCounter + copyFirstBar),
             fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
 
-        toSequence->getStateManager()->drainQueue();
-
         sourceBarCounter++;
 
         if (sourceBarCounter >= numberOfSourceBars)
@@ -345,8 +346,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     auto firstTickOfFromSequence = 0;
     auto lastTickOfFromSequence = 0;
 
-    const auto fromSeqSnapshot = fromSequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyFirstBar)
@@ -354,12 +353,12 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
+        firstTickOfFromSequence += fromSequence->getBarLength(i);
     }
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        lastTickOfFromSequence += fromSeqSnapshot.getBarLength(i);
+        lastTickOfFromSequence += fromSequence->getBarLength(i);
 
         if (i == copyLastBar)
         {
@@ -369,8 +368,6 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
     auto firstTickOfToSequence = 0;
 
-    const auto toSeqSnapshot = toSequence->getStateManager()->getSnapshot();
-
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
         if (i == copyAfterBar)
@@ -378,7 +375,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
             break;
         }
 
-        firstTickOfToSequence += toSeqSnapshot.getBarLength(i);
+        firstTickOfToSequence += toSequence->getBarLength(i);
     }
 
     const auto segmentLengthTicks =
@@ -397,7 +394,8 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         auto t1Events =
             t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
         const auto t2 = toSequence->getTrack(i);
-        t2->getEventStateManager()->drainQueue();
+
+        sequencer->getStateManager()->drainQueue();
 
         if (!t2->isUsed())
         {

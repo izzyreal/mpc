@@ -145,7 +145,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
 
                     sequencer.lock()->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(
-                            sequence->getLoopStart()));
+                            sequence->getLoopStartTick()));
 
                     if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
                     {

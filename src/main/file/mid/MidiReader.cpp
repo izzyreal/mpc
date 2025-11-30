@@ -176,16 +176,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
     }
 
     sequence->setLastBarIndex(barCounter - 1);
-    sequence->setFirstLoopBarIndex(firstLoopBar);
+    sequence->setFirstLoopBarIndex(BarIndex(firstLoopBar));
 
     if (lastLoopBar == -1)
     {
-        sequence->setLastLoopBarIndex(sequence->getLastBarIndex());
-        sequence->setLastLoopBarIndex(sequence->getLastLoopBarIndex() + 1);
+        sequence->setLastLoopBarIndex(EndOfSequence);
     }
     else
     {
-        sequence->setLastLoopBarIndex(lastLoopBar);
+        sequence->setLastLoopBarIndex(BarIndex(lastLoopBar));
     }
 
     std::pair noteVariationData{NoteVariationTypeTune,

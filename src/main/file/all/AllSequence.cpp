@@ -16,7 +16,6 @@
 #include "file/ByteUtil.hpp"
 #include "StrUtil.hpp"
 #include "Util.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -112,8 +111,6 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
 {
     mpcSeq->init(barCount - 1);
 
-    mpcSeq->getStateManager()->drainQueue();
-
     for (int i = 0; i < barCount; i++)
     {
         const auto num = barList->getBars()[i]->getNumerator();
@@ -156,13 +153,13 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
         mpcSeq->setDeviceName(i, devNames[i]);
     }
 
-    mpcSeq->setFirstLoopBarIndex(loopFirst);
-    mpcSeq->setLastLoopBarIndex(loopLast);
-    mpcSeq->setLastLoopBarIndex(loopLast);
+    mpcSeq->setFirstLoopBarIndex(BarIndex(loopFirst));
+    mpcSeq->setLastLoopBarIndex(BarIndex(loopLast));
+    mpcSeq->setLastLoopBarIndex(BarIndex(loopLast));
 
     if (loopLastEnd)
     {
-        mpcSeq->setLastLoopBarIndex(INT_MAX);
+        mpcSeq->setLastLoopBarIndex(EndOfSequence);
     }
 
     mpcSeq->setLoopEnabled(loop);
@@ -218,7 +215,7 @@ AllSequence::AllSequence(Sequence *seq, int number)
     auto loopStartBytes = ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
     auto loopEndBytes = ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
 
-    if (seq->isLastLoopBarEnd())
+    if (seq->getLastLoopBarIndex() == EndOfSequence)
     {
         loopEndBytes =
             std::vector{static_cast<char>(255), static_cast<char>(255)};
@@ -400,7 +397,7 @@ int AllSequence::getNumberOfEventSegmentsForThisSeq(
     return accum;
 }
 
-int AllSequence::getEventAmount()
+int AllSequence::getEventAmount() const
 {
     return static_cast<int>(allEvents.size());
 }

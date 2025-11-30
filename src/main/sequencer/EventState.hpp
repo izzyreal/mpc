@@ -10,6 +10,7 @@ namespace mpc::sequencer
         // === BASE SECTION ===
         EventId eventId;
         EventType type;
+        SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
         Tick tick;
 
@@ -36,7 +37,6 @@ namespace mpc::sequencer
         NoteNumber noteNumber;
 
         // NOTE ON SECTION
-        NoteEventId noteEventId;
         Duration duration;
         Velocity velocity;
         NoteVariationType noteVariationType;
@@ -64,25 +64,31 @@ namespace mpc::sequencer
         {
             eventId = NoEventId;
             type = EventType::Unknown;
+            sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
-
             tick = NoTick;
-
-            noteNumber = NoNoteNumber;
-            noteEventId = NoNoteEventId;
+            metronomeOnlyTickPosition = 0;
             beingRecorded = false;
-
+            wasMoved = 0;
+            noteNumber = NoNoteNumber;
             duration = NoDuration;
             velocity = NoVelocityOrPressure;
             noteVariationType = NoteVariationTypeTune;
             noteVariationValue = DefaultNoteVariationValue;
+            amount = 0;
+            controllerNumber = 0;
+            controllerValue = 0;
+            programChangeProgramIndex = NoProgramIndex;
+            mixerParameter = 0;
+            mixerPad = 0;
+            mixerValue = 0;
         }
 
         bool operator==(EventState const &other) const
         {
             return type == other.type && trackIndex == other.trackIndex &&
-                   tick == other.tick && noteNumber == other.noteNumber &&
-                   noteEventId == other.noteEventId &&
+                   sequenceIndex == other.sequenceIndex && tick == other.tick &&
+                   noteNumber == other.noteNumber && eventId == other.eventId &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
                    metronomeOnlyTickPosition ==
@@ -97,6 +103,29 @@ namespace mpc::sequencer
                        other.programChangeProgramIndex &&
                    mixerParameter == other.mixerParameter &&
                    mixerPad == other.mixerPad && mixerValue == other.mixerValue;
+        }
+
+        bool operator!=(EventState const &other) const
+        {
+            return !(*this == other);
+        }
+
+        void printInfo() const
+        {
+            printf("== EventState ==\n");
+            printf("     type: %s\n", eventTypeToString(type).c_str());
+            printf("  eventId: %i\n", eventId);
+            printf(" sequence: %i\n", sequenceIndex.get());
+            printf("    track: %i\n", trackIndex.get());
+            printf("     tick: %lld\n", tick);
+
+            if (type == EventType::NoteOn)
+            {
+                printf("     note: %i\n", noteNumber.get());
+                printf(" velocity: %i\n", velocity.get());
+                printf(" duration: %i\n", duration.get());
+            }
+            printf("================\n");
         }
     };
 } // namespace mpc::sequencer

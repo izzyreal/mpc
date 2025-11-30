@@ -1,27 +1,15 @@
 #pragma once
 
-#include "IntTypes.hpp"
+#include "sequencer/NoteRange.hpp"
 
-#include <cstdint>
+#include "sequencer/TransportMessage.hpp"
+#include "sequencer/SequenceMessage.hpp"
+
+#include <functional>
 #include <variant>
 
 namespace mpc::sequencer
 {
-    struct SetPositionQuarterNotes
-    {
-        double positionQuarterNotes;
-    };
-
-    struct SetPlayStartPositionQuarterNotes
-    {
-        double positionQuarterNotes;
-    };
-
-    struct BumpPositionByTicks
-    {
-        uint8_t ticks;
-    };
-
     struct SwitchToNextSequence
     {
         SequenceIndex sequenceIndex;
@@ -33,17 +21,23 @@ namespace mpc::sequencer
         bool setPositionTo0 = true;
     };
 
-    struct Stop
+    struct CopyEvents
     {
+        Tick sourceStartTick;
+        Tick sourceEndTick;
+        SequenceIndex sourceSequenceIndex;
+        SequenceIndex destSequenceIndex;
+        TrackIndex sourceTrackIndex;
+        TrackIndex destTrackIndex;
+        Tick destStartTick;
+        bool copyModeMerge;
+        int copyCount;
+        NoteRange sourceNoteRange{};
+        std::function<EventId()> generateEventId;
     };
 
-    struct Play
-    {
-        bool fromStart;
-    };
+    using SequencerMessage = std::variant<TransportMessage, SequenceMessage,
 
-    using SequencerMessage =
-        std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks, SwitchToNextSequence,
-                     SetSelectedSequenceIndex, Stop, Play>;
+                                          CopyEvents, SwitchToNextSequence,
+                                          SetSelectedSequenceIndex>;
 } // namespace mpc::sequencer

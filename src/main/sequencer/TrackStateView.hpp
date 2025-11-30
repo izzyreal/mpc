@@ -1,19 +1,18 @@
 #pragma once
 
+#include "SequencerState.hpp"
 #include "sequencer/EventState.hpp"
 
-#include <memory>
 #include <vector>
 
 namespace mpc::sequencer
 {
-    struct TrackEventState;
+    struct SequencerState;
 
-    class TrackEventStateView
+    class TrackStateView
     {
     public:
-        explicit TrackEventStateView(
-            const std::shared_ptr<const TrackEventState> &s) noexcept;
+        explicit TrackStateView(const TrackState &s) noexcept;
 
         std::optional<EventState> findNoteEvent(int tick,
                                                 NoteNumber note) const;
@@ -28,13 +27,15 @@ namespace mpc::sequencer
 
         std::vector<EventState> getNoteEvents() const;
 
+        std::vector<EventState> getEvents() const;
+
         EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
-        EventState findRecordingNoteOnByNoteEventId(NoteEventId) const;
+        EventState findRecordingNoteOnByEventId(EventId) const;
 
         EventState getEventById(EventId) const;
 
     private:
-        const std::shared_ptr<const TrackEventState> state;
+        const TrackState &state;
     };
 } // namespace mpc::sequencer

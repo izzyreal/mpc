@@ -76,7 +76,7 @@ namespace mpc::performance
         Velocity velocity;
         ProgramIndex programIndex;
         Pressure pressure;
-        NoteEventId recordNoteEventId = NoNoteEventId;
+        EventId recordNoteEventId = NoEventId;
     };
 
     struct NoteAftertouchEvent

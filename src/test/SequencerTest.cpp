@@ -20,9 +20,6 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include "hardware/Component.hpp"
-#include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
-#include "sequencer/TrackEventStateWorker.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;

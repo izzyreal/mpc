@@ -56,11 +56,6 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
 
 void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 {
-    if (sequencerIsRunning.load())
-    {
-        return;
-    }
-
     if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
     {
         // TODO Implement MIDI clock out
@@ -72,17 +67,10 @@ void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 
     metronomeOnly = metronomeOnlyToUse;
     metronomeOnlyTickPosition = 0;
-
-    sequencerIsRunning.store(true);
 }
 
 void SequencerPlaybackEngine::startMetronome()
 {
-    if (sequencerIsRunning.load())
-    {
-        return;
-    }
-
     start(true);
 }
 
@@ -93,18 +81,7 @@ unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 
 void SequencerPlaybackEngine::stop()
 {
-    if (!sequencerIsRunning.load())
-    {
-        return;
-    }
-
-    sequencerIsRunning.store(false);
     tickFrameOffset = 0;
-}
-
-bool SequencerPlaybackEngine::isRunning() const
-{
-    return sequencerIsRunning.load();
 }
 
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
@@ -112,6 +89,8 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
+    sequencer->getStateManager()->drainQueue();
+    sequencer->getStateManager()->enqueue(SyncTrackEventIndices{});
     sequencer->getStateManager()->drainQueue();
 }
 
@@ -124,7 +103,6 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
     setTickPositionEffectiveImmediately(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
     newSeq->syncTrackEventIndices(0);
-    newSeq->initLoop();
     return newSeq;
 }
 
@@ -327,7 +305,8 @@ bool SequencerPlaybackEngine::processSongMode() const
 bool SequencerPlaybackEngine::processSeqLoopEnabled() const
 {
     if (const auto seq = sequencer->getCurrentlyPlayingSequence();
-        sequencer->getTransport()->getTickPosition() >= seq->getLoopEnd() - 1)
+        sequencer->getTransport()->getTickPosition() >=
+        seq->getLoopEndTick() - 1)
     {
         const auto punch =
             sequencer->getTransport()->isPunchEnabled() &&
@@ -359,7 +338,7 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
         }
 
         sequencer->playToTick(sequencer->getTransport()->getTickPosition());
-        setTickPositionEffectiveImmediately(seq->getLoopStart());
+        setTickPositionEffectiveImmediately(seq->getLoopStartTick());
 
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
@@ -384,7 +363,7 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
         {
             const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
-            seq->insertBars(1, seq->getLastBarIndex());
+            seq->insertBars(1, BarIndex(seq->getLastBarIndex()));
             seq->setTimeSignature(
                 seq->getLastBarIndex(), seq->getLastBarIndex(),
                 userScreen->timeSig.numerator, userScreen->timeSig.denominator);
@@ -501,7 +480,10 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
 
-    const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
+    const auto snapshot = sequencer->getStateManager()->getSnapshot();
+
+    const bool sequencerIsRunningAtStartOfBuffer =
+        snapshot.getTransportStateView().isSequencerRunning();
     const auto sampleRate = getSampleRate();
 
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
@@ -546,15 +528,22 @@ void SequencerPlaybackEngine::work(const int nFrames)
         const auto hostPositionQuarterNotes =
             clock->getLastProcessedHostPositionQuarterNotes();
 
+        PositionQuarterNotes wrappedPosition;
+
         if (sequencer->isSongModeEnabled())
         {
-            sequencer->getTransport()->setPositionWithinSong(
-                hostPositionQuarterNotes);
+            wrappedPosition =
+                sequencer->getTransport()->getWrappedPositionInSong(
+                    hostPositionQuarterNotes);
         }
         else
         {
-            sequencer->getTransport()->setPosition(hostPositionQuarterNotes);
+            wrappedPosition =
+                sequencer->getTransport()->getWrappedPositionInSequence(
+                    hostPositionQuarterNotes);
         }
+
+        sequencer->getTransport()->setPosition(wrappedPosition);
         sequencer->getStateManager()->drainQueue();
     }
 

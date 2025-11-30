@@ -8,7 +8,7 @@
 
 namespace mpc
 {
-    ///////////
+    /////////
 
     using PhysicalPadIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::HARDWARE_PAD_COUNT - 1>;
@@ -20,6 +20,7 @@ namespace mpc
     constexpr Velocity MinVelocity{0};
     constexpr Velocity Velocity1{1};
     constexpr Velocity MaxVelocity{127};
+    constexpr Velocity MediumVelocity{64};
 
     /////////
 
@@ -44,6 +45,7 @@ namespace mpc
 
     using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
     constexpr DrumNoteNumber NoDrumNoteAssigned{34};
+    constexpr DrumNoteNumber AllDrumNotes{34};
     constexpr DrumNoteNumber MinDrumNoteNumber{Mpc2000XlSpecs::FIRST_DRUM_NOTE};
     constexpr DrumNoteNumber MaxDrumNoteNumber{Mpc2000XlSpecs::LAST_DRUM_NOTE};
 
@@ -92,12 +94,17 @@ namespace mpc
     /////////
 
     using SequenceIndex =
-        ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::LAST_SEQUENCE_INDEX>;
+        ConstrainedInt<int8_t, -2, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT - 1>;
 
     constexpr SequenceIndex NoSequenceIndex{-1};
     constexpr SequenceIndex MinSequenceIndex{0};
     constexpr SequenceIndex MaxSequenceIndex{
         Mpc2000XlSpecs::LAST_SEQUENCE_INDEX};
+    constexpr SequenceIndex SelectedSequenceIndex{-2};
+
+    constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
+    constexpr SequenceIndex PlaceholderSequenceIndex{
+        Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
 
     /////////
 
@@ -143,19 +150,6 @@ namespace mpc
 
     /////////
 
-    using NoteEventId = uint32_t;
-    constexpr NoteEventId NoNoteEventId = 0;
-    constexpr NoteEventId MinNoteEventId{1};
-    constexpr NoteEventId MaxNoteEventId{
-        std::numeric_limits<NoteEventId>::max()};
-
-    inline NoteEventId getNextNoteEventId(const NoteEventId current)
-    {
-        return current >= MaxNoteEventId ? MinNoteEventId : current + 1;
-    }
-
-    /////////
-
     using EventId = uint32_t;
     constexpr EventId NoEventId = 0;
     constexpr EventId MinEventId{1};
@@ -171,6 +165,13 @@ namespace mpc
     using Tick = int64_t;
     constexpr Tick NoTick{-1};
     constexpr Tick NoTickAssignedWhileRecording{-2};
+
+    /////////
+
+    using BarIndex =
+        ConstrainedInt<int16_t, -1, Mpc2000XlSpecs::MAX_LAST_BAR_INDEX>;
+    constexpr BarIndex NoBarIndex{-1};
+    constexpr BarIndex EndOfSequence{-2};
 
     /////////
 
@@ -204,5 +205,17 @@ namespace mpc
 
     constexpr TimeSigNumerator DefaultTimeSigNumerator{4};
     constexpr TimeSigDenominator DefaultTimeSigDenominator{4};
+
+    /////////
+
+    using TimeInSamples = int64_t;
+    constexpr TimeInSamples NoTimeInSamples{-1};
+    constexpr TimeInSamples CurrentTimeInSamples{-2};
+
+    /////////
+
+    using SampleRate = ConstrainedInt<uint32_t, 0, 192'000>;
+    constexpr SampleRate DefaultSampleRate{44100};
+    constexpr SampleRate NoSampleRate{0};
 
 } // namespace mpc

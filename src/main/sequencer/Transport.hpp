@@ -1,5 +1,8 @@
 #pragma once
 
+#include "FloatTypes.hpp"
+#include "IntTypes.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <functional>
@@ -27,22 +30,25 @@ namespace mpc::sequencer
                 std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
         void play(bool fromStart = false) const;
-        void rec();
-        void recFromStart();
-        void overdub();
-        void overdubFromStart();
-        void switchRecordToOverdub();
-        void stop();
-        void setRecording(bool b);
-        void setOverdubbing(bool b);
-        void setPosition(double positionQuarterNotes,
-                         bool shouldSyncTrackEventIndicesToNewPosition = true,
-                         bool shouldSetPlayStartPosition = true) const;
-        void setPositionWithinSong(
-            double positionQuarterNotes,
-            bool shouldSyncTrackEventIndicesToNewPosition = true,
-            bool shouldSetPlayStartPosition = true);
-        void bumpPositionByTicks(uint8_t tickCount) const;
+        void rec() const;
+        void recFromStart() const;
+        void overdub() const;
+        void overdubFromStart() const;
+        void switchRecordToOverdub() const;
+        void stop() const;
+        void setRecording(bool b) const;
+        void setOverdubbing(bool b) const;
+
+        PositionQuarterNotes
+            getWrappedPositionInSequence(PositionQuarterNotes) const;
+
+        PositionQuarterNotes
+            getWrappedPositionInSong(PositionQuarterNotes) const;
+
+        void moveSongToStepThatContainsPosition(PositionQuarterNotes) const;
+
+        void setPosition(PositionQuarterNotes) const;
+
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;
@@ -63,6 +69,7 @@ namespace mpc::sequencer
         void stopMetronomeTrack();
 
         int getTickPosition() const;
+        double getPositionQuarterNotes() const;
         double getPlayStartPositionQuarterNotes() const;
         int getCurrentBarIndex() const;
         int getCurrentBeatIndex() const;
@@ -73,7 +80,7 @@ namespace mpc::sequencer
         void setClock(int i) const;
 
         bool isCountEnabled() const;
-        void setCountEnabled(bool b);
+        void setCountEnabled(bool b) const;
         bool isCountingIn() const;
         void setCountingIn(bool b);
         void resetCountInPositions();
@@ -92,20 +99,17 @@ namespace mpc::sequencer
         void incrementPlayedStepRepetitions();
         void resetPlayedStepRepetitions();
 
+        void bumpPositionByTicks(Tick) const;
+
         const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
             getSequencerPlaybackEngine;
 
     private:
         Sequencer &sequencer;
 
-        bool playing = false;
-        bool recording = false;
-        bool overdubbing = false;
-        bool countingIn = false;
         bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         bool punchEnabled = false;
-        bool countEnabled = true;
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;

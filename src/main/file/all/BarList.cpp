@@ -4,7 +4,6 @@
 #include "sequencer/Sequence.hpp"
 
 #include "Util.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc::file::all;
 
@@ -45,11 +44,9 @@ BarList::BarList(sequencer::Sequence *seq)
     auto ticksPerBeat = 0;
     auto lastTick = 0;
 
-    const auto snapshot = seq->getStateManager()->getSnapshot();
-
     for (int i = 0; i < seq->getLastBarIndex() + 1; i++)
     {
-        const auto barLength = snapshot.getBarLength(i);
+        const auto barLength = seq->getBarLength(i);
         lastTick += barLength;
         ticksPerBeat = barLength / seq->getNumerator(i);
 
