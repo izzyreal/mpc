@@ -277,15 +277,8 @@ void StepEditorScreen::function(int i)
             if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
             {
                 auto track = sequencer.lock()->getSelectedTrack();
-                for (int e = 0; e < track->getEvents().size(); e++)
-                {
-                    if (eventsEqual(track->getEvents()[e],
-                                    visibleEvents[rowIndex]))
-                    {
-                        track->removeEvent(e);
-                        break;
-                    }
-                }
+
+                track->removeEvent(visibleEvents[rowIndex]);
 
                 if (rowIndex == 2 && yOffset > 0)
                 {
@@ -458,7 +451,7 @@ void StepEditorScreen::function(int i)
                     if (auto noteEvent =
                             std::dynamic_pointer_cast<NoteOnEvent>(event))
                     {
-                        adhocPlayNoteEvent(noteEvent->getSnapshot());
+                        adhocPlayNoteEvent(*noteEvent->eventState);
                     }
                 }
             }
@@ -1555,7 +1548,7 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
     {
         if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            adhocPlayNoteEvent(noteEvent->getSnapshot());
+            adhocPlayNoteEvent(*noteEvent->eventState);
         }
     }
 }

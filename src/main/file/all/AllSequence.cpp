@@ -107,7 +107,7 @@ AllSequence::~AllSequence()
     }
 }
 
-void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
+void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
 {
     mpcSeq->init(barCount - 1);
 
@@ -489,7 +489,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq)
                 {
                     event->setTrack(track->getIndex());
                     ea.push_back(
-                        AllEvent::mpcEventToBytes(event->getSnapshot()));
+                        AllEvent::mpcEventToBytes(*event->eventState));
                 }
             }
         }

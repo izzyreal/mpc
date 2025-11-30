@@ -17,6 +17,20 @@ SequenceStateHandler::SequenceStateHandler(SequencerStateManager *manager,
 
 SequenceStateHandler::~SequenceStateHandler() {}
 
+void updateEvent(EventState* e, const EventState& replacement)
+{
+    // Preserve links
+    auto* prev = e->prev;
+    auto* next = e->next;
+
+    // Copy everything else (POD-style)
+    *e = replacement;
+
+    // Restore links
+    e->prev = prev;
+    e->next = next;
+}
+
 void SequenceStateHandler::applyMessage(
     SequencerState &state, std::vector<std::function<void()>> &actions,
     const SequenceMessage &msg)
@@ -65,25 +79,28 @@ void SequenceStateHandler::applyMessage(
         },
         [&](const UpdateTrackIndexOfAllEvents &m)
         {
-            for (auto &e :
-                 state.sequences[m.sequence].tracks[m.trackIndex].events)
+            EventState *it = state.sequences[m.sequence].tracks[m.trackIndex].head;
+            while (it)
             {
-                e.trackIndex = m.trackIndex;
+                it->trackIndex = m.trackIndex;
+                it = it->next;
             }
         },
         [&](const FinalizeNonLiveNoteEvent &m)
         {
-            for (auto &e : state.sequences[m.noteOnEvent.sequenceIndex]
-                               .tracks[m.noteOnEvent.trackIndex]
-                               .events)
+            EventState *it = state.sequences[m.noteOnEvent->sequenceIndex]
+                               .tracks[m.noteOnEvent->trackIndex]
+                               .head;
+            while (it)
             {
-                if (e.beingRecorded && e.duration == NoDuration &&
-                    e.noteNumber == m.noteOnEvent.noteNumber)
+                if (it->beingRecorded && it->duration == NoDuration &&
+                    it->noteNumber == m.noteOnEvent->noteNumber)
                 {
-                    e.duration = m.duration;
-                    e.beingRecorded = false;
+                    it->duration = m.duration;
+                    it->beingRecorded = false;
                     break;
                 }
+                it = it->next;
             }
         },
         [&](const SetInitialTempo &m)
@@ -92,163 +109,129 @@ void SequenceStateHandler::applyMessage(
         },
         [&](const UpdateEvent &m)
         {
-            for (auto &e : state.sequences[m.payload.sequenceIndex]
-                               .tracks[m.payload.trackIndex]
-                               .events)
-            {
-                if (e.eventId == m.payload.eventId)
-                {
-                    e = m.payload;
-                }
-            }
+            updateEvent(m.event, m.payload);
         },
         [&](const InsertEvent &m)
         {
-            assert(m.eventState.eventId != NoEventId);
-            auto &events = state.sequences[m.eventState.sequenceIndex]
-                               .tracks[m.eventState.trackIndex]
-                               .events;
+            auto &track = state.sequences[m.eventState->sequenceIndex]
+                               .tracks[m.eventState->trackIndex];
 
-            if (m.eventState.type == EventType::NoteOn &&
-                !m.allowMultipleNoteEventsWithSameNoteOnSameTick)
-            {
-                for (auto it = events.begin(); it != events.end(); ++it)
-                {
-                    if (it->type == EventType::NoteOn)
-                    {
-                        if (it->tick == m.eventState.tick &&
-                            it->noteNumber == m.eventState.noteNumber)
-                        {
-                            events.erase(it);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            const bool insertRequired =
-                !events.empty() && events.back().tick >= m.eventState.tick;
-
-            if (insertRequired)
-            {
-                const auto insertAt =
-                    std::find_if(events.begin(), events.end(),
-                                 [tick = m.eventState.tick](const EventState &e)
-                                 {
-                                     return e.tick > tick;
-                                 });
-
-                if (insertAt == events.end())
-                {
-                    events.emplace_back(m.eventState);
-                }
-                else
-                {
-                    events.emplace(insertAt, m.eventState);
-                }
-            }
-            else
-            {
-                events.emplace_back(m.eventState);
-            }
+            manager->insertEvent(track, m.eventState, m.allowMultipleNoteEventsWithSameNoteOnSameTick);
 
             actions.push_back(m.onComplete);
         },
         [&](const ClearEvents &m)
         {
-            state.sequences[m.sequence].tracks[m.track].events.clear();
+            auto &track = state.sequences[m.sequence].tracks[m.track];
+
+            EventState* cur = track.head;
+            while (cur)
+            {
+                EventState* nxt = cur->next;
+                cur->prev = nullptr;
+                cur->next = nullptr;
+                manager->returnEventToPool(cur);
+                cur = nxt;
+            }
+            track.head = nullptr;
         },
         [&](const RemoveDoubles &m)
         {
-            auto eventCounter = 0;
-            std::vector<int> deleteIndexList;
-            std::vector<int> notesAtTick;
-            int lastTick = -100;
+            auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            auto &events = state.sequences[m.sequence].tracks[m.track].events;
+            std::vector<NoteNumber> notesAtTick;
+            Tick lastTick = -100;
 
-            for (auto &e : events)
+            EventState* cur = track.head;
+
+            while (cur)
             {
-                if (e.type == EventType::NoteOn)
+                EventState* next = cur->next;
+
+                if (cur->type == EventType::NoteOn)
                 {
-                    if (lastTick != e.tick)
-                    {
+                    if (cur->tick != lastTick)
                         notesAtTick.clear();
-                    }
 
-                    bool contains = false;
+                    bool exists = false;
+                    for (auto n : notesAtTick)
+                        if (n == cur->noteNumber)
+                            exists = true;
 
-                    for (const auto &n : notesAtTick)
+                    if (!exists)
                     {
-                        if (n == e.noteNumber)
-                        {
-                            contains = true;
-                            break;
-                        }
-                    }
-
-                    if (!contains)
-                    {
-                        notesAtTick.push_back(e.noteNumber);
+                        notesAtTick.push_back(cur->noteNumber);
+                        lastTick = cur->tick;
                     }
                     else
                     {
-                        deleteIndexList.push_back(eventCounter);
+                        manager->freeEvent(track.head, cur);
                     }
-
-                    lastTick = e.tick;
                 }
-                eventCounter++;
-            }
 
-            std::reverse(deleteIndexList.begin(), deleteIndexList.end());
-
-            for (const auto &i : deleteIndexList)
-            {
-                events.erase(events.begin() + i);
+                cur = next;
             }
         },
         [&](const UpdateEventTick &m)
         {
-            auto &events = state.sequences[m.eventState.sequenceIndex]
-                               .tracks[m.eventState.trackIndex]
-                               .events;
-            const auto it = std::find_if(
-                events.begin(), events.end(),
-                [eventId = m.eventState.eventId](const EventState &e)
-                {
-                    return e.eventId == eventId;
-                });
-            assert(it != events.end());
-            const auto oldIndex = it - events.begin();
+            auto &track = state.sequences[m.eventState->sequenceIndex]
+                              .tracks[m.eventState->trackIndex];
+
+            EventState* e = m.eventState;
             const Tick newTick = m.newTick;
+            const Tick oldTick = e->tick;
 
-            const EventState ev = events[oldIndex];
+            if (newTick == oldTick)
+                return;
 
-            events.erase(events.begin() + oldIndex);
+            EventState*& head = track.head;
 
-            const auto it2 =
-                std::lower_bound(events.begin(), events.end(), newTick,
-                                 [](const EventState &e, const Tick t)
-                                 {
-                                     return e.tick < t;
-                                 });
+            if (e->prev) e->prev->next = e->next;
+            else head = e->next;
+            if (e->next) e->next->prev = e->prev;
 
-            events.insert(it2, ev);
-            const auto newIndex = it2 - events.begin();
-            events[newIndex].tick = newTick;
+            e->prev = nullptr;
+            e->next = nullptr;
+            e->tick = newTick;
+
+            if (!head) { head = e; return; }
+
+            EventState* cur = head;
+            EventState* prev = nullptr;
+
+            while (cur && cur->tick <= newTick)
+            {
+                prev = cur;
+                cur = cur->next;
+            }
+
+            if (!prev)
+            {
+                e->next = head;
+                head->prev = e;
+                head = e;
+                return;
+            }
+
+            e->prev = prev;
+            e->next = cur;
+            prev->next = e;
+            if (cur) cur->prev = e;
         },
         [&](const RemoveEvent &m)
         {
-            auto &events = state.sequences[m.sequence].tracks[m.track].events;
-            const auto it =
-                std::find_if(events.begin(), events.end(),
-                             [eventId = m.eventId](const EventState &e)
-                             {
-                                 return e.eventId == eventId;
-                             });
-            assert(it != events.end());
-            events.erase(it);
+            auto &track = state.sequences[m.sequence].tracks[m.track];
+            EventState* e = m.eventState;
+            if (!e) return;
+
+            if (e->prev) e->prev->next = e->next;
+            if (e->next) e->next->prev = e->prev;
+            if (track.head == e) track.head = e->next;
+
+            e->prev = nullptr;
+            e->next = nullptr;
+
+            manager->returnEventToPool(e);
         },
         [&](const UpdateBarLength &m)
         {
@@ -284,35 +267,26 @@ void SequenceStateHandler::applyMessage(
         {
             applyInsertBars(m, state, actions);
         },
-        [&](const UpdateEvents &m)
+        [&](const UpdateEvents& m)
         {
-            state.sequences[m.sequence].tracks[m.track].events = m.eventStates;
+            auto& track = state.sequences[m.sequence].tracks[m.track];
 
-            EventId eventId = MinEventId;
-            for (auto &e : state.sequences[m.sequence].tracks[m.track].events)
-            {
-                e.sequenceIndex = m.sequence;
-                e.trackIndex = m.track;
-                e.eventId = eventId++;
+            EventState* cur = track.head;
+            while (cur) {
+                EventState* nxt = cur->next;
+                cur->prev = nullptr;
+                cur->next = nullptr;
+                manager->freeEvent(track.head, cur);
+                cur = nxt;
             }
-        },
-        [&](const UpdateSequenceEvents &m)
-        {
-            auto &sequence = state.sequences[m.sequenceIndex];
+            track.head = nullptr;
 
-            for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
-            {
-                sequence.tracks[i].events.clear();
-            }
-
-            EventId eventId = MinEventId;
-
-            for (const auto &e : m.eventStates)
-            {
-                auto &events = sequence.tracks[e.trackIndex].events;
-                events.push_back(e);
-                events.back().sequenceIndex = m.sequenceIndex;
-                events.back().eventId = eventId++;
+            for (const auto& src : m.snapshot) {
+                EventState* e = manager->acquireEvent();
+                std::memcpy(e, &src, sizeof(EventState));
+                e->prev = nullptr;
+                e->next = nullptr;
+                manager->insertEvent(track, e, true);
             }
         }};
 
@@ -394,13 +368,15 @@ void SequenceStateHandler::applyInsertBars(
         // if that is the desired behaviour.
         for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
         {
-            for (auto &e : seq.tracks[i].events)
+            auto it = seq.tracks[i].head;
+            while (it)
             {
-                if (e.tick >= barStart)
+                if (it->tick >= barStart)
                 {
-                    const Tick newTick = e.tick + (newBarStart - barStart);
-                    applyMessage(state, actions, UpdateEventTick{e, newTick});
+                    const Tick newTick = it->tick + (newBarStart - barStart);
+                    applyMessage(state, actions, UpdateEventTick{it, newTick});
                 }
+                it = it->next;
             }
         }
     }

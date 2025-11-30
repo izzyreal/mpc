@@ -5,7 +5,6 @@
 #include "sequencer/TransportMessage.hpp"
 #include "sequencer/SequenceMessage.hpp"
 
-#include <functional>
 #include <variant>
 
 namespace mpc::sequencer
@@ -33,7 +32,6 @@ namespace mpc::sequencer
         bool copyModeMerge;
         int copyCount;
         NoteRange sourceNoteRange{};
-        std::function<EventId()> generateEventId;
     };
 
     using SequencerMessage = std::variant<TransportMessage, SequenceMessage,

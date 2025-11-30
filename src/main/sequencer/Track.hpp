@@ -2,7 +2,7 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "SequencerMessage.hpp"
+#include "SequenceMessage.hpp"
 #include "SequencerStateView.hpp"
 
 #include "sequencer/EventState.hpp"
@@ -36,6 +36,7 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    class SequencerStateManager;
     class Sequence;
     class Event;
     class NoteOnEvent;
@@ -45,8 +46,9 @@ namespace mpc::sequencer
     {
     public:
         Track(
+            const std::shared_ptr<SequencerStateManager> &,
             const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
-            const std::function<void(SequencerMessage &&)> &dispatch,
+            const std::function<void(SequenceMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
@@ -74,13 +76,13 @@ namespace mpc::sequencer
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
-        void timingCorrect(int fromBar, int toBar, EventId, Tick eventTick,
+        void timingCorrect(int fromBar, int toBar, EventState *, Tick eventTick,
                            int stepLength, int swingPercentage) const;
 
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
                               int swingPercentage) const;
 
-        void shiftTiming(EventId, Tick eventTick, bool later, int amount,
+        void shiftTiming(EventState *, Tick eventTick, bool later, int amount,
                          int lastTick) const;
 
         std::string getActualName();
@@ -94,14 +96,19 @@ namespace mpc::sequencer
         void setOn(bool b);
 
         void insertEvent(
-            EventState &event,
+            EventState *event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
             const std::function<void()> &onComplete = [] {});
 
-        EventState recordNoteEventNonLive(int tick, NoteNumber, Velocity,
-                                          int64_t metronomeOnlyTick = 0);
+        void insertEvent(
+            const EventState &,
+            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
+            const std::function<void()> &onComplete = [] {});
 
-        EventState recordNoteEventLive(NoteNumber, Velocity);
+        EventState *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
+                                           int64_t metronomeOnlyTick = 0);
+
+        EventState *recordNoteEventLive(NoteNumber, Velocity) const;
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
@@ -109,11 +116,11 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(EventState &) const;
+        void finalizeNoteEventLive(EventState *) const;
 
-        void finalizeNoteEventNonLive(const EventState &, Duration) const;
+        void finalizeNoteEventNonLive(EventState *, Duration) const;
 
-        void removeEvent(EventId) const;
+        void removeEvent(EventState *) const;
         void removeEvent(const std::shared_ptr<Event> &event) const;
         void removeEvents() const;
         void setVelocityRatio(int i);
@@ -129,8 +136,6 @@ namespace mpc::sequencer
         std::string getName();
         std::vector<std::shared_ptr<Event>> getEvents() const;
         std::vector<EventState> getEventStates() const;
-
-        EventId getAndIncrementNextEventId();
 
         int getNextTick();
         void playNext();
@@ -151,9 +156,9 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventState findRecordingNoteOnEventById(EventId);
+        EventState *findRecordingNoteOnEvent(const EventState *);
 
-        EventState findRecordingNoteOnEventByNoteNumber(NoteNumber);
+        EventState *findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         void printEvents() const;
 
@@ -162,10 +167,10 @@ namespace mpc::sequencer
         void processRealtimeQueuedEvents();
 
     private:
-        EventId nextEventId = MinEventId;
+        std::shared_ptr<SequencerStateManager> manager;
         EventIndex playEventIndex{0};
         std::function<std::shared_ptr<TrackStateView>()> getSnapshot;
-        std::function<void(SequencerMessage &&)> dispatch;
+        std::function<void(SequenceMessage &&)> dispatch;
         BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};
@@ -176,10 +181,10 @@ namespace mpc::sequencer
         bool used{false};
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventState, moodycamel::ConcurrentQueueDefaultTraits>>
+            EventState *, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventState, moodycamel::ConcurrentQueueDefaultTraits>>
+            EventState *, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};
@@ -203,10 +208,10 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<EventState> bulkNoteOns;
-        std::vector<EventState> bulkNoteOffs;
+        std::vector<EventState *> bulkNoteOns;
+        std::vector<EventState *> bulkNoteOffs;
 
-        void updateEventTick(EventId, int newTick) const;
+        void updateEventTick(EventState *, int newTick) const;
 
         int getCorrectedTickPos() const;
 

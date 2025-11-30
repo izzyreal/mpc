@@ -2,7 +2,6 @@
 
 #include "Mpc.hpp"
 #include "SequenceStateView.hpp"
-#include "SequencerStateManager.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -18,8 +17,9 @@ using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
     SequenceIndex sequenceIndex,
+    std::shared_ptr<SequencerStateManager> manager,
     const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
-    const std::function<void(SequencerMessage &&)> &dispatch,
+    const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
     std::function<std::shared_ptr<Screens>()> getScreens,
@@ -38,7 +38,7 @@ Sequence::Sequence(
     std::function<int64_t()> getPunchOutTime,
     std::function<bool()> isSoloEnabled,
     std::function<int()> getCurrentBarIndex)
-    : sequenceIndex(sequenceIndex), getSnapshot(getSnapshot),
+    : getSnapshot(getSnapshot), sequenceIndex(sequenceIndex), manager(manager),
       dispatch(dispatch), getScreens(getScreens),
       getCurrentBarIndex(getCurrentBarIndex)
 {
@@ -48,7 +48,7 @@ Sequence::Sequence(
         {
             return getSnapshot()->getTrack(trackIndex);
         };
-        tracks.emplace_back(std::make_shared<Track>(
+        tracks.emplace_back(std::make_shared<Track>(manager,
             getTrackSnapshot, dispatch, trackIndex, this, getDefaultTrackName,
             getTickPosition, getScreens, isRecordingModeMulti,
             getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
@@ -62,7 +62,7 @@ Sequence::Sequence(
         return getSnapshot()->getTrack(TempoChangeTrackIndex);
     };
 
-    auto tempoChangeTrack = std::make_shared<Track>(
+    auto tempoChangeTrack = std::make_shared<Track>(manager,
         getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
         getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
         getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
@@ -83,11 +83,6 @@ Sequence::Sequence(
 
 Sequence::~Sequence()
 {
-}
-
-void Sequence::setEventStates(const std::vector<EventState> &eventStates) const
-{
-    dispatch(UpdateSequenceEvents{getSequenceIndex(), eventStates});
 }
 
 mpc::SequenceIndex Sequence::getSequenceIndex() const
@@ -272,9 +267,9 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
                 for (int eventIndex = t->getEvents().size() - 1;
                      eventIndex >= 0; eventIndex--)
                 {
-                    if (t->getEvent(eventIndex)->getTick() == tick)
+                    if (auto event = t->getEvent(eventIndex); event->getTick() == tick)
                     {
-                        t->removeEvent(eventIndex);
+                        t->removeEvent(event);
                     }
                 }
             }
@@ -367,7 +362,8 @@ void Sequence::setInitialTempo(const double initialTempo) const
 
 void Sequence::removeTempoChangeEvent(const int i) const
 {
-    getTempoChangeTrack()->removeEvent(i);
+    const auto events = getTempoChangeTrack()->getEvents();
+    getTempoChangeTrack()->removeEvent(events[i]);
 }
 
 bool Sequence::isTempoChangeOn() const

@@ -18,7 +18,7 @@ namespace mpc::sequencer
     {
         SequenceIndex sequence;
         TrackIndex track;
-        std::vector<EventState> eventStates;
+        std::vector<EventState> snapshot;
     };
 
     struct UpdateTrackIndexOfAllEvents
@@ -29,13 +29,13 @@ namespace mpc::sequencer
 
     struct FinalizeNonLiveNoteEvent
     {
-        EventState noteOnEvent;
+        EventState *noteOnEvent;
         Duration duration;
     };
 
     struct InsertEvent
     {
-        EventState eventState;
+        EventState *eventState;
         bool allowMultipleNoteEventsWithSameNoteOnSameTick;
         std::function<void()> onComplete = [] {};
     };
@@ -44,12 +44,12 @@ namespace mpc::sequencer
     {
         SequenceIndex sequence;
         TrackIndex track;
-        EventId eventId;
+        EventState *eventState;
     };
 
     struct UpdateEventTick
     {
-        EventState eventState;
+        EventState *eventState;
         Tick newTick;
     };
 
@@ -61,6 +61,7 @@ namespace mpc::sequencer
 
     struct UpdateEvent
     {
+        EventState *event;
         EventState payload;
     };
 
@@ -88,12 +89,6 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
         int barIndex;
         TimeSignature timeSignature;
-    };
-
-    struct UpdateSequenceEvents
-    {
-        SequenceIndex sequenceIndex;
-        std::vector<EventState> eventStates;
     };
 
     struct SetLastBarIndex
@@ -154,7 +149,7 @@ namespace mpc::sequencer
         SetLastBarIndex, InsertBars, UpdateTrackIndexOfAllEvents, UpdateEvent,
         SetInitialTempo, FinalizeNonLiveNoteEvent, UpdateBarLength,
         UpdateBarLengths, UpdateTimeSignatures, UpdateTimeSignature,
-        UpdateEvents, UpdateSequenceEvents, SetLoopEnabled, SetUsed,
+        UpdateEvents, SetLoopEnabled, SetUsed,
         SetTempoChangeEnabled, SetFirstLoopBarIndex, SetLastLoopBarIndex,
         SyncTrackEventIndices>;
 } // namespace mpc::sequencer

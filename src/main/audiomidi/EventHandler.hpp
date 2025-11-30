@@ -35,7 +35,7 @@ namespace mpc::audiomidi
 
     public:
         void handleFinalizedEvent(const sequencer::EventState &,
-                                  sequencer::Track *);
+                                  const sequencer::Track *);
 
         // Handles physical pad presses.
         //

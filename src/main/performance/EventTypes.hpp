@@ -10,6 +10,10 @@
 #include <vector>
 #include <cstdint>
 
+namespace mpc::sequencer
+{
+    struct EventState;
+}
 namespace mpc::performance
 {
     struct PhysicalPadPressEvent
@@ -76,7 +80,7 @@ namespace mpc::performance
         Velocity velocity;
         ProgramIndex programIndex;
         Pressure pressure;
-        EventId recordNoteEventId = NoEventId;
+        sequencer::EventState *recordNoteEvent = nullptr;
     };
 
     struct NoteAftertouchEvent

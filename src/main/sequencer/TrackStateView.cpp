@@ -7,46 +7,55 @@ using namespace mpc::sequencer;
 
 TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 
-std::optional<EventState>
+EventState *
 TrackStateView::findNoteEvent(const int tick, const NoteNumber note) const
 {
-    for (int i = 0; i < state.events.size(); ++i)
+    const auto noteEvents = getNoteEvents();
+
+    for (const auto e : noteEvents)
     {
-        if (const auto &e = state.events[i]; e.type == EventType::NoteOn &&
-                                             e.tick == tick &&
-                                             e.noteNumber == note)
+        if (e->tick == tick &&
+            e->noteNumber == note)
         {
             return e;
         }
     }
 
-    return std::nullopt;
+    return nullptr;
 }
 
-EventState TrackStateView::getEventByIndex(const EventIndex idx) const
+EventState *TrackStateView::getEventByIndex(const EventIndex idx) const
 {
-    if (idx >= 0 && idx < state.events.size())
+    int counter = 0;
+
+    EventState *it = state.head;
+
+    while (it)
     {
-        return state.events[idx];
+        if (counter++ == idx) return it;
+        it = it->next;
     }
-    return {};
+
+    return nullptr;
 }
 
-std::vector<EventState> TrackStateView::getEventRange(const int startTick,
+std::vector<EventState *> TrackStateView::getEventRange(const int startTick,
                                                       const int endTick) const
 {
-    std::vector<EventState> result;
+    std::vector<EventState *> result;
 
-    for (int i = 0; i < state.events.size(); ++i)
+    EventState *it = state.head;
+
+    while (it)
     {
-        auto &e = state.events[i];
-        if (e.tick > endTick)
+        it = it->next;
+        if (it->tick > endTick)
         {
             break;
         }
-        if (e.tick >= startTick && e.tick <= endTick)
+        if (it->tick >= startTick && it->tick <= endTick)
         {
-            result.push_back(e);
+            result.push_back(it);
         }
     }
 
@@ -55,68 +64,92 @@ std::vector<EventState> TrackStateView::getEventRange(const int startTick,
 
 bool TrackStateView::isEventsEmpty() const
 {
-    return state.events.empty();
+    return state.head == nullptr;
 }
 
 int TrackStateView::getEventCount() const
 {
-    return state.events.size();
+    int result = 0;
+
+    const EventState *it = state.head;
+
+    while (it)
+    {
+        result++;
+        it = it->next;
+    }
+    return result;
 }
 
-std::vector<EventState> TrackStateView::getNoteEvents() const
+std::vector<EventState *> TrackStateView::getNoteEvents() const
 {
-    std::vector<EventState> result;
+    std::vector<EventState *> result;
 
-    for (int i = 0; i < state.events.size(); ++i)
+    EventState *it = state.head;
+
+    while (it)
     {
-        if (auto &e = state.events[i]; e.type == EventType::NoteOn)
+        if (it->type == EventType::NoteOn)
         {
-            result.push_back(e);
+            result.push_back(it);
         }
+
+        it = it->next;
     }
 
     return result;
 }
 
-std::vector<EventState> TrackStateView::getEvents() const
+std::vector<EventState *> TrackStateView::getEvents() const
 {
-    return state.events;
-}
+    std::vector<EventState *> result;
 
-EventState TrackStateView::findRecordingNoteOnByNoteNumber(
-    const NoteNumber noteNumber) const
-{
-    for (auto &e : getNoteEvents())
+    EventState *it = state.head;
+
+    while (it)
     {
-        if (e.noteNumber == noteNumber && e.beingRecorded)
-        {
-            return e;
-        }
+        result.push_back(it);
+        it = it->next;
     }
-    return {};
+
+    return result;
 }
 
-EventState TrackStateView::findRecordingNoteOnByEventId(const EventId id) const
+EventState *TrackStateView::findRecordingNoteOnByNoteNumber(
+    const NoteNumber noteNumber) const
 {
     for (const auto &e : getNoteEvents())
     {
-        if (e.eventId == id && e.beingRecorded)
+        if (e->noteNumber == noteNumber && e->beingRecorded)
         {
             return e;
         }
     }
-    return {};
+    return nullptr;
 }
 
-EventState TrackStateView::getEventById(const EventId eventId) const
+EventState *TrackStateView::findRecordingNoteOn(const EventState *eventState) const
 {
-    for (auto &e : state.events)
+    for (const auto &e : getNoteEvents())
     {
-        if (e.eventId == eventId)
+        if (e == eventState && e->beingRecorded)
         {
             return e;
         }
     }
 
-    return {};
+    return nullptr;
+}
+
+EventState *TrackStateView::getEvent(const EventState *eventState) const
+{
+    EventState *it = state.head;
+
+    while (it)
+    {
+        if (it == eventState) return it;
+        it = it->next;
+    }
+
+    return nullptr;
 }

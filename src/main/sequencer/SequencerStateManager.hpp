@@ -4,6 +4,7 @@
 #include "sequencer/SequencerStateView.hpp"
 #include "sequencer/SequencerMessage.hpp"
 #include "concurrency/AtomicStateExchange.hpp"
+#include "concurrency/FreeList.hpp"
 
 #include <functional>
 #include <memory>
@@ -21,6 +22,19 @@ namespace mpc::sequencer
     public:
         explicit SequencerStateManager(Sequencer *);
         ~SequencerStateManager() override;
+
+        using EventStateFreeList = concurrency::FreeList<EventState, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
+
+        std::shared_ptr<EventStateFreeList> pool;
+
+        void returnEventToPool(EventState* e) const;
+
+        void freeEvent(EventState*& head, EventState* e) const;
+
+        static void insertEvent(TrackState& track, EventState* e,
+                 bool allowMultipleNoteEventsWithSameNoteOnSameTick);
+
+        EventState* acquireEvent() const;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

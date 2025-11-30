@@ -247,12 +247,12 @@ void EraseScreen::doErase() const
                             (!midi && (noteA <= NoDrumNoteAssigned ||
                                        noteA == noteNumber)))
                         {
-                            seqTrack->removeEvent(eventIndex);
+                            seqTrack->removeEvent(noteEvent);
                         }
                     }
                     else
                     {
-                        seqTrack->removeEvent(eventIndex);
+                        seqTrack->removeEvent(noteEvent);
                     }
                 }
             }

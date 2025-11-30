@@ -14,26 +14,26 @@ namespace mpc::sequencer
     public:
         explicit TrackStateView(const TrackState &s) noexcept;
 
-        std::optional<EventState> findNoteEvent(int tick,
-                                                NoteNumber note) const;
+        EventState *findNoteEvent(int tick, NoteNumber note) const;
 
-        EventState getEventByIndex(EventIndex) const;
+        EventState *getEventByIndex(EventIndex) const;
 
-        std::vector<EventState> getEventRange(int startTick, int endTick) const;
+        std::vector<EventState *> getEventRange(int startTick,
+                                                int endTick) const;
 
         bool isEventsEmpty() const;
 
         int getEventCount() const;
 
-        std::vector<EventState> getNoteEvents() const;
+        std::vector<EventState *> getNoteEvents() const;
 
-        std::vector<EventState> getEvents() const;
+        std::vector<EventState *> getEvents() const;
 
-        EventState findRecordingNoteOnByNoteNumber(NoteNumber) const;
+        EventState *findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
-        EventState findRecordingNoteOnByEventId(EventId) const;
+        EventState *findRecordingNoteOn(const EventState *) const;
 
-        EventState getEventById(EventId) const;
+        EventState *getEvent(const EventState *) const;
 
     private:
         const TrackState &state;
