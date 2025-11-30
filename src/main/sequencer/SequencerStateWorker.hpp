@@ -28,11 +28,6 @@ namespace mpc::sequencer
 
         void work() const;
 
-        void
-        refreshPlaybackState(const PlaybackState &previousPlaybackState,
-                             TimeInSamples,
-                             const std::function<void()> &onComplete) const;
-
         Sequencer *getSequencer() const;
 
     private:
@@ -45,9 +40,14 @@ namespace mpc::sequencer
 
         Sequencer *sequencer;
 
+        void
+        refreshPlaybackState(const PlaybackState &previousPlaybackState,
+                             TimeInSamples,
+                             const std::function<void()> &onComplete) const;
+
         PlaybackState renderPlaybackState(SampleRate,
                                           const PlaybackState &prevState,
                                           TimeInSamples,
-                                          const SequencerStateView&) const;
+                                          const SequencerStateView &) const;
     };
 } // namespace mpc::sequencer

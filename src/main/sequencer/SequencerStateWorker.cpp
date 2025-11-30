@@ -10,7 +10,6 @@
 #include "Track.hpp"
 #include "SequencerStateManager.hpp"
 #include "SequencerAudioStateManager.hpp"
-#include "Transport.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -40,26 +39,38 @@ SequencerStateWorker::~SequencerStateWorker()
 void SequencerStateWorker::start()
 {
     if (running.load())
-    {
         return;
-    }
 
     running.store(true);
 
     if (workerThread.joinable())
-    {
         workerThread.join();
-    }
 
-    workerThread = std::thread(
-        [&]
+    workerThread = std::thread([this]
+    {
+        constexpr auto sampleRate = SampleRate(44100);
+        constexpr int bufferSize = 512;
+
+        constexpr double blockMs = static_cast<double>(bufferSize) / sampleRate * 1000.0;
+
+        while (running.load())
         {
-            while (running.load())
-            {
-                work();
-                std::this_thread::sleep_for(std::chrono::milliseconds(3));
-            }
-        });
+            const auto t0 = std::chrono::steady_clock::now();
+
+            work();
+
+            const auto t1 = std::chrono::steady_clock::now();
+            const double workMs =
+                std::chrono::duration<double, std::milli>(t1 - t0).count();
+
+            double sleepMs = blockMs - workMs;
+            if (sleepMs < 0.0)
+                sleepMs = 0.0;
+
+            std::this_thread::sleep_for(
+                std::chrono::duration<double, std::milli>(sleepMs));
+        }
+    });
 }
 
 void SequencerStateWorker::stop()
@@ -84,35 +95,22 @@ void SequencerStateWorker::stopAndWaitUntilStopped()
 
 void SequencerStateWorker::work() const
 {
+    sequencer->getStateManager()->drainQueue();
     const auto sequencerStateView = sequencer->getStateManager()->getSnapshot();
     const auto transportState = sequencerStateView.getTransportStateView();
 
     const auto audioStateView = sequencer->getAudioStateManager()->getSnapshot();
     const auto currentTimeInSamples = audioStateView.getTimeInSamples();
 
-    auto playbackState = sequencerStateView.getPlaybackState();
+    const auto playbackState = sequencerStateView.getPlaybackState();
 
-    bool snapshotIsInvalid = false;
-
-    if (transportState.getPositionQuarterNotes() != NoPositionQuarterNotes &&
-        currentTimeInSamples > playbackState.safeValidUntil)
-    {
-        snapshotIsInvalid = true;
-    }
-
-    if (snapshotIsInvalid)
-    {
-        constexpr auto onComplete = [] {};
-        playbackState.events.clear();
-        refreshPlaybackState(playbackState, currentTimeInSamples, onComplete);
-    }
+    constexpr auto onComplete = [] {};
+    refreshPlaybackState(playbackState, currentTimeInSamples, onComplete);
 
     if (transportState.isRecordingOrOverdubbing())
     {
         for (const auto &t : sequencer->getSelectedSequence()->getTracks())
-        {
             t->processRealtimeQueuedEvents();
-        }
     }
 
     sequencer->getStateManager()->drainQueue();
@@ -146,22 +144,6 @@ void SequencerStateWorker::refreshPlaybackState(
 Sequencer *SequencerStateWorker::getSequencer() const
 {
     return sequencer;
-}
-
-void printRenderDebugInfo(const PlaybackState &prev,
-                          const PlaybackState &current)
-{
-    static int counter = 0;
-    printf("===================\n");
-    printf("Current time: %lld\n", current.strictValidFrom);
-    // printf("%i Rendering with previous PlaybackState:\n", counter);
-    // prev.printOrigin();
-    // prev.transition.printInfo();
-    // printf("===================\n");
-    printf("%i PlaybackState for this block:\n", counter);
-    current.printOrigin();
-    current.transition.printInfo();
-    counter++;
 }
 
 void installTransition(RenderContext &ctx)
@@ -202,6 +184,7 @@ PlaybackState initPlaybackState(const PlaybackState &prev,
 {
     PlaybackState playbackState = prev;
     playbackState.sampleRate = sampleRate;
+    playbackState.events.clear();
     return playbackState;
 }
 
@@ -241,8 +224,6 @@ PlaybackState SequencerStateWorker::renderPlaybackState(
         initRenderCtx(prevState, sampleRate, currentTime, sequencerStateView);
 
     installTransition(renderCtx);
-
-    printRenderDebugInfo(prevState, renderCtx.playbackState);
 
     renderSeq(renderCtx);
 

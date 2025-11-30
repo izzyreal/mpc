@@ -4,6 +4,10 @@
 
 #include <functional>
 
+namespace mpc::utils
+{
+    struct SequenceTimingData;
+}
 namespace mpc::lcdgui
 {
     class Screens;

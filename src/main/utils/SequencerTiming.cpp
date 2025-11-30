@@ -239,3 +239,22 @@ int mpc::utils::getEventTimeInSamples(const sequencer::SequenceStateView &seq,
 
     return currentTimeSamples + (loopLen - (phase - eventSample));
 }
+
+int mpc::utils::getEventTimeInSamples(
+    const SequenceTimingData &snapshotTimingData,
+    int blockStartTick,
+    int eventTick,
+    int64_t strictValidFromSamples,
+    SampleRate sampleRate)
+{
+    // delta ticks from block start
+    const double deltaTicks = static_cast<double>(eventTick - blockStartTick);
+
+    // convert delta ticks to samples using snapshot tempo map
+    const double deltaFrames = getFrameCountForTicks(
+        snapshotTimingData, static_cast<double>(blockStartTick),
+        deltaTicks, sampleRate);
+
+    // event sample = block start + deltaFrames
+    return static_cast<int>(strictValidFromSamples + std::round(deltaFrames));
+}

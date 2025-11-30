@@ -44,4 +44,12 @@ namespace mpc::utils
     int getEventTimeInSamples(const sequencer::SequenceStateView &,
                               int eventTick, int currentTimeSamples,
                               SampleRate);
+
+    int getEventTimeInSamples(
+    const SequenceTimingData &snapshotTimingData,
+    int blockStartTick,
+    int eventTick,
+    int64_t strictValidFromSamples,
+    SampleRate sampleRate);
+
 } // namespace mpc::utils

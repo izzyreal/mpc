@@ -7,15 +7,15 @@
 
 using namespace mpc::sequencer;
 
-mpc::PositionQuarterNotes PlaybackState::getSafeValidFromQN() const
-{
-    return Sequencer::ticksToQuarterNotes(safeValidFromTick);
-}
-
-mpc::PositionQuarterNotes PlaybackState::getSafeValidUntilQN() const
-{
-    return Sequencer::ticksToQuarterNotes(safeValidUntilTick);
-}
+// mpc::PositionQuarterNotes PlaybackState::getSafeValidFromQN() const
+// {
+//     return Sequencer::ticksToQuarterNotes(safeValidFromTick);
+// }
+//
+// mpc::PositionQuarterNotes PlaybackState::getSafeValidUntilQN() const
+// {
+//     return Sequencer::ticksToQuarterNotes(safeValidUntilTick);
+// }
 
 mpc::PositionQuarterNotes PlaybackState::getLastTransitionQN() const
 {

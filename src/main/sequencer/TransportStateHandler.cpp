@@ -99,49 +99,6 @@ void TransportStateHandler::applyMessage(TransportState &state,
                  }};
 
     std::visit(visitor, msg);
-
-    if (!autoRefreshPlaybackState)
-    {
-        return;
-    }
-
-    const auto isPlaying = sequencer->getTransport()->isPlaying();
-    const auto playbackState =
-        sequencer->getStateManager()->getSnapshot().getPlaybackState();
-
-    if (std::holds_alternative<SetPositionQuarterNotes>(msg))
-    {
-        if (isPlaying)
-        {
-            return;
-        }
-
-        manager->publishState();
-
-        if (state.positionQuarterNotes > playbackState.getSafeValidUntilQN() ||
-            state.positionQuarterNotes < playbackState.getSafeValidFromQN())
-        {
-            manager->applyMessage(RefreshPlaybackStateWhileNotPlaying{});
-        }
-
-        return;
-    }
-
-    if (isPlaying &&
-        isVariantAnyOf(
-            msg, TransportMessagesThatInvalidatePlaybackStateWhilePlaying{}))
-    {
-        manager->publishState();
-        manager->applyMessage(RefreshPlaybackStateWhilePlaying{});
-    }
-    else if (!isPlaying &&
-             isVariantAnyOf(
-                 msg,
-                 TransportMessagesThatInvalidatePlaybackStateWhileNotPlaying{}))
-    {
-        manager->publishState();
-        manager->applyMessage(RefreshPlaybackStateWhileNotPlaying{});
-    }
 }
 
 void TransportStateHandler::applyPlayMessage(

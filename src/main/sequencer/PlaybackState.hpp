@@ -33,19 +33,19 @@ namespace mpc::sequencer
         TimeInSamples strictValidUntil;
         double strictValidUntilTick;
 
-        TimeInSamples safeValidFrom;
-        double safeValidFromTick;
-
-        TimeInSamples safeValidUntil;
-        double safeValidUntilTick;
+        // TimeInSamples safeValidFrom;
+        // double safeValidFromTick;
+        //
+        // TimeInSamples safeValidUntil;
+        // double safeValidUntilTick;
 
         PlaybackState()
         {
             initializeDefaults();
         }
 
-        PositionQuarterNotes getSafeValidFromQN() const;
-        PositionQuarterNotes getSafeValidUntilQN() const;
+        // PositionQuarterNotes getSafeValidFromQN() const;
+        // PositionQuarterNotes getSafeValidUntilQN() const;
         PositionQuarterNotes getLastTransitionQN() const;
         PositionQuarterNotes getStrictValidFromQN() const;
         PositionQuarterNotes getStrictValidUntilQN() const;
@@ -83,11 +83,11 @@ namespace mpc::sequencer
             strictValidUntil = NoTimeInSamples;
             strictValidUntilTick = NoTick;
 
-            safeValidFrom = NoTimeInSamples;
-            safeValidFromTick = NoTick;
-
-            safeValidUntil = NoTimeInSamples;
-            safeValidUntilTick = NoTick;
+            // safeValidFrom = NoTimeInSamples;
+            // safeValidFromTick = NoTick;
+            //
+            // safeValidUntil = NoTimeInSamples;
+            // safeValidUntilTick = NoTick;
         }
 
         void printOrigin() const

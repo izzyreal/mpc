@@ -58,17 +58,11 @@ void SequencerStateManager::myApplyMessage(
             playbackState.lastTransitionTime = 0;
 
             playbackState.events.clear();
-            publishState();
-            worker->refreshPlaybackState(
-                playbackState, 0, m.onComplete);
         },
         [&](const RefreshPlaybackStateWhilePlaying &m)
         {
             activeState.playbackState.events.clear();
             publishState();
-            worker->refreshPlaybackState(
-                activeState.playbackState,
-                CurrentTimeInSamples, m.onComplete);
         },
         [&](const UpdatePlaybackState &m)
         {
