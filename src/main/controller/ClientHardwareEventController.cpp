@@ -374,14 +374,12 @@ void ClientHardwareEventController::handlePadRelease(
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
 
-        const auto recordingNoteEventId = recordingNoteOnEvent.eventId;
-
         if (p->noteNumber != NoNoteNumber)
         {
             const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     PerformanceEventSource::VirtualMpcHardware, p->noteNumber,
-                    recordingNoteEventId, track, p->busType,
+                    recordingNoteOnEvent, track, p->busType,
                     screens->getScreenById(p->screenId), programPadIndex,
                     sampler->getProgram(p->programIndex), sequencer,
                     sequencerPlaybackEngine, performanceManager,

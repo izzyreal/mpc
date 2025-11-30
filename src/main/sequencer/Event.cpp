@@ -4,36 +4,36 @@
 
 using namespace mpc::sequencer;
 
-Event::Event(const std::function<EventState()> &getSnapshot,
-             const std::function<void(SequencerMessage &&)> &dispatch)
-    : getSnapshot(getSnapshot), dispatch(dispatch)
+Event::Event(EventState *eventState,
+             const std::function<void(SequenceMessage &&)> &dispatch)
+    : eventState(eventState), dispatch(dispatch)
 {
 }
 
 Event::Event(const Event &event)
 {
-    getSnapshot = event.getSnapshot;
+    eventState = event.eventState;
     dispatch = event.dispatch;
 }
 
 void Event::setTick(const int tick) const
 {
-    dispatch(UpdateEventTick{getSnapshot(), tick});
+    dispatch(UpdateEventTick{eventState, tick});
 }
 
 int Event::getTick() const
 {
-    return getSnapshot().tick;
+    return eventState->tick;
 }
 
 mpc::TrackIndex Event::getTrack() const
 {
-    return getSnapshot().trackIndex;
+    return eventState->trackIndex;
 }
 
 void Event::setTrack(const TrackIndex i) const
 {
-    auto e = getSnapshot();
+    auto e = *eventState;
     e.trackIndex = i;
-    dispatch(UpdateEvent{e});
+    dispatch(UpdateEvent{eventState, e});
 }

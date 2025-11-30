@@ -123,7 +123,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->track->getVelocityRatio(), drumBusType);
     }
 
-    std::optional<sequencer::EventState> recordNoteOnEvent = std::nullopt;
+    sequencer::EventState* recordNoteOnEvent = nullptr;
 
     if (ctx->sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
     {
@@ -175,7 +175,7 @@ void TriggerLocalNoteOnCommand::execute()
         // construct the whole Event before enqueueing it.
         apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
 
-        ctx->registryNoteOnEvent.recordNoteEventId =
-            recordNoteOnEvent->eventId;
+        ctx->registryNoteOnEvent.recordNoteEvent =
+            recordNoteOnEvent;
     }
 }

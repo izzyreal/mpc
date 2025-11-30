@@ -42,7 +42,7 @@ namespace mpc::command::context
         const bool currentScreenIsSamplerScreen;
         NoteNumber noteNumber;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::optional<sequencer::EventState> recordOnEvent = std::nullopt;
+        sequencer::EventState *recordOnEvent = nullptr;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
         sequencer::Track *track;

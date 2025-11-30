@@ -107,6 +107,7 @@ void InsertEventScreen::insertEvent() const
                 ls.lock()->openScreenById(ScreenId::StepEditorScreen);
             });
     };
+
     sequencer.lock()->getSelectedTrack()->insertEvent(
         e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
 }

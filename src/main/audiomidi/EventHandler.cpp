@@ -175,19 +175,19 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 }
 
 void EventHandler::handleFinalizedEvent(const EventState &event,
-                                        Track *const track)
+                                        const Track *const track)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
     {
         return;
     }
 
-    if (event.type == sequencer::EventType::TempoChange)
+    if (event.type == EventType::TempoChange)
     {
         return;
     }
 
-    if (event.type == sequencer::EventType::NoteOn)
+    if (event.type == EventType::NoteOn)
     {
         assert(event.noteNumber != NoNoteNumber &&
                event.duration != NoDuration);

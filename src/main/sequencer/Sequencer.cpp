@@ -61,7 +61,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
-    std::shared_ptr<Clock> clock,
+    const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     std::vector<std::shared_ptr<Voice>> *voices,

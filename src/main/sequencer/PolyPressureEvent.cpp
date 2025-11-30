@@ -3,32 +3,32 @@
 using namespace mpc::sequencer;
 
 PolyPressureEvent::PolyPressureEvent(
-    const std::function<EventState()> &getSnapshot,
-    const std::function<void(SequencerMessage &&)> &dispatch)
-    : Event(getSnapshot, dispatch)
+    EventState *eventState,
+    const std::function<void(SequenceMessage &&)> &dispatch)
+    : Event(eventState, dispatch)
 {
 }
 
 void PolyPressureEvent::setNote(const int i) const
 {
-    auto e = getSnapshot();
+    auto e = *eventState;
     e.noteNumber = NoteNumber(i);
-    dispatch(UpdateEvent{e});
+    dispatch(UpdateEvent{eventState, e});
 }
 
 int PolyPressureEvent::getNote() const
 {
-    return getSnapshot().noteNumber;
+    return eventState->noteNumber;
 }
 
 void PolyPressureEvent::setAmount(const int i) const
 {
-    auto e = getSnapshot();
+    auto e = *eventState;
     e.amount = i;
-    dispatch(UpdateEvent{e});
+    dispatch(UpdateEvent{eventState, e});
 }
 
 int PolyPressureEvent::getAmount() const
 {
-    return getSnapshot().amount;
+    return eventState->amount;
 }

@@ -3,9 +3,9 @@
 using namespace mpc::sequencer;
 
 SystemExclusiveEvent::SystemExclusiveEvent(
-    const std::function<EventState()> &getSnapshot,
-    const std::function<void(SequencerMessage &&)> &dispatch)
-    : Event(getSnapshot, dispatch)
+    EventState *eventState,
+    const std::function<void(SequenceMessage &&)> &dispatch)
+    : Event(eventState, dispatch)
 {
 }
 

@@ -52,7 +52,7 @@ namespace mpc::sequencer
         Sequence(SequenceIndex,
                  const std::function<std::shared_ptr<SequenceStateView>()>
                      &getSnapshot,
-                 const std::function<void(SequencerMessage &&)> &dispatch,
+                 const std::function<void(SequenceMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
                  std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
@@ -76,8 +76,6 @@ namespace mpc::sequencer
                  std::function<int()> getCurrentBarIndex);
 
         ~Sequence();
-
-        void setEventStates(const std::vector<EventState> &) const;
 
         SequenceIndex getSequenceIndex() const;
 
@@ -166,7 +164,7 @@ namespace mpc::sequencer
 
     private:
         SequenceIndex sequenceIndex;
-        const std::function<void(SequencerMessage &&)> dispatch;
+        const std::function<void(SequenceMessage &&)> dispatch;
         StartTime startTime{0, 0, 0, 0, 0};
 
         std::vector<std::shared_ptr<Track>> tracks;

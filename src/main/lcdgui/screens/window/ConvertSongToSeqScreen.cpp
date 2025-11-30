@@ -278,7 +278,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                     const auto destinationTick =
                         destinationFirstBarStartTick + sourceEvent->getTick();
 
-                    EventState eventState = sourceEvent->getSnapshot();
+                    EventState eventState = *sourceEvent->eventState;
                     eventState.tick = destinationTick;
 
                     constexpr bool

@@ -333,7 +333,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     tick = noteOff2->getTick();
                 }
 
-                if (noteValue == noteOn.noteNumber && tick >= noteOn.tick)
+                if (noteValue == noteOn->noteNumber && tick >= noteOn->tick)
                 {
                     if (constexpr int maxNoteOffTick = 999999999;
                         tick < maxNoteOffTick)
@@ -346,13 +346,13 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
             if (indexCandidate != -1)
             {
-                noteOn.duration =
-                    Duration(noteOffs[indexCandidate]->getTick() - noteOn.tick);
+                noteOn->duration =
+                    Duration(noteOffs[indexCandidate]->getTick() - noteOn->tick);
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else
             {
-                noteOn.duration = Duration(24);
+                noteOn->duration = Duration(24);
             }
         }
 

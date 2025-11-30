@@ -7,10 +7,13 @@
 #include "utils/VariantUtils.hpp"
 
 using namespace mpc::sequencer;
+using namespace mpc::concurrency;
 
 SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     : AtomicStateExchange([](SequencerState &) {}), sequencer(sequencer)
 {
+    pool = std::make_shared<EventStateFreeList>();
+
     transportStateHandler =
         std::make_unique<TransportStateHandler>(this, sequencer);
 
@@ -19,6 +22,45 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 }
 
 SequencerStateManager::~SequencerStateManager() {}
+
+void SequencerStateManager::returnEventToPool(EventState* e) const
+{
+    // Reset object to default "clean" state before returning it.
+    e->resetToDefaultValues();
+
+    // Return pointer to freelist
+    pool->release(e);
+}
+
+void SequencerStateManager::freeEvent(EventState*& head, EventState* e) const
+{
+    // unlink from list
+    if (e->prev)
+        e->prev->next = e->next;
+    else
+        head = e->next;   // removing head
+
+    if (e->next)
+        e->next->prev = e->prev;
+
+    // reset links
+    e->prev = nullptr;
+    e->next = nullptr;
+
+    // return to freelist or push into an audio→main free queue
+    // (replace with your actual mechanism)
+    returnEventToPool(e);
+}
+
+EventState* SequencerStateManager::acquireEvent() const
+{
+    EventState* e = nullptr;
+    if (!pool->acquire(e))
+        return nullptr;
+
+    new (e) EventState();  // placement-new calls resetToDefaultValues()
+    return e;
+}
 
 void SequencerStateManager::applyMessage(
     const SequencerMessage &msg) noexcept
@@ -59,12 +101,9 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     const auto segLength = m.sourceEndTick - m.sourceStartTick;
     const auto destOffset = m.destStartTick - m.sourceStartTick;
 
-    auto destNumerator = -1;
-    auto destDenominator = -1;
-    auto destBarLength = -1;
-
-    assert(m.sourceSequenceIndex >= 0 ||
-           m.sourceSequenceIndex == SelectedSequenceIndex);
+    int destNumerator = -1;
+    int destDenominator = -1;
+    int destBarLength = -1;
 
     const SequenceIndex sourceSequenceIndexToUse =
         m.sourceSequenceIndex >= MinSequenceIndex
@@ -75,20 +114,17 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     const SequenceStateView destSeqView(destSeq);
     auto &destTrack = destSeq.tracks[m.destTrackIndex];
 
-    const SequenceStateView destSequenceView(destSeq);
-
     const auto destSequenceBarCount = destSeq.lastBarIndex + 1;
 
     for (int i = 0; i < destSequenceBarCount; i++)
     {
-        const auto firstTickOfBar =
-            destSequenceView.getFirstTickOfBar(BarIndex(i));
+        const auto firstTickOfBar = destSeqView.getFirstTickOfBar(BarIndex(i));
+        const auto barLength = destSeqView.getBarLength(i);
 
-        if (const auto barLength = destSequenceView.getBarLength(i);
-            m.destStartTick >= firstTickOfBar &&
+        if (m.destStartTick >= firstTickOfBar &&
             m.destStartTick <= firstTickOfBar + barLength)
         {
-            const auto ts = destSequenceView.getTimeSignature(i);
+            const auto ts = destSeqView.getTimeSignature(i);
             destNumerator = ts.numerator;
             destDenominator = ts.denominator;
             destBarLength = barLength;
@@ -97,23 +133,18 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     }
 
     const auto minimumRequiredNewSequenceLength = m.destStartTick + segLength;
-
     const auto ticksToAdd =
-        minimumRequiredNewSequenceLength - destSequenceView.getLastTick();
+        minimumRequiredNewSequenceLength - destSeqView.getLastTick();
 
     const auto barsToAdd =
         static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
 
-    const auto initialLastBarIndex = destSequenceView.getLastBarIndex();
+    const auto initialLastBarIndex = destSeqView.getLastBarIndex();
 
     for (int i = 0; i < barsToAdd; i++)
     {
         const auto afterBar = initialLastBarIndex + i + 1;
-
-        if (afterBar >= 998)
-        {
-            break;
-        }
+        if (afterBar >= 998) break;
 
         applyMessage(InsertBars{m.destSequenceIndex, 1, afterBar});
         const TimeSignature ts{TimeSigNumerator(destNumerator),
@@ -123,57 +154,132 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
     if (!m.copyModeMerge)
     {
-        auto &destTrackEvents = destTrack.events;
+        EventState *prev = nullptr;
+        EventState *cur = destTrack.head;
 
-        for (auto it = destTrackEvents.begin(); it != destTrackEvents.end();)
+        while (cur)
         {
-            if (it->tick >= destOffset &&
-                it->tick < destOffset + segLength * m.copyCount)
+            const bool inRange =
+                cur->tick >= destOffset &&
+                cur->tick < destOffset + segLength * m.copyCount;
+
+            EventState *next = cur->next;
+
+            if (inRange)
             {
-                destTrackEvents.erase(it);
-                continue;
+                if (prev) prev->next = next;
+                else destTrack.head = next;
+                if (next) next->prev = prev;
+                returnEventToPool(cur);
             }
-            ++it;
+            else
+            {
+                prev = cur;
+            }
+
+            cur = next;
         }
     }
 
     const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
-    const auto sourceTrackEvents = sourceSeq.tracks[m.sourceTrackIndex].events;
+    const EventState *src = sourceSeq.tracks[m.sourceTrackIndex].head;
 
-    for (auto &e : sourceTrackEvents)
+    while (src)
     {
-        if (e.type == EventType::NoteOn &&
-            !m.sourceNoteRange.contains(e.noteNumber))
+        if (src->type == EventType::NoteOn &&
+            !m.sourceNoteRange.contains(src->noteNumber))
         {
+            src = src->next;
             continue;
         }
 
-        if (e.tick >= m.sourceEndTick)
-        {
-            break;
-        }
+        if (src->tick >= m.sourceEndTick) break;
 
-        if (e.tick >= m.sourceStartTick)
+        if (src->tick >= m.sourceStartTick)
         {
             for (int copyIndex = 0; copyIndex < m.copyCount; copyIndex++)
             {
                 const int tickCandidate =
-                    e.tick + destOffset + copyIndex * segLength;
+                    src->tick + destOffset + copyIndex * segLength;
 
-                if (tickCandidate >= destSeqView.getLastTick())
-                {
-                    break;
-                }
+                if (tickCandidate >= destSeqView.getLastTick()) break;
 
-                EventState eventCopy = e;
-                eventCopy.eventId = m.generateEventId();
-                eventCopy.sequenceIndex = m.destSequenceIndex;
-                eventCopy.trackIndex = m.destTrackIndex;
-                eventCopy.tick = tickCandidate;
-                applyMessage(InsertEvent{eventCopy});
+                EventState *ev = acquireEvent();
+                *ev = *src;
+
+                ev->sequenceIndex = m.destSequenceIndex;
+                ev->trackIndex = m.destTrackIndex;
+                ev->tick = tickCandidate;
+
+                insertEvent(destTrack, ev, true);
             }
         }
+
+        src = src->next;
     }
 
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
+}
+
+void SequencerStateManager::insertEvent(TrackState& track, EventState* e,
+                 const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
+{
+    assert(e);
+    e->prev = nullptr;
+    e->next = nullptr;
+
+    EventState*& head = track.head;
+
+    // === CASE 1: empty list ===
+    if (!head) {
+        head = e;
+        return;
+    }
+
+    // === CASE 2: remove previous NoteOn at same tick? ===
+    if (e->type == EventType::NoteOn &&
+        !allowMultipleNoteEventsWithSameNoteOnSameTick)
+    {
+        const EventState * it = head;
+
+        while (it) {
+            if (it->type == EventType::NoteOn &&
+                it->tick == e->tick &&
+                it->noteNumber == e->noteNumber)
+            {
+                // unlink
+                EventState* p = it->prev;
+                EventState* n = it->next;
+                if (p) p->next = n; else head = n;
+                if (n) n->prev = p;
+
+                // caller will later return it to the freelist
+                break;
+            }
+            it = it->next;
+        }
+    }
+
+    // === CASE 3: insert at head (smallest tick) ===
+    if (e->tick < head->tick) {
+        e->next = head;
+        head->prev = e;
+        head = e;
+        return;
+    }
+
+    // === CASE 4: find insertion point ===
+    EventState* it = head;
+    while (it->next && it->next->tick <= e->tick) {
+        it = it->next;
+    }
+
+    // insert after `it`
+    EventState* n = it->next;
+
+    it->next = e;
+    e->prev = it;
+
+    e->next = n;
+    if (n) n->prev = e;
 }

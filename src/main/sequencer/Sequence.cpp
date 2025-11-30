@@ -19,7 +19,7 @@ using namespace mpc::lcdgui::screens;
 Sequence::Sequence(
     SequenceIndex sequenceIndex,
     const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
-    const std::function<void(SequencerMessage &&)> &dispatch,
+    const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
     std::function<std::shared_ptr<Screens>()> getScreens,
@@ -38,7 +38,7 @@ Sequence::Sequence(
     std::function<int64_t()> getPunchOutTime,
     std::function<bool()> isSoloEnabled,
     std::function<int()> getCurrentBarIndex)
-    : sequenceIndex(sequenceIndex), getSnapshot(getSnapshot),
+    : getSnapshot(getSnapshot), sequenceIndex(sequenceIndex),
       dispatch(dispatch), getScreens(getScreens),
       getCurrentBarIndex(getCurrentBarIndex)
 {
@@ -83,11 +83,6 @@ Sequence::Sequence(
 
 Sequence::~Sequence()
 {
-}
-
-void Sequence::setEventStates(const std::vector<EventState> &eventStates) const
-{
-    dispatch(UpdateSequenceEvents{getSequenceIndex(), eventStates});
 }
 
 mpc::SequenceIndex Sequence::getSequenceIndex() const
@@ -272,9 +267,9 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
                 for (int eventIndex = t->getEvents().size() - 1;
                      eventIndex >= 0; eventIndex--)
                 {
-                    if (t->getEvent(eventIndex)->getTick() == tick)
+                    if (auto event = t->getEvent(eventIndex); event->getTick() == tick)
                     {
-                        t->removeEvent(eventIndex);
+                        t->removeEvent(event);
                     }
                 }
             }
@@ -367,7 +362,8 @@ void Sequence::setInitialTempo(const double initialTempo) const
 
 void Sequence::removeTempoChangeEvent(const int i) const
 {
-    getTempoChangeTrack()->removeEvent(i);
+    const auto events = getTempoChangeTrack()->getEvents();
+    getTempoChangeTrack()->removeEvent(events[i]);
 }
 
 bool Sequence::isTempoChangeOn() const

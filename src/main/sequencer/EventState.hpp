@@ -7,8 +7,10 @@ namespace mpc::sequencer
 {
     struct EventState
     {
+        EventState *prev;
+        EventState *next;
+
         // === BASE SECTION ===
-        EventId eventId;
         EventType type;
         SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
@@ -62,7 +64,8 @@ namespace mpc::sequencer
 
         void resetToDefaultValues()
         {
-            eventId = NoEventId;
+            prev = nullptr;
+            next = nullptr;
             type = EventType::Unknown;
             sequenceIndex = NoSequenceIndex;
             trackIndex = NoTrackIndex;
@@ -88,7 +91,7 @@ namespace mpc::sequencer
         {
             return type == other.type && trackIndex == other.trackIndex &&
                    sequenceIndex == other.sequenceIndex && tick == other.tick &&
-                   noteNumber == other.noteNumber && eventId == other.eventId &&
+                   noteNumber == other.noteNumber &&
                    beingRecorded == other.beingRecorded &&
                    wasMoved == other.wasMoved &&
                    metronomeOnlyTickPosition ==
@@ -114,7 +117,6 @@ namespace mpc::sequencer
         {
             printf("== EventState ==\n");
             printf("     type: %s\n", eventTypeToString(type).c_str());
-            printf("  eventId: %i\n", eventId);
             printf(" sequence: %i\n", sequenceIndex.get());
             printf("    track: %i\n", trackIndex.get());
             printf("     tick: %lld\n", tick);
