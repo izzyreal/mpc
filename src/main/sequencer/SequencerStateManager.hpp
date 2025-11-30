@@ -10,7 +10,6 @@
 
 namespace mpc::sequencer
 {
-    class TrackEvent;
     class Sequencer;
     class TransportStateHandler;
     class SequenceStateHandler;
