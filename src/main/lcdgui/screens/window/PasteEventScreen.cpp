@@ -38,7 +38,6 @@ void PasteEventScreen::function(const int i)
          eventIndex < stepEditorScreen->getPlaceHolder().size(); ++eventIndex)
     {
         const auto event = stepEditorScreen->getPlaceHolder()[eventIndex];
-        constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
         sequencer::EventData eventState = *event->handle;
         eventState.tick = sequencer.lock()->getTransport()->getTickPosition();
 
@@ -56,8 +55,7 @@ void PasteEventScreen::function(const int i)
             };
         }
 
-        sequencer.lock()->getSelectedTrack()->insertEvent(
-            eventState, allowMultipleNoteEventsWithSameNoteOnSameTick,
-            onComplete);
+        sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(eventState,
+                                                          onComplete);
     }
 }

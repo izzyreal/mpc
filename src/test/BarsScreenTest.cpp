@@ -38,7 +38,7 @@ TEST_CASE("BARS1", "[bars-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -92,7 +92,7 @@ TEST_CASE("BARS2", "[bars-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        seq->getTrack(0)->insertEvent(eventData);
+        seq->getTrack(0)->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -122,7 +122,7 @@ TEST_CASE("BARS2", "[bars-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        toSeq->getTrack(0)->insertEvent(eventData);
+        toSeq->getTrack(0)->acquireAndInsertEvent(eventData);
     }
 
     stateManager->drainQueue();

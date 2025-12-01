@@ -46,7 +46,7 @@ TEST_CASE("COPY1", "[events-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -109,7 +109,7 @@ TEST_CASE("COPY2", "[events-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -177,7 +177,7 @@ TEST_CASE("COPY3", "[events-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -301,7 +301,7 @@ TEST_CASE("COPY5", "[events-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 
@@ -366,7 +366,7 @@ TEST_CASE("COPY6", "[events-screen]")
         eventData.noteNumber = NoteNumber(35 + i);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(42);
-        tr->insertEvent(eventData);
+        tr->acquireAndInsertEvent(eventData);
         tickPos += 24;
     }
 

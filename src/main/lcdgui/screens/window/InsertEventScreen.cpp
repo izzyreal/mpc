@@ -98,7 +98,6 @@ void InsertEventScreen::insertEvent() const
         e.mixerValue = 0;
     }
 
-    constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
     const auto onComplete = [ls = ls]
     {
         ls.lock()->postToUiThread(
@@ -108,8 +107,7 @@ void InsertEventScreen::insertEvent() const
             });
     };
 
-    sequencer.lock()->getSelectedTrack()->insertEvent(
-        e, allowMultipleNoteEventsWithSameNoteOnSameTick, onComplete);
+    sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e, onComplete);
 }
 
 void InsertEventScreen::turnWheel(const int i)

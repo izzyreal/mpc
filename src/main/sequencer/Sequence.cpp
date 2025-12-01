@@ -346,7 +346,7 @@ void Sequence::addTempoChangeEvent(const int tick, const int amount) const
     e.tick = tick;
     e.amount = amount;
     e.trackIndex = TempoChangeTrackIndex;
-    getTempoChangeTrack()->insertEvent(e);
+    getTempoChangeTrack()->acquireAndInsertEvent(e);
 }
 
 double Sequence::getInitialTempo() const

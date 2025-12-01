@@ -130,7 +130,7 @@ void TrackStateHandler::applyMessage(
             updateEvent(m.handle, m.snapshot);
             lock.release();
         },
-        [&](const InsertEvent &m)
+        [&](const InsertAcquiredEvent &m)
         {
             auto &lock = manager->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
 
@@ -143,7 +143,7 @@ void TrackStateHandler::applyMessage(
             auto &track = state.sequences[m.handle->sequenceIndex]
                                .tracks[m.handle->trackIndex];
 
-            manager->insertEvent(track, m.handle, m.allowMultipleNoteEventsWithSameNoteOnSameTick);
+            manager->insertAcquiredEvent(track, m.handle);
 
             lock.release();
 
@@ -344,7 +344,7 @@ void TrackStateHandler::applyMessage(
                 std::memcpy(e, &src, sizeof(EventData));
                 e->prev = nullptr;
                 e->next = nullptr;
-                manager->insertEvent(track, e, true);
+                manager->insertAcquiredEvent(track, e);
             }
 
             lock.release();

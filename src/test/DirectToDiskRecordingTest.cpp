@@ -58,7 +58,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     eventData.noteNumber = mpc::MinDrumNoteNumber;
     eventData.velocity = mpc::MaxVelocity;
     eventData.duration = mpc::Duration(1);
-    seq->getTrack(0)->insertEvent(eventData);
+    seq->getTrack(0)->acquireAndInsertEvent(eventData);
     stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(

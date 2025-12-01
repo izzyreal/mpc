@@ -95,14 +95,12 @@ namespace mpc::sequencer
         void setUsed(bool b);
         void setOn(bool b) const;
 
-        void insertEvent(
+        void insertAcquiredEvent(
             EventData *event,
-            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
             const std::function<void()> &onComplete = [] {});
 
-        void insertEvent(
+        void acquireAndInsertEvent(
             const EventData &,
-            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false,
             const std::function<void()> &onComplete = [] {});
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
@@ -116,7 +114,7 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(EventData *, Tick positionTicks) const;
+        void finalizeNoteEventLive(const EventData *, Tick noteOffPositionTicks) const;
 
         void finalizeNoteEventNonLive(EventData *, Duration) const;
 
@@ -177,7 +175,7 @@ namespace mpc::sequencer
             EventData *, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventData *, moodycamel::ConcurrentQueueDefaultTraits>>
+            EventData, moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};
@@ -202,7 +200,7 @@ namespace mpc::sequencer
         std::function<bool()> isSoloEnabled;
 
         std::vector<EventData *> bulkNoteOns;
-        std::vector<EventData *> bulkNoteOffs;
+        std::vector<EventData> bulkNoteOffs;
 
         void updateEventTick(EventData *, int newTick) const;
 

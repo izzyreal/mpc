@@ -33,6 +33,8 @@ namespace mpc::sequencer
         // `Track::processRealtimeQueuedEvents`.
         int wasMoved;
 
+        bool dontDelete;
+
         // === END OF RECORD SECTION ===
 
         // === NOTE AND POLY PRESSURE SECTION ===
@@ -72,6 +74,7 @@ namespace mpc::sequencer
             tick = NoTick;
             metronomeOnlyTickPosition = 0;
             beingRecorded = false;
+            dontDelete = false;
             wasMoved = 0;
             noteNumber = NoNoteNumber;
             duration = NoDuration;

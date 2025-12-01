@@ -207,7 +207,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
                 ev->trackIndex = m.destTrackIndex;
                 ev->tick = tickCandidate;
 
-                insertEvent(destTrack, ev, true);
+                insertAcquiredEvent(destTrack, ev);
             }
         }
 
@@ -219,46 +219,22 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }
 
-void SequencerStateManager::insertEvent(TrackState& track, EventData* e,
-                 const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
+void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
 {
     assert(e);
+
+    track.playEventIndex = track.playEventIndex + 1;
+
     e->prev = nullptr;
     e->next = nullptr;
 
     EventData*& head = track.head;
 
-    // === CASE 1: empty list ===
     if (!head) {
         head = e;
         return;
     }
 
-    // === CASE 2: remove previous NoteOn at same tick? ===
-    if (e->type == EventType::NoteOn &&
-        !allowMultipleNoteEventsWithSameNoteOnSameTick)
-    {
-        const EventData * it = head;
-
-        while (it) {
-            if (it->type == EventType::NoteOn &&
-                it->tick == e->tick &&
-                it->noteNumber == e->noteNumber)
-            {
-                // unlink
-                EventData* p = it->prev;
-                EventData* n = it->next;
-                if (p) p->next = n; else head = n;
-                if (n) n->prev = p;
-
-                // caller will later return it to the freelist
-                break;
-            }
-            it = it->next;
-        }
-    }
-
-    // === CASE 3: insert at head (smallest tick) ===
     if (e->tick < head->tick) {
         e->next = head;
         head->prev = e;
@@ -266,13 +242,11 @@ void SequencerStateManager::insertEvent(TrackState& track, EventData* e,
         return;
     }
 
-    // === CASE 4: find insertion point ===
     EventData* it = head;
     while (it->next && it->next->tick <= e->tick) {
         it = it->next;
     }
 
-    // insert after `it`
     EventData* n = it->next;
 
     it->next = e;

@@ -31,7 +31,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
 
     auto tr = sequencer->getSelectedSequence()->getTrack(0);
 
-    tr->insertEvent(eventData);
+    tr->acquireAndInsertEvent(eventData);
 
     stateManager->drainQueue();
 

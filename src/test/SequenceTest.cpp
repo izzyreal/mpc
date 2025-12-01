@@ -33,7 +33,7 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     eventData.velocity = mpc::MaxVelocity;
     eventData.duration = mpc::Duration(42);
 
-    tr->insertEvent(eventData);
+    tr->acquireAndInsertEvent(eventData);
     stateManager->drainQueue();
 
     seq->insertBars(1, mpc::BarIndex(0));

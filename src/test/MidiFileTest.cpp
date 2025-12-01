@@ -42,7 +42,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         eventData.noteNumber = NoteNumber(37);
         eventData.velocity = MaxVelocity;
         eventData.duration = Duration(10);
-        track0->insertEvent(eventData);
+        track0->acquireAndInsertEvent(eventData);
         stateManager->drainQueue();
 
         MidiWriter midiWriter(sequence.get());

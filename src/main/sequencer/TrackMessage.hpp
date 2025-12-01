@@ -34,10 +34,9 @@ namespace mpc::sequencer
         Duration duration;
     };
 
-    struct InsertEvent
+    struct InsertAcquiredEvent
     {
         EventData *handle;
-        bool allowMultipleNoteEventsWithSameNoteOnSameTick;
         std::function<void()> onComplete = [] {};
     };
 
@@ -114,7 +113,7 @@ namespace mpc::sequencer
     };
 
     using TrackMessage =
-        std::variant<InsertEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+        std::variant<InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
                      RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
                      FinalizeNonLiveNoteEvent, UpdateEvents, SetTrackUsed,
                      SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,

@@ -145,7 +145,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
 
         const int track = e.trackIndex;
 
-        mpcSeq->getTrack(track)->insertEvent(e);
+        mpcSeq->getTrack(track)->acquireAndInsertEvent(e);
     }
 
     for (int i = 0; i < 32; i++)

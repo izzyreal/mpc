@@ -61,8 +61,7 @@ namespace mpc::sequencer
         void returnEventToPool(EventData *e) const;
 
         static void
-        insertEvent(TrackState &track, EventData *e,
-                    bool allowMultipleNoteEventsWithSameNoteOnSameTick);
+        insertAcquiredEvent(TrackState &track, EventData *e);
 
         EventData *acquireEvent() const;
 

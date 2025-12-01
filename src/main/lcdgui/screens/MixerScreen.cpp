@@ -572,7 +572,7 @@ void MixerScreen::recordMixerEvent(const int pad, const int param,
     e.mixerParameter = param;
     e.mixerPad = pad;
     e.mixerValue = value;
-    sequencer.lock()->getSelectedTrack()->insertEvent(e);
+    sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e);
 }
 
 void MixerScreen::displayStereoFaders()

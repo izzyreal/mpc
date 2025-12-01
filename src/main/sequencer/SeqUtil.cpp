@@ -426,10 +426,10 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                     break;
                 }
 
-                EventData eventToInsert = *event->handle;
-
-                eventToInsert.tick = tick;
-                t2->insertEvent(eventToInsert, true);
+                EventData eventCopy = *event->handle;
+                eventCopy.sequenceIndex = SequenceIndex(toSeqIndex);
+                eventCopy.tick = tick;
+                t2->acquireAndInsertEvent(eventCopy);
             }
         }
     }
