@@ -403,8 +403,6 @@ void EngineHost::stopBouncing()
         return;
     }
 
-    mpc.getLayeredScreen()->openScreenById(
-        ScreenId::VmpcRecordingFinishedScreen);
     bouncing.store(false);
 
     const auto directToDiskRecorderScreen =
@@ -424,6 +422,17 @@ void EngineHost::stopBouncing()
         song->setLoopEnabled(true);
         directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
+
+    getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
+        [&]
+        {
+            mpc.getLayeredScreen()->postToUiThread(
+                [ls = mpc.getLayeredScreen()]
+                {
+                    ls->openScreenById(ScreenId::VmpcRecordingFinishedScreen);
+                });
+        },
+        0);
 }
 
 void EngineHost::stopBouncingEarly()

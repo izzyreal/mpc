@@ -223,12 +223,10 @@ void TransportStateHandler::applyPlaySequence(
     {
         sequencer->startBouncing();
     }
-    else
-    {
-        state.playStartPositionQuarterNotes = state.positionQuarterNotes;
-        manager->applyMessage(SyncTrackEventIndices{});
-        state.sequencerRunning = true;
-    }
+
+    state.playStartPositionQuarterNotes = state.positionQuarterNotes;
+    manager->applyMessage(SyncTrackEventIndices{});
+    state.sequencerRunning = true;
 }
 
 void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
@@ -248,12 +246,10 @@ void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
     {
         sequencer->startBouncing();
     }
-    else
-    {
-        state.playStartPositionQuarterNotes = state.positionQuarterNotes;
-        manager->applyMessage(SyncTrackEventIndices{});
-        state.sequencerRunning = true;
-    }
+
+    state.playStartPositionQuarterNotes = state.positionQuarterNotes;
+    manager->applyMessage(SyncTrackEventIndices{});
+    state.sequencerRunning = true;
 }
 
 void TransportStateHandler::applyStopSequence(
@@ -276,9 +272,11 @@ void TransportStateHandler::applyStopSequence(
     }
 
     const auto vmpcDirectToDiskRecorderScreen =
-        sequencer->getScreens()->get<lcdgui::ScreenId::VmpcDirectToDiskRecorderScreen>();
+        sequencer->getScreens()
+            ->get<lcdgui::ScreenId::VmpcDirectToDiskRecorderScreen>();
 
-    if (sequencer->isBouncing() && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
+    if (sequencer->isBouncing() &&
+        vmpcDirectToDiskRecorderScreen->getRecord() != 4)
     {
         sequencer->stopBouncing();
     }
