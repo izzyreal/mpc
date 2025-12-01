@@ -4,7 +4,6 @@
 #include "SequencerStateManager.hpp"
 #include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
@@ -37,13 +36,69 @@ bool Transport::isPlaying() const
 
 void Transport::play(const bool fromStart) const
 {
-    if (fromStart)
+    const bool isSongMode = sequencer.isSongModeEnabled();
+
+    if (isSongMode)
     {
-        sequencer.getStateManager()->enqueue(PlayFromStart{});
+        const auto songScreen =
+            sequencer.getScreens()->get<ScreenId::SongScreen>();
+
+        const auto currentSong =
+            sequencer.getSong(songScreen->getSelectedSongIndex());
+
+        if (!currentSong->isUsed())
+        {
+            return;
+        }
+
+        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
+        {
+            return;
+        }
+
+        int step = songScreen->getOffset() + 1;
+
+        if (step > currentSong->getStepCount())
+        {
+            step = currentSong->getStepCount() - 1;
+        }
+
+        if (const std::shared_ptr<Step> currentStep =
+                currentSong->getStep(step).lock();
+            !sequencer.getSequence(currentStep->getSequence())->isUsed())
+        {
+            return;
+        }
     }
     else
     {
-        sequencer.getStateManager()->enqueue(Play{});
+        if (!sequencer.getSelectedSequence()->isUsed())
+        {
+            return;
+        }
+    }
+
+    if (fromStart)
+    {
+        if (isSongMode)
+        {
+            sequencer.getStateManager()->enqueue(PlaySongFromStart{});
+        }
+        else
+        {
+            sequencer.getStateManager()->enqueue(PlaySequenceFromStart{});
+        }
+    }
+    else
+    {
+        if (isSongMode)
+        {
+            sequencer.getStateManager()->enqueue(PlaySong{});
+        }
+        else
+        {
+            sequencer.getStateManager()->enqueue(PlaySequence{});
+        }
     }
 }
 
@@ -99,13 +154,19 @@ void Transport::overdubFromStart() const
 
 void Transport::stop() const
 {
-    sequencer.getStateManager()->enqueue(Stop{});
+    if (sequencer.isSongModeEnabled())
+    {
+        sequencer.getStateManager()->enqueue(StopSong{});
+    }
+    else
+    {
+        sequencer.getStateManager()->enqueue(StopSequence{});
+    }
 }
 
-void Transport::resetCountInPositions()
+void Transport::resetCountInPositions() const
 {
-    countInStartPos = -1;
-    countInEndPos = -1;
+    sequencer.getStateManager()->enqueue(SetCountInPositions{NoTick, NoTick});
 }
 
 void Transport::setRecording(const bool b) const
@@ -287,7 +348,7 @@ bool Transport::isCountEnabled() const
         .isCountEnabled();
 }
 
-void Transport::setCountingIn(const bool b)
+void Transport::setCountingIn(const bool b) const
 {
     sequencer.getStateManager()->enqueue(SetCountingIn{b});
 
@@ -358,23 +419,28 @@ bool Transport::isMetronomeOnlyEnabled() const
 
 int Transport::getPlayedStepRepetitions() const
 {
-    return playedStepRepetitions;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .getPlayedSongStepRepetitionCount();
 }
 
-void Transport::setEndOfSong(const bool b)
+void Transport::setEndOfSong(const bool b) const
 {
-    endOfSong = b;
+    sequencer.getStateManager()->enqueue(SetEndOfSongEnabled{b});
 }
 
-void Transport::incrementPlayedStepRepetitions()
+void Transport::incrementPlayedStepRepetitions() const
 {
-    playedStepRepetitions++;
+    sequencer.getStateManager()->enqueue(
+        SetPlayedSongStepRepetitionCount{getPlayedStepRepetitions() + 1});
 }
 
-void Transport::resetPlayedStepRepetitions()
+void Transport::resetPlayedStepRepetitions() const
 {
-    playedStepRepetitions = 0;
+    sequencer.getStateManager()->enqueue(SetPlayedSongStepRepetitionCount{0});
 }
+
 void Transport::bumpPositionByTicks(const Tick ticks) const
 {
     const auto snapshot =
@@ -429,20 +495,18 @@ void Transport::setPunchOutTime(const int time)
 
 int64_t Transport::getCountInStartPosTicks() const
 {
-    return countInStartPos;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .countInStartPosTicks();
 }
 
 int64_t Transport::getCountInEndPosTicks() const
 {
-    return countInEndPos;
-}
-void Transport::setCountInStartPosTicks(const int64_t pos)
-{
-    countInStartPos = pos;
-}
-void Transport::setCountInEndPosTicks(const int64_t pos)
-{
-    countInEndPos = pos;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .countInEndPosTicks();
 }
 
 bool Transport::isTempoSourceSequenceEnabled() const

@@ -33,6 +33,12 @@ namespace mpc::sequencer
 
         Tick getMetronomeOnlyPositionTicks() const;
 
+        Tick countInStartPosTicks() const;
+
+        Tick countInEndPosTicks() const;
+
+        int getPlayedSongStepRepetitionCount() const;
+
     private:
         const TransportState state;
     };

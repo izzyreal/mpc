@@ -16,11 +16,11 @@ namespace mpc::sequencer
         bool countingIn;
     };
 
-    struct Stop
+    struct StopSequence
     {
     };
 
-    struct Play
+    struct PlaySequence
     {
     };
 
@@ -44,7 +44,7 @@ namespace mpc::sequencer
     {
     };
 
-    struct PlayFromStart
+    struct PlaySequenceFromStart
     {
     };
 
@@ -84,12 +84,43 @@ namespace mpc::sequencer
     {
     };
 
+    struct PlaySong
+    {
+    };
+
+    struct PlaySongFromStart
+    {
+    };
+
+    struct StopSong
+    {
+    };
+
+    struct SetEndOfSongEnabled
+    {
+        bool endOfSongEnabled;
+    };
+
+    struct SetPlayedSongStepRepetitionCount
+    {
+        int count;
+    };
+
+    struct SetCountInPositions
+    {
+        Tick start;
+        Tick end;
+    };
+
     using TransportMessage =
-        std::variant<SetPositionQuarterNotes, Stop, Play, PlayFromStart, Record,
-                     RecordFromStart, Overdub, OverdubFromStart,
-                     SwitchRecordToOverdub, SetRecordingEnabled,
-                     SetOverdubbingEnabled, SetCountEnabled, SetCountingIn,
-                     SetMetronomeOnlyEnabled, SetMetronomeOnlyTickPosition,
+        std::variant<SetPositionQuarterNotes, StopSequence, PlaySequence,
+                     PlaySequenceFromStart, Record, RecordFromStart, Overdub,
+                     OverdubFromStart, SwitchRecordToOverdub,
+                     SetRecordingEnabled, SetOverdubbingEnabled,
+                     SetCountEnabled, SetCountingIn, SetMetronomeOnlyEnabled,
+                     SetMetronomeOnlyTickPosition,
                      BumpMetronomeOnlyTickPositionOneTick, PlayMetronomeOnly,
-                     StopMetronomeOnly>;
+                     StopMetronomeOnly, PlaySong, PlaySongFromStart, StopSong,
+                     SetCountInPositions, SetEndOfSongEnabled,
+                     SetPlayedSongStepRepetitionCount>;
 } // namespace mpc::sequencer

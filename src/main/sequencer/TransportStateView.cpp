@@ -64,3 +64,18 @@ mpc::Tick TransportStateView::getMetronomeOnlyPositionTicks() const
 {
     return state.metronomeOnlyPositionTicks;
 }
+
+mpc::Tick TransportStateView::countInStartPosTicks() const
+{
+    return state.countInStartPos;
+}
+
+mpc::Tick TransportStateView::countInEndPosTicks() const
+{
+    return state.countInEndPos;
+}
+
+int TransportStateView::getPlayedSongStepRepetitionCount() const
+{
+    return state.playedSongStepRepetitionCount;
+}

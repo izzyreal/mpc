@@ -15,11 +15,14 @@ namespace mpc::sequencer
     public:
         explicit TransportStateHandler(SequencerStateManager *, Sequencer *);
         ~TransportStateHandler();
+        void installCountIn(TransportState &state, bool fromStart) const;
 
         void applyMessage(TransportState &, const TransportMessage &);
 
-        void applyPlayMessage(TransportState &) const noexcept;
-        void applyStopMessage(TransportState &) noexcept;
+        void applyPlaySequence(TransportState &) const noexcept;
+        void applyPlaySong(TransportState &) const noexcept;
+        void applyStopSequence(TransportState &) const noexcept;
+        void applyStopSong(TransportState &) const noexcept;
 
     private:
         SequencerStateManager *manager;

@@ -3,9 +3,6 @@
 #include "FloatTypes.hpp"
 #include "IntTypes.hpp"
 
-#include <cstdint>
-#include <functional>
-
 namespace mpc::lcdgui
 {
     class Screens;
@@ -73,36 +70,30 @@ namespace mpc::sequencer
         bool isCountEnabled() const;
         void setCountEnabled(bool b) const;
         bool isCountingIn() const;
-        void setCountingIn(bool b);
-        void resetCountInPositions();
-        int64_t getCountInStartPosTicks() const;
-        int64_t getCountInEndPosTicks() const;
-        void setCountInStartPosTicks(int64_t);
-        void setCountInEndPosTicks(int64_t);
+        void setCountingIn(bool b) const;
+        void resetCountInPositions() const;
+        Tick getCountInStartPosTicks() const;
+        Tick getCountInEndPosTicks() const;
 
         bool isPunchEnabled() const;
         int getAutoPunchMode() const;
         int getPunchInTime() const;
         int getPunchOutTime() const;
 
-        void setEndOfSong(bool);
+        void setEndOfSong(bool) const;
         int getPlayedStepRepetitions() const;
-        void incrementPlayedStepRepetitions();
-        void resetPlayedStepRepetitions();
+        void incrementPlayedStepRepetitions() const;
+        void resetPlayedStepRepetitions() const;
 
         void bumpPositionByTicks(Tick) const;
 
     private:
         Sequencer &sequencer;
 
-        bool endOfSong = false;
         bool punchEnabled = false;
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;
-        int countInStartPos = -1;
-        int countInEndPos = -1;
-        int playedStepRepetitions = 0;
 
         double tempo = 120.0;
         bool tempoSourceSequenceEnabled = true;

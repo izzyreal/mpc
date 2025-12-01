@@ -15,6 +15,10 @@ namespace mpc::sequencer
         bool overdubbingEnabled = false;
         bool countEnabled = true;
         bool countingIn = false;
+        Tick countInStartPos = NoTick;
+        Tick countInEndPos = NoTick;
         bool metronomeOnlyEnabled = false;
+        bool endOfSong = false;
+        int playedSongStepRepetitionCount = 0;
     };
 } // namespace mpc::sequencer
