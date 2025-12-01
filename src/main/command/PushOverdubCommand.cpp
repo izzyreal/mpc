@@ -37,8 +37,4 @@ void PushOverdubCommand::execute()
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
-
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(true);
 }

@@ -335,12 +335,9 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
         sequencer->playToTick(sequencer->getTransport()->getTickPosition());
         setTickPositionEffectiveImmediately(seq->getLoopStartTick());
 
-        if (sequencer->getTransport()->isRecordingOrOverdubbing())
+        if (sequencer->getTransport()->isRecording())
         {
-            if (sequencer->getTransport()->isRecording())
-            {
-                sequencer->getTransport()->switchRecordToOverdub();
-            }
+            sequencer->getTransport()->switchRecordToOverdub();
         }
 
         return true;

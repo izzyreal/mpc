@@ -84,13 +84,7 @@ void Transport::switchRecordToOverdub() const
         return;
     }
 
-    // Maybe we should give our Led GUI component knowledge of Transport
-    // so it can figure this out itself. It's already polling other kinds
-    // of state.
-    sequencer.hardware->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    sequencer.hardware->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(true);
+    sequencer.getStateManager()->enqueue(SwitchRecordToOverdub{});
 }
 
 void Transport::overdubFromStart() const
