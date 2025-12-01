@@ -1,9 +1,9 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class MixerEvent final : public Event
+    class MixerEvent final : public EventRef
     {
     public:
         void setParameter(int i) const;
@@ -14,7 +14,7 @@ namespace mpc::sequencer
         int getValue() const;
 
         explicit MixerEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
 
         std::string getTypeName() const override

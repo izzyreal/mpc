@@ -19,7 +19,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     mpc.getSequencer()->getSelectedSequence()->init(1);
     mpc.getSequencer()->getSelectedSequence()->getStateManager()->drainQueue();
 
-    mpc::sequencer::EventState eventState;
+    mpc::sequencer::EventData eventState;
     eventState.type = mpc::sequencer::EventType::NoteOn;
     eventState.tick = 1;
     eventState.noteNumber = mpc::NoteNumber(60);

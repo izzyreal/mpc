@@ -5,12 +5,12 @@
 #include <vector>
 
 #include "sequencer/Sequence.hpp"
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 namespace mpc::sequencer
 {
     class Sequence;
-    class Event;
+    class EventRef;
 } // namespace mpc::sequencer
 
 namespace mpc::file::all
@@ -92,12 +92,12 @@ namespace mpc::file::all
         std::vector<std::string> devNames = std::vector<std::string>(33);
         Tracks *tracks = nullptr;
         BarList *barList = nullptr;
-        std::vector<sequencer::EventState> allEvents;
+        std::vector<sequencer::EventData> allEvents;
 
     private:
         std::vector<char> saveBytes;
 
-        static std::vector<sequencer::EventState>
+        static std::vector<sequencer::EventData>
         readEvents(const std::vector<char> &seqBytes);
         static std::vector<std::vector<char>>
         readEventSegments(const std::vector<char> &seqBytes);

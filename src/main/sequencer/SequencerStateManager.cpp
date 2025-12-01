@@ -27,7 +27,7 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 
 SequencerStateManager::~SequencerStateManager() {}
 
-void SequencerStateManager::returnEventToPool(EventState* e) const
+void SequencerStateManager::returnEventToPool(EventData* e) const
 {
     // Reset object to default "clean" state before returning it.
     e->resetToDefaultValues();
@@ -36,7 +36,7 @@ void SequencerStateManager::returnEventToPool(EventState* e) const
     pool->release(e);
 }
 
-void SequencerStateManager::freeEvent(EventState*& head, EventState* e) const
+void SequencerStateManager::freeEvent(EventData*& head, EventData* e) const
 {
     // unlink from list
     if (e->prev)
@@ -56,13 +56,13 @@ void SequencerStateManager::freeEvent(EventState*& head, EventState* e) const
     returnEventToPool(e);
 }
 
-EventState* SequencerStateManager::acquireEvent() const
+EventData* SequencerStateManager::acquireEvent() const
 {
-    EventState* e = nullptr;
+    EventData* e = nullptr;
     if (!pool->acquire(e))
         return nullptr;
 
-    new (e) EventState();  // placement-new calls resetToDefaultValues()
+    new (e) EventData();  // placement-new calls resetToDefaultValues()
     return e;
 }
 
@@ -162,8 +162,8 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
     if (!m.copyModeMerge)
     {
-        EventState *prev = nullptr;
-        EventState *cur = destTrack.head;
+        EventData *prev = nullptr;
+        EventData *cur = destTrack.head;
 
         while (cur)
         {
@@ -171,7 +171,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
                 cur->tick >= destOffset &&
                 cur->tick < destOffset + segLength * m.copyCount;
 
-            EventState *next = cur->next;
+            EventData *next = cur->next;
 
             if (inRange)
             {
@@ -190,7 +190,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     }
 
     const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
-    const EventState *src = sourceSeq.tracks[m.sourceTrackIndex].head;
+    const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].head;
 
     while (src)
     {
@@ -212,7 +212,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
                 if (tickCandidate >= destSeqView.getLastTick()) break;
 
-                EventState *ev = acquireEvent();
+                EventData *ev = acquireEvent();
                 *ev = *src;
 
                 ev->sequenceIndex = m.destSequenceIndex;
@@ -229,14 +229,14 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }
 
-void SequencerStateManager::insertEvent(TrackState& track, EventState* e,
+void SequencerStateManager::insertEvent(TrackState& track, EventData* e,
                  const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     assert(e);
     e->prev = nullptr;
     e->next = nullptr;
 
-    EventState*& head = track.head;
+    EventData*& head = track.head;
 
     // === CASE 1: empty list ===
     if (!head) {
@@ -248,7 +248,7 @@ void SequencerStateManager::insertEvent(TrackState& track, EventState* e,
     if (e->type == EventType::NoteOn &&
         !allowMultipleNoteEventsWithSameNoteOnSameTick)
     {
-        const EventState * it = head;
+        const EventData * it = head;
 
         while (it) {
             if (it->type == EventType::NoteOn &&
@@ -256,8 +256,8 @@ void SequencerStateManager::insertEvent(TrackState& track, EventState* e,
                 it->noteNumber == e->noteNumber)
             {
                 // unlink
-                EventState* p = it->prev;
-                EventState* n = it->next;
+                EventData* p = it->prev;
+                EventData* n = it->next;
                 if (p) p->next = n; else head = n;
                 if (n) n->prev = p;
 
@@ -277,13 +277,13 @@ void SequencerStateManager::insertEvent(TrackState& track, EventState* e,
     }
 
     // === CASE 4: find insertion point ===
-    EventState* it = head;
+    EventData* it = head;
     while (it->next && it->next->tick <= e->tick) {
         it = it->next;
     }
 
     // insert after `it`
-    EventState* n = it->next;
+    EventData* n = it->next;
 
     it->next = e;
     e->prev = it;

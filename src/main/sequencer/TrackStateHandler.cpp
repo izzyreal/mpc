@@ -14,16 +14,13 @@ TrackStateHandler::TrackStateHandler(SequencerStateManager *manager,
 
 TrackStateHandler::~TrackStateHandler() {}
 
-void updateEvent(EventState* e, const EventState& replacement)
+void updateEvent(EventData *const e, const EventData& replacement)
 {
-    // Preserve links
     auto* prev = e->prev;
     auto* next = e->next;
 
-    // Copy everything else (POD-style)
     *e = replacement;
 
-    // Restore links
     e->prev = prev;
     e->next = next;
 }
@@ -70,7 +67,7 @@ void TrackStateHandler::applyMessage(
         },
         [&](const UpdateTrackIndexOfAllEvents &m)
         {
-            EventState *it = state.sequences[m.sequence].tracks[m.trackIndex].head;
+            EventData *it = state.sequences[m.sequence].tracks[m.trackIndex].head;
             while (it)
             {
                 it->trackIndex = m.trackIndex;
@@ -79,13 +76,13 @@ void TrackStateHandler::applyMessage(
         },
         [&](const FinalizeNonLiveNoteEvent &m)
         {
-            EventState *it = state.sequences[m.noteOnEvent->sequenceIndex]
-                               .tracks[m.noteOnEvent->trackIndex]
+            EventData *it = state.sequences[m.handle->sequenceIndex]
+                               .tracks[m.handle->trackIndex]
                                .head;
             while (it)
             {
                 if (it->beingRecorded && it->duration == NoDuration &&
-                    it->noteNumber == m.noteOnEvent->noteNumber)
+                    it->noteNumber == m.handle->noteNumber)
                 {
                     it->duration = m.duration;
                     it->beingRecorded = false;
@@ -96,14 +93,14 @@ void TrackStateHandler::applyMessage(
         },
         [&](const UpdateEvent &m)
         {
-            updateEvent(m.event, m.payload);
+            updateEvent(m.event, m.snapshot);
         },
         [&](const InsertEvent &m)
         {
-            auto &track = state.sequences[m.eventState->sequenceIndex]
-                               .tracks[m.eventState->trackIndex];
+            auto &track = state.sequences[m.handle->sequenceIndex]
+                               .tracks[m.handle->trackIndex];
 
-            manager->insertEvent(track, m.eventState, m.allowMultipleNoteEventsWithSameNoteOnSameTick);
+            manager->insertEvent(track, m.handle, m.allowMultipleNoteEventsWithSameNoteOnSameTick);
 
             actions.push_back(m.onComplete);
         },
@@ -111,10 +108,10 @@ void TrackStateHandler::applyMessage(
         {
             auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            EventState* cur = track.head;
+            EventData* cur = track.head;
             while (cur)
             {
-                EventState* nxt = cur->next;
+                EventData* nxt = cur->next;
                 cur->prev = nullptr;
                 cur->next = nullptr;
                 manager->returnEventToPool(cur);
@@ -129,11 +126,11 @@ void TrackStateHandler::applyMessage(
             std::vector<NoteNumber> notesAtTick;
             Tick lastTick = -100;
 
-            EventState* cur = track.head;
+            EventData* cur = track.head;
 
             while (cur)
             {
-                EventState* next = cur->next;
+                EventData* next = cur->next;
 
                 if (cur->type == EventType::NoteOn)
                 {
@@ -161,17 +158,17 @@ void TrackStateHandler::applyMessage(
         },
         [&](const UpdateEventTick &m)
         {
-            auto &track = state.sequences[m.eventState->sequenceIndex]
-                              .tracks[m.eventState->trackIndex];
+            auto &track = state.sequences[m.handle->sequenceIndex]
+                              .tracks[m.handle->trackIndex];
 
-            EventState* e = m.eventState;
+            EventData* e = m.handle;
             const Tick newTick = m.newTick;
             const Tick oldTick = e->tick;
 
             if (newTick == oldTick)
                 return;
 
-            EventState*& head = track.head;
+            EventData*& head = track.head;
 
             if (e->prev) e->prev->next = e->next;
             else head = e->next;
@@ -183,8 +180,8 @@ void TrackStateHandler::applyMessage(
 
             if (!head) { head = e; return; }
 
-            EventState* cur = head;
-            EventState* prev = nullptr;
+            EventData* cur = head;
+            EventData* prev = nullptr;
 
             while (cur && cur->tick <= newTick)
             {
@@ -208,7 +205,7 @@ void TrackStateHandler::applyMessage(
         [&](const RemoveEvent &m)
         {
             auto &track = state.sequences[m.sequence].tracks[m.track];
-            EventState* e = m.eventState;
+            EventData* e = m.handle;
             if (!e) return;
 
             if (e->prev) e->prev->next = e->next;
@@ -224,9 +221,9 @@ void TrackStateHandler::applyMessage(
         {
             auto& track = state.sequences[m.sequence].tracks[m.track];
 
-            EventState* cur = track.head;
+            EventData* cur = track.head;
             while (cur) {
-                EventState* nxt = cur->next;
+                EventData* nxt = cur->next;
                 cur->prev = nullptr;
                 cur->next = nullptr;
                 manager->freeEvent(track.head, cur);
@@ -235,8 +232,8 @@ void TrackStateHandler::applyMessage(
             track.head = nullptr;
 
             for (const auto& src : m.snapshot) {
-                EventState* e = manager->acquireEvent();
-                std::memcpy(e, &src, sizeof(EventState));
+                EventData* e = manager->acquireEvent();
+                std::memcpy(e, &src, sizeof(EventData));
                 e->prev = nullptr;
                 e->next = nullptr;
                 manager->insertEvent(track, e, true);

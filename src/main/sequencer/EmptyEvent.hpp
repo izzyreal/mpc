@@ -1,9 +1,9 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class EmptyEvent final : public Event
+    class EmptyEvent final : public EventRef
     {
     public:
         EmptyEvent();

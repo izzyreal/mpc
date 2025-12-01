@@ -341,7 +341,7 @@ Sequence::getTempoChangeEvents() const
 
 void Sequence::addTempoChangeEvent(const int tick, const int amount) const
 {
-    EventState e;
+    EventData e;
     e.type = EventType::TempoChange;
     e.tick = tick;
     e.amount = amount;

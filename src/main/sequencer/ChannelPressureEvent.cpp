@@ -3,20 +3,20 @@
 using namespace mpc::sequencer;
 
 ChannelPressureEvent::ChannelPressureEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
 }
 
 void ChannelPressureEvent::setAmount(const int i) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.amount = i;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 int ChannelPressureEvent::getAmount() const
 {
-    return eventState->amount;
+    return snapshot.amount;
 }

@@ -39,7 +39,7 @@ void PasteEventScreen::function(const int i)
     {
         const auto event = stepEditorScreen->getPlaceHolder()[eventIndex];
         constexpr bool allowMultipleNoteEventsWithSameNoteOnSameTick = true;
-        sequencer::EventState eventState = *event->eventState;
+        sequencer::EventData eventState = *event->handle;
         eventState.tick = sequencer.lock()->getTransport()->getTickPosition();
 
         std::function onComplete = [] {};

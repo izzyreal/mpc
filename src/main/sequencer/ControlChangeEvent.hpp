@@ -1,9 +1,9 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class ControlChangeEvent final : public Event
+    class ControlChangeEvent final : public EventRef
     {
     public:
         void setController(int i) const;
@@ -12,7 +12,7 @@ namespace mpc::sequencer
         int getAmount() const;
 
         explicit ControlChangeEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
 
         std::string getTypeName() const override

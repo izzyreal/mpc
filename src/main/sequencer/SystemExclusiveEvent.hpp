@@ -1,9 +1,9 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class SystemExclusiveEvent final : public Event
+    class SystemExclusiveEvent final : public EventRef
     {
     public:
         void setByteA(unsigned char i);
@@ -14,7 +14,7 @@ namespace mpc::sequencer
         const std::vector<unsigned char> &getBytes() const;
 
         explicit SystemExclusiveEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
         std::string getTypeName() const override
         {

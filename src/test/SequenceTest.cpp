@@ -6,7 +6,7 @@
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/BarsScreen.hpp"
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/TrackEventStateManager.hpp"
 
@@ -24,7 +24,7 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
-    EventState eventState;
+    EventData eventState;
     eventState.type = EventType::NoteOn;
     eventState.tick = 0;
     eventState.noteNumber = mpc::MinDrumNoteNumber;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 namespace mpc::file::all
 {
@@ -9,7 +9,7 @@ namespace mpc::file::all
         static constexpr int AMOUNT_OFFSET = 5;
 
     public:
-        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
+        static sequencer::EventData bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventData &);
     };
 } // namespace mpc::file::all

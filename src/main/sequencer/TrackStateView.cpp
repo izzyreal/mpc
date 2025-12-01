@@ -1,13 +1,13 @@
 #include "sequencer/TrackStateView.hpp"
 
-#include "EventState.hpp"
+#include "EventData.hpp"
 #include "TrackState.hpp"
 
 using namespace mpc::sequencer;
 
 TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 
-EventState *TrackStateView::findNoteEvent(const int tick,
+EventData *TrackStateView::findNoteEvent(const int tick,
                                           const NoteNumber note) const
 {
     const auto noteEvents = getNoteEvents();
@@ -23,11 +23,11 @@ EventState *TrackStateView::findNoteEvent(const int tick,
     return nullptr;
 }
 
-EventState *TrackStateView::getEventByIndex(const EventIndex idx) const
+EventData *TrackStateView::getEventByIndex(const EventIndex idx) const
 {
     int counter = 0;
 
-    EventState *it = state.head;
+    EventData *it = state.head;
 
     while (it)
     {
@@ -41,12 +41,12 @@ EventState *TrackStateView::getEventByIndex(const EventIndex idx) const
     return nullptr;
 }
 
-std::vector<EventState *> TrackStateView::getEventRange(const int startTick,
+std::vector<EventData *> TrackStateView::getEventRange(const int startTick,
                                                         const int endTick) const
 {
-    std::vector<EventState *> result;
+    std::vector<EventData *> result;
 
-    EventState *it = state.head;
+    EventData *it = state.head;
 
     while (it)
     {
@@ -73,7 +73,7 @@ int TrackStateView::getEventCount() const
 {
     int result = 0;
 
-    const EventState *it = state.head;
+    const EventData *it = state.head;
 
     while (it)
     {
@@ -83,11 +83,11 @@ int TrackStateView::getEventCount() const
     return result;
 }
 
-std::vector<EventState *> TrackStateView::getNoteEvents() const
+std::vector<EventData *> TrackStateView::getNoteEvents() const
 {
-    std::vector<EventState *> result;
+    std::vector<EventData *> result;
 
-    EventState *it = state.head;
+    EventData *it = state.head;
 
     while (it)
     {
@@ -102,11 +102,11 @@ std::vector<EventState *> TrackStateView::getNoteEvents() const
     return result;
 }
 
-std::vector<EventState *> TrackStateView::getEvents() const
+std::vector<EventData *> TrackStateView::getEvents() const
 {
-    std::vector<EventState *> result;
+    std::vector<EventData *> result;
 
-    EventState *it = state.head;
+    EventData *it = state.head;
 
     while (it)
     {
@@ -117,7 +117,7 @@ std::vector<EventState *> TrackStateView::getEvents() const
     return result;
 }
 
-EventState *TrackStateView::findRecordingNoteOnByNoteNumber(
+EventData *TrackStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
     for (const auto &e : getNoteEvents())
@@ -130,8 +130,8 @@ EventState *TrackStateView::findRecordingNoteOnByNoteNumber(
     return nullptr;
 }
 
-EventState *
-TrackStateView::findRecordingNoteOn(const EventState *eventState) const
+EventData *
+TrackStateView::findRecordingNoteOn(const EventData *eventState) const
 {
     for (const auto &e : getNoteEvents())
     {
@@ -144,9 +144,9 @@ TrackStateView::findRecordingNoteOn(const EventState *eventState) const
     return nullptr;
 }
 
-EventState *TrackStateView::getEvent(const EventState *eventState) const
+EventData *TrackStateView::getEvent(const EventData *eventState) const
 {
-    EventState *it = state.head;
+    EventData *it = state.head;
 
     while (it)
     {

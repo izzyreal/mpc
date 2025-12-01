@@ -10,13 +10,13 @@ using namespace mpc::sequencer;
 std::vector<char> AllSysExEvent::MIXER_SIGNATURE = {static_cast<char>(240), 71,
                                                     0, 68, 69};
 
-EventState AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventData AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     const int byteCount = bytes[BYTE_COUNT_OFFSET];
 
     std::vector<char> sysexLoadData(byteCount);
 
-    EventState e;
+    EventData e;
 
     for (int i = 0; i < byteCount; i++)
     {
@@ -54,7 +54,7 @@ EventState AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllSysExEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllSysExEvent::mpcEventToBytes(const EventData &e)
 {
     std::vector<char> bytes;
 

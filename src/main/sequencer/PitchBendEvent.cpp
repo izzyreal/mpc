@@ -3,20 +3,20 @@
 using namespace mpc::sequencer;
 
 PitchBendEvent::PitchBendEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
 }
 
 void PitchBendEvent::setAmount(const int i) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.amount = std::clamp(i, -8192, 8191);
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 int PitchBendEvent::getAmount() const
 {
-    return eventState->amount;
+    return snapshot.amount;
 }

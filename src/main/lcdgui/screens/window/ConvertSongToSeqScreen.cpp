@@ -4,7 +4,7 @@
 #include "StrUtil.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
@@ -278,7 +278,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                     const auto destinationTick =
                         destinationFirstBarStartTick + sourceEvent->getTick();
 
-                    EventState eventState = *sourceEvent->eventState;
+                    EventData eventState = *sourceEvent->handle;
                     eventState.tick = destinationTick;
 
                     constexpr bool

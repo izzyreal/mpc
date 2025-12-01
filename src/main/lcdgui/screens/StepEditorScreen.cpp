@@ -66,7 +66,7 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding({[&]
                         {
                             const auto original = computeVisibleEvents();
-                            std::vector<std::shared_ptr<Event>> clones;
+                            std::vector<std::shared_ptr<EventRef>> clones;
                             clones.reserve(original.size());
                             for (auto &e : original)
                             {
@@ -451,7 +451,7 @@ void StepEditorScreen::function(int i)
                     if (auto noteEvent =
                             std::dynamic_pointer_cast<NoteOnEvent>(event))
                     {
-                        adhocPlayNoteEvent(*noteEvent->eventState);
+                        adhocPlayNoteEvent(*noteEvent->handle);
                     }
                 }
             }
@@ -1012,16 +1012,16 @@ void StepEditorScreen::refreshSelection()
     }
 }
 
-std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(
-    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick) const
+std::vector<std::shared_ptr<EventRef>> StepEditorScreen::computeVisibleEvents(
+    const std::vector<std::shared_ptr<EventRef>> &eventsAtCurrentTick) const
 {
-    std::vector<std::shared_ptr<Event>> result(4);
+    std::vector<std::shared_ptr<EventRef>> result(4);
     const int firstVisibleEventIndex = yOffset;
     int visibleEventCounter = 0;
 
-    std::optional<std::vector<std::shared_ptr<Event>>> ownedEvents;
+    std::optional<std::vector<std::shared_ptr<EventRef>>> ownedEvents;
 
-    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTickToUse =
+    const std::vector<std::shared_ptr<EventRef>> &eventsAtCurrentTickToUse =
         eventsAtCurrentTick.empty()
             ? (ownedEvents = computeEventsAtCurrentTick(), *ownedEvents)
             : eventsAtCurrentTick;
@@ -1042,10 +1042,10 @@ std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(
     return result;
 }
 
-std::vector<std::shared_ptr<Event>>
+std::vector<std::shared_ptr<EventRef>>
 StepEditorScreen::computeEventsAtCurrentTick() const
 {
-    std::vector<std::shared_ptr<Event>> result;
+    std::vector<std::shared_ptr<EventRef>> result;
 
     const auto track = sequencer.lock()->getSelectedTrack();
     auto trackEvents = track->getEvents();
@@ -1399,7 +1399,7 @@ void StepEditorScreen::checkSelection()
     }
 }
 
-void StepEditorScreen::setSelectedEvent(const std::weak_ptr<Event> &event)
+void StepEditorScreen::setSelectedEvent(const std::weak_ptr<EventRef> &event)
 {
     selectedEvent = event.lock();
 }
@@ -1444,7 +1444,7 @@ void StepEditorScreen::displayView() const
     findField("view")->setText(viewNames[view]);
 }
 
-std::vector<std::shared_ptr<Event>> &StepEditorScreen::getSelectedEvents()
+std::vector<std::shared_ptr<EventRef>> &StepEditorScreen::getSelectedEvents()
 {
     return selectedEvents;
 }
@@ -1454,12 +1454,12 @@ std::string StepEditorScreen::getSelectedParameterLetter()
     return selectedParameterLetter;
 }
 
-std::shared_ptr<Event> StepEditorScreen::getSelectedEvent()
+std::shared_ptr<EventRef> StepEditorScreen::getSelectedEvent()
 {
     return selectedEvent;
 }
 
-std::vector<std::shared_ptr<Event>> &StepEditorScreen::getPlaceHolder()
+std::vector<std::shared_ptr<EventRef>> &StepEditorScreen::getPlaceHolder()
 {
     return placeHolder;
 }
@@ -1469,7 +1469,7 @@ int StepEditorScreen::getYOffset() const
     return yOffset;
 }
 
-void StepEditorScreen::adhocPlayNoteEvent(const EventState &noteEvent) const
+void StepEditorScreen::adhocPlayNoteEvent(const EventData &noteEvent) const
 {
     const auto track = sequencer.lock()->getSelectedTrack();
     mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
@@ -1548,7 +1548,7 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
     {
         if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            adhocPlayNoteEvent(*noteEvent->eventState);
+            adhocPlayNoteEvent(*noteEvent->handle);
         }
     }
 }

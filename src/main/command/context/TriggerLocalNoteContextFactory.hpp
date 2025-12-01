@@ -69,7 +69,7 @@ namespace mpc::command::context
         static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerLocalNoteOffContext(
             performance::PerformanceEventSource source, NoteNumber noteNumber,
-            const sequencer::EventState *recordedNoteOnEvent, sequencer::Track *,
+            const sequencer::EventData *recordedNoteOnEvent, sequencer::Track *,
             sequencer::BusType,
             const std::shared_ptr<lcdgui::ScreenComponent> &,
             ProgramPadIndex programPadIndex,

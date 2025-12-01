@@ -1,9 +1,9 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class PolyPressureEvent final : public Event
+    class PolyPressureEvent final : public EventRef
     {
     public:
         void setNote(int i) const;
@@ -12,7 +12,7 @@ namespace mpc::sequencer
         int getAmount() const;
 
         explicit PolyPressureEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
 
         std::string getTypeName() const override

@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "mpc_types.hpp"
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 namespace mpc
 {
@@ -71,7 +71,7 @@ namespace mpc
         static void initSequence(Mpc &mpc);
         static void initSequence(int sequenceIndex, Mpc &mpc);
         static void set16LevelsValues(const SixteenLevelsContext &,
-                                      sequencer::EventState &);
+                                      sequencer::EventData &);
 
         static std::pair<NoteVariationType, int>
         getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);

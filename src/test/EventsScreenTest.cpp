@@ -7,7 +7,7 @@
 
 #include "lcdgui/screens/EventsScreen.hpp"
 
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/TrackEventStateManager.hpp"
@@ -38,7 +38,7 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -101,7 +101,7 @@ TEST_CASE("COPY2", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -167,7 +167,7 @@ TEST_CASE("COPY3", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -286,7 +286,7 @@ TEST_CASE("COPY5", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -351,7 +351,7 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);

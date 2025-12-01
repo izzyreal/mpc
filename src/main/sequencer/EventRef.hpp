@@ -1,21 +1,20 @@
 #pragma once
 #include "IntTypes.hpp"
 #include "TrackMessage.hpp"
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 #include <functional>
 
 namespace mpc::sequencer
 {
-    class Event
+    class EventRef
     {
     public:
-        explicit Event(
-            EventState *eventState,
-            const std::function<void(TrackMessage &&)> &dispatch);
-        Event(const Event &);
+        explicit EventRef(EventData *ptr, const EventData &snapshot,
+                          const std::function<void(TrackMessage &&)> &dispatch);
+        EventRef(const EventRef &);
 
-        virtual ~Event() = default;
+        virtual ~EventRef() = default;
 
         void setTick(int tick) const;
         int getTick() const;
@@ -24,7 +23,8 @@ namespace mpc::sequencer
 
         virtual std::string getTypeName() const = 0;
 
-        EventState *eventState = nullptr;
+        EventData *const handle = nullptr;
+        const EventData snapshot;
         std::function<void(TrackMessage &&)> dispatch;
     };
 } // namespace mpc::sequencer

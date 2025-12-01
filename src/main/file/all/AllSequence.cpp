@@ -7,7 +7,7 @@
 #include "SequenceNames.hpp"
 #include "Tracks.hpp"
 
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
@@ -321,10 +321,10 @@ const int AllSequence::BAR_LIST_OFFSET;
 const int AllSequence::BAR_LIST_LENGTH;
 const int AllSequence::EVENTS_OFFSET;
 
-std::vector<EventState>
+std::vector<EventData>
 AllSequence::readEvents(const std::vector<char> &seqBytes)
 {
-    std::vector<EventState> events;
+    std::vector<EventData> events;
 
     for (auto &eventBytes : readEventSegments(seqBytes))
     {
@@ -489,7 +489,7 @@ std::vector<char> AllSequence::createEventSegmentsChunk(Sequence *seq)
                 {
                     event->setTrack(track->getIndex());
                     ea.push_back(
-                        AllEvent::mpcEventToBytes(*event->eventState));
+                        AllEvent::mpcEventToBytes(*event->handle));
                 }
             }
         }

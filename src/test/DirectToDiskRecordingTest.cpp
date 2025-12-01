@@ -50,7 +50,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     seq->init(1);
     seq->getStateManager()->drainQueue();
     seq->setInitialTempo(300);
-    mpc::sequencer::EventState eventState;
+    mpc::sequencer::EventData eventState;
     eventState.type = mpc::sequencer::EventType::NoteOn;
     eventState.tick = 0;
     eventState.noteNumber = mpc::MinDrumNoteNumber;

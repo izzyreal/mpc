@@ -1,5 +1,5 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
@@ -8,7 +8,7 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
-    class TempoChangeEvent final : public Event
+    class TempoChangeEvent final : public EventRef
     {
         Sequence *parent = nullptr;
 
@@ -29,7 +29,7 @@ namespace mpc::sequencer
         void setParent(Sequence *newParent);
 
         TempoChangeEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             Sequence *parent);
 

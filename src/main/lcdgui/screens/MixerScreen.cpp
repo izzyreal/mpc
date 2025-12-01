@@ -567,7 +567,7 @@ void MixerScreen::turnWheel(const int i)
 void MixerScreen::recordMixerEvent(const int pad, const int param,
                                    const int value) const
 {
-    EventState e;
+    EventData e;
     e.type = EventType::Mixer;
     e.mixerParameter = param;
     e.mixerPad = pad;

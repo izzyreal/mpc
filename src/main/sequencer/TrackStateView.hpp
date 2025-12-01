@@ -7,7 +7,7 @@
 
 namespace mpc::sequencer
 {
-    struct EventState;
+    struct EventData;
     struct TrackState;
 
     class TrackStateView
@@ -15,26 +15,26 @@ namespace mpc::sequencer
     public:
         explicit TrackStateView(const TrackState &s) noexcept;
 
-        EventState *findNoteEvent(int tick, NoteNumber note) const;
+        EventData *findNoteEvent(int tick, NoteNumber note) const;
 
-        EventState *getEventByIndex(EventIndex) const;
+        EventData *getEventByIndex(EventIndex) const;
 
-        std::vector<EventState *> getEventRange(int startTick,
+        std::vector<EventData *> getEventRange(int startTick,
                                                 int endTick) const;
 
         bool isEventsEmpty() const;
 
         int getEventCount() const;
 
-        std::vector<EventState *> getNoteEvents() const;
+        std::vector<EventData *> getNoteEvents() const;
 
-        std::vector<EventState *> getEvents() const;
+        std::vector<EventData *> getEvents() const;
 
-        EventState *findRecordingNoteOnByNoteNumber(NoteNumber) const;
+        EventData *findRecordingNoteOnByNoteNumber(NoteNumber) const;
 
-        EventState *findRecordingNoteOn(const EventState *) const;
+        EventData *findRecordingNoteOn(const EventData *) const;
 
-        EventState *getEvent(const EventState *) const;
+        EventData *getEvent(const EventData *) const;
 
         EventIndex getPlayEventIndex() const;
 

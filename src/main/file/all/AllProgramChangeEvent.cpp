@@ -5,10 +5,10 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventState
+EventData
 AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    EventState e;
+    EventData e;
     e.type = EventType::ProgramChange;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -17,7 +17,7 @@ AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllProgramChangeEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllProgramChangeEvent::mpcEventToBytes(const EventData &e)
 {
     std::vector<char> bytes(8);
 

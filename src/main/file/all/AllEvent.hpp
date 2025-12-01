@@ -1,13 +1,13 @@
 #pragma once
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 #include <memory>
 #include <vector>
 
 namespace mpc::sequencer
 {
-    class Event;
+    class EventRef;
 }
 
 namespace mpc::file::all
@@ -33,7 +33,7 @@ namespace mpc::file::all
         static int readTick(const std::vector<char> &);
         static void writeTick(std::vector<char> &, int);
 
-        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
+        static sequencer::EventData bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventData &);
     };
 } // namespace mpc::file::all

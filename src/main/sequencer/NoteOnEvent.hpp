@@ -1,21 +1,21 @@
 #pragma once
 #include "IntTypes.hpp"
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 
 namespace mpc::sequencer
 {
-    class NoteOnEvent final : public Event
+    class NoteOnEvent final : public EventRef
     {
     public:
         explicit NoteOnEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             NoteNumber, Velocity vel = MaxVelocity);
         explicit NoteOnEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
         explicit NoteOnEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             DrumNoteNumber);
 

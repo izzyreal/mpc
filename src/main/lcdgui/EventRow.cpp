@@ -15,7 +15,7 @@
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/EmptyEvent.hpp"
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
@@ -750,7 +750,7 @@ void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
     }
 }
 
-void EventRow::setEvent(const std::weak_ptr<Event> &newEvent)
+void EventRow::setEvent(const std::weak_ptr<EventRef> &newEvent)
 {
     event = newEvent;
 }

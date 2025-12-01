@@ -19,7 +19,7 @@ namespace mpc
 
 namespace mpc::sequencer
 {
-    class Event;
+    class EventRef;
 }
 
 namespace mpc::lcdgui
@@ -35,7 +35,7 @@ namespace mpc::lcdgui
     class EventRow : public Component
     {
         Mpc &mpc;
-        std::weak_ptr<sequencer::Event> event;
+        std::weak_ptr<sequencer::EventRef> event;
         std::shared_ptr<HorizontalBar> horizontalBar;
         std::shared_ptr<EventRowParameters> parameters;
         std::vector<std::shared_ptr<Field>> fields;
@@ -105,7 +105,7 @@ namespace mpc::lcdgui
                                   const std::vector<int> &fieldWidths) const;
 
     public:
-        void setEvent(const std::weak_ptr<sequencer::Event> &newEvent);
+        void setEvent(const std::weak_ptr<sequencer::EventRef> &newEvent);
         void setSelected(bool b);
         bool isSelected() const;
 

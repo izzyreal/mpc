@@ -36,7 +36,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         track0->setUsed(true);
         track0->setDeviceIndex(2);
 
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = 0;
         eventState.noteNumber = NoteNumber(37);

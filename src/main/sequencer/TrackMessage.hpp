@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 #include "sequencer/BusType.hpp"
 
 #include <functional>
@@ -18,7 +18,7 @@ namespace mpc::sequencer
     {
         SequenceIndex sequence;
         TrackIndex track;
-        std::vector<EventState> snapshot;
+        std::vector<EventData> snapshot;
     };
 
     struct UpdateTrackIndexOfAllEvents
@@ -29,13 +29,13 @@ namespace mpc::sequencer
 
     struct FinalizeNonLiveNoteEvent
     {
-        EventState *noteOnEvent;
+        EventData *handle;
         Duration duration;
     };
 
     struct InsertEvent
     {
-        EventState *eventState;
+        EventData *handle;
         bool allowMultipleNoteEventsWithSameNoteOnSameTick;
         std::function<void()> onComplete = [] {};
     };
@@ -44,12 +44,12 @@ namespace mpc::sequencer
     {
         SequenceIndex sequence;
         TrackIndex track;
-        EventState *eventState;
+        EventData *handle;
     };
 
     struct UpdateEventTick
     {
-        EventState *eventState;
+        EventData *handle;
         Tick newTick;
     };
 
@@ -61,8 +61,8 @@ namespace mpc::sequencer
 
     struct UpdateEvent
     {
-        EventState *event;
-        EventState payload;
+        EventData *event;
+        EventData snapshot;
     };
 
     struct SetTrackUsed

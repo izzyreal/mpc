@@ -3,32 +3,32 @@
 using namespace mpc::sequencer;
 
 ControlChangeEvent::ControlChangeEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
 }
 
 void ControlChangeEvent::setController(const int i) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.controllerNumber = i;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 int ControlChangeEvent::getController() const
 {
-    return eventState->controllerNumber;
+    return snapshot.controllerNumber;
 }
 
 void ControlChangeEvent::setAmount(const int i) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.controllerValue = i;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 int ControlChangeEvent::getAmount() const
 {
-    return eventState->controllerValue;
+    return snapshot.controllerValue;
 }

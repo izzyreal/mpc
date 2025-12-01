@@ -5,10 +5,10 @@
 
 namespace mpc::sequencer
 {
-    struct EventState
+    struct EventData
     {
-        EventState *prev;
-        EventState *next;
+        EventData *prev;
+        EventData *next;
 
         // === BASE SECTION ===
         EventType type;
@@ -57,7 +57,7 @@ namespace mpc::sequencer
         int8_t mixerPad;
         int8_t mixerValue;
 
-        EventState()
+        EventData()
         {
             resetToDefaultValues();
         }
@@ -87,7 +87,7 @@ namespace mpc::sequencer
             mixerValue = 0;
         }
 
-        bool operator==(EventState const &other) const
+        bool operator==(EventData const &other) const
         {
             return type == other.type && trackIndex == other.trackIndex &&
                    sequenceIndex == other.sequenceIndex && tick == other.tick &&
@@ -108,7 +108,7 @@ namespace mpc::sequencer
                    mixerPad == other.mixerPad && mixerValue == other.mixerValue;
         }
 
-        bool operator!=(EventState const &other) const
+        bool operator!=(EventData const &other) const
         {
             return !(*this == other);
         }

@@ -3,53 +3,53 @@
 using namespace mpc::sequencer;
 
 NoteOnEvent::NoteOnEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch,
     const NoteNumber noteNumber, const Velocity vel)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
     setNote(noteNumber);
     setVelocity(vel);
 }
 
 NoteOnEvent::NoteOnEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
 }
 
 NoteOnEvent::NoteOnEvent(
-    EventState *eventState,
+    EventData *const ptr, const EventData &snapshot,
     const std::function<void(TrackMessage &&)> &dispatch,
     const DrumNoteNumber drumNoteNumber)
-    : Event(eventState, dispatch)
+    : EventRef(ptr, snapshot, dispatch)
 {
     setNote(drumNoteNumber);
 }
 
 void NoteOnEvent::setNote(const NoteNumber n) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.noteNumber = n;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 mpc::NoteNumber NoteOnEvent::getNote() const
 {
-    return eventState->noteNumber;
+    return snapshot.noteNumber;
 }
 
 void NoteOnEvent::setDuration(const Duration duration) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.duration = std::clamp(duration, MinDuration, MaxDuration);
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 mpc::Duration NoteOnEvent::getDuration() const
 {
-    return eventState->duration;
+    return snapshot.duration;
 }
 
 void NoteOnEvent::resetDuration() const
@@ -59,36 +59,36 @@ void NoteOnEvent::resetDuration() const
 
 mpc::NoteVariationType NoteOnEvent::getVariationType() const
 {
-    return eventState->noteVariationType;
+    return snapshot.noteVariationType;
 }
 
 void NoteOnEvent::setVariationType(const NoteVariationType type) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.noteVariationType = type;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 void NoteOnEvent::setVariationValue(const int i) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.noteVariationValue = NoteVariationValue(i);
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 int NoteOnEvent::getVariationValue() const
 {
-    return eventState->noteVariationValue;
+    return snapshot.noteVariationValue;
 }
 
 void NoteOnEvent::setVelocity(const Velocity velocity) const
 {
-    auto e = *eventState;
+    auto e = snapshot;
     e.velocity = velocity;
-    dispatch(UpdateEvent{eventState, e});
+    dispatch(UpdateEvent{handle, e});
 }
 
 mpc::Velocity NoteOnEvent::getVelocity() const
 {
-    return eventState->velocity;
+    return snapshot.velocity;
 }

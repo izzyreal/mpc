@@ -47,7 +47,7 @@ EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 }
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
-    const EventState &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
+    const EventData &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
     const Track *track)
 {
     const auto sampler = mpc.getSampler();
@@ -174,7 +174,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         noteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
 }
 
-void EventHandler::handleFinalizedEvent(const EventState &event,
+void EventHandler::handleFinalizedEvent(const EventData &event,
                                         const Track *const track)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
@@ -257,7 +257,7 @@ void EventHandler::handleFinalizedEvent(const EventState &event,
 }
 
 void EventHandler::handleUnfinalizedNoteOn(
-    const EventState &noteOnEvent, Track *track,
+    const EventData &noteOnEvent, Track *track,
     const std::optional<int> trackDevice,
     const std::optional<int> trackVelocityRatio,
     const std::optional<BusType> drumBusType) const

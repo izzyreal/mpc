@@ -7,7 +7,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 
-#include "sequencer/Event.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SequenceStateManager.hpp"
 #include "sequencer/TrackEventStateManager.hpp"
@@ -31,7 +31,7 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -87,7 +87,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = tickPos;
         eventState.noteNumber = NoteNumber(35 + i);
@@ -116,7 +116,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        EventState eventState;
+        EventData eventState;
         eventState.type = EventType::NoteOn;
         eventState.tick = i * 24;
         eventState.noteNumber = NoteNumber(35 + i);

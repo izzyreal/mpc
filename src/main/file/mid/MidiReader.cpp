@@ -224,7 +224,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
             }
         }
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
-        std::vector<EventState> noteOns;
+        std::vector<EventData> noteOns;
 
         auto track = sequence->purgeTrack(trackIndex);
         track->setDeviceIndex(deviceIndex);
@@ -265,7 +265,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                                 0));
                         }
 
-                        EventState ne;
+                        EventData ne;
                         ne.type = EventType::NoteOn;
                         ne.noteNumber = NoteNumber(noteOn->getNoteValue());
 
@@ -293,7 +293,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
                 else if (noteOn)
                 {
-                    EventState ne;
+                    EventData ne;
                     ne.type = EventType::NoteOn;
                     ne.noteNumber = NoteNumber(noteOn->getNoteValue());
                     ne.tick = noteOn->getTick();
@@ -369,7 +369,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     sysExEventBytes[3] == 69 &&
                     sysExEventBytes[7] == static_cast<char>(247))
                 {
-                    EventState e;
+                    EventData e;
                     e.type = EventType::Mixer;
                     e.tick = sysEx->getTick();
                     e.mixerParameter = sysExEventBytes[4] - 1;
@@ -388,7 +388,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                         sysExEventBytes[j + 1] = sysEx->getData()[j];
                     }
 
-                    EventState e;
+                    EventData e;
                     e.type = EventType::SystemExclusive;
                     e.tick = sysEx->getTick();
 
@@ -408,7 +408,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<NoteAftertouch>(me.lock());
                      noteAfterTouch)
             {
-                EventState e;
+                EventData e;
                 e.type = EventType::PolyPressure;
                 e.tick = noteAfterTouch->getTick();
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
@@ -420,7 +420,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                              me.lock());
                      channelAfterTouch)
             {
-                EventState e;
+                EventData e;
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
                 track->insertEvent(e);
@@ -429,7 +429,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
                      programChange)
             {
-                EventState e;
+                EventData e;
                 e.type = EventType::ProgramChange;
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
@@ -445,7 +445,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<Controller>(me.lock());
                      controller)
             {
-                EventState e;
+                EventData e;
                 e.type = EventType::ControlChange;
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
@@ -455,7 +455,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
                      pitchBend)
             {
-                EventState e;
+                EventData e;
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
                 track->insertEvent(e);
@@ -498,7 +498,7 @@ int MidiReader::getNumberOfNoteOns(
 }
 
 int MidiReader::getNumberOfNotes(const int noteValue,
-                                 const std::vector<EventState> &allNotes)
+                                 const std::vector<EventData> &allNotes)
 {
     int counter = 0;
 

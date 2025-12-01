@@ -2,7 +2,7 @@
 
 #include "file/mid/MidiFile.hpp"
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 #include <memory>
 #include <string>
@@ -49,6 +49,6 @@ namespace mpc::file::mid
             const std::vector<std::shared_ptr<event::ChannelEvent>> &allNotes);
         static int
         getNumberOfNotes(int noteValue,
-                         const std::vector<sequencer::EventState> &allNotes);
+                         const std::vector<sequencer::EventData> &allNotes);
     };
 } // namespace mpc::file::mid

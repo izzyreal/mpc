@@ -12,7 +12,7 @@
 
 namespace mpc::sequencer
 {
-    struct EventState;
+    struct EventData;
 }
 namespace mpc::performance
 {
@@ -80,7 +80,7 @@ namespace mpc::performance
         Velocity velocity;
         ProgramIndex programIndex;
         Pressure pressure;
-        sequencer::EventState *recordNoteEvent = nullptr;
+        sequencer::EventData *recordNoteEvent = nullptr;
     };
 
     struct NoteAftertouchEvent

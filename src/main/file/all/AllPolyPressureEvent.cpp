@@ -5,9 +5,9 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventState AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventData AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    EventState e;
+    EventData e;
     e.type = EventType::PolyPressure;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
@@ -17,7 +17,7 @@ EventState AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllPolyPressureEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllPolyPressureEvent::mpcEventToBytes(const EventData &e)
 {
     std::vector<char> bytes(8);
 

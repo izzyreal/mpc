@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 
 #include <cstdint>
 
@@ -24,7 +24,7 @@ namespace mpc::file::all
         static std::vector<char> MIXER_SIGNATURE;
 
     public:
-        static sequencer::EventState bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(const sequencer::EventState &);
+        static sequencer::EventData bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(const sequencer::EventData &);
     };
 } // namespace mpc::file::all

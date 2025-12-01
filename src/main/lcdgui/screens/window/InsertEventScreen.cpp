@@ -5,7 +5,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
@@ -44,7 +44,7 @@ void InsertEventScreen::function(const int i)
 
 void InsertEventScreen::insertEvent() const
 {
-    EventState e;
+    EventData e;
     e.tick = sequencer.lock()->getTransport()->getTickPosition();
 
     if (insertEventType == 0)

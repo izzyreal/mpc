@@ -24,18 +24,18 @@ namespace mpc::sequencer
         explicit SequencerStateManager(Sequencer *);
         ~SequencerStateManager() override;
 
-        using EventStateFreeList = concurrency::FreeList<EventState, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
+        using EventStateFreeList = concurrency::FreeList<EventData, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 
         std::shared_ptr<EventStateFreeList> pool;
 
-        void returnEventToPool(EventState* e) const;
+        void returnEventToPool(EventData* e) const;
 
-        void freeEvent(EventState*& head, EventState* e) const;
+        void freeEvent(EventData*& head, EventData* e) const;
 
-        static void insertEvent(TrackState& track, EventState* e,
+        static void insertEvent(TrackState& track, EventData* e,
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick);
 
-        EventState* acquireEvent() const;
+        EventData* acquireEvent() const;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

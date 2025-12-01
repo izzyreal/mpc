@@ -1,16 +1,16 @@
 #pragma once
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 
 namespace mpc::sequencer
 {
-    class ChannelPressureEvent final : public Event
+    class ChannelPressureEvent final : public EventRef
     {
     public:
         void setAmount(int i) const;
         int getAmount() const;
 
         explicit ChannelPressureEvent(
-            EventState *eventState,
+            EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);
 
         std::string getTypeName() const override

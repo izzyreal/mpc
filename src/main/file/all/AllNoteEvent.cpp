@@ -8,9 +8,9 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventState AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventData AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
-    EventState e;
+    EventData e;
     e.type = EventType::NoteOn;
     e.noteNumber = NoteNumber(bytes[NOTE_NUMBER_OFFSET]);
     e.tick = AllEvent::readTick(bytes);
@@ -24,7 +24,7 @@ EventState AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return e;
 }
 
-std::vector<char> AllNoteOnEvent::mpcEventToBytes(const EventState &e)
+std::vector<char> AllNoteOnEvent::mpcEventToBytes(const EventData &e)
 {
     std::vector<char> bytes(AllSequence::EVENT_SEG_LENGTH);
 

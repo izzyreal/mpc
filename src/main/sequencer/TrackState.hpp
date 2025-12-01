@@ -1,13 +1,13 @@
 #pragma once
 
-#include "sequencer/EventState.hpp"
+#include "sequencer/EventData.hpp"
 #include "sequencer/BusType.hpp"
 
 namespace mpc::sequencer
 {
     struct TrackState
     {
-        EventState *head;
+        EventData *head;
         EventIndex playEventIndex;
         BusType busType;
         bool on;

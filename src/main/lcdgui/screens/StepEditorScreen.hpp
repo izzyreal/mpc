@@ -1,7 +1,7 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
-#include <sequencer/Event.hpp>
+#include <sequencer/EventRef.hpp>
 #include <sequencer/EmptyEvent.hpp>
 
 #include <vector>
@@ -19,17 +19,17 @@ namespace mpc::lcdgui::screens
     class StepEditorScreen final : public ScreenComponent
     {
         void downOrUp(int increment);
-        void adhocPlayNoteEvent(const sequencer::EventState &noteEvent) const;
+        void adhocPlayNoteEvent(const sequencer::EventData &noteEvent) const;
         void adhocPlayNoteEventsAtCurrentPosition() const;
 
-        std::vector<std::shared_ptr<sequencer::Event>>
+        std::vector<std::shared_ptr<sequencer::EventRef>>
         computeEventsAtCurrentTick() const;
 
     public:
         StepEditorScreen(Mpc &mpc, int layerIndex);
 
-        std::vector<std::shared_ptr<sequencer::Event>> computeVisibleEvents(
-            const std::vector<std::shared_ptr<sequencer::Event>>
+        std::vector<std::shared_ptr<sequencer::EventRef>> computeVisibleEvents(
+            const std::vector<std::shared_ptr<sequencer::EventRef>>
                 &eventsAtCurrentTick = {}) const;
 
         void shift();
@@ -73,9 +73,9 @@ namespace mpc::lcdgui::screens
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
         const std::shared_ptr<sequencer::EmptyEvent> emptyEvent =
             std::make_shared<sequencer::EmptyEvent>();
-        std::vector<std::shared_ptr<sequencer::Event>> placeHolder;
-        std::shared_ptr<sequencer::Event> selectedEvent;
-        std::vector<std::shared_ptr<sequencer::Event>> selectedEvents;
+        std::vector<std::shared_ptr<sequencer::EventRef>> placeHolder;
+        std::shared_ptr<sequencer::EventRef> selectedEvent;
+        std::vector<std::shared_ptr<sequencer::EventRef>> selectedEvents;
         std::map<std::string, std::string> lastColumn;
         int lastRow = 0;
 
@@ -98,18 +98,18 @@ namespace mpc::lcdgui::screens
         void setSelectionEndIndex(int i);
         void setSelectionStartIndex(int i);
         void setSelectedEvents();
-        void setSelectedEvent(const std::weak_ptr<sequencer::Event> &event);
+        void setSelectedEvent(const std::weak_ptr<sequencer::EventRef> &event);
         void setSelectedParameterLetter(const std::string &str);
         void checkSelection();
         void removeEvents();
         void displayView() const;
 
     public:
-        std::vector<std::shared_ptr<sequencer::Event>> &getSelectedEvents();
-        std::shared_ptr<sequencer::Event> getSelectedEvent();
+        std::vector<std::shared_ptr<sequencer::EventRef>> &getSelectedEvents();
+        std::shared_ptr<sequencer::EventRef> getSelectedEvent();
         std::string getSelectedParameterLetter();
         void clearSelection();
         int getYOffset() const;
-        std::vector<std::shared_ptr<sequencer::Event>> &getPlaceHolder();
+        std::vector<std::shared_ptr<sequencer::EventRef>> &getPlaceHolder();
     };
 } // namespace mpc::lcdgui::screens
