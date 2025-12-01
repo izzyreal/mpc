@@ -1,4 +1,5 @@
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
+
 #include "sequencer/Transport.hpp"
 
 #include "controller/ClientEventController.hpp"
@@ -15,10 +16,10 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include "performance/PerformanceManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
@@ -39,7 +40,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
     const std::weak_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::weak_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
@@ -57,11 +57,14 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         controller->clientHardwareEventController->isNoteRepeatLocked() ||
         hardware->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
     const bool isErasePressed = hardware->getButton(ERASE)->isPressed();
+
+    const auto lockedSequencer = sequencer.lock();
+
     const bool isStepRecording =
-        SeqUtil::isStepRecording(screen->getName(), sequencer.lock());
+        SeqUtil::isStepRecording(screen->getName(), lockedSequencer);
 
     const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-        sequencer.lock(), screens->get<ScreenId::TimingCorrectScreen>(),
+        lockedSequencer, screens->get<ScreenId::TimingCorrectScreen>(),
         screen->getName(), hardware->getButton(REC),
         controller->clientHardwareEventController);
 
@@ -85,48 +88,50 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const auto drumScreenSelectedDrum =
         screens->get<ScreenId::DrumScreen>()->getDrum();
 
+    const auto transportSnapshot = lockedSequencer->getStateManager()
+                                   ->getSnapshot()
+                                   .getTransportStateView();
+
     return std::make_shared<TriggerLocalNoteOnContext>(
-        TriggerLocalNoteOnContext{
-            source,
-            performanceManager,
-            registryNoteOnEvent,
-            isSequencerScreen,
-            programPadIndex,
-            velocity,
-            isFullLevelEnabled,
-            isSixteenLevelsEnabled,
-            isNoteRepeatLockedOrPressed,
-            isErasePressed,
-            isStepRecording,
-            isRecMainWithoutPlaying,
-            sequencer.lock()->getTransport()->isRecordingOrOverdubbing(),
-            bus,
-            program,
-            note,
-            drumScreenSelectedDrum,
-            isSamplerScreen,
-            track,
-            sequencer,
-            timingCorrectScreen,
-            assign16LevelsScreen,
-            eventHandler,
-            sequencerPlaybackEngine,
-            allowCentralNoteAndPadUpdate,
-            screen,
-            setSelectedNote,
-            setSelectedPad,
-            hardwareSliderValue});
+        TriggerLocalNoteOnContext{source,
+                                  performanceManager,
+                                  registryNoteOnEvent,
+                                  isSequencerScreen,
+                                  programPadIndex,
+                                  velocity,
+                                  isFullLevelEnabled,
+                                  isSixteenLevelsEnabled,
+                                  isNoteRepeatLockedOrPressed,
+                                  isErasePressed,
+                                  isStepRecording,
+                                  isRecMainWithoutPlaying,
+                                  transportSnapshot.isRecordingOrOverdubbing(),
+                                  bus,
+                                  program,
+                                  note,
+                                  drumScreenSelectedDrum,
+                                  isSamplerScreen,
+                                  track,
+                                  sequencer,
+                                  timingCorrectScreen,
+                                  assign16LevelsScreen,
+                                  eventHandler,
+                                  allowCentralNoteAndPadUpdate,
+                                  screen,
+                                  setSelectedNote,
+                                  setSelectedPad,
+                                  hardwareSliderValue,
+                                  transportSnapshot.getMetronomeOnlyPositionTicks()});
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const PerformanceEventSource source, const NoteNumber noteNumber,
-    const EventData *recordedNoteOnEvent, Track *track,
-    const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
+    const EventData *recordedNoteOnEvent, Track *track, const BusType busType,
+    const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
     const std::weak_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::weak_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
@@ -135,9 +140,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
-    const auto registrySnapshot = performanceManager.lock()->getSnapshot();
-
-    EventData *sequencerRecordNoteOnEvent = nullptr;;
+    EventData *sequencerRecordNoteOnEvent = nullptr;
+    ;
 
     if (recordedNoteOnEvent)
     {
@@ -163,40 +167,46 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 
     const std::function sequencerStopMetronomeTrack = [sequencer = sequencer]
     {
-        sequencer.lock()->getTransport()->stopMetronomeTrack();
+        sequencer.lock()->getTransport()->stopMetronomeOnly();
     };
 
+    const auto lockedSequencer = sequencer.lock();
+
     const bool isStepRecording =
-        SeqUtil::isStepRecording(screen->getName(), sequencer.lock());
+        SeqUtil::isStepRecording(screen->getName(), lockedSequencer);
 
     const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-        sequencer.lock(), screens->get<ScreenId::TimingCorrectScreen>(),
+        lockedSequencer, screens->get<ScreenId::TimingCorrectScreen>(),
         screen->getName(), hardware->getButton(REC),
         controller->clientHardwareEventController);
+
+    const auto transportSnapshot = lockedSequencer->getStateManager()
+                                       ->getSnapshot()
+                                       .getTransportStateView();
 
     return std::make_shared<TriggerLocalNoteOffContext>(
         TriggerLocalNoteOffContext{
             source,
             performanceManager,
-            sequencer.lock()->getBus(busType),
+            lockedSequencer->getBus(busType),
             program,
             programPadIndex,
             isSamplerScreen,
             noteNumber,
             eventHandler,
             sequencerRecordNoteOnEvent,
-            sequencer.lock()->getTransport()->isRecordingOrOverdubbing(),
+            transportSnapshot.isRecordingOrOverdubbing(),
             hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
-            sequencerPlaybackEngine->getMetronomeOnlyTickPosition(),
+            transportSnapshot.getMetronomeOnlyPositionTicks(),
             isRecMainWithoutPlaying,
-            sequencer.lock()->getTransport()->getTickPosition(),
+            transportSnapshot.getPositionTicks(),
             stepEditOptionsScreen->getTcValuePercentage(),
             timingCorrectScreen->getNoteValueLengthInTicks(),
             stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
             stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-            sequencer.lock()->getTransport()->getCurrentBarIndex(),
+            lockedSequencer->getTransport()->getCurrentBarIndex(),
             timingCorrectScreen->getSwing(),
             getActiveSequenceLastTick,
             sequencerMoveToQuarterNotePosition,

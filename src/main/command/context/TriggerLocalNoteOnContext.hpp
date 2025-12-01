@@ -1,14 +1,13 @@
 #pragma once
 
-#include "performance/PerformanceManager.hpp"
+#include "IntTypes.hpp"
+
+#include "performance/PerformanceEventSource.hpp"
+#include "performance/EventTypes.hpp"
 
 #include <memory>
 #include <functional>
-
-namespace mpc::engine
-{
-    class SequencerPlaybackEngine;
-}
+#include <optional>
 
 namespace mpc::performance
 {
@@ -76,8 +75,6 @@ namespace mpc::command::context
         std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
             assign16LevelsScreen;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<engine::SequencerPlaybackEngine>
-            sequencerPlaybackEngine;
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
@@ -85,5 +82,6 @@ namespace mpc::command::context
         std::function<void(ProgramPadIndex)> setSelectedPad;
 
         int hardwareSliderValue;
+        Tick metronomeOnlyPositionTicks;
     };
 } // namespace mpc::command::context

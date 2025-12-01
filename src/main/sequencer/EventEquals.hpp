@@ -22,8 +22,6 @@ namespace mpc::sequencer
 
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
-        printf("duration a: %i, b: %i\n", a.getDuration().get(),
-               b.getDuration().get());
         return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
                a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&

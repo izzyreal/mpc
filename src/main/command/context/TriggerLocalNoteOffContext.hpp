@@ -47,9 +47,9 @@ namespace mpc::command::context
         const bool isErasePressed;
         sequencer::Track *track;
         const bool isStepRecording;
-        const uint64_t metronomeOnlyTickPosition;
+        const Tick metronomeOnlyPositionTicks;
         const bool isRecMainWithoutPlaying;
-        const int64_t sequencerTickPosition;
+        const Tick sequencerPositionTicks;
         const int tcValuePercentage;
         const int noteValueLengthInTicks;
         const bool isDurationOfRecordedNotesTcValue;

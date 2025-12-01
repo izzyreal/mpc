@@ -8,7 +8,6 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sequencer/Bus.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"
 #include "performance/PerformanceManager.hpp"
@@ -28,15 +27,10 @@ TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
 
 void TriggerLocalNoteOnCommand::execute()
 {
-    const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
-
-    sequencer::EventData noteOnEvent;
-    noteOnEvent.type = sequencer::EventType::NoteOn;
-    noteOnEvent.noteNumber = ctx->note;
-    noteOnEvent.velocity = velo;
+    const auto transport = ctx->sequencer.lock()->getTransport();
 
     if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
-        ctx->sequencer.lock()->getTransport()->isPlaying())
+        transport->isPlaying())
     {
         return;
     }
@@ -98,6 +92,13 @@ void TriggerLocalNoteOnCommand::execute()
         }
     };
 
+    const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
+
+    sequencer::EventData noteOnEvent;
+    noteOnEvent.type = sequencer::EventType::NoteOn;
+    noteOnEvent.noteNumber = ctx->note;
+    noteOnEvent.velocity = velo;
+
     apply16LevelsAndSliderNoteVariation(noteOnEvent);
 
     if (ctx->isSamplerScreen)
@@ -125,7 +126,7 @@ void TriggerLocalNoteOnCommand::execute()
 
     sequencer::EventData* recordNoteOnEvent = nullptr;
 
-    if (ctx->sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
+    if (transport->isRecordingOrOverdubbing())
     {
         recordNoteOnEvent = ctx->track->recordNoteEventLive(ctx->note, velo);
     }
@@ -133,19 +134,19 @@ void TriggerLocalNoteOnCommand::execute()
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||
               isDrumNote(ctx->note)))
     {
-        ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
+        transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note,
-            velo, ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
+            transport->getTickPosition(), ctx->note,
+            velo, ctx->metronomeOnlyPositionTicks);
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
-        ctx->sequencer.lock()->getTransport()->playMetronomeTrack();
+        transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->sequencer.lock()->getTransport()->getTickPosition(), ctx->note,
-            velo, ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
+            transport->getTickPosition(), ctx->note,
+            velo, ctx->metronomeOnlyPositionTicks);
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
 
@@ -154,16 +155,16 @@ void TriggerLocalNoteOnCommand::execute()
             stepLength != 1)
         {
             const int bar =
-                ctx->sequencer.lock()->getTransport()->getCurrentBarIndex() + 1;
+                transport->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
                 0, bar,
-                ctx->sequencer.lock()->getTransport()->getTickPosition(),
+                transport->getTickPosition(),
                 stepLength, timingCorrectScreen->getSwing());
 
-            if (ctx->sequencer.lock()->getTransport()->getTickPosition() !=
+            if (transport->getTickPosition() !=
                 correctedTick)
             {
-                ctx->sequencer.lock()->getTransport()->setPosition(
+                transport->setPosition(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));
             }
         }

@@ -37,20 +37,30 @@ bool TransportStateView::isCountEnabled() const
 
 bool TransportStateView::isRecording() const
 {
-    return state.recording;
+    return state.recordingEnabled;
 }
 
 bool TransportStateView::isOverdubbing() const
 {
-    return state.overdubbing;
+    return state.overdubbingEnabled;
 }
 
 bool TransportStateView::isRecordingOrOverdubbing() const
 {
-    return state.recording || state.overdubbing;
+    return state.recordingEnabled || state.overdubbingEnabled;
 }
 
 bool TransportStateView::isCountingIn() const
 {
     return state.countingIn;
+}
+
+bool TransportStateView::isMetronomeOnlyEnabled() const
+{
+    return state.metronomeOnlyEnabled;
+}
+
+mpc::Tick TransportStateView::getMetronomeOnlyPositionTicks() const
+{
+    return state.metronomeOnlyPositionTicks;
 }

@@ -11,6 +11,7 @@
 
 #include "client/event/ClientHardwareEvent.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
@@ -46,7 +47,6 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     PreviewSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
@@ -55,7 +55,6 @@ ClientMidiEventController::ClientMidiEventController(
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
       hardware(hardware), screens(screens),
-      sequencerPlaybackEngine(sequencerPlaybackEngine),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
@@ -214,7 +213,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                 PerformanceEventSource::MidiInput, *registryNoteOnEvent,
                 NoteNumber(noteNumber), Velocity(velocity), track.get(),
                 screen->getBus(), screen, programPadIndex, program, sequencer,
-                sequencerPlaybackEngine, performanceManager.lock(),
+                performanceManager.lock(),
                 clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
@@ -287,7 +286,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     ->getTrack(trackIndex)
                     .get(),
                 noteEventInfo->busType, screen, programPadIndex, program,
-                sequencer, sequencerPlaybackEngine, performanceManager.lock(),
+                sequencer, performanceManager.lock(),
                 clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();

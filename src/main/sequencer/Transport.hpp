@@ -4,17 +4,11 @@
 #include "IntTypes.hpp"
 
 #include <cstdint>
-#include <memory>
 #include <functional>
 
 namespace mpc::lcdgui
 {
     class Screens;
-}
-
-namespace mpc::engine
-{
-    class SequencerPlaybackEngine;
 }
 
 namespace mpc::sequencer
@@ -24,10 +18,7 @@ namespace mpc::sequencer
     class Transport
     {
     public:
-        explicit Transport(
-            Sequencer &owner,
-            const std::function<
-                std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
+        explicit Transport(Sequencer &owner);
 
         void play(bool fromStart = false) const;
         void rec() const;
@@ -65,8 +56,8 @@ namespace mpc::sequencer
         void setPunchOutTime(int time);
 
         bool isMetronomeOnlyEnabled() const;
-        void playMetronomeTrack();
-        void stopMetronomeTrack();
+        void playMetronomeOnly() const;
+        void stopMetronomeOnly() const;
 
         int getTickPosition() const;
         double getPositionQuarterNotes() const;
@@ -101,13 +92,9 @@ namespace mpc::sequencer
 
         void bumpPositionByTicks(Tick) const;
 
-        const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-            getSequencerPlaybackEngine;
-
     private:
         Sequencer &sequencer;
 
-        bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         bool punchEnabled = false;
         int autoPunchMode = 0;

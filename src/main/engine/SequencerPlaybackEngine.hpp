@@ -53,9 +53,7 @@ namespace mpc::engine
 
         void work(int nFrames) override;
 
-        void start(bool metronomeOnlyToUse = false);
-
-        void startMetronome();
+        void start();
 
         unsigned short getEventFrameOffset() const;
 
@@ -63,8 +61,6 @@ namespace mpc::engine
 
         void enqueueEventAfterNFrames(const std::function<void()> &event,
                                       unsigned long nFrames) const;
-
-        uint64_t getMetronomeOnlyTickPosition() const;
 
     private:
         std::shared_ptr<EventQueue> eventQueue;
@@ -83,7 +79,6 @@ namespace mpc::engine
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
         bool shouldWaitForMidiClockLock = false;
-        bool metronomeOnly = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
         // Offset of current tick within current buffer
@@ -111,7 +106,5 @@ namespace mpc::engine
         void setTickPositionEffectiveImmediately(int newTickPos) const;
 
         void stopSequencer() const;
-
-        uint64_t metronomeOnlyTickPosition = 0;
     };
 } // namespace mpc::engine

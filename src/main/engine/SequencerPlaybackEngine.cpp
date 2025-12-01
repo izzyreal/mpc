@@ -54,7 +54,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     tempEventQueue.reserve(100);
 }
 
-void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
+void SequencerPlaybackEngine::start()
 {
     if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
     {
@@ -62,16 +62,6 @@ void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
         // shouldWaitForMidiClockLock = true;
         shouldWaitForMidiClockLock = false;
     }
-
-    clock->reset();
-
-    metronomeOnly = metronomeOnlyToUse;
-    metronomeOnlyTickPosition = 0;
-}
-
-void SequencerPlaybackEngine::startMetronome()
-{
-    start(true);
 }
 
 unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
@@ -89,9 +79,11 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
-    sequencer->getStateManager()->drainQueue();
-    sequencer->getStateManager()->enqueue(SyncTrackEventIndices{});
-    sequencer->getStateManager()->drainQueue();
+
+    const auto manager = sequencer->getStateManager();
+    manager->drainQueue();
+    manager->enqueue(SyncTrackEventIndices{});
+    manager->drainQueue();
 }
 
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
@@ -108,7 +100,9 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 
 void SequencerPlaybackEngine::triggerClickIfNeeded() const
 {
-    if (!sequencer->getTransport()->isCountEnabled())
+    const auto transport = sequencer->getStateManager()->getSnapshot().getTransportStateView();
+
+    if (!transport.isCountEnabled())
     {
         return;
     }
@@ -121,10 +115,10 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
     const auto countMetronomeScreen =
         getScreens()->get<ScreenId::CountMetronomeScreen>();
 
-    if (sequencer->getTransport()->isRecordingOrOverdubbing())
+    if (transport.isRecordingOrOverdubbing())
     {
         if (!countMetronomeScreen->getInRec() &&
-            !sequencer->getTransport()->isCountingIn())
+            !transport.isCountingIn())
         {
             return;
         }
@@ -133,16 +127,17 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
     {
 
         if (!isStepEditor && !countMetronomeScreen->getInPlay() &&
-            !sequencer->getTransport()->isCountingIn() &&
+            !transport.isCountingIn() &&
             !isRecMainWithoutPlaying())
         {
             return;
         }
     }
 
-    const auto pos = metronomeOnly
-                         ? metronomeOnlyTickPosition
-                         : sequencer->getTransport()->getTickPosition();
+    const auto pos = transport.isMetronomeOnlyEnabled()
+                         ? transport.getMetronomeOnlyPositionTicks()
+                         : transport.getPositionTicks();
+
     const auto bar = sequencer->getTransport()->getCurrentBarIndex();
     const auto seq = sequencer->getCurrentlyPlayingSequence();
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
@@ -478,15 +473,17 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
-    sequencer->getStateManager()->drainQueue();
+    const auto manager = sequencer->getStateManager();
+    manager->drainQueue();
 
-    const auto snapshot = sequencer->getStateManager()->getSnapshot();
+    const auto sequencerSnapshot = manager->getSnapshot();
+    const auto transportSnapshot = sequencerSnapshot.getTransportStateView();
 
     const bool sequencerIsRunningAtStartOfBuffer =
-        snapshot.getTransportStateView().isSequencerRunning();
+        transportSnapshot.isSequencerRunning();
     const auto sampleRate = getSampleRate();
 
-    if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
+    if (sequencerIsRunningAtStartOfBuffer && transportSnapshot.isMetronomeOnlyEnabled())
     {
         clock->processBufferInternal(sequencer->getTransport()->getTempo(),
                                      sampleRate, nFrames, 0);
@@ -501,7 +498,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
                           frameIndex) != ticksForCurrentBuffer.end())
             {
                 triggerClickIfNeeded();
-                metronomeOnlyTickPosition++;
+                manager->enqueue(BumpMetronomeOnlyTickPositionOneTick{});
+                manager->drainQueue();
             }
         }
 
@@ -544,7 +542,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         }
 
         sequencer->getTransport()->setPosition(wrappedPosition);
-        sequencer->getStateManager()->drainQueue();
+        manager->drainQueue();
     }
 
     bool songHasStopped = false;
@@ -598,7 +596,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->getTransport()->bumpPositionByTicks(
                 tickCountAtThisFrameIndex - 1);
-            sequencer->getStateManager()->drainQueue();
+            manager->drainQueue();
         }
 
         tickFrameOffset = frameIndex;
@@ -614,7 +612,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (sequencer->getTransport()->isCountingIn())
         {
             sequencer->getTransport()->bumpPositionByTicks(1);
-            sequencer->getStateManager()->drainQueue();
+            manager->drainQueue();
             stopCountingInIfRequired();
             continue;
         }
@@ -657,13 +655,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         }
 
         sequencer->getTransport()->bumpPositionByTicks(1);
-        sequencer->getStateManager()->drainQueue();
+        manager->drainQueue();
     }
 
     clock->clearTicks();
-}
-
-uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
-{
-    return metronomeOnlyTickPosition;
 }

@@ -4,13 +4,9 @@
 #include "command/context/TriggerLocalNoteOffContext.hpp"
 
 #include "IntTypes.hpp"
+#include "sequencer/BusType.hpp"
 
 #include <memory>
-
-namespace mpc::engine
-{
-    class SequencerPlaybackEngine;
-}
 
 namespace mpc::sequencer
 {
@@ -20,6 +16,7 @@ namespace mpc::sequencer
 
 namespace mpc::performance
 {
+    struct NoteOnEvent;
     class PerformanceManager;
 }
 
@@ -59,7 +56,6 @@ namespace mpc::command::context
             ProgramPadIndex programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::weak_ptr<sequencer::Sequencer> &,
-            const std::shared_ptr<engine::SequencerPlaybackEngine> &,
             const std::weak_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
@@ -75,7 +71,6 @@ namespace mpc::command::context
             ProgramPadIndex programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::weak_ptr<sequencer::Sequencer> &,
-            const std::shared_ptr<engine::SequencerPlaybackEngine> &,
             const std::weak_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,

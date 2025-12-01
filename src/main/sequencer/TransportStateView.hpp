@@ -29,6 +29,10 @@ namespace mpc::sequencer
 
         bool isCountingIn() const;
 
+        bool isMetronomeOnlyEnabled() const;
+
+        Tick getMetronomeOnlyPositionTicks() const;
+
     private:
         const TransportState state;
     };

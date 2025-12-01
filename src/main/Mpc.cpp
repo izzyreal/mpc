@@ -182,10 +182,6 @@ void Mpc::init()
         [&]
         {
             return clientEventController->isSixteenLevelsEnabled();
-        },
-        [&]
-        {
-            return engineHost->getSequencerPlaybackEngine();
         });
     MLOG("Sequencer created");
 

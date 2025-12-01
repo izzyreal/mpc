@@ -17,7 +17,6 @@ namespace mpc::lcdgui
 
 namespace mpc::engine
 {
-    class SequencerPlaybackEngine;
     class Voice;
 } // namespace mpc::engine
 
@@ -79,9 +78,7 @@ namespace mpc::sequencer
             const std::shared_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<sampler::Sampler> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
-            const std::function<bool()> &isSixteenLevelsEnabled,
-            const std::function<
-                std::shared_ptr<engine::SequencerPlaybackEngine>()> &
+            const std::function<bool()> &isSixteenLevelsEnabled
             );
 
         ~Sequencer();
@@ -110,9 +107,6 @@ namespace mpc::sequencer
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
-
-        const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-            getSequencerPlaybackEngine;
 
         std::shared_ptr<Clock> clock;
 

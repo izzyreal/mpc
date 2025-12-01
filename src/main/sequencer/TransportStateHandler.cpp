@@ -40,36 +40,36 @@ void TransportStateHandler::applyMessage(TransportState &state,
                  },
                  [&](const Record &)
                  {
-                     state.recording = true;
+                     state.recordingEnabled = true;
                      applyMessage(state, Play{});
                  },
                  [&](const RecordFromStart &)
                  {
-                     state.recording = true;
+                     state.recordingEnabled = true;
                      applyMessage(state, PlayFromStart{});
                  },
                  [&](const Overdub &)
                  {
-                     state.overdubbing = true;
+                     state.overdubbingEnabled = true;
                      applyMessage(state, Play{});
                  },
                  [&](const OverdubFromStart &)
                  {
-                     state.overdubbing = true;
+                     state.overdubbingEnabled = true;
                      applyMessage(state, PlayFromStart{});
                  },
-                 [&](const UpdateRecording &m)
+                 [&](const SetRecordingEnabled &m)
                  {
-                     state.recording = m.recording;
+                     state.recordingEnabled = m.recording;
                  },
-                 [&](const UpdateOverdubbing &m)
+                 [&](const SetOverdubbingEnabled &m)
                  {
-                     state.overdubbing = m.overdubbing;
+                     state.overdubbingEnabled = m.overdubbing;
                  },
                  [&](const SwitchRecordToOverdub &)
                  {
-                     state.recording = false;
-                     state.overdubbing = true;
+                     state.recordingEnabled = false;
+                     state.overdubbingEnabled = true;
                      applyMessage(state, Play{});
                  },
                  [&](const PlayFromStart &)
@@ -77,9 +77,32 @@ void TransportStateHandler::applyMessage(TransportState &state,
                      state.positionQuarterNotes = 0;
                      manager->enqueue(Play{});
                  },
-                 [&](const UpdateCountEnabled &m)
+                 [&](const SetCountEnabled &m)
                  {
                      state.countEnabled = m.enabled;
+                 },
+                 [&](const SetMetronomeOnlyEnabled &m)
+                 {
+                     state.metronomeOnlyEnabled = m.enabled;
+                 },
+                 [&](const SetMetronomeOnlyTickPosition &m)
+                 {
+                     state.metronomeOnlyPositionTicks = m.position;
+                 },
+                 [&](const BumpMetronomeOnlyTickPositionOneTick &)
+                 {
+                     state.metronomeOnlyPositionTicks += 1;
+                 },
+                 [&](const PlayMetronomeOnly &)
+                 {
+                     state.metronomeOnlyEnabled = true;
+                     state.metronomeOnlyPositionTicks = 0;
+                     state.sequencerRunning = true;
+                 },
+                 [&](const StopMetronomeOnly &)
+                 {
+                     state.sequencerRunning = false;
+                     state.metronomeOnlyEnabled = false;
                  },
                  [&](const SetCountingIn &m)
                  {
@@ -266,8 +289,8 @@ void TransportStateHandler::applyStopMessage(TransportState &state) noexcept
     //     newTickPosition = activeSequence->getLastTick();
     // }
     //
-    state.recording = false;
-    state.overdubbing = false;
+    state.recordingEnabled = false;
+    state.overdubbingEnabled = false;
     //
     // if (countingIn)
     // {

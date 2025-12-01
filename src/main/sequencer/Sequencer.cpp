@@ -13,7 +13,6 @@
 #include "sampler/Sampler.hpp"
 
 #include "engine/Voice.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 
 #include "performance/PerformanceManager.hpp"
 #include "hardware/Hardware.hpp"
@@ -37,7 +36,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
-using namespace mpc::engine::audio::mixer;
 using namespace mpc::performance;
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
@@ -75,12 +73,10 @@ Sequencer::Sequencer(
     const std::shared_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
-    const std::function<bool()> &isSixteenLevelsEnabled,
-    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
-        &getSequencerPlaybackEngine)
+    const std::function<bool()> &isSixteenLevelsEnabled)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared), startBouncing(startBouncing),
       hardware(hardware), isBouncing(isBouncing), stopBouncing(stopBouncing),
-      layeredScreen(layeredScreen), getSequencerPlaybackEngine(getSequencerPlaybackEngine),
+      layeredScreen(layeredScreen),
       clock(clock), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed),
@@ -106,7 +102,7 @@ std::shared_ptr<Transport> Sequencer::getTransport()
 
 void Sequencer::init()
 {
-    transport = std::make_shared<Transport>(*this, getSequencerPlaybackEngine);
+    transport = std::make_shared<Transport>(*this);
 
     for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
          ++midiBusIndex)

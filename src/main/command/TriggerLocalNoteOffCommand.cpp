@@ -55,9 +55,9 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
         {
-            auto newDuration = ctx->metronomeOnlyTickPosition -
+            auto newDuration = ctx->metronomeOnlyPositionTicks -
                                ctx->recordOnEvent->metronomeOnlyTickPosition;
-            ctx->recordOnEvent->tick = ctx->sequencerTickPosition;
+            ctx->recordOnEvent->tick = ctx->sequencerPositionTicks;
 
             if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
             {
@@ -80,7 +80,7 @@ void TriggerLocalNoteOffCommand::execute()
             {
                 if (thisIsTheLastActiveNoteOn)
                 {
-                    int nextPos = ctx->sequencerTickPosition +
+                    int nextPos = ctx->sequencerPositionTicks +
                                   ctx->noteValueLengthInTicks;
 
                     const auto bar = ctx->currentBarIndex + 1;

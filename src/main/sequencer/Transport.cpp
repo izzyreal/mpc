@@ -11,7 +11,6 @@
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
@@ -20,14 +19,9 @@
 #include <algorithm>
 
 using namespace mpc::sequencer;
-using namespace mpc::engine;
 using namespace mpc::lcdgui;
 
-Transport::Transport(
-    Sequencer &owner,
-    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
-        &getSequencerPlaybackEngine)
-    : getSequencerPlaybackEngine(getSequencerPlaybackEngine), sequencer(owner)
+Transport::Transport(Sequencer &owner) : sequencer(owner)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -35,10 +29,10 @@ Transport::Transport(
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && sequencer.getStateManager()
-                                        ->getSnapshot()
-                                        .getTransportStateView()
-                                        .isSequencerRunning();
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isSequencerRunning();
 }
 
 void Transport::play(const bool fromStart) const
@@ -122,12 +116,12 @@ void Transport::resetCountInPositions()
 
 void Transport::setRecording(const bool b) const
 {
-    sequencer.getStateManager()->enqueue(UpdateRecording{b});
+    sequencer.getStateManager()->enqueue(SetRecordingEnabled{b});
 }
 
 void Transport::setOverdubbing(const bool b) const
 {
-    sequencer.getStateManager()->enqueue(UpdateOverdubbing{b});
+    sequencer.getStateManager()->enqueue(SetOverdubbingEnabled{b});
 }
 
 mpc::PositionQuarterNotes Transport::getWrappedPositionInSequence(
@@ -288,7 +282,7 @@ void Transport::moveSongToStepThatContainsPosition(
 
 void Transport::setCountEnabled(const bool b) const
 {
-    sequencer.getStateManager()->enqueue(UpdateCountEnabled{b});
+    sequencer.getStateManager()->enqueue(SetCountEnabled{b});
 }
 
 bool Transport::isCountEnabled() const
@@ -340,31 +334,32 @@ double Transport::getPlayStartPositionQuarterNotes() const
         .getPlayStartPositionQuarterNotes();
 }
 
-void Transport::playMetronomeTrack()
+void Transport::playMetronomeOnly() const
 {
     if (isPlaying())
     {
         return;
     }
 
-    metronomeOnlyEnabled = true;
-    // getSequencerPlaybackEngine()->startMetronome();
+    sequencer.getStateManager()->enqueue(PlayMetronomeOnly{});
 }
 
-void Transport::stopMetronomeTrack()
+void Transport::stopMetronomeOnly() const
 {
-    if (!metronomeOnlyEnabled)
+    if (!isPlaying() || !isMetronomeOnlyEnabled())
     {
         return;
     }
 
-    // getSequencerPlaybackEngine()->stop();
-    metronomeOnlyEnabled = false;
+    sequencer.getStateManager()->enqueue(StopMetronomeOnly{});
 }
 
 bool Transport::isMetronomeOnlyEnabled() const
 {
-    return metronomeOnlyEnabled;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isMetronomeOnlyEnabled();
 }
 
 int Transport::getPlayedStepRepetitions() const
@@ -388,7 +383,8 @@ void Transport::resetPlayedStepRepetitions()
 }
 void Transport::bumpPositionByTicks(const Tick ticks) const
 {
-    const auto snapshot = sequencer.getStateManager()->getSnapshot().getTransportStateView();
+    const auto snapshot =
+        sequencer.getStateManager()->getSnapshot().getTransportStateView();
     const auto pos = snapshot.getPositionTicks();
     const auto newPos = Sequencer::ticksToQuarterNotes(pos + ticks);
     setPosition(newPos);
@@ -751,8 +747,7 @@ void Transport::setPosition(const double positionQuarterNotes) const
 
     if (!isPlaying())
     {
-        sequencer.getStateManager()->enqueue(
-            SyncTrackEventIndices{});
+        sequencer.getStateManager()->enqueue(SyncTrackEventIndices{});
     }
 }
 

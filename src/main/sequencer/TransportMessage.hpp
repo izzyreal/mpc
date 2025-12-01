@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <variant>
 
 namespace mpc::sequencer
@@ -46,24 +48,48 @@ namespace mpc::sequencer
     {
     };
 
-    struct UpdateRecording
+    struct SetRecordingEnabled
     {
         bool recording;
     };
-    struct UpdateOverdubbing
+    struct SetOverdubbingEnabled
     {
         bool overdubbing;
     };
 
-    struct UpdateCountEnabled
+    struct SetCountEnabled
     {
         bool enabled;
     };
 
+    struct SetMetronomeOnlyEnabled
+    {
+        bool enabled;
+    };
+
+    struct PlayMetronomeOnly
+    {
+    };
+
+    struct StopMetronomeOnly
+    {
+    };
+
+    struct SetMetronomeOnlyTickPosition
+    {
+        Tick position;
+    };
+
+    struct BumpMetronomeOnlyTickPositionOneTick
+    {
+    };
+
     using TransportMessage =
-        std::variant<SetPositionQuarterNotes,
-                     Stop, Play, PlayFromStart, Record,
+        std::variant<SetPositionQuarterNotes, Stop, Play, PlayFromStart, Record,
                      RecordFromStart, Overdub, OverdubFromStart,
-                     SwitchRecordToOverdub, UpdateRecording, UpdateOverdubbing,
-                     UpdateCountEnabled, SetCountingIn>;
+                     SwitchRecordToOverdub, SetRecordingEnabled,
+                     SetOverdubbingEnabled, SetCountEnabled, SetCountingIn,
+                     SetMetronomeOnlyEnabled, SetMetronomeOnlyTickPosition,
+                     BumpMetronomeOnlyTickPositionOneTick, PlayMetronomeOnly,
+                     StopMetronomeOnly>;
 } // namespace mpc::sequencer

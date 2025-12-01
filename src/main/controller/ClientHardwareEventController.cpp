@@ -299,7 +299,6 @@ void ClientHardwareEventController::handlePadPress(
                     Velocity(clampedVelocity), track.get(), screen->getBus(),
                     screen, ProgramPadIndex(programPadIndex), program,
                     mpc.getSequencer(),
-                    mpc.getEngineHost()->getSequencerPlaybackEngine(),
                     mpc.getPerformanceManager(), mpc.clientEventController,
                     mpc.getEventHandler(), mpc.screens, mpc.getHardware());
 
@@ -344,8 +343,6 @@ void ClientHardwareEventController::handlePadRelease(
          screens = mpc.screens, sequencer = mpc.getSequencer(),
          hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
-         sequencerPlaybackEngine =
-             mpc.getEngineHost()->getSequencerPlaybackEngine(),
          previewSoundPlayer =
              mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
     {
@@ -382,7 +379,7 @@ void ClientHardwareEventController::handlePadRelease(
                     recordingNoteOnEvent, track, p->busType,
                     screens->getScreenById(p->screenId), programPadIndex,
                     sampler->getProgram(p->programIndex), sequencer,
-                    sequencerPlaybackEngine, performanceManager,
+                    performanceManager,
                     clientEventController, eventHandler, screens, hardware);
 
             TriggerLocalNoteOffCommand(ctx).execute();
