@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <thread>
 
 namespace mpc
 {
@@ -24,11 +23,13 @@ namespace mpc::lcdgui
         TextComp(Mpc &mpc, const std::string &name);
         ~TextComp() override;
 
+        void onTimerCallback() override;
+
         virtual void setText(const std::string &s);
 
         void setLeftMargin(int margin);
         void enableTwoDots();
-        void setBlinking(bool b);
+        void setBlinking(bool b, int intervalMultiplier = 24);
         void setInverted(bool b);
         void setDoubleInverted(bool b);
         void setAlignment(Alignment newAlignment, int endX = -1);
@@ -47,12 +48,10 @@ namespace mpc::lcdgui
 
     private:
         Mpc &mpc;
-        static constexpr int BLINK_INTERVAL = 300;
+        int blinkCounter = 0;
+        int blinkIntervalMultiplier = 24;
         bool blinking = false;
         bool invisibleDueToBlinking = false;
-        std::thread blinkThread;
-        static void static_blink(void *args);
-        void runBlinkThread();
         Alignment alignment = Alignment::None;
         bool textuallyAligned = false;
         int alignmentEndX = -1;

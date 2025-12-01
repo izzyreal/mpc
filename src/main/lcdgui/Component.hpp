@@ -56,13 +56,13 @@ namespace mpc::lcdgui
 
             for (const auto &c : children)
             {
-                c->onTimerCallback();
+                c->timerCallback();
             }
         }
 
         virtual void onTimerCallback() {}
 
-        void printTree(int depth = 0) const
+        void printTree(const int depth = 0) const
         {
             std::string space;
             for (int i = 0; i < depth * 2; i++)

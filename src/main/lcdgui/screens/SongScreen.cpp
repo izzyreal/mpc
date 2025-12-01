@@ -31,6 +31,17 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
+                            return offset;
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
                             return sequencer.lock()->getTransport()->getTempo();
                         },
                         [&](auto)
@@ -45,8 +56,18 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
          },
          [&](auto isPlaying)
          {
-             findField("sequence1")->setBlinking(isPlaying);
-             findField("reps1")->setBlinking(isPlaying);
+             findField("sequence1")->setBlinking(isPlaying, 10);
+             findField("reps1")->setBlinking(isPlaying, 10);
+         }});
+
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->getPlayedStepRepetitions();
+         },
+         [&](auto)
+         {
+             displaySteps();
          }});
 
     addReactiveBinding({[&]
@@ -394,8 +415,16 @@ void SongScreen::displaySteps() const
                         song->getStep(stepIndex).lock()->getSequence() + 1),
                     "0", 2) +
                 "-" + seqname);
+
+            int value = song->getStep(stepIndex).lock()->getRepeats();
+
+            if (i == 1 && sequencer.lock()->getTransport()->isPlaying())
+            {
+                value -= sequencer.lock()->getTransport()->getPlayedStepRepetitions();
+            }
+
             repsArray[i]->setText(
-                std::to_string(song->getStep(stepIndex).lock()->getRepeats()));
+                std::to_string(value));
         }
         else
         {

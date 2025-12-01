@@ -51,23 +51,22 @@ void Transport::play(const bool fromStart) const
             return;
         }
 
-        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
+        if (songScreen->getOffset() + 1 >= currentSong->getStepCount() &&
+            !fromStart)
         {
             return;
         }
 
-        int step = songScreen->getOffset() + 1;
+        int step = fromStart ? 0 : songScreen->getOffset() + 1;
 
-        if (step > currentSong->getStepCount())
+        if (step < currentSong->getStepCount())
         {
-            step = currentSong->getStepCount() - 1;
-        }
-
-        if (const std::shared_ptr<Step> currentStep =
-                currentSong->getStep(step).lock();
-            !sequencer.getSequence(currentStep->getSequence())->isUsed())
-        {
-            return;
+            if (const std::shared_ptr<Step> currentStep =
+                    currentSong->getStep(step).lock();
+                !sequencer.getSequence(currentStep->getSequence())->isUsed())
+            {
+                return;
+            }
         }
     }
     else
@@ -555,6 +554,8 @@ int Transport::getCurrentBarIndex() const
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
 
+    if (!seq) return 0;
+
     const auto pos = getTickPositionGuiPresentation();
 
     if (pos == seq->getLastTick())
@@ -586,6 +587,8 @@ int Transport::getCurrentBeatIndex() const
 {
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
+
+    if (!seq) return 0;
 
     const auto pos = getTickPositionGuiPresentation();
 
@@ -637,6 +640,8 @@ int Transport::getCurrentClockNumber() const
 {
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                       : sequencer.getSelectedSequence();
+
+    if (!sequence) return 0;
 
     auto clock = getTickPositionGuiPresentation();
 

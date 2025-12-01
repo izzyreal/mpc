@@ -74,11 +74,10 @@ Sequencer::Sequencer(
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled)
-    : getScreens(getScreens), isBouncePrepared(isBouncePrepared), startBouncing(startBouncing),
-      hardware(hardware), isBouncing(isBouncing), stopBouncing(stopBouncing),
-      layeredScreen(layeredScreen),
-      clock(clock), voices(voices),
-      isAudioServerRunning(isAudioServerRunning),
+    : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
+      startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
+      stopBouncing(stopBouncing), layeredScreen(layeredScreen), clock(clock),
+      voices(voices), isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed),
       performanceManager(performanceManager), sampler(sampler),
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
@@ -86,9 +85,7 @@ Sequencer::Sequencer(
     stateManager = std::make_shared<SequencerStateManager>(this);
 }
 
-Sequencer::~Sequencer()
-{
-}
+Sequencer::~Sequencer() {}
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
@@ -215,7 +212,7 @@ void Sequencer::playToTick(const int targetTick) const
                 transport->isMetronomeOnlyEnabled() ||
                 secondSequenceScreen->sq ==
                     seqIndex) // Real 2KXL would play all events twice (i.e.
-                        // double as loud as normal) for the last clause
+                              // double as loud as normal) for the last clause
             {
                 break;
             }
@@ -884,15 +881,14 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
             return NoSequenceIndex;
         }
 
-        const auto seqIndexShouldBeDerivedFromSongStep =
-            songScreen->getOffset() + 1 < song->getStepCount();
+        int step = songScreen->getOffset() + 1;
 
-        const auto songSeqIndex =
-            seqIndexShouldBeDerivedFromSongStep
-                ? song->getStep(songScreen->getOffset() + 1)
-                      .lock()
-                      ->getSequence()
-                : NoSequenceIndex;
+        if (step >= song->getStepCount())
+        {
+            step = song->getStepCount() - 1;
+        }
+
+        const auto songSeqIndex = song->getStep(step).lock()->getSequence();
         return songSeqIndex;
     }
 
@@ -996,7 +992,7 @@ SequenceIndex Sequencer::getSongSequenceIndex() const
     const auto song = songs[songScreen->getSelectedSongIndex()];
     auto step = songScreen->getOffset() + 1;
 
-    if (step > song->getStepCount() - 1)
+    if (step >= song->getStepCount())
     {
         step = song->getStepCount() - 1;
     }

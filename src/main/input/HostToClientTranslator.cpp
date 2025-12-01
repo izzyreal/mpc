@@ -60,8 +60,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
             if (gesture.componentId == NONE)
             {
-                throw std::invalid_argument(
-                    "GestureEvent.componentId must not be NONE");
+                printf("A gesture without a componentId was emitted. How is that possible?\n");
+                return std::nullopt;
             }
 
             clientHardwareEvent.componentId = gesture.componentId;

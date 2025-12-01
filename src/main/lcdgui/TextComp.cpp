@@ -310,34 +310,20 @@ void TextComp::setTextPadded(const int i, const std::string &padding)
     setTextPadded(std::to_string(i), padding);
 }
 
-void TextComp::static_blink(void *args)
+void TextComp::onTimerCallback()
 {
-    static_cast<TextComp *>(args)->runBlinkThread();
-}
-
-void TextComp::runBlinkThread()
-{
-    while (blinking)
+    if (!blinking || blinkCounter++ < blinkIntervalMultiplier)
     {
-        int counter = 0;
-
-        while (blinking && counter++ != BLINK_INTERVAL)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-
-        invisibleDueToBlinking = !invisibleDueToBlinking;
-        SetDirty();
+        return;
     }
 
-    if (invisibleDueToBlinking)
-    {
-        invisibleDueToBlinking = false;
-        SetDirty();
-    }
+    blinkCounter = 0;
+
+    invisibleDueToBlinking = !invisibleDueToBlinking;
+    SetDirty();
 }
 
-void TextComp::setBlinking(const bool b)
+void TextComp::setBlinking(const bool b, const int intervalMultiplier)
 {
     if (blinking == b)
     {
@@ -346,15 +332,17 @@ void TextComp::setBlinking(const bool b)
 
     blinking = b;
 
-    if (blinkThread.joinable())
-    {
-        blinkThread.join();
-    }
-
     if (blinking)
     {
-        blinkThread = std::thread(&TextComp::static_blink, this);
+        blinkIntervalMultiplier = intervalMultiplier;
     }
+    else
+    {
+        blinkCounter = 0;
+        invisibleDueToBlinking = false;
+    }
+
+    SetDirty();
 }
 
 void TextComp::setAlignment(const Alignment newAlignment, const int endX)
@@ -372,9 +360,4 @@ void TextComp::setAlignment(const Alignment newAlignment, const int endX)
 
 TextComp::~TextComp()
 {
-    if (blinking)
-    {
-        blinking = false;
-        blinkThread.join();
-    }
 }

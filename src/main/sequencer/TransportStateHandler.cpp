@@ -164,6 +164,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
                 sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
 
             const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
+
             songScreen->setOffset(-1);
 
             if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
