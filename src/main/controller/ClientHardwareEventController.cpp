@@ -62,6 +62,17 @@ bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
            mpc.getHardware()->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 }
 
+bool ClientHardwareEventController::isRecLockedOrPressed() const
+{
+    return isRecLocked() || mpc.getHardware()->getButton(REC)->isPressed();
+}
+
+bool ClientHardwareEventController::isOverdubLockedOrPressed() const
+{
+    return isOverdubLocked() ||
+           mpc.getHardware()->getButton(OVERDUB)->isPressed();
+}
+
 mpc::TimeInMilliseconds
 ClientHardwareEventController::getMostRecentPhysicalPadPressTime() const
 {
