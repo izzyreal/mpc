@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 #include <functional>
-#include <atomic>
 
 namespace moodycamel
 {
@@ -83,7 +82,6 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
-        double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;
         bool metronomeOnly = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
