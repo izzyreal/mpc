@@ -241,6 +241,7 @@ bool SequencerPlaybackEngine::processSongMode() const
 
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->getTransport()->incrementPlayedStepRepetitions();
+    sequencer->getStateManager()->drainQueue();
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
     const auto step = songScreen->getOffset() + 1;

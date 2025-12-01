@@ -159,6 +159,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
         },
         [&](const PlaySongFromStart &)
         {
+            state.positionQuarterNotes = 0;
             const auto songScreen =
                 sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
 
