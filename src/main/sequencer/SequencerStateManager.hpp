@@ -16,6 +16,34 @@ namespace mpc::sequencer
     class SequenceStateHandler;
     class TrackStateHandler;
 
+    struct TrackLock
+    {
+        std::atomic<bool> flag{false};
+
+        bool try_acquire()
+        {
+            bool expected = false;
+            return flag.compare_exchange_strong(expected, true,
+                                                std::memory_order_acquire,
+                                                std::memory_order_relaxed);
+        }
+
+        void release()
+        {
+            flag.store(false, std::memory_order_release);
+        }
+
+        void acquire()
+        {
+            for (;;)
+            {
+                if (try_acquire())
+                    return;
+                std::this_thread::yield();
+            }
+        }
+    };
+
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
               SequencerState, SequencerStateView, SequencerMessage>
@@ -24,18 +52,23 @@ namespace mpc::sequencer
         explicit SequencerStateManager(Sequencer *);
         ~SequencerStateManager() override;
 
-        using EventStateFreeList = concurrency::FreeList<EventData, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
+        using EventStateFreeList =
+            concurrency::FreeList<EventData,
+                                  Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 
         std::shared_ptr<EventStateFreeList> pool;
 
-        void returnEventToPool(EventData* e) const;
+        void returnEventToPool(EventData *e) const;
 
-        void freeEvent(EventData*& head, EventData* e) const;
+        static void
+        insertEvent(TrackState &track, EventData *e,
+                    bool allowMultipleNoteEventsWithSameNoteOnSameTick);
 
-        static void insertEvent(TrackState& track, EventData* e,
-                 bool allowMultipleNoteEventsWithSameNoteOnSameTick);
+        EventData *acquireEvent() const;
 
-        EventData* acquireEvent() const;
+        std::array<std::array<TrackLock, Mpc2000XlSpecs::TOTAL_TRACK_COUNT>,
+                   Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
+            trackLocks;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

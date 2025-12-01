@@ -24,7 +24,8 @@ namespace mpc::sequencer
     struct UpdateTrackIndexOfAllEvents
     {
         SequenceIndex sequence;
-        TrackIndex trackIndex;
+        TrackIndex oldTrackIndex;
+        TrackIndex newTrackIndex;
     };
 
     struct FinalizeNonLiveNoteEvent
@@ -42,8 +43,6 @@ namespace mpc::sequencer
 
     struct RemoveEvent
     {
-        SequenceIndex sequence;
-        TrackIndex track;
         EventData *handle;
     };
 
@@ -61,7 +60,7 @@ namespace mpc::sequencer
 
     struct UpdateEvent
     {
-        EventData *event;
+        EventData *handle;
         EventData snapshot;
     };
 

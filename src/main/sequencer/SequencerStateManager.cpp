@@ -36,26 +36,6 @@ void SequencerStateManager::returnEventToPool(EventData* e) const
     pool->release(e);
 }
 
-void SequencerStateManager::freeEvent(EventData*& head, EventData* e) const
-{
-    // unlink from list
-    if (e->prev)
-        e->prev->next = e->next;
-    else
-        head = e->next;   // removing head
-
-    if (e->next)
-        e->next->prev = e->prev;
-
-    // reset links
-    e->prev = nullptr;
-    e->next = nullptr;
-
-    // return to freelist or push into an audio→main free queue
-    // (replace with your actual mechanism)
-    returnEventToPool(e);
-}
-
 EventData* SequencerStateManager::acquireEvent() const
 {
     EventData* e = nullptr;
@@ -106,6 +86,14 @@ void SequencerStateManager::applyMessage(
 
 void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 {
+    auto &lock = trackLocks[m.destSequenceIndex][m.destTrackIndex];
+
+    if (!lock.try_acquire())
+    {
+        enqueue(m);
+        return;
+    }
+
     const auto segLength = m.sourceEndTick - m.sourceStartTick;
     const auto destOffset = m.destStartTick - m.sourceStartTick;
 
@@ -225,6 +213,8 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
         src = src->next;
     }
+
+    lock.release();
 
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }

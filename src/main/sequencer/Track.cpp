@@ -180,8 +180,10 @@ void Track::setEventStates(const std::vector<EventData> &eventStates) const
 
 void Track::setTrackIndex(const TrackIndex i)
 {
+    if (trackIndex == i) return;
+    const auto oldTrackIndex = trackIndex;
     trackIndex = i;
-    dispatch(UpdateTrackIndexOfAllEvents{parent->getSequenceIndex(), i});
+    dispatch(UpdateTrackIndexOfAllEvents{parent->getSequenceIndex(), oldTrackIndex, trackIndex});
 }
 
 mpc::TrackIndex Track::getIndex() const
@@ -262,7 +264,7 @@ void Track::syncEventIndex(const int currentTick, const int previousTick) const
 void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
 {
     dispatch(
-        RemoveEvent{parent->getSequenceIndex(), getIndex(), event->handle});
+        RemoveEvent{event->handle});
 }
 
 EventData *Track::recordNoteEventLive(const NoteNumber note,
@@ -322,7 +324,7 @@ void Track::removeEvent(EventData *eventState) const
 {
     assert(eventState && eventState->trackIndex == getIndex() &&
            eventState->sequenceIndex == parent->getSequenceIndex());
-    dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), eventState});
+    dispatch(RemoveEvent{eventState});
 }
 
 void Track::removeEvents() const
@@ -395,7 +397,10 @@ int Track::getDeviceIndex() const
 std::shared_ptr<EventRef> Track::getEvent(const int i) const
 {
     const auto eventHandle = getSnapshot()->getEventByIndex(EventIndex(i));
+    auto &lock = manager->trackLocks[eventHandle->sequenceIndex][eventHandle->trackIndex];
+    lock.acquire();
     const auto eventSnapshot = *eventHandle;
+    lock.release();
     return mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
 }
 
@@ -426,6 +431,8 @@ std::vector<EventData> Track::getEventStates() const
 std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
 {
     std::vector<std::shared_ptr<EventRef>> result;
+    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    lock.acquire();
 
     const auto snapshot = getSnapshot();
 
@@ -438,6 +445,8 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
         auto event = mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
         result.emplace_back(event);
     }
+
+    lock.release();
 
     return result;
 }
@@ -590,12 +599,17 @@ bool Track::isUsed() const
 std::vector<std::shared_ptr<EventRef>>
 Track::getEventRange(const int startTick, const int endTick) const
 {
+    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    lock.acquire();
+
     std::vector<std::shared_ptr<EventRef>> result;
     for (const auto &eventHandle : getSnapshot()->getEventRange(startTick, endTick))
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent));
     }
+
+    lock.release();
     return result;
 }
 
@@ -758,12 +772,17 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 {
     std::vector<std::shared_ptr<NoteOnEvent>> result;
 
+    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    lock.acquire();
+
     for (const auto &eventHandle : getSnapshot()->getNoteEvents())
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(std::dynamic_pointer_cast<NoteOnEvent>(
             mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent)));
     }
+
+    lock.release();
 
     return result;
 }
@@ -956,7 +975,7 @@ void Track::playNext() const
 
     if (_delete)
     {
-        dispatch(RemoveEvent{parent->getSequenceIndex(), getIndex(), event});
+        dispatch(RemoveEvent{event});
         manager->drainQueue();
         return;
     }
