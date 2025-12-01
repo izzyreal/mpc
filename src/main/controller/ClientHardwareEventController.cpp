@@ -928,14 +928,6 @@ void ClientHardwareEventController::handleButtonRelease(
     {
         ReleaseFunctionCommand(mpc, 5).execute();
     }
-    else if (id == REC)
-    {
-        ReleaseRecCommand(mpc).execute();
-    }
-    else if (id == OVERDUB)
-    {
-        ReleaseOverdubCommand(mpc).execute();
-    }
     else if (id == TAP_TEMPO_OR_NOTE_REPEAT)
     {
         ReleaseTapCommand(mpc).execute();

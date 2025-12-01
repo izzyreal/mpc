@@ -24,17 +24,13 @@ void PushPlayStartCommand::execute()
     const bool currentScreenAllowsPlayAndRecord =
         screengroups::isPlayAndRecordScreen(currentScreen);
 
-    auto hardware = mpc.getHardware();
-
-    const auto recButtonIsPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
+        const auto recButtonIsPressedOrLocked =
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+            ->isRecLockedOrPressed();
 
     const auto overdubButtonIsPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+            ->isOverdubLockedOrPressed();
 
     if (recButtonIsPressedOrLocked)
     {
@@ -56,7 +52,7 @@ void PushPlayStartCommand::execute()
     }
     else
     {
-        if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
             mpc.getLayeredScreen()->openScreenById(
                 ScreenId::VmpcDirectToDiskRecorderScreen);
@@ -78,14 +74,4 @@ void PushPlayStartCommand::execute()
         .unlock(hardware::ComponentId::REC);
     mpc.clientEventController->clientHardwareEventController->buttonLockTracker
         .unlock(hardware::ComponentId::OVERDUB);
-
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }

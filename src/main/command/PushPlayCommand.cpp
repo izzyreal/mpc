@@ -16,10 +16,11 @@ PushPlayCommand::PushPlayCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushPlayCommand::execute()
 {
-    auto sequencer = mpc.getSequencer();
-    auto hardware = mpc.getHardware();
-    auto recButton = hardware->getButton(hardware::ComponentId::REC);
-    auto overdubButton = hardware->getButton(hardware::ComponentId::OVERDUB);
+    const auto sequencer = mpc.getSequencer();
+    const auto hardware = mpc.getHardware();
+    const auto recButton = hardware->getButton(hardware::ComponentId::REC);
+    const auto overdubButton =
+        hardware->getButton(hardware::ComponentId::OVERDUB);
 
     if (sequencer->getTransport()->isPlaying())
     {
@@ -44,14 +45,12 @@ void PushPlayCommand::execute()
         screengroups::isPlayAndRecordScreen(currentScreen);
 
     const auto recButtonIsPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+            ->isRecLockedOrPressed();
 
     const auto overdubButtonIsPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+            ->isOverdubLockedOrPressed();
 
     if (recButtonIsPressedOrLocked)
     {
@@ -95,14 +94,4 @@ void PushPlayCommand::execute()
         .unlock(hardware::ComponentId::REC);
     mpc.clientEventController->clientHardwareEventController->buttonLockTracker
         .unlock(hardware::ComponentId::OVERDUB);
-
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }
