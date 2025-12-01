@@ -299,7 +299,6 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
-    printf("Deleting Mpc\n");
     if (midiDeviceDetector)
     {
         midiDeviceDetector->stop();
