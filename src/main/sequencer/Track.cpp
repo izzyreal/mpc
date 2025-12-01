@@ -844,6 +844,8 @@ void Track::playNext() const
 
     const auto event = snapshot->getEventByIndex(playEventIndex);
 
+    assert (event);
+
     const auto recordingModeIsMulti = isRecordingModeMulti();
     const auto isActiveTrackIndex = trackIndex == getActiveTrackIndex();
     auto _delete = isRecording() &&
