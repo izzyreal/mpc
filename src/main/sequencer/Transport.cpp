@@ -373,6 +373,16 @@ int Transport::getTickPosition() const
     return transportState.getPositionTicks();
 }
 
+mpc::Tick Transport::getTickPositionGuiPresentation() const
+{
+    if (isCountingIn())
+    {
+        return getCountInStartPosTicks();
+    }
+
+    return getTickPosition();
+}
+
 double Transport::getPositionQuarterNotes() const
 {
     return sequencer.getStateManager()
@@ -544,10 +554,8 @@ int Transport::getCurrentBarIndex() const
 {
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
-    const auto pos =
-        isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
-            : getTickPosition();
+
+    const auto pos = getTickPositionGuiPresentation();
 
     if (pos == seq->getLastTick())
     {
@@ -578,10 +586,8 @@ int Transport::getCurrentBeatIndex() const
 {
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
-    const auto pos =
-        isCountingIn()
-            ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
-            : getTickPosition();
+
+    const auto pos = getTickPositionGuiPresentation();
 
     if (pos == seq->getLastTick())
     {
@@ -632,9 +638,7 @@ int Transport::getCurrentClockNumber() const
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                       : sequencer.getSelectedSequence();
 
-    auto clock = isCountingIn()
-                     ? Sequencer::quarterNotesToTicks(getPositionQuarterNotes())
-                     : getTickPosition();
+    auto clock = getTickPositionGuiPresentation();
 
     if (clock == sequence->getLastTick())
     {

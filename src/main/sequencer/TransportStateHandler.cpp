@@ -44,14 +44,13 @@ void TransportStateHandler::installCountIn(TransportState &state,
         return;
     }
 
-    state.countingIn = true;
-
     const auto activeSequence = sequencer->getSelectedSequence();
 
     if (fromStart)
     {
         state.countInStartPos = state.positionQuarterNotes;
         state.countInEndPos = activeSequence->getLastTickOfBar(0);
+        state.countingIn = true;
         return;
     }
 
@@ -65,6 +64,7 @@ void TransportStateHandler::installCountIn(TransportState &state,
         Sequencer::ticksToQuarterNotes(posToStartPlayingFrom);
     state.countInStartPos = posToStartPlayingFrom;
     state.countInEndPos = activeSequence->getLastTickOfBar(currentBarIndex);
+    state.countingIn = true;
 }
 
 void TransportStateHandler::applyMessage(TransportState &state,

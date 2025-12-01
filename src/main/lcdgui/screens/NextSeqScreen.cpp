@@ -46,17 +46,18 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
                             displaySq();
                         }});
 
-    addReactiveBinding(
-        {[&]
-         {
-             return sequencer.lock()->getTransport()->getTickPosition();
-         },
-         [&](auto)
-         {
-             displayNow0();
-             displayNow1();
-             displayNow2();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()
+                                ->getTransport()
+                                ->getTickPositionGuiPresentation();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 
     addReactiveBinding({[&]
                         {

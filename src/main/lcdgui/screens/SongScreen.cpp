@@ -16,17 +16,18 @@ using namespace mpc::lcdgui::screens;
 SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "song", layerIndex)
 {
-    addReactiveBinding(
-        {[&]
-         {
-             return sequencer.lock()->getTransport()->getTickPosition();
-         },
-         [&](auto)
-         {
-             displayNow0();
-             displayNow1();
-             displayNow2();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()
+                                ->getTransport()
+                                ->getTickPositionGuiPresentation();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 
     addReactiveBinding({[&]
                         {

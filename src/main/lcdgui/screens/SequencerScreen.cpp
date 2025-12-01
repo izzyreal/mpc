@@ -137,15 +137,8 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             if (sequencer.lock()->getTransport()->isCountingIn())
-             {
-                 return static_cast<int>(Sequencer::quarterNotesToTicks(
-                     sequencer.lock()
-                         ->getTransport()
-                         ->getPositionQuarterNotes()));
-             }
-
-             return sequencer.lock()->getTransport()->getTickPosition();
+             const auto transport = sequencer.lock()->getTransport();
+             return transport->getTickPositionGuiPresentation();
          },
          [&](auto)
          {
