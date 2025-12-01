@@ -116,7 +116,7 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(EventData *) const;
+        void finalizeNoteEventLive(EventData *, Tick positionTicks) const;
 
         void finalizeNoteEventNonLive(EventData *, Duration) const;
 

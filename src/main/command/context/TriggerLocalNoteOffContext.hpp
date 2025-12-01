@@ -59,5 +59,6 @@ namespace mpc::command::context
         std::function<int()> sequencerGetActiveSequenceLastTick;
         std::function<void(double)> sequencerMoveToQuarterNotePosition;
         std::function<void()> sequencerStopMetronomeTrack;
+        Tick positionTicks;
     };
 } // namespace mpc::command::context

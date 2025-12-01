@@ -282,9 +282,9 @@ EventData *Track::recordNoteEventLive(const NoteNumber note,
     return e;
 }
 
-void Track::finalizeNoteEventLive(EventData *e) const
+void Track::finalizeNoteEventLive(EventData *e, const Tick positionTicks) const
 {
-    e->tick = getTickPosition();
+    e->tick = positionTicks;
     queuedNoteOffEvents->enqueue(e);
 }
 

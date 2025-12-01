@@ -32,6 +32,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 #include "utils/TimeUtils.hpp"
@@ -290,6 +291,15 @@ void ClientHardwareEventController::handlePadPress(
     {
         if (program && registryNoteOnEvent)
         {
+            const auto transport = mpc.getSequencer()
+                                       ->getStateManager()
+                                       ->getSnapshot()
+                                       .getTransportStateView();
+            const auto metronomeOnlyPositionTicks =
+                transport.getMetronomeOnlyPositionTicks();
+
+            const auto positionTicks = transport.getPositionTicks();
+
             auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                     PerformanceEventSource::VirtualMpcHardware,
@@ -298,9 +308,10 @@ void ClientHardwareEventController::handlePadPress(
                         ProgramPadIndex(programPadIndex))),
                     Velocity(clampedVelocity), track.get(), screen->getBus(),
                     screen, ProgramPadIndex(programPadIndex), program,
-                    mpc.getSequencer(),
-                    mpc.getPerformanceManager(), mpc.clientEventController,
-                    mpc.getEventHandler(), mpc.screens, mpc.getHardware());
+                    mpc.getSequencer(), mpc.getPerformanceManager(),
+                    mpc.clientEventController, mpc.getEventHandler(),
+                    mpc.screens, mpc.getHardware(), metronomeOnlyPositionTicks,
+                    positionTicks);
 
             action = [ctx](void *)
             {
@@ -337,6 +348,14 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
+    auto transport = mpc.getSequencer()
+                         ->getStateManager()
+                         ->getSnapshot()
+                         .getTransportStateView();
+
+    const auto metronomeOnlyPositionTicks = transport.getMetronomeOnlyPositionTicks();
+    const auto positionTicks = transport.getPositionTicks();
+
     auto action =
         [performanceManager = mpc.getPerformanceManager(),
          sampler = mpc.getSampler(), eventHandler = mpc.getEventHandler(),
@@ -344,7 +363,8 @@ void ClientHardwareEventController::handlePadRelease(
          hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
          previewSoundPlayer =
-             mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
+             mpc.getEngineHost()->getPreviewSoundPlayer(),
+             metronomeOnlyPositionTicks, positionTicks](void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 
@@ -379,8 +399,8 @@ void ClientHardwareEventController::handlePadRelease(
                     recordingNoteOnEvent, track, p->busType,
                     screens->getScreenById(p->screenId), programPadIndex,
                     sampler->getProgram(p->programIndex), sequencer,
-                    performanceManager,
-                    clientEventController, eventHandler, screens, hardware);
+                    performanceManager, clientEventController, eventHandler,
+                    screens, hardware, metronomeOnlyPositionTicks, positionTicks);
 
             TriggerLocalNoteOffCommand(ctx).execute();
 

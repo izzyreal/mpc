@@ -18,7 +18,7 @@ namespace mpc::performance
 {
     struct NoteOnEvent;
     class PerformanceManager;
-}
+} // namespace mpc::performance
 
 namespace mpc::audiomidi
 {
@@ -60,7 +60,8 @@ namespace mpc::command::context
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<lcdgui::Screens> &,
-            const std::shared_ptr<hardware::Hardware> &);
+            const std::shared_ptr<hardware::Hardware> &,
+            Tick metronomeOnlyPositionTicks, Tick positionTicks);
 
         static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerLocalNoteOffContext(
@@ -75,6 +76,7 @@ namespace mpc::command::context
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
             const std::shared_ptr<lcdgui::Screens> &,
-            const std::shared_ptr<hardware::Hardware> &);
+            const std::shared_ptr<hardware::Hardware> &,
+            Tick metronomeOnlyPositionTicks, Tick positionTicks);
     };
 } // namespace mpc::command::context

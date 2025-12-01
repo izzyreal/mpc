@@ -44,7 +44,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<Hardware> &hardware)
+    const std::shared_ptr<Hardware> &hardware,
+    const Tick metronomeOnlyPositionTicks, const Tick positionTicks)
 {
     const bool isSequencerScreen =
         std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
@@ -89,8 +90,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         screens->get<ScreenId::DrumScreen>()->getDrum();
 
     const auto transportSnapshot = lockedSequencer->getStateManager()
-                                   ->getSnapshot()
-                                   .getTransportStateView();
+                                       ->getSnapshot()
+                                       .getTransportStateView();
 
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{source,
@@ -121,7 +122,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                                   setSelectedNote,
                                   setSelectedPad,
                                   hardwareSliderValue,
-                                  transportSnapshot.getMetronomeOnlyPositionTicks()});
+                                  metronomeOnlyPositionTicks,
+                                  positionTicks});
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
@@ -136,12 +138,13 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<Hardware> &hardware)
+    const std::shared_ptr<Hardware> &hardware,
+    const Tick metronomeOnlyPositionTicks,
+    const Tick positionTicks)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
     EventData *sequencerRecordNoteOnEvent = nullptr;
-    ;
 
     if (recordedNoteOnEvent)
     {
@@ -199,9 +202,9 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
-            transportSnapshot.getMetronomeOnlyPositionTicks(),
+            metronomeOnlyPositionTicks,
             isRecMainWithoutPlaying,
-            transportSnapshot.getPositionTicks(),
+            positionTicks,
             stepEditOptionsScreen->getTcValuePercentage(),
             timingCorrectScreen->getNoteValueLengthInTicks(),
             stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
@@ -210,5 +213,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             timingCorrectScreen->getSwing(),
             getActiveSequenceLastTick,
             sequencerMoveToQuarterNotePosition,
-            sequencerStopMetronomeTrack});
+            sequencerStopMetronomeTrack,
+            positionTicks});
 }

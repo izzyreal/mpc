@@ -83,5 +83,6 @@ namespace mpc::command::context
 
         int hardwareSliderValue;
         Tick metronomeOnlyPositionTicks;
+        Tick positionTicks;
     };
 } // namespace mpc::command::context

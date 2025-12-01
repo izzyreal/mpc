@@ -17,6 +17,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 #include <memory>
@@ -201,9 +202,20 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         }
     }
 
-    const std::function action =
-        [noteNumber = e.getNoteNumber(), velocity = e.getVelocity(), track,
-         screen, programPadIndex, program, this](void *userData)
+    const auto transport = sequencer.lock()
+                               ->getStateManager()
+                               ->getSnapshot()
+                               .getTransportStateView();
+
+    const auto metronomeOnlyPositionTicks =
+        transport.getMetronomeOnlyPositionTicks();
+
+    const auto positionTicks = transport.getPositionTicks();
+
+    const std::function action = [noteNumber = e.getNoteNumber(),
+                                  velocity = e.getVelocity(), track, screen,
+                                  programPadIndex, program, this,
+                                  positionTicks, metronomeOnlyPositionTicks](void *userData)
     {
         const performance::NoteOnEvent *registryNoteOnEvent =
             static_cast<performance::NoteOnEvent *>(userData);
@@ -213,8 +225,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                 PerformanceEventSource::MidiInput, *registryNoteOnEvent,
                 NoteNumber(noteNumber), Velocity(velocity), track.get(),
                 screen->getBus(), screen, programPadIndex, program, sequencer,
-                performanceManager.lock(),
-                clientEventController, eventHandler, screens, hardware);
+                performanceManager.lock(), clientEventController, eventHandler,
+                screens, hardware, metronomeOnlyPositionTicks, positionTicks);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
@@ -239,7 +251,16 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
-    const std::function action = [this, noteNumber](void *userData)
+    const auto transport = sequencer.lock()
+                               ->getStateManager()
+                               ->getSnapshot()
+                               .getTransportStateView();
+    const auto positionTicks = transport.getPositionTicks();
+    const auto metronomeOnlyPositionTicks =
+        transport.getMetronomeOnlyPositionTicks();
+
+    const std::function action = [this, noteNumber, positionTicks,
+                                  metronomeOnlyPositionTicks](void *userData)
     {
         const auto noteEventInfo =
             static_cast<performance::NoteOnEvent *>(userData);
@@ -286,8 +307,9 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     ->getTrack(trackIndex)
                     .get(),
                 noteEventInfo->busType, screen, programPadIndex, program,
-                sequencer, performanceManager.lock(),
-                clientEventController, eventHandler, screens, hardware);
+                sequencer, performanceManager.lock(), clientEventController,
+                eventHandler, screens, hardware, metronomeOnlyPositionTicks,
+                positionTicks);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };

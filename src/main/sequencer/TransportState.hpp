@@ -9,7 +9,7 @@ namespace mpc::sequencer
     {
         PositionQuarterNotes positionQuarterNotes = NoPositionQuarterNotes;
         PositionQuarterNotes playStartPositionQuarterNotes = NoPositionQuarterNotes;
-        Tick metronomeOnlyPositionTicks = NoTick;
+        Tick metronomeOnlyPositionTicks = 0;
         bool sequencerRunning = false;
         bool recordingEnabled = false;
         bool overdubbingEnabled = false;

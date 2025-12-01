@@ -137,7 +137,7 @@ void TriggerLocalNoteOnCommand::execute()
         transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            transport->getTickPosition(), ctx->note,
+            ctx->positionTicks, ctx->note,
             velo, ctx->metronomeOnlyPositionTicks);
     }
     else if (ctx->isRecMainWithoutPlaying)
@@ -145,7 +145,7 @@ void TriggerLocalNoteOnCommand::execute()
         transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            transport->getTickPosition(), ctx->note,
+            ctx->positionTicks, ctx->note,
             velo, ctx->metronomeOnlyPositionTicks);
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
@@ -158,10 +158,10 @@ void TriggerLocalNoteOnCommand::execute()
                 transport->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
                 0, bar,
-                transport->getTickPosition(),
+                ctx->positionTicks,
                 stepLength, timingCorrectScreen->getSwing());
 
-            if (transport->getTickPosition() !=
+            if (ctx->positionTicks !=
                 correctedTick)
             {
                 transport->setPosition(

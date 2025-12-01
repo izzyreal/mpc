@@ -95,14 +95,15 @@ void TransportStateHandler::applyMessage(TransportState &state,
                  },
                  [&](const PlayMetronomeOnly &)
                  {
-                     state.metronomeOnlyEnabled = true;
                      state.metronomeOnlyPositionTicks = 0;
+                     state.metronomeOnlyEnabled = true;
                      state.sequencerRunning = true;
                  },
                  [&](const StopMetronomeOnly &)
                  {
                      state.sequencerRunning = false;
                      state.metronomeOnlyEnabled = false;
+                     state.metronomeOnlyPositionTicks = 0;
                  },
                  [&](const SetCountingIn &m)
                  {
