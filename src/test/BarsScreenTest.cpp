@@ -9,8 +9,7 @@
 
 #include "sequencer/EventRef.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -19,11 +18,13 @@ using namespace mpc::lcdgui;
 
 TEST_CASE("BARS1", "[bars-screen]")
 {
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -31,17 +32,17 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = MaxVelocity;
-        eventState.duration = Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 8);
 
@@ -55,18 +56,13 @@ TEST_CASE("BARS1", "[bars-screen]")
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
 
     auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
-    toSeq->getStateManager()->drainQueue();
-
-    for (auto &t : toSeq->getTracks())
-    {
-        t->getEventStateManager()->drainQueue();
-    }
+    stateManager->drainQueue();
 
     REQUIRE(toSeq->isUsed());
 
-    auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
+    auto expectedBarCount = (lastBar - firstBar + 1) * copies;
 
-    REQUIRE(toSeq->getLastBarIndex() + 1 == expectedBarCount);
+    REQUIRE(toSeq->getBarCount() == expectedBarCount);
 
     for (int i = 0; i < 8; i++)
     {
@@ -76,28 +72,31 @@ TEST_CASE("BARS1", "[bars-screen]")
 
 TEST_CASE("BARS2", "[bars-screen]")
 {
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
     auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
 
     int tickPos = 0;
 
     for (int i = 0; i < 8; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = MaxVelocity;
-        eventState.duration = Duration(42);
-        seq->getTrack(0)->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        seq->getTrack(0)->insertEvent(eventData);
         tickPos += 24;
     }
 
-    seq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(seq->getTrack(0)->getEvents().size() == 8);
 
@@ -111,30 +110,30 @@ TEST_CASE("BARS2", "[bars-screen]")
     auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
 
     toSeq->init(0);
-    toSeq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     toSeq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
 
     for (int i = 0; i < 16; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = i * 24;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = MaxVelocity;
-        eventState.duration = Duration(42);
-        toSeq->getTrack(0)->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = i * 24;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        toSeq->getTrack(0)->insertEvent(eventData);
     }
 
-    toSeq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
-    auto expectedBarCount = ((lastBar - firstBar) + 1) * copies;
-    expectedBarCount += toSeq->getLastBarIndex() + 1;
+    auto expectedBarCount = (lastBar - firstBar + 1) * copies;
+    expectedBarCount += toSeq->getBarCount();
 
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
-    toSeq->getStateManager()->drainQueue();
-    toSeq->getTrack(0)->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
-    REQUIRE(toSeq->getLastBarIndex() + 1 == expectedBarCount);
+    REQUIRE(toSeq->getBarCount() == expectedBarCount);
     REQUIRE(toSeq->getTrack(0)->getEvents().size() == 24);
 
     for (int eventIndex = 0; eventIndex < 8; eventIndex++)

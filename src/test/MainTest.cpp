@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/SequenceStateManager.hpp"
 
 using namespace mpc;
 
@@ -20,9 +20,9 @@ SCENARIO("A Sequence initializes correctly", "[sequence]")
     {
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
-        const auto seq = mpc.getSequencer()->makeNewSequence();
+        const auto seq = mpc.getSequencer()->makeNewSequence(SequenceIndex(0));
         seq->init(1);
-        seq->getStateManager()->drainQueue();
+        mpc.getSequencer()->getStateManager()->drainQueue();
         REQUIRE(seq->getInitialTempo() == 120.0);
     }
 }

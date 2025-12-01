@@ -8,9 +8,9 @@
 #include "lcdgui/screens/EventsScreen.hpp"
 
 #include "sequencer/EventRef.hpp"
+#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -24,13 +24,15 @@ TEST_CASE("COPY1", "[events-screen]")
      * Copy operation: Copy all notes of the first half of the bar to the second
      * half. After: a note on all 16ths.
      */
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto tr = seq->getTrack(0);
 
@@ -38,17 +40,17 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -65,9 +67,7 @@ TEST_CASE("COPY1", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    seq->getStateManager()->drainQueue();
-
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -88,30 +88,32 @@ TEST_CASE("COPY2", "[events-screen]")
      * Copy operation: Copy all notes of the first half of the bar to the second
      * half. After: a note on all 16ths with 23 ticks "delay".
      */
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 23;
 
     for (int i = 0; i < 8; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -128,7 +130,7 @@ TEST_CASE("COPY2", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -154,30 +156,32 @@ TEST_CASE("COPY3", "[events-screen]")
      *        bars long, because the 2 delays added up imply bleeding outside
      *        the end of the first bar.
      */
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 23;
 
     for (int i = 0; i < 8; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     assert(tr->getEvents().size() == 8);
 
@@ -196,7 +200,7 @@ TEST_CASE("COPY3", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -227,15 +231,17 @@ TEST_CASE("COPY4", "[events-screen]")
      * that needs to be copied, so another bar of 3/4 is inserted.
      */
 
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(1);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(1, 3, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     assert(seq->getLastTick() == 384 + 288);
 
@@ -254,15 +260,16 @@ TEST_CASE("COPY4", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
 
-    auto seqSnapshot = seq->getStateManager()->getSnapshot();
+    auto seqSnapshot = stateManager->getSnapshot().getSequenceState(
+        stateManager->getSnapshot().getSelectedSequenceIndex());
 
-    REQUIRE(seq->getLastTick() == 384 + 288 + 288 + 288);
-    REQUIRE(seqSnapshot.getBarLength(0) == 384);
-    REQUIRE(seqSnapshot.getBarLength(1) == 288);
-    REQUIRE(seqSnapshot.getBarLength(2) == 288);
-    REQUIRE(seqSnapshot.getBarLength(3) == 288);
+    REQUIRE(seqSnapshot->getLastTick() == 384 + 288 + 288 + 288);
+    REQUIRE(seqSnapshot->getBarLength(0) == 384);
+    REQUIRE(seqSnapshot->getBarLength(1) == 288);
+    REQUIRE(seqSnapshot->getBarLength(2) == 288);
+    REQUIRE(seqSnapshot->getBarLength(3) == 288);
 }
 
 TEST_CASE("COPY5", "[events-screen]")
@@ -273,30 +280,32 @@ TEST_CASE("COPY5", "[events-screen]")
      * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex
      * to 0 at note 8
      */
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
     int tickPos = 0;
 
     for (int i = 0; i < 16; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -313,9 +322,7 @@ TEST_CASE("COPY5", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    seq->getStateManager()->drainQueue();
-
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -339,11 +346,13 @@ TEST_CASE("COPY6", "[events-screen]")
      * After: 24 notes in total. The first half repeats in the second half,
      *        while the original 8 notes of the 2nd half are still there.
      */
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
 
@@ -351,17 +360,17 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        EventData eventState;
-        eventState.type = EventType::NoteOn;
-        eventState.tick = tickPos;
-        eventState.noteNumber = NoteNumber(35 + i);
-        eventState.velocity = mpc::MaxVelocity;
-        eventState.duration = mpc::Duration(42);
-        tr->insertEvent(eventState);
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = tickPos;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->insertEvent(eventData);
         tickPos += 24;
     }
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
@@ -378,9 +387,7 @@ TEST_CASE("COPY6", "[events-screen]")
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
                               toTrack, merge, copies, note0, note1);
 
-    seq->getStateManager()->drainQueue();
-
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(tr->getEvents().size() == 24);
 

@@ -7,8 +7,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 #include "sequencer/EventRef.hpp"
-#include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
@@ -18,24 +17,26 @@ TEST_CASE("Insert bar and move event forward", "[sequence]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    auto seq = mpc.getSequencer()->getSelectedSequence();
+    const auto sequencer = mpc.getSequencer();
+    const auto stateManager = sequencer->getStateManager();
+    const auto seq = sequencer->getSelectedSequence();
     seq->init(0);
-    seq->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     seq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
     auto tr = seq->getTrack(0);
 
-    EventData eventState;
-    eventState.type = EventType::NoteOn;
-    eventState.tick = 0;
-    eventState.noteNumber = mpc::MinDrumNoteNumber;
-    eventState.velocity = mpc::MaxVelocity;
-    eventState.duration = mpc::Duration(42);
+    EventData eventData;
+    eventData.type = EventType::NoteOn;
+    eventData.tick = 0;
+    eventData.noteNumber = mpc::MinDrumNoteNumber;
+    eventData.velocity = mpc::MaxVelocity;
+    eventData.duration = mpc::Duration(42);
 
-    tr->insertEvent(eventState);
-    tr->getEventStateManager()->drainQueue();
+    tr->insertEvent(eventData);
+    stateManager->drainQueue();
 
-    seq->insertBars(1, 0);
-    seq->getStateManager()->drainQueue();
-    tr->getEventStateManager()->drainQueue();
+    seq->insertBars(1, mpc::BarIndex(0));
+    stateManager->drainQueue();
     REQUIRE(tr->getEvent(0)->getTick() == 384);
 }

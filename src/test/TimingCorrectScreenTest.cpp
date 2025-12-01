@@ -6,41 +6,44 @@
 #include "sequencer/Track.hpp"
 #include "TestMpc.hpp"
 #include "sequencer/NoteOnEvent.hpp"
-#include "sequencer/SequenceStateManager.hpp"
-#include "sequencer/TrackEventStateManager.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
+using namespace mpc::sequencer;
 
 TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.getSequencer()->getSelectedSequence()->init(1);
-    mpc.getSequencer()->getSelectedSequence()->getStateManager()->drainQueue();
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
 
-    mpc::sequencer::EventData eventState;
-    eventState.type = mpc::sequencer::EventType::NoteOn;
-    eventState.tick = 1;
-    eventState.noteNumber = mpc::NoteNumber(60);
-    eventState.velocity = mpc::MaxVelocity;
-    eventState.duration = mpc::Duration(1);
+    sequencer->getSelectedSequence()->init(1);
+    stateManager->drainQueue();
 
-    auto tr = mpc.getSequencer()->getSelectedSequence()->getTrack(0);
+    EventData eventData;
+    eventData.type = EventType::NoteOn;
+    eventData.tick = 1;
+    eventData.noteNumber = mpc::NoteNumber(60);
+    eventData.velocity = mpc::MaxVelocity;
+    eventData.duration = mpc::Duration(1);
 
-    tr->insertEvent(eventState);
+    auto tr = sequencer->getSelectedSequence()->getTrack(0);
 
-    tr->getEventStateManager()->drainQueue();
+    tr->insertEvent(eventData);
+
+    stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     auto controls = mpc.getScreen();
     controls->function(4); // DO IT
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getNoteEvents().front()->getTick() == 0);
 
     tr->getNoteEvents().front()->setTick(1);
 
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     controls->down();
@@ -48,6 +51,6 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     controls->down();       // Move to 'Notes:' field.
     controls->turnWheel(1); // 'Notes:' was 'ALL', here we set it to '35/A01'.
     controls->function(4);  // DO IT
-    tr->getEventStateManager()->drainQueue();
+    stateManager->drainQueue();
     REQUIRE(tr->getNoteEvents().front()->getTick() == 1);
 }
