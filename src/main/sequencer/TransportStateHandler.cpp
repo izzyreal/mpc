@@ -229,6 +229,7 @@ void TransportStateHandler::applyPlayMessage(
 
         sequencer->clock->reset();
         state.playStartPositionQuarterNotes = state.positionQuarterNotes;
+        manager->applyMessage(SyncTrackEventIndices{});
         state.sequencerRunning = true;
     }
 }
