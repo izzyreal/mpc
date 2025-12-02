@@ -2,7 +2,6 @@
 
 #include "FloatTypes.hpp"
 #include "IntTypes.hpp"
-#include "file/all/AllSequencer.hpp"
 
 namespace mpc::lcdgui
 {
