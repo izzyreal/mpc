@@ -69,8 +69,8 @@ Track::Track(
       isSoloEnabled(isSoloEnabled)
 {
     init();
-    bulkNoteOns.resize(20);
-    bulkNoteOffs.resize(20);
+    tempLiveNoteOnRecordingEvents.resize(20);
+    tempLiveNoteOffRecordingEvents.resize(20);
 }
 
 Track::~Track() {}
@@ -80,19 +80,19 @@ void Track::init()
     name = trackIndex == TempoChangeTrackIndex
                ? "tempo"
                : getDefaultTrackName(trackIndex);
-    queuedNoteOnEvents =
+    liveNoteOnEventRecordingQueue =
         std::make_shared<moodycamel::ConcurrentQueue<EventData *>>(20);
-    queuedNoteOffEvents =
+    liveNoteOffEventRecordingQueue =
         std::make_shared<moodycamel::ConcurrentQueue<EventData>>(20);
 }
 
 void Track::purge()
 {
     init();
-    bulkNoteOns.clear();
-    bulkNoteOns.resize(20);
-    bulkNoteOffs.clear();
-    bulkNoteOffs.resize(20);
+    tempLiveNoteOnRecordingEvents.clear();
+    tempLiveNoteOnRecordingEvents.resize(20);
+    tempLiveNoteOffRecordingEvents.clear();
+    tempLiveNoteOffRecordingEvents.resize(20);
     removeEvents();
 }
 
@@ -100,12 +100,13 @@ EventData *Track::findRecordingNoteOnEvent(const EventData *eventState)
 {
     EventData *found = nullptr;
 
-    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(),
-                                                            bulkNoteOns.size());
+    const auto count = liveNoteOnEventRecordingQueue->try_dequeue_bulk(
+        tempLiveNoteOnRecordingEvents.begin(),
+        tempLiveNoteOnRecordingEvents.size());
 
     for (int i = 0; i < count; i++)
     {
-        const auto e = bulkNoteOns[i];
+        const auto e = tempLiveNoteOnRecordingEvents[i];
         if (e == eventState)
         {
             found = e;
@@ -115,11 +116,12 @@ EventData *Track::findRecordingNoteOnEvent(const EventData *eventState)
 
     for (size_t i = 0; i < count; i++)
     {
-        queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+        liveNoteOnEventRecordingQueue->enqueue(
+            tempLiveNoteOnRecordingEvents[i]);
     }
 
-    bulkNoteOns.clear();
-    bulkNoteOns.resize(20);
+    tempLiveNoteOnRecordingEvents.clear();
+    tempLiveNoteOnRecordingEvents.resize(20);
 
     if (!found)
     {
@@ -134,12 +136,13 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
     EventData *found = nullptr;
 
-    const auto count = queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(),
-                                                            bulkNoteOns.size());
+    const auto count = liveNoteOnEventRecordingQueue->try_dequeue_bulk(
+        tempLiveNoteOnRecordingEvents.begin(),
+        tempLiveNoteOnRecordingEvents.size());
 
     for (int i = 0; i < count; i++)
     {
-        const auto e = bulkNoteOns[i];
+        const auto e = tempLiveNoteOnRecordingEvents[i];
         if (e->noteNumber == noteNumber)
         {
             found = e;
@@ -149,11 +152,12 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     for (size_t i = 0; i < count; i++)
     {
-        queuedNoteOnEvents->enqueue(bulkNoteOns[i]);
+        liveNoteOnEventRecordingQueue->enqueue(
+            tempLiveNoteOnRecordingEvents[i]);
     }
 
-    bulkNoteOns.clear();
-    bulkNoteOns.resize(20);
+    tempLiveNoteOnRecordingEvents.clear();
+    tempLiveNoteOnRecordingEvents.resize(20);
 
     if (!found)
     {
@@ -198,10 +202,10 @@ mpc::TrackIndex Track::getIndex() const
 void Track::flushNoteCache() const
 {
     EventData *e;
-    while (queuedNoteOnEvents->try_dequeue(e))
+    while (liveNoteOnEventRecordingQueue->try_dequeue(e))
     {
     }
-    while (queuedNoteOffEvents->try_dequeue(*e))
+    while (liveNoteOffEventRecordingQueue->try_dequeue(*e))
     {
     }
 }
@@ -281,7 +285,7 @@ EventData *Track::recordNoteEventLive(const NoteNumber note,
     e->sequenceIndex = parent->getSequenceIndex();
     e->trackIndex = trackIndex;
     e->tick = TickUnassignedWhileRecording;
-    queuedNoteOnEvents->enqueue(e);
+    liveNoteOnEventRecordingQueue->enqueue(e);
     return e;
 }
 
@@ -292,7 +296,7 @@ void Track::finalizeNoteEventLive(const EventData *e,
     noteOff.type = EventType::NoteOff;
     noteOff.noteNumber = e->noteNumber;
     noteOff.tick = noteOffPositionTicks;
-    queuedNoteOffEvents->enqueue(noteOff);
+    liveNoteOffEventRecordingQueue->enqueue(noteOff);
 }
 
 EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
@@ -507,13 +511,13 @@ int Track::getCorrectedTickPos() const
     return correctedTickPos;
 }
 
-void Track::processRealtimeQueuedEvents()
+void Track::processLiveNoteEventRecordingQueues()
 {
-    const auto noteOnCount =
-        queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), 20);
+    const auto noteOnCount = liveNoteOnEventRecordingQueue->try_dequeue_bulk(
+        tempLiveNoteOnRecordingEvents.begin(), 20);
 
-    const auto noteOffCount =
-        queuedNoteOffEvents->try_dequeue_bulk(bulkNoteOffs.begin(), 20);
+    const auto noteOffCount = liveNoteOffEventRecordingQueue->try_dequeue_bulk(
+        tempLiveNoteOffRecordingEvents.begin(), 20);
 
     if (noteOnCount == 0 && noteOffCount == 0)
     {
@@ -525,7 +529,7 @@ void Track::processRealtimeQueuedEvents()
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
     {
-        if (auto &noteOff = bulkNoteOffs[noteOffIndex];
+        if (auto &noteOff = tempLiveNoteOffRecordingEvents[noteOffIndex];
             noteOff.tick == TickUnassignedWhileRecording)
         {
             noteOff.tick = pos;
@@ -534,7 +538,7 @@ void Track::processRealtimeQueuedEvents()
 
     for (int noteOnIndex = 0; noteOnIndex < noteOnCount; noteOnIndex++)
     {
-        auto noteOn = bulkNoteOns[noteOnIndex];
+        auto noteOn = tempLiveNoteOnRecordingEvents[noteOnIndex];
 
         if (noteOn->tick == TickUnassignedWhileRecording)
         {
@@ -552,7 +556,7 @@ void Track::processRealtimeQueuedEvents()
 
         for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
         {
-            if (auto &noteOff = bulkNoteOffs[noteOffIndex];
+            if (auto &noteOff = tempLiveNoteOffRecordingEvents[noteOffIndex];
                 noteOff.noteNumber == noteOn->noteNumber)
             {
                 auto newTick = noteOff.tick + noteOn->wasMoved;
@@ -586,6 +590,8 @@ void Track::processRealtimeQueuedEvents()
                 noteOn->duration = Duration(duration);
                 noteOn->beingRecorded = false;
                 insertAcquiredEvent(noteOn);
+                manager->enqueue(
+                    RemoveDoubles{parent->getSequenceIndex(), getIndex()});
 
                 if (fixEventIndex)
                 {
@@ -603,13 +609,13 @@ void Track::processRealtimeQueuedEvents()
             }
             else
             {
-                queuedNoteOffEvents->enqueue(noteOff);
+                liveNoteOffEventRecordingQueue->enqueue(noteOff);
             }
         }
 
         if (needsToBeRequeued)
         {
-            queuedNoteOnEvents->enqueue(noteOn);
+            liveNoteOnEventRecordingQueue->enqueue(noteOn);
         }
     }
 }
@@ -854,11 +860,11 @@ int Track::getNextTick()
 
     if (playEventIndex >= snapshot->getEventCount())
     {
-        processRealtimeQueuedEvents();
+        processLiveNoteEventRecordingQueues();
         return std::numeric_limits<int>::max();
     }
 
-    processRealtimeQueuedEvents();
+    processLiveNoteEventRecordingQueues();
     return snapshot->getEventByIndex(playEventIndex)->tick;
 }
 

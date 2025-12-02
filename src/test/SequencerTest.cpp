@@ -19,6 +19,7 @@
 #include "sequencer/Track.hpp"
 
 #include "hardware/Component.hpp"
+#include "sequencer/EventRef.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
@@ -74,163 +75,171 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     REQUIRE(pos() == 0);
 }
 
-// TEST_CASE("Can record and playback from different threads",
-//           "[sequencer-multithread]")
-// {
-//     constexpr int SAMPLE_RATE = 44100;
-//     constexpr int BUFFER_SIZE = 512;
-//     constexpr int PROCESS_BLOCK_INTERVAL =
-//         12; // Approximate duration of 512 frames at 44100khz
-//     constexpr int AUDIO_THREAD_TIMEOUT = 4000;
-//     constexpr int RECORD_DELAY = 500;
-//     constexpr int INITIAL_EVENT_INSERTION_DELAY = 500;
-//
-//     //                      1                   2                   3 4 1...
-//     //                      <loop>
-//     // Quantized positions: 0  , 24 , 48 , 72 , 96 , 120, 144, 168, 192, 216,
-//     // 240, 264, 288, 312, 336, 360, 384
-//
-//     // The event at tick 382 is expected to be quantized to tick 0, because
-//     the
-//     // sequence is one bar long. Event at tick 2 will also be quantized to
-//     tick
-//     // 0. Hence of the 17 ticks below, only 16 will survive.
-//     std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167,
-//     194,
-//                                    218, 243, 264, 290, 310, 332, 361, 382};
-//
-//     std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
-//                                    192, 216, 240, 264, 288, 312, 336, 360};
-//
-//     bool audioThreadBusy = true;
-//
-//     mpc::Mpc mpc;
-//     mpc::TestMpc::initializeTestMpc(mpc);
-//
-//
-//     auto seq = mpc.getSequencer();
-//     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//     seq->SequencerStateWorker->start();
-//     seq->getTransport()->setCountEnabled(false);
-//
-//     auto sequence = seq->getSelectedSequence();
-//     sequence->init(0);
-//     sequence->getStateManager()->drainQueue();
-//
-//     auto track = seq->getSelectedTrack();
-//
-//     auto server = mpc.getEngineHost()->getAudioServer();
-//
-//     server->resizeBuffers(BUFFER_SIZE);
-//     server->setSampleRate(SAMPLE_RATE);
-//     server->start();
-//
-//     int64_t timeInSamples = 0;
-//
-//     std::thread audioThread(
-//         [&]
-//         {
-//             int dspCycleCounter = 0;
-//
-//             while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL <
-//                        AUDIO_THREAD_TIMEOUT &&
-//                    track->getEvents().size() < humanTickPositions.size())
-//             {
-//                 mpc.getEngineHost()->applyPendingStateChanges();
-//                 mpc.getClock()->processBufferInternal(
-//                     seq->getTransport()->getTempo(), SAMPLE_RATE,
-//                     BUFFER_SIZE, 0);
-//                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-//                 timeInSamples += BUFFER_SIZE;
-//
-//                 if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
-//                 {
-//                     std::this_thread::sleep_for(
-//                         std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-//                     continue;
-//                 }
-//
-//                 std::this_thread::sleep_for(
-//                     std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-//             }
-//
-//             audioThreadBusy = false;
-//         });
-//
-//     int initialDelayCounter = 0;
-//
-//     while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
-//     {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//     }
-//
-//     int tickPos = seq->getTransport()->getTickPosition();
-//
-//     if (!seq->getTransport()->isRecordingOrOverdubbing())
-//     {
-//         seq->getTransport()->recFromStart();
-//     }
-//
-//     std::vector<int> recordedTickPos;
-//     int prevTickPos = -1;
-//
-//     const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
-//
-//     while (tickPos < 384 && prevTickPos <= tickPos)
-//     {
-//         for (int i = 0; i < humanTickPositions.size(); i++)
-//         {
-//             auto hTickPos = humanTickPositions[i];
-//
-//             if (tickPos >= hTickPos && tickPos < hTickPos + 24)
-//             {
-//                 if (find(begin(recordedTickPos), end(recordedTickPos),
-//                          hTickPos) == end(recordedTickPos))
-//                 {
-//                     ClientEvent clientEvent;
-//                     clientEvent.payload = ClientHardwareEvent{
-//                         ClientHardwareEvent::Source::HostInputGesture,
-//                         ClientHardwareEvent::Type::PadPress,
-//                         0,
-//                         PAD_1_OR_AB,
-//                         127.f,
-//                         std::nullopt,
-//                         std::nullopt};
-//                     mpc.clientEventController->handleClientEvent(clientEvent);
-//
-//                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
-//
-//                     clientEvent.payload = ClientHardwareEvent{
-//                         ClientHardwareEvent::Source::HostInputGesture,
-//                         ClientHardwareEvent::Type::PadRelease,
-//                         0,
-//                         PAD_1_OR_AB,
-//                         127.f,
-//                         std::nullopt,
-//                         std::nullopt};
-//                     mpc.clientEventController->handleClientEvent(clientEvent);
-//                     recordedTickPos.push_back(hTickPos);
-//                 }
-//             }
-//         }
-//
-//         std::this_thread::sleep_for(std::chrono::milliseconds(5));
-//         prevTickPos = tickPos;
-//         tickPos = seq->getTransport()->getTickPosition();
-//     }
-//
-//     seq->getTransport()->stop();
-//
-//     while (audioThreadBusy)
-//     {
-//         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//     }
-//
-//     audioThread.join();
-//
-//     // For - 1 explanation, see humanTickPositions comment
-//     // REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
-// }
+TEST_CASE("Can record and playback from different threads",
+          "[sequencer-multithread]")
+{
+    constexpr int SAMPLE_RATE = 44100;
+    constexpr int BUFFER_SIZE = 512;
+    constexpr int PROCESS_BLOCK_INTERVAL =
+        12; // Approximate duration of 512 frames at 44100khz
+    constexpr int AUDIO_THREAD_TIMEOUT = 4000;
+    constexpr int RECORD_DELAY = 500;
+    constexpr int INITIAL_EVENT_INSERTION_DELAY = 500;
+
+    // Quantized positions:
+    // 1                   2
+    // 0  , 24 , 48 , 72 , 96 , 120, 144, 168,
+    //
+    // 3                   4                   1... <loop>
+    // 192, 216, 240, 264, 288, 312, 336, 360, 384
+    //
+    // The event at tick 382 is expected to be quantized to tick 0, because the
+    // sequence is one bar long. Event at tick 2 will also be quantized to tick
+    // 0. Since the events have the same note number, and during recording no
+    // duplicate note numbers per tick position are left over, of the 17 ticks
+    // below, only 16 will survive.
+    std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167, 194,
+                                   218, 243, 264, 290, 310, 332, 361, 382};
+
+    std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
+                                   192, 216, 240, 264, 288, 312, 336, 360};
+
+    bool audioThreadBusy = true;
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+
+    auto track = sequencer->getSelectedTrack();
+
+    auto server = mpc.getEngineHost()->getAudioServer();
+
+    server->resizeBuffers(BUFFER_SIZE);
+    server->setSampleRate(SAMPLE_RATE);
+    server->start();
+
+    int64_t timeInSamples = 0;
+
+    std::thread audioThread(
+        [&]
+        {
+            int dspCycleCounter = 0;
+
+            while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL <
+                       AUDIO_THREAD_TIMEOUT &&
+                   track->getEvents().size() < humanTickPositions.size())
+            {
+                mpc.getEngineHost()->applyPendingStateChanges();
+                mpc.getClock()->processBufferInternal(
+                    sequencer->getTransport()->getTempo(), SAMPLE_RATE,
+                    BUFFER_SIZE, 0);
+                server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+                timeInSamples += BUFFER_SIZE;
+
+                if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
+                {
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+                    continue;
+                }
+
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+            }
+
+            audioThreadBusy = false;
+        });
+
+    int initialDelayCounter = 0;
+
+    while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    int tickPos = sequencer->getTransport()->getTickPosition();
+
+    if (!sequencer->getTransport()->isRecordingOrOverdubbing())
+    {
+        sequencer->getTransport()->recFromStart();
+    }
+
+    std::vector<int> recordedTickPos;
+    int prevTickPos = -1;
+
+    const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
+
+    while (tickPos < 384 && prevTickPos <= tickPos)
+    {
+        for (int i = 0; i < humanTickPositions.size(); i++)
+        {
+            auto hTickPos = humanTickPositions[i];
+
+            if (tickPos >= hTickPos && tickPos < hTickPos + 24)
+            {
+                if (std::find(recordedTickPos.begin(), recordedTickPos.end(),
+                              hTickPos) == recordedTickPos.end())
+                {
+                    ClientEvent clientEvent;
+                    clientEvent.payload = ClientHardwareEvent{
+                        ClientHardwareEvent::Source::HostInputGesture,
+                        ClientHardwareEvent::Type::PadPress,
+                        0,
+                        PAD_1_OR_AB,
+                        127.f,
+                        std::nullopt,
+                        std::nullopt};
+                    mpc.clientEventController->handleClientEvent(clientEvent);
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+
+                    clientEvent.payload = ClientHardwareEvent{
+                        ClientHardwareEvent::Source::HostInputGesture,
+                        ClientHardwareEvent::Type::PadRelease,
+                        0,
+                        PAD_1_OR_AB,
+                        127.f,
+                        std::nullopt,
+                        std::nullopt};
+                    mpc.clientEventController->handleClientEvent(clientEvent);
+                    recordedTickPos.push_back(hTickPos);
+                }
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        prevTickPos = tickPos;
+        tickPos = sequencer->getTransport()->getTickPosition();
+    }
+
+    sequencer->getTransport()->stop();
+
+    while (audioThreadBusy)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    audioThread.join();
+
+    sequencer->getStateManager()->drainQueue();
+
+    track->printEvents();
+    // For - 1 explanation, see humanTickPositions comment
+    REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
+    REQUIRE(track->getEvents().size() == quantizedPositions.size());
+
+    for (int i = 0; i < quantizedPositions.size(); ++i)
+    {
+        REQUIRE(track->getEvent(i)->getTick() == quantizedPositions[i]);
+    }
+}
 
 TEST_CASE("Copy sequence", "[sequencer]")
 {
@@ -354,7 +363,8 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->getTransport()->stop();
     stateManager->drainQueue();
-    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() == 10);
+    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() ==
+            10);
 
     sequencer->undoSeq();
 
@@ -366,5 +376,6 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
     stateManager->drainQueue();
-    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() == 10);
+    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() ==
+            10);
 }

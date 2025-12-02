@@ -162,7 +162,7 @@ namespace mpc::sequencer
 
         void setEventStates(const std::vector<EventData> &eventStates) const;
 
-        void processRealtimeQueuedEvents();
+        void processLiveNoteEventRecordingQueues();
 
     private:
         std::shared_ptr<SequencerStateManager> manager;
@@ -173,10 +173,11 @@ namespace mpc::sequencer
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
             EventData *, moodycamel::ConcurrentQueueDefaultTraits>>
-            queuedNoteOnEvents;
+            liveNoteOnEventRecordingQueue;
+
         std::shared_ptr<moodycamel::ConcurrentQueue<
             EventData, moodycamel::ConcurrentQueueDefaultTraits>>
-            queuedNoteOffEvents;
+            liveNoteOffEventRecordingQueue;
 
         Sequence *parent{nullptr};
         std::function<std::string(int)> getDefaultTrackName;
@@ -199,8 +200,8 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<EventData *> bulkNoteOns;
-        std::vector<EventData> bulkNoteOffs;
+        std::vector<EventData *> tempLiveNoteOnRecordingEvents;
+        std::vector<EventData> tempLiveNoteOffRecordingEvents;
 
         void updateEventTick(EventData *, int newTick) const;
 
