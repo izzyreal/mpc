@@ -194,7 +194,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
         {
             state.playedSongStepRepetitionCount = m.count;
         },
-        [&](const SetTransportTempo &m)
+        [&](const SetMasterTempo &m)
         {
             state.tempo = m.tempo;
         },

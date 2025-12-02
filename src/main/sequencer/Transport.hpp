@@ -2,6 +2,7 @@
 
 #include "FloatTypes.hpp"
 #include "IntTypes.hpp"
+#include "file/all/AllSequencer.hpp"
 
 namespace mpc::lcdgui
 {
@@ -87,6 +88,8 @@ namespace mpc::sequencer
         void resetPlayedStepRepetitions() const;
 
         void bumpPositionByTicks(Tick) const;
+
+        void setMasterTempo(double) const;
 
     private:
         Sequencer &sequencer;

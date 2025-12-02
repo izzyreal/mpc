@@ -22,7 +22,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 
@@ -40,9 +39,9 @@
 #include "lcdgui/screens/OthersScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -94,6 +93,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     int index = 0;
 
     mpc.getSequencer()->purgeAllSequences();
+    mpc.getSequencer()->getStateManager()->drainQueue();
 
     for (auto &as : allSequences)
     {
@@ -108,13 +108,11 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     }
 
     auto allParserSequencer = allParser.getSequencer();
-    // Direct state init — safe because sequencer is inactive
     mpcSequencer->setSelectedSequenceIndex(
         SequenceIndex(allParserSequencer->sequence), false);
     mpcSequencer->getTransport()->setPosition(0);
     mpcSequencer->setSelectedTrackIndex(allParserSequencer->track);
-    mpcSequencer->getTransport()->setTempoSourceIsSequence(false);
-    mpcSequencer->getTransport()->setTempo(allParserSequencer->masterTempo);
+    mpcSequencer->getTransport()->setMasterTempo(allParserSequencer->masterTempo);
     mpcSequencer->getTransport()->setTempoSourceIsSequence(
         allParserSequencer->tempoSourceIsSequence);
 

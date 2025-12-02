@@ -112,7 +112,7 @@ namespace mpc::sequencer
         Tick end;
     };
 
-    struct SetTransportTempo
+    struct SetMasterTempo
     {
         double tempo;
     };
@@ -132,6 +132,6 @@ namespace mpc::sequencer
                      BumpMetronomeOnlyTickPositionOneTick, PlayMetronomeOnly,
                      StopMetronomeOnly, PlaySong, PlaySongFromStart, StopSong,
                      SetCountInPositions, SetEndOfSongEnabled,
-                     SetPlayedSongStepRepetitionCount, SetTransportTempo,
+                     SetPlayedSongStepRepetitionCount, SetMasterTempo,
                      SetTempoSourceIsSequence>;
 } // namespace mpc::sequencer

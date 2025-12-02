@@ -23,8 +23,7 @@ using namespace mpc::lcdgui;
 Transport::Transport(Sequencer &owner) : sequencer(owner)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
-    sequencer.getStateManager()->enqueue(
-        SetTransportTempo{userScreen->getTempo()});
+    setMasterTempo(userScreen->getTempo());
 }
 
 bool Transport::isPlaying() const
@@ -460,6 +459,12 @@ void Transport::bumpPositionByTicks(const Tick ticks) const
     setPosition(newPos);
 }
 
+void Transport::setMasterTempo(const double masterTempo) const
+{
+    sequencer.getStateManager()->enqueue(
+        SetMasterTempo{std::clamp(masterTempo, 30.0, 300.0)});
+}
+
 bool Transport::isPunchEnabled() const
 {
     return punchEnabled;
@@ -821,16 +826,13 @@ void Transport::setTempo(const double newTempo) const
     {
         if (!tce)
         {
-            sequencer.getStateManager()->enqueue(
-                SetTransportTempo{std::clamp(newTempo, 30.0, 300.0)});
+            setMasterTempo(newTempo);
             return;
         }
 
-        const auto tempoWithRatioApplied =
-            std::clamp(newTempo / (tce->getRatio() * 0.001), 30.0, 300.0);
+        const auto tempoWithRatioApplied = newTempo / (tce->getRatio() * 0.001);
 
-        sequencer.getStateManager()->enqueue(
-            SetTransportTempo{tempoWithRatioApplied});
+        setMasterTempo(tempoWithRatioApplied);
 
         return;
     }
