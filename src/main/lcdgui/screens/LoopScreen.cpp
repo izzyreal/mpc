@@ -78,9 +78,8 @@ void LoopScreen::openWindow()
     }
 }
 
-void LoopScreen::function(int f)
+void LoopScreen::function(const int f)
 {
-
     switch (f)
     {
         case 0:
@@ -122,12 +121,12 @@ void LoopScreen::function(int f)
 
             sampler.lock()->playX();
             break;
+        default:;
     }
 }
 
-void LoopScreen::turnWheel(int i)
+void LoopScreen::turnWheel(const int i)
 {
-
     auto soundInc = getSoundIncrement(i);
     const auto sound = sampler.lock()->getSound();
 
@@ -220,7 +219,7 @@ void LoopScreen::turnWheel(int i)
     }
 }
 
-void LoopScreen::setSlider(int i)
+void LoopScreen::setSlider(const int i)
 {
     if (!mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)
@@ -265,14 +264,13 @@ void LoopScreen::setSlider(int i)
     }
 }
 
-void LoopScreen::setSliderLoopTo(int i) const
+void LoopScreen::setSliderLoopTo(const int i) const
 {
     const auto sound = sampler.lock()->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    const auto newLoopToValue =
-        (int)(i / 124.0 *
-              (loopLngthFix ? sound->getFrameCount() - oldLength
-                            : sound->getEnd()));
+    const auto newLoopToValue = static_cast<int>(
+        i / 124.0 *
+        (loopLngthFix ? sound->getFrameCount() - oldLength : sound->getEnd()));
     setLoopTo(newLoopToValue);
 }
 
@@ -280,7 +278,7 @@ void LoopScreen::setLoopTo(int newLoopToValue) const
 {
     const auto loopLengthIsFixed = loopLngthFix;
     const auto soundLengthIsFixed =
-        mpc.screens->get<ScreenId::TrimScreen>()->smplLngthFix;
+        mpc.screens->get<ScreenId::TrimScreen>()->isSampleLengthFixed();
     const auto sound = sampler.lock()->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
@@ -324,15 +322,13 @@ void LoopScreen::setLoopTo(int newLoopToValue) const
 // Adjusts the Loop To value if soundLengthIsFixed, else adjusts the End value
 void LoopScreen::setLength(int newLength) const
 {
-    const auto loopLengthIsFixed = loopLngthFix;
-
-    if (loopLengthIsFixed)
+    if (loopLngthFix)
     {
         return;
     }
 
     const auto soundLengthIsFixed =
-        mpc.screens->get<ScreenId::TrimScreen>()->smplLngthFix;
+        mpc.screens->get<ScreenId::TrimScreen>()->isSampleLengthFixed();
 
     if (newLength < 0)
     {
@@ -352,10 +348,20 @@ void LoopScreen::setLength(int newLength) const
     }
 }
 
-void LoopScreen::setSliderLength(int i) const
+bool LoopScreen::isLoopLengthFixed() const
+{
+    return loopLngthFix;
+}
+
+void LoopScreen::setLoopLengthFixed(const bool b)
+{
+    loopLngthFix = b;
+}
+
+void LoopScreen::setSliderLength(const int i) const
 {
     const auto sound = sampler.lock()->getSound();
-    const auto newLength = (int)(i / 124.0 * sound->getFrameCount());
+    const auto newLength = static_cast<int>(i / 124.0 * sound->getFrameCount());
     setLength(newLength);
 }
 
@@ -555,11 +561,11 @@ void LoopScreen::displayWave()
 
     const auto sampleData = sound->getSampleData();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
-    findWave()->setSampleData(sampleData, sound->isMono(), trimScreen->view);
+    findWave()->setSampleData(sampleData, sound->isMono(), trimScreen->getView());
     findWave()->setSelection(sound->getLoopTo(), sound->getEnd());
 }
 
-void LoopScreen::setEndSelected(bool b)
+void LoopScreen::setEndSelected(const bool b)
 {
     endSelected = b;
     displayEndLength();

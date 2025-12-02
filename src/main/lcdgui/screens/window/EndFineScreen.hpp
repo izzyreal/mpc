@@ -23,12 +23,12 @@ namespace mpc::lcdgui::screens::window
         void setSlider(int) override;
 
     private:
-        void displayEnd();
-        void displayLngthLabel();
-        void displaySmplLngth();
+        void displayEnd() const;
+        void displayLngthLabel() const;
+        void displaySmplLngth() const;
 
         void displayFineWave();
-        void displayPlayX();
+        void displayPlayX() const;
 
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};

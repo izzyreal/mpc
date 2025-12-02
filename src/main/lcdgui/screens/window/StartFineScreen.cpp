@@ -42,11 +42,11 @@ void StartFineScreen::displayFineWave()
     }
 
     findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
-                              trimScreen->view);
+                              trimScreen->getView());
     findWave()->setCenterSamplePos(sound->getStart());
 }
 
-void StartFineScreen::displayStart()
+void StartFineScreen::displayStart() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -58,7 +58,7 @@ void StartFineScreen::displayStart()
     findField("start")->setTextPadded(sound->getStart(), " ");
 }
 
-void StartFineScreen::displayLngthLabel()
+void StartFineScreen::displayLngthLabel() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -70,20 +70,19 @@ void StartFineScreen::displayLngthLabel()
     findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
 
-void StartFineScreen::displaySmplLngth()
+void StartFineScreen::displaySmplLngth() const
 {
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
-    findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
+    findField("smpllngth")->setText(trimScreen->isSampleLengthFixed() ? "FIX" : "VARI");
 }
 
-void StartFineScreen::displayPlayX()
+void StartFineScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void StartFineScreen::function(const int i)
 {
-
     ScreenComponent::function(i);
 
     switch (i)
@@ -97,6 +96,7 @@ void StartFineScreen::function(const int i)
         case 4:
             sampler.lock()->playX();
             break;
+        default:;
     }
 }
 
@@ -128,7 +128,7 @@ void StartFineScreen::turnWheel(const int i)
         auto highestStartPos = sampleLength - 1;
         const auto length = sound->getEnd() - sound->getStart();
 
-        if (trimScreen->smplLngthFix)
+        if (trimScreen->isSampleLengthFixed())
         {
             highestStartPos -= startEndLength;
 
@@ -140,7 +140,7 @@ void StartFineScreen::turnWheel(const int i)
 
         sound->setStart(sound->getStart() + soundInc);
 
-        if (trimScreen->smplLngthFix)
+        if (trimScreen->isSampleLengthFixed())
         {
             sound->setEnd(sound->getStart() + length);
         }
@@ -151,7 +151,7 @@ void StartFineScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "smpllngth")
     {
-        trimScreen->smplLngthFix = i > 0;
+        trimScreen->setSampleLengthFixed(i > 0);
         displaySmplLngth();
     }
     else if (focusedFieldName == "playx")

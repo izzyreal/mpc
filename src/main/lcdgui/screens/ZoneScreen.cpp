@@ -269,7 +269,7 @@ void ZoneScreen::displayWave()
     const auto sampleData = sound->getSampleData();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findWave()->setSampleData(sampleData, sampler.lock()->getSound()->isMono(),
-                              trimScreen->view);
+                              trimScreen->getView());
     findWave()->setSelection(getZoneStart(selectedZoneIndex),
                              getZoneEnd(selectedZoneIndex));
 }

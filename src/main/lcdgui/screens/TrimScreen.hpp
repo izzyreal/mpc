@@ -1,25 +1,10 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::lcdgui::screens::window
-{
-    class StartFineScreen;
-    class EndFineScreen;
-    class LoopToFineScreen;
-    class LoopEndFineScreen;
-} // namespace mpc::lcdgui::screens::window
-
-namespace mpc::lcdgui::screens
-{
-    class LoopScreen;
-    class ZoneScreen;
-} // namespace mpc::lcdgui::screens
-
 namespace mpc::lcdgui::screens
 {
     class TrimScreen final : public ScreenComponent
     {
-
     public:
         void openWindow() override;
         void function(int f) override;
@@ -34,6 +19,9 @@ namespace mpc::lcdgui::screens
         void setEnd(int newValue) const;
 
         int getView() const;
+
+        bool isSampleLengthFixed() const;
+        void setSampleLengthFixed(bool);
 
         TrimScreen(Mpc &mpc, int layerIndex);
         void open() override;
@@ -52,12 +40,5 @@ namespace mpc::lcdgui::screens
         int view = 0;
 
         void setView(int i);
-
-        friend class LoopScreen;
-        friend class ZoneScreen;
-        friend class StartFineScreen;
-        friend class EndFineScreen;
-        friend class LoopEndFineScreen;
-        friend class LoopToFineScreen;
     };
 } // namespace mpc::lcdgui::screens

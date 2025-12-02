@@ -42,11 +42,11 @@ void EndFineScreen::displayFineWave()
     }
 
     findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
-                              trimScreen->view);
+                              trimScreen->getView());
     findWave()->setCenterSamplePos(sound->getEnd());
 }
 
-void EndFineScreen::displayEnd()
+void EndFineScreen::displayEnd() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -58,7 +58,7 @@ void EndFineScreen::displayEnd()
     findField("end")->setTextPadded(sound->getEnd(), " ");
 }
 
-void EndFineScreen::displayLngthLabel()
+void EndFineScreen::displayLngthLabel() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -70,13 +70,13 @@ void EndFineScreen::displayLngthLabel()
     findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
 
-void EndFineScreen::displaySmplLngth()
+void EndFineScreen::displaySmplLngth() const
 {
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
-    findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
+    findField("smpllngth")->setText(trimScreen->isSampleLengthFixed() ? "FIX" : "VARI");
 }
 
-void EndFineScreen::displayPlayX()
+void EndFineScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
@@ -96,6 +96,7 @@ void EndFineScreen::function(const int i)
         case 4:
             sampler.lock()->playX();
             break;
+        default:;
     }
 }
 
@@ -132,7 +133,7 @@ void EndFineScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "smpllngth")
     {
-        trimScreen->smplLngthFix = i > 0;
+        trimScreen->setSampleLengthFixed(i > 0);
         displaySmplLngth();
     }
     else if (focusedFieldName == "playx")

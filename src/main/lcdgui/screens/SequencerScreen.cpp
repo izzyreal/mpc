@@ -640,6 +640,12 @@ void SequencerScreen::displayTiming() const
 
 void SequencerScreen::pressEnter()
 {
+    if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    {
+        openScreenById(ScreenId::SaveScreen);
+        return;
+    }
+
     const auto focusedField = getFocusedFieldOrThrow();
 
     if (!focusedField->isTypeModeEnabled())

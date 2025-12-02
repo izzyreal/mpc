@@ -1,21 +1,10 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::lcdgui::screens::window
-{
-    class LoopEndFineScreen;
-    class EndFineScreen;
-    class LoopToFineScreen;
-} // namespace mpc::lcdgui::screens::window
-
 namespace mpc::lcdgui::screens
 {
-
-    class TrimScreen;
-
     class LoopScreen final : public ScreenComponent
     {
-
     public:
         LoopScreen(Mpc &mpc, int layerIndex);
 
@@ -34,6 +23,9 @@ namespace mpc::lcdgui::screens
         void setLoopTo(int) const;
         void setLength(int) const;
 
+        bool isLoopLengthFixed() const;
+        void setLoopLengthFixed(bool);
+
     private:
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
@@ -49,10 +41,5 @@ namespace mpc::lcdgui::screens
         bool loopLngthFix = false;
 
         void setEndSelected(bool b);
-
-        friend class LoopEndFineScreen;
-        friend class EndFineScreen;
-        friend class LoopToFineScreen;
-        friend class TrimScreen;
     };
 } // namespace mpc::lcdgui::screens

@@ -295,7 +295,7 @@ void TrimScreen::setSliderEnd(const int i) const
 void TrimScreen::setEnd(int newValue) const
 {
     const auto loopLengthIsFixed =
-        mpc.screens->get<ScreenId::LoopScreen>()->loopLngthFix;
+        mpc.screens->get<ScreenId::LoopScreen>()->isLoopLengthFixed();
     const auto sound = sampler.lock()->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
@@ -342,9 +342,20 @@ void TrimScreen::setEnd(int newValue) const
         displaySt();
     }
 }
+
 int TrimScreen::getView() const
 {
     return view;
+}
+
+bool TrimScreen::isSampleLengthFixed() const
+{
+    return smplLngthFix;
+}
+
+void TrimScreen::setSampleLengthFixed(const bool b)
+{
+    smplLngthFix = b;
 }
 
 void TrimScreen::left()

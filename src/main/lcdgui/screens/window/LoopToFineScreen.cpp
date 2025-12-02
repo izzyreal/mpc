@@ -31,13 +31,13 @@ void LoopToFineScreen::open()
     displayFineWave();
 }
 
-void LoopToFineScreen::displayLoopLngth()
+void LoopToFineScreen::displayLoopLngth() const
 {
     const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
-    findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
+    findField("loop-lngth")->setText(loopScreen->isLoopLengthFixed() ? "FIX" : "VARI");
 }
 
-void LoopToFineScreen::displayLngthField()
+void LoopToFineScreen::displayLngthField() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -61,16 +61,16 @@ void LoopToFineScreen::displayFineWave()
     }
 
     findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
-                              trimScreen->view);
+                              trimScreen->getView());
     findWave()->setCenterSamplePos(sound->getLoopTo());
 }
 
-void LoopToFineScreen::displayPlayX()
+void LoopToFineScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
-void LoopToFineScreen::displayTo()
+void LoopToFineScreen::displayTo() const
 {
     const auto sound = sampler.lock()->getSound();
 
@@ -84,7 +84,6 @@ void LoopToFineScreen::displayTo()
 
 void LoopToFineScreen::function(const int i)
 {
-
     ScreenComponent::function(i);
 
     switch (i)
@@ -98,6 +97,7 @@ void LoopToFineScreen::function(const int i)
         case 4:
             sampler.lock()->playX();
             break;
+        default:;
     }
 }
 
@@ -124,7 +124,7 @@ void LoopToFineScreen::turnWheel(const int i)
 
     if (focusedFieldName == "loop-lngth")
     {
-        loopScreen->loopLngthFix = i > 0;
+        loopScreen->setLoopLengthFixed(i > 0);
         displayLoopLngth();
     }
     else if (focusedFieldName == "lngth")

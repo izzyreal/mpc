@@ -26,9 +26,9 @@ namespace mpc::lcdgui::screens::window
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
         void displayFineWave();
-        void displayStart();
-        void displaySmplLngth();
-        void displayLngthLabel();
-        void displayPlayX();
+        void displayStart() const;
+        void displaySmplLngth() const;
+        void displayLngthLabel() const;
+        void displayPlayX() const;
     };
 } // namespace mpc::lcdgui::screens::window
