@@ -57,7 +57,7 @@ void Transport::play(const bool fromStart) const
             return;
         }
 
-        int step = fromStart ? 0 : songScreen->getOffset() + 1;
+        const int step = fromStart ? 0 : songScreen->getOffset() + 1;
 
         if (step < currentSong->getStepCount())
         {
@@ -558,29 +558,7 @@ int Transport::getCurrentBarIndex() const
 
     const auto pos = getTickPositionGuiPresentation();
 
-    if (pos == seq->getLastTick())
-    {
-        return seq->getBarCount();
-    }
-
-    int tickCounter = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        if (i > seq->getLastBarIndex())
-        {
-            return 0; // Should not happen
-        }
-
-        tickCounter += seq->getBarLength(i);
-
-        if (tickCounter > pos)
-        {
-            return i;
-        }
-    }
-
-    return 0;
+    return seq->getBarIndexForPositionTicks(pos);
 }
 
 int Transport::getCurrentBeatIndex() const

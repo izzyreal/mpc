@@ -226,6 +226,33 @@ void Sequence::init(const int newLastBarIndex)
     setUsed(true);
 }
 
+mpc::BarIndex Sequence::getBarIndexForPositionQN(const PositionQuarterNotes posQN) const
+{
+    return getBarIndexForPositionTicks(Sequencer::quarterNotesToTicks(posQN));
+}
+
+mpc::BarIndex Sequence::getBarIndexForPositionTicks(const Tick posTicks) const
+{
+    int tickCounter = 0;
+
+    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
+    {
+        if (i > getLastBarIndex())
+        {
+            return BarIndex(0);
+        }
+
+        tickCounter += getBarLength(i);
+
+        if (tickCounter > posTicks)
+        {
+            return BarIndex(i);
+        }
+    }
+
+    return BarIndex(0);
+}
+
 void Sequence::setBarLengths(
     const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> &barLengths) const
 {

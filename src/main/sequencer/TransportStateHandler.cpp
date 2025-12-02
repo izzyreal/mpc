@@ -4,7 +4,6 @@
 #include "Sequence.hpp"
 #include "Sequencer.hpp"
 #include "SequencerStateManager.hpp"
-#include "Transport.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
@@ -54,8 +53,8 @@ void TransportStateHandler::installCountIn(TransportState &state,
         return;
     }
 
-    const auto transport = sequencer->getTransport();
-    const auto currentBarIndex = transport->getCurrentBarIndex();
+    const auto currentBarIndex =
+        activeSequence->getBarIndexForPositionQN(state.positionQuarterNotes);
 
     const Tick posToStartPlayingFrom =
         activeSequence->getFirstTickOfBar(currentBarIndex);
@@ -211,9 +210,9 @@ void TransportStateHandler::applyPlaySequence(
         return;
     }
 
-    const auto transport = sequencer->getTransport();
+    const TransportStateView transport(state);
 
-    if (transport->isRecordingOrOverdubbing())
+    if (transport.isRecordingOrOverdubbing())
     {
         sequencer->storeSelectedSequenceInUndoPlaceHolder();
     }
@@ -232,8 +231,6 @@ void TransportStateHandler::applyPlaySequence(
 
 void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
 {
-    const auto transport = sequencer->getTransport();
-
     state.endOfSong = false;
 
     const auto countMetronomeScreen =

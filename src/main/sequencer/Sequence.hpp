@@ -110,6 +110,8 @@ namespace mpc::sequencer
         void setUsed(bool b) const;
         bool isUsed() const;
         void init(int newLastBarIndex);
+        BarIndex getBarIndexForPositionQN(PositionQuarterNotes) const;
+        BarIndex getBarIndexForPositionTicks(Tick) const;
 
         void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
         void setTimeSignature(int barIndex, int num, int den);

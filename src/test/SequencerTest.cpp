@@ -358,9 +358,6 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
 
-    seq = sequencer->getSelectedSequence();
-    stateManager->drainQueue();
-    tr = seq->getTrack(0);
     stateManager->drainQueue();
 
     REQUIRE(seq->isUsed());
