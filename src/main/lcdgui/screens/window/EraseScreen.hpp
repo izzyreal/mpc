@@ -6,7 +6,6 @@ namespace mpc::lcdgui::screens::window
 {
     class EraseScreen final : public ScreenComponent, public WithTimesAndNotes
     {
-
     public:
         void turnWheel(int i) override;
         void function(int i) override;

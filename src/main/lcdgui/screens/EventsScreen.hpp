@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
         void turnWheel(int i) override;
 
-        void setNote0(NoteNumber) override;
+        void setDrumNote(DrumNoteNumber) override;
 
         EventsScreen(Mpc &mpc, int layerIndex);
 

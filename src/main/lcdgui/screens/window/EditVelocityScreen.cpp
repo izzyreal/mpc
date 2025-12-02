@@ -21,12 +21,12 @@ EditVelocityScreen::EditVelocityScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void EditVelocityScreen::setNote0(const NoteNumber noteNumber)
+void EditVelocityScreen::setDrumNote(const DrumNoteNumber noteNumber)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "note0")
     {
-        WithTimesAndNotes::setNote0(noteNumber);
+        WithTimesAndNotes::setDrumNote(noteNumber);
     }
 }
 
@@ -135,23 +135,23 @@ void EditVelocityScreen::displayTime()
 void EditVelocityScreen::displayNotes()
 {
     if (const auto track = sequencer.lock()->getSelectedTrack();
-        isDrumBusType(track->getBusType()))
+        track->getBusType() == BusType::MIDI)
     {
         findField("note0")->setSize(47, 9);
         findLabel("note1")->Hide(false);
         findField("note1")->Hide(false);
         findField("note0")->setText(
-            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-            Util::noteNames()[note0] + u8"\u00D4");
+            StrUtil::padLeft(std::to_string(midiNote0), " ", 3) + "(" +
+            Util::noteNames()[midiNote0] + u8"\u00D4");
         findField("note1")->setText(
-            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-            Util::noteNames()[note1] + u8"\u00D4");
+            StrUtil::padLeft(std::to_string(midiNote1), " ", 3) + "(" +
+            Util::noteNames()[midiNote1] + u8"\u00D4");
     }
     else
     {
         findField("note0")->setSize(37, 9);
 
-        if (note0 == NoDrumNoteAssigned)
+        if (drumNoteNumber == AllDrumNotes)
         {
             findField("note0")->setText("ALL");
         }
@@ -159,8 +159,8 @@ void EditVelocityScreen::displayNotes()
         {
             const auto program = getProgramOrThrow();
             const auto padName = sampler.lock()->getPadName(
-                program->getPadIndexFromNote(DrumNoteNumber(note0)));
-            findField("note0")->setText(std::to_string(note0) + "/" + padName);
+                program->getPadIndexFromNote(drumNoteNumber));
+            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" + padName);
         }
 
         findLabel("note1")->Hide(true);

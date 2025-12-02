@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
     public:
         EditVelocityScreen(Mpc &mpc, int layerIndex);
 
-        void setNote0(NoteNumber) override;
+        void setDrumNote(DrumNoteNumber) override;
 
         void function(int i) override;
         void turnWheel(int i) override;

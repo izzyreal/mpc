@@ -22,19 +22,7 @@ EraseScreen::EraseScreen(Mpc &mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-    if (const auto busType = sequencer.lock()->getSelectedTrack()->getBusType();
-        isMidiBusType(busType))
-    {
-        findField("note0")->setAlignment(Alignment::Centered, 18);
-        findField("note1")->setAlignment(Alignment::Centered, 18);
-        findField("note0")->setLocation(62, 42);
-    }
-    else
-    {
-        findField("note0")->setAlignment(Alignment::None);
-        findField("note1")->setAlignment(Alignment::None);
-        findField("note0")->setLocation(61, 42);
-    }
+    setTrack(sequencer.lock()->getSelectedTrackIndex());
 
     findField("note1")->setLocation(116, 42);
 
@@ -52,7 +40,6 @@ void EraseScreen::open()
 
 void EraseScreen::turnWheel(const int i)
 {
-
     if (checkAllTimesAndNotes(mpc, i))
     {
         return;
@@ -138,6 +125,23 @@ void EraseScreen::displayType() const
 
 void EraseScreen::displayNotes()
 {
+    if (const auto busType = track >= 0 ? sequencer.lock()
+                                              ->getSelectedSequence()
+                                              ->getTrack(track)
+                                              ->getBusType()
+                                        : BusType::DRUM1;
+        isMidiBusType(busType))
+    {
+        findField("note0")->setAlignment(Alignment::Centered, 18);
+        findField("note1")->setAlignment(Alignment::Centered, 18);
+        findField("note0")->setLocation(62, 42);
+    }
+    else
+    {
+        findField("note0")->setAlignment(Alignment::None);
+        findField("note1")->setAlignment(Alignment::None);
+        findField("note0")->setLocation(61, 42);
+    }
 
     if (erase != 0 && ((erase == 1 && type != 0) || (erase == 2 && type != 0)))
     {
@@ -148,7 +152,11 @@ void EraseScreen::displayNotes()
         return;
     }
 
-    const auto busType = sequencer.lock()->getSelectedTrack()->getBusType();
+    const auto busType = track >= 0 ? sequencer.lock()
+                                          ->getSelectedSequence()
+                                          ->getTrack(track)
+                                          ->getBusType()
+                                    : BusType::DRUM1;
 
     findField("note0")->Hide(false);
     findLabel("note0")->Hide(false);
@@ -159,17 +167,17 @@ void EraseScreen::displayNotes()
     {
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
-            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-            Util::noteNames()[note0] + ")");
+            StrUtil::padLeft(std::to_string(midiNote0), " ", 3) + "(" +
+            Util::noteNames()[midiNote0] + ")");
         findField("note1")->setText(
-            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-            Util::noteNames()[note1] + ")");
+            StrUtil::padLeft(std::to_string(midiNote1), " ", 3) + "(" +
+            Util::noteNames()[midiNote1] + ")");
     }
     else
     {
         findField("note0")->setSize(37, 9);
 
-        if (note0 == NoDrumNoteAssigned)
+        if (drumNoteNumber == AllDrumNotes)
         {
             findField("note0")->setText("ALL");
         }
@@ -177,17 +185,20 @@ void EraseScreen::displayNotes()
         {
             const auto program = getProgramOrThrow();
             const auto padIndexWithBank =
-                program->getPadIndexFromNote(DrumNoteNumber(note0));
+                program->getPadIndexFromNote(DrumNoteNumber(drumNoteNumber));
             const auto padName = sampler.lock()->getPadName(padIndexWithBank);
-            findField("note0")->setText(std::to_string(note0) + "/" + padName);
+            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" +
+                                        padName);
         }
     }
 }
 
 void EraseScreen::setTrack(const int i)
 {
-    track = std::clamp(i, -1, 63);
+    track = std::clamp(i, static_cast<int>(AllTrackIndex),
+                       static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX));
     displayTrack();
+    displayNotes();
 }
 
 void EraseScreen::setErase(const int i)
@@ -210,11 +221,11 @@ void EraseScreen::doErase() const
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;
 
-    const auto midi =
-        isMidiBusType(sequencer.lock()->getSelectedTrack()->getBusType());
+    const auto midi = track >= 0 && isMidiBusType(
+        sequencer.lock()->getSelectedSequence()->getTrack(track)->getBusType());
 
-    const auto noteA = note0;
-    const auto noteB = midi ? note1 : -1;
+    const auto noteA = midi ? midiNote0 : drumNoteNumber;
+    const auto noteB = midi ? midiNote1 : -1;
 
     const auto seq = sequencer.lock()->getSelectedSequence();
 
@@ -244,8 +255,8 @@ void EraseScreen::doErase() const
                         if (const auto noteNumber = noteEvent->getNote();
                             (midi && noteNumber >= noteA &&
                              noteNumber <= noteB) ||
-                            (!midi && (noteA <= NoDrumNoteAssigned ||
-                                       noteA == noteNumber)))
+                            (!midi &&
+                             (noteA == AllDrumNotes || noteA == noteNumber)))
                         {
                             seqTrack->removeEvent(noteEvent);
                         }

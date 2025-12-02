@@ -19,16 +19,18 @@ namespace mpc::lcdgui::screens
     protected:
         int time0 = 0;
         int time1 = 0;
-        NoteNumber note0{NoDrumNoteAssigned};
-        NoteNumber note1 = MaxNoteNumber;
+        DrumNoteNumber drumNoteNumber{AllDrumNotes};
+        NoteNumber midiNote0{MinNoteNumber};
+        NoteNumber midiNote1{MaxNoteNumber};
 
     public:
         virtual ~WithTimesAndNotes() = default;
         void setTime0(int newTime0);
         void setTime1(int newTime1);
 
-        virtual void setNote0(NoteNumber);
-        void setNote1(NoteNumber);
+        virtual void setDrumNote(DrumNoteNumber);
+        void setMidiNote0(NoteNumber);
+        void setMidiNote1(NoteNumber);
 
     protected:
         virtual void displayNotes() = 0;
@@ -40,9 +42,9 @@ namespace mpc::lcdgui::screens
 
     public:
         bool checkAllTimes(Mpc &mpc, int notch,
-                           sequencer::Sequence *sequence = nullptr);
+                           const sequencer::Sequence *sequence = nullptr);
         bool checkAllTimesAndNotes(Mpc &mpc, int notch,
-                                   sequencer::Sequence *sequence = nullptr,
+                              const sequencer::Sequence *sequence = nullptr,
                                    const sequencer::Track *track = nullptr);
     };
 } // namespace mpc::lcdgui::screens

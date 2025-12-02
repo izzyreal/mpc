@@ -16,7 +16,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex)
+TimingCorrectScreen::TimingCorrectScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "timing-correct", layerIndex)
 {
 }
@@ -24,11 +24,6 @@ TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex)
 void TimingCorrectScreen::open()
 {
     const auto track = sequencer.lock()->getSelectedTrack();
-
-    if (track->getBusType() != BusType::MIDI)
-    {
-        note0 = DrumNoteNumber(note0);
-    }
 
     findField("note1")->setAlignment(Alignment::Centered, 18);
     findField("note1")->setLocation(116, 40);
@@ -46,7 +41,7 @@ void TimingCorrectScreen::open()
     displayNotes();
 }
 
-void TimingCorrectScreen::function(int i)
+void TimingCorrectScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -60,23 +55,23 @@ void TimingCorrectScreen::function(int i)
 
             const auto track = sequencer.lock()->getSelectedTrack();
 
-            if (track->getBusType() != BusType::MIDI)
+            if (track->getBusType() == BusType::MIDI)
             {
-                if (note0 == NoDrumNoteAssigned)
-                {
-                    noteRange[0] = MinNoteNumber;
-                    noteRange[1] = MaxNoteNumber;
-                }
-                else
-                {
-                    noteRange[0] = note0;
-                    noteRange[1] = note0;
-                }
+                noteRange[0] = midiNote0;
+                noteRange[1] = midiNote1;
             }
             else
             {
-                noteRange[0] = note0;
-                noteRange[1] = note1;
+                if (drumNoteNumber == AllDrumNotes)
+                {
+                    noteRange[0] = MinDrumNoteNumber;
+                    noteRange[1] = MaxDrumNoteNumber;
+                }
+                else
+                {
+                    noteRange[0] = drumNoteNumber;
+                    noteRange[1] = drumNoteNumber;
+                }
             }
 
             const auto eventRange = track->getEventRange(time0, time1);
@@ -108,7 +103,7 @@ void TimingCorrectScreen::function(int i)
     }
 }
 
-void TimingCorrectScreen::turnWheel(int i)
+void TimingCorrectScreen::turnWheel(const int i)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "notevalue")
@@ -158,11 +153,11 @@ void TimingCorrectScreen::displayNotes()
         findField("note0")->setLocation(62, 40);
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
-            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-            mpc::Util::noteNames()[note0] + u8"\u00D4");
+            StrUtil::padLeft(std::to_string(midiNote0), " ", 3) + "(" +
+            Util::noteNames()[midiNote0] + u8"\u00D4");
         findField("note1")->setText(
-            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-            mpc::Util::noteNames()[note1] + u8"\u00D4");
+            StrUtil::padLeft(std::to_string(midiNote1), " ", 3) + "(" +
+            Util::noteNames()[midiNote1] + u8"\u00D4");
         findLabel("note1")->Hide(false);
         findField("note1")->Hide(false);
     }
@@ -172,7 +167,7 @@ void TimingCorrectScreen::displayNotes()
         findField("note0")->setLocation(61, 40);
         findField("note0")->setSize(37, 9);
 
-        if (note0 == NoDrumNoteAssigned)
+        if (drumNoteNumber == AllDrumNotes)
         {
             findField("note0")->setText("ALL");
         }
@@ -180,9 +175,9 @@ void TimingCorrectScreen::displayNotes()
         {
             const auto program = getProgramOrThrow();
             const auto padIndex =
-                program->getPadIndexFromNote(DrumNoteNumber(note0));
+                program->getPadIndexFromNote(drumNoteNumber);
             const auto padName = sampler.lock()->getPadName(padIndex);
-            findField("note0")->setText(std::to_string(note0) + "/" + padName);
+            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" + padName);
         }
 
         findLabel("note1")->Hide(true);
@@ -213,7 +208,7 @@ void TimingCorrectScreen::displayTime()
     findField("time5")->setTextPadded(SeqUtil::getClock(s, time1), "0");
 }
 
-void TimingCorrectScreen::setAmount(int i)
+void TimingCorrectScreen::setAmount(const int i)
 {
     int maxVal = 0;
 
@@ -249,7 +244,7 @@ void TimingCorrectScreen::setAmount(int i)
     displayAmount();
 }
 
-void TimingCorrectScreen::setShiftTimingLater(bool b)
+void TimingCorrectScreen::setShiftTimingLater(const bool b)
 {
     shiftTimingLater = b;
     displayShiftTiming();
@@ -260,7 +255,7 @@ int TimingCorrectScreen::getSwing() const
     return swing;
 }
 
-void TimingCorrectScreen::setSwing(int i)
+void TimingCorrectScreen::setSwing(const int i)
 {
     swing = std::clamp(i, 50, 75);
     displaySwing();
@@ -276,7 +271,7 @@ int TimingCorrectScreen::getNoteValue() const
     return noteValue.load();
 }
 
-void TimingCorrectScreen::setNoteValue(int i)
+void TimingCorrectScreen::setNoteValue(const int i)
 {
     noteValue.store(std::clamp(i, 0, 6));
     setAmount(amount); // reclamp to new bounds

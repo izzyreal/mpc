@@ -31,15 +31,14 @@ void NoteInputScreenUpdateCommand::execute()
 
     const auto screenComponent = ctx.screenComponent;
 
-    if (isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
+    if (ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
         ctx.setSelectedNote(note);
     }
     else if (const auto withNotes =
-                 std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
-             withNotes && note >= MinDrumNoteNumber)
+                 std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent))
     {
-        withNotes->setNote0(note);
+        withNotes->setDrumNote(note);
     }
     else if (const auto assign16LevelsScreen =
                  std::dynamic_pointer_cast<Assign16LevelsScreen>(

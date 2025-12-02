@@ -36,15 +36,16 @@ EventsScreen::EventsScreen(Mpc &mpc, const int layerIndex)
                         [&](auto)
                         {
                             displayFromSq();
+                            displayNotes();
                         }});
 }
 
-void EventsScreen::setNote0(const NoteNumber noteNumber)
+void EventsScreen::setDrumNote(const DrumNoteNumber noteNumber)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "note0")
     {
-        WithTimesAndNotes::setNote0(noteNumber);
+        WithTimesAndNotes::setDrumNote(noteNumber);
     }
 }
 
@@ -139,8 +140,16 @@ void EventsScreen::function(const int i)
 
             if (editFunctionNumber == 0)
             {
-                performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
-                            note0, note1);
+                if (sourceTrack->getBusType() == BusType::MIDI)
+                {
+                    performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
+                                midiNote0, midiNote1);
+                }
+                else
+                {
+                    performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
+                                drumNoteNumber, drumNoteNumber);
+                }
             }
             else if (editFunctionNumber == 1)
             {
@@ -248,16 +257,19 @@ void EventsScreen::turnWheel(const int i)
 
         setFromSq(selectedSequenceIndex);
 
-        if (const auto fromSeq =
-                sequencer.lock()->getSequence(selectedSequenceIndex);
-            time1 > fromSeq->getLastTick())
+        const auto selectedSequence =
+            sequencer.lock()->getSequence(selectedSequenceIndex);
+
+        if (time1 > selectedSequence->getLastTick())
         {
-            setTime1(fromSeq->getLastTick());
+            setTime1(selectedSequence->getLastTick());
         }
     }
     else if (focusedFieldName == "from-tr")
     {
         setFromTr(sequencer.lock()->getSelectedTrackIndex() + i);
+        const auto selectedTrack = sequencer.lock()->getSelectedTrack();
+        displayNotes();
     }
     else if (focusedFieldName == "to-sq")
     {
@@ -509,16 +521,16 @@ void EventsScreen::displayNotes()
 void EventsScreen::displayMidiNotes() const
 {
     findField("note0")->setText(
-        StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-        Util::noteNames()[note0] + u8"\u00D4");
+        StrUtil::padLeft(std::to_string(midiNote0), " ", 3) + "(" +
+        Util::noteNames()[midiNote0] + u8"\u00D4");
     findField("note1")->setText(
-        StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-        Util::noteNames()[note1] + u8"\u00D4");
+        StrUtil::padLeft(std::to_string(midiNote1), " ", 3) + "(" +
+        Util::noteNames()[midiNote1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
 {
-    if (note0 == NoDrumNoteAssigned)
+    if (drumNoteNumber == AllDrumNotes)
     {
         findField("note0")->setText("ALL");
     }
@@ -531,9 +543,9 @@ void EventsScreen::displayDrumNotes()
         const auto program =
             sampler.lock()->getProgram(drumBus->getProgramIndex());
 
-        const auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
+        const auto noteText = StrUtil::padLeft(std::to_string(drumNoteNumber), " ", 2);
         const auto padName = sampler.lock()->getPadName(
-            program->getPadIndexFromNote(DrumNoteNumber(note0)));
+            program->getPadIndexFromNote(DrumNoteNumber(drumNoteNumber)));
         findField("note0")->setText(noteText + "/" + padName);
     }
 }
@@ -761,7 +773,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         {
             if (isDrumBusType(sourceTrack->getBusType()))
             {
-                if (copyNote0 != NoDrumNoteAssigned &&
+                if (copyNote0 != AllDrumNotes &&
                     copyNote0 != ne->getNote())
                 {
                     continue;

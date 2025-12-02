@@ -12,7 +12,7 @@ using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
 
 bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
-                                      Sequence *sequence)
+                                      const Sequence *sequence)
 {
     const auto sequenceToUse =
         sequence != nullptr ? sequence
@@ -69,7 +69,7 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
 }
 
 bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
-                                              Sequence *sequence,
+                                              const Sequence *sequence,
                                               const Track *track)
 {
     auto param = mpc.getLayeredScreen()->getFocusedFieldName();
@@ -88,13 +88,11 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
                                  : mpc.getSequencer()->getSelectedTrack().get();
             isMidiBusType(trackToUse->getBusType()))
         {
-            setNote0(note0 + notch);
+            setMidiNote0(NoteNumber(midiNote0 + notch));
         }
         else
         {
-            const auto note = note0 + notch;
-
-            note0 = DrumNoteNumber(note);
+            setDrumNote(DrumNoteNumber(drumNoteNumber + notch));
             displayDrumNotes();
         }
 
@@ -102,32 +100,38 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
     }
     else if (focusedFieldName == "note1")
     {
-        setNote1(note1 + notch);
+        setMidiNote1(NoteNumber(midiNote1 + notch));
         notesHaveChanged = true;
     }
 
     return timesHaveChanged || notesHaveChanged;
 }
 
-void WithTimesAndNotes::setNote0(const NoteNumber noteNumber)
+void WithTimesAndNotes::setDrumNote(const DrumNoteNumber drumNoteNumberToUse)
 {
-    note0 = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
+    drumNoteNumber = drumNoteNumberToUse;
+    displayDrumNotes();
+}
 
-    if (note0 > note1)
+void WithTimesAndNotes::setMidiNote0(const NoteNumber noteNumber)
+{
+    midiNote0 = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
+
+    if (midiNote0 > midiNote1)
     {
-        note1 = note0;
+        midiNote1 = midiNote0;
     }
 
     displayNotes();
 }
 
-void WithTimesAndNotes::setNote1(const NoteNumber noteNumber)
+void WithTimesAndNotes::setMidiNote1(const NoteNumber noteNumber)
 {
-    note1 = noteNumber;
+    midiNote1 = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
 
-    if (note1 < note0)
+    if (midiNote1 < midiNote0)
     {
-        note0 = note1;
+        midiNote0 = midiNote1;
     }
 
     displayNotes();
