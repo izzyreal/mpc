@@ -29,6 +29,14 @@ using namespace mpc::sequencer;
 EventsScreen::EventsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "events", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayFromSq();
+                        }});
 }
 
 void EventsScreen::setNote0(const NoteNumber noteNumber)
@@ -234,9 +242,14 @@ void EventsScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "from-sq")
     {
-        setFromSq(sequencer.lock()->getSelectedSequenceIndex() + i);
+        const auto selectedSequenceIndex =
+            std::clamp(sequencer.lock()->getSelectedSequenceIndex() + i,
+                       MinSequenceIndex, MaxSequenceIndex);
 
-        if (const auto fromSeq = sequencer.lock()->getSelectedSequence();
+        setFromSq(selectedSequenceIndex);
+
+        if (const auto fromSeq =
+                sequencer.lock()->getSequence(selectedSequenceIndex);
             time1 > fromSeq->getLastTick())
         {
             setTime1(fromSeq->getLastTick());
@@ -534,7 +547,6 @@ void EventsScreen::setEdit(const int i)
 void EventsScreen::setFromSq(const SequenceIndex i) const
 {
     sequencer.lock()->setSelectedSequenceIndex(i, true);
-    displayFromSq();
 }
 
 void EventsScreen::setFromTr(const int i) const
