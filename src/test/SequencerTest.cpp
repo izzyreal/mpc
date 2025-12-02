@@ -239,6 +239,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
     sequencer->getTransport()->setTempo(121);
+    stateManager->drainQueue();
 
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
 
