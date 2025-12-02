@@ -302,13 +302,30 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
             sequencer->getSequence(m.toSeqIndex)->getTrack(i)->setUsed(true);
         }
 
+        const auto toSequenceLastTick = toSequence.getLastTick();
+
         for (const auto &event : t1Events)
         {
             const auto firstCopyTick = event->tick + offset;
 
+            if (firstCopyTick >= toSequenceLastTick)
+            {
+                // The events in Track are ordered by tick, so this and
+                // any following event copies would be out of bounds.
+                break;
+            }
+
             for (auto k = 0; k < m.copyCount; k++)
             {
                 const auto tick = firstCopyTick + k * segmentLengthTicks;
+
+                // We do a more specific exit-check here, since within-bounds
+                // copies may be followed by out-of-bounds ones.
+                if (tick >= toSequenceLastTick)
+                {
+                    break;
+                }
+
                 const auto eventCopy = acquireEvent();
                 *eventCopy = *event;
                 eventCopy->sequenceIndex = SequenceIndex(m.toSeqIndex);

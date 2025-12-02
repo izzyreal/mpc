@@ -166,8 +166,6 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        void removeEventsThatAreOutsideTickBounds();
-
         const std::function<std::shared_ptr<SequenceStateView>()> getSnapshot;
 
     private:

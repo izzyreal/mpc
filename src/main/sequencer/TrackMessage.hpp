@@ -21,13 +21,6 @@ namespace mpc::sequencer
         std::vector<EventData> snapshot;
     };
 
-    struct UpdateTrackIndexOfAllEvents
-    {
-        SequenceIndex sequence;
-        TrackIndex oldTrackIndex;
-        TrackIndex newTrackIndex;
-    };
-
     struct FinalizeNonLiveNoteEvent
     {
         EventData *handle;
@@ -114,7 +107,7 @@ namespace mpc::sequencer
 
     using TrackMessage = std::variant<
         InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
-        RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+        RemoveDoubles, UpdateEvent,
         FinalizeNonLiveNoteEvent, UpdateEvents, SetTrackUsed, SetTrackOn,
         SetPlayEventIndex, SetTrackVelocityRatio, SetTrackProgramChange,
         SetTrackBusType, SetTrackDeviceIndex>;

@@ -15,6 +15,16 @@ using namespace mpc::lcdgui::screens;
 TrMoveScreen::TrMoveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "tr-move", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displaySq();
+                            displayTrFields();
+                            displayTrLabels();
+                        }});
 }
 
 void TrMoveScreen::open()
@@ -28,9 +38,8 @@ void TrMoveScreen::open()
     displayTrLabels();
 }
 
-void TrMoveScreen::turnWheel(int i)
+void TrMoveScreen::turnWheel(const int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.find("tr") != std::string::npos && i > 0)
@@ -43,9 +52,8 @@ void TrMoveScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "sq")
     {
-        const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-        eventsScreen->setFromSq(sequencer.lock()->getSelectedSequenceIndex() +
-                                i);
+        sequencer.lock()->setSelectedSequenceIndex(
+            sequencer.lock()->getSelectedSequenceIndex() + i, true);
         displaySq();
         displayTrFields();
         displayTrLabels();
@@ -112,7 +120,7 @@ void TrMoveScreen::right()
     ls.lock()->setFunctionKeysArrangement(1);
 }
 
-void TrMoveScreen::function(int i)
+void TrMoveScreen::function(const int i)
 {
     switch (i)
     {
@@ -153,6 +161,7 @@ void TrMoveScreen::function(int i)
             }
             break;
         }
+        default:;
     }
 }
 
@@ -160,8 +169,6 @@ void TrMoveScreen::displayTrLabels() const
 {
     std::string tr0;
     std::string tr1;
-    std::string tr0Name;
-    std::string tr1Name;
 
     auto tr0Index = currentTrackIndex - 1;
     auto tr1Index = 0;
@@ -188,11 +195,11 @@ void TrMoveScreen::displayTrLabels() const
         }
     }
 
-    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     auto sequence = sequencer.lock()->getSelectedSequence();
 
     if (tr0Index >= 0)
     {
+        std::string tr0Name;
         tr0Name = sequence->getTrack(tr0Index)->getName();
         tr0 += "Tr:" + StrUtil::padLeft(std::to_string(tr0Index + 1), "0", 2) +
                "-" + tr0Name;
@@ -203,6 +210,7 @@ void TrMoveScreen::displayTrLabels() const
     }
     if (tr1Index < 64)
     {
+        std::string tr1Name;
         tr1Name = sequence->getTrack(tr1Index)->getName();
         tr1 += "Tr:" + StrUtil::padLeft(std::to_string(tr1Index + 1), "0", 2) +
                "-" + tr1Name;
@@ -235,7 +243,6 @@ void TrMoveScreen::displayTrLabels() const
 
 void TrMoveScreen::displayTrFields() const
 {
-    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     const auto sequence = sequencer.lock()->getSelectedSequence();
 
     if (isSelected())

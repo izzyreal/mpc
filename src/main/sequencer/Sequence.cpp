@@ -44,9 +44,9 @@ Sequence::Sequence(
 {
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
-        std::function getTrackSnapshot = [trackIndex, getSnapshot]
+        std::function getTrackSnapshot = [getSnapshot](const TrackIndex idx)
         {
-            return getSnapshot()->getTrack(trackIndex);
+            return getSnapshot()->getTrack(idx);
         };
         tracks.emplace_back(std::make_shared<Track>(
             manager, getTrackSnapshot, dispatch, trackIndex, this,
@@ -58,7 +58,7 @@ Sequence::Sequence(
             isSoloEnabled));
     }
 
-    std::function getTempoTrackSnapshot = [getSnapshot]
+    std::function getTempoTrackSnapshot = [getSnapshot](TrackIndex)
     {
         return getSnapshot()->getTrack(TempoChangeTrackIndex);
     };
@@ -514,18 +514,15 @@ void Sequence::insertBars(const int barCount, const BarIndex afterBar,
     dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
 }
 
-bool trackIndexComparator(const std::shared_ptr<Track> &t0,
-                          const std::shared_ptr<Track> &t1)
-{
-    return t0->getIndex() < t1->getIndex();
-}
-
 void Sequence::moveTrack(const int source, const int destination)
 {
     if (source == destination)
     {
         return;
     }
+
+    auto &lock = manager->trackLocks[getSequenceIndex()][source];
+    lock.acquire();
 
     if (source > destination)
     {
@@ -534,22 +531,39 @@ void Sequence::moveTrack(const int source, const int destination)
         for (int i = destination; i < source; i++)
         {
             const auto t = tracks[i];
+            auto &lock2 = manager->trackLocks[getSequenceIndex()][i];
+            lock2.acquire();
             t->setTrackIndex(t->getIndex() + 1);
+            lock2.release();
         }
     }
-
-    if (destination > source)
+    else
     {
         tracks[source]->setTrackIndex(TrackIndex(destination));
 
         for (int i = source + 1; i <= destination; i++)
         {
             const auto t = tracks[i];
+            auto &lock2 = manager->trackLocks[getSequenceIndex()][i];
+            lock2.acquire();
             t->setTrackIndex(t->getIndex() - 1);
+            lock2.release();
         }
     }
 
-    sort(begin(tracks), end(tracks), trackIndexComparator);
+    lock.release();
+
+    if (source < destination) {
+        std::rotate(tracks.begin() + source,
+                    tracks.begin() + source + 1,
+                    tracks.begin() + destination + 1);
+    } else if (destination < source) {
+        std::rotate(tracks.begin() + destination,
+                    tracks.begin() + source,
+                    tracks.begin() + source + 1);
+    }
+
+    manager->enqueue(MoveTrack{getSequenceIndex(), TrackIndex(source), TrackIndex(destination)});
 }
 
 int Sequence::getEventCount() const
@@ -608,11 +622,6 @@ std::array<TimeSignature, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
 Sequence::getTimeSignatures() const
 {
     return getSnapshot()->getTimeSignatures();
-}
-
-void Sequence::removeEventsThatAreOutsideTickBounds()
-{
-    manager->enqueue(RemoveEventsThatAreOutsideTickBounds{getSequenceIndex()});
 }
 
 std::shared_ptr<Track> Sequence::getTempoChangeTrack() const

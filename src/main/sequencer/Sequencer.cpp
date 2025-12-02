@@ -588,7 +588,6 @@ void Sequencer::copySong(const int source, const int dest)
 void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
                           const std::shared_ptr<Track> &dest)
 {
-    dest->setTrackIndex(src->getIndex());
     dest->setEventStates(src->getEventStates());
     copyTrackParameters(src, dest);
 }

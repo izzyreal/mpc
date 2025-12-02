@@ -29,7 +29,7 @@ constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
     const std::shared_ptr<SequencerStateManager> &manager,
-    const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
+    const std::function<std::shared_ptr<TrackStateView>(TrackIndex)> &getSnapshot,
     const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
     Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
@@ -126,7 +126,7 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     if (!found)
     {
-        found = getSnapshot()->findRecordingNoteOnByNoteNumber(noteNumber);
+        found = getSnapshot(getIndex())->findRecordingNoteOnByNoteNumber(noteNumber);
     }
 
     return found;
@@ -153,10 +153,7 @@ void Track::setTrackIndex(const TrackIndex i)
     {
         return;
     }
-    const auto oldTrackIndex = trackIndex;
     trackIndex = i;
-    dispatch(UpdateTrackIndexOfAllEvents{parent->getSequenceIndex(),
-                                         oldTrackIndex, trackIndex});
 }
 
 mpc::TrackIndex Track::getIndex() const
@@ -201,7 +198,7 @@ void Track::syncEventIndex(const int currentTick, const int previousTick) const
 
     int startIndex = 0;
 
-    const auto snapshot = getSnapshot();
+    const auto snapshot = getSnapshot(getIndex());
     const auto eventCount = snapshot->getEventCount();
     const auto currentPlayEventIndex = snapshot->getPlayEventIndex();
 
@@ -268,7 +265,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
                                          const Velocity velocity,
                                          const int64_t metronomeOnlyTick)
 {
-    if (const auto result = getSnapshot()->findNoteEvent(tick, note))
+    if (const auto result = getSnapshot(getIndex())->findNoteEvent(tick, note))
     {
         result->beingRecorded = true;
         result->velocity = velocity;
@@ -325,7 +322,7 @@ void Track::setVelocityRatio(int i) const
 
 int Track::getVelocityRatio() const
 {
-    return getSnapshot()->getVelocityRatio();
+    return getSnapshot(getIndex())->getVelocityRatio();
 }
 
 void Track::setProgramChange(const int i) const
@@ -337,7 +334,7 @@ void Track::setProgramChange(const int i) const
 
 int Track::getProgramChange() const
 {
-    return getSnapshot()->getProgramChange();
+    return getSnapshot(getIndex())->getProgramChange();
 }
 
 void Track::setBusType(BusType bt) const
@@ -355,7 +352,7 @@ void Track::setBusType(BusType bt) const
 
 BusType Track::getBusType() const
 {
-    return getSnapshot()->getBusType();
+    return getSnapshot(getIndex())->getBusType();
 }
 
 void Track::setDeviceIndex(const int i) const
@@ -367,12 +364,12 @@ void Track::setDeviceIndex(const int i) const
 
 int Track::getDeviceIndex() const
 {
-    return getSnapshot()->getDeviceIndex();
+    return getSnapshot(getIndex())->getDeviceIndex();
 }
 
 std::shared_ptr<EventRef> Track::getEvent(const int i) const
 {
-    const auto eventHandle = getSnapshot()->getEventByIndex(EventIndex(i));
+    const auto eventHandle = getSnapshot(getIndex())->getEventByIndex(EventIndex(i));
     auto &lock =
         manager
             ->trackLocks[eventHandle->sequenceIndex][eventHandle->trackIndex];
@@ -399,7 +396,7 @@ std::string Track::getName()
 std::vector<EventData> Track::getEventStates() const
 {
     std::vector<EventData> result;
-    for (const auto e : getSnapshot()->getEvents())
+    for (const auto e : getSnapshot(getIndex())->getEvents())
     {
         result.push_back(*e);
     }
@@ -412,7 +409,7 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
     auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
     lock.acquire();
 
-    const auto snapshot = getSnapshot();
+    const auto snapshot = getSnapshot(getIndex());
 
     const int eventCount = snapshot->getEventCount();
 
@@ -556,7 +553,7 @@ void Track::processLiveNoteEventRecordingQueues()
                 noteOn->beingRecorded = false;
 
                 const bool shouldBeInserted =
-                    getSnapshot()->findNoteEvent(noteOn->tick,
+                    getSnapshot(getIndex())->findNoteEvent(noteOn->tick,
                                                  noteOn->noteNumber) == nullptr;
 
                 if (shouldBeInserted)
@@ -565,7 +562,7 @@ void Track::processLiveNoteEventRecordingQueues()
 
                     if (fixEventIndex)
                     {
-                        const auto snapshot = getSnapshot();
+                        const auto snapshot = getSnapshot(getIndex());
                         const auto playEventIndex =
                             snapshot->getPlayEventIndex();
                         if (playEventIndex > 0)
@@ -598,12 +595,12 @@ void Track::processLiveNoteEventRecordingQueues()
 
 bool Track::isOn() const
 {
-    return getSnapshot()->isOn();
+    return getSnapshot(getIndex())->isOn();
 }
 
 bool Track::isUsed() const
 {
-    return getSnapshot()->isUsed();
+    return getSnapshot(getIndex())->isUsed();
 }
 
 std::vector<std::shared_ptr<EventRef>>
@@ -614,7 +611,7 @@ Track::getEventRange(const int startTick, const int endTick) const
 
     std::vector<std::shared_ptr<EventRef>> result;
     for (const auto &eventHandle :
-         getSnapshot()->getEventRange(startTick, endTick))
+         getSnapshot(getIndex())->getEventRange(startTick, endTick))
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
@@ -656,7 +653,7 @@ void Track::correctTimeRange(const int startPos, const int endPos,
         }
     }
 
-    for (const auto &event : getSnapshot()->getNoteEvents())
+    for (const auto &event : getSnapshot(getIndex())->getNoteEvents())
     {
         if (event->tick >= endPos)
         {
@@ -787,7 +784,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
     lock.acquire();
 
-    for (const auto &eventHandle : getSnapshot()->getNoteEvents())
+    for (const auto &eventHandle : getSnapshot(getIndex())->getNoteEvents())
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
@@ -831,7 +828,7 @@ std::string Track::getActualName()
 
 int Track::getNextTick()
 {
-    const auto snapshot = getSnapshot();
+    const auto snapshot = getSnapshot(getIndex());
     const auto playEventIndex = snapshot->getPlayEventIndex();
 
     if (playEventIndex >= snapshot->getEventCount())
@@ -846,7 +843,7 @@ int Track::getNextTick()
 
 void Track::playNext() const
 {
-    const auto snapshot = getSnapshot();
+    const auto snapshot = getSnapshot(getIndex());
     const auto eventCount = snapshot->getEventCount();
     auto playEventIndex = snapshot->getPlayEventIndex();
 

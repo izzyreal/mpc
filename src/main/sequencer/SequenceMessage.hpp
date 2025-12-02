@@ -89,9 +89,11 @@ namespace mpc::sequencer
     {
     };
 
-    struct RemoveEventsThatAreOutsideTickBounds
+    struct MoveTrack
     {
         SequenceIndex sequenceIndex;
+        TrackIndex source;
+        TrackIndex destination;
     };
 
     using SequenceMessage =
@@ -99,6 +101,5 @@ namespace mpc::sequencer
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
                      SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
                      SetTempoChangeEnabled, SetFirstLoopBarIndex,
-                     SetLastLoopBarIndex, SyncTrackEventIndices,
-                     RemoveEventsThatAreOutsideTickBounds>;
+                     SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack>;
 } // namespace mpc::sequencer

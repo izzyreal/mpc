@@ -47,7 +47,7 @@ namespace mpc::sequencer
     public:
         Track(
             const std::shared_ptr<SequencerStateManager> &,
-            const std::function<std::shared_ptr<TrackStateView>()> &getSnapshot,
+            const std::function<std::shared_ptr<TrackStateView>(TrackIndex)> &getSnapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
@@ -165,7 +165,7 @@ namespace mpc::sequencer
 
     private:
         std::shared_ptr<SequencerStateManager> manager;
-        std::function<std::shared_ptr<TrackStateView>()> getSnapshot;
+        std::function<std::shared_ptr<TrackStateView>(TrackIndex)> getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
         std::string name;
         TrackIndex trackIndex{0};

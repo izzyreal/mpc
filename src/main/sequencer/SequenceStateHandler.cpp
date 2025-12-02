@@ -139,24 +139,20 @@ void SequenceStateHandler::applyMessage(
         {
             state.sequences[m.sequenceIndex].lastBarIndex = m.barIndex;
         },
-        [&](const RemoveEventsThatAreOutsideTickBounds &m)
+        [&](const MoveTrack &m)
         {
-            const auto &seq = state.sequences[m.sequenceIndex];
-            const SequenceStateView seqView(seq);
+            auto &tracks = state.sequences[m.sequenceIndex].tracks;
+            const auto source = m.source;
+            const auto dest = m.destination;
 
-            for (auto &t : seq.tracks)
-            {
-                EventData *it = t.head;
-                while (it)
-                {
-                    const int tick = it->tick;
-
-                    if (tick < 0 || tick >= seqView.getLastTick())
-                    {
-                        manager->enqueue(RemoveEvent{it});
-                    }
-                    it = it->next;
-                }
+            if (source < dest) {
+                std::rotate(tracks.begin() + source,
+                            tracks.begin() + source + 1,
+                            tracks.begin() + dest + 1);
+            } else if (dest < source) {
+                std::rotate(tracks.begin() + dest,
+                            tracks.begin() + source,
+                            tracks.begin() + source + 1);
             }
         },
         [&](const InsertBars &m)

@@ -65,34 +65,6 @@ void TrackStateHandler::applyMessage(
             auto &track = state.sequences[m.sequence].tracks[m.track];
             track.used = m.used;
         },
-        [&](const UpdateTrackIndexOfAllEvents &m)
-        {
-            // This message type should not be necessary. It leads to various
-            // issues. Consumers should find another (bulk) way to fulfill
-            // their needs. For now, for legacy reasons, we keep this
-            // implementation around, until consumers are updated.
-
-            auto &lock1 = manager->trackLocks[m.sequence][m.oldTrackIndex];
-            auto &lock2 = manager->trackLocks[m.sequence][m.newTrackIndex];
-
-            if (!lock1.try_acquire() || !lock2.try_acquire())
-            {
-                lock1.release();
-                manager->enqueue(m);
-                return;
-            }
-
-            EventData *it =
-                state.sequences[m.sequence].tracks[m.oldTrackIndex].head;
-            while (it)
-            {
-                it->trackIndex = m.newTrackIndex;
-                it = it->next;
-            }
-
-            lock1.release();
-            lock2.release();
-        },
         [&](const FinalizeNonLiveNoteEvent &m)
         {
             auto &lock =
@@ -390,6 +362,8 @@ void TrackStateHandler::applyMessage(
             {
                 EventData *e = manager->acquireEvent();
                 std::memcpy(e, &src, sizeof(EventData));
+                e->sequenceIndex = m.sequence;
+                e->trackIndex = m.track;
                 e->prev = nullptr;
                 e->next = nullptr;
                 manager->insertAcquiredEvent(track, e);
