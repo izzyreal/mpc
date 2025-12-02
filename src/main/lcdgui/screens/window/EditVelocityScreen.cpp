@@ -160,7 +160,8 @@ void EditVelocityScreen::displayNotes()
             const auto program = getProgramOrThrow();
             const auto padName = sampler.lock()->getPadName(
                 program->getPadIndexFromNote(drumNoteNumber));
-            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" + padName);
+            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" +
+                                        padName);
         }
 
         findLabel("note1")->Hide(true);

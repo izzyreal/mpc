@@ -34,7 +34,8 @@ void LoopEndFineScreen::open()
 void LoopEndFineScreen::displayLoopLngth() const
 {
     const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
-    findField("loop-lngth")->setText(loopScreen->isLoopLengthFixed() ? "FIX" : "VARI");
+    findField("loop-lngth")
+        ->setText(loopScreen->isLoopLengthFixed() ? "FIX" : "VARI");
 }
 
 void LoopEndFineScreen::displayLngthField() const

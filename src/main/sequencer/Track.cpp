@@ -29,7 +29,8 @@ constexpr int TickUnassignedWhileRecording = -2;
 
 Track::Track(
     const std::shared_ptr<SequencerStateManager> &manager,
-    const std::function<std::shared_ptr<TrackStateView>(TrackIndex)> &getSnapshot,
+    const std::function<std::shared_ptr<TrackStateView>(TrackIndex)>
+        &getSnapshot,
     const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
     Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
@@ -126,7 +127,8 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 
     if (!found)
     {
-        found = getSnapshot(getIndex())->findRecordingNoteOnByNoteNumber(noteNumber);
+        found = getSnapshot(getIndex())
+                    ->findRecordingNoteOnByNoteNumber(noteNumber);
     }
 
     return found;
@@ -369,7 +371,8 @@ int Track::getDeviceIndex() const
 
 std::shared_ptr<EventRef> Track::getEvent(const int i) const
 {
-    const auto eventHandle = getSnapshot(getIndex())->getEventByIndex(EventIndex(i));
+    const auto eventHandle =
+        getSnapshot(getIndex())->getEventByIndex(EventIndex(i));
     auto &lock =
         manager
             ->trackLocks[eventHandle->sequenceIndex][eventHandle->trackIndex];
@@ -553,8 +556,9 @@ void Track::processLiveNoteEventRecordingQueues()
                 noteOn->beingRecorded = false;
 
                 const bool shouldBeInserted =
-                    getSnapshot(getIndex())->findNoteEvent(noteOn->tick,
-                                                 noteOn->noteNumber) == nullptr;
+                    getSnapshot(getIndex())
+                        ->findNoteEvent(noteOn->tick, noteOn->noteNumber) ==
+                    nullptr;
 
                 if (shouldBeInserted)
                 {

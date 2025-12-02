@@ -174,10 +174,10 @@ void TimingCorrectScreen::displayNotes()
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padIndex =
-                program->getPadIndexFromNote(drumNoteNumber);
+            const auto padIndex = program->getPadIndexFromNote(drumNoteNumber);
             const auto padName = sampler.lock()->getPadName(padIndex);
-            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" + padName);
+            findField("note0")->setText(std::to_string(drumNoteNumber) + "/" +
+                                        padName);
         }
 
         findLabel("note1")->Hide(true);

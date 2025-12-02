@@ -111,7 +111,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         SequenceIndex(allParserSequencer->sequence), false);
     mpcSequencer->getTransport()->setPosition(0);
     mpcSequencer->setSelectedTrackIndex(allParserSequencer->track);
-    mpcSequencer->getTransport()->setMasterTempo(allParserSequencer->masterTempo);
+    mpcSequencer->getTransport()->setMasterTempo(
+        allParserSequencer->masterTempo);
     mpcSequencer->getTransport()->setTempoSourceIsSequence(
         allParserSequencer->tempoSourceIsSequence);
 

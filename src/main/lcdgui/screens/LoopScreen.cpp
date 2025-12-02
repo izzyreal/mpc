@@ -561,7 +561,8 @@ void LoopScreen::displayWave()
 
     const auto sampleData = sound->getSampleData();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
-    findWave()->setSampleData(sampleData, sound->isMono(), trimScreen->getView());
+    findWave()->setSampleData(sampleData, sound->isMono(),
+                              trimScreen->getView());
     findWave()->setSelection(sound->getLoopTo(), sound->getEnd());
 }
 

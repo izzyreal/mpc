@@ -73,7 +73,8 @@ void StartFineScreen::displayLngthLabel() const
 void StartFineScreen::displaySmplLngth() const
 {
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
-    findField("smpllngth")->setText(trimScreen->isSampleLengthFixed() ? "FIX" : "VARI");
+    findField("smpllngth")
+        ->setText(trimScreen->isSampleLengthFixed() ? "FIX" : "VARI");
 }
 
 void StartFineScreen::displayPlayX() const

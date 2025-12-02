@@ -553,17 +553,19 @@ void Sequence::moveTrack(const int source, const int destination)
 
     lock.release();
 
-    if (source < destination) {
-        std::rotate(tracks.begin() + source,
-                    tracks.begin() + source + 1,
+    if (source < destination)
+    {
+        std::rotate(tracks.begin() + source, tracks.begin() + source + 1,
                     tracks.begin() + destination + 1);
-    } else if (destination < source) {
-        std::rotate(tracks.begin() + destination,
-                    tracks.begin() + source,
+    }
+    else if (destination < source)
+    {
+        std::rotate(tracks.begin() + destination, tracks.begin() + source,
                     tracks.begin() + source + 1);
     }
 
-    manager->enqueue(MoveTrack{getSequenceIndex(), TrackIndex(source), TrackIndex(destination)});
+    manager->enqueue(MoveTrack{getSequenceIndex(), TrackIndex(source),
+                               TrackIndex(destination)});
 }
 
 int Sequence::getEventCount() const

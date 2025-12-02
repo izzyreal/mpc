@@ -221,8 +221,10 @@ void EraseScreen::doErase() const
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;
 
-    const auto midi = track >= 0 && isMidiBusType(
-        sequencer.lock()->getSelectedSequence()->getTrack(track)->getBusType());
+    const auto midi = track >= 0 && isMidiBusType(sequencer.lock()
+                                                      ->getSelectedSequence()
+                                                      ->getTrack(track)
+                                                      ->getBusType());
 
     const auto noteA = midi ? midiNote0 : drumNoteNumber;
     const auto noteB = midi ? midiNote1 : -1;

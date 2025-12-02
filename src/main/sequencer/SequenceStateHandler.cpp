@@ -145,13 +145,15 @@ void SequenceStateHandler::applyMessage(
             const auto source = m.source;
             const auto dest = m.destination;
 
-            if (source < dest) {
+            if (source < dest)
+            {
                 std::rotate(tracks.begin() + source,
                             tracks.begin() + source + 1,
                             tracks.begin() + dest + 1);
-            } else if (dest < source) {
-                std::rotate(tracks.begin() + dest,
-                            tracks.begin() + source,
+            }
+            else if (dest < source)
+            {
+                std::rotate(tracks.begin() + dest, tracks.begin() + source,
                             tracks.begin() + source + 1);
             }
         },

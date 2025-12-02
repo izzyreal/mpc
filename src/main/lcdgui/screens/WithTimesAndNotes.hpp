@@ -43,8 +43,9 @@ namespace mpc::lcdgui::screens
     public:
         bool checkAllTimes(Mpc &mpc, int notch,
                            const sequencer::Sequence *sequence = nullptr);
-        bool checkAllTimesAndNotes(Mpc &mpc, int notch,
+        bool
+        checkAllTimesAndNotes(Mpc &mpc, int notch,
                               const sequencer::Sequence *sequence = nullptr,
-                                   const sequencer::Track *track = nullptr);
+                              const sequencer::Track *track = nullptr);
     };
 } // namespace mpc::lcdgui::screens

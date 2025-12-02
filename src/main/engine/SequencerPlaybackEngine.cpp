@@ -220,8 +220,7 @@ void SequencerPlaybackEngine::stopCountingInIfRequired() const
 {
     const auto transport = sequencer->getTransport();
 
-    if (transport->getTickPosition() >=
-        transport->getCountInEndPosTicks())
+    if (transport->getTickPosition() >= transport->getCountInEndPosTicks())
     {
         setTickPositionEffectiveImmediately(
             transport->getCountInStartPosTicks());

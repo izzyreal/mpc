@@ -59,6 +59,7 @@ namespace mpc::client::event
         {
             bufferOffset = b;
         }
+
         double getBufferOffset() const noexcept
         {
             return bufferOffset;
@@ -68,6 +69,7 @@ namespace mpc::client::event
         {
             return data1;
         }
+
         void setNoteNumber(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
@@ -77,6 +79,7 @@ namespace mpc::client::event
         {
             return data2;
         }
+
         void setVelocity(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
@@ -86,6 +89,7 @@ namespace mpc::client::event
         {
             return data1;
         }
+
         void setControllerNumber(const int c) noexcept
         {
             data1 = static_cast<uint8_t>(c);
@@ -95,6 +99,7 @@ namespace mpc::client::event
         {
             return data2;
         }
+
         void setControllerValue(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
@@ -104,6 +109,7 @@ namespace mpc::client::event
         {
             return data1;
         }
+
         void setAftertouchNote(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
@@ -113,6 +119,7 @@ namespace mpc::client::event
         {
             return data2;
         }
+
         void setAftertouchValue(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
@@ -122,6 +129,7 @@ namespace mpc::client::event
         {
             return data1;
         }
+
         void setChannelPressure(const int p) noexcept
         {
             data1 = static_cast<uint8_t>(p);
@@ -131,6 +139,7 @@ namespace mpc::client::event
         {
             return data1;
         }
+
         void setProgramNumber(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
@@ -140,6 +149,7 @@ namespace mpc::client::event
         {
             return (data2 << 7 | data1) - 8192;
         }
+
         void setPitchWheelValue(int v) noexcept
         {
             v += 8192;

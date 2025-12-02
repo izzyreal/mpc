@@ -142,13 +142,13 @@ void EventsScreen::function(const int i)
             {
                 if (sourceTrack->getBusType() == BusType::MIDI)
                 {
-                    performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
-                                midiNote0, midiNote1);
+                    performCopy(time0, time1, toSq, start, toTr, modeMerge,
+                                copies, midiNote0, midiNote1);
                 }
                 else
                 {
-                    performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
-                                drumNoteNumber, drumNoteNumber);
+                    performCopy(time0, time1, toSq, start, toTr, modeMerge,
+                                copies, drumNoteNumber, drumNoteNumber);
                 }
             }
             else if (editFunctionNumber == 1)
@@ -543,7 +543,8 @@ void EventsScreen::displayDrumNotes()
         const auto program =
             sampler.lock()->getProgram(drumBus->getProgramIndex());
 
-        const auto noteText = StrUtil::padLeft(std::to_string(drumNoteNumber), " ", 2);
+        const auto noteText =
+            StrUtil::padLeft(std::to_string(drumNoteNumber), " ", 2);
         const auto padName = sampler.lock()->getPadName(
             program->getPadIndexFromNote(DrumNoteNumber(drumNoteNumber)));
         findField("note0")->setText(noteText + "/" + padName);
@@ -773,8 +774,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         {
             if (isDrumBusType(sourceTrack->getBusType()))
             {
-                if (copyNote0 != AllDrumNotes &&
-                    copyNote0 != ne->getNote())
+                if (copyNote0 != AllDrumNotes && copyNote0 != ne->getNote())
                 {
                     continue;
                 }
