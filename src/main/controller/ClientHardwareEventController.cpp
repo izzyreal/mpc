@@ -521,6 +521,12 @@ void ClientHardwareEventController::handleDataWheel(
         return;
     }
 
+    if (const auto focusedField = mpc.getLayeredScreen()->getFocusedField();
+        focusedField && focusedField->isTypeModeEnabled())
+    {
+        focusedField->disableTypeMode();
+    }
+
     screen->turnWheel(steps);
 
     if (const auto opensNameScreen =
