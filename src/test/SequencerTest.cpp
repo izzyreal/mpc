@@ -296,10 +296,10 @@ TEST_CASE("Undo", "[sequencer]")
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(0);
 
-    auto seq = sequencer->getSelectedSequence();
-    seq->init(2);
+    sequencer->getSelectedSequence()->init(2);
     stateManager->drainQueue();
     sequencer->getTransport()->setTempo(121);
+    stateManager->drainQueue();
 
     auto server = mpc.getEngineHost()->getAudioServer();
     server->resizeBuffers(BUFFER_SIZE);
@@ -307,6 +307,7 @@ TEST_CASE("Undo", "[sequencer]")
     server->start();
 
     sequencer->getTransport()->recFromStart();
+    stateManager->drainQueue();
 
     int64_t timeInSamples = 0;
 
@@ -351,23 +352,18 @@ TEST_CASE("Undo", "[sequencer]")
     }
 
     sequencer->getTransport()->stop();
-
-    auto tr = seq->getTrack(0);
     stateManager->drainQueue();
-    REQUIRE(tr->getEvents().size() == 10);
+    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() == 10);
 
     sequencer->undoSeq();
 
     stateManager->drainQueue();
 
-    REQUIRE(seq->isUsed());
+    REQUIRE(sequencer->getSelectedSequence()->isUsed());
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
-    REQUIRE(tr->getEvents().empty());
+    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().empty());
 
     sequencer->undoSeq();
-    seq = sequencer->getSelectedSequence();
     stateManager->drainQueue();
-    tr = seq->getTrack(0);
-    stateManager->drainQueue();
-    REQUIRE(tr->getEvents().size() == 10);
+    REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() == 10);
 }
