@@ -101,14 +101,9 @@ namespace mpc::audiomidi
         }
 
     private:
-        // trackVelocityRatio is std::nullopt for note off events, else must be
-        // non-null
-        /*
-                void
-                handleNoteEventMidiOut(const std::shared_ptr<Event> &, Track *,
-                                       int trackDevice,
-                                       std::optional<int> trackVelocityRatio);
-                                       */
+        void handleNoteEventMidiOut(const sequencer::EventData &,
+                                    const sequencer::Track *, int trackDevice,
+                                    std::optional<int> trackVelocityRatio);
 
         void handleFinalizedDrumNoteOnEvent(
             const sequencer::EventData &,
@@ -137,9 +132,8 @@ namespace mpc::audiomidi
          * someone wants to have 100,000 simultaneous MIDI note events. So we'll
          * use a nice spacious number based on intuition, which is 512.
          */
-        const size_t TRANSPOSE_CACHE_CAPACITY = 512;
-        // std::unordered_map<std::shared_ptr<NoteOffEvent>, int>
-        // transposeCache;
+        // const size_t TRANSPOSE_CACHE_CAPACITY = 512;
+        // std::unordered_map<sequencer::EventData, int> transposeCache;
 
         Mpc &mpc;
     };

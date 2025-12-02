@@ -7,10 +7,6 @@
 #include "Observer.hpp"
 #include "sequencer/BusType.hpp"
 
-namespace mpc::file::mid::event
-{
-    class ClientMidiEvent;
-}
 namespace mpc::performance
 {
     class PerformanceManager;
