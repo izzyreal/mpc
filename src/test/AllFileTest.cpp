@@ -50,11 +50,13 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
     disk->flush();
     disk->initFiles();
 
-    mpc.getSequencer()->purgeAllSequences();
+    const auto sequencer = mpc.getSequencer();
+
+    sequencer->purgeAllSequences();
 
     for (int i = 0; i < 20; i++)
     {
-        mpc.getSequencer()->deleteSong(i);
+        sequencer->deleteSong(i);
     }
 
     AllLoader::loadEverythingFromFile(mpc, disk->getFile(filename).get());
@@ -65,11 +67,12 @@ TEST_CASE("ALL file song", "[allfile]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
 
     sequencer->getSequence(0)->init(1);
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
     sequencer->getSequence(1)->init(1);
-    sequencer->getStateManager()->drainQueue();
+    stateManager->drainQueue();
 
     auto song = sequencer->getSong(0);
 
@@ -103,9 +106,10 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSequence(0);
     seq->init(1);
-    mpc.getSequencer()->getStateManager()->drainQueue();
     seq->getTrack(60)->setUsed(false);
     seq->getTrack(60)->setOn(true);
     seq->getTrack(61)->setUsed(false);
@@ -114,15 +118,18 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     seq->getTrack(62)->setOn(true);
     seq->getTrack(63)->setUsed(true);
     seq->getTrack(63)->setOn(false);
+
+    stateManager->drainQueue();
+
     auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
 
-    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    assert(sequencer->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getSelectedSequence();
+    auto seq1 = sequencer->getSelectedSequence();
     REQUIRE(!seq1->getTrack(60)->isUsed());
     REQUIRE(seq1->getTrack(60)->isOn());
     REQUIRE(!seq1->getTrack(61)->isUsed());
@@ -180,22 +187,28 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getSequence(0);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    auto seq = sequencer->getSequence(0);
     seq->init(1);
-    mpc.getSequencer()->getStateManager()->drainQueue();
     seq->getTrack(60)->setDeviceIndex(1);
     seq->getTrack(61)->setDeviceIndex(2);
     seq->getTrack(62)->setDeviceIndex(3);
     seq->getTrack(63)->setDeviceIndex(4);
+
+    stateManager->drainQueue();
+
     auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
 
-    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    assert(sequencer->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getSelectedSequence();
+    auto seq1 = sequencer->getSelectedSequence();
 
     REQUIRE(seq1->getTrack(60)->getDeviceIndex() == 1);
     REQUIRE(seq1->getTrack(61)->getDeviceIndex() == 2);
