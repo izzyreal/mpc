@@ -5,7 +5,6 @@
 #include "Sequencer.hpp"
 #include "SequencerStateManager.hpp"
 #include "TrackStateHandler.hpp"
-#include "TrackStateView.hpp"
 #include "sequencer/SequencerState.hpp"
 #include "utils/VariantUtils.hpp"
 
