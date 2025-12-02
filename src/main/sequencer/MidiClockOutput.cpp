@@ -3,9 +3,9 @@
 
 #include "Mpc.hpp"
 
-#include "engine/EngineHost.hpp"
-#include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiOutput.hpp"
+#include "lcdgui/Screens.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
 
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -15,70 +15,48 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
+using namespace mpc::client::event;
 
 MidiClockOutput::MidiClockOutput(
+const std::function<int()> &getSampleRate,
+    const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
+        &getMidiOutput,
     Sequencer *sequencer,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     const std::function<bool()> &isBouncing)
-    : sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
-// midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
-// msg(std::make_shared<ShortMessage>())
+    : getSampleRate(getSampleRate), getMidiOutput(getMidiOutput), sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 {
     eventQueue = std::make_shared<
         moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
-    // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
-void MidiClockOutput::sendMidiClockMsg(int frameIndex) const
+void MidiClockOutput::sendMidiClockMsg(const int frameIndex) const
 {
-    /*
-    auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
-    clockMsg->setMessage(ShortMessage::TIMING_CLOCK);
+    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
     if (syncScreen->getModeOut() > 0)
     {
-        clockMsg->bufferPos = frameIndex;
-
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputA(clockMsg);
-        }
-
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputB(clockMsg);
-        }
+        ClientMidiEvent e;
+        e.setMessageType(ClientMidiEvent::MIDI_CLOCK);
+        e.setBufferOffset(frameIndex);
+        getMidiOutput()->enqueueEvent(e);
     }
-    */
 }
 
-void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
+void MidiClockOutput::sendMidiSyncMsg(
+    const ClientMidiEvent::MessageType msgType, const int sampleNumber) const
 {
-    // midiSyncStartStopContinueMsg->setMessage(status);
-
-    // bufferpos should be set by SequencerPlaybackEngine when it's actually
-    // emitting these events, i.e. enqueueing them for host processing
-    // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
-    /*
+    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
     if (syncScreen->getModeOut() > 0)
     {
-        midiSyncStartStopContinueMsg->setMessage(status);
+        ClientMidiEvent e;
+        e.setMessageType(msgType);
+        e.setBufferOffset(sampleNumber);
 
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputA(
-                midiSyncStartStopContinueMsg);
-        }
-
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputB(
-                midiSyncStartStopContinueMsg);
-        }
+        getMidiOutput()->enqueueEvent(e);
     }
-    */
 }
 
 void MidiClockOutput::processTempoChange()
@@ -92,7 +70,7 @@ void MidiClockOutput::processTempoChange()
 }
 
 void MidiClockOutput::enqueueEventAfterNFrames(
-    const std::function<void()> &event, const unsigned long nFrames) const
+    const std::function<void(int)> &event, const unsigned long nFrames) const
 {
     engine::EventAfterNFrames e;
     e.f = event;
@@ -102,7 +80,6 @@ void MidiClockOutput::enqueueEventAfterNFrames(
 
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
 {
-    /*
     const auto durationToNextClockInFrames =
         static_cast<unsigned int>(SeqUtil::ticksToFrames(
             4, clock.getBpm(), static_cast<float>(clock.getSampleRate())));
@@ -114,21 +91,19 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
         durationToNextClockInFrames - oneMsInFrames;
 
     enqueueEventAfterNFrames(
-        [&]
+        [&](const int sampleNumber)
         {
-            sendMidiSyncMsg(sequencer->getTransport()->getPlayStartPositionQuarterNotes()
-    == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
+            const auto playStartPosition =
+                sequencer->getTransport()->getPlayStartPositionQuarterNotes();
+            const auto msgType = playStartPosition == 0.0
+                                     ? ClientMidiEvent::MIDI_START
+                                     : ClientMidiEvent::MIDI_CONTINUE;
+            sendMidiSyncMsg(msgType, sampleNumber);
         },
         numberOfFramesBeforeMidiSyncStart);
-        */
 }
 
-void MidiClockOutput::setSampleRate(const unsigned int sampleRate)
-{
-    requestedSampleRate = sampleRate;
-}
-
-void MidiClockOutput::processEventsAfterNFrames()
+void MidiClockOutput::processEventsAfterNFrames(const int sampleNumber)
 {
     engine::EventAfterNFrames batch[100];
 
@@ -141,7 +116,7 @@ void MidiClockOutput::processEventsAfterNFrames()
         auto &e = batch[i];
         if (++e.frameCounter >= e.nFrames)
         {
-            e.f();
+            e.f(sampleNumber);
         }
         else
         {
@@ -155,10 +130,10 @@ void MidiClockOutput::processEventsAfterNFrames()
     }
 }
 
-void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
-                                   int frameIndex) const
+void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
+                                   const int frameIndex,
+                                   int tickCountAtThisFrame)
 {
-    /*
     lastProcessedFrameIsMidiClockLock = false;
 
     if (isBouncing())
@@ -166,21 +141,37 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
         return;
     }
 
-    processEventsAfterNFrames();
+    processEventsAfterNFrames(frameIndex);
 
-    if (!clock.proc())
+    if (!isRunningAtStartOfBuffer)
+    {
+        if (clock.proc())
+        {
+            tickCountAtThisFrame = 1;
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    if (isRunningAtStartOfBuffer && tickCountAtThisFrame == 0)
     {
         return;
     }
 
-    const auto lockedToClock = midiClockTickCounter++ == 0;
+    const auto lockedToClock = midiClockTickCounter == 0;
+
+    midiClockTickCounter += tickCountAtThisFrame;
 
     lastProcessedFrameIsMidiClockLock = true;
 
-    if (midiClockTickCounter == 4)
+    if (midiClockTickCounter >= 4)
     {
         midiClockTickCounter = 0;
     }
+
+    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
     if (syncScreen->modeOut > 0)
     {
@@ -197,19 +188,19 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
 
         if (wasRunning && !isRunningAtStartOfBuffer)
         {
-            // sendMidiSyncMsg(ShortMessage::STOP);
+            sendMidiSyncMsg(ClientMidiEvent::MIDI_STOP, frameIndex);
             wasRunning = false;
         }
     }
-    */
 }
 
 void MidiClockOutput::processSampleRateChange()
 {
-    if (clock.getSampleRate() != requestedSampleRate)
+    const auto sampleRate = getSampleRate();
+    if (clock.getSampleRate() != sampleRate)
     {
         const auto bpm = clock.getBpm();
-        clock.init(requestedSampleRate);
+        clock.init(sampleRate);
         clock.set_bpm(bpm);
     }
 }

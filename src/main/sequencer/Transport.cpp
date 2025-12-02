@@ -465,6 +465,19 @@ void Transport::setMasterTempo(const double masterTempo) const
         SetMasterTempo{std::clamp(masterTempo, 30.0, 300.0)});
 }
 
+void Transport::setShouldWaitForMidiClockLock(const bool b) const
+{
+    sequencer.getStateManager()->enqueue(SetShouldWaitForMidiClockLock{b});
+}
+
+bool Transport::shouldWaitForMidiClockLock() const
+{
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isShouldWaitForMidiClockLockEnabled();
+}
+
 bool Transport::isPunchEnabled() const
 {
     return punchEnabled;

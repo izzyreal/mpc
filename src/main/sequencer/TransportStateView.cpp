@@ -89,3 +89,8 @@ bool TransportStateView::isTempoSourceSequenceEnabled() const
 {
     return state.tempoSourceIsSequenceEnabled;
 }
+
+bool TransportStateView::isShouldWaitForMidiClockLockEnabled() const
+{
+    return state.shouldWaitForMidiClockLock;
+}

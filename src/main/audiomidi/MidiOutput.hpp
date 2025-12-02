@@ -13,7 +13,6 @@ namespace moodycamel
 
 namespace mpc::audiomidi
 {
-
     class MidiOutput
     {
     public:
@@ -21,15 +20,14 @@ namespace mpc::audiomidi
 
     private:
         using MidiEvent = client::event::ClientMidiEvent;
-        using MidiEventPtr = std::shared_ptr<MidiEvent>;
         using MidiEventQueue = moodycamel::ConcurrentQueue<
-            MidiEventPtr, moodycamel::ConcurrentQueueDefaultTraits>;
+            MidiEvent, moodycamel::ConcurrentQueueDefaultTraits>;
 
         std::shared_ptr<MidiEventQueue> queue;
 
     public:
-        void enqueueEvent(const MidiEventPtr &) const;
-        int dequeue(std::vector<MidiEventPtr> &) const;
+        void enqueueEvent(const MidiEvent &) const;
+        int dequeue(std::vector<MidiEvent> &) const;
         void panic() const;
     };
 } // namespace mpc::audiomidi

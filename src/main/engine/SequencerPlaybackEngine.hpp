@@ -15,6 +15,11 @@ namespace moodycamel
     template <typename T, typename Traits> class ConcurrentQueue;
 } // namespace moodycamel
 
+namespace mpc::audiomidi
+{
+    class MidiOutput;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;
@@ -40,6 +45,7 @@ namespace mpc::engine
 
     public:
         explicit SequencerPlaybackEngine(
+            std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
             sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
@@ -53,13 +59,11 @@ namespace mpc::engine
 
         void work(int nFrames) override;
 
-        void start();
-
         unsigned short getEventFrameOffset() const;
 
         void stop();
 
-        void enqueueEventAfterNFrames(const std::function<void()> &event,
+        void enqueueEventAfterNFrames(const std::function<void(int)> &event,
                                       unsigned long nFrames) const;
 
     private:
@@ -78,14 +82,13 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
-        bool shouldWaitForMidiClockLock = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
         // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames();
+        void processEventsAfterNFrames(int frameIndex);
 
         void triggerClickIfNeeded() const;
 

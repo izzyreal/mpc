@@ -43,6 +43,8 @@ namespace mpc::sequencer
 
         bool isTempoSourceSequenceEnabled() const;
 
+        bool isShouldWaitForMidiClockLockEnabled() const;
+
     private:
         const TransportState state;
     };

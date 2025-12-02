@@ -40,7 +40,7 @@ void ReleaseFunctionCommand::execute()
                 ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
                 const std::function stopSoundPlayer =
-                    [ls, engineHost = mpc.getEngineHost()]
+                    [ls, engineHost = mpc.getEngineHost()](int)
                 {
                     if (ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
                     {
@@ -85,7 +85,7 @@ void ReleaseFunctionCommand::execute()
                     ls->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
                 {
                     const std::function stopSoundPlayer =
-                        [ls, engineHost = mpc.getEngineHost()]
+                        [ls, engineHost = mpc.getEngineHost()](int)
                     {
                         if (ls->isCurrentScreenPopupFor(
                                 ScreenId::DirectoryScreen))

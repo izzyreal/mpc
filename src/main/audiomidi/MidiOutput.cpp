@@ -11,12 +11,12 @@ MidiOutput::MidiOutput()
 
 void MidiOutput::panic() const {}
 
-void MidiOutput::enqueueEvent(const MidiEventPtr &e) const
+void MidiOutput::enqueueEvent(const MidiEvent &e) const
 {
     queue->enqueue(e);
 }
 
-int MidiOutput::dequeue(std::vector<MidiEventPtr> &buf) const
+int MidiOutput::dequeue(std::vector<MidiEvent> &buf) const
 {
     return queue->try_dequeue_bulk(buf.begin(), buf.size());
 }

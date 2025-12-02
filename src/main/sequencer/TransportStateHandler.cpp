@@ -7,6 +7,7 @@
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "sequencer/TransportState.hpp"
@@ -201,6 +202,10 @@ void TransportStateHandler::applyMessage(TransportState &state,
         {
             state.tempoSourceIsSequenceEnabled = m.enabled;
         },
+        [&](const SetShouldWaitForMidiClockLock &m)
+        {
+            state.shouldWaitForMidiClockLock = m.enabled;
+        },
         [&](const SetCountingIn &m)
         {
             state.countingIn = m.countingIn;
@@ -233,6 +238,12 @@ void TransportStateHandler::applyPlaySequence(
 
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
     manager->applyMessage(SyncTrackEventIndices{});
+
+    if (sequencer->getScreens()->get<lcdgui::ScreenId::SyncScreen>()->modeOut != 0)
+    {
+        state.shouldWaitForMidiClockLock = true;
+    }
+
     state.sequencerRunning = true;
 }
 

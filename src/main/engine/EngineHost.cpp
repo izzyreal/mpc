@@ -122,6 +122,10 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+        [&]
+        {
+            return mpc.getMidiOutput();
+        },
         mpc.getSequencer().get(), mpc.getClock(), mpc.getLayeredScreen(),
         [&]
         {
@@ -160,8 +164,7 @@ void EngineHost::start()
         });
 
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
-    compoundAudioClient->add(
-        mpc.getEngineHost()->getSequencerPlaybackEngine().get());
+    compoundAudioClient->add(sequencerPlaybackEngine.get());
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
@@ -424,7 +427,7 @@ void EngineHost::stopBouncing()
     }
 
     getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&]
+        [&](int)
         {
             mpc.getLayeredScreen()->postToUiThread(
                 [ls = mpc.getLayeredScreen()]
@@ -473,7 +476,7 @@ bool EngineHost::isBouncePrepared() const
 void EngineHost::finishPreviewSoundPlayerVoice()
 {
     getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&]
+        [&](int)
         {
             getPreviewSoundPlayer()->finishVoice();
         },
@@ -525,16 +528,10 @@ void EngineHost::changeBounceStateIfRequired()
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
-
             if (getAudioServer()->isRealTime())
             {
                 getAudioServer()->setRealTime(false);
             }
-        }
-        else if (directToDiskRecorderScreen->getRecord() != 4)
-        {
-            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
         }
 
         for (const auto &diskRecorder : diskRecorders)

@@ -149,7 +149,7 @@ void LoadScreen::function(const int i)
                 }
 
                 const std::function startSoundPlayer =
-                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
+                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls](int)
                 {
                     const auto audioServerSampleRate =
                         engineHost->getAudioServer()->getSampleRate();
