@@ -55,17 +55,17 @@ TEST_CASE("timing-correct", "[track]")
     tr->timingCorrect(0, 0, note91, note91->tick, 24, swingPercentage);
     stateManager->drainQueue();
 
-    REQUIRE(tr->getNoteEvents()[0]->getNote() == 88);
+    REQUIRE(tr->getNoteEvents()[0]->getNote().get() == 88);
     REQUIRE(tr->getNoteEvents()[0]->getTick() == 0);
 
-    REQUIRE(tr->getNoteEvents()[3]->getNote() == 89);
-    REQUIRE(tr->getNoteEvents()[3]->getTick() == 24);
+    REQUIRE(tr->getNoteEvents()[2]->getNote().get() == 89);
+    REQUIRE(tr->getNoteEvents()[2]->getTick() == 24);
 
-    REQUIRE(tr->getNoteEvents()[1]->getNote() == 90);
+    REQUIRE(tr->getNoteEvents()[1]->getNote().get() == 90);
     REQUIRE(tr->getNoteEvents()[1]->getTick() == 23);
 
-    REQUIRE(tr->getNoteEvents()[2]->getNote() == 91);
-    REQUIRE(tr->getNoteEvents()[2]->getTick() == 24);
+    REQUIRE(tr->getNoteEvents()[3]->getNote().get() == 91);
+    REQUIRE(tr->getNoteEvents()[3]->getTick() == 24);
 }
 
 TEST_CASE("swing1", "[track]")
