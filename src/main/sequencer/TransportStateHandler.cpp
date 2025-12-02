@@ -115,7 +115,6 @@ void TransportStateHandler::applyMessage(TransportState &state,
         {
             state.recordingEnabled = false;
             state.overdubbingEnabled = true;
-            applyMessage(state, PlaySequence{});
         },
         [&](const PlaySequenceFromStart &)
         {
