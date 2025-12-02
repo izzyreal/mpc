@@ -1,5 +1,4 @@
 #include "Mpc.hpp"
-#include "sequencer/Transport.hpp"
 
 #include <mpc_fs.hpp>
 
@@ -294,32 +293,9 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
-    if (midiDeviceDetector)
-    {
-        midiDeviceDetector->stop();
-    }
-    if (sampler)
-    {
-        sampler->stopAllVoices(0);
-    }
-    if (sequencer)
-    {
-        sequencer->getTransport()->stop();
-    }
-
     nvram::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
-
-    if (layeredScreen)
-    {
-        layeredScreen.reset();
-    }
-
-    if (engineHost)
-    {
-        engineHost->destroyServices();
-    }
 }
 
 void Mpc::panic() const
