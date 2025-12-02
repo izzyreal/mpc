@@ -15,6 +15,9 @@
 #include "engine/DrumNoteEventContextBuilder.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "Util.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/TrackStateView.hpp"
 
 using namespace mpc;
 using namespace mpc::engine;
@@ -49,8 +52,9 @@ void NoteRepeatProcessor::process(
     const unsigned short eventFrameOffset, const double tempo,
     const float sampleRate) const
 {
-    auto track = sequencer.lock()->getSelectedTrack();
-    auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
+    auto lockedSequencer = sequencer.lock();
+    auto track = lockedSequencer->getSelectedTrack();
+    auto drumBus = lockedSequencer->getBus<DrumBus>(track->getBusType());
 
     std::shared_ptr<sampler::Program> program;
 
@@ -195,10 +199,25 @@ void NoteRepeatProcessor::process(
             // mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
         }
 
-        if (sequencer.lock()->getTransport()->isRecordingOrOverdubbing())
+        if (lockedSequencer->getTransport()->isRecordingOrOverdubbing())
         {
             noteEvent.velocity = velocityBeforeTrackVelocityRatioApplied;
-            track->acquireAndInsertEvent(noteEvent);
+
+            auto existingNoteEvent = lockedSequencer->getStateManager()
+                ->getSnapshot()
+                .getTrackState(lockedSequencer->getSelectedSequenceIndex(),
+                               track->getIndex())
+                ->findNoteEvent(noteEvent.tick, noteEvent.noteNumber);
+
+            if (existingNoteEvent)
+            {
+                *existingNoteEvent = noteEvent;
+                track->insertAcquiredEvent(existingNoteEvent);
+            }
+            else
+            {
+                track->acquireAndInsertEvent(noteEvent);
+            }
         }
 
         sequencerPlaybackEngine->enqueueEventAfterNFrames(
