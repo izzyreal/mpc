@@ -15,10 +15,19 @@ using namespace mpc::lcdgui::screens;
 BarsScreen::BarsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "bars", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayFromSq();
+                        }});
 }
 
 void BarsScreen::open()
 {
+    findField("copies")->setAlignment(Alignment::Centered);
     const auto fromSequence = sequencer.lock()->getSelectedSequence();
     const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     const auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
@@ -105,12 +114,14 @@ void BarsScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "fromsq")
     {
-        sequencer.lock()->setSelectedSequenceIndex(
-            sequencer.lock()->getSelectedSequenceIndex() + increment, true);
+        const auto selectedSequenceIndex =
+            std::clamp(sequencer.lock()->getSelectedSequenceIndex() + increment,
+                       MinSequenceIndex, MaxSequenceIndex);
 
-        displayFromSq();
+        sequencer.lock()->setSelectedSequenceIndex(selectedSequenceIndex, true);
 
-        const auto fromSequence = sequencer.lock()->getSelectedSequence();
+        const auto fromSequence =
+            sequencer.lock()->getSequence(selectedSequenceIndex);
         const auto lastBarIndex = fromSequence->isUsed()
                                       ? fromSequence->getLastBarIndex()
                                       : userLastBar;
