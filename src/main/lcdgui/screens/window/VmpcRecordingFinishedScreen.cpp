@@ -1,5 +1,7 @@
 #include "VmpcRecordingFinishedScreen.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
+
 using namespace mpc::lcdgui::screens::window;
 
 VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(Mpc &mpc,
@@ -10,11 +12,11 @@ VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(Mpc &mpc,
 
 void VmpcRecordingFinishedScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
-            openScreenById(ScreenId::SequencerScreen);
+            ls.lock()->closeCurrentScreen();
             break;
+        default:;
     }
 }
