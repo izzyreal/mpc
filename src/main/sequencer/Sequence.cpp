@@ -16,8 +16,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
-    SequenceIndex sequenceIndex,
-    std::shared_ptr<SequencerStateManager> manager,
+    SequenceIndex sequenceIndex, std::shared_ptr<SequencerStateManager> manager,
     const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
@@ -48,13 +47,14 @@ Sequence::Sequence(
         {
             return getSnapshot()->getTrack(trackIndex);
         };
-        tracks.emplace_back(std::make_shared<Track>(manager,
-            getTrackSnapshot, dispatch, trackIndex, this, getDefaultTrackName,
-            getTickPosition, getScreens, isRecordingModeMulti,
-            getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
-            isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
-            getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
-            getPunchInTime, getPunchOutTime, isSoloEnabled));
+        tracks.emplace_back(std::make_shared<Track>(
+            manager, getTrackSnapshot, dispatch, trackIndex, this,
+            getDefaultTrackName, getTickPosition, getScreens,
+            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
+            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
+            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
+            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
+            isSoloEnabled));
     }
 
     std::function getTempoTrackSnapshot = [getSnapshot]
@@ -62,8 +62,8 @@ Sequence::Sequence(
         return getSnapshot()->getTrack(TempoChangeTrackIndex);
     };
 
-    auto tempoChangeTrack = std::make_shared<Track>(manager,
-        getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
+    auto tempoChangeTrack = std::make_shared<Track>(
+        manager, getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
         getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
         getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
         isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
@@ -81,9 +81,7 @@ Sequence::Sequence(
     }
 }
 
-Sequence::~Sequence()
-{
-}
+Sequence::~Sequence() {}
 
 mpc::SequenceIndex Sequence::getSequenceIndex() const
 {
@@ -253,47 +251,30 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
 
     const auto oldBarLength = snapshot->getBarLength(barIndex);
     const auto newBarLength = static_cast<int>(newDenTicks * num);
-    const auto tickShift = newBarLength - oldBarLength;
+    const auto tickShift = static_cast<int>(newBarLength - oldBarLength);
 
-    if (newBarLength < oldBarLength)
+    const auto cutStart = barStart + newBarLength;
+    const auto cutEnd = barStart + oldBarLength;
+
+    const auto nextBarStartTick = barIndex < Mpc2000XlSpecs::MAX_LAST_BAR_INDEX
+                                      ? getFirstTickOfBar(barIndex + 1)
+                                      : getLastTick();
+
+    for (const auto &t : getTracks())
     {
-        // The bar will be cropped, so we may have to remove some events
-        // if they fall outside the new bar's region.
-        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength;
-             tick++)
+        const auto ev = t->getEvents();
+
+        for (const auto &e : ev)
         {
-            for (const auto &t : getTracks())
+            const int tick = e->getTick();
+
+            if (tick >= cutStart && tick < cutEnd)
             {
-                for (int eventIndex = t->getEvents().size() - 1;
-                     eventIndex >= 0; eventIndex--)
-                {
-                    if (auto event = t->getEvent(eventIndex); event->getTick() == tick)
-                    {
-                        t->removeEvent(event);
-                    }
-                }
+                t->removeEvent(e);
             }
-        }
-    }
-
-    if (barIndex < Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-    {
-        // We're changing the timesignature of not the last bar, so
-        // all bars after the bar we're changing are shifting. Here we
-        // shift all relevant event ticks.
-        const auto nextBarStartTick = getFirstTickOfBar(barIndex + 1);
-
-        for (const auto &t : getTracks())
-        {
-            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0;
-                 eventIndex--)
+            else if (tick >= nextBarStartTick)
             {
-                if (const auto event = t->getEvent(eventIndex);
-                    event->getTick() >= nextBarStartTick &&
-                    event->getTick() < getLastTick())
-                {
-                    event->setTick(event->getTick() + tickShift);
-                }
+                e->setTick(tick + tickShift);
             }
         }
     }
