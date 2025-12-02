@@ -96,41 +96,6 @@ void Track::purge()
     removeEvents();
 }
 
-EventData *Track::findRecordingNoteOnEvent(const EventData *eventState)
-{
-    EventData *found = nullptr;
-
-    const auto count = liveNoteOnEventRecordingQueue->try_dequeue_bulk(
-        tempLiveNoteOnRecordingEvents.begin(),
-        tempLiveNoteOnRecordingEvents.size());
-
-    for (int i = 0; i < count; i++)
-    {
-        const auto e = tempLiveNoteOnRecordingEvents[i];
-        if (e == eventState)
-        {
-            found = e;
-            break;
-        }
-    }
-
-    for (size_t i = 0; i < count; i++)
-    {
-        liveNoteOnEventRecordingQueue->enqueue(
-            tempLiveNoteOnRecordingEvents[i]);
-    }
-
-    tempLiveNoteOnRecordingEvents.clear();
-    tempLiveNoteOnRecordingEvents.resize(20);
-
-    if (!found)
-    {
-        found = getSnapshot()->findRecordingNoteOn(eventState);
-    }
-
-    return found;
-}
-
 EventData *
 Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
 {
@@ -589,20 +554,30 @@ void Track::processLiveNoteEventRecordingQueues()
 
                 noteOn->duration = Duration(duration);
                 noteOn->beingRecorded = false;
-                insertAcquiredEvent(noteOn);
-                manager->enqueue(
-                    RemoveDoubles{parent->getSequenceIndex(), getIndex()});
 
-                if (fixEventIndex)
+                const bool shouldBeInserted =
+                    getSnapshot()->findNoteEvent(noteOn->tick,
+                                                 noteOn->noteNumber) == nullptr;
+
+                if (shouldBeInserted)
                 {
-                    const auto snapshot = getSnapshot();
-                    const auto playEventIndex = snapshot->getPlayEventIndex();
-                    if (playEventIndex > 0)
+                    insertAcquiredEvent(noteOn);
+
+                    if (fixEventIndex)
                     {
-                        dispatch(SetPlayEventIndex{parent->getSequenceIndex(),
-                                                   getIndex(),
-                                                   playEventIndex - 1});
+                        const auto snapshot = getSnapshot();
+                        const auto playEventIndex = snapshot->getPlayEventIndex();
+                        if (playEventIndex > 0)
+                        {
+                            dispatch(SetPlayEventIndex{parent->getSequenceIndex(),
+                                                       getIndex(),
+                                                       playEventIndex - 1});
+                        }
                     }
+                }
+                else
+                {
+                    manager->returnEventToPool(noteOn);
                 }
 
                 needsToBeRequeued = false;

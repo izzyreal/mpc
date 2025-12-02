@@ -10,14 +10,18 @@ TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 EventData *TrackStateView::findNoteEvent(const int tick,
                                           const NoteNumber note) const
 {
-    const auto noteEvents = getNoteEvents();
+    EventData *it = state.head;
 
-    for (const auto e : noteEvents)
+    while (it)
     {
-        if (e->tick == tick && e->noteNumber == note)
+        if (it->type == EventType::NoteOn &&
+            it->tick == tick &&
+            it->noteNumber == note)
         {
-            return e;
+            return it;
         }
+
+        it = it->next;
     }
 
     return nullptr;
@@ -120,25 +124,39 @@ std::vector<EventData *> TrackStateView::getEvents() const
 EventData *TrackStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
-    for (const auto &e : getNoteEvents())
+    EventData *it = state.head;
+
+    while (it)
     {
-        if (e->noteNumber == noteNumber && e->beingRecorded)
+        if (it->type == EventType::NoteOn &&
+            it->noteNumber == noteNumber &&
+            it->beingRecorded)
         {
-            return e;
+            return it;
         }
+
+        it = it->next;
     }
+
     return nullptr;
 }
 
 EventData *
 TrackStateView::findRecordingNoteOn(const EventData *eventState) const
 {
-    for (const auto &e : getNoteEvents())
+    assert(eventState->type == EventType::NoteOn);
+
+    EventData *it = state.head;
+
+    while (it)
     {
-        if (e == eventState && e->beingRecorded)
+        if (it->type == EventType::NoteOn &&
+            it == eventState && it->beingRecorded)
         {
-            return e;
+            return it;
         }
+
+        it = it->next;
     }
 
     return nullptr;

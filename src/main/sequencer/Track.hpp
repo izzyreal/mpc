@@ -154,8 +154,6 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventData *findRecordingNoteOnEvent(const EventData *);
-
         EventData *findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
         void printEvents() const;

@@ -129,7 +129,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const PerformanceEventSource source, const NoteNumber noteNumber,
-    const EventData *recordedNoteOnEvent, Track *track, const BusType busType,
+    EventData *recordedNoteOnEvent, Track *track, const BusType busType,
     const std::shared_ptr<ScreenComponent> &screen,
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
@@ -143,14 +143,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const Tick positionTicks)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
-
-    EventData *sequencerRecordNoteOnEvent = nullptr;
-
-    if (recordedNoteOnEvent)
-    {
-        sequencerRecordNoteOnEvent =
-            track->findRecordingNoteOnEvent(recordedNoteOnEvent);
-    }
 
     const auto stepEditOptionsScreen =
         screens->get<ScreenId::StepEditOptionsScreen>();
@@ -197,7 +189,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             isSamplerScreen,
             noteNumber,
             eventHandler,
-            sequencerRecordNoteOnEvent,
+            recordedNoteOnEvent,
             transportSnapshot.isRecordingOrOverdubbing(),
             hardware->getButton(ERASE)->isPressed(),
             track,
