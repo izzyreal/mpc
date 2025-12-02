@@ -113,8 +113,8 @@ namespace mpc::sequencer
         BarIndex getBarIndexForPositionQN(PositionQuarterNotes) const;
         BarIndex getBarIndexForPositionTicks(Tick) const;
 
-        void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
-        void setTimeSignature(int barIndex, int num, int den);
+        void setTimeSignature(int firstBar, int tsLastBar, int num, int den) const;
+        void setTimeSignature(int barIndex, int num, int den) const;
 
         void syncTrackEventIndices(int tick) const;
 
@@ -145,7 +145,7 @@ namespace mpc::sequencer
         int getDenominator(int i) const;
         int getNumerator(int i) const;
         void deleteBars(int firstBar, int lastBarToDelete) const;
-        void insertBars(int barCount, BarIndex afterBar) const;
+        void insertBars(int barCount, BarIndex afterBar, std::function<void()> onComplete2 = []{}) const;
         void moveTrack(int source, int destination);
 
         int getEventCount() const;
@@ -163,6 +163,8 @@ namespace mpc::sequencer
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
+
+        void removeEventsThatAreOutsideTickBounds();
 
         const std::function<std::shared_ptr<SequenceStateView>()> getSnapshot;
 

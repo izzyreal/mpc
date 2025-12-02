@@ -230,7 +230,6 @@ TEST_CASE("Can record and playback from different threads",
 
     sequencer->getStateManager()->drainQueue();
 
-    track->printEvents();
     // For - 1 explanation, see humanTickPositions comment
     REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
     REQUIRE(track->getEvents().size() == quantizedPositions.size());

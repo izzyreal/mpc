@@ -132,6 +132,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
     stateManager->drainQueue();
+    stateManager->drainQueue();
 
     REQUIRE(toSeq->getBarCount() == expectedBarCount);
     REQUIRE(toSeq->getTrack(0)->getEvents().size() == 24);

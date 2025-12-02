@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "SequenceStateView.hpp"
+#include "SequencerStateManager.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -226,7 +227,8 @@ void Sequence::init(const int newLastBarIndex)
     setUsed(true);
 }
 
-mpc::BarIndex Sequence::getBarIndexForPositionQN(const PositionQuarterNotes posQN) const
+mpc::BarIndex
+Sequence::getBarIndexForPositionQN(const PositionQuarterNotes posQN) const
 {
     return getBarIndexForPositionTicks(Sequencer::quarterNotesToTicks(posQN));
 }
@@ -260,7 +262,7 @@ void Sequence::setBarLengths(
 }
 
 void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
-                                const int num, const int den)
+                                const int num, const int den) const
 {
     for (int i = firstBar; i <= tsLastBar; i++)
     {
@@ -269,47 +271,12 @@ void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
 }
 
 void Sequence::setTimeSignature(const int barIndex, const int num,
-                                const int den)
+                                const int den) const
 {
-    const auto newDenTicks = 96 * (4.0 / den);
-
-    const auto barStart = getFirstTickOfBar(barIndex);
-    const auto snapshot = getSnapshot();
-
-    const auto oldBarLength = snapshot->getBarLength(barIndex);
-    const auto newBarLength = static_cast<int>(newDenTicks * num);
-    const auto tickShift = static_cast<int>(newBarLength - oldBarLength);
-
-    const auto cutStart = barStart + newBarLength;
-    const auto cutEnd = barStart + oldBarLength;
-
-    const auto nextBarStartTick = barIndex < Mpc2000XlSpecs::MAX_LAST_BAR_INDEX
-                                      ? getFirstTickOfBar(barIndex + 1)
-                                      : getLastTick();
-
-    for (const auto &t : getTracks())
-    {
-        const auto ev = t->getEvents();
-
-        for (const auto &e : ev)
-        {
-            const int tick = e->getTick();
-
-            if (tick >= cutStart && tick < cutEnd)
-            {
-                t->removeEvent(e);
-            }
-            else if (tick >= nextBarStartTick)
-            {
-                e->setTick(tick + tickShift);
-            }
-        }
-    }
-
     const auto ts =
         TimeSignature{TimeSigNumerator(num), TimeSigDenominator(den)};
 
-    dispatch(UpdateTimeSignature{getSequenceIndex(), barIndex, ts});
+    dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(barIndex), ts});
 }
 
 void Sequence::setTimeSignatures(
@@ -532,14 +499,16 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
     }
 }
 
-void Sequence::insertBars(const int barCount, const BarIndex afterBar) const
+void Sequence::insertBars(const int barCount, const BarIndex afterBar,
+                          std::function<void()> onComplete2) const
 {
-    auto onComplete = [this](const BarIndex newLastBarIndex)
+    auto onComplete = [this, onComplete2](const BarIndex newLastBarIndex)
     {
         if (newLastBarIndex != NoBarIndex && !isUsed())
         {
             setUsed(true);
         }
+        onComplete2();
     };
 
     dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
@@ -639,6 +608,11 @@ std::array<TimeSignature, mpc::Mpc2000XlSpecs::MAX_BAR_COUNT>
 Sequence::getTimeSignatures() const
 {
     return getSnapshot()->getTimeSignatures();
+}
+
+void Sequence::removeEventsThatAreOutsideTickBounds()
+{
+    manager->enqueue(RemoveEventsThatAreOutsideTickBounds{getSequenceIndex()});
 }
 
 std::shared_ptr<Track> Sequence::getTempoChangeTrack() const
