@@ -175,8 +175,5 @@ void TriggerLocalNoteOnCommand::execute()
         // TODO These changes still need to be committed. We should probably
         // construct the whole Event before enqueueing it.
         apply16LevelsAndSliderNoteVariation(*recordNoteOnEvent);
-
-        ctx->registryNoteOnEvent.recordNoteEvent =
-            recordNoteOnEvent;
     }
 }

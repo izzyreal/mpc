@@ -297,15 +297,19 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         }
 
         const auto screen = screens->getScreenById(noteEventInfo->screenId);
+        const auto track = sequencer.lock()
+                            ->getSelectedSequence()
+                            ->getTrack(trackIndex)
+                            .get();
+
+        const auto recordingNoteOnEvent =
+            track->findRecordingNoteOnEventByNoteNumber(NoteNumber(noteNumber));
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-                noteEventInfo->recordNoteEvent,
-                sequencer.lock()
-                    ->getSelectedSequence()
-                    ->getTrack(trackIndex)
-                    .get(),
+                recordingNoteOnEvent,
+                track,
                 noteEventInfo->busType, screen, programPadIndex, program,
                 sequencer, performanceManager.lock(), clientEventController,
                 eventHandler, screens, hardware, metronomeOnlyPositionTicks,

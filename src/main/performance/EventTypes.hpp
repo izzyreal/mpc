@@ -80,7 +80,6 @@ namespace mpc::performance
         Velocity velocity;
         ProgramIndex programIndex;
         Pressure pressure;
-        sequencer::EventData *recordNoteEvent = nullptr;
     };
 
     struct NoteAftertouchEvent
