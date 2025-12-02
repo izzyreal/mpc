@@ -44,19 +44,16 @@ void TrMoveScreen::turnWheel(const int i)
 
     if (focusedFieldName.find("tr") != std::string::npos && i > 0)
     {
-        goUp();
+        goDown();
     }
     else if (focusedFieldName.find("tr") != std::string::npos && i < 0)
     {
-        goDown();
+        goUp();
     }
     else if (focusedFieldName == "sq")
     {
         sequencer.lock()->setSelectedSequenceIndex(
             sequencer.lock()->getSelectedSequenceIndex() + i, true);
-        displaySq();
-        displayTrFields();
-        displayTrLabels();
     }
 }
 
