@@ -669,19 +669,31 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     const auto sourceTrack = sequencer.lock()->getSelectedTrack();
 
     const auto fromSequence = sequencer.lock()->getSelectedSequence();
-
     if (!fromSequence->isUsed())
     {
         return;
     }
 
+    const int fromSequenceLastBarIndex = fromSequence->getLastBarIndex();
+
     const auto destOffset = destStart - sourceStart;
 
     const auto toSequence = sequencer.lock()->getSequence(toSequenceIndex);
 
+    auto oldToSequenceLastTick = toSequence->getLastTick();
+
     if (!toSequence->isUsed())
     {
-        toSequence->init(fromSequence->getLastBarIndex());
+        toSequence->init(fromSequenceLastBarIndex);
+
+        oldToSequenceLastTick = 0;
+
+        const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+
+        for (int i = 0; i <= fromSequenceLastBarIndex; i++)
+        {
+            oldToSequenceLastTick += userScreen->timeSig.getBarLength();
+        }
     }
 
     auto destNumerator = -1;
@@ -721,9 +733,6 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         }
 
         toSequence->insertBars(1, BarIndex(afterBar));
-
-        sequencer.lock()->getStateManager()->drainQueue();
-
         toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
 
@@ -772,6 +781,9 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
             break;
         }
 
+        const auto newToSequenceLastTick =
+            oldToSequenceLastTick + barsToAdd * destBarLength;
+
         if (e->getTick() >= sourceStart)
         {
             for (int copy = 0; copy < copyCount; copy++)
@@ -779,7 +791,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
                 const int tickCandidate =
                     e->getTick() + destOffset + copy * segLength;
 
-                if (tickCandidate >= toSequence->getLastTick())
+                if (tickCandidate >= newToSequenceLastTick)
                 {
                     break;
                 }
