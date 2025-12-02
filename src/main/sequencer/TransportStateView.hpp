@@ -39,6 +39,10 @@ namespace mpc::sequencer
 
         int getPlayedSongStepRepetitionCount() const;
 
+        double getTempo() const;
+
+        bool isTempoSourceSequenceEnabled() const;
+
     private:
         const TransportState state;
     };

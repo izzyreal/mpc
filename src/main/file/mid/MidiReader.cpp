@@ -70,11 +70,11 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
             if (text.find("TEMPO=ON") != std::string::npos)
             {
-                lSequencer->getTransport()->setTempoSourceSequence(true);
+                lSequencer->getTransport()->setTempoSourceIsSequence(true);
             }
             else if (text.find("TEMPO=OFF") != std::string::npos)
             {
-                lSequencer->getTransport()->setTempoSourceSequence(false);
+                lSequencer->getTransport()->setTempoSourceIsSequence(false);
             }
 
             firstLoopBar = stoi(text.substr(15, 18));
@@ -114,7 +114,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
     sequence->setInitialTempo(initialTempo);
 
-    if (!lSequencer->getTransport()->isTempoSourceSequenceEnabled())
+    if (!lSequencer->getTransport()->isTempoSourceSequence())
     {
         lSequencer->getTransport()->setTempo(initialTempo);
     }

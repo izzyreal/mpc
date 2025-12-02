@@ -43,20 +43,20 @@ AllSequencer::AllSequencer(Mpc &mpc)
     saveBytes[TR_OFFSET] = mpcSequencer->getSelectedTrackIndex();
 
     const bool tempoSourceIsSequence =
-        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled();
+        mpcSequencer->getTransport()->isTempoSourceSequence();
 
-    mpcSequencer->getTransport()->setTempoSourceSequence(false);
+    mpcSequencer->getTransport()->setTempoSourceIsSequence(false);
 
     const auto masterTempoBytes =
         ByteUtil::ushort2bytes(mpcSequencer->getTransport()->getTempo() * 10.0);
 
-    mpcSequencer->getTransport()->setTempoSourceSequence(tempoSourceIsSequence);
+    mpcSequencer->getTransport()->setTempoSourceIsSequence(tempoSourceIsSequence);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
     saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] =
-        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled() ? 0x01
+        mpcSequencer->getTransport()->isTempoSourceSequence() ? 0x01
                                                                      : 0x00;
 
     const auto timingCorrectScreen =

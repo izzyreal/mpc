@@ -20,5 +20,7 @@ namespace mpc::sequencer
         bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         int playedSongStepRepetitionCount = 0;
+        double tempo = 120.0;
+        bool tempoSourceIsSequenceEnabled = true;
     };
 } // namespace mpc::sequencer

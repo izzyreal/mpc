@@ -160,7 +160,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                         {
                             return sequencer.lock()
                                 ->getTransport()
-                                ->isTempoSourceSequenceEnabled();
+                                ->isTempoSourceSequence();
                         },
                         [&](auto)
                         {
@@ -535,7 +535,7 @@ void SequencerScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
+            sequencer.lock()->getTransport()->isTempoSourceSequence()
                 ? "(SEQ)"
                 : "(MAS)");
 }
@@ -900,7 +900,7 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer.lock()->getTransport()->setTempoSourceSequence(i > 0);
+        sequencer.lock()->getTransport()->setTempoSourceIsSequence(i > 0);
     }
     else if (focusedFieldName == "count")
     {

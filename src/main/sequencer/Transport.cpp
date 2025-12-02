@@ -23,7 +23,8 @@ using namespace mpc::lcdgui;
 Transport::Transport(Sequencer &owner) : sequencer(owner)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
-    tempo = userScreen->getTempo();
+    sequencer.getStateManager()->enqueue(
+        SetTransportTempo{userScreen->getTempo()});
 }
 
 bool Transport::isPlaying() const
@@ -518,14 +519,17 @@ int64_t Transport::getCountInEndPosTicks() const
         .countInEndPosTicks();
 }
 
-bool Transport::isTempoSourceSequenceEnabled() const
+bool Transport::isTempoSourceSequence() const
 {
-    return tempoSourceSequenceEnabled;
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .isTempoSourceSequenceEnabled();
 }
 
-void Transport::setTempoSourceSequence(const bool b)
+void Transport::setTempoSourceIsSequence(const bool b) const
 {
-    tempoSourceSequenceEnabled = b;
+    sequencer.getStateManager()->enqueue(SetTempoSourceIsSequence{b});
 }
 
 bool Transport::isRecordingOrOverdubbing() const
@@ -554,7 +558,10 @@ int Transport::getCurrentBarIndex() const
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
 
-    if (!seq) return 0;
+    if (!seq)
+    {
+        return 0;
+    }
 
     const auto pos = getTickPositionGuiPresentation();
 
@@ -566,7 +573,10 @@ int Transport::getCurrentBeatIndex() const
     const auto seq = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                  : sequencer.getSelectedSequence();
 
-    if (!seq) return 0;
+    if (!seq)
+    {
+        return 0;
+    }
 
     const auto pos = getTickPositionGuiPresentation();
 
@@ -619,7 +629,10 @@ int Transport::getCurrentClockNumber() const
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                       : sequencer.getSelectedSequence();
 
-    if (!sequence) return 0;
+    if (!sequence)
+    {
+        return 0;
+    }
 
     auto clock = getTickPositionGuiPresentation();
 
@@ -796,41 +809,26 @@ void Transport::setPosition(const double positionQuarterNotes) const
     }
 }
 
-void Transport::setTempo(double newTempo)
+void Transport::setTempo(const double newTempo) const
 {
-    if (newTempo < 30.0)
-    {
-        newTempo = 30.0;
-    }
-    else if (newTempo > 300.0)
-    {
-        newTempo = 300.0;
-    }
-
     const auto s = sequencer.getSelectedSequence();
     const auto tce = sequencer.getCurrentTempoChangeEvent();
 
-    if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
+    if (!s || !s->isUsed() || !isTempoSourceSequence())
     {
-        if (tce)
+        if (!tce)
         {
-            auto candidate = newTempo / (tce->getRatio() * 0.001);
-
-            if (candidate < 30.0)
-            {
-                candidate = 30.0;
-            }
-            else if (candidate > 300.0)
-            {
-                candidate = 300.0;
-            }
-
-            tempo = candidate;
+            sequencer.getStateManager()->enqueue(
+                SetTransportTempo{std::clamp(newTempo, 30.0, 300.0)});
+            return;
         }
-        else
-        {
-            tempo = newTempo;
-        }
+
+        const auto tempoWithRatioApplied =
+            std::clamp(newTempo / (tce->getRatio() * 0.001), 30.0, 300.0);
+
+        sequencer.getStateManager()->enqueue(
+            SetTransportTempo{tempoWithRatioApplied});
+
         return;
     }
 
@@ -852,9 +850,12 @@ void Transport::setTempo(double newTempo)
 
 double Transport::getTempo() const
 {
+    const auto snapshot =
+        sequencer.getStateManager()->getSnapshot().getTransportStateView();
+
     if (!isPlaying() && !sequencer.getSelectedSequence()->isUsed())
     {
-        return tempo;
+        return snapshot.getTempo();
     }
 
     const auto seq = sequencer.getSelectedSequence();
@@ -870,7 +871,7 @@ double Transport::getTempo() const
 
     const auto tce = sequencer.getCurrentTempoChangeEvent();
 
-    if (tempoSourceSequenceEnabled)
+    if (snapshot.isTempoSourceSequenceEnabled())
     {
         const auto ignoreTempoChangeScreen =
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
@@ -889,8 +890,8 @@ double Transport::getTempo() const
 
     if (seq->isTempoChangeOn() && tce)
     {
-        return tempo * tce->getRatio() * 0.001;
+        return snapshot.getTempo() * tce->getRatio() * 0.001;
     }
 
-    return tempo;
+    return snapshot.getTempo();
 }

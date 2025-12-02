@@ -42,10 +42,10 @@ namespace mpc::sequencer
         bool isOverdubbing() const;
         bool isRecordingOrOverdubbing() const;
 
-        void setTempo(double newTempo);
+        void setTempo(double newTempo) const;
         double getTempo() const;
-        bool isTempoSourceSequenceEnabled() const;
-        void setTempoSourceSequence(bool b);
+        bool isTempoSourceSequence() const;
+        void setTempoSourceIsSequence(bool b) const;
 
         void setAutoPunchMode(int mode);
         void setPunchEnabled(bool enabled);
@@ -95,8 +95,5 @@ namespace mpc::sequencer
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;
-
-        double tempo = 120.0;
-        bool tempoSourceSequenceEnabled = true;
     };
 } // namespace mpc::sequencer

@@ -274,7 +274,7 @@ void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
+            sequencer.lock()->getTransport()->isTempoSourceSequence()
                 ? "(SEQ)"
                 : "(MAS)");
 }

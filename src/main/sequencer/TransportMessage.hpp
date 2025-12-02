@@ -112,6 +112,16 @@ namespace mpc::sequencer
         Tick end;
     };
 
+    struct SetTransportTempo
+    {
+        double tempo;
+    };
+
+    struct SetTempoSourceIsSequence
+    {
+        bool enabled;
+    };
+
     using TransportMessage =
         std::variant<SetPositionQuarterNotes, StopSequence, PlaySequence,
                      PlaySequenceFromStart, Record, RecordFromStart, Overdub,
@@ -122,5 +132,6 @@ namespace mpc::sequencer
                      BumpMetronomeOnlyTickPositionOneTick, PlayMetronomeOnly,
                      StopMetronomeOnly, PlaySong, PlaySongFromStart, StopSong,
                      SetCountInPositions, SetEndOfSongEnabled,
-                     SetPlayedSongStepRepetitionCount>;
+                     SetPlayedSongStepRepetitionCount, SetTransportTempo,
+                     SetTempoSourceIsSequence>;
 } // namespace mpc::sequencer

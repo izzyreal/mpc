@@ -79,3 +79,13 @@ int TransportStateView::getPlayedSongStepRepetitionCount() const
 {
     return state.playedSongStepRepetitionCount;
 }
+
+double TransportStateView::getTempo() const
+{
+    return state.tempo;
+}
+
+bool TransportStateView::isTempoSourceSequenceEnabled() const
+{
+    return state.tempoSourceIsSequenceEnabled;
+}

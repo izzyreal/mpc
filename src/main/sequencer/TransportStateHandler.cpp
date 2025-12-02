@@ -194,6 +194,14 @@ void TransportStateHandler::applyMessage(TransportState &state,
         {
             state.playedSongStepRepetitionCount = m.count;
         },
+        [&](const SetTransportTempo &m)
+        {
+            state.tempo = m.tempo;
+        },
+        [&](const SetTempoSourceIsSequence &m)
+        {
+            state.tempoSourceIsSequenceEnabled = m.enabled;
+        },
         [&](const SetCountingIn &m)
         {
             state.countingIn = m.countingIn;

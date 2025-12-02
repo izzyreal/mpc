@@ -287,14 +287,14 @@ void SongScreen::turnWheel(const int increment)
         }
     }
     else if (focusedFieldName == "tempo" &&
-             !sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled())
+             !sequencer.lock()->getTransport()->isTempoSourceSequence())
     {
         sequencer.lock()->getTransport()->setTempo(
             sequencer.lock()->getTransport()->getTempo() + increment * 0.1);
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer.lock()->getTransport()->setTempoSourceSequence(increment > 0);
+        sequencer.lock()->getTransport()->setTempoSourceIsSequence(increment > 0);
         displayTempoSource();
         displayTempo();
     }
@@ -440,7 +440,7 @@ void SongScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequenceEnabled()
+            sequencer.lock()->getTransport()->isTempoSourceSequence()
                 ? "SEQ"
                 : "MAS");
 }
