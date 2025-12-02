@@ -30,7 +30,8 @@ namespace mpc::client::event
 
     public:
         ClientMidiEvent() = default;
-        ClientMidiEvent(MessageType type, int d1 = 0, int d2 = 0)
+        explicit ClientMidiEvent(const MessageType type, const int d1 = 0,
+                                 const int d2 = 0)
             : messageType(type), data1(static_cast<uint8_t>(d1)),
               data2(static_cast<uint8_t>(d2))
         {
@@ -40,7 +41,7 @@ namespace mpc::client::event
         {
             return messageType;
         }
-        void setMessageType(MessageType type) noexcept
+        void setMessageType(const MessageType type) noexcept
         {
             messageType = type;
         }
@@ -67,7 +68,7 @@ namespace mpc::client::event
         {
             return data1;
         }
-        void setNoteNumber(int n) noexcept
+        void setNoteNumber(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
         }
@@ -76,7 +77,7 @@ namespace mpc::client::event
         {
             return data2;
         }
-        void setVelocity(int v) noexcept
+        void setVelocity(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
         }
@@ -85,7 +86,7 @@ namespace mpc::client::event
         {
             return data1;
         }
-        void setControllerNumber(int c) noexcept
+        void setControllerNumber(const int c) noexcept
         {
             data1 = static_cast<uint8_t>(c);
         }
@@ -94,7 +95,7 @@ namespace mpc::client::event
         {
             return data2;
         }
-        void setControllerValue(int v) noexcept
+        void setControllerValue(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
         }
@@ -103,7 +104,7 @@ namespace mpc::client::event
         {
             return data1;
         }
-        void setAftertouchNote(int n) noexcept
+        void setAftertouchNote(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
         }
@@ -112,7 +113,7 @@ namespace mpc::client::event
         {
             return data2;
         }
-        void setAftertouchValue(int v) noexcept
+        void setAftertouchValue(const int v) noexcept
         {
             data2 = static_cast<uint8_t>(v);
         }
@@ -121,7 +122,7 @@ namespace mpc::client::event
         {
             return data1;
         }
-        void setChannelPressure(int p) noexcept
+        void setChannelPressure(const int p) noexcept
         {
             data1 = static_cast<uint8_t>(p);
         }
@@ -130,7 +131,7 @@ namespace mpc::client::event
         {
             return data1;
         }
-        void setProgramNumber(int n) noexcept
+        void setProgramNumber(const int n) noexcept
         {
             data1 = static_cast<uint8_t>(n);
         }
