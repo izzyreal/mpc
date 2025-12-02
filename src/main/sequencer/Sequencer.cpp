@@ -328,24 +328,6 @@ int Sequencer::getSelectedTrackIndex() const
     return selectedTrackIndex;
 }
 
-void Sequencer::trackUp()
-{
-    if (selectedTrackIndex == 63)
-    {
-        return;
-    }
-    selectedTrackIndex++;
-}
-
-void Sequencer::trackDown()
-{
-    if (selectedTrackIndex == 0)
-    {
-        return;
-    }
-    selectedTrackIndex--;
-}
-
 void Sequencer::undoSeq()
 {
     if (transport->isPlaying())
@@ -865,7 +847,9 @@ std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 
 void Sequencer::setSelectedTrackIndex(const int i)
 {
-    selectedTrackIndex = i;
+    selectedTrackIndex =
+        std::clamp(static_cast<int8_t>(i), static_cast<int8_t>(0),
+                   Mpc2000XlSpecs::LAST_TRACK_INDEX);
 }
 
 SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const

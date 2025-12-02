@@ -180,8 +180,6 @@ namespace mpc::sequencer
         void setRecordingModeMulti(bool b);
         bool isRecordingModeMulti() const;
         int getSelectedTrackIndex() const;
-        void trackUp();
-        void trackDown();
 
         void undoSeq();
         void setSequence(SequenceIndex, std::shared_ptr<Sequence>);

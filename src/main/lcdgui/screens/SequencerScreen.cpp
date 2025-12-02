@@ -738,10 +738,12 @@ void SequencerScreen::function(const int i)
             break;
         }
         case 4:
-            sequencer.lock()->trackDown();
+            sequencer.lock()->setSelectedTrackIndex(
+                sequencer.lock()->getSelectedTrackIndex() - 1);
             break;
         case 5:
-            sequencer.lock()->trackUp();
+            sequencer.lock()->setSelectedTrackIndex(
+                sequencer.lock()->getSelectedTrackIndex() + 1);
             break;
         default:;
     }
@@ -796,14 +798,8 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "tr")
     {
-        if (i > 0)
-        {
-            sequencer.lock()->trackUp();
-        }
-        else if (i < 0)
-        {
-            sequencer.lock()->trackDown();
-        }
+        sequencer.lock()->setSelectedTrackIndex(
+            sequencer.lock()->getSelectedTrackIndex() + i);
     }
     else if (focusedFieldName == "bus")
     {
