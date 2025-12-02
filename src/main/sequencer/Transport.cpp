@@ -719,7 +719,10 @@ void Transport::setBar(int i) const
 
     const auto seq = sequencer.getSelectedSequence();
 
-    i = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
+    i = std::clamp(
+        i, 0,
+        std::min(seq->getBarCount(),
+                 static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)));
 
     int pos = 0;
 

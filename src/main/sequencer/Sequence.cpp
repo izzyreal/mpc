@@ -239,9 +239,9 @@ mpc::BarIndex Sequence::getBarIndexForPositionTicks(const Tick posTicks) const
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        if (i > getLastBarIndex())
+        if (i >= getBarCount())
         {
-            return BarIndex(0);
+            return BarIndex(i);
         }
 
         tickCounter += getBarLength(i);
