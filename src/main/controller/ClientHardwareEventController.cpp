@@ -413,12 +413,11 @@ void ClientHardwareEventController::handlePadRelease(
                     performanceManager, clientEventController, eventHandler,
                     screens, hardware, metronomeOnlyPositionTicks, positionTicks);
 
-            TriggerLocalNoteOffCommand(ctx).execute();
-
             constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+
             performanceManager.lock()->registerNoteOff(
                 PerformanceEventSource::VirtualMpcHardware, p->noteNumber,
-                noMidiChannel, [](void *) {});
+                noMidiChannel, [ctx](void *) {TriggerLocalNoteOffCommand(ctx).execute();});
         }
 
         if (p->programIndex != NoProgramIndex)

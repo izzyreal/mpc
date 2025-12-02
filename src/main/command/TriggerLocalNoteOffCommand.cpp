@@ -46,7 +46,7 @@ void TriggerLocalNoteOffCommand::execute()
         const auto snapshot = ctx->performanceManager.lock()->getSnapshot();
 
         const bool thisIsTheLastActiveNoteOn =
-            snapshot.getTotalNoteOnCount() == 1;
+            snapshot.getTotalNoteOnCount() == 0;
 
         if (ctx->sequencerIsRecordingOrOverdubbing)
         {
