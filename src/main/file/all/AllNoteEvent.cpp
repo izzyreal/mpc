@@ -14,7 +14,7 @@ EventData AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     e.type = EventType::NoteOn;
     e.noteNumber = NoteNumber(bytes[NOTE_NUMBER_OFFSET]);
     e.tick = AllEvent::readTick(bytes);
-    const auto track = readTrackNumber(bytes);
+    const auto track = readTrackIndex(bytes);
     e.trackIndex = TrackIndex(track);
     e.duration = Duration(readDuration(bytes) - track * 4);
     e.velocity = Velocity(readVelocity(bytes));
@@ -30,7 +30,7 @@ std::vector<char> AllNoteOnEvent::mpcEventToBytes(const EventData &e)
 
     bytes[NOTE_NUMBER_OFFSET] = static_cast<int8_t>(e.noteNumber);
 
-    writeTrackNumber(bytes, e.trackIndex);
+    writeTrackIndex(bytes, e.trackIndex);
     writeVariationType(bytes, e.noteVariationType);
     writeVariationValue(bytes, e.noteVariationValue);
     AllEvent::writeTick(bytes, e.tick);
@@ -69,31 +69,10 @@ int AllNoteOnEvent::readDuration(const std::vector<char> &bytes)
     return (i1 << 6) + (i2 << 2) + i3;
 }
 
-int AllNoteOnEvent::readTrackNumber(const std::vector<char> &bytes)
+int AllNoteOnEvent::readTrackIndex(const std::vector<char> &bytes)
 {
-    auto b = static_cast<unsigned char>(bytes[TRACK_NUMBER_OFFSET]);
-    for (int i = 0; i < 8; i++)
-    {
-        if (i < TRACK_NUMBER_BIT_RANGE[0] || i > TRACK_NUMBER_BIT_RANGE[1])
-        {
-            b = BitUtil::setBit(b, i, false);
-        }
-    }
-
-    if (b > 128)
-    {
-        b -= 128;
-    }
-    if (b < 0)
-    {
-        b += 128;
-    }
-    if (b > 63)
-    {
-        b -= 64;
-    }
-
-    return b;
+    const auto raw = static_cast<unsigned char>(bytes[TRACK_NUMBER_OFFSET]);
+    return raw & 0x3F;
 }
 
 int AllNoteOnEvent::readVelocity(const std::vector<char> &bytes)
@@ -155,7 +134,7 @@ void AllNoteOnEvent::writeVelocity(std::vector<char> &event, const int v)
         VELOCITY_BIT_RANGE);
 }
 
-void AllNoteOnEvent::writeTrackNumber(std::vector<char> &event, const int t)
+void AllNoteOnEvent::writeTrackIndex(std::vector<char> &event, const int t)
 {
     const auto value = static_cast<int8_t>(t);
     event[TRACK_NUMBER_OFFSET] = BitUtil::stitchBytes(

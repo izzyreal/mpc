@@ -25,13 +25,13 @@ namespace mpc::file::all
         static std::vector<int> VAR_VALUE_BIT_RANGE;
 
         static int readDuration(const std::vector<char> &);
-        static int readTrackNumber(const std::vector<char> &);
+        static int readTrackIndex(const std::vector<char> &);
         static int readVelocity(const std::vector<char> &);
         static int readVariationValue(const std::vector<char> &);
         static NoteVariationType readVariationType(const std::vector<char> &);
 
         static void writeVelocity(std::vector<char> &event, int);
-        static void writeTrackNumber(std::vector<char> &event, int);
+        static void writeTrackIndex(std::vector<char> &event, int);
         static void writeVariationValue(std::vector<char> &event, int);
         static void writeDuration(std::vector<char> &event, int);
         static void writeVariationType(std::vector<char> &event, int);
