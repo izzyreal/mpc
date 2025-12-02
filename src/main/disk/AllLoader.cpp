@@ -93,7 +93,6 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     int index = 0;
 
     mpc.getSequencer()->purgeAllSequences();
-    mpc.getSequencer()->getStateManager()->drainQueue();
 
     for (auto &as : allSequences)
     {
