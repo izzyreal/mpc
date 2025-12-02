@@ -70,7 +70,7 @@ void LayeredScreen::postToUiThread(const std::function<void()> &fn)
 bool LayeredScreen::isPreviousScreen(
     const std::initializer_list<ScreenId> ids) const
 {
-    auto screenId = previousScreenId.load();
+    const auto screenId = previousScreenId.load();
 
     for (const auto candidate : ids)
     {
@@ -86,7 +86,7 @@ bool LayeredScreen::isPreviousScreen(
 bool LayeredScreen::isPreviousScreenNot(
     const std::initializer_list<ScreenId> ids) const
 {
-    auto screenId = previousScreenId.load();
+    const auto screenId = previousScreenId.load();
 
     for (const auto candidate : ids)
     {
@@ -102,7 +102,7 @@ bool LayeredScreen::isPreviousScreenNot(
 bool LayeredScreen::isCurrentScreen(
     const std::initializer_list<ScreenId> ids) const
 {
-    auto screenId = currentScreenId.load();
+    const auto screenId = currentScreenId.load();
 
     for (const auto candidate : ids)
     {
