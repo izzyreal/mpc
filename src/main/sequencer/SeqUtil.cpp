@@ -305,7 +305,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
         static_cast<uint16_t>((copyLastBar - copyFirstBar + 1) * copyCount),
         static_cast<uint16_t>(0), Mpc2000XlSpecs::MAX_BAR_COUNT);
 
-    CopyBars copyBars {
+    CopyBars copyBars{
         SequenceIndex(fromSeqIndex),
         SequenceIndex(toSeqIndex),
         BarIndex(copyFirstBar),
@@ -324,13 +324,14 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                                            toSequence->getLastBarIndex();
         }
 
-        auto onComplete = [stateManager = sequencer->getStateManager(), copyBars]
+        auto onComplete =
+            [stateManager = sequencer->getStateManager(), copyBars]
         {
             stateManager->enqueue(copyBars);
         };
 
-        toSequence->insertBars(destinationBarCount,
-                               BarIndex(copyAfterBar), onComplete);
+        toSequence->insertBars(destinationBarCount, BarIndex(copyAfterBar),
+                               onComplete);
     }
     else
     {

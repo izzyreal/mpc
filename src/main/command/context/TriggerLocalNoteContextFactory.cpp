@@ -139,8 +139,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
     const std::shared_ptr<Hardware> &hardware,
-    const Tick metronomeOnlyPositionTicks,
-    const Tick positionTicks)
+    const Tick metronomeOnlyPositionTicks, const Tick positionTicks)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 

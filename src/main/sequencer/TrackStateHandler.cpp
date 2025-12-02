@@ -7,17 +7,17 @@
 using namespace mpc::sequencer;
 
 TrackStateHandler::TrackStateHandler(SequencerStateManager *manager,
-                                           Sequencer *sequencer)
+                                     Sequencer *sequencer)
     : manager(manager), sequencer(sequencer)
 {
 }
 
 TrackStateHandler::~TrackStateHandler() {}
 
-void updateEvent(EventData *const e, const EventData& replacement)
+void updateEvent(EventData *const e, const EventData &replacement)
 {
-    auto* prev = e->prev;
-    auto* next = e->next;
+    auto *prev = e->prev;
+    auto *next = e->next;
 
     *e = replacement;
 
@@ -82,7 +82,8 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            EventData *it = state.sequences[m.sequence].tracks[m.oldTrackIndex].head;
+            EventData *it =
+                state.sequences[m.sequence].tracks[m.oldTrackIndex].head;
             while (it)
             {
                 it->trackIndex = m.newTrackIndex;
@@ -94,7 +95,9 @@ void TrackStateHandler::applyMessage(
         },
         [&](const FinalizeNonLiveNoteEvent &m)
         {
-            auto &lock = manager->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
+            auto &lock =
+                manager
+                    ->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
 
             if (!lock.try_acquire())
             {
@@ -103,8 +106,8 @@ void TrackStateHandler::applyMessage(
             }
 
             EventData *it = state.sequences[m.handle->sequenceIndex]
-                               .tracks[m.handle->trackIndex]
-                               .head;
+                                .tracks[m.handle->trackIndex]
+                                .head;
             while (it)
             {
                 if (it->beingRecorded && it->duration == NoDuration &&
@@ -121,7 +124,9 @@ void TrackStateHandler::applyMessage(
         },
         [&](const UpdateEvent &m)
         {
-            auto &lock = manager->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
+            auto &lock =
+                manager
+                    ->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
             if (!lock.try_acquire())
             {
                 manager->enqueue(m);
@@ -132,7 +137,9 @@ void TrackStateHandler::applyMessage(
         },
         [&](const InsertAcquiredEvent &m)
         {
-            auto &lock = manager->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
+            auto &lock =
+                manager
+                    ->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
 
             if (!lock.try_acquire())
             {
@@ -141,7 +148,7 @@ void TrackStateHandler::applyMessage(
             }
 
             auto &track = state.sequences[m.handle->sequenceIndex]
-                               .tracks[m.handle->trackIndex];
+                              .tracks[m.handle->trackIndex];
 
             manager->insertAcquiredEvent(track, m.handle);
 
@@ -161,10 +168,10 @@ void TrackStateHandler::applyMessage(
 
             auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            EventData* cur = track.head;
+            EventData *cur = track.head;
             while (cur)
             {
-                EventData* nxt = cur->next;
+                EventData *nxt = cur->next;
                 cur->prev = nullptr;
                 cur->next = nullptr;
                 manager->returnEventToPool(cur);
@@ -189,21 +196,27 @@ void TrackStateHandler::applyMessage(
             std::vector<NoteNumber> notesAtTick;
             Tick lastTick = -100;
 
-            EventData* cur = track.head;
+            EventData *cur = track.head;
 
             while (cur)
             {
-                EventData* next = cur->next;
+                EventData *next = cur->next;
 
                 if (cur->type == EventType::NoteOn)
                 {
                     if (cur->tick != lastTick)
+                    {
                         notesAtTick.clear();
+                    }
 
                     bool exists = false;
                     for (auto n : notesAtTick)
+                    {
                         if (n == cur->noteNumber)
+                        {
                             exists = true;
+                        }
+                    }
 
                     if (!exists)
                     {
@@ -212,9 +225,18 @@ void TrackStateHandler::applyMessage(
                     }
                     else
                     {
-                        if (cur->prev) cur->prev->next = cur->next;
-                        else track.head = cur->next;
-                        if (cur->next) cur->next->prev = cur->prev;
+                        if (cur->prev)
+                        {
+                            cur->prev->next = cur->next;
+                        }
+                        else
+                        {
+                            track.head = cur->next;
+                        }
+                        if (cur->next)
+                        {
+                            cur->next->prev = cur->prev;
+                        }
 
                         cur->prev = nullptr;
                         cur->next = nullptr;
@@ -230,7 +252,9 @@ void TrackStateHandler::applyMessage(
         },
         [&](const UpdateEventTick &m)
         {
-            auto &lock = manager->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
+            auto &lock =
+                manager
+                    ->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
 
             if (!lock.try_acquire())
             {
@@ -241,7 +265,7 @@ void TrackStateHandler::applyMessage(
             auto &track = state.sequences[m.handle->sequenceIndex]
                               .tracks[m.handle->trackIndex];
 
-            EventData* e = m.handle;
+            EventData *e = m.handle;
             const Tick newTick = m.newTick;
             const Tick oldTick = e->tick;
 
@@ -251,11 +275,20 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            EventData*& head = track.head;
+            EventData *&head = track.head;
 
-            if (e->prev) e->prev->next = e->next;
-            else head = e->next;
-            if (e->next) e->next->prev = e->prev;
+            if (e->prev)
+            {
+                e->prev->next = e->next;
+            }
+            else
+            {
+                head = e->next;
+            }
+            if (e->next)
+            {
+                e->next->prev = e->prev;
+            }
 
             e->prev = nullptr;
             e->next = nullptr;
@@ -268,8 +301,8 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            EventData* cur = head;
-            EventData* prev = nullptr;
+            EventData *cur = head;
+            EventData *prev = nullptr;
 
             while (cur && cur->tick <= newTick)
             {
@@ -289,7 +322,10 @@ void TrackStateHandler::applyMessage(
             e->prev = prev;
             e->next = cur;
             prev->next = e;
-            if (cur) cur->prev = e;
+            if (cur)
+            {
+                cur->prev = e;
+            }
 
             lock.release();
         },
@@ -305,11 +341,21 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            auto &track = state.sequences[e->sequenceIndex].tracks[e->trackIndex];
+            auto &track =
+                state.sequences[e->sequenceIndex].tracks[e->trackIndex];
 
-            if (e->prev) e->prev->next = e->next;
-            if (e->next) e->next->prev = e->prev;
-            if (track.head == e) track.head = e->next;
+            if (e->prev)
+            {
+                e->prev->next = e->next;
+            }
+            if (e->next)
+            {
+                e->next->prev = e->prev;
+            }
+            if (track.head == e)
+            {
+                track.head = e->next;
+            }
 
             e->prev = nullptr;
             e->next = nullptr;
@@ -317,7 +363,7 @@ void TrackStateHandler::applyMessage(
             manager->returnEventToPool(e);
             lock.release();
         },
-        [&](const UpdateEvents& m)
+        [&](const UpdateEvents &m)
         {
             auto &lock = manager->trackLocks[m.sequence][m.track];
 
@@ -327,11 +373,12 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            auto& track = state.sequences[m.sequence].tracks[m.track];
+            auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            EventData* cur = track.head;
-            while (cur) {
-                EventData* nxt = cur->next;
+            EventData *cur = track.head;
+            while (cur)
+            {
+                EventData *nxt = cur->next;
                 cur->prev = nullptr;
                 cur->next = nullptr;
                 manager->returnEventToPool(cur);
@@ -339,8 +386,9 @@ void TrackStateHandler::applyMessage(
             }
             track.head = nullptr;
 
-            for (const auto& src : m.snapshot) {
-                EventData* e = manager->acquireEvent();
+            for (const auto &src : m.snapshot)
+            {
+                EventData *e = manager->acquireEvent();
                 std::memcpy(e, &src, sizeof(EventData));
                 e->prev = nullptr;
                 e->next = nullptr;

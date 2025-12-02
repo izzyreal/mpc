@@ -19,8 +19,8 @@ void TempoChangeEvent::setParent(Sequence *newParent)
 
 void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next) const
 {
-    auto candidate = parent->getFirstTickOfBar(
-        SeqUtil::getBar(parent, handle->tick) + 1);
+    auto candidate =
+        parent->getFirstTickOfBar(SeqUtil::getBar(parent, handle->tick) + 1);
 
     if (candidate > parent->getLastTick())
     {
@@ -40,8 +40,8 @@ void TempoChangeEvent::plusOneBar(const TempoChangeEvent *next) const
 
 void TempoChangeEvent::minusOneBar(const TempoChangeEvent *previous) const
 {
-    auto candidate = parent->getFirstTickOfBar(
-        SeqUtil::getBar(parent, handle->tick) - 1);
+    auto candidate =
+        parent->getFirstTickOfBar(SeqUtil::getBar(parent, handle->tick) - 1);
 
     if (candidate < 0)
     {

@@ -146,8 +146,7 @@ void Mpc::init()
     MLOG("EngineHost created");
 
     sequencer = std::make_shared<Sequencer>(
-        clock,
-        layeredScreen,
+        clock, layeredScreen,
         [&]
         {
             return screens;

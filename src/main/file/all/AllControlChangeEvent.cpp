@@ -5,8 +5,7 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-EventData
-AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+EventData AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     EventData e;
     e.type = EventType::ControlChange;

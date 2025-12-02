@@ -28,10 +28,9 @@ namespace mpc::sequencer
 
         void setParent(Sequence *newParent);
 
-        TempoChangeEvent(
-            EventData *ptr, const EventData &snapshot,
-            const std::function<void(TrackMessage &&)> &dispatch,
-            Sequence *parent);
+        TempoChangeEvent(EventData *ptr, const EventData &snapshot,
+                         const std::function<void(TrackMessage &&)> &dispatch,
+                         Sequence *parent);
 
         std::string getTypeName() const override
         {

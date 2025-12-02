@@ -38,7 +38,9 @@ namespace mpc::sequencer
             for (;;)
             {
                 if (try_acquire())
+                {
                     return;
+                }
                 std::this_thread::yield();
             }
         }
@@ -60,8 +62,7 @@ namespace mpc::sequencer
 
         void returnEventToPool(EventData *e) const;
 
-        static void
-        insertAcquiredEvent(TrackState &track, EventData *e);
+        static void insertAcquiredEvent(TrackState &track, EventData *e);
 
         EventData *acquireEvent() const;
 

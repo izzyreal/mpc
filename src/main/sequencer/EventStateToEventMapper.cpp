@@ -15,10 +15,10 @@
 namespace mpc::sequencer
 {
     class SequencerStateManager;
-    std::shared_ptr<EventRef> mapEventStateToEvent(
-        EventData *const ptr, const EventData &snapshot,
-        const std::function<void(TrackMessage &&)> &dispatch,
-        Sequence *parent)
+    std::shared_ptr<EventRef>
+    mapEventStateToEvent(EventData *const ptr, const EventData &snapshot,
+                         const std::function<void(TrackMessage &&)> &dispatch,
+                         Sequence *parent)
     {
         if (snapshot.type == EventType::NoteOn)
         {
@@ -26,11 +26,13 @@ namespace mpc::sequencer
         }
         if (snapshot.type == EventType::ChannelPressure)
         {
-            return std::make_shared<ChannelPressureEvent>(ptr, snapshot, dispatch);
+            return std::make_shared<ChannelPressureEvent>(ptr, snapshot,
+                                                          dispatch);
         }
         if (snapshot.type == EventType::ControlChange)
         {
-            return std::make_shared<ControlChangeEvent>(ptr, snapshot, dispatch);
+            return std::make_shared<ControlChangeEvent>(ptr, snapshot,
+                                                        dispatch);
         }
         if (snapshot.type == EventType::Mixer)
         {
@@ -46,15 +48,18 @@ namespace mpc::sequencer
         }
         if (snapshot.type == EventType::SystemExclusive)
         {
-            return std::make_shared<SystemExclusiveEvent>(ptr, snapshot, dispatch);
+            return std::make_shared<SystemExclusiveEvent>(ptr, snapshot,
+                                                          dispatch);
         }
         if (snapshot.type == EventType::ProgramChange)
         {
-            return std::make_shared<ProgramChangeEvent>(ptr, snapshot, dispatch);
+            return std::make_shared<ProgramChangeEvent>(ptr, snapshot,
+                                                        dispatch);
         }
         if (snapshot.type == EventType::TempoChange)
         {
-            return std::make_shared<TempoChangeEvent>(ptr, snapshot, dispatch, parent);
+            return std::make_shared<TempoChangeEvent>(ptr, snapshot, dispatch,
+                                                      parent);
         }
         return {};
     }

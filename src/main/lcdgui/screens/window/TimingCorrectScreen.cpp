@@ -91,9 +91,9 @@ void TimingCorrectScreen::function(int i)
                     if (noteEvent->getNote() >= noteRange[0] &&
                         noteEvent->getNote() <= noteRange[1])
                     {
-                        track->shiftTiming(e->handle,
-                                           e->getTick(), shiftTimingLater,
-                                           amount, sequence->getLastTick());
+                        track->shiftTiming(e->handle, e->getTick(),
+                                           shiftTimingLater, amount,
+                                           sequence->getLastTick());
                     }
                 }
             }

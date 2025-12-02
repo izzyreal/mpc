@@ -1049,7 +1049,8 @@ StepEditorScreen::computeEventsAtCurrentTick() const
 
     const auto track = sequencer.lock()->getSelectedTrack();
     const auto trackEvents = track->getEvents();
-    const auto positionTicks = sequencer.lock()->getTransport()->getTickPosition();
+    const auto positionTicks =
+        sequencer.lock()->getTransport()->getTickPosition();
 
     for (auto &event : track->getEvents())
     {

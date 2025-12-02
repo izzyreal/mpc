@@ -2,27 +2,24 @@
 
 using namespace mpc::sequencer;
 
-NoteOnEvent::NoteOnEvent(
-    EventData *const ptr, const EventData &snapshot,
-    const std::function<void(TrackMessage &&)> &dispatch,
-    const NoteNumber noteNumber, const Velocity vel)
+NoteOnEvent::NoteOnEvent(EventData *const ptr, const EventData &snapshot,
+                         const std::function<void(TrackMessage &&)> &dispatch,
+                         const NoteNumber noteNumber, const Velocity vel)
     : EventRef(ptr, snapshot, dispatch)
 {
     setNote(noteNumber);
     setVelocity(vel);
 }
 
-NoteOnEvent::NoteOnEvent(
-    EventData *const ptr, const EventData &snapshot,
-    const std::function<void(TrackMessage &&)> &dispatch)
+NoteOnEvent::NoteOnEvent(EventData *const ptr, const EventData &snapshot,
+                         const std::function<void(TrackMessage &&)> &dispatch)
     : EventRef(ptr, snapshot, dispatch)
 {
 }
 
-NoteOnEvent::NoteOnEvent(
-    EventData *const ptr, const EventData &snapshot,
-    const std::function<void(TrackMessage &&)> &dispatch,
-    const DrumNoteNumber drumNoteNumber)
+NoteOnEvent::NoteOnEvent(EventData *const ptr, const EventData &snapshot,
+                         const std::function<void(TrackMessage &&)> &dispatch,
+                         const DrumNoteNumber drumNoteNumber)
     : EventRef(ptr, snapshot, dispatch)
 {
     setNote(drumNoteNumber);

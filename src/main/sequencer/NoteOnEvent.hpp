@@ -9,8 +9,8 @@ namespace mpc::sequencer
     public:
         explicit NoteOnEvent(
             EventData *ptr, const EventData &snapshot,
-            const std::function<void(TrackMessage &&)> &dispatch,
-            NoteNumber, Velocity vel = MaxVelocity);
+            const std::function<void(TrackMessage &&)> &dispatch, NoteNumber,
+            Velocity vel = MaxVelocity);
         explicit NoteOnEvent(
             EventData *ptr, const EventData &snapshot,
             const std::function<void(TrackMessage &&)> &dispatch);

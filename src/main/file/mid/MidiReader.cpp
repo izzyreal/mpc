@@ -346,8 +346,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
             if (indexCandidate != -1)
             {
-                noteOn->duration =
-                    Duration(noteOffs[indexCandidate]->getTick() - noteOn->tick);
+                noteOn->duration = Duration(
+                    noteOffs[indexCandidate]->getTick() - noteOn->tick);
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else

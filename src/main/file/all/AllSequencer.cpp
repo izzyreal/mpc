@@ -50,14 +50,14 @@ AllSequencer::AllSequencer(Mpc &mpc)
     const auto masterTempoBytes =
         ByteUtil::ushort2bytes(mpcSequencer->getTransport()->getTempo() * 10.0);
 
-    mpcSequencer->getTransport()->setTempoSourceIsSequence(tempoSourceIsSequence);
+    mpcSequencer->getTransport()->setTempoSourceIsSequence(
+        tempoSourceIsSequence);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
     saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] =
-        mpcSequencer->getTransport()->isTempoSourceSequence() ? 0x01
-                                                                     : 0x00;
+        mpcSequencer->getTransport()->isTempoSourceSequence() ? 0x01 : 0x00;
 
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();

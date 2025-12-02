@@ -50,8 +50,7 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(SequenceIndex,
-                 std::shared_ptr<SequencerStateManager> manager,
+        Sequence(SequenceIndex, std::shared_ptr<SequencerStateManager> manager,
                  const std::function<std::shared_ptr<SequenceStateView>()>
                      &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
@@ -113,7 +112,8 @@ namespace mpc::sequencer
         BarIndex getBarIndexForPositionQN(PositionQuarterNotes) const;
         BarIndex getBarIndexForPositionTicks(Tick) const;
 
-        void setTimeSignature(int firstBar, int tsLastBar, int num, int den) const;
+        void setTimeSignature(int firstBar, int tsLastBar, int num,
+                              int den) const;
         void setTimeSignature(int barIndex, int num, int den) const;
 
         void syncTrackEventIndices(int tick) const;
@@ -145,7 +145,9 @@ namespace mpc::sequencer
         int getDenominator(int i) const;
         int getNumerator(int i) const;
         void deleteBars(int firstBar, int lastBarToDelete) const;
-        void insertBars(int barCount, BarIndex afterBar, std::function<void()> onComplete2 = []{}) const;
+        void insertBars(
+            int barCount, BarIndex afterBar,
+            std::function<void()> onComplete2 = [] {}) const;
         void moveTrack(int source, int destination);
 
         int getEventCount() const;

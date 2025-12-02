@@ -100,7 +100,8 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 
 void SequencerPlaybackEngine::triggerClickIfNeeded() const
 {
-    const auto transport = sequencer->getStateManager()->getSnapshot().getTransportStateView();
+    const auto transport =
+        sequencer->getStateManager()->getSnapshot().getTransportStateView();
 
     if (!transport.isCountEnabled())
     {
@@ -117,8 +118,7 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
 
     if (transport.isRecordingOrOverdubbing())
     {
-        if (!countMetronomeScreen->getInRec() &&
-            !transport.isCountingIn())
+        if (!countMetronomeScreen->getInRec() && !transport.isCountingIn())
         {
             return;
         }
@@ -127,8 +127,7 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
     {
 
         if (!isStepEditor && !countMetronomeScreen->getInPlay() &&
-            !transport.isCountingIn() &&
-            !isRecMainWithoutPlaying())
+            !transport.isCountingIn() && !isRecMainWithoutPlaying())
         {
             return;
         }
@@ -481,7 +480,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         transportSnapshot.isSequencerRunning();
     const auto sampleRate = getSampleRate();
 
-    if (sequencerIsRunningAtStartOfBuffer && transportSnapshot.isMetronomeOnlyEnabled())
+    if (sequencerIsRunningAtStartOfBuffer &&
+        transportSnapshot.isMetronomeOnlyEnabled())
     {
         clock->processBufferInternal(sequencer->getTransport()->getTempo(),
                                      sampleRate, nFrames, 0);

@@ -18,9 +18,7 @@ PerformanceManager::PerformanceManager()
 {
 }
 
-PerformanceManager::~PerformanceManager()
-{
-}
+PerformanceManager::~PerformanceManager() {}
 
 void PerformanceManager::reserveState(PerformanceState &s)
 {

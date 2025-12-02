@@ -273,10 +273,9 @@ void NextSeqScreen::displayTempoLabel() const
 void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequence()
-                ? "(SEQ)"
-                : "(MAS)");
+        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequence()
+                      ? "(SEQ)"
+                      : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming() const

@@ -364,7 +364,8 @@ void ClientHardwareEventController::handlePadRelease(
                          ->getSnapshot()
                          .getTransportStateView();
 
-    const auto metronomeOnlyPositionTicks = transport.getMetronomeOnlyPositionTicks();
+    const auto metronomeOnlyPositionTicks =
+        transport.getMetronomeOnlyPositionTicks();
     const auto positionTicks = transport.getPositionTicks();
 
     auto action =
@@ -373,9 +374,8 @@ void ClientHardwareEventController::handlePadRelease(
          screens = mpc.screens, sequencer = mpc.getSequencer(),
          hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
-         previewSoundPlayer =
-             mpc.getEngineHost()->getPreviewSoundPlayer(),
-             metronomeOnlyPositionTicks, positionTicks](void *userData)
+         previewSoundPlayer = mpc.getEngineHost()->getPreviewSoundPlayer(),
+         metronomeOnlyPositionTicks, positionTicks](void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 
@@ -411,13 +411,18 @@ void ClientHardwareEventController::handlePadRelease(
                     screens->getScreenById(p->screenId), programPadIndex,
                     sampler->getProgram(p->programIndex), sequencer,
                     performanceManager, clientEventController, eventHandler,
-                    screens, hardware, metronomeOnlyPositionTicks, positionTicks);
+                    screens, hardware, metronomeOnlyPositionTicks,
+                    positionTicks);
 
             constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
             performanceManager.lock()->registerNoteOff(
                 PerformanceEventSource::VirtualMpcHardware, p->noteNumber,
-                noMidiChannel, [ctx](void *) {TriggerLocalNoteOffCommand(ctx).execute();});
+                noMidiChannel,
+                [ctx](void *)
+                {
+                    TriggerLocalNoteOffCommand(ctx).execute();
+                });
         }
 
         if (p->programIndex != NoProgramIndex)

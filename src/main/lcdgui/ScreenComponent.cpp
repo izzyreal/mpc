@@ -255,26 +255,32 @@ void ScreenComponent::numpad(const int i)
 {
     PushNumPadCommand(mpc, i).execute();
 }
+
 void ScreenComponent::pressEnter()
 {
     PushEnterCommand(mpc).execute();
 }
+
 void ScreenComponent::rec()
 {
     PushRecCommand(mpc).execute();
 }
+
 void ScreenComponent::overDub()
 {
     PushOverdubCommand(mpc).execute();
 }
+
 void ScreenComponent::stop()
 {
     PushStopCommand(mpc).execute();
 }
+
 void ScreenComponent::play()
 {
     PushPlayCommand(mpc).execute();
 }
+
 void ScreenComponent::playStart()
 {
     PushPlayStartCommand(mpc).execute();

@@ -134,18 +134,18 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             displayOn();
                         }});
 
-    addReactiveBinding(
-        {[&]
-         {
-             const auto transport = sequencer.lock()->getTransport();
-             return transport->getTickPositionGuiPresentation();
-         },
-         [&](auto)
-         {
-             displayNow0();
-             displayNow1();
-             displayNow2();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            const auto transport =
+                                sequencer.lock()->getTransport();
+                            return transport->getTickPositionGuiPresentation();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 
     addReactiveBinding({[&]
                         {
@@ -156,16 +156,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             displayTempo();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()
-                                ->getTransport()
-                                ->isTempoSourceSequence();
-                        },
-                        [&](auto)
-                        {
-                            displayTempoSource();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->isTempoSourceSequence();
+         },
+         [&](auto)
+         {
+             displayTempoSource();
+         }});
 
     addReactiveBinding(
         {[&]
@@ -534,10 +533,9 @@ void SequencerScreen::displayTempoLabel() const
 void SequencerScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequence()
-                ? "(SEQ)"
-                : "(MAS)");
+        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequence()
+                      ? "(SEQ)"
+                      : "(MAS)");
 }
 
 void SequencerScreen::displaySq() const

@@ -24,7 +24,7 @@ void PushPlayStartCommand::execute()
     const bool currentScreenAllowsPlayAndRecord =
         screengroups::isPlayAndRecordScreen(currentScreen);
 
-        const auto recButtonIsPressedOrLocked =
+    const auto recButtonIsPressedOrLocked =
         mpc.clientEventController->clientHardwareEventController
             ->isRecLockedOrPressed();
 
@@ -52,7 +52,9 @@ void PushPlayStartCommand::execute()
     }
     else
     {
-        if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (mpc.getHardware()
+                ->getButton(hardware::ComponentId::SHIFT)
+                ->isPressed())
         {
             mpc.getLayeredScreen()->openScreenById(
                 ScreenId::VmpcDirectToDiskRecorderScreen);

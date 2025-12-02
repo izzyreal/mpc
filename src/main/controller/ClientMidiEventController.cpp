@@ -214,8 +214,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     const std::function action = [noteNumber = e.getNoteNumber(),
                                   velocity = e.getVelocity(), track, screen,
-                                  programPadIndex, program, this,
-                                  positionTicks, metronomeOnlyPositionTicks](void *userData)
+                                  programPadIndex, program, this, positionTicks,
+                                  metronomeOnlyPositionTicks](void *userData)
     {
         const performance::NoteOnEvent *registryNoteOnEvent =
             static_cast<performance::NoteOnEvent *>(userData);
@@ -297,10 +297,8 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         }
 
         const auto screen = screens->getScreenById(noteEventInfo->screenId);
-        const auto track = sequencer.lock()
-                            ->getSelectedSequence()
-                            ->getTrack(trackIndex)
-                            .get();
+        const auto track =
+            sequencer.lock()->getSelectedSequence()->getTrack(trackIndex).get();
 
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(NoteNumber(noteNumber));
@@ -308,12 +306,10 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-                recordingNoteOnEvent,
-                track,
-                noteEventInfo->busType, screen, programPadIndex, program,
-                sequencer, performanceManager.lock(), clientEventController,
-                eventHandler, screens, hardware, metronomeOnlyPositionTicks,
-                positionTicks);
+                recordingNoteOnEvent, track, noteEventInfo->busType, screen,
+                programPadIndex, program, sequencer, performanceManager.lock(),
+                clientEventController, eventHandler, screens, hardware,
+                metronomeOnlyPositionTicks, positionTicks);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };

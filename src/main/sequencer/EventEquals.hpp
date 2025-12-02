@@ -22,7 +22,8 @@ namespace mpc::sequencer
 
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&
                a.getDuration() == b.getDuration() &&
@@ -32,56 +33,64 @@ namespace mpc::sequencer
 
     inline bool operator==(const MixerEvent &a, const MixerEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getParameter() == b.getParameter() &&
                a.getPad() == b.getPad() && a.getValue() == b.getValue();
     }
 
     inline bool operator==(const TempoChangeEvent &a, const TempoChangeEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getRatio() == b.getRatio();
     }
 
     inline bool operator==(const ChannelPressureEvent &a,
                            const ChannelPressureEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const ControlChangeEvent &a,
                            const ControlChangeEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getController() == b.getController() &&
                a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const PitchBendEvent &a, const PitchBendEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const PolyPressureEvent &a,
                            const PolyPressureEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getNote() == b.getNote() && a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const ProgramChangeEvent &a,
                            const ProgramChangeEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getProgram() == b.getProgram();
     }
 
     inline bool operator==(const SystemExclusiveEvent &a,
                            const SystemExclusiveEvent &b)
     {
-        return static_cast<const EventRef &>(a) == static_cast<const EventRef &>(b) &&
+        return static_cast<const EventRef &>(a) ==
+                   static_cast<const EventRef &>(b) &&
                a.getBytes() == b.getBytes();
     }
 

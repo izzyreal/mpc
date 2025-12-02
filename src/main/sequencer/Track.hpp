@@ -96,15 +96,13 @@ namespace mpc::sequencer
         void setOn(bool b) const;
 
         void insertAcquiredEvent(
-            EventData *event,
-            const std::function<void()> &onComplete = [] {});
+            EventData *event, const std::function<void()> &onComplete = [] {});
 
         void acquireAndInsertEvent(
-            const EventData &,
-            const std::function<void()> &onComplete = [] {});
+            const EventData &, const std::function<void()> &onComplete = [] {});
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
-                                           int64_t metronomeOnlyTick = 0);
+                                          int64_t metronomeOnlyTick = 0);
 
         EventData *recordNoteEventLive(NoteNumber, Velocity) const;
 
@@ -114,7 +112,8 @@ namespace mpc::sequencer
         // For non-live note event recording, i.e. in the step editor and in the
         // MAIN screen when the sequencer is not running, use
         // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(const EventData *, Tick noteOffPositionTicks) const;
+        void finalizeNoteEventLive(const EventData *,
+                                   Tick noteOffPositionTicks) const;
 
         void finalizeNoteEventNonLive(EventData *, Duration) const;
 
@@ -141,9 +140,10 @@ namespace mpc::sequencer
         bool isOn() const;
         bool isUsed() const;
 
-        // Returns the events between startTick (inclusive) and endTick (exclusive)
+        // Returns the events between startTick (inclusive) and endTick
+        // (exclusive)
         std::vector<std::shared_ptr<EventRef>> getEventRange(int startTick,
-                                                          int endTick) const;
+                                                             int endTick) const;
 
         // Do not call from audio thread
         void correctTimeRange(int startPos, int endPos, int stepLength,

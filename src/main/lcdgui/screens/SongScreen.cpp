@@ -60,15 +60,16 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
              findField("reps1")->setBlinking(isPlaying, 10);
          }});
 
-    addReactiveBinding(
-        {[&]
-         {
-             return sequencer.lock()->getTransport()->getPlayedStepRepetitions();
-         },
-         [&](auto)
-         {
-             displaySteps();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()
+                                ->getTransport()
+                                ->getPlayedStepRepetitions();
+                        },
+                        [&](auto)
+                        {
+                            displaySteps();
+                        }});
 
     addReactiveBinding({[&]
                         {
@@ -294,7 +295,8 @@ void SongScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer.lock()->getTransport()->setTempoSourceIsSequence(increment > 0);
+        sequencer.lock()->getTransport()->setTempoSourceIsSequence(increment >
+                                                                   0);
         displayTempoSource();
         displayTempo();
     }
@@ -420,11 +422,12 @@ void SongScreen::displaySteps() const
 
             if (i == 1 && sequencer.lock()->getTransport()->isPlaying())
             {
-                value -= sequencer.lock()->getTransport()->getPlayedStepRepetitions();
+                value -= sequencer.lock()
+                             ->getTransport()
+                             ->getPlayedStepRepetitions();
             }
 
-            repsArray[i]->setText(
-                std::to_string(value));
+            repsArray[i]->setText(std::to_string(value));
         }
         else
         {
@@ -439,10 +442,9 @@ void SongScreen::displaySteps() const
 void SongScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(
-            sequencer.lock()->getTransport()->isTempoSourceSequence()
-                ? "SEQ"
-                : "MAS");
+        ->setText(sequencer.lock()->getTransport()->isTempoSourceSequence()
+                      ? "SEQ"
+                      : "MAS");
 }
 
 void SongScreen::displayNow0() const

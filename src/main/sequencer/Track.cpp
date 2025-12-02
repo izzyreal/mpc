@@ -566,12 +566,13 @@ void Track::processLiveNoteEventRecordingQueues()
                     if (fixEventIndex)
                     {
                         const auto snapshot = getSnapshot();
-                        const auto playEventIndex = snapshot->getPlayEventIndex();
+                        const auto playEventIndex =
+                            snapshot->getPlayEventIndex();
                         if (playEventIndex > 0)
                         {
-                            dispatch(SetPlayEventIndex{parent->getSequenceIndex(),
-                                                       getIndex(),
-                                                       playEventIndex - 1});
+                            dispatch(SetPlayEventIndex{
+                                parent->getSequenceIndex(), getIndex(),
+                                playEventIndex - 1});
                         }
                     }
                 }

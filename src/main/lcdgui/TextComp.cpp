@@ -358,6 +358,4 @@ void TextComp::setAlignment(const Alignment newAlignment, const int endX)
     SetDirty();
 }
 
-TextComp::~TextComp()
-{
-}
+TextComp::~TextComp() {}

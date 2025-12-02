@@ -124,7 +124,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->track->getVelocityRatio(), drumBusType);
     }
 
-    sequencer::EventData* recordNoteOnEvent = nullptr;
+    sequencer::EventData *recordNoteOnEvent = nullptr;
 
     if (transport->isRecordingOrOverdubbing())
     {
@@ -137,16 +137,16 @@ void TriggerLocalNoteOnCommand::execute()
         transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->positionTicks, ctx->note,
-            velo, ctx->metronomeOnlyPositionTicks);
+            ctx->positionTicks, ctx->note, velo,
+            ctx->metronomeOnlyPositionTicks);
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
         transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->positionTicks, ctx->note,
-            velo, ctx->metronomeOnlyPositionTicks);
+            ctx->positionTicks, ctx->note, velo,
+            ctx->metronomeOnlyPositionTicks);
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
 
@@ -154,15 +154,12 @@ void TriggerLocalNoteOnCommand::execute()
                 timingCorrectScreen->getNoteValueLengthInTicks();
             stepLength != 1)
         {
-            const int bar =
-                transport->getCurrentBarIndex() + 1;
+            const int bar = transport->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
-                0, bar,
-                ctx->positionTicks,
-                stepLength, timingCorrectScreen->getSwing());
+                0, bar, ctx->positionTicks, stepLength,
+                timingCorrectScreen->getSwing());
 
-            if (ctx->positionTicks !=
-                correctedTick)
+            if (ctx->positionTicks != correctedTick)
             {
                 transport->setPosition(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));

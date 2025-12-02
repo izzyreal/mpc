@@ -50,7 +50,8 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->sequencerIsRecordingOrOverdubbing)
         {
-            ctx->track->finalizeNoteEventLive(ctx->recordOnEvent, ctx->positionTicks);
+            ctx->track->finalizeNoteEventLive(ctx->recordOnEvent,
+                                              ctx->positionTicks);
         }
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)

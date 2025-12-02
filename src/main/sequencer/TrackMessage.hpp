@@ -112,10 +112,10 @@ namespace mpc::sequencer
         uint8_t deviceIndex;
     };
 
-    using TrackMessage =
-        std::variant<InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
-                     RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
-                     FinalizeNonLiveNoteEvent, UpdateEvents, SetTrackUsed,
-                     SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
-                     SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex>;
+    using TrackMessage = std::variant<
+        InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+        RemoveDoubles, UpdateTrackIndexOfAllEvents, UpdateEvent,
+        FinalizeNonLiveNoteEvent, UpdateEvents, SetTrackUsed, SetTrackOn,
+        SetPlayEventIndex, SetTrackVelocityRatio, SetTrackProgramChange,
+        SetTrackBusType, SetTrackDeviceIndex>;
 } // namespace mpc::sequencer

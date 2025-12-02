@@ -45,11 +45,9 @@ namespace mpc::utils
                               int eventTick, int currentTimeSamples,
                               SampleRate);
 
-    int getEventTimeInSamples(
-    const SequenceTimingData &snapshotTimingData,
-    int blockStartTick,
-    int eventTick,
-    int64_t strictValidFromSamples,
-    SampleRate sampleRate);
+    int getEventTimeInSamples(const SequenceTimingData &snapshotTimingData,
+                              int blockStartTick, int eventTick,
+                              int64_t strictValidFromSamples,
+                              SampleRate sampleRate);
 
 } // namespace mpc::utils

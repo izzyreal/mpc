@@ -65,21 +65,20 @@ namespace mpc::sequencer
         };
 
         Sequencer(const std::shared_ptr<Clock> &,
-            const std::shared_ptr<lcdgui::LayeredScreen> &,
-            const std::function<std::shared_ptr<lcdgui::Screens>()> &,
-            std::vector<std::shared_ptr<engine::Voice>> *,
-            const std::function<bool()> &isAudioServerRunning,
-            const std::shared_ptr<hardware::Hardware> &,
-            const std::function<bool()> &isBouncePrepared,
-            const std::function<void()> &startBouncing,
-            const std::function<void()> &stopBouncing,
-            const std::function<bool()> &isBouncing,
-            const std::function<bool()> &isEraseButtonPressed,
-            const std::shared_ptr<performance::PerformanceManager> &,
-            const std::shared_ptr<sampler::Sampler> &,
-            const std::shared_ptr<audiomidi::EventHandler> &,
-            const std::function<bool()> &isSixteenLevelsEnabled
-            );
+                  const std::shared_ptr<lcdgui::LayeredScreen> &,
+                  const std::function<std::shared_ptr<lcdgui::Screens>()> &,
+                  std::vector<std::shared_ptr<engine::Voice>> *,
+                  const std::function<bool()> &isAudioServerRunning,
+                  const std::shared_ptr<hardware::Hardware> &,
+                  const std::function<bool()> &isBouncePrepared,
+                  const std::function<void()> &startBouncing,
+                  const std::function<void()> &stopBouncing,
+                  const std::function<bool()> &isBouncing,
+                  const std::function<bool()> &isEraseButtonPressed,
+                  const std::shared_ptr<performance::PerformanceManager> &,
+                  const std::shared_ptr<sampler::Sampler> &,
+                  const std::shared_ptr<audiomidi::EventHandler> &,
+                  const std::function<bool()> &isSixteenLevelsEnabled);
 
         ~Sequencer();
 

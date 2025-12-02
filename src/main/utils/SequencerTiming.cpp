@@ -220,7 +220,8 @@ int mpc::utils::getEventTimeInSamples(const sequencer::SequenceStateView &seq,
                                       const SampleRate sampleRate)
 {
     const auto seqTimingData = getSequenceTimingData(seq);
-    const auto seqFrameLength = getFrameCountForTicks(seqTimingData, 0, seq.getLastTick(), sampleRate);
+    const auto seqFrameLength =
+        getFrameCountForTicks(seqTimingData, 0, seq.getLastTick(), sampleRate);
     const int loopLen = seqFrameLength;
 
     if (loopLen <= 0)
@@ -230,7 +231,8 @@ int mpc::utils::getEventTimeInSamples(const sequencer::SequenceStateView &seq,
 
     const int phase = currentTimeSamples % loopLen;
 
-    const int eventSample = getFrameCountForTicks(seqTimingData, 0, eventTick, sampleRate);
+    const int eventSample =
+        getFrameCountForTicks(seqTimingData, 0, eventTick, sampleRate);
 
     if (eventSample >= phase)
     {
@@ -241,19 +243,16 @@ int mpc::utils::getEventTimeInSamples(const sequencer::SequenceStateView &seq,
 }
 
 int mpc::utils::getEventTimeInSamples(
-    const SequenceTimingData &snapshotTimingData,
-    int blockStartTick,
-    int eventTick,
-    int64_t strictValidFromSamples,
-    SampleRate sampleRate)
+    const SequenceTimingData &snapshotTimingData, int blockStartTick,
+    int eventTick, int64_t strictValidFromSamples, SampleRate sampleRate)
 {
     // delta ticks from block start
     const double deltaTicks = static_cast<double>(eventTick - blockStartTick);
 
     // convert delta ticks to samples using snapshot tempo map
     const double deltaFrames = getFrameCountForTicks(
-        snapshotTimingData, static_cast<double>(blockStartTick),
-        deltaTicks, sampleRate);
+        snapshotTimingData, static_cast<double>(blockStartTick), deltaTicks,
+        sampleRate);
 
     // event sample = block start + deltaFrames
     return static_cast<int>(strictValidFromSamples + std::round(deltaFrames));

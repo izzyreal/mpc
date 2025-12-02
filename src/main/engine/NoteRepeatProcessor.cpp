@@ -203,11 +203,12 @@ void NoteRepeatProcessor::process(
         {
             noteEvent.velocity = velocityBeforeTrackVelocityRatioApplied;
 
-            auto existingNoteEvent = lockedSequencer->getStateManager()
-                ->getSnapshot()
-                .getTrackState(lockedSequencer->getSelectedSequenceIndex(),
-                               track->getIndex())
-                ->findNoteEvent(noteEvent.tick, noteEvent.noteNumber);
+            auto existingNoteEvent =
+                lockedSequencer->getStateManager()
+                    ->getSnapshot()
+                    .getTrackState(lockedSequencer->getSelectedSequenceIndex(),
+                                   track->getIndex())
+                    ->findNoteEvent(noteEvent.tick, noteEvent.noteNumber);
 
             if (existingNoteEvent)
             {

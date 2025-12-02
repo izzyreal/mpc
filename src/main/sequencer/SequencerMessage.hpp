@@ -45,7 +45,7 @@ namespace mpc::sequencer
         int destinationBarCount;
     };
 
-    using SequencerMessage = std::variant<TransportMessage, SequenceMessage,
-                                          CopyEvents, SwitchToNextSequence,
-                                          SetSelectedSequenceIndex, CopyBars>;
+    using SequencerMessage =
+        std::variant<TransportMessage, SequenceMessage, CopyEvents,
+                     SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars>;
 } // namespace mpc::sequencer

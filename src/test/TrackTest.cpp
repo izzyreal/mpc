@@ -100,8 +100,7 @@ TEST_CASE("swing1", "[track]")
     REQUIRE(tr->getNoteEvents()[1]->getTick() == 34);
     REQUIRE(tr->getNoteEvents()[1]->getNote() == n2->noteNumber);
 
-    tr->timingCorrect(0, 0, n2, tr->getNoteEvents()[1]->getTick(), 24,
-                      60);
+    tr->timingCorrect(0, 0, n2, tr->getNoteEvents()[1]->getTick(), 24, 60);
     stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[1]->getNote() == n2->noteNumber);
@@ -128,8 +127,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24,
-                          50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 0);
     }
@@ -138,8 +136,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24,
-                          50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 24);
     }
@@ -148,8 +145,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24,
-                          50);
+        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 48);
     }

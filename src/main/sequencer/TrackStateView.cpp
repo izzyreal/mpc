@@ -8,14 +8,13 @@ using namespace mpc::sequencer;
 TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 
 EventData *TrackStateView::findNoteEvent(const int tick,
-                                          const NoteNumber note) const
+                                         const NoteNumber note) const
 {
     EventData *it = state.head;
 
     while (it)
     {
-        if (it->type == EventType::NoteOn &&
-            it->tick == tick &&
+        if (it->type == EventType::NoteOn && it->tick == tick &&
             it->noteNumber == note)
         {
             return it;
@@ -46,7 +45,7 @@ EventData *TrackStateView::getEventByIndex(const EventIndex idx) const
 }
 
 std::vector<EventData *> TrackStateView::getEventRange(const int startTick,
-                                                        const int endTick) const
+                                                       const int endTick) const
 {
     std::vector<EventData *> result;
 
@@ -128,8 +127,7 @@ EventData *TrackStateView::findRecordingNoteOnByNoteNumber(
 
     while (it)
     {
-        if (it->type == EventType::NoteOn &&
-            it->noteNumber == noteNumber &&
+        if (it->type == EventType::NoteOn && it->noteNumber == noteNumber &&
             it->beingRecorded)
         {
             return it;
@@ -150,8 +148,8 @@ TrackStateView::findRecordingNoteOn(const EventData *eventState) const
 
     while (it)
     {
-        if (it->type == EventType::NoteOn &&
-            it == eventState && it->beingRecorded)
+        if (it->type == EventType::NoteOn && it == eventState &&
+            it->beingRecorded)
         {
             return it;
         }
