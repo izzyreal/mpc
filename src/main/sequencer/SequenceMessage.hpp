@@ -27,10 +27,10 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures;
     };
 
-    struct UpdateTimeSignature
+    struct SetTimeSignature
     {
         SequenceIndex sequenceIndex;
-        int barIndex;
+        BarIndex barIndex;
         TimeSignature timeSignature;
     };
 
@@ -89,10 +89,16 @@ namespace mpc::sequencer
     {
     };
 
+    struct RemoveEventsThatAreOutsideTickBounds
+    {
+        SequenceIndex sequenceIndex;
+    };
+
     using SequenceMessage =
         std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
                      UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
-                     UpdateTimeSignature, SetLoopEnabled, SetSequenceUsed,
+                     SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
                      SetTempoChangeEnabled, SetFirstLoopBarIndex,
-                     SetLastLoopBarIndex, SyncTrackEventIndices>;
+                     SetLastLoopBarIndex, SyncTrackEventIndices,
+                     RemoveEventsThatAreOutsideTickBounds>;
 } // namespace mpc::sequencer

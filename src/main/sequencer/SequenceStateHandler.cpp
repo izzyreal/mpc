@@ -5,6 +5,7 @@
 #include "Sequencer.hpp"
 #include "SequencerStateManager.hpp"
 #include "TrackStateHandler.hpp"
+#include "TrackStateView.hpp"
 #include "sequencer/SequencerState.hpp"
 #include "utils/VariantUtils.hpp"
 
@@ -20,7 +21,7 @@ SequenceStateHandler::~SequenceStateHandler() {}
 
 void SequenceStateHandler::applyMessage(
     SequencerState &state, std::vector<std::function<void()>> &actions,
-    const SequenceMessage &msg)
+    const SequenceMessage &msg) const
 {
     const auto visitor = Overload{
         [&](const TrackMessage &m)
@@ -91,8 +92,45 @@ void SequenceStateHandler::applyMessage(
                 seq.barLengths[i] = seq.timeSignatures[i].getBarLength();
             }
         },
-        [&](const UpdateTimeSignature &m)
+        [&](const SetTimeSignature &m)
         {
+            const SequenceStateView stateView(state.sequences[m.sequenceIndex]);
+
+            const auto barStart = stateView.getFirstTickOfBar(m.barIndex);
+
+            const auto oldBarLength = stateView.getBarLength(m.barIndex);
+            const auto newBarLength = m.timeSignature.getBarLength();
+            const auto tickShift =
+                static_cast<int>(newBarLength - oldBarLength);
+
+            const auto cutStart = barStart + newBarLength;
+            const auto cutEnd = barStart + oldBarLength;
+
+            const auto nextBarStartTick =
+                m.barIndex < Mpc2000XlSpecs::MAX_LAST_BAR_INDEX
+                    ? stateView.getFirstTickOfBar(m.barIndex + 1)
+                    : stateView.getLastTick();
+
+            for (const auto &t : state.sequences[m.sequenceIndex].tracks)
+            {
+                EventData *it = t.head;
+                while (it)
+                {
+                    const int tick = it->tick;
+
+                    if (tick >= cutStart && tick < cutEnd)
+                    {
+                        manager->applyMessage(RemoveEvent{it});
+                    }
+                    else if (tick >= nextBarStartTick)
+                    {
+                        manager->applyMessage(
+                            UpdateEventTick{it, tick + tickShift});
+                    }
+                    it = it->next;
+                }
+            }
+
             state.sequences[m.sequenceIndex].timeSignatures[m.barIndex] =
                 m.timeSignature;
             state.sequences[m.sequenceIndex].barLengths[m.barIndex] =
@@ -101,6 +139,26 @@ void SequenceStateHandler::applyMessage(
         [&](const SetLastBarIndex &m)
         {
             state.sequences[m.sequenceIndex].lastBarIndex = m.barIndex;
+        },
+        [&](const RemoveEventsThatAreOutsideTickBounds &m)
+        {
+            const auto &seq = state.sequences[m.sequenceIndex];
+            const SequenceStateView seqView(seq);
+
+            for (auto &t : seq.tracks)
+            {
+                EventData *it = t.head;
+                while (it)
+                {
+                    const int tick = it->tick;
+
+                    if (tick < 0 || tick >= seqView.getLastTick())
+                    {
+                        manager->enqueue(RemoveEvent{it});
+                    }
+                    it = it->next;
+                }
+            }
         },
         [&](const InsertBars &m)
         {
@@ -111,11 +169,12 @@ void SequenceStateHandler::applyMessage(
 }
 
 void SequenceStateHandler::applyInsertBars(
-    const InsertBars &m, SequencerState &state,
-    std::vector<std::function<void()>> &actions) noexcept
+    const InsertBars &m, const SequencerState &state,
+    std::vector<std::function<void()>> &actions) const noexcept
 {
-    const auto seq = state.sequences[m.sequenceIndex];
+    const auto &seq = state.sequences[m.sequenceIndex];
     const SequenceStateView seqView(seq);
+
     const auto oldLastBarIndex = seqView.getLastBarIndex();
     const bool isAppending = m.afterBar - 1 == oldLastBarIndex;
 
@@ -135,8 +194,8 @@ void SequenceStateHandler::applyInsertBars(
 
     const auto newLastBarIndex = oldLastBarIndex + barCountToUse;
 
-    applyMessage(state, actions,
-                 SetLastBarIndex{m.sequenceIndex, BarIndex(newLastBarIndex)});
+    manager->applyMessage(
+        SetLastBarIndex{m.sequenceIndex, BarIndex(newLastBarIndex)});
 
     std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
 
@@ -164,7 +223,7 @@ void SequenceStateHandler::applyInsertBars(
         newTs[out] = TimeSignature{};
     }
 
-    applyMessage(state, actions, UpdateTimeSignatures{m.sequenceIndex, newTs});
+    manager->applyMessage(UpdateTimeSignatures{m.sequenceIndex, newTs});
 
     int barStart = 0;
 
@@ -181,18 +240,18 @@ void SequenceStateHandler::applyInsertBars(
             newBarStart += seqView.getBarLength(i);
         }
 
-        // TODO Tempo change track is excluded. We should double-check
-        // if that is the desired behaviour.
-        for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
+        for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
         {
             auto it = seq.tracks[i].head;
+
             while (it)
             {
                 if (it->tick >= barStart)
                 {
                     const Tick newTick = it->tick + (newBarStart - barStart);
-                    manager->trackStateHandler->applyMessage(state, actions, UpdateEventTick{it, newTick});
+                    manager->enqueue(UpdateEventTick{it, newTick});
                 }
+
                 it = it->next;
             }
         }

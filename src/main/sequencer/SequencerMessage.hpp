@@ -34,7 +34,18 @@ namespace mpc::sequencer
         NoteRange sourceNoteRange{};
     };
 
+    struct CopyBars
+    {
+        SequenceIndex fromSeqIndex;
+        SequenceIndex toSeqIndex;
+        BarIndex copyFirstBar;
+        BarIndex copyLastBar;
+        int copyCount;
+        BarIndex copyAfterBar;
+        int destinationBarCount;
+    };
+
     using SequencerMessage = std::variant<TransportMessage, SequenceMessage,
                                           CopyEvents, SwitchToNextSequence,
-                                          SetSelectedSequenceIndex>;
+                                          SetSelectedSequenceIndex, CopyBars>;
 } // namespace mpc::sequencer

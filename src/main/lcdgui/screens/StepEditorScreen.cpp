@@ -1048,11 +1048,12 @@ StepEditorScreen::computeEventsAtCurrentTick() const
     std::vector<std::shared_ptr<EventRef>> result;
 
     const auto track = sequencer.lock()->getSelectedTrack();
-    auto trackEvents = track->getEvents();
+    const auto trackEvents = track->getEvents();
+    const auto positionTicks = sequencer.lock()->getTransport()->getTickPosition();
+
     for (auto &event : track->getEvents())
     {
-        if (event->getTick() ==
-            sequencer.lock()->getTransport()->getTickPosition())
+        if (event->getTick() == positionTicks)
         {
             if ((view == 0 || view == 1) &&
                 std::dynamic_pointer_cast<NoteOnEvent>(event))
@@ -1542,9 +1543,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
 
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
 {
-    const auto tick = sequencer.lock()->getTransport()->getTickPosition();
-    const auto track = sequencer.lock()->getSelectedTrack();
-    for (auto &e : track->getEventRange(tick, tick))
+    for (auto &e : computeEventsAtCurrentTick())
     {
         if (const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {

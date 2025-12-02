@@ -1,7 +1,9 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include "SequenceStateHandler.hpp"
+#include "Track.hpp"
 #include "TrackStateHandler.hpp"
+#include "TrackStateView.hpp"
 #include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TransportStateHandler.hpp"
@@ -21,13 +23,12 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     sequenceStateHandler =
         std::make_unique<SequenceStateHandler>(this, sequencer);
 
-    trackStateHandler =
-        std::make_unique<TrackStateHandler>(this, sequencer);
+    trackStateHandler = std::make_unique<TrackStateHandler>(this, sequencer);
 }
 
 SequencerStateManager::~SequencerStateManager() {}
 
-void SequencerStateManager::returnEventToPool(EventData* e) const
+void SequencerStateManager::returnEventToPool(EventData *e) const
 {
     // Reset object to default "clean" state before returning it.
     e->resetToDefaultValues();
@@ -36,18 +37,19 @@ void SequencerStateManager::returnEventToPool(EventData* e) const
     pool->release(e);
 }
 
-EventData* SequencerStateManager::acquireEvent() const
+EventData *SequencerStateManager::acquireEvent() const
 {
-    EventData* e = nullptr;
+    EventData *e = nullptr;
     if (!pool->acquire(e))
+    {
         return nullptr;
+    }
 
-    new (e) EventData();  // placement-new calls resetToDefaultValues()
+    new (e) EventData(); // placement-new calls resetToDefaultValues()
     return e;
 }
 
-void SequencerStateManager::applyMessage(
-    const SequencerMessage &msg) noexcept
+void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 {
     auto visitor = Overload{
         [&](const TransportMessage &m)
@@ -75,6 +77,10 @@ void SequencerStateManager::applyMessage(
             {
                 activeState.transport.positionQuarterNotes = 0;
             }
+        },
+        [&](const CopyBars &m)
+        {
+            applyCopyBars(m);
         },
         [&](const CopyEvents &m)
         {
@@ -140,12 +146,15 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     for (int i = 0; i < barsToAdd; i++)
     {
         const auto afterBar = initialLastBarIndex + i + 1;
-        if (afterBar >= 998) break;
+        if (afterBar >= 998)
+        {
+            break;
+        }
 
         applyMessage(InsertBars{m.destSequenceIndex, 1, afterBar});
         const TimeSignature ts{TimeSigNumerator(destNumerator),
                                TimeSigDenominator(destDenominator)};
-        applyMessage(UpdateTimeSignature{m.destSequenceIndex, afterBar, ts});
+        applyMessage(SetTimeSignature{m.destSequenceIndex, afterBar, ts});
     }
 
     if (!m.copyModeMerge)
@@ -163,9 +172,18 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
             if (inRange)
             {
-                if (prev) prev->next = next;
-                else destTrack.head = next;
-                if (next) next->prev = prev;
+                if (prev)
+                {
+                    prev->next = next;
+                }
+                else
+                {
+                    destTrack.head = next;
+                }
+                if (next)
+                {
+                    next->prev = prev;
+                }
                 returnEventToPool(cur);
             }
             else
@@ -189,7 +207,10 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
             continue;
         }
 
-        if (src->tick >= m.sourceEndTick) break;
+        if (src->tick >= m.sourceEndTick)
+        {
+            break;
+        }
 
         if (src->tick >= m.sourceStartTick)
         {
@@ -198,7 +219,10 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
                 const int tickCandidate =
                     src->tick + destOffset + copyIndex * segLength;
 
-                if (tickCandidate >= destSeqView.getLastTick()) break;
+                if (tickCandidate >= destSeqView.getLastTick())
+                {
+                    break;
+                }
 
                 EventData *ev = acquireEvent();
                 *ev = *src;
@@ -219,7 +243,83 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }
 
-void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
+void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
+{
+    int sourceBarCounter = 0;
+
+    const auto numberOfSourceBars = m.copyLastBar + 1 - m.copyFirstBar;
+
+    for (int i = 0; i < m.destinationBarCount; ++i)
+    {
+        const TimeSignature ts =
+            activeState.sequences[m.fromSeqIndex]
+                .timeSignatures[m.copyFirstBar + sourceBarCounter];
+
+        applyMessage(
+            SetTimeSignature{m.toSeqIndex, BarIndex(i + m.copyAfterBar), ts});
+
+        sourceBarCounter++;
+
+        if (sourceBarCounter >= numberOfSourceBars)
+        {
+            sourceBarCounter = 0;
+        }
+    }
+
+    const SequenceStateView fromSequence(activeState.sequences[m.fromSeqIndex]);
+    const SequenceStateView toSequence(activeState.sequences[m.toSeqIndex]);
+
+    const auto firstTickOfFromSequence =
+        fromSequence.getFirstTickOfBar(m.copyFirstBar);
+
+    const auto lastTickOfFromSequence =
+        fromSequence.getFirstTickOfBar(m.copyLastBar + 1);
+
+    const auto firstTickOfToSequence =
+        toSequence.getFirstTickOfBar(m.copyAfterBar);
+
+    const auto segmentLengthTicks =
+        lastTickOfFromSequence - firstTickOfFromSequence;
+
+    const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
+
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
+    {
+        const auto t1 = fromSequence.getTrack(i);
+
+        if (!t1->isUsed())
+        {
+            continue;
+        }
+
+        auto t1Events =
+            t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
+
+        const auto t2 = toSequence.getTrack(i);
+
+        if (!t2->isUsed())
+        {
+            sequencer->getSequence(m.toSeqIndex)->getTrack(i)->setUsed(true);
+        }
+
+        for (const auto &event : t1Events)
+        {
+            const auto firstCopyTick = event->tick + offset;
+
+            for (auto k = 0; k < m.copyCount; k++)
+            {
+                const auto tick = firstCopyTick + k * segmentLengthTicks;
+                const auto eventCopy = acquireEvent();
+                *eventCopy = *event;
+                eventCopy->sequenceIndex = SequenceIndex(m.toSeqIndex);
+                eventCopy->tick = tick;
+                applyMessage(InsertAcquiredEvent{eventCopy});
+            }
+        }
+    }
+}
+
+void SequencerStateManager::insertAcquiredEvent(TrackState &track, EventData *e)
 {
     assert(e);
 
@@ -228,30 +328,36 @@ void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
     e->prev = nullptr;
     e->next = nullptr;
 
-    EventData*& head = track.head;
+    EventData *&head = track.head;
 
-    if (!head) {
+    if (!head)
+    {
         head = e;
         return;
     }
 
-    if (e->tick < head->tick) {
+    if (e->tick < head->tick)
+    {
         e->next = head;
         head->prev = e;
         head = e;
         return;
     }
 
-    EventData* it = head;
-    while (it->next && it->next->tick <= e->tick) {
+    EventData *it = head;
+    while (it->next && it->next->tick <= e->tick)
+    {
         it = it->next;
     }
 
-    EventData* n = it->next;
+    EventData *n = it->next;
 
     it->next = e;
     e->prev = it;
 
     e->next = n;
-    if (n) n->prev = e;
+    if (n)
+    {
+        n->prev = e;
+    }
 }

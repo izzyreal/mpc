@@ -58,7 +58,7 @@ std::vector<EventData *> TrackStateView::getEventRange(const int startTick,
         {
             break;
         }
-        if (it->tick >= startTick && it->tick <= endTick)
+        if (it->tick >= startTick && it->tick < endTick)
         {
             result.push_back(it);
         }

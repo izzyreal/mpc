@@ -69,6 +69,8 @@ namespace mpc::sequencer
                    Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
             trackLocks;
 
+        void applyCopyBars(const CopyBars &) noexcept;
+
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;
 

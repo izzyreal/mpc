@@ -17,14 +17,14 @@ namespace mpc::sequencer
 
         void applyMessage(SequencerState &,
                           std::vector<std::function<void()>> &actions,
-                          const SequenceMessage &);
+                          const SequenceMessage &) const;
 
     private:
         SequencerStateManager *manager;
         Sequencer *sequencer;
 
         void
-        applyInsertBars(const InsertBars &, SequencerState &,
-                        std::vector<std::function<void()>> &actions) noexcept;
+        applyInsertBars(const InsertBars &, const SequencerState &,
+                        std::vector<std::function<void()>> &actions) const noexcept;
     };
 } // namespace mpc::sequencer

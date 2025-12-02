@@ -141,6 +141,7 @@ namespace mpc::sequencer
         bool isOn() const;
         bool isUsed() const;
 
+        // Returns the events between startTick (inclusive) and endTick (exclusive)
         std::vector<std::shared_ptr<EventRef>> getEventRange(int startTick,
                                                           int endTick) const;
 

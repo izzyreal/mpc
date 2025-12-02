@@ -19,6 +19,7 @@ namespace mpc::sequencer
 
         EventData *getEventByIndex(EventIndex) const;
 
+        // Returns the events between startTick (inclusive) and endTick (exclusive)
         std::vector<EventData *> getEventRange(int startTick,
                                                 int endTick) const;
 

@@ -8,7 +8,6 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Song.hpp"
@@ -301,137 +300,42 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
     }
 
     const auto toSequence = sequencer->getSequence(toSeqIndex);
-    auto numberOfDestinationBars = (copyLastBar - copyFirstBar + 1) * copyCount;
 
-    if (numberOfDestinationBars > Mpc2000XlSpecs::MAX_BAR_COUNT)
-    {
-        numberOfDestinationBars = Mpc2000XlSpecs::MAX_BAR_COUNT;
-    }
+    const auto destinationBarCount = std::clamp(
+        static_cast<uint16_t>((copyLastBar - copyFirstBar + 1) * copyCount),
+        static_cast<uint16_t>(0), Mpc2000XlSpecs::MAX_BAR_COUNT);
 
-    if (!toSequence->isUsed())
+    CopyBars copyBars {
+        SequenceIndex(fromSeqIndex),
+        SequenceIndex(toSeqIndex),
+        BarIndex(copyFirstBar),
+        BarIndex(copyLastBar),
+        copyCount,
+        BarIndex(copyAfterBar),
+        destinationBarCount,
+    };
+
+    if (toSequence->isUsed())
     {
-        toSequence->init(numberOfDestinationBars - 1);
+        if (toSequence->getLastBarIndex() + destinationBarCount >
+            Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
+        {
+            copyBars.destinationBarCount = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX -
+                                           toSequence->getLastBarIndex();
+        }
+
+        auto onComplete = [stateManager = sequencer->getStateManager(), copyBars]
+        {
+            stateManager->enqueue(copyBars);
+        };
+
+        toSequence->insertBars(destinationBarCount,
+                               BarIndex(copyAfterBar), onComplete);
     }
     else
     {
-        if (toSequence->getLastBarIndex() + numberOfDestinationBars >
-            Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-        {
-            numberOfDestinationBars = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX -
-                                      toSequence->getLastBarIndex();
-        }
-
-        toSequence->insertBars(numberOfDestinationBars, BarIndex(copyAfterBar));
-    }
-
-    int sourceBarCounter = 0;
-
-    const auto numberOfSourceBars = copyLastBar + 1 - copyFirstBar;
-
-    for (int i = 0; i < numberOfDestinationBars; i++)
-    {
-        toSequence->setTimeSignature(
-            i + copyAfterBar,
-            fromSequence->getNumerator(sourceBarCounter + copyFirstBar),
-            fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
-
-        sourceBarCounter++;
-
-        if (sourceBarCounter >= numberOfSourceBars)
-        {
-            sourceBarCounter = 0;
-        }
-    }
-
-    auto firstTickOfFromSequence = 0;
-    auto lastTickOfFromSequence = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        if (i == copyFirstBar)
-        {
-            break;
-        }
-
-        firstTickOfFromSequence += fromSequence->getBarLength(i);
-    }
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        lastTickOfFromSequence += fromSequence->getBarLength(i);
-
-        if (i == copyLastBar)
-        {
-            break;
-        }
-    }
-
-    auto firstTickOfToSequence = 0;
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        if (i == copyAfterBar)
-        {
-            break;
-        }
-
-        firstTickOfToSequence += toSequence->getBarLength(i);
-    }
-
-    const auto segmentLengthTicks =
-        lastTickOfFromSequence - firstTickOfFromSequence;
-    const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
-
-    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
-    {
-        const auto t1 = fromSequence->getTrack(i);
-
-        if (!t1->isUsed())
-        {
-            continue;
-        }
-
-        auto t1Events =
-            t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
-        const auto t2 = toSequence->getTrack(i);
-
-        sequencer->getStateManager()->drainQueue();
-
-        if (!t2->isUsed())
-        {
-            t2->setUsed(true);
-        }
-
-        const auto toSeqLastTick = toSequence->getLastTick();
-
-        for (const auto &event : t1Events)
-        {
-            const auto firstCopyTick = event->getTick() + offset;
-
-            if (firstCopyTick >= toSeqLastTick)
-            {
-                // The events in Track are ordered by tick, so this and
-                // any following event copies would be out of bounds.
-                break;
-            }
-
-            for (auto k = 0; k < copyCount; k++)
-            {
-                const auto tick = firstCopyTick + k * segmentLengthTicks;
-
-                // We do a more specific exit-check here, since within-bounds
-                // copies may be followed by out-of-bounds ones.
-                if (tick >= toSeqLastTick)
-                {
-                    break;
-                }
-
-                EventData eventCopy = *event->handle;
-                eventCopy.sequenceIndex = SequenceIndex(toSeqIndex);
-                eventCopy.tick = tick;
-                t2->acquireAndInsertEvent(eventCopy);
-            }
-        }
+        toSequence->init(destinationBarCount - 1);
+        sequencer->getStateManager()->enqueue(copyBars);
     }
 }
 
