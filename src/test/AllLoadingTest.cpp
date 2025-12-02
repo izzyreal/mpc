@@ -9,6 +9,7 @@
 #include "disk/MpcFile.hpp"
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>
@@ -53,6 +54,8 @@ TEST_CASE("Load ALL and check sequence 21 is used", "[load-all]")
     REQUIRE(seqNames->getUsednesses()[20]);
 
     AllLoader::loadEverythingFromAllParser(mpc, parser);
+
+    mpc.getSequencer()->getStateManager()->drainQueue();
 
     auto seq1 = mpc.getSequencer()->getSequence(0);
     REQUIRE(seq1);
