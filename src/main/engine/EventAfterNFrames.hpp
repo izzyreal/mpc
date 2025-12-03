@@ -7,7 +7,7 @@ namespace mpc::engine
 {
     struct EventAfterNFrames
     {
-        std::function<void()> f;
+        std::function<void(int)> f;
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
     };

@@ -89,7 +89,7 @@ void LoadASoundScreen::function(const int i)
             mpc.getEngineHost()
                 ->getSequencerPlaybackEngine()
                 ->enqueueEventAfterNFrames(
-                    [&]
+                    [&](int)
                     {
                         mpc.getEngineHost()
                             ->getPreviewSoundPlayer()

@@ -242,7 +242,7 @@ void DirectoryScreen::function(const int f)
                 }
 
                 const std::function startSoundPlayer =
-                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
+                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls](int)
                 {
                     const auto audioServerSampleRate =
                         engineHost->getAudioServer()->getSampleRate();

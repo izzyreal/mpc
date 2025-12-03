@@ -29,6 +29,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
+    std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
     Sequencer *sequencer, const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     std::function<bool()> isBouncing, const std::function<int()> &getSampleRate,
@@ -47,8 +48,8 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
       noteRepeatProcessor(noteRepeatProcessor),
       isAudioServerCurrentlyRunningOffline(
           isAudioServerCurrentlyRunningOffline),
-      midiClockOutput(
-          std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
+      midiClockOutput(std::make_shared<MidiClockOutput>(
+          getMidiOutput, sequencer, getScreens, isBouncing))
 {
     eventQueue = std::make_shared<EventQueue>(100);
     tempEventQueue.reserve(100);
@@ -435,7 +436,7 @@ void SequencerPlaybackEngine::stopSequencer() const
 }
 
 void SequencerPlaybackEngine::enqueueEventAfterNFrames(
-    const std::function<void()> &event, const unsigned long nFrames) const
+    const std::function<void(int)> &event, const unsigned long nFrames) const
 {
     EventAfterNFrames e;
     e.f = event;
@@ -443,7 +444,7 @@ void SequencerPlaybackEngine::enqueueEventAfterNFrames(
     eventQueue->enqueue(std::move(e));
 }
 
-void SequencerPlaybackEngine::processEventsAfterNFrames()
+void SequencerPlaybackEngine::processEventsAfterNFrames(const int frameIndex)
 {
     EventAfterNFrames batch[100];
 
@@ -455,7 +456,7 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
     {
         if (auto &e = batch[i]; ++e.frameCounter >= e.nFrames)
         {
-            e.f();
+            e.f(frameIndex);
         }
         else
         {
@@ -490,7 +491,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
-            processEventsAfterNFrames();
+            processEventsAfterNFrames(frameIndex);
 
             if (std::find(ticksForCurrentBuffer.begin(),
                           ticksForCurrentBuffer.end(),
@@ -555,7 +556,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex);
 
-        processEventsAfterNFrames();
+        processEventsAfterNFrames(frameIndex);
 
         if (!sequencerIsRunningAtStartOfBuffer)
         {

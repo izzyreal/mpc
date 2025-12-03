@@ -13,7 +13,6 @@ namespace moodycamel
 
 namespace mpc::audiomidi
 {
-
     class MidiOutput
     {
     public:

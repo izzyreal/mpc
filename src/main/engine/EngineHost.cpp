@@ -122,6 +122,7 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+        [&]{return mpc.getMidiOutput(); },
         mpc.getSequencer().get(), mpc.getClock(), mpc.getLayeredScreen(),
         [&]
         {
@@ -424,7 +425,7 @@ void EngineHost::stopBouncing()
     }
 
     getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&]
+        [&](int)
         {
             mpc.getLayeredScreen()->postToUiThread(
                 [ls = mpc.getLayeredScreen()]
@@ -473,7 +474,7 @@ bool EngineHost::isBouncePrepared() const
 void EngineHost::finishPreviewSoundPlayerVoice()
 {
     getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&]
+        [&](int)
         {
             getPreviewSoundPlayer()->finishVoice();
         },

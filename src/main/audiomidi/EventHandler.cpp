@@ -159,7 +159,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     auto noteOffEventFn = [note, programIndex,
                            performanceManager = mpc.getPerformanceManager(),
-                           programPadIndex, noteOffCtx]
+                           programPadIndex, noteOffCtx](int)
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
@@ -412,7 +412,7 @@ void EventHandler::handleNoteEventMidiOut(
             noteOff.type = EventType::NoteOff;
 
             sequencerPlaybackEngine->enqueueEventAfterNFrames(
-                [this, noteOff, track, trackDevice]
+                [this, noteOff, track, trackDevice](int)
                 {
                     handleNoteEventMidiOut(noteOff, track, trackDevice,
                                            std::nullopt);

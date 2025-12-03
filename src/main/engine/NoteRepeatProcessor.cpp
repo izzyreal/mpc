@@ -222,7 +222,7 @@ void NoteRepeatProcessor::process(
         }
 
         sequencerPlaybackEngine->enqueueEventAfterNFrames(
-            [voices = voices, track, note, tickPosition, drumBus]
+            [voices = voices, track, note, tickPosition, drumBus](int)
             {
                 if (drumBus)
                 {
