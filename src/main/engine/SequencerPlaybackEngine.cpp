@@ -601,9 +601,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->playToTick(sequencer->getTransport()->getTickPosition());
             processNoteRepeat();
+            sequencer->getTransport()->bumpPositionByTicks(1);
         }
 
-        sequencer->getTransport()->bumpPositionByTicks(1);
         manager->drainQueue();
     }
 
