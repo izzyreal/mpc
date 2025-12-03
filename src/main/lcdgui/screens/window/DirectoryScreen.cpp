@@ -16,7 +16,6 @@
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
 
@@ -242,7 +241,7 @@ void DirectoryScreen::function(const int f)
                 }
 
                 const std::function startSoundPlayer =
-                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls](int)
+                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
                 {
                     const auto audioServerSampleRate =
                         engineHost->getAudioServer()->getSampleRate();
@@ -271,8 +270,7 @@ void DirectoryScreen::function(const int f)
                 };
 
                 mpc.getEngineHost()
-                    ->getSequencerPlaybackEngine()
-                    ->enqueueEventAfterNFrames(startSoundPlayer, 0);
+                    ->postToAudioThread(startSoundPlayer);
             }
 
             break;
@@ -1087,7 +1085,7 @@ void DirectoryScreen::drawGraphicsRight() const
 }
 
 std::string DirectoryScreen::padFileName(const std::string &s,
-                                         const std::string &pad) const
+                                         const std::string &pad)
 {
     return StrUtil::padRight(StrUtil::trim(s), pad, 8);
 }

@@ -10,7 +10,6 @@
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -86,18 +85,13 @@ void LoadASoundScreen::function(const int i)
         }
         case 3:
 
-            mpc.getEngineHost()
-                ->getSequencerPlaybackEngine()
-                ->enqueueEventAfterNFrames(
-                    [&](int)
-                    {
-                        mpc.getEngineHost()
-                            ->getPreviewSoundPlayer()
-                            ->finishVoice();
-                        sampler.lock()->deleteSound(
-                            sampler.lock()->getPreviewSound());
-                    },
-                    0);
+            mpc.getEngineHost()->postToAudioThread(
+                [&]
+                {
+                    mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
+                    sampler.lock()->deleteSound(
+                        sampler.lock()->getPreviewSound());
+                });
 
             openScreenById(ScreenId::LoadScreen);
             break;
@@ -148,9 +142,9 @@ void LoadASoundScreen::keepSound() const
     {
         auto replaceAction = [this, existingSoundIndex, actionAfterLoadingSound]
         {
-            const auto previewSound = sampler.lock()->getPreviewSound();
-            const auto isMono = previewSound->isMono();
-            sampler.lock()->replaceSound(existingSoundIndex, previewSound);
+            const auto replacePreviewSound = sampler.lock()->getPreviewSound();
+            const auto isMono = replacePreviewSound->isMono();
+            sampler.lock()->replaceSound(existingSoundIndex, replacePreviewSound);
             actionAfterLoadingSound(isMono);
             openScreenById(ScreenId::LoadScreen);
         };

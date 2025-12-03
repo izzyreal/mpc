@@ -168,8 +168,15 @@ void EngineHost::start()
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
-void EngineHost::applyPendingStateChanges() const
+
+void EngineHost::postToAudioThread(const std::function<void()> &fn)
 {
+    audioTasks.post(fn);
+}
+
+void EngineHost::applyPendingStateChanges()
+{
+    audioTasks.drain();
     mpc.getSequencer()->getStateManager()->drainQueue();
     mpc.getPerformanceManager().lock()->drainQueue();
 }
@@ -426,16 +433,15 @@ void EngineHost::stopBouncing()
         directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
 
-    getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&](int)
+    postToAudioThread(
+        [&]
         {
             mpc.getLayeredScreen()->postToUiThread(
                 [ls = mpc.getLayeredScreen()]
                 {
                     ls->openScreenById(ScreenId::VmpcRecordingFinishedScreen);
                 });
-        },
-        0);
+        });
 }
 
 void EngineHost::stopBouncingEarly()
@@ -475,12 +481,11 @@ bool EngineHost::isBouncePrepared() const
 
 void EngineHost::finishPreviewSoundPlayerVoice()
 {
-    getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
-        [&](int)
+    postToAudioThread(
+        [&]
         {
             getPreviewSoundPlayer()->finishVoice();
-        },
-        0);
+        });
 }
 
 bool EngineHost::isBouncing() const

@@ -9,7 +9,6 @@
 #include "disk/SoundLoader.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
@@ -149,7 +148,7 @@ void LoadScreen::function(const int i)
                 }
 
                 const std::function startSoundPlayer =
-                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls](int)
+                    [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
                 {
                     const auto audioServerSampleRate =
                         engineHost->getAudioServer()->getSampleRate();
@@ -178,8 +177,7 @@ void LoadScreen::function(const int i)
                 };
 
                 mpc.getEngineHost()
-                    ->getSequencerPlaybackEngine()
-                    ->enqueueEventAfterNFrames(startSoundPlayer, 0);
+                    ->postToAudioThread(startSoundPlayer);
             }
             break;
         }

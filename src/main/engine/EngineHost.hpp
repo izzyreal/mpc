@@ -1,5 +1,7 @@
 #pragma once
 
+#include "concurrency/TaskQueue.hpp"
+
 #include <memory>
 #include <atomic>
 #include <vector>
@@ -69,7 +71,9 @@ namespace mpc::engine
         // by the audio thread in the correct state. This includes, but is not
         // limited to, the transport state, which pads are pressed and which
         // local note events are currently active.
-        void applyPendingStateChanges() const;
+        void applyPendingStateChanges();
+
+        void postToAudioThread(const std::function<void()> &);
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
@@ -101,6 +105,7 @@ namespace mpc::engine
         std::atomic<bool> bouncing{false};
         std::atomic<bool> recordingSound{false};
         std::shared_ptr<AudioProcess> monitorInputAdapter;
+        concurrency::TaskQueue audioTasks;
 
     public:
         bool isBouncing() const;

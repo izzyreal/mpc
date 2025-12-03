@@ -18,13 +18,14 @@ using namespace mpc::sequencer;
 using namespace mpc::client::event;
 
 MidiClockOutput::MidiClockOutput(
-const std::function<int()> &getSampleRate,
+    const std::function<int()> &getSampleRate,
     const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
         &getMidiOutput,
     Sequencer *sequencer,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     const std::function<bool()> &isBouncing)
-    : getSampleRate(getSampleRate), getMidiOutput(getMidiOutput), sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
+    : getSampleRate(getSampleRate), getMidiOutput(getMidiOutput),
+      sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 {
     eventQueue = std::make_shared<
         moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);

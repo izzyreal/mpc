@@ -40,7 +40,7 @@ void ReleaseFunctionCommand::execute()
                 ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
                 const std::function stopSoundPlayer =
-                    [ls, engineHost = mpc.getEngineHost()](int)
+                    [ls, engineHost = mpc.getEngineHost()]
                 {
                     if (ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
                     {
@@ -53,9 +53,7 @@ void ReleaseFunctionCommand::execute()
                     }
                 };
 
-                mpc.getEngineHost()
-                    ->getSequencerPlaybackEngine()
-                    ->enqueueEventAfterNFrames(stopSoundPlayer, 0);
+                mpc.getEngineHost()->postToAudioThread(stopSoundPlayer);
             }
             break;
         }
@@ -85,7 +83,7 @@ void ReleaseFunctionCommand::execute()
                     ls->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
                 {
                     const std::function stopSoundPlayer =
-                        [ls, engineHost = mpc.getEngineHost()](int)
+                        [ls, engineHost = mpc.getEngineHost()]
                     {
                         if (ls->isCurrentScreenPopupFor(
                                 ScreenId::DirectoryScreen))
@@ -100,9 +98,7 @@ void ReleaseFunctionCommand::execute()
                         }
                     };
 
-                    mpc.getEngineHost()
-                        ->getSequencerPlaybackEngine()
-                        ->enqueueEventAfterNFrames(stopSoundPlayer, 0);
+                    mpc.getEngineHost()->postToAudioThread(stopSoundPlayer);
                 }
             }
             break;
