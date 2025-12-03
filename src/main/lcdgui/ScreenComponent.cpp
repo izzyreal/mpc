@@ -196,7 +196,7 @@ std::optional<mpc::ProgramIndex> ScreenComponent::getProgramIndex() const
 
     if (!drumBus)
     {
-        return std::nullopt;
+        return sequencer.lock()->getDrumBus(DrumBusIndex(0))->getProgramIndex();
     }
 
     return drumBus->getProgramIndex();

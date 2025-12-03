@@ -109,7 +109,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
     std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))
         ->setValue(static_cast<float>(stereoMixer.panning) / PAN_SCALE);
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
-        ->setValue(static_cast<float>(stereoMixer.level));
+        ->setValue(stereoMixer.level);
 
     auto duplicateStrip = mixerControls->getStripControls(
         std::to_string(stripNumber + STRIP_OFFSET));
@@ -210,26 +210,26 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
     }
 }
 
-void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
+void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &ctx)
 {
-    if (c.note < Mpc2000XlSpecs::FIRST_DRUM_NOTE ||
-        c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE)
+    if (ctx.note < Mpc2000XlSpecs::FIRST_DRUM_NOTE ||
+        ctx.note > Mpc2000XlSpecs::LAST_DRUM_NOTE)
     {
         return;
     }
 
-    auto startDecayForNote = [&](int noteToStop, uint64_t noteEventId)
+    auto startDecayForNote = [&](const int noteToStop, const uint64_t noteEventId)
     {
-        for (const auto &voice : *c.voices)
+        for (const auto &voice : *ctx.voices)
         {
             if (!voice->isFinished() &&
-                voice->getStartTick() == c.noteOnStartTick &&
+                voice->getStartTick() == ctx.noteOnStartTick &&
                 voice->getNote() == noteToStop &&
                 voice->getVoiceOverlapMode() ==
                     sampler::VoiceOverlapMode::NOTE_OFF &&
                 !voice->isDecaying() &&
-                c.drumIndex == voice->getMuteInfo().getDrum() &&
-                (c.noteEventId == 0 || voice->getNoteEventId() == noteEventId))
+                ctx.drumIndex == voice->getMuteInfo().getDrum() &&
+                (ctx.noteEventId == 0 || voice->getNoteEventId() == noteEventId))
             {
                 voice->startDecay();
                 break;
@@ -237,17 +237,17 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
         }
     };
 
-    startDecayForNote(c.note, c.noteEventId);
+    startDecayForNote(ctx.note, ctx.noteEventId);
 
-    if (auto it = c.drumSimultA->find(c.note); it != c.drumSimultA->end())
+    if (const auto it = ctx.drumSimultA->find(ctx.note); it != ctx.drumSimultA->end())
     {
-        startDecayForNote(it->second, c.noteEventId);
-        c.drumSimultA->erase(it);
+        startDecayForNote(it->second, ctx.noteEventId);
+        ctx.drumSimultA->erase(it);
     }
 
-    if (auto it = c.drumSimultB->find(c.note); it != c.drumSimultB->end())
+    if (const auto it = ctx.drumSimultB->find(ctx.note); it != ctx.drumSimultB->end())
     {
-        startDecayForNote(it->second, c.noteEventId);
-        c.drumSimultB->erase(it);
+        startDecayForNote(it->second, ctx.noteEventId);
+        ctx.drumSimultB->erase(it);
     }
 }

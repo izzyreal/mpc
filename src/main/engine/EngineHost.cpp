@@ -181,6 +181,24 @@ void EngineHost::postSamplePreciseTaskToAudioThread(
     preciseTasks.post(task);
 }
 
+void EngineHost::flushNoteOffs()
+{
+    concurrency::Task audioTask;
+    audioTask.set([this]
+    {
+        preciseTasks.flushMidiNoteOffs();
+
+        for (const auto &v : voices)
+        {
+            if (v->getVoiceOverlapMode() == VoiceOverlapMode::NOTE_OFF)
+            {
+                v->startDecay(0);
+            }
+        }
+    });
+    postToAudioThread(audioTask);
+}
+
 void EngineHost::prepareProcessBlock(const int nFrames)
 {
     audioTasks.drain();

@@ -179,7 +179,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding({[&]
                         {
                             const auto seq = sequencer.lock();
-                            return seq->getSelectedSequence()->getTimeSignature(
+                            return seq->getSelectedSequence()->getTimeSignatureFromTickPos(
                                 seq->getTransport()->getTickPosition());
                         },
                         [&](auto)
@@ -593,7 +593,7 @@ void SequencerScreen::displayTsig() const
 {
     std::string result;
     const auto seq = sequencer.lock();
-    const auto ts = seq->getSelectedSequence()->getTimeSignature(
+    const auto ts = seq->getSelectedSequence()->getTimeSignatureFromTickPos(
         seq->getTransport()->getTickPosition());
     result.append(std::to_string(ts.numerator));
     result.append("/");

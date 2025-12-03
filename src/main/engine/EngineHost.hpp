@@ -77,6 +77,8 @@ namespace mpc::engine
         void postToAudioThread(const concurrency::Task &);
         void postSamplePreciseTaskToAudioThread(const concurrency::SamplePreciseTask &);
 
+        void flushNoteOffs();
+
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
         std::shared_ptr<PreviewSoundPlayer> getPreviewSoundPlayer() const;

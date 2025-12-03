@@ -59,6 +59,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
+    const std::function<void()> &flushMidiNoteOffs,
     const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
@@ -74,7 +75,7 @@ Sequencer::Sequencer(
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled)
-    : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
+    : flushMidiNoteOffs(flushMidiNoteOffs), getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), clock(clock),
       voices(voices), isAudioServerRunning(isAudioServerRunning),

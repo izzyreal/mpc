@@ -64,7 +64,8 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(const std::shared_ptr<Clock> &,
+        Sequencer(const std::function<void()> &flushMidiNoteOffs,
+                  const std::shared_ptr<Clock> &,
                   const std::shared_ptr<lcdgui::LayeredScreen> &,
                   const std::function<std::shared_ptr<lcdgui::Screens>()> &,
                   std::vector<std::shared_ptr<engine::Voice>> *,
@@ -108,6 +109,7 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
         std::shared_ptr<Clock> clock;
+        const std::function<void()> flushMidiNoteOffs;
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;

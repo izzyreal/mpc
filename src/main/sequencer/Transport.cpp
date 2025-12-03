@@ -162,6 +162,7 @@ void Transport::stop() const
     {
         sequencer.getStateManager()->enqueue(StopSequence{});
     }
+    sequencer.flushMidiNoteOffs();
 }
 
 void Transport::resetCountInPositions() const

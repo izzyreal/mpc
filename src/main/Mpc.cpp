@@ -137,14 +137,13 @@ void Mpc::init()
 
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);
-    /*
-     * EngineHost requires sequencer to exist.
-     */
+
     engineHost = std::make_shared<engine::EngineHost>(*this);
 
     MLOG("EngineHost created");
 
     sequencer = std::make_shared<Sequencer>(
+        [&]{ engineHost->flushNoteOffs(); },
         clock, layeredScreen,
         [&]
         {

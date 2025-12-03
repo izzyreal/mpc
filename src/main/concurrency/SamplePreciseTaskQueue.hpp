@@ -13,22 +13,55 @@ namespace mpc::concurrency
         utils::SmallFn<96, void(int)> f;
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
+        bool midiNoteOff = false;
     };
 
     class SamplePreciseTaskQueue
     {
     public:
+        SamplePreciseTaskQueue()
+        {
+            queue = moodycamel::ConcurrentQueue<SamplePreciseTask>(Capacity);
+        }
+
         void post(const SamplePreciseTask &task)
         {
             queue.enqueue(task);
         }
 
+        void flushMidiNoteOffs()
+        {
+            SamplePreciseTask batch[Capacity];
+            SamplePreciseTask temp[Capacity];
+
+            const size_t queueSize = queue.try_dequeue_bulk(batch, Capacity);
+            size_t reinsertSize = 0;
+
+            for (size_t i = 0; i < queueSize; ++i)
+            {
+                auto &task = batch[i];
+
+                if (task.midiNoteOff)
+                {
+                    task.f(0);
+                    continue;
+                }
+
+                temp[reinsertSize++] = task;
+            }
+
+            for (size_t i = 0; i < reinsertSize; ++i)
+            {
+                queue.enqueue(std::move(temp[i]));
+            }
+        }
+
         void processTasks(const int nFrames)
         {
-            SamplePreciseTask batch[100];
-            SamplePreciseTask temp[100];
+            SamplePreciseTask batch[Capacity];
+            SamplePreciseTask temp[Capacity];
 
-            const size_t queueSize = queue.try_dequeue_bulk(batch, 100);
+            const size_t queueSize = queue.try_dequeue_bulk(batch, Capacity);
             size_t reinsertSize = 0;
 
             for (size_t i = 0; i < queueSize; ++i)
@@ -59,6 +92,7 @@ namespace mpc::concurrency
         }
 
     private:
+        static constexpr int Capacity = 100;
         moodycamel::ConcurrentQueue<SamplePreciseTask> queue;
     };
 } // namespace mpc::concurrency

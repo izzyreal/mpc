@@ -243,6 +243,7 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
         noteOff.type = EventType::NoteOff;
 
         concurrency::SamplePreciseTask task;
+        task.midiNoteOff = true;
         task.f.set(
             [this, noteOff, trackDeviceIndex,
              transposeAmount](const int noteOffSampleNumber)
