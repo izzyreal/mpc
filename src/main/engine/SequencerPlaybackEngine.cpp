@@ -548,11 +548,15 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         triggerClickIfNeeded();
 
-        layeredScreen->postToUiThread(
+        concurrency::Task uiTask;
+
+        uiTask.set(
             [this]
             {
                 displayPunchRects();
             });
+
+        layeredScreen->postToUiThread(uiTask);
 
         if (sequencer->getTransport()->isCountingIn())
         {

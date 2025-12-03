@@ -1013,12 +1013,14 @@ void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    layeredScreen->postToUiThread(
+    concurrency::Task uiTask;
+    uiTask.set(
         [this]
         {
             hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
         });
+    layeredScreen->postToUiThread(uiTask);
 }
 
 void Sequencer::resetUndo()

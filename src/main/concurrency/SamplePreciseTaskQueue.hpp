@@ -1,35 +1,16 @@
 #pragma once
 
+#include "utils/SmallFn.hpp"
+
 #include <concurrentqueue.h>
 
 #include <cstdint>
 
 namespace mpc::concurrency
 {
-    template <size_t MaxBytes> struct SmallFn
-    {
-        alignas(void *) unsigned char storage[MaxBytes];
-        void (*invoke)(void *, int);
-
-        template <class F> void set(F f)
-        {
-            static_assert(sizeof(F) <= MaxBytes);
-            new (storage) F(std::move(f));
-            invoke = [](void *p, int x)
-            {
-                (*static_cast<F *>(p))(x);
-            };
-        }
-
-        void operator()(int x)
-        {
-            invoke(storage, x);
-        }
-    };
-
     struct SamplePreciseTask
     {
-        SmallFn<96> f;
+        utils::SmallFn<96, void(int)> f;
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
     };

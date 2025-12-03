@@ -39,21 +39,25 @@ void ReleaseFunctionCommand::execute()
             if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
                 ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
-                const std::function stopSoundPlayer =
+                concurrency::Task task;
+                task.set(
                     [ls, engineHost = mpc.getEngineHost()]
-                {
-                    if (ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
                     {
-                        engineHost->getSoundPlayer()->enableStopEarly();
-                        ls->postToUiThread(
-                            [ls]
-                            {
-                                ls->openScreenById(ScreenId::LoadScreen);
-                            });
-                    }
-                };
+                        if (ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
+                        {
+                            engineHost->getSoundPlayer()->enableStopEarly();
 
-                mpc.getEngineHost()->postToAudioThread(stopSoundPlayer);
+                            concurrency::Task uiTask;
+                            uiTask.set(
+                                [ls]
+                                {
+                                    ls->openScreenById(ScreenId::LoadScreen);
+                                });
+                            ls->postToUiThread(uiTask);
+                        }
+                    });
+
+                mpc.getEngineHost()->postToAudioThread(task);
             }
             break;
         }
@@ -82,23 +86,26 @@ void ReleaseFunctionCommand::execute()
                 if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
                     ls->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
                 {
-                    const std::function stopSoundPlayer =
+                    concurrency::Task task;
+                    task.set(
                         [ls, engineHost = mpc.getEngineHost()]
-                    {
-                        if (ls->isCurrentScreenPopupFor(
-                                ScreenId::DirectoryScreen))
                         {
-                            engineHost->getSoundPlayer()->enableStopEarly();
-                            ls->postToUiThread(
-                                [ls]
-                                {
-                                    ls->openScreenById(
-                                        ScreenId::DirectoryScreen);
-                                });
-                        }
-                    };
+                            if (ls->isCurrentScreenPopupFor(
+                                    ScreenId::DirectoryScreen))
+                            {
+                                engineHost->getSoundPlayer()->enableStopEarly();
+                                concurrency::Task uiTask;
+                                uiTask.set(
+                                    [ls]
+                                    {
+                                        ls->openScreenById(
+                                            ScreenId::DirectoryScreen);
+                                    });
+                                ls->postToUiThread(uiTask);
+                            }
+                        });
 
-                    mpc.getEngineHost()->postToAudioThread(stopSoundPlayer);
+                    mpc.getEngineHost()->postToAudioThread(task);
                 }
             }
             break;

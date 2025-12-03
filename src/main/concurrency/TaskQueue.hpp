@@ -1,27 +1,30 @@
 #pragma once
 
+#include "utils/SmallFn.hpp"
+
 #include <concurrentqueue.h>
 
 namespace mpc::concurrency
 {
+    using Task = utils::SmallFn<96, void()>;
     class TaskQueue
     {
     public:
-        void post(const std::function<void()> &fn)
+        void post(const Task &task)
         {
-            queue.enqueue(fn);
+            queue.enqueue(task);
         }
 
         void drain()
         {
-            std::function<void()> fn;
-            while (queue.try_dequeue(fn))
+            Task task;
+            while (queue.try_dequeue(task))
             {
-                fn();
+                task();
             }
         }
 
     private:
-        moodycamel::ConcurrentQueue<std::function<void()>> queue;
+        moodycamel::ConcurrentQueue<Task> queue;
     };
 } // namespace mpc::concurrency

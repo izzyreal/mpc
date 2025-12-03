@@ -62,9 +62,9 @@ LayeredScreen::LayeredScreen(Mpc &mpc) : mpc(mpc)
     }
 }
 
-void LayeredScreen::postToUiThread(const std::function<void()> &fn)
+void LayeredScreen::postToUiThread(const concurrency::Task &task)
 {
-    uiTasks.post(fn);
+    uiTasks.post(task);
 }
 
 bool LayeredScreen::isPreviousScreen(

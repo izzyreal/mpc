@@ -147,37 +147,41 @@ void LoadScreen::function(const int i)
                     return;
                 }
 
-                const std::function startSoundPlayer =
+                concurrency::Task audioTask;
+                audioTask.set(
                     [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
-                {
-                    const auto audioServerSampleRate =
-                        engineHost->getAudioServer()->getSampleRate();
+                    {
+                        const auto audioServerSampleRate =
+                            engineHost->getAudioServer()->getSampleRate();
 
-                    const bool started = engineHost->getSoundPlayer()->start(
-                        file->getInputStream(),
-                        isSnd ? audiomidi::SoundPlayerFileFormat::SND
-                              : audiomidi::SoundPlayerFileFormat::WAV,
-                        audioServerSampleRate);
+                        const bool started =
+                            engineHost->getSoundPlayer()->start(
+                                file->getInputStream(),
+                                isSnd ? audiomidi::SoundPlayerFileFormat::SND
+                                      : audiomidi::SoundPlayerFileFormat::WAV,
+                                audioServerSampleRate);
 
-                    ls.lock()->postToUiThread(
-                        [started, file, ls]
-                        {
-                            const auto name = file->getNameWithoutExtension();
-
-                            if (started)
+                        concurrency::Task uiTask;
+                        uiTask.set(
+                            [started, file, ls]
                             {
-                                ls.lock()->showPopup("Playing " + name);
-                            }
-                            else
-                            {
-                                ls.lock()->showPopupAndAwaitInteraction(
-                                    "Can't play " + name);
-                            }
-                        });
-                };
+                                const auto name =
+                                    file->getNameWithoutExtension();
 
-                mpc.getEngineHost()
-                    ->postToAudioThread(startSoundPlayer);
+                                if (started)
+                                {
+                                    ls.lock()->showPopup("Playing " + name);
+                                }
+                                else
+                                {
+                                    ls.lock()->showPopupAndAwaitInteraction(
+                                        "Can't play " + name);
+                                }
+                            });
+                        ls.lock()->postToUiThread(uiTask);
+                    });
+
+                mpc.getEngineHost()->postToAudioThread(audioTask);
             }
             break;
         }

@@ -100,11 +100,13 @@ void InsertEventScreen::insertEvent() const
 
     const auto onComplete = [ls = ls]
     {
-        ls.lock()->postToUiThread(
+        concurrency::Task uiTask;
+        uiTask.set(
             [ls]
             {
                 ls.lock()->openScreenById(ScreenId::StepEditorScreen);
             });
+        ls.lock()->postToUiThread(uiTask);
     };
 
     sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e, onComplete);

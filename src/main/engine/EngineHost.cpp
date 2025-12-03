@@ -170,9 +170,9 @@ void EngineHost::start()
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 
-void EngineHost::postToAudioThread(const std::function<void()> &fn)
+void EngineHost::postToAudioThread(const concurrency::Task &task)
 {
-    audioTasks.post(fn);
+    audioTasks.post(task);
 }
 
 void EngineHost::postSamplePreciseTaskToAudioThread(
@@ -441,15 +441,19 @@ void EngineHost::stopBouncing()
         directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
 
-    postToAudioThread(
+    concurrency::Task task;
+    task.set(
         [&]
         {
-            mpc.getLayeredScreen()->postToUiThread(
+            concurrency::Task uiTask;
+            uiTask.set(
                 [ls = mpc.getLayeredScreen()]
                 {
                     ls->openScreenById(ScreenId::VmpcRecordingFinishedScreen);
                 });
+            mpc.getLayeredScreen()->postToUiThread(uiTask);
         });
+    postToAudioThread(task);
 }
 
 void EngineHost::stopBouncingEarly()
@@ -489,11 +493,13 @@ bool EngineHost::isBouncePrepared() const
 
 void EngineHost::finishPreviewSoundPlayerVoice()
 {
-    postToAudioThread(
+    concurrency::Task task;
+    task.set(
         [&]
         {
             getPreviewSoundPlayer()->finishVoice();
         });
+    postToAudioThread(task);
 }
 
 bool EngineHost::isBouncing() const

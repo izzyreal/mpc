@@ -84,17 +84,20 @@ void LoadASoundScreen::function(const int i)
             break;
         }
         case 3:
-
-            mpc.getEngineHost()->postToAudioThread(
+        {
+            concurrency::Task audioTask;
+            audioTask.set(
                 [&]
                 {
                     mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
                     sampler.lock()->deleteSound(
                         sampler.lock()->getPreviewSound());
                 });
+            mpc.getEngineHost()->postToAudioThread(audioTask);
 
             openScreenById(ScreenId::LoadScreen);
             break;
+        }
         case 4:
             keepSound();
             break;
@@ -144,7 +147,8 @@ void LoadASoundScreen::keepSound() const
         {
             const auto replacePreviewSound = sampler.lock()->getPreviewSound();
             const auto isMono = replacePreviewSound->isMono();
-            sampler.lock()->replaceSound(existingSoundIndex, replacePreviewSound);
+            sampler.lock()->replaceSound(existingSoundIndex,
+                                         replacePreviewSound);
             actionAfterLoadingSound(isMono);
             openScreenById(ScreenId::LoadScreen);
         };

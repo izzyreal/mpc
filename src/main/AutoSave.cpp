@@ -83,11 +83,13 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                 return;
             }
 
-            layeredScreen->postToUiThread(
+            concurrency::Task uiTask;
+            uiTask.set(
                 [layeredScreen, msg]
                 {
                     layeredScreen->showPopup(msg);
                 });
+            layeredScreen->postToUiThread(uiTask);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         };
@@ -248,7 +250,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         const auto screenName = getStringProperty("screen.txt");
         const auto focusName = getStringProperty("focus.txt");
 
-        layeredScreen->postToUiThread(
+        concurrency::Task uiTask;
+        uiTask.set(
             [layeredScreen, screenName, focusName,
              sequencer = mpc.getSequencer()]
             {
@@ -265,6 +268,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                     layeredScreen->setFocus(focusName);
                 }
             });
+        layeredScreen->postToUiThread(uiTask);
 
         for (auto &p : mpc.getSampler()->getPrograms())
         {

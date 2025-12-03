@@ -74,7 +74,7 @@ namespace mpc::engine
         // local note events are currently active.
         void prepareProcessBlock(int nFrames);
 
-        void postToAudioThread(const std::function<void()> &);
+        void postToAudioThread(const concurrency::Task &);
         void postSamplePreciseTaskToAudioThread(const concurrency::SamplePreciseTask &);
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
