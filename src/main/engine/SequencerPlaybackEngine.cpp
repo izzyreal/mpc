@@ -538,8 +538,19 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
+        size_t tickCountAtThisFrameIndex = 0;
+
+        for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
+        {
+            if (const auto tickFrameIndex = clockTicks[tickIndex];
+                tickFrameIndex == frameIndex)
+            {
+                tickCountAtThisFrameIndex++;
+            }
+        }
+
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
-                                      frameIndex);
+                                      frameIndex, tickCountAtThisFrameIndex);
 
         processEventsAfterNFrames(frameIndex);
 
@@ -559,17 +570,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
             else if (sequencer->getTransport()->shouldWaitForMidiClockLock())
             {
                 continue;
-            }
-        }
-
-        size_t tickCountAtThisFrameIndex = 0;
-
-        for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
-        {
-            if (const auto tickFrameIndex = clockTicks[tickIndex];
-                tickFrameIndex == frameIndex)
-            {
-                tickCountAtThisFrameIndex++;
             }
         }
 

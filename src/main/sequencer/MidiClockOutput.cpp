@@ -131,7 +131,8 @@ void MidiClockOutput::processEventsAfterNFrames(const int sampleNumber)
 }
 
 void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
-                                   const int frameIndex)
+                                   const int frameIndex,
+                                   int tickCountAtThisFrame)
 {
     lastProcessedFrameIsMidiClockLock = false;
 
@@ -142,16 +143,30 @@ void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
 
     processEventsAfterNFrames(frameIndex);
 
-    if (!clock.proc())
+    if (!isRunningAtStartOfBuffer)
+    {
+        if (clock.proc())
+        {
+            tickCountAtThisFrame = 1;
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    if (isRunningAtStartOfBuffer && tickCountAtThisFrame == 0)
     {
         return;
     }
 
-    const auto lockedToClock = midiClockTickCounter++ == 0;
+    const auto lockedToClock = midiClockTickCounter == 0;
+
+    midiClockTickCounter += tickCountAtThisFrame;
 
     lastProcessedFrameIsMidiClockLock = true;
 
-    if (midiClockTickCounter == 4)
+    if (midiClockTickCounter >= 4)
     {
         midiClockTickCounter = 0;
     }

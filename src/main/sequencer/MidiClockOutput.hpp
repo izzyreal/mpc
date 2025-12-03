@@ -46,7 +46,7 @@ namespace mpc::sequencer
 
         void processTempoChange();
         void processSampleRateChange();
-        void processFrame(bool isRunningAtStartOfBuffer, int frameIndex);
+        void processFrame(bool isRunningAtStartOfBuffer, int frameIndex, int tickCountAtThisFrame);
 
         void enqueueMidiSyncStart1msBeforeNextClock() const;
 
