@@ -35,6 +35,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
                         },
                         [&](auto)
                         {
+                            displaySteps();
                             displayNow0();
                             displayNow1();
                             displayNow2();

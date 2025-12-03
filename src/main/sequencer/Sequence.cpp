@@ -361,9 +361,9 @@ TimeSignature Sequence::getTimeSignature(const int barIndex) const
     return getSnapshot()->getTimeSignature(barIndex);
 }
 
-TimeSignature Sequence::getTimeSignature() const
+TimeSignature Sequence::getTimeSignatureFromTickPos(const Tick pos) const
 {
-    int bar = getCurrentBarIndex();
+    int bar = getBarIndexForPositionTicks(pos);
 
     if (bar > getLastBarIndex() && bar != 0)
     {

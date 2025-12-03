@@ -176,15 +176,16 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
              displayPgm();
          }});
 
-    addReactiveBinding(
-        {[&]
-         {
-             return sequencer.lock()->getSelectedSequence()->getTimeSignature();
-         },
-         [&](auto)
-         {
-             displayTsig();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            const auto seq = sequencer.lock();
+                            return seq->getSelectedSequence()->getTimeSignature(
+                                seq->getTransport()->getTickPosition());
+                        },
+                        [&](auto)
+                        {
+                            displayTsig();
+                        }});
 
     addReactiveBinding(
         {[&]
@@ -591,7 +592,9 @@ void SequencerScreen::displayRecordingMode() const
 void SequencerScreen::displayTsig() const
 {
     std::string result;
-    const auto ts = sequencer.lock()->getSelectedSequence()->getTimeSignature();
+    const auto seq = sequencer.lock();
+    const auto ts = seq->getSelectedSequence()->getTimeSignature(
+        seq->getTransport()->getTickPosition());
     result.append(std::to_string(ts.numerator));
     result.append("/");
     result.append(std::to_string(ts.denominator));

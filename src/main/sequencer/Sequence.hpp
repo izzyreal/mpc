@@ -139,7 +139,7 @@ namespace mpc::sequencer
         void setTempoChangeOn(bool b) const;
         int getLastTick() const;
         TimeSignature getTimeSignature(int barIndex) const;
-        TimeSignature getTimeSignature() const;
+        TimeSignature getTimeSignatureFromTickPos(Tick) const;
         void purgeAllTracks();
         std::shared_ptr<Track> purgeTrack(int i);
         int getDenominator(int i) const;

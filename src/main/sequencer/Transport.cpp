@@ -1,6 +1,7 @@
 #include "Transport.hpp"
 
 #include "FloatTypes.hpp"
+#include "SeqUtil.hpp"
 #include "SequencerStateManager.hpp"
 #include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
@@ -615,7 +616,7 @@ int Transport::getCurrentBeatIndex() const
         }
     }
 
-    const auto den = seq->getTimeSignature().denominator;
+    const auto den = seq->getTimeSignatureFromTickPos(pos).denominator;
     const auto denTicks = 96 * (4.0 / den);
 
     if (index == 0)
@@ -652,49 +653,8 @@ int Transport::getCurrentClockNumber() const
         return 0;
     }
 
-    auto clock = getTickPositionGuiPresentation();
-
-    if (clock == sequence->getLastTick())
-    {
-        return 0;
-    }
-
-    if (isPlaying() && !isCountingIn())
-    {
-        if (clock > sequence->getLastTick())
-        {
-            clock %= sequence->getLastTick();
-        }
-    }
-
-    const auto den = sequence->getTimeSignature().denominator;
-    const auto denTicks = 96 * (4.0 / den);
-
-    if (clock == 0)
-    {
-        return 0;
-    }
-
-    const auto currentBarIndex = getCurrentBarIndex();
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (i == currentBarIndex)
-        {
-            break;
-        }
-
-        clock -= sequence->getBarLength(i);
-    }
-
-    const auto currentBeatIndex = getCurrentBeatIndex();
-
-    for (int i = 0; i < currentBeatIndex; i++)
-    {
-        clock -= denTicks;
-    }
-
-    return clock;
+    const auto tickPos = getTickPositionGuiPresentation();
+    return SeqUtil::getClock(sequence.get(), tickPos);
 }
 
 void Transport::setBarBeatClock(const int bar, const int beat,
@@ -707,7 +667,7 @@ void Transport::setBarBeatClock(const int bar, const int beat,
 
     const auto seq = sequencer.getSelectedSequence();
 
-    const auto [num, den] = seq->getTimeSignature();
+    const auto [num, den] = seq->getTimeSignatureFromTickPos(getTickPosition());
 
     const int clampedBar = std::clamp(
         bar, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
@@ -772,7 +732,7 @@ void Transport::setBeat(int i) const
         return;
     }
 
-    const auto [num, den] = s->getTimeSignature();
+    const auto [num, den] = s->getTimeSignatureFromTickPos(pos);
 
     if (i >= num)
     {
@@ -806,7 +766,7 @@ void Transport::setClock(int i) const
         return;
     }
 
-    const auto den = s->getTimeSignature().denominator;
+    const auto den = s->getTimeSignatureFromTickPos(pos).denominator;
 
     if (const auto denTicks = 96 * (4.0 / den); i > denTicks - 1)
     {

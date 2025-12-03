@@ -151,12 +151,14 @@ void TempoChangeScreen::displayTempoChangeOn() const
 
 void TempoChangeScreen::displayTempoChange0() const
 {
-    const auto sequence = sequencer.lock()->getSelectedSequence();
+    const auto lockedSequencer = sequencer.lock();
+    const auto sequence = lockedSequencer->getSelectedSequence();
     bars[0]->Hide(false);
 
     const auto tce = getVisibleTempoChanges()[0];
     findField("a0")->setText(std::to_string(offset + 1));
-    const auto timeSig = sequence->getTimeSignature();
+    const auto timeSig = sequence->getTimeSignature(
+        lockedSequencer->getTransport()->getTickPosition());
 
     int value = tce->getBar(timeSig.numerator, timeSig.denominator) + 1;
     findField("b0")->setTextPadded(value, "0");
@@ -212,8 +214,10 @@ void TempoChangeScreen::displayTempoChange1() const
 
     findField("a1")->setText(std::to_string(offset + 2));
 
-    const auto sequence = sequencer.lock()->getSelectedSequence();
-    const auto timeSig = sequence->getTimeSignature();
+    const auto lockedSequencer = sequencer.lock();
+    const auto sequence = lockedSequencer->getSelectedSequence();
+    const auto timeSig = sequence->getTimeSignature(
+        lockedSequencer->getTransport()->getTickPosition());
 
     findField("b1")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");
@@ -265,8 +269,10 @@ void TempoChangeScreen::displayTempoChange2() const
 
     findField("a2")->setText(std::to_string(offset + 3));
 
-    const auto sequence = sequencer.lock()->getSelectedSequence();
-    const auto timeSig = sequence->getTimeSignature();
+    const auto lockedSequencer = sequencer.lock();
+    const auto sequence = lockedSequencer->getSelectedSequence();
+    const auto timeSig = sequence->getTimeSignature(
+        lockedSequencer->getTransport()->getTickPosition());
     findField("b2")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");
     findField("c2")->setTextPadded(
