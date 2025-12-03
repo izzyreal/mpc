@@ -7,7 +7,7 @@
 #include <deque>
 #include <functional>
 
-#include "lcdgui/LayeredScreenTasks.hpp"
+#include "concurrency/TaskQueue.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/BasicStructs.hpp"
 #include "lcdgui/BMFStructs.hpp"
@@ -30,11 +30,10 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-
     class LayeredScreen
     {
         Mpc &mpc;
-        LayeredScreenTasks uiTasks;
+        concurrency::TaskQueue uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
             std::vector(248, std::vector<bool>(60));
@@ -55,9 +54,7 @@ namespace mpc::lcdgui
         bool transfer(int direction);
 
     public:
-        // Uses a lock, so don't invoke on the audio thread.
-        // It is meant to be used from worker threads.
-        void postToUiThread(const std::function<void()> &fn);
+        void postToUiThread(const std::function<void()> &);
         void transferLeft();
         void transferRight();
         void transferUp();
@@ -133,6 +130,6 @@ namespace mpc::lcdgui
         std::shared_ptr<Field> getFocusedField();
         bool setFocus(const std::string &focus);
 
-        LayeredScreen(Mpc &mpc);
+        explicit LayeredScreen(Mpc &mpc);
     };
 } // namespace mpc::lcdgui
