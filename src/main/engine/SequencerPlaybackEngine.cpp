@@ -55,24 +55,9 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     tempEventQueue.reserve(100);
 }
 
-void SequencerPlaybackEngine::start()
-{
-    if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
-    {
-        // TODO Implement MIDI clock out
-        // shouldWaitForMidiClockLock = true;
-        shouldWaitForMidiClockLock = false;
-    }
-}
-
 unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 {
     return tickFrameOffset;
-}
-
-void SequencerPlaybackEngine::stop()
-{
-    tickFrameOffset = 0;
 }
 
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
@@ -560,6 +545,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (!sequencerIsRunningAtStartOfBuffer)
         {
+            tickFrameOffset = 0;
             continue;
         }
 
@@ -568,9 +554,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {
-                shouldWaitForMidiClockLock = false;
+                sequencer->getTransport()->setShouldWaitForMidiClockLock(false);
             }
-            else if (shouldWaitForMidiClockLock)
+            else if (sequencer->getTransport()->shouldWaitForMidiClockLock())
             {
                 continue;
             }

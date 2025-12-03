@@ -37,6 +37,7 @@ void MidiClockOutput::sendMidiClockMsg(const int frameIndex) const
     if (syncScreen->getModeOut() > 0)
     {
         ClientMidiEvent e;
+        e.setMessageType(ClientMidiEvent::MIDI_CLOCK);
         e.setBufferOffset(frameIndex);
         getMidiOutput()->enqueueEvent(e);
     }

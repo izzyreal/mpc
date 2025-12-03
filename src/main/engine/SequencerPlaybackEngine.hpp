@@ -59,8 +59,6 @@ namespace mpc::engine
 
         void work(int nFrames) override;
 
-        void start();
-
         unsigned short getEventFrameOffset() const;
 
         void stop();
@@ -84,7 +82,6 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
-        bool shouldWaitForMidiClockLock = false;
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
         // Offset of current tick within current buffer

@@ -122,6 +122,11 @@ namespace mpc::sequencer
         bool enabled;
     };
 
+    struct SetShouldWaitForMidiClockLock
+    {
+        bool enabled;
+    };
+
     using TransportMessage =
         std::variant<SetPositionQuarterNotes, StopSequence, PlaySequence,
                      PlaySequenceFromStart, Record, RecordFromStart, Overdub,
@@ -133,5 +138,5 @@ namespace mpc::sequencer
                      StopMetronomeOnly, PlaySong, PlaySongFromStart, StopSong,
                      SetCountInPositions, SetEndOfSongEnabled,
                      SetPlayedSongStepRepetitionCount, SetMasterTempo,
-                     SetTempoSourceIsSequence>;
+                     SetTempoSourceIsSequence, SetShouldWaitForMidiClockLock>;
 } // namespace mpc::sequencer
