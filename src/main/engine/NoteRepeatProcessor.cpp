@@ -46,11 +46,11 @@ NoteRepeatProcessor::NoteRepeatProcessor(
 {
 }
 
-void NoteRepeatProcessor::process(
-    EngineHost *engineHost,
-    unsigned int tickPosition, int durationTicks,
-    const unsigned short eventFrameOffset, const double tempo,
-    const float sampleRate) const
+void NoteRepeatProcessor::process(EngineHost *engineHost,
+                                  unsigned int tickPosition, int durationTicks,
+                                  const unsigned short eventFrameOffset,
+                                  const double tempo,
+                                  const float sampleRate) const
 {
     auto lockedSequencer = sequencer.lock();
     auto track = lockedSequencer->getSelectedTrack();
@@ -221,7 +221,9 @@ void NoteRepeatProcessor::process(
             }
         }
 
-        concurrency::SamplePreciseTask task{
+        concurrency::SamplePreciseTask task;
+
+        task.f.set(
             [voices = voices, track, note, tickPosition, drumBus](int)
             {
                 if (drumBus)
@@ -240,9 +242,9 @@ void NoteRepeatProcessor::process(
                     //(track->getDeviceIndex() - 1) % 16);
                     // mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                 }
-            },
-            durationFrames - 1
-        };
+            });
+
+        task.nFrames = durationFrames - 1;
 
         engineHost->postSamplePreciseTaskToAudioThread(task);
     }

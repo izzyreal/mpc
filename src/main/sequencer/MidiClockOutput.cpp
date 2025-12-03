@@ -77,19 +77,22 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
     const unsigned int numberOfFramesBeforeMidiSyncStart =
         durationToNextClockInFrames - oneMsInFrames;
 
-    engineHost->postSamplePreciseTaskToAudioThread(
-        concurrency::SamplePreciseTask{
-            [&](const int sampleNumber)
-            {
-                const auto playStartPosition =
-                    sequencer->getTransport()
-                        ->getPlayStartPositionQuarterNotes();
-                const auto msgType = playStartPosition == 0.0
-                                         ? ClientMidiEvent::MIDI_START
-                                         : ClientMidiEvent::MIDI_CONTINUE;
-                sendMidiSyncMsg(msgType, sampleNumber);
-            },
-            numberOfFramesBeforeMidiSyncStart});
+    concurrency::SamplePreciseTask task;
+
+    task.f.set(
+        [&](const int sampleNumber)
+        {
+            const auto playStartPosition =
+                sequencer->getTransport()->getPlayStartPositionQuarterNotes();
+            const auto msgType = playStartPosition == 0.0
+                                     ? ClientMidiEvent::MIDI_START
+                                     : ClientMidiEvent::MIDI_CONTINUE;
+            sendMidiSyncMsg(msgType, sampleNumber);
+        });
+
+    task.nFrames = numberOfFramesBeforeMidiSyncStart;
+
+    engineHost->postSamplePreciseTaskToAudioThread(task);
 }
 
 void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,

@@ -156,30 +156,32 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             noteEventIdToUse, drumBus, &mpc.getEngineHost()->getVoices(), note,
             noteOnEvent.tick);
 
-    auto noteOffEventFn = [note, programIndex,
-                           performanceManager = mpc.getPerformanceManager(),
-                           programPadIndex, noteOffCtx](int)
-    {
-        constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+    concurrency::SamplePreciseTask task;
 
-        performanceManager.lock()->registerNoteOff(
-            performance::PerformanceEventSource::Sequence, note, noMidiChannel,
-            [](void *) {});
-
-        if (programPadIndex != -1)
+    task.f.set(
+        [note, programIndex, performanceManager = mpc.getPerformanceManager(),
+         programPadIndex, noteOffCtx](int)
         {
-            performanceManager.lock()->registerProgramPadRelease(
-                performance::PerformanceEventSource::Sequence, programPadIndex,
-                programIndex, [](void *) {});
-        }
+            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        DrumNoteEventHandler::noteOff(noteOffCtx);
-    };
+            performanceManager.lock()->registerNoteOff(
+                performance::PerformanceEventSource::Sequence, note,
+                noMidiChannel, [](void *) {});
 
-    mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(
-        concurrency::SamplePreciseTask{noteOffEventFn,
-                                       static_cast<int64_t>(durationFrames) +
-                                           eventFrameOffsetInBuffer});
+            if (programPadIndex != -1)
+            {
+                performanceManager.lock()->registerProgramPadRelease(
+                    performance::PerformanceEventSource::Sequence,
+                    programPadIndex, programIndex, [](void *) {});
+            }
+
+            DrumNoteEventHandler::noteOff(noteOffCtx);
+        });
+
+    task.nFrames =
+        static_cast<int64_t>(durationFrames) + eventFrameOffsetInBuffer;
+
+    mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(task);
 }
 
 void EventHandler::handleFinalizedEvent(const EventData &event,
@@ -240,20 +242,20 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
         EventData noteOff = event;
         noteOff.type = EventType::NoteOff;
 
-        const auto noteOffFn = [this, noteOff, trackDeviceIndex,
-                                transposeAmount](const int noteOffSampleNumber)
-        {
-            handleNoteEventMidiOut(noteOff, trackDeviceIndex, std::nullopt,
-                                   transposeAmount, noteOffSampleNumber);
-        };
+        concurrency::SamplePreciseTask task;
+        task.f.set(
+            [this, noteOff, trackDeviceIndex,
+             transposeAmount](const int noteOffSampleNumber)
+            {
+                handleNoteEventMidiOut(noteOff, trackDeviceIndex, std::nullopt,
+                                       transposeAmount, noteOffSampleNumber);
+            });
 
-        const auto taskFrameCount = SeqUtil::ticksToFrames(
+        task.nFrames = SeqUtil::ticksToFrames(
             event.duration, mpc.getSequencer()->getTransport()->getTempo(),
             audioServer->getSampleRate());
 
-        mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(
-            concurrency::SamplePreciseTask{
-                noteOffFn, static_cast<int64_t>(taskFrameCount)});
+        mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(task);
     }
     else if (event.type == EventType::Mixer)
     {

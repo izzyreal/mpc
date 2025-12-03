@@ -2,14 +2,34 @@
 
 #include <concurrentqueue.h>
 
-#include <functional>
 #include <cstdint>
 
 namespace mpc::concurrency
 {
+    template <size_t MaxBytes> struct SmallFn
+    {
+        alignas(void *) unsigned char storage[MaxBytes];
+        void (*invoke)(void *, int);
+
+        template <class F> void set(F f)
+        {
+            static_assert(sizeof(F) <= MaxBytes);
+            new (storage) F(std::move(f));
+            invoke = [](void *p, int x)
+            {
+                (*static_cast<F *>(p))(x);
+            };
+        }
+
+        void operator()(int x)
+        {
+            invoke(storage, x);
+        }
+    };
+
     struct SamplePreciseTask
     {
-        std::function<void(int)> f;
+        SmallFn<96> f;
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
     };
