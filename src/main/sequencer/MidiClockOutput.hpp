@@ -37,6 +37,7 @@ namespace mpc::sequencer
     {
     public:
         explicit MidiClockOutput(
+        const std::function<int()> &getSampleRate,
             const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
                 &getMidiOutput,
             Sequencer *,
@@ -49,13 +50,12 @@ namespace mpc::sequencer
 
         void enqueueMidiSyncStart1msBeforeNextClock() const;
 
-        void setSampleRate(unsigned int sampleRate);
-
         void sendMidiSyncMsg(client::event::ClientMidiEvent::MessageType, int sampleNumber) const;
 
         bool isLastProcessedFrameMidiClockLock() const;
 
     private:
+        const std::function<int()> getSampleRate;
         std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput;
         std::atomic<bool> running{false};
         std::atomic_int32_t requestedSampleRate{44100};

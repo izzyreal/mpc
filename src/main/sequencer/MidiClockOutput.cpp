@@ -18,12 +18,13 @@ using namespace mpc::sequencer;
 using namespace mpc::client::event;
 
 MidiClockOutput::MidiClockOutput(
+const std::function<int()> &getSampleRate,
     const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
         &getMidiOutput,
     Sequencer *sequencer,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     const std::function<bool()> &isBouncing)
-    : getMidiOutput(getMidiOutput), sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
+    : getSampleRate(getSampleRate), getMidiOutput(getMidiOutput), sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 {
     eventQueue = std::make_shared<
         moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
@@ -100,11 +101,6 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
             sendMidiSyncMsg(msgType, sampleNumber);
         },
         numberOfFramesBeforeMidiSyncStart);
-}
-
-void MidiClockOutput::setSampleRate(const unsigned int sampleRate)
-{
-    requestedSampleRate = sampleRate;
 }
 
 void MidiClockOutput::processEventsAfterNFrames(const int sampleNumber)
@@ -185,10 +181,11 @@ void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
 
 void MidiClockOutput::processSampleRateChange()
 {
-    if (clock.getSampleRate() != requestedSampleRate)
+    const auto sampleRate = getSampleRate();
+    if (clock.getSampleRate() != sampleRate)
     {
         const auto bpm = clock.getBpm();
-        clock.init(requestedSampleRate);
+        clock.init(sampleRate);
         clock.set_bpm(bpm);
     }
 }

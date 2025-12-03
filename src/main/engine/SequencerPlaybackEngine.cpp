@@ -48,7 +48,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
       noteRepeatProcessor(noteRepeatProcessor),
       isAudioServerCurrentlyRunningOffline(
           isAudioServerCurrentlyRunningOffline),
-      midiClockOutput(std::make_shared<MidiClockOutput>(
+      midiClockOutput(std::make_shared<MidiClockOutput>(getSampleRate,
           getMidiOutput, sequencer, getScreens, isBouncing))
 {
     eventQueue = std::make_shared<EventQueue>(100);
