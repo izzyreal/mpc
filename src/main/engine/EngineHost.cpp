@@ -122,6 +122,7 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+        this,
         [&]
         {
             return mpc.getMidiOutput();
@@ -174,9 +175,16 @@ void EngineHost::postToAudioThread(const std::function<void()> &fn)
     audioTasks.post(fn);
 }
 
-void EngineHost::applyPendingStateChanges()
+void EngineHost::postSamplePreciseTaskToAudioThread(
+    const concurrency::SamplePreciseTask &task)
+{
+    preciseTasks.post(task);
+}
+
+void EngineHost::prepareProcessBlock(const int nFrames)
 {
     audioTasks.drain();
+    preciseTasks.processTasks(nFrames);
     mpc.getSequencer()->getStateManager()->drainQueue();
     mpc.getPerformanceManager().lock()->drainQueue();
 }

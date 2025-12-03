@@ -1,5 +1,6 @@
 #pragma once
 
+#include "concurrency/SamplePreciseTaskQueue.hpp"
 #include "concurrency/TaskQueue.hpp"
 
 #include <memory>
@@ -71,9 +72,10 @@ namespace mpc::engine
         // by the audio thread in the correct state. This includes, but is not
         // limited to, the transport state, which pads are pressed and which
         // local note events are currently active.
-        void applyPendingStateChanges();
+        void prepareProcessBlock(int nFrames);
 
         void postToAudioThread(const std::function<void()> &);
+        void postSamplePreciseTaskToAudioThread(const concurrency::SamplePreciseTask &);
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
@@ -106,6 +108,7 @@ namespace mpc::engine
         std::atomic<bool> recordingSound{false};
         std::shared_ptr<AudioProcess> monitorInputAdapter;
         concurrency::TaskQueue audioTasks;
+        concurrency::SamplePreciseTaskQueue preciseTasks;
 
     public:
         bool isBouncing() const;

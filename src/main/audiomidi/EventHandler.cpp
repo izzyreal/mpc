@@ -176,8 +176,10 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         DrumNoteEventHandler::noteOff(noteOffCtx);
     };
 
-    sequencerPlaybackEngine->enqueueEventAfterNFrames(
-        noteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
+    mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(
+        concurrency::SamplePreciseTask{noteOffEventFn,
+                                       static_cast<int64_t>(durationFrames) +
+                                           eventFrameOffsetInBuffer});
 }
 
 void EventHandler::handleFinalizedEvent(const EventData &event,
@@ -238,16 +240,20 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
         EventData noteOff = event;
         noteOff.type = EventType::NoteOff;
 
-        sequencerPlaybackEngine->enqueueEventAfterNFrames(
-            [this, noteOff, trackDeviceIndex,
-             transposeAmount](const int noteOffSampleNumber)
-            {
-                handleNoteEventMidiOut(noteOff, trackDeviceIndex, std::nullopt,
-                                       transposeAmount, noteOffSampleNumber);
-            },
-            SeqUtil::ticksToFrames(
-                event.duration, mpc.getSequencer()->getTransport()->getTempo(),
-                audioServer->getSampleRate()));
+        const auto noteOffFn = [this, noteOff, trackDeviceIndex,
+                                transposeAmount](const int noteOffSampleNumber)
+        {
+            handleNoteEventMidiOut(noteOff, trackDeviceIndex, std::nullopt,
+                                   transposeAmount, noteOffSampleNumber);
+        };
+
+        const auto taskFrameCount = SeqUtil::ticksToFrames(
+            event.duration, mpc.getSequencer()->getTransport()->getTempo(),
+            audioServer->getSampleRate());
+
+        mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(
+            concurrency::SamplePreciseTask{
+                noteOffFn, static_cast<int64_t>(taskFrameCount)});
     }
     else if (event.type == EventType::Mixer)
     {

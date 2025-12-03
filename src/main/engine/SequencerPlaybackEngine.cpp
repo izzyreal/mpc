@@ -20,8 +20,6 @@
 
 #include "sequencer/MidiClockOutput.hpp"
 
-#include <concurrentqueue.h>
-
 using namespace mpc::engine;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -29,6 +27,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
+    EngineHost *engineHost,
     std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
     Sequencer *sequencer, const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
@@ -39,20 +38,19 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
     const std::function<bool()> &isAudioServerCurrentlyRunningOffline)
-    : layeredScreen(layeredScreen), getScreens(getScreens),
-      sequencer(sequencer), clock(clock), isBouncing(isBouncing),
-      getSampleRate(getSampleRate),
+    : engineHost(engineHost), layeredScreen(layeredScreen),
+      getScreens(getScreens), sequencer(sequencer), clock(clock),
+      isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       playMetronome(playMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
       noteRepeatProcessor(noteRepeatProcessor),
       isAudioServerCurrentlyRunningOffline(
           isAudioServerCurrentlyRunningOffline),
-      midiClockOutput(std::make_shared<MidiClockOutput>(getSampleRate,
-          getMidiOutput, sequencer, getScreens, isBouncing))
+      midiClockOutput(std::make_shared<MidiClockOutput>(
+          engineHost, getSampleRate, getMidiOutput, sequencer, getScreens,
+          isBouncing))
 {
-    eventQueue = std::make_shared<EventQueue>(100);
-    tempEventQueue.reserve(100);
 }
 
 unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
@@ -406,7 +404,7 @@ void SequencerPlaybackEngine::processNoteRepeat() const
     if (shouldRepeatNote)
     {
         noteRepeatProcessor->process(
-            this, sequencer->getTransport()->getTickPosition(),
+            engineHost, sequencer->getTransport()->getTickPosition(),
             repeatIntervalTicks, getEventFrameOffset(),
             sequencer->getTransport()->getTempo(),
             static_cast<float>(getSampleRate()));
@@ -418,41 +416,6 @@ void SequencerPlaybackEngine::stopSequencer() const
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->getTransport()->stop();
     setTickPositionEffectiveImmediately(0);
-}
-
-void SequencerPlaybackEngine::enqueueEventAfterNFrames(
-    const std::function<void(int)> &event, const unsigned long nFrames) const
-{
-    EventAfterNFrames e;
-    e.f = event;
-    e.nFrames = nFrames;
-    eventQueue->enqueue(std::move(e));
-}
-
-void SequencerPlaybackEngine::processEventsAfterNFrames(const int frameIndex)
-{
-    EventAfterNFrames batch[100];
-
-    const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
-
-    tempEventQueue.clear();
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        if (auto &e = batch[i]; ++e.frameCounter >= e.nFrames)
-        {
-            e.f(frameIndex);
-        }
-        else
-        {
-            tempEventQueue.push_back(std::move(e));
-        }
-    }
-
-    for (auto &e : tempEventQueue)
-    {
-        eventQueue->enqueue(std::move(e));
-    }
 }
 
 void SequencerPlaybackEngine::work(const int nFrames)
@@ -476,8 +439,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
-            processEventsAfterNFrames(frameIndex);
-
             if (std::find(ticksForCurrentBuffer.begin(),
                           ticksForCurrentBuffer.end(),
                           frameIndex) != ticksForCurrentBuffer.end())
@@ -551,8 +512,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex, tickCountAtThisFrameIndex);
-
-        processEventsAfterNFrames(frameIndex);
 
         if (!sequencerIsRunningAtStartOfBuffer)
         {

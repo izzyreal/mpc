@@ -1,5 +1,6 @@
 #include "NoteRepeatProcessor.hpp"
 
+#include "EngineHost.hpp"
 #include "sequencer/Transport.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "hardware/Component.hpp"
@@ -7,7 +8,6 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
@@ -47,7 +47,7 @@ NoteRepeatProcessor::NoteRepeatProcessor(
 }
 
 void NoteRepeatProcessor::process(
-    const SequencerPlaybackEngine *sequencerPlaybackEngine,
+    EngineHost *engineHost,
     unsigned int tickPosition, int durationTicks,
     const unsigned short eventFrameOffset, const double tempo,
     const float sampleRate) const
@@ -221,7 +221,7 @@ void NoteRepeatProcessor::process(
             }
         }
 
-        sequencerPlaybackEngine->enqueueEventAfterNFrames(
+        concurrency::SamplePreciseTask task{
             [voices = voices, track, note, tickPosition, drumBus](int)
             {
                 if (drumBus)
@@ -241,6 +241,9 @@ void NoteRepeatProcessor::process(
                     // mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                 }
             },
-            durationFrames - 1);
+            durationFrames - 1
+        };
+
+        engineHost->postSamplePreciseTaskToAudioThread(task);
     }
 }

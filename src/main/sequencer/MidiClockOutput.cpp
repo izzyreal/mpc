@@ -1,16 +1,13 @@
 #include "MidiClockOutput.hpp"
 #include "sequencer/Transport.hpp"
 
-#include "Mpc.hpp"
-
 #include "audiomidi/MidiOutput.hpp"
+#include "engine/EngineHost.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
-
-#include <concurrentqueue.h>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -18,18 +15,16 @@ using namespace mpc::sequencer;
 using namespace mpc::client::event;
 
 MidiClockOutput::MidiClockOutput(
-    const std::function<int()> &getSampleRate,
+    engine::EngineHost *engineHost, const std::function<int()> &getSampleRate,
     const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
         &getMidiOutput,
     Sequencer *sequencer,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     const std::function<bool()> &isBouncing)
-    : getSampleRate(getSampleRate), getMidiOutput(getMidiOutput),
-      sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
+    : engineHost(engineHost), getSampleRate(getSampleRate),
+      getMidiOutput(getMidiOutput), sequencer(sequencer),
+      getScreens(getScreens), isBouncing(isBouncing)
 {
-    eventQueue = std::make_shared<
-        moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
-    tempEventQueue.reserve(100);
 }
 
 void MidiClockOutput::sendMidiClockMsg(const int frameIndex) const
@@ -70,15 +65,6 @@ void MidiClockOutput::processTempoChange()
     }
 }
 
-void MidiClockOutput::enqueueEventAfterNFrames(
-    const std::function<void(int)> &event, const unsigned long nFrames) const
-{
-    engine::EventAfterNFrames e;
-    e.f = event;
-    e.nFrames = nFrames;
-    eventQueue->enqueue(std::move(e));
-}
-
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
 {
     const auto durationToNextClockInFrames =
@@ -91,44 +77,19 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
     const unsigned int numberOfFramesBeforeMidiSyncStart =
         durationToNextClockInFrames - oneMsInFrames;
 
-    enqueueEventAfterNFrames(
-        [&](const int sampleNumber)
-        {
-            const auto playStartPosition =
-                sequencer->getTransport()->getPlayStartPositionQuarterNotes();
-            const auto msgType = playStartPosition == 0.0
-                                     ? ClientMidiEvent::MIDI_START
-                                     : ClientMidiEvent::MIDI_CONTINUE;
-            sendMidiSyncMsg(msgType, sampleNumber);
-        },
-        numberOfFramesBeforeMidiSyncStart);
-}
-
-void MidiClockOutput::processEventsAfterNFrames(const int sampleNumber)
-{
-    engine::EventAfterNFrames batch[100];
-
-    const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
-
-    tempEventQueue.clear();
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        auto &e = batch[i];
-        if (++e.frameCounter >= e.nFrames)
-        {
-            e.f(sampleNumber);
-        }
-        else
-        {
-            tempEventQueue.push_back(std::move(e));
-        }
-    }
-
-    for (auto &e : tempEventQueue)
-    {
-        eventQueue->enqueue(std::move(e));
-    }
+    engineHost->postSamplePreciseTaskToAudioThread(
+        concurrency::SamplePreciseTask{
+            [&](const int sampleNumber)
+            {
+                const auto playStartPosition =
+                    sequencer->getTransport()
+                        ->getPlayStartPositionQuarterNotes();
+                const auto msgType = playStartPosition == 0.0
+                                         ? ClientMidiEvent::MIDI_START
+                                         : ClientMidiEvent::MIDI_CONTINUE;
+                sendMidiSyncMsg(msgType, sampleNumber);
+            },
+            numberOfFramesBeforeMidiSyncStart});
 }
 
 void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
@@ -141,8 +102,6 @@ void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
     {
         return;
     }
-
-    processEventsAfterNFrames(frameIndex);
 
     if (!isRunningAtStartOfBuffer)
     {

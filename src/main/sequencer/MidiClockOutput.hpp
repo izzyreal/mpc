@@ -1,7 +1,5 @@
 #pragma once
 
-#include "engine/EventAfterNFrames.hpp"
-
 #include "sequencer/LegacyClock.hpp"
 #include "client/event/ClientMidiEvent.hpp"
 
@@ -9,13 +7,10 @@
 #include <functional>
 #include <atomic>
 
-namespace moodycamel
+namespace mpc::engine
 {
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits> class ConcurrentQueue;
-} // namespace moodycamel
-
-
+    class EngineHost;
+}
 namespace mpc::audiomidi
 {
     class MidiOutput;
@@ -28,7 +23,6 @@ namespace mpc::lcdgui
 
 namespace mpc::sequencer
 {
-
     class Sequencer;
 
     class Sequence;
@@ -37,6 +31,7 @@ namespace mpc::sequencer
     {
     public:
         explicit MidiClockOutput(
+            engine::EngineHost *,
         const std::function<int()> &getSampleRate,
             const std::function<std::shared_ptr<audiomidi::MidiOutput>()>
                 &getMidiOutput,
@@ -55,6 +50,7 @@ namespace mpc::sequencer
         bool isLastProcessedFrameMidiClockLock() const;
 
     private:
+        engine::EngineHost *engineHost;
         const std::function<int()> getSampleRate;
         std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput;
         std::atomic<bool> running{false};
@@ -65,20 +61,9 @@ namespace mpc::sequencer
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<bool()> isBouncing;
 
-        // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames(int);
-
         unsigned char midiClockTickCounter = 0;
         bool wasRunning = false;
 
-        std::shared_ptr<moodycamel::ConcurrentQueue<
-            engine::EventAfterNFrames,
-            moodycamel::ConcurrentQueueDefaultTraits>>
-            eventQueue;
-        std::vector<engine::EventAfterNFrames> tempEventQueue;
-
         void sendMidiClockMsg(int frameIndex) const;
-        void enqueueEventAfterNFrames(const std::function<void(int)> &event,
-                                      unsigned long nFrames) const;
     };
 } // namespace mpc::sequencer

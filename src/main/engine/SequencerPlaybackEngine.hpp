@@ -1,19 +1,10 @@
 #pragma once
 
-#include "engine/EventAfterNFrames.hpp"
-
 #include "engine/audio/server/AudioClient.hpp"
 #include "engine/NoteRepeatProcessor.hpp"
 
 #include <memory>
-#include <vector>
 #include <functional>
-
-namespace moodycamel
-{
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits> class ConcurrentQueue;
-} // namespace moodycamel
 
 namespace mpc::audiomidi
 {
@@ -40,11 +31,9 @@ namespace mpc::engine
 
     class SequencerPlaybackEngine final : public audio::server::AudioClient
     {
-        using EventQueue = moodycamel::ConcurrentQueue<
-            EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
-
     public:
         explicit SequencerPlaybackEngine(
+            EngineHost *,
             std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
             sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
@@ -61,15 +50,8 @@ namespace mpc::engine
 
         unsigned short getEventFrameOffset() const;
 
-        void stop();
-
-        void enqueueEventAfterNFrames(const std::function<void(int)> &event,
-                                      unsigned long nFrames) const;
-
     private:
-        std::shared_ptr<EventQueue> eventQueue;
-        std::vector<EventAfterNFrames> tempEventQueue;
-
+        EngineHost *engineHost;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         sequencer::Sequencer *sequencer;
@@ -86,9 +68,6 @@ namespace mpc::engine
 
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
-
-        // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames(int frameIndex);
 
         void triggerClickIfNeeded() const;
 
