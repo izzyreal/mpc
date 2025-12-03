@@ -16,12 +16,11 @@ ChangeTsigScreen::ChangeTsigScreen(Mpc &mpc, const int layerIndex)
 
 void ChangeTsigScreen::open()
 {
-    const auto seq = sequencer.lock();
-    timesignature = seq->getSelectedSequence()->getTimeSignature(
-        seq->getTransport()->getTickPosition());
+    const auto lastBarIndex =
+        sequencer.lock()->getSelectedSequence()->getLastBarIndex();
 
-    bar0 = 0;
-    bar1 = seq->getSelectedSequence()->getLastBarIndex();
+    bar0 = std::min(bar0, lastBarIndex);
+    bar1 = std::min(bar1, lastBarIndex);
 
     displayBars();
     displayNewTsig();

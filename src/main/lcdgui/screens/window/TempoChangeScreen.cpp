@@ -157,7 +157,7 @@ void TempoChangeScreen::displayTempoChange0() const
 
     const auto tce = getVisibleTempoChanges()[0];
     findField("a0")->setText(std::to_string(offset + 1));
-    const auto timeSig = sequence->getTimeSignature(
+    const auto timeSig = sequence->getTimeSignatureFromTickPos(
         lockedSequencer->getTransport()->getTickPosition());
 
     int value = tce->getBar(timeSig.numerator, timeSig.denominator) + 1;
@@ -216,7 +216,7 @@ void TempoChangeScreen::displayTempoChange1() const
 
     const auto lockedSequencer = sequencer.lock();
     const auto sequence = lockedSequencer->getSelectedSequence();
-    const auto timeSig = sequence->getTimeSignature(
+    const auto timeSig = sequence->getTimeSignatureFromTickPos(
         lockedSequencer->getTransport()->getTickPosition());
 
     findField("b1")->setTextPadded(
@@ -271,7 +271,7 @@ void TempoChangeScreen::displayTempoChange2() const
 
     const auto lockedSequencer = sequencer.lock();
     const auto sequence = lockedSequencer->getSelectedSequence();
-    const auto timeSig = sequence->getTimeSignature(
+    const auto timeSig = sequence->getTimeSignatureFromTickPos(
         lockedSequencer->getTransport()->getTickPosition());
     findField("b2")->setTextPadded(
         tce->getBar(timeSig.numerator, timeSig.denominator) + 1, "0");

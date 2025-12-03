@@ -356,7 +356,7 @@ int Sequence::getLastTick() const
     return getSnapshot()->getLastTick();
 }
 
-TimeSignature Sequence::getTimeSignature(const int barIndex) const
+TimeSignature Sequence::getTimeSignatureFromBarIndex(const int barIndex) const
 {
     return getSnapshot()->getTimeSignature(barIndex);
 }
