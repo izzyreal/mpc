@@ -30,6 +30,7 @@
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
+#include "engine/EngineHost.hpp"
 #include "lcdgui/EventRow.hpp"
 #include "lcdgui/Label.hpp"
 
@@ -201,6 +202,7 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
+    mpc.getEngineHost()->flushNoteOffs();
     isFirstTickPosChangeAfterScreenHasBeenOpened = true;
 
     const auto track = sequencer.lock()->getSelectedTrack();
@@ -474,6 +476,8 @@ void StepEditorScreen::turnWheel(const int increment)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     const auto track = sequencer.lock()->getSelectedTrack();
+    const auto transport = sequencer.lock()->getTransport();
+    const auto tickPosition = transport->getTickPosition();
 
     if (focusedFieldName == "view")
     {
@@ -481,32 +485,65 @@ void StepEditorScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "now0")
     {
+        if (tickPosition == 0 && increment < 0)
+        {
+            adhocPlayNoteEventsAtCurrentPosition();
+            return;
+        }
+
         setSequencerTickPos(
             [&]
             {
-                sequencer.lock()->getTransport()->setBar(
-                    sequencer.lock()->getTransport()->getCurrentBarIndex() +
-                    increment);
+                transport->setBar(transport->getCurrentBarIndex() + increment);
             });
     }
     else if (focusedFieldName == "now1")
     {
+        if (transport->getCurrentBeatIndex() == 0 && increment < 0)
+        {
+            adhocPlayNoteEventsAtCurrentPosition();
+            return;
+        }
+
+        if (increment > 0 && transport->getCurrentBeatIndex() == sequencer.lock()
+                                 ->getSelectedSequence()
+                                 ->getTimeSignatureFromTickPos(tickPosition).numerator - 1)
+        {
+            adhocPlayNoteEventsAtCurrentPosition();
+            return;
+        }
+
         setSequencerTickPos(
             [&]
             {
-                sequencer.lock()->getTransport()->setBeat(
-                    sequencer.lock()->getTransport()->getCurrentBeatIndex() +
-                    increment);
+                transport->setBeat(transport->getCurrentBeatIndex() +
+                                   increment);
             });
     }
     else if (focusedFieldName == "now2")
     {
+        if (transport->getCurrentClockNumber() == 0 && increment < 0)
+        {
+            adhocPlayNoteEventsAtCurrentPosition();
+            return;
+        }
+
+        const auto timeSig = sequencer.lock()
+                                 ->getSelectedSequence()
+                                 ->getTimeSignatureFromTickPos(tickPosition);
+        const auto ticksPerBeat = 96 * (4 / timeSig.denominator);
+
+        if (increment > 0 && transport->getCurrentClockNumber() == ticksPerBeat - 1)
+        {
+            adhocPlayNoteEventsAtCurrentPosition();
+            return;
+        }
+
         setSequencerTickPos(
             [&]
             {
-                sequencer.lock()->getTransport()->setClock(
-                    sequencer.lock()->getTransport()->getCurrentClockNumber() +
-                    increment);
+                transport->setClock(transport->getCurrentClockNumber() +
+                                    increment);
             });
     }
     else if (focusedFieldName == "tcvalue")
@@ -709,6 +746,14 @@ void StepEditorScreen::setSequencerTickPos(
 
 void StepEditorScreen::prevStepEvent()
 {
+    mpc.getEngineHost()->flushNoteOffs();
+
+    if (sequencer.lock()->getTransport()->getTickPosition() == 0)
+    {
+        adhocPlayNoteEventsAtCurrentPosition();
+        return;
+    }
+
     setSequencerTickPos(
         [&]
         {
@@ -727,6 +772,7 @@ void StepEditorScreen::prevStepEvent()
 
 void StepEditorScreen::nextStepEvent()
 {
+    mpc.getEngineHost()->flushNoteOffs();
     setSequencerTickPos(
         [&]
         {
@@ -745,6 +791,14 @@ void StepEditorScreen::nextStepEvent()
 
 void StepEditorScreen::prevBarStart()
 {
+    mpc.getEngineHost()->flushNoteOffs();
+
+    if (sequencer.lock()->getTransport()->getTickPosition() == 0)
+    {
+        adhocPlayNoteEventsAtCurrentPosition();
+        return;
+    }
+
     setSequencerTickPos(
         [&]
         {
@@ -764,6 +818,7 @@ void StepEditorScreen::prevBarStart()
 
 void StepEditorScreen::nextBarEnd()
 {
+    mpc.getEngineHost()->flushNoteOffs();
     setSequencerTickPos(
         [&]
         {
@@ -1474,9 +1529,21 @@ int StepEditorScreen::getYOffset() const
 void StepEditorScreen::adhocPlayNoteEvent(const EventData &noteEvent) const
 {
     const auto track = sequencer.lock()->getSelectedTrack();
-    mpc.getEventHandler()->handleFinalizedEvent(
-        noteEvent, track->getIndex(), track->getVelocityRatio(),
-        track->getBusType(), track->getDeviceIndex());
+    const auto trackIndex = track->getIndex();
+    const auto trackVelocityRatio = track->getVelocityRatio();
+    const auto trackBusType = track->getBusType();
+    const auto trackDeviceIndex = track->getDeviceIndex();
+
+    concurrency::Task audioTask;
+    audioTask.set(
+        [this, e = noteEvent, trackIndex, trackVelocityRatio, trackBusType,
+         trackDeviceIndex]
+        {
+            mpc.getEventHandler()->handleFinalizedEvent(
+                e, trackIndex, trackVelocityRatio, trackBusType,
+                trackDeviceIndex);
+        });
+    mpc.getEngineHost()->postToAudioThread(audioTask);
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
