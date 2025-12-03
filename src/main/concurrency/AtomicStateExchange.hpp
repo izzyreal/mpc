@@ -2,6 +2,8 @@
 
 #include "MpcMacros.hpp"
 
+#include "utils/SimpleAction.hpp"
+
 #include <atomic>
 #include <memory>
 #include <functional>
@@ -117,7 +119,7 @@ namespace mpc::concurrency
         std::shared_ptr<State> currentSnapshot;
         State *writeBuffer;
         size_t writeIndex = 1;
-        std::vector<std::function<void()>> actions;
+        std::vector<utils::SimpleAction> actions;
 
         void publishState() noexcept
         {

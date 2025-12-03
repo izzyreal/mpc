@@ -98,16 +98,14 @@ void InsertEventScreen::insertEvent() const
         e.mixerValue = 0;
     }
 
-    const auto onComplete = [ls = ls]
+    const utils::SimpleAction onComplete([ls = ls]
     {
-        concurrency::Task uiTask;
-        uiTask.set(
+        ls.lock()->postToUiThread(concurrency::Task(
             [ls]
             {
                 ls.lock()->openScreenById(ScreenId::StepEditorScreen);
-            });
-        ls.lock()->postToUiThread(uiTask);
-    };
+            }));
+    });
 
     sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e, onComplete);
 }

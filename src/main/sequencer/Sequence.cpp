@@ -502,16 +502,17 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
 void Sequence::insertBars(const int barCount, const BarIndex afterBar,
                           std::function<void()> onComplete2) const
 {
-    auto onComplete = [this, onComplete2](const BarIndex newLastBarIndex)
+    InsertBars::Callback cb;
+    cb.set([this, onComplete2](const BarIndex newLastBarIndex)
     {
         if (newLastBarIndex != NoBarIndex && !isUsed())
         {
             setUsed(true);
         }
         onComplete2();
-    };
+    });
 
-    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, onComplete});
+    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, cb});
 }
 
 void Sequence::moveTrack(const int source, const int destination)

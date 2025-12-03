@@ -3,7 +3,8 @@
 #include "sequencer/TimeSignature.hpp"
 #include "sequencer/TrackMessage.hpp"
 
-#include <functional>
+#include "utils/SmallFn.hpp"
+
 #include <variant>
 
 namespace mpc::sequencer
@@ -42,11 +43,11 @@ namespace mpc::sequencer
 
     struct InsertBars
     {
+        using Callback = utils::SmallFn<64, void(BarIndex)>;
         SequenceIndex sequenceIndex;
         int barCount;
         BarIndex afterBar;
-        std::function<void(BarIndex newLastBarIndex)> onComplete =
-            [](const BarIndex) {};
+        Callback onComplete{[](BarIndex) {}};
     };
 
     struct SetInitialTempo

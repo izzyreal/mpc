@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SequenceMessage.hpp"
+#include "utils/SimpleAction.hpp"
 
 namespace mpc::sequencer
 {
@@ -16,7 +17,7 @@ namespace mpc::sequencer
         ~SequenceStateHandler();
 
         void applyMessage(SequencerState &,
-                          std::vector<std::function<void()>> &actions,
+                          std::vector<utils::SimpleAction> &actions,
                           const SequenceMessage &) const;
 
     private:
@@ -25,6 +26,6 @@ namespace mpc::sequencer
 
         void applyInsertBars(
             const InsertBars &, const SequencerState &,
-            std::vector<std::function<void()>> &actions) const noexcept;
+            std::vector<utils::SimpleAction> &actions) const noexcept;
     };
 } // namespace mpc::sequencer

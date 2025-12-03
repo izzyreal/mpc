@@ -14,6 +14,10 @@ namespace mpc::utils
         alignas(void*) unsigned char storage[MaxBytes];
         R (*invoke)(void*, Args...);
 
+        SmallFn() = default;
+
+        template<class F> explicit SmallFn(F f) { set(std::move(f)); }
+
         template<class F>
         void set(F f)
         {

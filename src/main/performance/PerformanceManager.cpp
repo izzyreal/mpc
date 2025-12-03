@@ -397,7 +397,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
                 activeState.physicalPadEvents.push_back(payload);
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, ev = payload]() mutable
                     {
                         a(&ev);
@@ -411,7 +411,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.source == msg.source)
                     {
                         e.pressure = payload.pressure;
-                        actions.push_back(
+                        actions.emplace_back(
                             [a = msg.action, e]() mutable
                             {
                                 a(&e);
@@ -431,7 +431,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
                 if (it == activeState.physicalPadEvents.end())
                 {
-                    actions.push_back(
+                    actions.emplace_back(
                         [a = msg.action]() mutable
                         {
                             a(nullptr);
@@ -439,7 +439,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     return;
                 }
 
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, e = *it]() mutable
                     {
                         a(&e);
@@ -449,7 +449,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, ProgramPadPressEvent>)
             {
                 activeState.programPadEvents.push_back(payload);
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, ev = payload]() mutable
                     {
                         a(&ev);
@@ -463,7 +463,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.source == msg.source)
                     {
                         e.pressure = payload.pressure;
-                        actions.push_back(
+                        actions.emplace_back(
                             [a = msg.action, e]() mutable
                             {
                                 a(&e);
@@ -485,7 +485,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
                 if (it == activeState.programPadEvents.end())
                 {
-                    actions.push_back(
+                    actions.emplace_back(
                         [a = msg.action]() mutable
                         {
                             a(nullptr);
@@ -493,7 +493,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     return;
                 }
 
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, e = *it]() mutable
                     {
                         a(&e);
@@ -503,7 +503,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, NoteOnEvent>)
             {
                 activeState.noteEvents.push_back(payload);
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, ev = payload]() mutable
                     {
                         a(&ev);
@@ -518,7 +518,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.midiInputChannel == payload.midiInputChannel)
                     {
                         e.pressure = payload.pressure;
-                        actions.push_back(
+                        actions.emplace_back(
                             [a = msg.action, e]() mutable
                             {
                                 a(&e);
@@ -541,7 +541,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
                 if (it == activeState.noteEvents.end())
                 {
-                    actions.push_back(
+                    actions.emplace_back(
                         [a = msg.action]() mutable
                         {
                             a(nullptr);
@@ -549,7 +549,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     return;
                 }
 
-                actions.push_back(
+                actions.emplace_back(
                     [a = msg.action, e = *it]() mutable
                     {
                         a(&e);

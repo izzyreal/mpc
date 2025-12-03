@@ -1,11 +1,13 @@
 #pragma once
 
-#include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "SequencerStateView.hpp"
-#include "TrackMessage.hpp"
 
+#include "sequencer/BusType.hpp"
+#include "sequencer/SequencerStateView.hpp"
+#include "sequencer/TrackMessage.hpp"
 #include "sequencer/EventData.hpp"
+
+#include "utils/SimpleAction.hpp"
 
 #include <vector>
 #include <memory>
@@ -97,10 +99,12 @@ namespace mpc::sequencer
         void setOn(bool b) const;
 
         void insertAcquiredEvent(
-            EventData *event, const std::function<void()> &onComplete = [] {});
+            EventData *event,
+            const utils::SimpleAction &onComplete = utils::SimpleAction([] {}));
 
         void acquireAndInsertEvent(
-            const EventData &, const std::function<void()> &onComplete = [] {});
+            const EventData &,
+            const utils::SimpleAction &onComplete = utils::SimpleAction([] {}));
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0);

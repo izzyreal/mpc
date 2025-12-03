@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TrackMessage.hpp"
+#include "utils/SimpleAction.hpp"
 
 namespace mpc::sequencer
 {
@@ -16,7 +17,7 @@ namespace mpc::sequencer
         ~TrackStateHandler();
 
         void applyMessage(SequencerState &,
-                          std::vector<std::function<void()>> &actions,
+                          std::vector<utils::SimpleAction> &actions,
                           const TrackMessage &) const;
 
     private:

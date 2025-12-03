@@ -19,7 +19,7 @@ SequenceStateHandler::SequenceStateHandler(SequencerStateManager *manager,
 SequenceStateHandler::~SequenceStateHandler() {}
 
 void SequenceStateHandler::applyMessage(
-    SequencerState &state, std::vector<std::function<void()>> &actions,
+    SequencerState &state, std::vector<utils::SimpleAction> &actions,
     const SequenceMessage &msg) const
 {
     const auto visitor = Overload{
@@ -167,7 +167,7 @@ void SequenceStateHandler::applyMessage(
 
 void SequenceStateHandler::applyInsertBars(
     const InsertBars &m, const SequencerState &state,
-    std::vector<std::function<void()>> &actions) const noexcept
+    std::vector<utils::SimpleAction> &actions) const noexcept
 {
     const auto &seq = state.sequences[m.sequenceIndex];
     const SequenceStateView seqView(seq);
@@ -254,8 +254,8 @@ void SequenceStateHandler::applyInsertBars(
         }
     }
 
-    actions.push_back(
-        [a = m.onComplete, newLastBarIndex]
+    actions.emplace_back(
+        [a = m.onComplete, newLastBarIndex]() mutable
         {
             a(newLastBarIndex);
         });

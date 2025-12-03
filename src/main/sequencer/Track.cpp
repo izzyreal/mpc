@@ -1012,7 +1012,7 @@ void Track::playNext() const
 }
 
 void Track::insertAcquiredEvent(EventData *event,
-                                const std::function<void()> &onComplete)
+                                const utils::SimpleAction &onComplete)
 {
     if (!isUsed())
     {
@@ -1026,7 +1026,7 @@ void Track::insertAcquiredEvent(EventData *event,
 }
 
 void Track::acquireAndInsertEvent(const EventData &eventState,
-                                  const std::function<void()> &onComplete)
+                                  const utils::SimpleAction &onComplete)
 {
     const auto e = manager->acquireEvent();
     *e = eventState;

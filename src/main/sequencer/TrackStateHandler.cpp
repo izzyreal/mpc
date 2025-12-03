@@ -26,7 +26,7 @@ void updateEvent(EventData *const e, const EventData &replacement)
 }
 
 void TrackStateHandler::applyMessage(
-    SequencerState &state, std::vector<std::function<void()>> &actions,
+    SequencerState &state, std::vector<utils::SimpleAction> &actions,
     const TrackMessage &msg) const
 {
     const auto visitor = Overload{
@@ -126,7 +126,7 @@ void TrackStateHandler::applyMessage(
 
             lock.release();
 
-            actions.push_back(m.onComplete);
+            actions.emplace_back(m.onComplete);
         },
         [&](const ClearEvents &m)
         {

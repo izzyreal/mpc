@@ -41,20 +41,22 @@ void PasteEventScreen::function(const int i)
         sequencer::EventData eventState = *event->handle;
         eventState.tick = sequencer.lock()->getTransport()->getTickPosition();
 
-        std::function onComplete = [] {};
+        utils::SimpleAction onComplete([] {});
 
         if (eventIndex == stepEditorScreen->getPlaceHolder().size() - 1)
         {
-            onComplete = [ls = ls]
-            {
-                concurrency::Task uiTask;
-                uiTask.set(
-                    [ls]
-                    {
-                        ls.lock()->openScreenById(ScreenId::StepEditorScreen);
-                    });
-                ls.lock()->postToUiThread(uiTask);
-            };
+            onComplete = utils::SimpleAction(
+                [ls = ls]
+                {
+                    concurrency::Task uiTask;
+                    uiTask.set(
+                        [ls]
+                        {
+                            ls.lock()->openScreenById(
+                                ScreenId::StepEditorScreen);
+                        });
+                    ls.lock()->postToUiThread(uiTask);
+                });
         }
 
         sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(eventState,
