@@ -1,6 +1,5 @@
 #include "DrumNoteEventContextBuilder.hpp"
 #include "Mpc.hpp"
-#include "engine/EngineHost.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sequencer/Bus.hpp"
 #include "engine/audio/mixer/AudioMixer.hpp"
@@ -13,7 +12,7 @@ using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     const uint64_t noteEventId, const performance::Drum &drum,
-    const std::shared_ptr<sequencer::DrumBus> drumBus,
+    const std::shared_ptr<DrumBus> &drumBus,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<AudioMixer> &mixer,
     const std::shared_ptr<MixerSetupScreen> &mixerSetupScreen,

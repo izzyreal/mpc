@@ -1,6 +1,6 @@
 #include "EventHandler.hpp"
 
-#include "MidiOutput.hpp"
+#include "audiomidi/MidiOutput.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
@@ -48,14 +48,13 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine;
 using namespace mpc::client::event;
 
-EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
-{
-    // transposeCache.reserve(512);
-}
+EventHandler::EventHandler(Mpc &mpc) : mpc(mpc) {}
+
+EventHandler::~EventHandler() {}
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
     const EventData &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
-    const Track *track)
+    const TrackIndex trackIndex, const int trackVelocityRatio)
 {
     const auto sampler = mpc.getSampler();
     const auto programIndex = drumBus->getProgramIndex();
@@ -65,8 +64,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         program->getPadIndexFromNote(DrumNoteNumber(note));
 
     const uint64_t noteEventIdToUse = noteEventId++;
-    const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
-        noteOnEvent.velocity * (track->getVelocityRatio() * 0.01f));
+    const auto velocityWithTrackVelocityRatioApplied =
+        static_cast<int>(noteOnEvent.velocity * (trackVelocityRatio * 0.01f));
 
     const auto velocityToUse =
         std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
@@ -140,14 +139,14 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     mpc.getPerformanceManager().lock()->registerNoteOn(
         performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
-        track->getIndex(), drumBusIndexToDrumBusType(ctx.drum.drumBusIndex),
-        note, Velocity(velocityToUse), programIndex, [](void *) {});
+        trackIndex, drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), note,
+        Velocity(velocityToUse), programIndex, [](void *) {});
 
     if (programPadIndex != -1)
     {
         mpc.getPerformanceManager().lock()->registerProgramPadPress(
             performance::PerformanceEventSource::Sequence, std::nullopt,
-            screenId, track->getIndex(),
+            screenId, trackIndex,
             drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), programPadIndex,
             Velocity(velocityToUse), programIndex, NoPhysicalPadIndex);
     }
@@ -182,7 +181,10 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 }
 
 void EventHandler::handleFinalizedEvent(const EventData &event,
-                                        const Track *const track)
+                                        const TrackIndex trackIndex,
+                                        const int trackVelocityRatio,
+                                        const BusType trackBusType,
+                                        const int trackDeviceIndex)
 {
     if (mpc.getSequencer()->getTransport()->isCountingIn())
     {
@@ -200,46 +202,58 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
                event.duration != NoDuration);
 
         if (const auto drumBus =
-                mpc.getSequencer()->getBus<DrumBus>(track->getBusType());
+                mpc.getSequencer()->getBus<DrumBus>(trackBusType);
             drumBus)
         {
             if (isDrumNote(event.noteNumber))
             {
-                handleFinalizedDrumNoteOnEvent(event, drumBus, track);
+                handleFinalizedDrumNoteOnEvent(event, drumBus, trackIndex,
+                                               trackVelocityRatio);
             }
         }
 
-        handleNoteEventMidiOut(event, track, track->getDeviceIndex(),
-                               track->getVelocityRatio());
+        const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
 
-        // auto midiNoteOffEventFn =
-        // [this, noteOffEvent = noteOnEvent->getNoteOff(), track,
-        // trackDeviceIndex = track->getDeviceIndex()]
-        // {
-        // handleNoteEventMidiOut(noteOffEvent, track, trackDeviceIndex,
-        //                        std::nullopt);
-        // };
+        std::optional<int> transposeAmount = std::nullopt;
+
+        if (transScreen->getTransposeAmount() != 0 &&
+            (transScreen->getTr() == AllTrackIndex ||
+             transScreen->getTr() == trackIndex))
+        {
+            transposeAmount = transScreen->getTransposeAmount();
+        }
+
+        const auto sampleNumber = mpc.getEngineHost()
+                                      ->getSequencerPlaybackEngine()
+                                      ->getEventFrameOffset();
+
+        handleNoteEventMidiOut(event, trackDeviceIndex, trackVelocityRatio,
+                               transposeAmount, sampleNumber);
 
         const auto engineHost = mpc.getEngineHost();
         const auto sequencerPlaybackEngine =
             engineHost->getSequencerPlaybackEngine();
-        const auto eventFrameOffsetInBuffer =
-            sequencerPlaybackEngine->getEventFrameOffset();
-        const auto durationTicks = event.duration;
         const auto audioServer = engineHost->getAudioServer();
-        const auto durationFrames = SeqUtil::ticksToFrames(
-            durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
-            audioServer->getSampleRate());
 
-        // sequencerPlaybackEngine->enqueueEventAfterNFrames(
-        //     midiNoteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
+        EventData noteOff = event;
+        noteOff.type = EventType::NoteOff;
+
+        sequencerPlaybackEngine->enqueueEventAfterNFrames(
+            [this, noteOff, trackDeviceIndex,
+             transposeAmount](const int noteOffSampleNumber)
+            {
+                handleNoteEventMidiOut(noteOff, trackDeviceIndex, std::nullopt,
+                                       transposeAmount, noteOffSampleNumber);
+            },
+            SeqUtil::ticksToFrames(
+                event.duration, mpc.getSequencer()->getTransport()->getTempo(),
+                audioServer->getSampleRate()));
     }
-    else if (event.type == sequencer::EventType::Mixer)
+    else if (event.type == EventType::Mixer)
     {
         const auto pad = event.mixerPad;
         const auto sampler = mpc.getSampler();
-        const auto drumBus =
-            mpc.getSequencer()->getBus<DrumBus>(track->getBusType());
+        const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(trackBusType);
 
         assert(drumBus);
 
@@ -264,10 +278,8 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
 }
 
 void EventHandler::handleUnfinalizedNoteOn(
-    const EventData &noteOnEvent, Track *track,
-    const std::optional<int> trackDevice,
-    const std::optional<int> trackVelocityRatio,
-    const std::optional<BusType> drumBusType) const
+    const EventData &noteOnEvent, const std::optional<int> trackDevice,
+    const std::optional<BusType> drumBusType)
 {
     assert(noteOnEvent.type == sequencer::EventType::NoteOn &&
            noteOnEvent.duration == NoDuration);
@@ -279,12 +291,6 @@ void EventHandler::handleUnfinalizedNoteOn(
 
         const auto note = noteOnEvent.noteNumber;
 
-        const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
-            noteOnEvent.velocity * (trackVelocityRatio.value_or(100) * 0.01f));
-
-        const auto velocityToUse =
-            std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
-
         const auto performanceDrum =
             mpc.getPerformanceManager().lock()->getSnapshot().getDrum(
                 drumBus->getIndex());
@@ -294,27 +300,24 @@ void EventHandler::handleUnfinalizedNoteOn(
             mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(),
-            mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
-            noteOnEvent.noteVariationType, noteOnEvent.noteVariationValue, 0,
-            true, -1, -1);
+            mpc.getEngineHost()->getMixerConnections(), note,
+            noteOnEvent.velocity, noteOnEvent.noteVariationType,
+            noteOnEvent.noteVariationValue, 0, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
     }
 
-    /*
-    if (track != nullptr && trackDevice.has_value())
+    if (trackDevice.has_value())
     {
-        handleNoteEventMidiOut(noteOnEvent, track, *trackDevice,
-                               trackVelocityRatio);
+        constexpr int sampleNumber = 0;
+        handleNoteEventMidiOut(noteOnEvent, *trackDevice, std::nullopt,
+                               std::nullopt, sampleNumber);
     }
-*/
 }
 
-// Input from physical pad releases
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
-    const NoteNumber noteNumber, Track *track,
-    const std::optional<int> trackDevice,
-    const std::optional<DrumBusIndex> drumBusIndex) const
+    const NoteNumber noteNumber, const std::optional<int> trackDevice,
+    const std::optional<DrumBusIndex> drumBusIndex)
 {
     if (drumBusIndex.has_value() && isDrumNote(noteNumber))
     {
@@ -328,12 +331,15 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         DrumNoteEventHandler::noteOff(ctx);
     }
 
-    /*
-    if (track != nullptr && trackDevice.has_value())
+    if (trackDevice.has_value())
     {
-        handleNoteEventMidiOut(noteOffEvent, track, *trackDevice, std::nullopt);
+        constexpr int sampleNumber = 0;
+        EventData noteOffEvent;
+        noteOffEvent.type = EventType::NoteOff;
+        noteOffEvent.noteNumber = noteNumber;
+        handleNoteEventMidiOut(noteOffEvent, *trackDevice, std::nullopt,
+                               std::nullopt, sampleNumber);
     }
-*/
 }
 
 /**
@@ -354,11 +360,11 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
  */
 
 void EventHandler::handleNoteEventMidiOut(
-    const EventData &event, const Track *track, const int trackDevice,
-    const std::optional<int> trackVelocityRatio)
+    const EventData &event, const int trackDevice,
+    const std::optional<int> trackVelocityRatio,
+    const std::optional<int> transposeAmount, const int sampleNumber)
 {
     assert(event.type == EventType::NoteOn || event.type == EventType::NoteOff);
-    assert(trackVelocityRatio.has_value() || event.type == EventType::NoteOff);
 
     if (const auto isRealTime =
             mpc.getEngineHost()->getAudioServer()->isRealTime();
@@ -370,29 +376,18 @@ void EventHandler::handleNoteEventMidiOut(
     // Derives a 0-based MIDI channel.
     const int midiChannel = (trackDevice - 1) % 16;
 
-    int transposeAmount = 0;
-
     ClientMidiEvent msg;
     SeqEventToMidiEventMapper::mapSeqEventToMidiEvent(event, msg);
     msg.setChannel(midiChannel);
-    msg.setBufferOffset(mpc.getEngineHost()
-                            ->getSequencerPlaybackEngine()
-                            ->getEventFrameOffset());
+    msg.setBufferOffset(sampleNumber);
 
-    if (event.type == EventType::NoteOn)
+    if (transposeAmount)
     {
-        const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
+        msg.setNoteNumber(event.noteNumber + *transposeAmount);
+    }
 
-        if (transScreen->getTransposeAmount() != 0 && track->getIndex() < 64 &&
-            (transScreen->getTr() == AllTrackIndex ||
-             transScreen->getTr() == track->getIndex()))
-        {
-            transposeAmount = transScreen->getTransposeAmount();
-            // transposeCache[event] = transposeAmount;
-        }
-
-        // noteOnEvent->createShortMessage(midiChannel, transposeAmount);
-
+    if (event.type == EventType::NoteOn && trackVelocityRatio)
+    {
         const auto velocityWithTrackVelocityRatioApplied =
             static_cast<int>(event.velocity * (*trackVelocityRatio * 0.01f));
 
@@ -400,49 +395,9 @@ void EventHandler::handleNoteEventMidiOut(
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
         msg.setVelocity(velocityToUse);
-
-        const auto engineHost = mpc.getEngineHost();
-        const auto sequencerPlaybackEngine =
-            engineHost->getSequencerPlaybackEngine();
-        const auto audioServer = engineHost->getAudioServer();
-
-        if (event.duration != NoDuration)
-        {
-            EventData noteOff = event;
-            noteOff.type = EventType::NoteOff;
-
-            sequencerPlaybackEngine->enqueueEventAfterNFrames(
-                [this, noteOff, track, trackDevice](int)
-                {
-                    handleNoteEventMidiOut(noteOff, track, trackDevice,
-                                           std::nullopt);
-                },
-                SeqUtil::ticksToFrames(
-                    event.duration,
-                    mpc.getSequencer()->getTransport()->getTempo(),
-                    audioServer->getSampleRate()));
-        }
-    }
-    else if (event.type == EventType::NoteOff)
-    {
-        // if (const auto candidate = transposeCache.find(noteOffEvent);
-        //     candidate != end(transposeCache) && track->getIndex() < 64)
-        // {
-        //     transposeAmount = candidate->second;
-        //     transposeCache.erase(candidate);
-        // }
-
-        // msg = noteOffEvent->createShortMessage(midiChannel, transposeAmount);
-        SeqEventToMidiEventMapper::mapSeqEventToMidiEvent(event, msg);
     }
 
-    const auto directToDiskRecorderScreen =
-        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-
-    if (!mpc.getEngineHost()->isBouncing() || !directToDiskRecorderScreen->offline)
-    {
-        mpc.getMidiOutput()->enqueueEvent(msg);
-    }
+    mpc.getMidiOutput()->enqueueEvent(msg);
 
     // For the MIDI output monitor screen
     notifyObservers(midiChannel < 16 ? "a" : "b" + std::to_string(midiChannel));

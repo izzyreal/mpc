@@ -304,7 +304,6 @@ void Mpc::panic() const
     // because panic is meant to help out other devices, i.e. things connected
     // to the MPC2000XL's MIDI output.
     midiOutput->panic();
-    eventHandler->clearTransposeCache();
 }
 
 std::shared_ptr<Clock> Mpc::getClock()

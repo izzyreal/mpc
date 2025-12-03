@@ -1000,7 +1000,9 @@ void Track::playNext() const
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
-        eventHandler->handleFinalizedEvent(*event, this);
+        eventHandler->handleFinalizedEvent(*event, getIndex(),
+                                           getVelocityRatio(), getBusType(),
+                                           getDeviceIndex());
     }
 
     playEventIndex = playEventIndex + 1;

@@ -10,7 +10,6 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"
-#include "performance/PerformanceManager.hpp"
 #include "sequencer/Track.hpp"
 #include <memory>
 #include <utility>
@@ -103,8 +102,8 @@ void TriggerLocalNoteOnCommand::execute()
 
     if (ctx->isSamplerScreen)
     {
-        ctx->eventHandler->handleUnfinalizedNoteOn(noteOnEvent, nullptr,
-                                                   std::nullopt, std::nullopt,
+        ctx->eventHandler->handleUnfinalizedNoteOn(noteOnEvent,
+                                                   ctx->track->getDeviceIndex(),
                                                    ctx->drumScreenSelectedDrum);
     }
     else
@@ -120,8 +119,7 @@ void TriggerLocalNoteOnCommand::execute()
         }
 
         ctx->eventHandler->handleUnfinalizedNoteOn(
-            noteOnEvent, ctx->track, ctx->track->getDeviceIndex(),
-            ctx->track->getVelocityRatio(), drumBusType);
+            noteOnEvent, ctx->track->getDeviceIndex(), drumBusType);
     }
 
     sequencer::EventData *recordNoteOnEvent = nullptr;

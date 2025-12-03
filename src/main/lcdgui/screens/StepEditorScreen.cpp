@@ -466,7 +466,7 @@ void StepEditorScreen::function(int i)
 
 bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 {
-    auto focusedFieldName = ls.lock()->getFocusedFieldName();
+    const auto focusedFieldName = ls.lock()->getFocusedFieldName();
     return focusedFieldName.find(letter) != std::string::npos;
 }
 
@@ -1474,7 +1474,9 @@ int StepEditorScreen::getYOffset() const
 void StepEditorScreen::adhocPlayNoteEvent(const EventData &noteEvent) const
 {
     const auto track = sequencer.lock()->getSelectedTrack();
-    mpc.getEventHandler()->handleFinalizedEvent(noteEvent, track.get());
+    mpc.getEventHandler()->handleFinalizedEvent(
+        noteEvent, track->getIndex(), track->getVelocityRatio(),
+        track->getBusType(), track->getDeviceIndex());
 }
 
 void StepEditorScreen::resetYPosAndYOffset()

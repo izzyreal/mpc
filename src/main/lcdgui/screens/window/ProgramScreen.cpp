@@ -11,6 +11,14 @@ using namespace mpc::lcdgui::screens::dialog2;
 ProgramScreen::ProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "program", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return getProgramIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayProgramName();
+                        }});
 }
 
 void ProgramScreen::open()
@@ -42,7 +50,6 @@ void ProgramScreen::openNameScreen()
 
 void ProgramScreen::turnWheel(const int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "midiprogramchange")
@@ -77,6 +84,7 @@ void ProgramScreen::function(const int i)
         case 4:
             openScreenById(ScreenId::CopyProgramScreen);
             break;
+        default:;
     }
 }
 

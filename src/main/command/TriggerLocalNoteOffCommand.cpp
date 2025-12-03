@@ -28,17 +28,9 @@ void TriggerLocalNoteOffCommand::execute()
         drumIndex = drumBus->getIndex();
     }
 
-    if (ctx->currentScreenIsSamplerScreen)
-    {
-        ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx->noteNumber, nullptr, std::nullopt, drumIndex);
-    }
-    else
-    {
-        ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx->noteNumber, ctx->track, ctx->track->getDeviceIndex(),
-            drumIndex);
-    }
+    ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
+        ctx->noteNumber, ctx->track->getDeviceIndex(),
+        drumIndex);
 
     if (ctx->recordOnEvent &&
         !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
