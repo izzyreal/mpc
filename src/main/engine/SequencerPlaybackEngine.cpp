@@ -1,5 +1,6 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 
+#include "EngineHost.hpp"
 #include "Logger.hpp"
 #include "sequencer/Transport.hpp"
 
@@ -487,6 +488,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
                     hostPositionQuarterNotes);
         }
 
+        engineHost->flushNoteOffs();
         sequencer->getTransport()->setPosition(wrappedPosition);
         seq->syncTrackEventIndices(Sequencer::quarterNotesToTicks(wrappedPosition));
         manager->drainQueue();
