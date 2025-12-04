@@ -138,12 +138,7 @@ void EngineHost::start()
         },
         [&]
         {
-            return SeqUtil::isRecMainWithoutPlaying(
-                mpc.getSequencer(),
-                mpc.screens->get<ScreenId::TimingCorrectScreen>(),
-                mpc.getLayeredScreen()->getCurrentScreenName(),
-                mpc.getHardware()->getButton(hardware::REC),
-                mpc.clientEventController->clientHardwareEventController);
+            return mpc.clientEventController->isRecMainWithoutPlaying();
         },
         [sampler = mpc.getSampler()](const int velo, const int frameOffset)
         {

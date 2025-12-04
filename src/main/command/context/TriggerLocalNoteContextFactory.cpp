@@ -20,7 +20,6 @@
 
 #include "performance/PerformanceManager.hpp"
 #include "sequencer/SequencerStateManager.hpp"
-#include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
 using namespace mpc::controller;
@@ -64,10 +63,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const bool isStepRecording =
         SeqUtil::isStepRecording(screen->getName(), lockedSequencer);
 
-    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-        lockedSequencer, screens->get<ScreenId::TimingCorrectScreen>(),
-        screen->getName(), hardware->getButton(REC),
-        controller->clientHardwareEventController);
+    const bool isRecMainWithoutPlaying = controller->isRecMainWithoutPlaying();
 
     const auto timingCorrectScreen =
         screens->get<ScreenId::TimingCorrectScreen>();
@@ -169,10 +165,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const bool isStepRecording =
         SeqUtil::isStepRecording(screen->getName(), lockedSequencer);
 
-    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-        lockedSequencer, screens->get<ScreenId::TimingCorrectScreen>(),
-        screen->getName(), hardware->getButton(REC),
-        controller->clientHardwareEventController);
+    const bool isRecMainWithoutPlaying = controller->isRecMainWithoutPlaying();
 
     const auto transportSnapshot = lockedSequencer->getStateManager()
                                        ->getSnapshot()

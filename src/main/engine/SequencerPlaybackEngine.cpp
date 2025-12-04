@@ -109,7 +109,6 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
     }
     else
     {
-
         if (!isStepEditor && !countMetronomeScreen->getInPlay() &&
             !transport.isCountingIn() && !isRecMainWithoutPlaying())
         {

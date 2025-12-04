@@ -87,8 +87,7 @@ bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(
         mpc.getSequencer(), screens->get<ScreenId::TimingCorrectScreen>(),
-        layeredScreen->getCurrentScreenName(), hardware->getButton(REC),
-        clientHardwareEventController);
+        layeredScreen->getCurrentScreenName(), clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const

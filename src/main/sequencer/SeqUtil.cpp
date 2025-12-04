@@ -5,7 +5,6 @@
 #include "SequencerStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -166,7 +165,8 @@ int SeqUtil::setBar(int i, const Sequence *sequence, int position)
     }
 
     const auto difference = i - getBar(sequence, position);
-    const auto den = sequence->getTimeSignatureFromTickPos(position).denominator;
+    const auto den =
+        sequence->getTimeSignatureFromTickPos(position).denominator;
 
     if (const auto denTicks = static_cast<int>(
             Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
@@ -344,7 +344,6 @@ bool SeqUtil::isRecMainWithoutPlaying(
     const std::shared_ptr<Sequencer> &sequencer,
     const std::shared_ptr<TimingCorrectScreen> &timingCorrectScreen,
     const std::string &currentScreenName,
-    const std::shared_ptr<hardware::Button> &recButton,
     const std::shared_ptr<controller::ClientHardwareEventController>
         &clientHardwareEventController)
 {
@@ -353,14 +352,13 @@ bool SeqUtil::isRecMainWithoutPlaying(
                                sequencer->getSelectedSequence()->getLastTick();
 
     const bool recIsPressedOrLocked =
-        recButton->isPressed() ||
-        clientHardwareEventController->buttonLockTracker.isLocked(
-            hardware::ComponentId::REC);
+        clientHardwareEventController->isRecLockedOrPressed();
 
     const bool recMainWithoutPlaying =
         currentScreenName == "sequencer" &&
-        !sequencer->getTransport()->isPlaying() && recIsPressedOrLocked &&
-        tc_note != 0 && !posIsLastTick;
+        (!sequencer->getTransport()->isPlaying() ||
+         sequencer->getTransport()->isMetronomeOnlyEnabled()) &&
+        recIsPressedOrLocked && tc_note != 0 && !posIsLastTick;
 
     return recMainWithoutPlaying;
 }

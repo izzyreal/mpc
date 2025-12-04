@@ -69,7 +69,6 @@ namespace mpc::sequencer
             const std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>
                 &timingCorrectScreen,
             const std::string &currentScreenName,
-            const std::shared_ptr<hardware::Button> &recButton,
             const std::shared_ptr<controller::ClientHardwareEventController>
                 &clientHardwareEventController);
 

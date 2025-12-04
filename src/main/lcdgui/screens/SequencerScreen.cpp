@@ -176,16 +176,17 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
              displayPgm();
          }});
 
-    addReactiveBinding({[&]
-                        {
-                            const auto seq = sequencer.lock();
-                            return seq->getSelectedSequence()->getTimeSignatureFromTickPos(
-                                seq->getTransport()->getTickPosition());
-                        },
-                        [&](auto)
-                        {
-                            displayTsig();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             const auto seq = sequencer.lock();
+             return seq->getSelectedSequence()->getTimeSignatureFromTickPos(
+                 seq->getTransport()->getTickPosition());
+         },
+         [&](auto)
+         {
+             displayTsig();
+         }});
 
     addReactiveBinding(
         {[&]
@@ -1074,13 +1075,12 @@ void SequencerScreen::displayPunchWhileRecording()
 {
     auto hardware = mpc.getHardware();
     auto isRecPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+            ->isRecLockedOrPressed();
+
     auto isOverdubPressedOrLocked =
-        hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
         mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+            ->isOverdubLockedOrPressed();
 
     if (sequencer.lock()->getTransport()->isPunchEnabled() &&
         (isRecPressedOrLocked || isOverdubPressedOrLocked))
