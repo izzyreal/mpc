@@ -259,4 +259,6 @@ void SequenceStateHandler::applyInsertBars(
         {
             a(newLastBarIndex);
         });
+
+    actions.emplace_back(m.nextAction);
 }

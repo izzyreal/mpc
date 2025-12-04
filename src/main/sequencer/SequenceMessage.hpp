@@ -48,6 +48,7 @@ namespace mpc::sequencer
         int barCount;
         BarIndex afterBar;
         Callback onComplete{[](BarIndex) {}};
+        utils::SimpleAction nextAction{[]{}};
     };
 
     struct SetInitialTempo

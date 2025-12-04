@@ -147,7 +147,7 @@ namespace mpc::sequencer
         void deleteBars(int firstBar, int lastBarToDelete) const;
         void insertBars(
             int barCount, BarIndex afterBar,
-            std::function<void()> onComplete2 = [] {}) const;
+                        const utils::SimpleAction &nextAction = utils::SimpleAction([] {})) const;
         void moveTrack(int source, int destination);
 
         int getEventCount() const;

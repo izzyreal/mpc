@@ -323,14 +323,14 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                                            toSequence->getLastBarIndex();
         }
 
-        auto onComplete =
+        const utils::SimpleAction nextAction(
             [stateManager = sequencer->getStateManager(), copyBars]
         {
             stateManager->enqueue(copyBars);
-        };
+        });
 
         toSequence->insertBars(destinationBarCount, BarIndex(copyAfterBar),
-                               onComplete);
+                               nextAction);
     }
     else
     {
