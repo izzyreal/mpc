@@ -35,20 +35,37 @@ namespace mpc::controller
             return buttonLockTracker.isLocked(hardware::ComponentId::REC);
         }
 
+        bool isRecPressed() const;
+
         bool isOverdubLocked() const
         {
             return buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
         }
+
+        bool isOverdubPressed() const;
 
         void lockNoteRepeat()
         {
             buttonLockTracker.lock(
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
+
         void unlockNoteRepeat()
         {
             buttonLockTracker.unlock(
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
+        }
+
+        void unlockRec()
+        {
+            buttonLockTracker.unlock(
+                hardware::ComponentId::REC);
+        }
+
+        void unlockOverdub()
+        {
+            buttonLockTracker.unlock(
+                hardware::ComponentId::OVERDUB);
         }
 
         bool isNoteRepeatLockedOrPressed() const;

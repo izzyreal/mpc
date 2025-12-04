@@ -21,6 +21,8 @@
 #include "Util.hpp"
 
 #include "MpcResourceUtil.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -272,6 +274,23 @@ void LayeredScreen::closeCurrentScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
+    const auto controller = mpc.clientEventController->clientHardwareEventController;
+
+    if (controller->isRecPressed() || controller->isOverdubPressed())
+    {
+        return;
+    }
+
+    if (controller->isRecLocked())
+    {
+        controller->unlockRec();
+    }
+
+    if (controller->isOverdubLocked())
+    {
+        controller->unlockOverdub();
+    }
+
     const auto engineHost = mpc.getEngineHost();
 
     if (!history.empty())

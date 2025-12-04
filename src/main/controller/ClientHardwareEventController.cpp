@@ -64,13 +64,22 @@ bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
 
 bool ClientHardwareEventController::isRecLockedOrPressed() const
 {
-    return isRecLocked() || mpc.getHardware()->getButton(REC)->isPressed();
+    return isRecLocked() || isRecPressed();
+}
+
+bool ClientHardwareEventController::isRecPressed() const
+{
+    return mpc.getHardware()->getButton(REC)->isPressed();
 }
 
 bool ClientHardwareEventController::isOverdubLockedOrPressed() const
 {
-    return isOverdubLocked() ||
-           mpc.getHardware()->getButton(OVERDUB)->isPressed();
+    return isOverdubLocked() || isOverdubPressed();
+}
+
+bool ClientHardwareEventController::isOverdubPressed() const
+{
+    return mpc.getHardware()->getButton(OVERDUB)->isPressed();
 }
 
 mpc::TimeInMilliseconds
@@ -360,9 +369,9 @@ void ClientHardwareEventController::handlePadRelease(
     }
 
     const auto transport = mpc.getSequencer()
-                         ->getStateManager()
-                         ->getSnapshot()
-                         .getTransportStateView();
+                               ->getStateManager()
+                               ->getSnapshot()
+                               .getTransportStateView();
 
     const auto metronomeOnlyPositionTicks =
         transport.getMetronomeOnlyPositionTicks();
