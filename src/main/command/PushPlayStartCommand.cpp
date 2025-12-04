@@ -72,8 +72,6 @@ void PushPlayStartCommand::execute()
         }
     }
 
-    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
-        .unlock(hardware::ComponentId::REC);
-    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
-        .unlock(hardware::ComponentId::OVERDUB);
+    mpc.clientEventController->clientHardwareEventController->unlockRec();
+    mpc.clientEventController->clientHardwareEventController->unlockOverdub();
 }

@@ -14,10 +14,8 @@ PushRecCommand::PushRecCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushRecCommand::execute()
 {
-    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
-        .unlock(hardware::ComponentId::REC);
-    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
-        .unlock(hardware::ComponentId::OVERDUB);
+    mpc.clientEventController->clientHardwareEventController->unlockRec();
+    mpc.clientEventController->clientHardwareEventController->unlockOverdub();
 
     if (screengroups::isPlayOnlyScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
