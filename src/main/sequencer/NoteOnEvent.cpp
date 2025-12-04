@@ -49,11 +49,6 @@ mpc::Duration NoteOnEvent::getDuration() const
     return snapshot.duration;
 }
 
-void NoteOnEvent::resetDuration() const
-{
-    setDuration(NoDuration);
-}
-
 mpc::NoteVariationType NoteOnEvent::getVariationType() const
 {
     return snapshot.noteVariationType;

@@ -271,7 +271,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     {
         result->beingRecorded = true;
         result->velocity = velocity;
-        result->duration = NoDuration;
+        result->duration = Duration(1);
         result->metronomeOnlyTickPosition = metronomeOnlyTick;
         return result;
     }
@@ -280,6 +280,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     result->type = EventType::NoteOn;
     result->noteNumber = note;
     result->velocity = velocity;
+    result->duration = Duration(1);
     result->sequenceIndex = parent->getSequenceIndex();
     result->trackIndex = trackIndex;
     result->tick = tick;
@@ -292,7 +293,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
 void Track::finalizeNoteEventNonLive(EventData *noteOnEvent,
                                      const Duration duration) const
 {
-    dispatch(FinalizeNonLiveNoteEvent{noteOnEvent, duration});
+    dispatch(FinalizeNoteEventNonLive{noteOnEvent, duration});
 }
 
 void Track::removeEvent(EventData *eventState) const

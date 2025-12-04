@@ -22,7 +22,7 @@ namespace mpc::sequencer
         std::vector<EventData> snapshot;
     };
 
-    struct FinalizeNonLiveNoteEvent
+    struct FinalizeNoteEventNonLive
     {
         EventData *handle;
         Duration duration;
@@ -108,7 +108,7 @@ namespace mpc::sequencer
 
     using TrackMessage = std::variant<
         InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
-        RemoveDoubles, UpdateEvent, FinalizeNonLiveNoteEvent, UpdateEvents,
+        RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, UpdateEvents,
         SetTrackUsed, SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
         SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex>;
 } // namespace mpc::sequencer

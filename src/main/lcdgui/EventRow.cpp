@@ -661,7 +661,7 @@ void EventRow::setDrumNoteEventValues() const
     }
 
     fields[3]->setText(StrUtil::padLeft(
-        std::to_string(ne->getDuration() == NoDuration ? 1 : ne->getDuration()),
+        std::to_string(ne->getDuration()),
         " ", 4));
     fields[4]->setText(
         StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));

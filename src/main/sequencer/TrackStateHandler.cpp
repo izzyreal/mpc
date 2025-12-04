@@ -65,7 +65,7 @@ void TrackStateHandler::applyMessage(
             auto &track = state.sequences[m.sequence].tracks[m.track];
             track.used = m.used;
         },
-        [&](const FinalizeNonLiveNoteEvent &m)
+        [&](const FinalizeNoteEventNonLive &m)
         {
             auto &lock =
                 manager
@@ -82,7 +82,7 @@ void TrackStateHandler::applyMessage(
                                 .head;
             while (it)
             {
-                if (it->beingRecorded && it->duration == NoDuration &&
+                if (it->beingRecorded &&
                     it->noteNumber == m.handle->noteNumber)
                 {
                     it->duration = m.duration;

@@ -23,7 +23,6 @@ namespace mpc::sequencer
         NoteNumber getNote() const;
         void setDuration(Duration duration) const;
         Duration getDuration() const;
-        void resetDuration() const;
         NoteVariationType getVariationType() const;
         void setVariationType(NoteVariationType) const;
         void setVariationValue(int i) const;
