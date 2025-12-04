@@ -141,7 +141,6 @@ void TransportStateHandler::applyMessage(TransportState &state,
         },
         [&](const PlayMetronomeOnly &)
         {
-            state.playStartPositionQuarterNotes = state.positionQuarterNotes;
             state.metronomeOnlyPositionTicks = 0;
             state.metronomeOnlyEnabled = true;
             state.sequencerRunning = true;
@@ -151,7 +150,6 @@ void TransportStateHandler::applyMessage(TransportState &state,
             state.sequencerRunning = false;
             state.metronomeOnlyEnabled = false;
             state.metronomeOnlyPositionTicks = 0;
-            state.playStartPositionQuarterNotes = NoPositionQuarterNotes;
         },
         [&](const PlaySong &)
         {
@@ -279,8 +277,6 @@ void TransportStateHandler::applyStopSequence(
 {
     state.sequencerRunning = false;
     sequencer->clock->reset();
-
-    state.playStartPositionQuarterNotes = NoPositionQuarterNotes;
 
     sequencer->setNextSq(NoSequenceIndex);
 
