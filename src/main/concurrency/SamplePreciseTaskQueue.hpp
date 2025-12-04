@@ -13,7 +13,7 @@ namespace mpc::concurrency
         utils::SmallFn<96, void(int)> f;
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
-        bool midiNoteOff = false;
+        bool noteOff = false;
     };
 
     class SamplePreciseTaskQueue
@@ -29,7 +29,7 @@ namespace mpc::concurrency
             queue.enqueue(task);
         }
 
-        void flushMidiNoteOffs()
+        void flushNoteOffs()
         {
             SamplePreciseTask batch[Capacity];
             SamplePreciseTask temp[Capacity];
@@ -41,7 +41,7 @@ namespace mpc::concurrency
             {
                 auto &task = batch[i];
 
-                if (task.midiNoteOff)
+                if (task.noteOff)
                 {
                     task.f(0);
                     continue;

@@ -34,12 +34,10 @@
 
 #include "performance/PerformanceManager.hpp"
 
-#include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "sampler/Sampler.hpp"
 
-#include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
@@ -181,15 +179,7 @@ void EngineHost::flushNoteOffs()
     concurrency::Task audioTask;
     audioTask.set([this]
     {
-        preciseTasks.flushMidiNoteOffs();
-
-        for (const auto &v : voices)
-        {
-            if (v->getVoiceOverlapMode() == VoiceOverlapMode::NOTE_OFF)
-            {
-                v->startDecay(0);
-            }
-        }
+        preciseTasks.flushNoteOffs();
     });
     postToAudioThread(audioTask);
 }

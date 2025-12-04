@@ -158,6 +158,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     concurrency::SamplePreciseTask task;
 
+    task.noteOff = true;
+
     task.f.set(
         [note, programIndex, performanceManager = mpc.getPerformanceManager(),
          programPadIndex, noteOffCtx](int)
@@ -243,7 +245,7 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
         noteOff.type = EventType::NoteOff;
 
         concurrency::SamplePreciseTask task;
-        task.midiNoteOff = true;
+        task.noteOff = true;
         task.f.set(
             [this, noteOff, trackDeviceIndex,
              transposeAmount](const int noteOffSampleNumber)
