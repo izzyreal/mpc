@@ -111,6 +111,22 @@ namespace mpc::concurrency
             return View{std::move(s)};
         }
 
+        // Use with care! May only be called by the thread
+        // that owns the state.
+        // Circumvents the queue and applies the message immediately.
+        void applyMessageImmediate(Message&& msg) noexcept
+        {
+            applyMessage(msg);
+            publishState();
+
+            for (auto &a : actions)
+            {
+                a();
+            }
+
+            actions.clear();
+        }
+
     protected:
         virtual void applyMessage(const Message &msg) noexcept = 0;
 

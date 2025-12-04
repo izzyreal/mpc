@@ -1,5 +1,6 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 
+#include "Logger.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "engine/NoteRepeatProcessor.hpp"
@@ -528,6 +529,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
             }
             else if (sequencer->getTransport()->shouldWaitForMidiClockLock())
             {
+                MLOG("Waiting for MIDI clock lock");
                 continue;
             }
         }

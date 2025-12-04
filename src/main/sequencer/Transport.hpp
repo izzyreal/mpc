@@ -18,6 +18,16 @@ namespace mpc::sequencer
         explicit Transport(Sequencer &owner);
 
         void play(bool fromStart = false) const;
+
+        // May only be invoked from the audio thread! Circumvents the
+        // thread-safe message queue.
+        // The current implementation does not support "play from start", but
+        // that's only because the current intended use case (host sync) does
+        // not need it. There's no inherent technical limitation that makes
+        // "from start" impossible, so, if necessary, we could at a later point
+        // add "from start" support.
+        void playImmediately() const;
+
         void rec() const;
         void recFromStart() const;
         void overdub() const;
@@ -105,5 +115,7 @@ namespace mpc::sequencer
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;
+
+        bool isPlayPossible(bool fromStart) const;
     };
 } // namespace mpc::sequencer

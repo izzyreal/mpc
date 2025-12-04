@@ -35,11 +35,9 @@ bool Transport::isPlaying() const
         .isSequencerRunning();
 }
 
-void Transport::play(const bool fromStart) const
+bool Transport::isPlayPossible(const bool fromStart) const
 {
-    const bool isSongMode = sequencer.isSongModeEnabled();
-
-    if (isSongMode)
+    if (sequencer.isSongModeEnabled())
     {
         const auto songScreen =
             sequencer.getScreens()->get<ScreenId::SongScreen>();
@@ -49,13 +47,13 @@ void Transport::play(const bool fromStart) const
 
         if (!currentSong->isUsed())
         {
-            return;
+            return false;
         }
 
         if (songScreen->getOffset() + 1 >= currentSong->getStepCount() &&
             !fromStart)
         {
-            return;
+            return false;
         }
 
         const int step = fromStart ? 0 : songScreen->getOffset() + 1;
@@ -66,7 +64,7 @@ void Transport::play(const bool fromStart) const
                     currentSong->getStep(step).lock();
                 !sequencer.getSequence(currentStep->getSequence())->isUsed())
             {
-                return;
+                return false;
             }
         }
     }
@@ -74,31 +72,64 @@ void Transport::play(const bool fromStart) const
     {
         if (!sequencer.getSelectedSequence()->isUsed())
         {
-            return;
+            return false;
         }
     }
+
+    return true;
+}
+
+void Transport::play(const bool fromStart) const
+{
+    if (!isPlayPossible(fromStart))
+    {
+        return;
+    }
+
+    const bool isSongMode = sequencer.isSongModeEnabled();
+    const auto stateManager = sequencer.getStateManager();
 
     if (fromStart)
     {
         if (isSongMode)
         {
-            sequencer.getStateManager()->enqueue(PlaySongFromStart{});
+            stateManager->enqueue(PlaySongFromStart{});
         }
         else
         {
-            sequencer.getStateManager()->enqueue(PlaySequenceFromStart{});
+            stateManager->enqueue(PlaySequenceFromStart{});
         }
     }
     else
     {
         if (isSongMode)
         {
-            sequencer.getStateManager()->enqueue(PlaySong{});
+            stateManager->enqueue(PlaySong{});
         }
         else
         {
-            sequencer.getStateManager()->enqueue(PlaySequence{});
+            stateManager->enqueue(PlaySequence{});
         }
+    }
+}
+
+void Transport::playImmediately() const
+{
+    if (!isPlayPossible(false))
+    {
+        return;
+    }
+
+    const bool isSongMode = sequencer.isSongModeEnabled();
+    const auto stateManager = sequencer.getStateManager();
+
+    if (isSongMode)
+    {
+        stateManager->applyMessageImmediate(PlaySong{});
+    }
+    else
+    {
+        stateManager->applyMessageImmediate(PlaySequence{});
     }
 }
 
