@@ -488,6 +488,13 @@ bool Transport::shouldWaitForMidiClockLock() const
         .isShouldWaitForMidiClockLockEnabled();
 }
 
+void Transport::setPositionTicksToReturnToWhenReleasingRec(
+    const Tick tick) const
+{
+    sequencer.getStateManager()->enqueue(
+        SetPositionTicksToReturnToWhenReleaseRec{tick});
+}
+
 bool Transport::isPunchEnabled() const
 {
     return punchEnabled;

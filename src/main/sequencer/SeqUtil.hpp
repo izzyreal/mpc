@@ -1,7 +1,5 @@
 #pragma once
 
-#include "IntTypes.hpp"
-
 #include <memory>
 #include <string>
 
@@ -16,11 +14,6 @@ namespace mpc::sequencer
     class Sequence;
     class Song;
 } // namespace mpc::sequencer
-
-namespace mpc::lcdgui::screens::window
-{
-    class TimingCorrectScreen;
-}
 
 namespace mpc::hardware
 {
@@ -66,8 +59,6 @@ namespace mpc::sequencer
 
         static bool isRecMainWithoutPlaying(
             const std::shared_ptr<Sequencer> &sequencer,
-            const std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>
-                &timingCorrectScreen,
             const std::string &currentScreenName,
             const std::shared_ptr<controller::ClientHardwareEventController>
                 &clientHardwareEventController);

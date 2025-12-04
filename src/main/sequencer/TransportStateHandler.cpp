@@ -141,6 +141,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
         },
         [&](const PlayMetronomeOnly &)
         {
+            state.playStartPositionQuarterNotes = state.positionQuarterNotes;
             state.metronomeOnlyPositionTicks = 0;
             state.metronomeOnlyEnabled = true;
             state.sequencerRunning = true;
@@ -150,6 +151,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
             state.sequencerRunning = false;
             state.metronomeOnlyEnabled = false;
             state.metronomeOnlyPositionTicks = 0;
+            state.playStartPositionQuarterNotes = NoPositionQuarterNotes;
         },
         [&](const PlaySong &)
         {
@@ -205,6 +207,10 @@ void TransportStateHandler::applyMessage(TransportState &state,
         [&](const SetShouldWaitForMidiClockLock &m)
         {
             state.shouldWaitForMidiClockLock = m.enabled;
+        },
+        [&](const SetPositionTicksToReturnToWhenReleaseRec &m)
+        {
+            state.positionTicksToReturnToWhenReleasingRec = m.pos;
         },
         [&](const SetCountingIn &m)
         {
@@ -272,6 +278,8 @@ void TransportStateHandler::applyStopSequence(
     TransportState &state) const noexcept
 {
     state.sequencerRunning = false;
+
+    state.playStartPositionQuarterNotes = NoPositionQuarterNotes;
 
     sequencer->setNextSq(NoSequenceIndex);
 

@@ -45,6 +45,8 @@ namespace mpc::sequencer
 
         bool isShouldWaitForMidiClockLockEnabled() const;
 
+        Tick getPositionTicksToReturnToWhenReleasingRec() const;
+
     private:
         const TransportState state;
     };

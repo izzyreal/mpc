@@ -4,7 +4,6 @@
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -26,15 +25,23 @@ void PushRecCommand::execute()
         return;
     }
 
-    if (mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
+    const auto transport = mpc.getSequencer()->getTransport();
+
+    if (transport->isRecordingOrOverdubbing())
     {
-        mpc.getSequencer()->getTransport()->setRecording(false);
-        mpc.getSequencer()->getTransport()->setOverdubbing(false);
+        transport->setRecording(false);
+        transport->setOverdubbing(false);
     }
 
     if (!screengroups::isPlayAndRecordScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
+    }
+
+    if (mpc.clientEventController->isRecMainWithoutPlaying())
+    {
+        transport->setPositionTicksToReturnToWhenReleasingRec(
+            transport->getTickPosition());
     }
 }

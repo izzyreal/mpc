@@ -29,8 +29,7 @@ void TriggerLocalNoteOffCommand::execute()
     }
 
     ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-        ctx->noteNumber, ctx->track->getDeviceIndex(),
-        drumIndex);
+        ctx->noteNumber, ctx->track->getDeviceIndex(), drumIndex);
 
     if (ctx->recordOnEvent &&
         !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
@@ -62,41 +61,34 @@ void TriggerLocalNoteOffCommand::execute()
                 }
             }
 
-            const Duration oldDuration = ctx->recordOnEvent->duration;
-
             ctx->track->finalizeNoteEventNonLive(ctx->recordOnEvent,
                                                  Duration(newDuration));
 
-            if ((oldDuration != ctx->recordOnEvent->duration &&
-                 ctx->isRecMainWithoutPlaying) ||
-                (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
+            if (((ctx->isStepRecording && ctx->isAutoStepIncrementEnabled) ||
+                 ctx->isRecMainWithoutPlaying) &&
+                thisIsTheLastActiveNoteOn)
             {
-                if (thisIsTheLastActiveNoteOn)
+                int nextPos =
+                    ctx->sequencerPositionTicks + ctx->noteValueLengthInTicks;
+
+                const auto bar = ctx->currentBarIndex + 1;
+
+                nextPos = ctx->track->timingCorrectTick(
+                    0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
+
+                if (const auto lastTick =
+                        ctx->sequencerGetActiveSequenceLastTick();
+                    nextPos != 0 && nextPos < lastTick)
                 {
-                    int nextPos = ctx->sequencerPositionTicks +
-                                  ctx->noteValueLengthInTicks;
-
-                    const auto bar = ctx->currentBarIndex + 1;
-
-                    nextPos = ctx->track->timingCorrectTick(
-                        0, bar, nextPos, ctx->noteValueLengthInTicks,
-                        ctx->swing);
-
-                    if (const auto lastTick =
-                            ctx->sequencerGetActiveSequenceLastTick();
-                        nextPos != 0 && nextPos < lastTick)
-                    {
-                        const double nextPosQuarterNotes =
-                            sequencer::Sequencer::ticksToQuarterNotes(nextPos);
-                        ctx->sequencerMoveToQuarterNotePosition(
-                            nextPosQuarterNotes);
-                    }
-                    else
-                    {
-                        ctx->sequencerMoveToQuarterNotePosition(
-                            sequencer::Sequencer::ticksToQuarterNotes(
-                                lastTick));
-                    }
+                    const double nextPosQuarterNotes =
+                        sequencer::Sequencer::ticksToQuarterNotes(nextPos);
+                    ctx->sequencerMoveToQuarterNotePosition(
+                        nextPosQuarterNotes);
+                }
+                else
+                {
+                    ctx->sequencerMoveToQuarterNotePosition(
+                        sequencer::Sequencer::ticksToQuarterNotes(lastTick));
                 }
             }
         }

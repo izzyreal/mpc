@@ -44,7 +44,6 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<MidiInputScreen> &midiInputScreen,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
     const std::shared_ptr<MultiRecordingSetupScreen> &multiRecordingSetupScreen,
-    const std::shared_ptr<TimingCorrectScreen> &timingCorrectScreen,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
@@ -54,7 +53,7 @@ ClientMidiEventController::ClientMidiEventController(
       performanceManager(performanceManager), midiInputScreen(midiInputScreen),
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
-      timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
+      layeredScreen(layeredScreen),
       hardware(hardware), screens(screens),
       previewSoundPlayer(previewSoundPlayer)
 {

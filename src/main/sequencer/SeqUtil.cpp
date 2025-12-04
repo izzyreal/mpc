@@ -5,7 +5,6 @@
 #include "SequencerStateManager.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
-#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Step.hpp"
@@ -342,12 +341,10 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
 bool SeqUtil::isRecMainWithoutPlaying(
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<TimingCorrectScreen> &timingCorrectScreen,
     const std::string &currentScreenName,
     const std::shared_ptr<controller::ClientHardwareEventController>
         &clientHardwareEventController)
 {
-    const auto tc_note = timingCorrectScreen->getNoteValue();
     const bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
                                sequencer->getSelectedSequence()->getLastTick();
 
@@ -358,7 +355,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
         currentScreenName == "sequencer" &&
         (!sequencer->getTransport()->isPlaying() ||
          sequencer->getTransport()->isMetronomeOnlyEnabled()) &&
-        recIsPressedOrLocked && tc_note != 0 && !posIsLastTick;
+        recIsPressedOrLocked && !posIsLastTick;
 
     return recMainWithoutPlaying;
 }

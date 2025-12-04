@@ -24,5 +24,6 @@ namespace mpc::sequencer
         double masterTempo = 120.0;
         bool tempoSourceIsSequenceEnabled = true;
         bool shouldWaitForMidiClockLock = false;
+        Tick positionTicksToReturnToWhenReleasingRec = NoTick;
     };
 } // namespace mpc::sequencer

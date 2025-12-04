@@ -918,6 +918,24 @@ void ClientHardwareEventController::handleButtonRelease(
     {
         ReleaseEraseCommand(mpc).execute();
     }
+    else if (id == REC)
+    {
+        const auto positionToReturnTo =
+            mpc.getSequencer()
+                ->getStateManager()
+                ->getSnapshot()
+                .getTransportStateView()
+                .getPositionTicksToReturnToWhenReleasingRec();
+
+        if (positionToReturnTo != NoTick)
+        {
+            mpc.getSequencer()
+                ->getTransport()
+                ->setPositionTicksToReturnToWhenReleasingRec(NoTick);
+            mpc.getSequencer()->getTransport()->setPosition(
+                sequencer::Sequencer::ticksToQuarterNotes(positionToReturnTo));
+        }
+    }
     else if (id == F1)
     {
         ReleaseFunctionCommand(mpc, 0).execute();

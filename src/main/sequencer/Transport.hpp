@@ -96,6 +96,8 @@ namespace mpc::sequencer
 
         bool shouldWaitForMidiClockLock() const;
 
+        void setPositionTicksToReturnToWhenReleasingRec(Tick) const;
+
     private:
         Sequencer &sequencer;
 

@@ -10,7 +10,6 @@
 
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
-#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 #include "hardware/ComponentId.hpp"
 
@@ -44,7 +43,7 @@ void ClientEventController::init()
         mpc.getSequencer(), mpc.getSampler(),
         screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
-        screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
+        layeredScreen, hardware,
         screens, mpc.getEngineHost()->getPreviewSoundPlayer().get());
 }
 
@@ -86,8 +85,8 @@ ClientEventController::getClientMidiEventController()
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(
-        mpc.getSequencer(), screens->get<ScreenId::TimingCorrectScreen>(),
-        layeredScreen->getCurrentScreenName(), clientHardwareEventController);
+        mpc.getSequencer(), layeredScreen->getCurrentScreenName(),
+        clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const

@@ -94,3 +94,8 @@ bool TransportStateView::isShouldWaitForMidiClockLockEnabled() const
 {
     return state.shouldWaitForMidiClockLock;
 }
+
+mpc::Tick TransportStateView::getPositionTicksToReturnToWhenReleasingRec() const
+{
+    return state.positionTicksToReturnToWhenReleasingRec;
+}

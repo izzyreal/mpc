@@ -37,7 +37,6 @@ namespace mpc::lcdgui::screens::window
 {
     class MidiInputScreen;
     class MultiRecordingSetupScreen;
-    class TimingCorrectScreen;
 } // namespace mpc::lcdgui::screens::window
 
 namespace mpc::audiomidi
@@ -65,7 +64,6 @@ namespace mpc::controller
         using EventHandler = audiomidi::EventHandler;
         using MidiInputScreen = MidiInputScreen;
         using MultiRecordingSetupScreen = MultiRecordingSetupScreen;
-        using TimingCorrectScreen = TimingCorrectScreen;
 
         using Track = sequencer::Track;
         using Program = sampler::Program;
@@ -80,7 +78,6 @@ namespace mpc::controller
             const std::shared_ptr<MidiInputScreen> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<MultiRecordingSetupScreen> &,
-            const std::shared_ptr<TimingCorrectScreen> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             const std::shared_ptr<hardware::Hardware> &,
             const std::shared_ptr<lcdgui::Screens> &,
@@ -122,7 +119,6 @@ namespace mpc::controller
         std::weak_ptr<Sequencer> sequencer;
         std::shared_ptr<Sampler> sampler;
         std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen;
-        std::shared_ptr<TimingCorrectScreen> timingCorrectScreen;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<lcdgui::Screens> screens;

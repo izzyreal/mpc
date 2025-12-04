@@ -141,7 +141,6 @@ void TriggerLocalNoteOnCommand::execute()
     else if (ctx->isRecMainWithoutPlaying)
     {
         transport->playMetronomeOnly();
-
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
             ctx->positionTicks, ctx->note, velo,
             ctx->metronomeOnlyPositionTicks);
