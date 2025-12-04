@@ -202,10 +202,23 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
+    const auto lockedSequencer = sequencer.lock();
+
+    lockedSequencer->getTransport()->stopMetronomeOnly();
+
+    const auto track = lockedSequencer->getSelectedTrack();
+
+    for (const auto &e : computeEventsAtCurrentTick())
+    {
+        if (e->snapshot.type == EventType::NoteOn &&
+            e->snapshot.beingRecorded)
+        {
+            track->finalizeNoteEventNonLive(e->handle, Duration(1));
+        }
+    }
+
     mpc.getEngineHost()->flushNoteOffs();
     isFirstTickPosChangeAfterScreenHasBeenOpened = true;
-
-    const auto track = sequencer.lock()->getSelectedTrack();
 
     storeColumnForEventAtActiveRow();
 

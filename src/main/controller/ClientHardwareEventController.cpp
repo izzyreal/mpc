@@ -359,7 +359,7 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    auto transport = mpc.getSequencer()
+    const auto transport = mpc.getSequencer()
                          ->getStateManager()
                          ->getSnapshot()
                          .getTransportStateView();
