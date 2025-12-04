@@ -90,6 +90,8 @@ namespace mpc::sequencer
 
         void setMasterTempo(double) const;
 
+        double getMasterTempo() const;
+
         void setShouldWaitForMidiClockLock(bool) const;
 
         bool shouldWaitForMidiClockLock() const;

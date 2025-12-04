@@ -467,6 +467,14 @@ void Transport::setMasterTempo(const double masterTempo) const
         SetMasterTempo{std::clamp(masterTempo, 30.0, 300.0)});
 }
 
+double Transport::getMasterTempo() const
+{
+    return sequencer.getStateManager()
+        ->getSnapshot()
+        .getTransportStateView()
+        .getMasterTempo();
+}
+
 void Transport::setShouldWaitForMidiClockLock(const bool b) const
 {
     sequencer.getStateManager()->enqueue(SetShouldWaitForMidiClockLock{b});
@@ -832,12 +840,17 @@ double Transport::getTempo() const
     const auto snapshot =
         sequencer.getStateManager()->getSnapshot().getTransportStateView();
 
-    if (!isPlaying() && !sequencer.getSelectedSequence()->isUsed())
+    if (!snapshot.isTempoSourceSequenceEnabled())
     {
-        return snapshot.getTempo();
+        return snapshot.getMasterTempo();
     }
 
     const auto seq = sequencer.getSelectedSequence();
+
+    if (!seq->isUsed())
+    {
+        return 120.0;
+    }
 
     if (screengroups::isSongScreen(
             sequencer.layeredScreen->getCurrentScreenId()))
@@ -869,8 +882,8 @@ double Transport::getTempo() const
 
     if (seq->isTempoChangeOn() && tce)
     {
-        return snapshot.getTempo() * tce->getRatio() * 0.001;
+        return snapshot.getMasterTempo() * tce->getRatio() * 0.001;
     }
 
-    return snapshot.getTempo();
+    return snapshot.getMasterTempo();
 }

@@ -196,7 +196,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
         },
         [&](const SetMasterTempo &m)
         {
-            state.tempo = m.tempo;
+            state.masterTempo = m.tempo;
         },
         [&](const SetTempoSourceIsSequence &m)
         {

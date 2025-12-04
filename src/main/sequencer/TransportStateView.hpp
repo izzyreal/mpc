@@ -39,7 +39,7 @@ namespace mpc::sequencer
 
         int getPlayedSongStepRepetitionCount() const;
 
-        double getTempo() const;
+        double getMasterTempo() const;
 
         bool isTempoSourceSequenceEnabled() const;
 

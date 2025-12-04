@@ -80,9 +80,9 @@ int TransportStateView::getPlayedSongStepRepetitionCount() const
     return state.playedSongStepRepetitionCount;
 }
 
-double TransportStateView::getTempo() const
+double TransportStateView::getMasterTempo() const
 {
-    return state.tempo;
+    return state.masterTempo;
 }
 
 bool TransportStateView::isTempoSourceSequenceEnabled() const
