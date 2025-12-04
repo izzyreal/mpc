@@ -221,10 +221,7 @@ void TransportStateHandler::applyMessage(TransportState &state,
 void TransportStateHandler::applyPlaySequence(
     TransportState &state) const noexcept
 {
-    if (state.sequencerRunning)
-    {
-        return;
-    }
+    state.positionTicksToReturnToWhenReleasingRec = NoTick;
 
     const TransportStateView transport(state);
 
