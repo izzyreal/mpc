@@ -36,7 +36,7 @@ namespace mpc::sequencer
         void reset();
         bool areTicksBeingProduced() const;
 
-        const double getLastProcessedHostPositionQuarterNotes() const;
+        double getLastProcessedHostPositionQuarterNotes() const;
 
         bool didJumpOccurInLastBuffer() const;
 

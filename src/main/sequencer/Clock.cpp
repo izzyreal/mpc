@@ -164,7 +164,7 @@ bool Clock::areTicksBeingProduced() const
     return ticksAreBeingProduced;
 }
 
-const double Clock::getLastProcessedHostPositionQuarterNotes() const
+double Clock::getLastProcessedHostPositionQuarterNotes() const
 {
     return previousHostPositionAtStartOfBufferQuarterNotes;
 }

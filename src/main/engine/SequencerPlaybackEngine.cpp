@@ -487,6 +487,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         }
 
         sequencer->getTransport()->setPosition(wrappedPosition);
+        seq->syncTrackEventIndices(Sequencer::quarterNotesToTicks(wrappedPosition));
         manager->drainQueue();
     }
 

@@ -278,6 +278,7 @@ void TransportStateHandler::applyStopSequence(
     TransportState &state) const noexcept
 {
     state.sequencerRunning = false;
+    sequencer->clock->reset();
 
     state.playStartPositionQuarterNotes = NoPositionQuarterNotes;
 
