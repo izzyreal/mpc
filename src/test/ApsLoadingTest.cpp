@@ -46,7 +46,7 @@ void doApsTest(Mpc &mpc)
 
     constexpr bool headless = true;
     ApsLoader::load(mpc, apsFile, headless);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     auto p1 = mpc.getSampler()->getProgram(0);
     auto p2 = mpc.getSampler()->getProgram(1);

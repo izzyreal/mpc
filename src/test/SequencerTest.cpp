@@ -136,7 +136,7 @@ TEST_CASE("Can record and playback from different threads",
                        AUDIO_THREAD_TIMEOUT &&
                    track->getEvents().size() < humanTickPositions.size())
             {
-                mpc.getEngineHost()->applyPendingStateChanges();
+                mpc.getEngineHost()->prepareProcessBlock(512);
                 mpc.getClock()->processBufferInternal(
                     sequencer->getTransport()->getTempo(), SAMPLE_RATE,
                     BUFFER_SIZE, 0);
@@ -351,7 +351,7 @@ TEST_CASE("Undo", "[sequencer]")
             stateManager->drainQueue();
         }
 
-        mpc.getEngineHost()->applyPendingStateChanges();
+        mpc.getEngineHost()->prepareProcessBlock(512);
 
         mpc.getClock()->processBufferInternal(
             sequencer->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);

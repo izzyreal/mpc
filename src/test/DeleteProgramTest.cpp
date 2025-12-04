@@ -16,11 +16,11 @@ TEST_CASE("Delete program", "[program]")
     auto sampler = mpc.getSampler();
 
     sampler->createNewProgramAddFirstAvailableSlot();
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     sampler->createNewProgramAddFirstAvailableSlot();
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     sampler->createNewProgramAddFirstAvailableSlot();
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     mpc.getSequencer()
         ->getBus<DrumBus>(BusType::DRUM1)
@@ -35,16 +35,16 @@ TEST_CASE("Delete program", "[program]")
         ->getBus<DrumBus>(BusType::DRUM4)
         ->setProgramIndex(ProgramIndex(3));
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     sampler->deleteProgram(sampler->getProgram(2));
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     REQUIRE(mpc.getSequencer()
                 ->getBus<DrumBus>(BusType::DRUM3)
                 ->getProgramIndex() == 0);
 
     sampler->deleteProgram(sampler->getProgram(0));
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     REQUIRE(mpc.getSequencer()
                 ->getBus<DrumBus>(BusType::DRUM1)
                 ->getProgramIndex() == 1);

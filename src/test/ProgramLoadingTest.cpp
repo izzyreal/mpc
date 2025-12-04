@@ -73,7 +73,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
     (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1, 0);
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
@@ -95,7 +95,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
         mpc.getSampler()->deleteAllSamples();
     }
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     disk->moveBack();
     disk->initFiles();
@@ -106,7 +106,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
     (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2, 1);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 }
 
 TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")
@@ -217,7 +217,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
 
     REQUIRE(cantFindFileScreenHasBeenOpened);
     assert(mpc.getLayeredScreen()->getCurrentScreenName() != "cant-find-file");
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
 
@@ -256,7 +256,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound",
         std::shared_ptr<sampler::Program> p2;
 
         doTestWithMissingSound(mpc, false, i == 0, p1, p2);
-        mpc.getEngineHost()->applyPendingStateChanges();
+        mpc.getEngineHost()->prepareProcessBlock(512);
 
         REQUIRE(mpc.getSampler()->getProgramCount() == 2);
         REQUIRE(mpc.getSampler()->getProgram(1) == p2);

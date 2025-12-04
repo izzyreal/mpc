@@ -269,7 +269,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::PgmAssignScreen);
     auto controls = mpc.getScreen();
@@ -283,20 +283,20 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
     };
     REQUIRE(soundName() == "OFF");
     controls->turnWheel(1);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     mpc.getLayeredScreen()->timerCallback();
     REQUIRE(soundName() == "sound1");
     controls->turnWheel(1);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     mpc.getLayeredScreen()->timerCallback();
     REQUIRE(soundName() == "sound2");
     controls->turnWheel(1);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     mpc.getLayeredScreen()->timerCallback();
     REQUIRE(soundName() == "sound3");
 
     controls->turnWheel(-1);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     mpc.getLayeredScreen()->timerCallback();
     REQUIRE(soundName() == "sound2");
 
@@ -311,7 +311,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 
     for (int i = 0; i < 3; i++)
     {
-        mpc.getEngineHost()->applyPendingStateChanges();
+        mpc.getEngineHost()->prepareProcessBlock(512);
         mpc.getLayeredScreen()->timerCallback();
         REQUIRE(soundName() == "sound" + std::to_string(expected[i]));
         controls->turnWheel(1);
@@ -337,11 +337,11 @@ TEST_CASE("Delete sound 1", "[sampler]")
         }
     }
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == 0);
     sampler->deleteSound(0);
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == -1);
 }
 
@@ -364,7 +364,7 @@ TEST_CASE("Delete sound 2", "[sampler]")
         }
     }
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == 0);
     sampler->deleteSound(1);
@@ -384,12 +384,12 @@ TEST_CASE("Purge unused sounds", "[sampler]")
         auto s = sampler->addSound();
         assert(s != nullptr);
         s->setName("sound" + std::to_string(i));
-        mpc.getEngineHost()->applyPendingStateChanges();
+        mpc.getEngineHost()->prepareProcessBlock(512);
 
         if (i % 2 == 0)
         {
             program->getNoteParameters(i + 35)->setSoundIndex(i);
-            mpc.getEngineHost()->applyPendingStateChanges();
+            mpc.getEngineHost()->prepareProcessBlock(512);
         }
     }
 
@@ -397,7 +397,7 @@ TEST_CASE("Purge unused sounds", "[sampler]")
 
     sampler->purge();
 
-    mpc.getEngineHost()->applyPendingStateChanges();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(sampler->getUnusedSampleCount() == 0);
 

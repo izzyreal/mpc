@@ -89,7 +89,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
         {
             for (int i = 0; i < DSP_CYCLE_COUNT; i++)
             {
-                engineHost->applyPendingStateChanges();
+                engineHost->prepareProcessBlock(BUFFER_SIZE);
                 engineHost->changeBounceStateIfRequired();
                 mpc.getClock()->processBufferInternal(
                     sequencer->getTransport()->getTempo(), SAMPLE_RATE,
