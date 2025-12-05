@@ -68,6 +68,13 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
     manager->drainQueue();
     manager->enqueue(SyncTrackEventIndices{});
     manager->drainQueue();
+    // We have to drain the queue once more, because SyncTrackEventIndices
+    // enqueues more messages. We should probably move track event index
+    // synchronization to SequenceStateHandler and do it globally in there.
+    // This keeps the message queue traffic low (rather than one message per
+    // track we have one message for the whole sequence), and we avoid the need
+    // for draining the queue twice.
+    manager->drainQueue();
 }
 
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
@@ -76,10 +83,9 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
     sequencer->setSelectedSequenceIndex(sequencer->getNextSq(), false);
     sequencer->getStateManager()->drainQueue();
     sequencer->setNextSq(NoSequenceIndex);
+    sequencer->getStateManager()->drainQueue();
     setTickPositionEffectiveImmediately(0);
-    auto newSeq = sequencer->getCurrentlyPlayingSequence();
-    newSeq->syncTrackEventIndices(0);
-    return newSeq;
+    return sequencer->getCurrentlyPlayingSequence();
 }
 
 void SequencerPlaybackEngine::triggerClickIfNeeded() const
@@ -491,6 +497,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         sequencer->getTransport()->setPosition(wrappedPosition);
         seq->syncTrackEventIndices(
             Sequencer::quarterNotesToTicks(wrappedPosition));
+        manager->drainQueue();
         manager->drainQueue();
     }
 
