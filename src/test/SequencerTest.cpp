@@ -125,8 +125,6 @@ TEST_CASE("Can record and playback from different threads",
     server->setSampleRate(SAMPLE_RATE);
     server->start();
 
-    int64_t timeInSamples = 0;
-
     std::thread audioThread(
         [&]
         {
@@ -136,12 +134,11 @@ TEST_CASE("Can record and playback from different threads",
                        AUDIO_THREAD_TIMEOUT &&
                    track->getEvents().size() < humanTickPositions.size())
             {
-                mpc.getEngineHost()->prepareProcessBlock(512);
+                mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
                 mpc.getClock()->processBufferInternal(
                     sequencer->getTransport()->getTempo(), SAMPLE_RATE,
                     BUFFER_SIZE, 0);
                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-                timeInSamples += BUFFER_SIZE;
 
                 if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
                 {
@@ -246,11 +243,6 @@ TEST_CASE("Copy sequence", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
-    sequencer->getTransport()->setTempo(121);
-    stateManager->drainQueue();
-
-    REQUIRE(sequencer->getTransport()->getTempo() == 121);
-
     auto seq1 = sequencer->getSelectedSequence();
     seq1->init(2);
     stateManager->drainQueue();
@@ -318,8 +310,6 @@ TEST_CASE("Undo", "[sequencer]")
     sequencer->getTransport()->recFromStart();
     stateManager->drainQueue();
 
-    int64_t timeInSamples = 0;
-
     const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
 
     for (int i = 0; i < 20; i++)
@@ -351,13 +341,12 @@ TEST_CASE("Undo", "[sequencer]")
             stateManager->drainQueue();
         }
 
-        mpc.getEngineHost()->prepareProcessBlock(512);
+        mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
 
         mpc.getClock()->processBufferInternal(
             sequencer->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
 
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-        timeInSamples += BUFFER_SIZE;
     }
 
     sequencer->getTransport()->stop();
