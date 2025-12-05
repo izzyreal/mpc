@@ -316,17 +316,37 @@ void TrackStateHandler::applyMessage(
             auto &track =
                 state.sequences[e->sequenceIndex].tracks[e->trackIndex];
 
+            const EventData * head = track.head;
+
+            int removedIndex = 0;
+
+            {
+                const EventData * it = head;
+                int idx = 0;
+                while (it && it != e)
+                {
+                    it = it->next;
+                    idx++;
+                }
+                removedIndex = idx;
+            }
+
             if (e->prev)
-            {
                 e->prev->next = e->next;
-            }
+
             if (e->next)
-            {
                 e->next->prev = e->prev;
-            }
+
             if (track.head == e)
-            {
                 track.head = e->next;
+
+            if (track.playEventIndex > removedIndex)
+            {
+                --track.playEventIndex;
+            }
+            else if (track.playEventIndex == removedIndex)
+            {
+                track.playEventIndex = std::max(EventIndex(0), track.playEventIndex);
             }
 
             e->prev = nullptr;

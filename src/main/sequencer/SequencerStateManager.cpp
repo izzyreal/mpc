@@ -359,16 +359,14 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
     }
 }
 
-void SequencerStateManager::insertAcquiredEvent(TrackState &track, EventData *e)
+void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
 {
     assert(e);
-
-    track.playEventIndex = track.playEventIndex + 1;
 
     e->prev = nullptr;
     e->next = nullptr;
 
-    EventData *&head = track.head;
+    EventData*& head = track.head;
 
     if (!head)
     {
@@ -376,28 +374,42 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track, EventData *e)
         return;
     }
 
+    int insertIndex = 0;
+
     if (e->tick < head->tick)
     {
         e->next = head;
         head->prev = e;
         head = e;
+
+        if (track.playEventIndex >= 0)
+            ++track.playEventIndex;
+
         return;
     }
 
-    EventData *it = head;
+    EventData* it = head;
+    int currentIndex = 0;
+
     while (it->next && it->next->tick <= e->tick)
     {
         it = it->next;
+        currentIndex++;
     }
 
-    EventData *n = it->next;
+    insertIndex = currentIndex + 1;
+
+    EventData* n = it->next;
 
     it->next = e;
     e->prev = it;
 
     e->next = n;
-    if (n)
+
+    if (n) n->prev = e;
+
+    if (track.playEventIndex >= insertIndex)
     {
-        n->prev = e;
+        ++track.playEventIndex;
     }
 }
