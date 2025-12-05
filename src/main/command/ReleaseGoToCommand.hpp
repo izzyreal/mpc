@@ -3,11 +3,10 @@
 
 namespace mpc::command
 {
-
-    class PushGoToCommand : public Command
+    class ReleaseGoToCommand final : public Command
     {
     public:
-        explicit PushGoToCommand(Mpc &mpc);
+        explicit ReleaseGoToCommand(Mpc &);
         void execute() override;
 
     private:

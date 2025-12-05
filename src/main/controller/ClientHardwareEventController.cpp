@@ -54,6 +54,10 @@ using namespace mpc::performance;
 ClientHardwareEventController::ClientHardwareEventController(Mpc &mpcToUse)
     : mpc(mpcToUse)
 {
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, PREV_STEP_OR_EVENT);
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, NEXT_STEP_OR_EVENT);
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, PREV_BAR_START);
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, NEXT_BAR_END);
 }
 
 bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
@@ -585,18 +589,9 @@ void ClientHardwareEventController::handlePot(
 }
 
 void ClientHardwareEventController::handleButtonPress(
-    const ClientHardwareEvent &event) const
+    const ClientHardwareEvent &event)
 {
     const auto button = mpc.getHardware()->getButton(event.componentId);
-
-    // The below check is necessary because the keyboard mapping routines in
-    // mpc::event may return labels like "ctrl" and "alt" rather than component
-    // labels. After we've improved the keyboard event handling, we can remove
-    // this check.
-    if (!button)
-    {
-        return;
-    }
 
     // Temporary hack. We actually want to synthesize repeat events ourselves,
     // so we don't depend on host-generated repeats. This way the behaviour is
@@ -609,6 +604,8 @@ void ClientHardwareEventController::handleButtonPress(
     {
         return;
     }
+
+    buttonConsumptionTracker.onPress(event.componentId);
 
     const auto screen = mpc.getScreen();
 
@@ -629,29 +626,25 @@ void ClientHardwareEventController::handleButtonPress(
 
     const auto id = event.componentId;
 
-    if (const auto stepEditorScreen =
-            std::dynamic_pointer_cast<StepEditorScreen>(screen);
-        stepEditorScreen)
+    if (const auto withLocate =
+            std::dynamic_pointer_cast<WithLocateStepEventBarSequence>(screen);
+        withLocate)
     {
         if (id == PREV_STEP_OR_EVENT)
         {
-            stepEditorScreen->prevStepEvent();
-            return;
+            withLocate->prevStepEvent();
         }
-        if (id == NEXT_STEP_OR_EVENT)
+        else if (id == NEXT_STEP_OR_EVENT)
         {
-            stepEditorScreen->nextStepEvent();
-            return;
+            withLocate->nextStepEvent();
         }
-        if (id == PREV_BAR_START)
+        else if (id == PREV_BAR_START)
         {
-            stepEditorScreen->prevBarStart();
-            return;
+            withLocate->prevBarStart();
         }
-        if (id == NEXT_BAR_END)
+        else if (id == NEXT_BAR_END)
         {
-            stepEditorScreen->nextBarEnd();
-            return;
+            withLocate->nextBarEnd();
         }
     }
 
@@ -744,10 +737,6 @@ void ClientHardwareEventController::handleButtonPress(
     else if (id == OPEN_WINDOW)
     {
         screen->openWindow();
-    }
-    else if (id == GO_TO)
-    {
-        PushGoToCommand(mpc).execute();
     }
     else if (id == TAP_TEMPO_OR_NOTE_REPEAT)
     {
@@ -905,27 +894,30 @@ void ClientHardwareEventController::handleButtonPress(
 }
 
 void ClientHardwareEventController::handleButtonRelease(
-    const ClientHardwareEvent &event) const
+    const ClientHardwareEvent &event)
 {
     const auto button = mpc.getHardware()->getButton(event.componentId);
-
-    // The below check is necessary because the keyboard mapping routines in
-    // mpc::event may return labels like "ctrl" and "alt" rather than component
-    // labels. After we've improved the keyboard event handling, we can remove
-    // this check.
-    if (!button)
-    {
-        return;
-    }
 
     if (!button->release())
     {
         return;
     }
 
+    buttonConsumptionTracker.onRelease(event.componentId);
+
+    if (buttonConsumptionTracker.isConsumed(event.componentId))
+    {
+        buttonConsumptionTracker.reset(event.componentId);
+        return;
+    }
+
     if (const auto id = event.componentId; id == ERASE)
     {
         ReleaseEraseCommand(mpc).execute();
+    }
+    else if (id == GO_TO)
+    {
+        ReleaseGoToCommand(mpc).execute();
     }
     else if (id == REC)
     {

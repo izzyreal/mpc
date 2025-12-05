@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/WithLocateStepEventBarSequence.hpp"
 
 #include <sequencer/EventRef.hpp>
 #include <sequencer/EmptyEvent.hpp>
@@ -16,7 +17,8 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class StepEditorScreen final : public ScreenComponent
+    class StepEditorScreen final : public ScreenComponent,
+                                   public WithLocateStepEventBarSequence
     {
         void downOrUp(int increment);
         void adhocPlayNoteEvent(const sequencer::EventData &noteEvent) const;
@@ -34,10 +36,10 @@ namespace mpc::lcdgui::screens
 
         void shift();
 
-        void prevStepEvent();
-        void nextStepEvent();
-        void prevBarStart();
-        void nextBarEnd();
+        void prevStepEvent() override;
+        void nextStepEvent() override;
+        void prevBarStart() override;
+        void nextBarEnd() override;
 
         void function(int i) override;
         void turnWheel(int increment) override;

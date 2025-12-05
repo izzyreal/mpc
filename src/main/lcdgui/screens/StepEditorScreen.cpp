@@ -42,7 +42,10 @@ using namespace mpc::sequencer;
 constexpr int EVENT_ROW_COUNT = 4;
 
 StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
-    : ScreenComponent(mpc, "step-editor", layerIndex)
+    : ScreenComponent(mpc, "step-editor", layerIndex),
+      WithLocateStepEventBarSequence(
+          mpc.getHardware()->getButton(hardware::ComponentId::GO_TO).get(),
+          mpc.getSequencer().get())
 {
     lastColumn["empty"] = "a";
     lastColumn["channel-pressure"] = "a";
@@ -210,8 +213,7 @@ void StepEditorScreen::close()
 
     for (const auto &e : computeEventsAtCurrentTick())
     {
-        if (e->snapshot.type == EventType::NoteOn &&
-            e->snapshot.beingRecorded)
+        if (e->snapshot.type == EventType::NoteOn && e->snapshot.beingRecorded)
         {
             track->finalizeNoteEventNonLive(e->handle, Duration(1));
         }
@@ -518,9 +520,13 @@ void StepEditorScreen::turnWheel(const int increment)
             return;
         }
 
-        if (increment > 0 && transport->getCurrentBeatIndex() == sequencer.lock()
-                                 ->getSelectedSequence()
-                                 ->getTimeSignatureFromTickPos(tickPosition).numerator - 1)
+        if (increment > 0 &&
+            transport->getCurrentBeatIndex() ==
+                sequencer.lock()
+                        ->getSelectedSequence()
+                        ->getTimeSignatureFromTickPos(tickPosition)
+                        .numerator -
+                    1)
         {
             adhocPlayNoteEventsAtCurrentPosition();
             return;
@@ -546,7 +552,8 @@ void StepEditorScreen::turnWheel(const int increment)
                                  ->getTimeSignatureFromTickPos(tickPosition);
         const auto ticksPerBeat = 96 * (4 / timeSig.denominator);
 
-        if (increment > 0 && transport->getCurrentClockNumber() == ticksPerBeat - 1)
+        if (increment > 0 &&
+            transport->getCurrentClockNumber() == ticksPerBeat - 1)
         {
             adhocPlayNoteEventsAtCurrentPosition();
             return;
@@ -770,16 +777,7 @@ void StepEditorScreen::prevStepEvent()
     setSequencerTickPos(
         [&]
         {
-            if (mpc.getHardware()
-                    ->getButton(hardware::ComponentId::GO_TO)
-                    ->isPressed())
-            {
-                sequencer.lock()->goToPreviousEvent();
-            }
-            else
-            {
-                sequencer.lock()->goToPreviousStep();
-            }
+            WithLocateStepEventBarSequence::prevStepEvent();
         });
 }
 
@@ -789,16 +787,7 @@ void StepEditorScreen::nextStepEvent()
     setSequencerTickPos(
         [&]
         {
-            if (mpc.getHardware()
-                    ->getButton(hardware::ComponentId::GO_TO)
-                    ->isPressed())
-            {
-                sequencer.lock()->goToNextEvent();
-            }
-            else
-            {
-                sequencer.lock()->goToNextStep();
-            }
+            WithLocateStepEventBarSequence::nextStepEvent();
         });
 }
 
@@ -815,17 +804,7 @@ void StepEditorScreen::prevBarStart()
     setSequencerTickPos(
         [&]
         {
-            if (mpc.getHardware()
-                    ->getButton(hardware::ComponentId::GO_TO)
-                    ->isPressed())
-            {
-                sequencer.lock()->getTransport()->setPosition(0);
-            }
-            else
-            {
-                sequencer.lock()->getTransport()->setBar(
-                    sequencer.lock()->getTransport()->getCurrentBarIndex() - 1);
-            }
+            WithLocateStepEventBarSequence::prevBarStart();
         });
 }
 
@@ -835,19 +814,7 @@ void StepEditorScreen::nextBarEnd()
     setSequencerTickPos(
         [&]
         {
-            if (mpc.getHardware()
-                    ->getButton(hardware::ComponentId::GO_TO)
-                    ->isPressed())
-            {
-                sequencer.lock()->getTransport()->setBar(
-                    sequencer.lock()->getSelectedSequence()->getLastBarIndex() +
-                    1);
-            }
-            else
-            {
-                sequencer.lock()->getTransport()->setBar(
-                    sequencer.lock()->getTransport()->getCurrentBarIndex() + 1);
-            }
+            WithLocateStepEventBarSequence::nextBarEnd();
         });
 }
 

@@ -83,6 +83,8 @@ namespace mpc::lcdgui
 
         bool isCurrentScreen(std::initializer_list<ScreenId> ids) const;
 
+        bool isCurrentScreenOrChildOf(ScreenId) const;
+
         bool isCurrentScreenPopupFor(ScreenId targetId) const;
 
         void openScreen(const std::string &screenName);

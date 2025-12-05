@@ -8,7 +8,6 @@
 
 namespace mpc::hardware
 {
-
     class Component
     {
     public:

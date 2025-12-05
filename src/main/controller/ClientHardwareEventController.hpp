@@ -6,6 +6,7 @@
 #include "client/event/ClientHardwareEvent.hpp"
 
 #include "controller/ButtonLockTracker.hpp"
+#include "controller/ButtonConsumptionTracker.hpp"
 
 namespace mpc
 {
@@ -23,6 +24,7 @@ namespace mpc::controller
             const client::event::ClientHardwareEvent &event);
 
         ButtonLockTracker buttonLockTracker;
+        ButtonConsumptionTracker buttonConsumptionTracker;
 
         bool isNoteRepeatLocked() const
         {
@@ -58,14 +60,12 @@ namespace mpc::controller
 
         void unlockRec()
         {
-            buttonLockTracker.unlock(
-                hardware::ComponentId::REC);
+            buttonLockTracker.unlock(hardware::ComponentId::REC);
         }
 
         void unlockOverdub()
         {
-            buttonLockTracker.unlock(
-                hardware::ComponentId::OVERDUB);
+            buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
         }
 
         bool isNoteRepeatLockedOrPressed() const;
@@ -99,10 +99,8 @@ namespace mpc::controller
         void handleDataWheel(const client::event::ClientHardwareEvent &);
         void handleSlider(const client::event::ClientHardwareEvent &) const;
         void handlePot(const client::event::ClientHardwareEvent &) const;
-        void
-        handleButtonPress(const client::event::ClientHardwareEvent &) const;
-        void
-        handleButtonRelease(const client::event::ClientHardwareEvent &) const;
+        void handleButtonPress(const client::event::ClientHardwareEvent &);
+        void handleButtonRelease(const client::event::ClientHardwareEvent &);
         void
         handleButtonDoublePress(const client::event::ClientHardwareEvent &);
     };

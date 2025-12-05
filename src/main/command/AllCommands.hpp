@@ -21,7 +21,6 @@
 #include "command/PushPlayStartCommand.hpp"
 #include "command/SplitLeftCommand.hpp"
 #include "command/SplitRightCommand.hpp"
-#include "command/PushGoToCommand.hpp"
 #include "command/PushNextSeqCommand.hpp"
 #include "command/PushTrackMuteCommand.hpp"
 #include "command/PushNumPadCommand.hpp"
@@ -32,3 +31,4 @@
 #include "command/ReleaseEraseCommand.hpp"
 #include "command/ReleaseTapCommand.hpp"
 #include "command/ReleaseFunctionCommand.hpp"
+#include "command/ReleaseGoToCommand.hpp"

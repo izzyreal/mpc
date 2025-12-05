@@ -117,6 +117,30 @@ bool LayeredScreen::isCurrentScreen(
     return false;
 }
 
+bool LayeredScreen::isCurrentScreenOrChildOf(
+    const ScreenId id) const
+{
+    if (isCurrentScreen({id}))
+    {
+        return true;
+    }
+
+    for (auto &layer : layers)
+    {
+        if (const auto screen = layer->findChild<ScreenComponent>())
+        {
+            const auto screenId = getScreenId(screen);
+
+            if (screenId == id)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool LayeredScreen::isCurrentScreenPopupFor(const ScreenId targetId) const
 {
     return currentScreenId.load() == ScreenId::PopupScreen &&
@@ -856,7 +880,7 @@ std::shared_ptr<Field> LayeredScreen::getFocusedField()
 
 std::string LayeredScreen::getFirstLayerScreenName() const
 {
-    if (const auto screen = layers[0]->findChild<ScreenComponent>(); screen)
+    if (const auto screen = layers[0]->findChild<ScreenComponent>())
     {
         return screen->getName();
     }

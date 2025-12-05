@@ -37,7 +37,10 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
-    : ScreenComponent(mpc, "sequencer", layerIndex)
+    : ScreenComponent(mpc, "sequencer", layerIndex),
+      WithLocateStepEventBarSequence(
+          mpc.getHardware()->getButton(hardware::ComponentId::GO_TO).get(),
+          mpc.getSequencer().get())
 {
     MRECT punch0(0, 52, 30, 59);
     addChildT<PunchRect>("punch-rect-0", punch0)->Hide(true);

@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/WithLocateStepEventBarSequence.hpp"
 
 #include <vector>
 #include <functional>
@@ -12,11 +13,11 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class SequencerScreen final : public ScreenComponent
+    class SequencerScreen final : public ScreenComponent,
+                                  public WithLocateStepEventBarSequence
     {
-
     public:
-        SequencerScreen(Mpc &mpc, int layerIndex);
+        SequencerScreen(Mpc &, int layerIndex);
 
         void erase();
         void tap();

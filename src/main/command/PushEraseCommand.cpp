@@ -17,5 +17,13 @@ void PushEraseCommand::execute()
         return;
     }
 
+    const auto ls = mpc.getLayeredScreen();
+
+    if (ls->isCurrentScreen({ScreenId::EraseScreen}))
+    {
+        ls->closeCurrentScreen();
+        return;
+    }
+
     mpc.getLayeredScreen()->openScreenById(ScreenId::EraseScreen);
 }
