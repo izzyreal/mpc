@@ -51,7 +51,7 @@ namespace mpc::sequencer
         static double sequenceFrameLength(const Sequence *, int firstTick,
                                           int lastTick, int sr);
         static int loopFrameLength(const Sequence *, int sr);
-        static int songFrameLength(Song *song, Sequencer *, int sr);
+        static int songFrameLength(const Song *song, Sequencer *, int sr);
 
         static void copyBars(Mpc &, uint8_t fromSeqIndex, uint8_t toSeqIndex,
                              uint8_t copyFirstBar, uint8_t copyLastBar,

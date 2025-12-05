@@ -47,3 +47,8 @@ TransportStateView SequencerStateView::getTransportStateView() const
 {
     return TransportStateView(state->transport);
 }
+
+SongStateView SequencerStateView::getSongStateView(const SongIndex idx) const
+{
+    return SongStateView(state->songs[idx]);
+}

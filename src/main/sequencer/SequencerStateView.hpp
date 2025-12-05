@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sequencer/SongStateView.hpp"
 #include "sequencer/TransportStateView.hpp"
 #include "sequencer/SequencerState.hpp"
 
@@ -9,7 +10,6 @@ namespace mpc::sequencer
 {
     class TrackStateView;
     class SequenceStateView;
-
     struct SequencerState;
 
     class SequencerStateView
@@ -29,6 +29,8 @@ namespace mpc::sequencer
         SongStepIndex getSelectedSongStepIndex() const noexcept;
 
         TransportStateView getTransportStateView() const;
+
+        SongStateView getSongStateView(SongIndex) const;
 
     private:
         const std::shared_ptr<const SequencerState> state;

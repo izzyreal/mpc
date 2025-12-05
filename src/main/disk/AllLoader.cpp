@@ -23,7 +23,6 @@
 #include "sequencer/Transport.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -284,10 +283,10 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 
             for (int stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
             {
-                mpcSong->insertStep(SongStepIndex(stepIndex));
-                auto step = mpcSong->getStep(SongStepIndex(stepIndex)).lock();
-                step->setSequence(SequenceIndex(steps[stepIndex].first));
-                step->setRepeats(steps[stepIndex].second);
+                const auto idx = SongStepIndex(stepIndex);
+                mpcSong->insertStep(idx);
+                mpcSong->setStepSequenceIndex(idx, SequenceIndex(steps[stepIndex].first));
+                mpcSong->setStepRepetitionCount(idx, steps[stepIndex].second);
             }
 
             mpcSong->setFirstLoopStepIndex(

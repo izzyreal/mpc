@@ -4,6 +4,7 @@
 
 #include "sequencer/TransportMessage.hpp"
 #include "sequencer/SequenceMessage.hpp"
+#include "sequencer/SongMessage.hpp"
 
 #include <variant>
 
@@ -58,7 +59,7 @@ namespace mpc::sequencer
     };
 
     using SequencerMessage =
-        std::variant<TransportMessage, SequenceMessage, CopyEvents,
+        std::variant<TransportMessage, SequenceMessage, SongMessage, CopyEvents,
                      SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars,
                      SetSelectedSongIndex, SetSelectedSongStepIndex>;
 } // namespace mpc::sequencer

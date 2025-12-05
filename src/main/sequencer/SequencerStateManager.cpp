@@ -1,6 +1,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include "SequenceStateHandler.hpp"
+#include "SongStateHandler.hpp"
 #include "Track.hpp"
 #include "TrackStateHandler.hpp"
 #include "TrackStateView.hpp"
@@ -24,6 +25,8 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
         std::make_unique<SequenceStateHandler>(this, sequencer);
 
     trackStateHandler = std::make_unique<TrackStateHandler>(this, sequencer);
+
+    songStateHandler = std::make_unique<SongStateHandler>();
 }
 
 SequencerStateManager::~SequencerStateManager() {}
@@ -63,6 +66,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         [&](const TrackMessage &m)
         {
             trackStateHandler->applyMessage(activeState, actions, m);
+        },
+        [&](const SongMessage &m)
+        {
+            songStateHandler->applyMessage(activeState, actions, m);
         },
         [&](const SwitchToNextSequence &m)
         {

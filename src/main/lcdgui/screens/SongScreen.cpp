@@ -4,7 +4,6 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/Step.hpp"
 #include "sequencer/Song.hpp"
 
 #include "Util.hpp"
@@ -110,6 +109,32 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
                             displayNow0();
                             displayNow1();
                             displayNow2();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            const auto lockedSequencer = sequencer.lock();
+                            const auto song =
+                                lockedSequencer->getSelectedSong();
+                            const auto step = song->getStep(
+                                lockedSequencer->getSelectedSongStepIndex());
+                            return step.repetitionCount;
+                        },
+                        [&](auto)
+                        {
+                            displaySteps();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            const auto lockedSequencer = sequencer.lock();
+                            const auto song =
+                                lockedSequencer->getSelectedSong();
+                            return song->isLoopEnabled();
+                        },
+                        [&](auto)
+                        {
+                            displayLoop();
                         }});
 }
 
@@ -298,9 +323,17 @@ void SongScreen::turnWheel(const int increment)
             return;
         }
 
-        const auto selectedStep = song->getStep(selectedStepIndex).lock();
-        selectedStep->setSequence(selectedStep->getSequenceIndex() + increment);
-        lockedSequencer->setSelectedSongStepIndex(selectedStepIndex);
+        const auto selectedStep = song->getStep(selectedStepIndex);
+
+        const auto onComplete = utils::SimpleAction(
+            [s = lockedSequencer, selectedStepIndex]
+            {
+                s->setSelectedSongStepIndex(selectedStepIndex);
+            });
+
+        song->setStepSequenceIndex(selectedStepIndex,
+                                   selectedStep.sequenceIndex + increment,
+                                   onComplete);
     }
     else if (focusedFieldName.find("reps") != std::string::npos)
     {
@@ -309,9 +342,9 @@ void SongScreen::turnWheel(const int increment)
             return;
         }
 
-        const auto selectedStep = song->getStep(selectedStepIndex).lock();
-        selectedStep->setRepeats(selectedStep->getRepeats() + increment);
-        displaySteps();
+        const auto selectedStep = song->getStep(selectedStepIndex);
+        song->setStepRepetitionCount(selectedStepIndex,
+                                     selectedStep.repetitionCount + increment);
     }
     else if (focusedFieldName == "song")
     {
@@ -334,7 +367,6 @@ void SongScreen::turnWheel(const int increment)
     else if (focusedFieldName == "loop")
     {
         song->setLoopEnabled(increment > 0);
-        displayLoop();
     }
     else if (focusedFieldName == "step1")
     {
@@ -438,46 +470,45 @@ void SongScreen::displaySteps() const
     const auto repsArray =
         std::vector{findField("reps0"), findField("reps1"), findField("reps2")};
 
-    for (int i = 0; i < 3; i++)
+    for (int visibleStepIndex = 0; visibleStepIndex < 3; ++visibleStepIndex)
     {
-        const int stepIndex = (i + selectedStepIndex) - 1;
+        const int stepIndex = visibleStepIndex + selectedStepIndex - 1;
 
         if (stepIndex < 0 || stepIndex >= songStepCount)
         {
-            stepArray[i]->setText("");
-            repsArray[i]->setText("");
+            stepArray[visibleStepIndex]->setText("");
+            repsArray[visibleStepIndex]->setText("");
 
             if (stepIndex == songStepCount)
             {
-                sequenceArray[i]->setText("   (end of song)");
+                sequenceArray[visibleStepIndex]->setText("   (end of song)");
                 continue;
             }
 
-            sequenceArray[i]->setText("");
+            sequenceArray[visibleStepIndex]->setText("");
             continue;
         }
 
-        stepArray[i]->setText(std::to_string(stepIndex + 1));
+        stepArray[visibleStepIndex]->setText(std::to_string(stepIndex + 1));
 
-        const auto step = song->getStep(SongStepIndex(stepIndex)).lock();
+        const auto step = song->getStep(SongStepIndex(stepIndex));
 
         auto seqname =
-            lockedSequencer->getSequence(step->getSequenceIndex())->getName();
+            lockedSequencer->getSequence(step.sequenceIndex)->getName();
 
-        sequenceArray[i]->setText(
-            StrUtil::padLeft(std::to_string(step->getSequenceIndex() + 1), "0",
-                             2) +
+        sequenceArray[visibleStepIndex]->setText(
+            StrUtil::padLeft(std::to_string(step.sequenceIndex + 1), "0", 2) +
             "-" + seqname);
 
-        int repeatCount = step->getRepeats();
+        int8_t repetitionCount = step.repetitionCount;
 
-        if (i == 1 && lockedSequencer->getTransport()->isPlaying())
+        if (visibleStepIndex == 1 && lockedSequencer->getTransport()->isPlaying())
         {
-            repeatCount -=
+            repetitionCount -=
                 lockedSequencer->getTransport()->getPlayedStepRepetitions();
         }
 
-        repsArray[i]->setText(std::to_string(repeatCount));
+        repsArray[visibleStepIndex]->setText(std::to_string(repetitionCount));
     }
 }
 
@@ -506,15 +537,15 @@ void SongScreen::displayNow0() const
             break;
         }
 
-        const auto step = song->getStep(SongStepIndex(i)).lock();
-        const auto seq = lockedSequencer->getSequence(step->getSequenceIndex());
+        const auto step = song->getStep(SongStepIndex(i));
+        const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
 
         if (!seq->isUsed())
         {
             continue;
         }
 
-        const auto bars = (seq->getLastBarIndex() + 1) * step->getRepeats();
+        const auto bars = (seq->getLastBarIndex() + 1) * step.repetitionCount;
 
         pastBars += bars;
     }
@@ -524,7 +555,8 @@ void SongScreen::displayNow0() const
     {
         pastBars += transport->getPlayedStepRepetitions() *
                     (lockedSequencer->getSequence(songSequenceIndex)
-                         ->getLastBarIndex() + 1);
+                         ->getLastBarIndex() +
+                     1);
     }
 
     findField("now0")->setTextPadded(

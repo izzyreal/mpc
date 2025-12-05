@@ -15,6 +15,7 @@ namespace mpc::sequencer
     class TransportStateHandler;
     class SequenceStateHandler;
     class TrackStateHandler;
+    class SongStateHandler;
 
     struct TrackLock
     {
@@ -80,6 +81,7 @@ namespace mpc::sequencer
         std::unique_ptr<TransportStateHandler> transportStateHandler;
         std::unique_ptr<SequenceStateHandler> sequenceStateHandler;
         std::unique_ptr<TrackStateHandler> trackStateHandler;
+        std::unique_ptr<SongStateHandler> songStateHandler;
 
         void applyCopyEvents(const CopyEvents &) noexcept;
 

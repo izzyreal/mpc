@@ -7,7 +7,6 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/Step.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
@@ -137,19 +136,19 @@ int SeqUtil::loopFrameLength(const Sequence *seq, const int sr)
                                                 seq->getLoopEndTick(), sr));
 }
 
-int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
+int SeqUtil::songFrameLength(const Song *song, Sequencer *sequencer,
+                             const int sr)
 {
     double result = 0;
     const auto steps = song->getStepCount();
 
     for (int i = 0; i < steps; i++)
     {
-        const auto step = song->getStep(SongStepIndex(i)).lock();
+        const auto step = song->getStep(SongStepIndex(i));
 
-        for (int j = 0; j < step->getRepeats(); j++)
+        for (int j = 0; j < step.repetitionCount; j++)
         {
-            const auto seq =
-                sequencer->getSequence(step->getSequenceIndex()).get();
+            const auto seq = sequencer->getSequence(step.sequenceIndex).get();
             result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
         }
     }

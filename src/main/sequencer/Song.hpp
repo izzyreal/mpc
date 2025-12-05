@@ -1,42 +1,51 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "SongState.hpp"
+
+#include "sequencer/SongMessage.hpp"
 
 #include <vector>
-#include <memory>
 #include <string>
+#include <functional>
 
 namespace mpc::sequencer
 {
     class Step;
-}
-
-namespace mpc::sequencer
-{
-    class Song
+    class SongStateView;
+    class Song final
     {
-        std::string name;
-        std::vector<std::shared_ptr<Step>> steps;
-        bool loopEnabled = false;
-        SongStepIndex firstLoopStepIndex{MinSongStepIndex};
-        SongStepIndex lastLoopStepIndex{MinSongStepIndex};
-        bool used = false;
-
     public:
-        void setLoopEnabled(bool b);
+        explicit Song(SongIndex,
+                      const std::function<SongStateView()> &getSnapshot,
+                      const std::function<void(SongMessage &&)> &dispatch);
+
+        void setLoopEnabled(bool b) const;
         bool isLoopEnabled() const;
-        void setFirstLoopStepIndex(SongStepIndex);
+        void setFirstLoopStepIndex(SongStepIndex) const;
         SongStepIndex getFirstLoopStepIndex() const;
-        void setLastLoopStepIndex(SongStepIndex);
+        void setLastLoopStepIndex(SongStepIndex) const;
         SongStepIndex getLastLoopStepIndex() const;
         void setName(const std::string &nameToUse);
         std::string getName();
-        void deleteStep(SongStepIndex);
-        void insertStep(SongStepIndex);
+        void deleteStep(SongStepIndex) const;
+        void insertStep(SongStepIndex) const;
 
-        std::weak_ptr<Step> getStep(SongStepIndex);
-        int getStepCount() const;
+        void setStepSequenceIndex(SongStepIndex, SequenceIndex,
+                                  const utils::SimpleAction &onComplete =
+                                      utils::SimpleAction([] {})) const;
+
+        void setStepRepetitionCount(SongStepIndex, int8_t reptitionCount) const;
+
+        SongStepState getStep(SongStepIndex) const;
+        uint8_t getStepCount() const;
         bool isUsed() const;
         void setUsed(bool b);
+
+    private:
+        const SongIndex songIndex;
+        std::string name;
+        const std::function<SongStateView()> getSnapshot;
+        const std::function<void(SongMessage &&)> dispatch;
     };
 } // namespace mpc::sequencer

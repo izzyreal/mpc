@@ -1,7 +1,6 @@
 #include "file/all/AllSong.hpp"
 
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 
 #include "Util.hpp"
 
@@ -80,13 +79,13 @@ Song::Song(sequencer::Song *mpcSong)
             continue;
         }
 
-        const auto step = mpcSong->getStep(SongStepIndex(i)).lock();
+        const auto step = mpcSong->getStep(SongStepIndex(i));
 
         saveBytes[FIRST_STEP_OFFSET + i * 2] =
-            static_cast<char>(step->getSequenceIndex());
+            static_cast<char>(step.sequenceIndex);
 
         saveBytes[FIRST_STEP_OFFSET + i * 2 + 1] =
-            static_cast<char>(step->getRepeats());
+            static_cast<char>(step.repetitionCount);
     }
 
     saveBytes[STEPS_TERMINATOR_OFFSET] = static_cast<char>(0xFF);

@@ -8,7 +8,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -167,8 +166,8 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
     for (int stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
     {
-        const auto step = song->getStep(SongStepIndex(stepIndex)).lock();
-        const auto sourceSequenceIndex = step->getSequenceIndex();
+        const auto step = song->getStep(SongStepIndex(stepIndex));
+        const auto sourceSequenceIndex = step.sequenceIndex;
         const auto sourceSequence =
             lockedSequencer->getSequence(sourceSequenceIndex);
         const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
@@ -187,13 +186,14 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
         const auto sourceSequencelastBarIndex =
             sourceSequence->getLastBarIndex();
-        const auto repeatCount = step->getRepeats();
+
+        const auto repetitionCount = step.repetitionCount;
 
         if (trackStatus == 0 || trackStatus == 1)
         {
             SeqUtil::copyBars(
                 mpc, sourceSequenceIndex, toSequenceIndex, 0,
-                sourceSequencelastBarIndex, repeatCount,
+                sourceSequencelastBarIndex, repetitionCount,
                 destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
 
             if (trackStatus == 1)
@@ -201,7 +201,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                 const auto firstBarIndexToRemove =
                     destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
                 const auto addedBarCount =
-                    sourceSequence->getBarCount() * repeatCount;
+                    sourceSequence->getBarCount() * repetitionCount;
                 const auto firstBarIndexToKeep =
                     firstBarIndexToRemove + addedBarCount;
 
@@ -214,14 +214,14 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
             { // Append bars with correct time signatures to destination
               // sequence
                 const auto barCountToAdd =
-                    sourceSequence->getBarCount() * repeatCount;
+                    sourceSequence->getBarCount() * repetitionCount;
                 destinationSequence->setLastBarIndex(
                     destinationSequenceLastBarIndexBeforeProcessingCurrentStep +
                     barCountToAdd);
                 auto destinationBarIndex =
                     destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
 
-                for (int repetition = 0; repetition < repeatCount; repetition++)
+                for (int repetition = 0; repetition < repetitionCount; repetition++)
                 {
                     for (int barCounter = 0;
                          barCounter < sourceSequence->getBarCount();
@@ -302,11 +302,11 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
     if (trackStatus == 0 || trackStatus == 1)
     {
-        const auto referenceStep = song->getStep(MinSongStepIndex).lock();
+        const auto referenceStep = song->getStep(MinSongStepIndex);
         const auto referenceSequence =
-            lockedSequencer->getSequence(referenceStep->getSequenceIndex());
+            lockedSequencer->getSequence(referenceStep.sequenceIndex);
 
-        for (int trackIndex = 0; trackIndex < 64; trackIndex++)
+        for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT; trackIndex++)
         {
             auto referenceTrack = referenceSequence->getTrack(trackIndex);
             auto destTrack = destinationSequence->getTrack(trackIndex);

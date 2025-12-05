@@ -8,7 +8,6 @@
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 
 #include "sampler/Sampler.hpp"
 
@@ -136,15 +135,25 @@ void Sequencer::init()
 
     purgeAllSequences();
 
+    const auto dispatch = [manager = stateManager](SongMessage &&m)
+    {
+        manager->enqueue(m);
+    };
+
     for (int i = 0; i < 20; i++)
     {
-        songs[i] = std::make_shared<Song>();
+        const auto getSnapshot = [manager = stateManager, idx = SongIndex(i)]
+        {
+            return manager->getSnapshot().getSongStateView(idx);
+        };
+
+        songs[i] = std::make_shared<Song>(SongIndex(i), getSnapshot, dispatch);
     }
 }
 
-void Sequencer::deleteSong(const int i)
+void Sequencer::deleteSong(const int i) const
 {
-    songs[i] = std::make_shared<Song>();
+    stateManager->enqueue(DeleteSong{SongIndex(i)});
 }
 
 SequenceIndex Sequencer::getSelectedSequenceIndex() const
@@ -217,7 +226,7 @@ void Sequencer::playTick(const Tick tick) const
             if (!secondSequenceEnabled.load() ||
                 secondSequenceScreen->sq ==
                     seqIndex) // Real 2KXL would play all events twice (i.e.
-                        // double as loud as normal) for the last clause
+                              // double as loud as normal) for the last clause
             {
                 break;
             }
@@ -530,7 +539,7 @@ void Sequencer::copyTrack(const int sourceTrackIndex,
     copyTrack(src, dest);
 }
 
-void Sequencer::copySong(const int source, const int dest)
+void Sequencer::copySong(const int source, const int dest) const
 {
     if (source == dest)
     {
@@ -552,11 +561,12 @@ void Sequencer::copySong(const int source, const int dest)
 
     for (int stepIndex = 0; stepIndex < s0->getStepCount(); ++stepIndex)
     {
-        const auto sourceStep = s0->getStep(SongStepIndex(stepIndex)).lock();
+        const auto sourceStep = s0->getStep(SongStepIndex(stepIndex));
         s1->insertStep(SongStepIndex(stepIndex));
-        const auto destStep = s1->getStep(SongStepIndex(stepIndex)).lock();
-        destStep->setRepeats(sourceStep->getRepeats());
-        destStep->setSequence(sourceStep->getSequenceIndex());
+        s1->setStepRepetitionCount(SongStepIndex(stepIndex),
+                                   sourceStep.repetitionCount);
+        s1->setStepSequenceIndex(SongStepIndex(stepIndex),
+                                 sourceStep.sequenceIndex);
     }
 
     s1->setFirstLoopStepIndex(s0->getFirstLoopStepIndex());
@@ -860,9 +870,7 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
         }
 
         const auto currentStep = getSelectedSongStepIndex();
-        const auto songSeqIndex =
-            song->getStep(currentStep).lock()->getSequenceIndex();
-        return songSeqIndex;
+        return song->getStep(currentStep).sequenceIndex;
     }
 
     return getSelectedSequenceIndex();
@@ -972,7 +980,7 @@ SequenceIndex Sequencer::getSongSequenceIndex() const
     }
 
     const auto song = songs[getSelectedSongIndex()];
-    return song->getStep(getSelectedSongStepIndex()).lock()->getSequenceIndex();
+    return song->getStep(getSelectedSongStepIndex()).sequenceIndex;
 }
 
 bool Sequencer::isSecondSequenceEnabled() const
@@ -1028,7 +1036,7 @@ void Sequencer::setSelectedSongIndex(const SongIndex songIndex) const
     const auto sequenceOfFirstStep =
         song->getStepCount() == 0
             ? NoSequenceIndex
-            : song->getStep(MinSongStepIndex).lock()->getSequenceIndex();
+            : song->getStep(MinSongStepIndex).sequenceIndex;
 
     stateManager->enqueue(SetSelectedSongIndex{songIndex, sequenceOfFirstStep});
 }
@@ -1058,7 +1066,7 @@ void Sequencer::setSelectedSongStepIndex(
     const auto sequenceIndex =
         stepIndexToUse > lastStepIndex
             ? NoSequenceIndex
-            : song->getStep(stepIndexToUse).lock()->getSequenceIndex();
+            : song->getStep(stepIndexToUse).sequenceIndex;
 
     stateManager->enqueue(
         SetSelectedSongStepIndex{stepIndexToUse, sequenceIndex});

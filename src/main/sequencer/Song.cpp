@@ -1,55 +1,54 @@
 #include "sequencer/Song.hpp"
 
-#include "sequencer/Step.hpp"
+#include "SongStateView.hpp"
 
 #include <algorithm>
 
 using namespace mpc::sequencer;
 
-void Song::setLoopEnabled(const bool b)
+Song::Song(const SongIndex songIndex,
+           const std::function<SongStateView()> &getSnapshot,
+           const std::function<void(SongMessage &&)> &dispatch)
+    : songIndex(songIndex), getSnapshot(getSnapshot), dispatch(dispatch)
 {
-    loopEnabled = b;
+}
+
+void Song::setLoopEnabled(const bool b) const
+{
+    dispatch(SetSongLoopEnabled{songIndex, b});
 }
 
 bool Song::isLoopEnabled() const
 {
-    return loopEnabled;
+    return getSnapshot().isLoopEnabled();
 }
 
-void Song::setFirstLoopStepIndex(const SongStepIndex i)
+void Song::setFirstLoopStepIndex(const SongStepIndex i) const
 {
     const auto max =
         std::max(MinSongStepIndex, SongStepIndex(getStepCount() - 1));
 
-    firstLoopStepIndex = std::clamp(i, MinSongStepIndex, max);
-
-    if (firstLoopStepIndex > lastLoopStepIndex)
-    {
-        setLastLoopStepIndex(firstLoopStepIndex);
-    }
+    dispatch(SetSongFirstLoopStepIndex{songIndex,
+                                       std::clamp(i, MinSongStepIndex, max)});
 }
 
 mpc::SongStepIndex Song::getFirstLoopStepIndex() const
 {
-    return firstLoopStepIndex;
+    return getSnapshot().getFirstLoopStepIndex();
 }
 
-void Song::setLastLoopStepIndex(const SongStepIndex i)
+void Song::setLastLoopStepIndex(const SongStepIndex i) const
 {
     const auto max =
         std::max(MinSongStepIndex, SongStepIndex(getStepCount() - 1));
 
-    lastLoopStepIndex = std::clamp(i, MinSongStepIndex, max);
-
-    if (lastLoopStepIndex < firstLoopStepIndex)
-    {
-        setFirstLoopStepIndex(lastLoopStepIndex);
-    }
+    dispatch(SetSongLastLoopStepIndex{songIndex,
+                                      std::clamp(i, MinSongStepIndex, max)});
 }
 
 mpc::SongStepIndex Song::getLastLoopStepIndex() const
 {
-    return lastLoopStepIndex;
+    return getSnapshot().getLastLoopStepIndex();
 }
 
 void Song::setName(const std::string &nameToUse)
@@ -59,7 +58,7 @@ void Song::setName(const std::string &nameToUse)
 
 std::string Song::getName()
 {
-    if (!used)
+    if (!getSnapshot().isUsed())
     {
         return "(Unused)";
     }
@@ -67,48 +66,60 @@ std::string Song::getName()
     return name;
 }
 
-void Song::deleteStep(const SongStepIndex stepIndex)
+void Song::deleteStep(const SongStepIndex stepIndex) const
 {
     if (stepIndex >= getStepCount())
     {
         return;
     }
 
-    steps.erase(steps.begin() + stepIndex);
-
-    if (lastLoopStepIndex >= getStepCount())
-    {
-        setLastLoopStepIndex(SongStepIndex(getStepCount() - 1));
-    }
+    dispatch(DeleteSongStep{songIndex, stepIndex});
 }
 
-void Song::insertStep(const SongStepIndex stepIndex)
+void Song::insertStep(const SongStepIndex stepIndex) const
 {
-    steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
+    dispatch(InsertSongStep{songIndex, stepIndex});
 }
 
-std::weak_ptr<Step> Song::getStep(const SongStepIndex i)
+void Song::setStepSequenceIndex(const SongStepIndex stepIndex,
+                                const SequenceIndex sequenceIndex,
+                                const utils::SimpleAction &onComplete) const
 {
-    return steps[i];
+    dispatch(SetSongStepSequenceIndex{songIndex, stepIndex, sequenceIndex,
+                                      onComplete});
 }
 
-int Song::getStepCount() const
+void Song::setStepRepetitionCount(const SongStepIndex stepIndex,
+                                  const int8_t reptitionCount) const
 {
-    return steps.size();
+    dispatch(SetSongStepRepetitionCount{
+        songIndex, stepIndex,
+        std::clamp(reptitionCount, int8_t{0},
+                   Mpc2000XlSpecs::MAX_SONG_STEP_REPETITION_COUNT)});
+}
+
+SongStepState Song::getStep(const SongStepIndex i) const
+{
+    return getSnapshot().getStep(i);
+}
+
+uint8_t Song::getStepCount() const
+{
+    return getSnapshot().getStepCount();
 }
 
 bool Song::isUsed() const
 {
-    return used;
+    return getSnapshot().isUsed();
 }
 
 void Song::setUsed(const bool b)
 {
-    used = b;
+    dispatch(SetSongUsed{songIndex, b});
 
-    if (!used)
+    if (!b)
     {
-        name = "";
-        steps.clear();
+        name.clear();
+        dispatch(DeleteSong{songIndex});
     }
 }

@@ -11,7 +11,6 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -231,7 +230,7 @@ bool SequencerPlaybackEngine::processSongMode() const
 
     const auto doneRepeating =
         sequencer->getTransport()->getPlayedStepRepetitions() >=
-        song->getStep(stepIndex).lock()->getRepeats();
+        song->getStep(stepIndex).repetitionCount;
 
     const auto reachedLastStep = stepIndex == song->getStepCount() - 1;
 
@@ -243,8 +242,8 @@ bool SequencerPlaybackEngine::processSongMode() const
         sequencer->getStateManager()->drainQueue();
 
         if (const auto newStep =
-                song->getStep(song->getFirstLoopStepIndex()).lock();
-            !sequencer->getSequence(newStep->getSequenceIndex())->isUsed())
+                song->getStep(song->getFirstLoopStepIndex());
+            !sequencer->getSequence(newStep.sequenceIndex)->isUsed())
         {
             stopSequencer();
             return true;
@@ -265,9 +264,9 @@ bool SequencerPlaybackEngine::processSongMode() const
             sequencer->getTransport()->resetPlayedStepRepetitions();
             sequencer->setSelectedSongStepIndex(stepIndex + 1);
 
-            const auto newStep = song->getStep(stepIndex + 1).lock();
+            const auto newStep = song->getStep(stepIndex + 1);
 
-            if (!sequencer->getSequence(newStep->getSequenceIndex())->isUsed())
+            if (!sequencer->getSequence(newStep.sequenceIndex)->isUsed())
             {
                 stopSequencer();
                 return true;

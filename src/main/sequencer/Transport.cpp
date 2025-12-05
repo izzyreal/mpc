@@ -12,7 +12,6 @@
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 
 #include <algorithm>
@@ -53,8 +52,8 @@ bool Transport::isPlayPossible(const bool fromStart) const
         const SongStepIndex stepIndex =
             fromStart ? MinSongStepIndex : sequencer.getSelectedSongStepIndex();
 
-        if (const auto step = song->getStep(stepIndex).lock();
-            !sequencer.getSequence(step->getSequenceIndex())->isUsed())
+        if (const auto step = song->getStep(stepIndex);
+            !sequencer.getSequence(step.sequenceIndex)->isUsed())
         {
             return false;
         }
@@ -261,13 +260,13 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
 
         const auto step = song->getStep(SongStepIndex(stepIndex));
 
-        if (const auto sequence =
-                sequencer.getSequence(step.lock()->getSequenceIndex());
+        if (const auto sequence = sequencer.getSequence(step.sequenceIndex);
             sequence->isUsed())
         {
-            stepEndTick = stepStartTick +
-                          sequence->getLastTick() * step.lock()->getRepeats();
+            stepEndTick =
+                stepStartTick + sequence->getLastTick() * step.repetitionCount;
         }
+
         songEndTick = stepEndTick;
     }
 
@@ -291,13 +290,12 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
         stepStartTick = stepEndTick;
 
         const auto step = song->getStep(SongStepIndex(stepIndex));
-        const auto sequence =
-            sequencer.getSequence(step.lock()->getSequenceIndex());
+        const auto sequence = sequencer.getSequence(step.sequenceIndex);
 
         if (sequence->isUsed())
         {
-            stepEndTick = stepStartTick +
-                          sequence->getLastTick() * step.lock()->getRepeats();
+            stepEndTick =
+                stepStartTick + sequence->getLastTick() * step.repetitionCount;
         }
 
         const auto stepStartPositionQuarterNotes =
@@ -336,14 +334,14 @@ void Transport::moveSongToStepThatContainsPosition(
     {
         stepStartTick = stepEndTick;
 
-        const auto step = song->getStep(SongStepIndex(stepIndex)).lock();
+        const auto step = song->getStep(SongStepIndex(stepIndex));
 
         if (const auto sequence =
-                sequencer.getSequence(step->getSequenceIndex());
+                sequencer.getSequence(step.sequenceIndex);
             sequence->isUsed())
         {
             stepEndTick =
-                stepStartTick + sequence->getLastTick() * step->getRepeats();
+                stepStartTick + sequence->getLastTick() * step.repetitionCount;
         }
 
         const auto stepStartPositionQuarterNotes =

@@ -189,7 +189,7 @@ namespace mpc::sequencer
         void purgeSequence(int i);
         void copySequence(int source, int destination);
         void copySequenceParameters(int source, int dest) const;
-        void copySong(int source, int dest);
+        void copySong(int source, int dest) const;
 
         void copyTrack(int sourceTrackIndex, int destinationTrackIndex,
                        int sourceSequenceIndex,
@@ -219,7 +219,7 @@ namespace mpc::sequencer
         void setNextSqPad(SequenceIndex);
         std::shared_ptr<Song> getSong(int i);
         std::shared_ptr<Song> getSelectedSong() const;
-        void deleteSong(int i);
+        void deleteSong(int i) const;
         bool isSongModeEnabled() const;
         SequenceIndex getSongSequenceIndex() const;
         bool isSecondSequenceEnabled() const;

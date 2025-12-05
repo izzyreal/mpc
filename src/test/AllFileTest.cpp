@@ -6,7 +6,6 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
@@ -86,14 +85,10 @@ TEST_CASE("ALL file song", "[allfile]")
     song->setName("TestSong");
     song->insertStep(mpc::SongStepIndex(0));
     song->insertStep(mpc::SongStepIndex(1));
-    song->getStep(mpc::SongStepIndex(0))
-        .lock()
-        ->setSequence(mpc::SequenceIndex(0));
-    song->getStep(mpc::SongStepIndex(0)).lock()->setRepeats(1);
-    song->getStep(mpc::SongStepIndex(1))
-        .lock()
-        ->setSequence(mpc::SequenceIndex(1));
-    song->getStep(mpc::SongStepIndex(1)).lock()->setRepeats(2);
+    song->setStepSequenceIndex(mpc::SongStepIndex(0), mpc::SequenceIndex(0));
+    song->setStepRepetitionCount(mpc::SongStepIndex(0), 1);
+    song->setStepSequenceIndex(mpc::SongStepIndex(1), mpc::SequenceIndex(1));
+    song->setStepRepetitionCount(mpc::SongStepIndex(1), 2);
 
     auto disk = mpc.getDisk();
 
@@ -104,10 +99,10 @@ TEST_CASE("ALL file song", "[allfile]")
     song = sequencer->getSong(0);
     REQUIRE(song->getName() == "TestSong");
     REQUIRE(song->getStepCount() == 2);
-    REQUIRE(song->getStep(mpc::SongStepIndex(0)).lock()->getSequenceIndex() == 0);
-    REQUIRE(song->getStep(mpc::SongStepIndex(0)).lock()->getRepeats() == 1);
-    REQUIRE(song->getStep(mpc::SongStepIndex(1)).lock()->getSequenceIndex() == 1);
-    REQUIRE(song->getStep(mpc::SongStepIndex(1)).lock()->getRepeats() == 2);
+    REQUIRE(song->getStep(mpc::SongStepIndex(0)).sequenceIndex == 0);
+    REQUIRE(song->getStep(mpc::SongStepIndex(0)).repetitionCount == 1);
+    REQUIRE(song->getStep(mpc::SongStepIndex(1)).sequenceIndex == 1);
+    REQUIRE(song->getStep(mpc::SongStepIndex(1)).repetitionCount == 2);
 }
 
 TEST_CASE("ALL file track is on and used", "[allfile]")
