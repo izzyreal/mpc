@@ -16,7 +16,6 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
@@ -227,23 +226,25 @@ bool SequencerPlaybackEngine::processSongMode() const
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->getTransport()->incrementPlayedStepRepetitions();
     sequencer->getStateManager()->drainQueue();
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
-    const auto step = songScreen->getOffset() + 1;
+    const auto song = sequencer->getSelectedSong();
+    const auto stepIndex = sequencer->getSelectedSongStepIndex();
 
     const auto doneRepeating =
         sequencer->getTransport()->getPlayedStepRepetitions() >=
-        song->getStep(step).lock()->getRepeats();
-    const auto reachedLastStep = step == song->getStepCount() - 1;
+        song->getStep(stepIndex).lock()->getRepeats();
 
-    if (doneRepeating && song->isLoopEnabled() && step == song->getLastStep())
+    const auto reachedLastStep = stepIndex == song->getStepCount() - 1;
+
+    if (doneRepeating && song->isLoopEnabled() &&
+        stepIndex == song->getLastLoopStepIndex())
     {
         sequencer->getTransport()->resetPlayedStepRepetitions();
-        songScreen->setOffset(song->getFirstStep() - 1);
+        sequencer->setSelectedSongStepIndex(song->getFirstLoopStepIndex());
+        sequencer->getStateManager()->drainQueue();
 
         if (const auto newStep =
-                song->getStep(songScreen->getOffset() + 1).lock();
-            !sequencer->getSequence(newStep->getSequence())->isUsed())
+                song->getStep(song->getFirstLoopStepIndex()).lock();
+            !sequencer->getSequence(newStep->getSequenceIndex())->isUsed())
         {
             stopSequencer();
             return true;
@@ -262,12 +263,11 @@ bool SequencerPlaybackEngine::processSongMode() const
         if (doneRepeating)
         {
             sequencer->getTransport()->resetPlayedStepRepetitions();
-            songScreen->setOffset(songScreen->getOffset() + 1);
+            sequencer->setSelectedSongStepIndex(stepIndex + 1);
 
-            const auto newStep =
-                song->getStep(songScreen->getOffset() + 1).lock();
+            const auto newStep = song->getStep(stepIndex + 1).lock();
 
-            if (!sequencer->getSequence(newStep->getSequence())->isUsed())
+            if (!sequencer->getSequence(newStep->getSequenceIndex())->isUsed())
             {
                 stopSequencer();
                 return true;
@@ -490,7 +490,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         engineHost->flushNoteOffs();
         sequencer->getTransport()->setPosition(wrappedPosition);
-        seq->syncTrackEventIndices(Sequencer::quarterNotesToTicks(wrappedPosition));
+        seq->syncTrackEventIndices(
+            Sequencer::quarterNotesToTicks(wrappedPosition));
         manager->drainQueue();
     }
 

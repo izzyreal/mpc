@@ -45,5 +45,8 @@ namespace mpc
 
         static constexpr int8_t TOTAL_SEQUENCE_COUNT =
             SEQUENCE_COUNT + META_SEQUENCE_COUNT;
+
+        static constexpr int8_t MAX_SONG_COUNT = 20;
+        static constexpr uint8_t MAX_SONG_STEP_COUNT = 250;
     };
 } // namespace mpc

@@ -4,12 +4,12 @@ using namespace mpc::sequencer;
 
 void Step::setSequence(const SequenceIndex i)
 {
-    sequence = std::clamp(i, MinSequenceIndex, MaxSequenceIndex);
+    sequenceIndex = std::clamp(i, MinSequenceIndex, MaxSequenceIndex);
 }
 
-mpc::SequenceIndex Step::getSequence() const
+mpc::SequenceIndex Step::getSequenceIndex() const
 {
-    return sequence;
+    return sequenceIndex;
 }
 
 void Step::setRepeats(const int i)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 #include <memory>
 #include <string>
@@ -13,27 +15,26 @@ namespace mpc::sequencer
 {
     class Song
     {
-
         std::string name;
         std::vector<std::shared_ptr<Step>> steps;
         bool loopEnabled = false;
-        int firstStep = 0;
-        int lastStep = 0;
+        SongStepIndex firstLoopStepIndex{MinSongStepIndex};
+        SongStepIndex lastLoopStepIndex{MinSongStepIndex};
         bool used = false;
 
     public:
         void setLoopEnabled(bool b);
         bool isLoopEnabled() const;
-        void setFirstStep(int i);
-        int getFirstStep() const;
-        void setLastStep(int i);
-        int getLastStep() const;
-        void setName(const std::string &string);
+        void setFirstLoopStepIndex(SongStepIndex);
+        SongStepIndex getFirstLoopStepIndex() const;
+        void setLastLoopStepIndex(SongStepIndex);
+        SongStepIndex getLastLoopStepIndex() const;
+        void setName(const std::string &nameToUse);
         std::string getName();
-        void deleteStep(int stepIndex);
-        void insertStep(int stepIndex);
+        void deleteStep(SongStepIndex);
+        void insertStep(SongStepIndex);
 
-        std::weak_ptr<Step> getStep(int i);
+        std::weak_ptr<Step> getStep(SongStepIndex);
         int getStepCount() const;
         bool isUsed() const;
         void setUsed(bool b);

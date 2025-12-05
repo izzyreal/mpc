@@ -13,8 +13,6 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/Label.hpp"
 
-#include "lcdgui/screens/SongScreen.hpp"
-
 using namespace mpc;
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;

@@ -33,6 +33,16 @@ mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept
     return state->selectedSequenceIndex;
 }
 
+mpc::SongIndex SequencerStateView::getSelectedSongIndex() const noexcept
+{
+    return state->selectedSongIndex;
+}
+
+mpc::SongStepIndex SequencerStateView::getSelectedSongStepIndex() const noexcept
+{
+    return state->selectedSongStepIndex;
+}
+
 TransportStateView SequencerStateView::getTransportStateView() const
 {
     return TransportStateView(state->transport);

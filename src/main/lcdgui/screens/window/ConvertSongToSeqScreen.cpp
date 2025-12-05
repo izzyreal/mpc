@@ -2,7 +2,6 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -19,16 +18,25 @@ using namespace mpc::sequencer;
 ConvertSongToSeqScreen::ConvertSongToSeqScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "convert-song-to-seq", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSongIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayFromSong();
+                        }});
 }
 
 void ConvertSongToSeqScreen::open()
 {
-    for (uint8_t i = 0; i < 99; i++)
-    {
-        toSequenceIndex = i;
+    const auto lockedSequencer = sequencer.lock();
 
-        if (!sequencer.lock()->getSequence(i)->isUsed())
+    for (uint8_t idx = 0; idx < Mpc2000XlSpecs::SEQUENCE_COUNT; ++idx)
+    {
+        if (!lockedSequencer->getSequence(idx)->isUsed())
         {
+            toSequenceIndex = SequenceIndex(idx);
             break;
         }
     }
@@ -58,8 +66,9 @@ void ConvertSongToSeqScreen::turnWheel(const int i)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "fromsong")
     {
-        const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-        setFromSong(songScreen->getSelectedSongIndex() + i);
+        const auto lockedSequencer = sequencer.lock();
+        lockedSequencer->setSelectedSongIndex(
+            lockedSequencer->getSelectedSongIndex() + i);
     }
     else if (focusedFieldName == "tosequence")
     {
@@ -71,18 +80,12 @@ void ConvertSongToSeqScreen::turnWheel(const int i)
     }
 }
 
-void ConvertSongToSeqScreen::setFromSong(const int8_t newValue) const
+void ConvertSongToSeqScreen::setToSequenceIndex(
+    const SequenceIndex toSequenceIndexToUse)
 {
-    const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 19);
-    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    songScreen->setSelectedSongIndex(clampedNewValue);
-    displayFromSong();
-}
+    toSequenceIndex =
+        std::clamp(toSequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex);
 
-void ConvertSongToSeqScreen::setToSequenceIndex(const int8_t newValue)
-{
-    const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 98);
-    toSequenceIndex = clampedNewValue;
     displayToSequence();
 }
 
@@ -95,21 +98,22 @@ void ConvertSongToSeqScreen::setTrackStatus(const int8_t newValue)
 
 void ConvertSongToSeqScreen::displayFromSong() const
 {
-    const auto activeSongIndex =
-        mpc.screens->get<ScreenId::SongScreen>()->getSelectedSongIndex();
-    const auto activeSong = sequencer.lock()->getSong(activeSongIndex);
+    const auto lockedSequencer = sequencer.lock();
+    const auto songIndex = lockedSequencer->getSelectedSongIndex();
+    const auto song = lockedSequencer->getSelectedSong();
     const auto songIndexString =
-        StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
-    const auto songName = activeSong->getName();
+        StrUtil::padLeft(std::to_string(songIndex + 1), "0", 2);
+    const auto songName = song->getName();
     findField("fromsong")->setText(songIndexString + "-" + songName);
 }
 
 void ConvertSongToSeqScreen::displayToSequence() const
 {
-    const auto activeSequence = sequencer.lock()->getSequence(toSequenceIndex);
+    const auto lockedSequencer = sequencer.lock();
+    const auto toSequence = lockedSequencer->getSequence(toSequenceIndex);
     const auto sequenceIndexString =
         StrUtil::padLeft(std::to_string(toSequenceIndex + 1), "0", 2);
-    const auto sequenceName = activeSequence->getName();
+    const auto sequenceName = toSequence->getName();
     findField("tosequence")->setText(sequenceIndexString + "-" + sequenceName);
 }
 
@@ -146,9 +150,9 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
-    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song =
-        sequencer.lock()->getSong(songScreen->getSelectedSongIndex());
+    const auto lockedSequencer = sequencer.lock();
+
+    const auto song = lockedSequencer->getSelectedSong();
 
     if (!song->isUsed())
     {
@@ -156,17 +160,17 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
     }
 
     const auto destinationSequence =
-        sequencer.lock()->getSequence(toSequenceIndex);
+        lockedSequencer->getSequence(toSequenceIndex);
 
     destinationSequence->init(0);
     destinationSequence->setName(song->getName());
 
     for (int stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
     {
-        const auto step = song->getStep(stepIndex).lock();
-        const auto sourceSequenceIndex = step->getSequence();
+        const auto step = song->getStep(SongStepIndex(stepIndex)).lock();
+        const auto sourceSequenceIndex = step->getSequenceIndex();
         const auto sourceSequence =
-            sequencer.lock()->getSequence(sourceSequenceIndex);
+            lockedSequencer->getSequence(sourceSequenceIndex);
         const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
             destinationSequence->getLastBarIndex();
 
@@ -298,9 +302,9 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
     if (trackStatus == 0 || trackStatus == 1)
     {
-        const auto referenceStep = song->getStep(0).lock();
+        const auto referenceStep = song->getStep(MinSongStepIndex).lock();
         const auto referenceSequence =
-            sequencer.lock()->getSequence(referenceStep->getSequence());
+            lockedSequencer->getSequence(referenceStep->getSequenceIndex());
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
         {

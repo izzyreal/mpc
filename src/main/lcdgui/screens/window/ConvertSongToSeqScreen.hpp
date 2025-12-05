@@ -17,12 +17,10 @@ namespace mpc::lcdgui::screens::window
         std::vector<std::string> trackStatusNames{
             "REFERENCED TO 1ST SQ", "OFF TRACKS IGNORED", "MERGED ON MIDI CH."};
 
-        uint8_t toSequenceIndex = 0;
+        SequenceIndex toSequenceIndex{MinSequenceIndex};
         uint8_t trackStatus = 0;
 
-        void setFromSong(int8_t) const;
-
-        void setToSequenceIndex(int8_t);
+        void setToSequenceIndex(SequenceIndex);
 
         void setTrackStatus(int8_t);
 

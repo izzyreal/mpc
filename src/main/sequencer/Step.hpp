@@ -5,12 +5,12 @@ namespace mpc::sequencer
 {
     class Step
     {
-        SequenceIndex sequence{MinSequenceIndex};
+        SequenceIndex sequenceIndex{MinSequenceIndex};
         int repeatCount = 1;
 
     public:
         void setSequence(SequenceIndex);
-        SequenceIndex getSequence() const;
+        SequenceIndex getSequenceIndex() const;
         void setRepeats(int i);
         int getRepeats() const;
     };

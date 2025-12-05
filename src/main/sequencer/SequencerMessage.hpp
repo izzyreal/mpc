@@ -20,6 +20,18 @@ namespace mpc::sequencer
         bool setPositionTo0 = true;
     };
 
+    struct SetSelectedSongIndex
+    {
+        SongIndex songIndex;
+        SequenceIndex sequenceIndexOfFirstStep;
+    };
+
+    struct SetSelectedSongStepIndex
+    {
+        SongStepIndex songStepIndex;
+        SequenceIndex sequenceIndexForThisStep;
+    };
+
     struct CopyEvents
     {
         Tick sourceStartTick;
@@ -47,5 +59,6 @@ namespace mpc::sequencer
 
     using SequencerMessage =
         std::variant<TransportMessage, SequenceMessage, CopyEvents,
-                     SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars>;
+                     SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars,
+                     SetSelectedSongIndex, SetSelectedSongStepIndex>;
 } // namespace mpc::sequencer

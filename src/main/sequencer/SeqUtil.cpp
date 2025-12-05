@@ -144,11 +144,12 @@ int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
 
     for (int i = 0; i < steps; i++)
     {
-        for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
+        const auto step = song->getStep(SongStepIndex(i)).lock();
+
+        for (int j = 0; j < step->getRepeats(); j++)
         {
             const auto seq =
-                sequencer->getSequence(song->getStep(i).lock()->getSequence())
-                    .get();
+                sequencer->getSequence(step->getSequenceIndex()).get();
             result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
         }
     }
@@ -325,9 +326,9 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
         const utils::SimpleAction nextAction(
             [stateManager = sequencer->getStateManager(), copyBars]
-        {
-            stateManager->enqueue(copyBars);
-        });
+            {
+                stateManager->enqueue(copyBars);
+            });
 
         toSequence->insertBars(destinationBarCount, BarIndex(copyAfterBar),
                                nextAction);

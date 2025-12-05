@@ -78,6 +78,29 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 activeState.transport.positionQuarterNotes = 0;
             }
         },
+        [&](const SetSelectedSongIndex &m)
+        {
+            activeState.selectedSongIndex = m.songIndex;
+            activeState.selectedSongStepIndex = MinSongStepIndex;
+
+            if (m.sequenceIndexOfFirstStep != NoSequenceIndex)
+            {
+                activeState.selectedSequenceIndex = m.sequenceIndexOfFirstStep;
+                activeState.transport.positionQuarterNotes = 0;
+                applyMessage(SyncTrackEventIndices{});
+            }
+        },
+        [&](const SetSelectedSongStepIndex &m)
+        {
+            activeState.selectedSongStepIndex = m.songStepIndex;
+
+            if (m.sequenceIndexForThisStep != NoSequenceIndex)
+            {
+                activeState.selectedSequenceIndex = m.sequenceIndexForThisStep;
+                activeState.transport.positionQuarterNotes = 0;
+                applyMessage(SyncTrackEventIndices{});
+            }
+        },
         [&](const CopyBars &m)
         {
             applyCopyBars(m);

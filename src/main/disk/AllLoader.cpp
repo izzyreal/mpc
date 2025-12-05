@@ -41,7 +41,6 @@
 #include "lcdgui/screens/UserScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
-#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -206,7 +205,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     int bindingCounter = 0;
     for (auto [cc, functionIndex] : misc->getSwitches())
     {
-        controller::MidiFootswitchFunction fn =
+        auto fn =
             static_cast<controller::MidiFootswitchFunction>(functionIndex);
 
         if (auto hw = controller::footswitchToComponentId.find(fn);
@@ -261,7 +260,6 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     secondSequenceScreen->sq = allParserSequencer->secondSeqIndex;
 
     auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    songScreen->setOffset(-1);
     songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
     auto ignoreTempoChangeScreen =
         mpc.screens->get<ScreenId::IgnoreTempoChangeScreen>();
@@ -283,19 +281,25 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 
             auto steps = allSong->getSteps();
 
-            for (int j = 0; j < steps.size(); j++)
+            for (int stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
             {
-                mpcSong->insertStep(mpcSong->getStepCount());
-                auto step = mpcSong->getStep(j).lock();
-                step->setSequence(SequenceIndex(steps[j].first));
-                step->setRepeats(steps[j].second);
+                mpcSong->insertStep(SongStepIndex(stepIndex));
+                auto step = mpcSong->getStep(SongStepIndex(stepIndex)).lock();
+                step->setSequence(SequenceIndex(steps[stepIndex].first));
+                step->setRepeats(steps[stepIndex].second);
             }
 
-            mpcSong->setFirstStep(allSong->getLoopFirstStepIndex());
-            mpcSong->setLastStep(allSong->getLoopLastStepIndex());
+            mpcSong->setFirstLoopStepIndex(
+                SongStepIndex(allSong->getLoopFirstStepIndex()));
+
+            mpcSong->setLastLoopStepIndex(
+                SongStepIndex(allSong->getLoopLastStepIndex()));
+
             mpcSong->setLoopEnabled(allSong->isLoopEnabled());
         }
     }
+
+    mpcSequencer->setSelectedSongStepIndex(MinSongStepIndex);
 }
 
 std::vector<std::shared_ptr<Sequence>>
@@ -305,9 +309,9 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
 
     AllParser allParser(mpc, f->getBytes());
 
-    auto allSequences = allParser.getAllSequences();
+    const auto allSequences = allParser.getAllSequences();
 
-    auto allSeqNames = allParser.getSeqNames()->getNames();
+    const auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
     for (int i = 0; i < 99; i++)

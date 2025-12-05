@@ -4,7 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
     class NameScreen;
-} // namespace mpc::lcdgui::screens::window
+}
 
 namespace mpc::lcdgui::screens
 {
@@ -22,16 +22,10 @@ namespace mpc::lcdgui::screens
         void turnWheel(int increment) override;
         void function(int i) override;
 
-        void setOffset(int i);
         void setDefaultSongName(const std::string &s);
         std::string getDefaultSongName();
-        int getOffset() const;
-        int getSelectedSongIndex() const;
-        void setSelectedSongIndex(int i);
 
     private:
-        int offset = -1;
-        int selectedSongIndex = 0;
         std::string defaultSongName = "Song";
 
         void displayTempo() const;

@@ -218,6 +218,7 @@ namespace mpc::sequencer
         void setNextSq(SequenceIndex);
         void setNextSqPad(SequenceIndex);
         std::shared_ptr<Song> getSong(int i);
+        std::shared_ptr<Song> getSelectedSong() const;
         void deleteSong(int i);
         bool isSongModeEnabled() const;
         SequenceIndex getSongSequenceIndex() const;
@@ -226,5 +227,10 @@ namespace mpc::sequencer
         void flushTrackNoteCache();
         void storeSelectedSequenceInUndoPlaceHolder();
         void resetUndo();
+        SongIndex getSelectedSongIndex() const;
+        void setSelectedSongIndex(SongIndex) const;
+        SongStepIndex getSelectedSongStepIndex() const;
+        bool isSelectedSongStepIndexEndOfSong() const;
+        void setSelectedSongStepIndex(SongStepIndex) const;
     };
 } // namespace mpc::sequencer

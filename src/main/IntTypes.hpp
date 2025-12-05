@@ -108,6 +108,18 @@ namespace mpc
 
     /////////
 
+    using SongIndex = ConstrainedInt<int8_t, 0, Mpc2000XlSpecs::MAX_SONG_COUNT - 1>;
+    constexpr SongIndex MinSongIndex{0};
+    constexpr SongIndex MaxStepIndex{Mpc2000XlSpecs::MAX_SONG_COUNT - 1};
+
+    /////////
+
+    using SongStepIndex = ConstrainedInt<uint8_t, 0, Mpc2000XlSpecs::MAX_SONG_STEP_COUNT>;
+    constexpr SongStepIndex MinSongStepIndex{0};
+    constexpr SongStepIndex MaxSongStepIndex{Mpc2000XlSpecs::MAX_SONG_STEP_COUNT};
+
+    /////////
+
     using EventIndex =
         ConstrainedInt<int64_t, -1, Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 

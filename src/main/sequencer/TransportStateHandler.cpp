@@ -6,7 +6,6 @@
 #include "SequencerStateManager.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
@@ -158,23 +157,8 @@ void TransportStateHandler::applyMessage(TransportState &state,
         },
         [&](const PlaySongFromStart &)
         {
-            state.positionQuarterNotes = 0;
-            const auto songScreen =
-                sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
-
-            const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
-
-            songScreen->setOffset(-1);
-
-            if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
-            {
-                sequencer->setSelectedSequenceIndex(
-                    sequencer->getSongSequenceIndex(), true);
-                manager->drainQueue();
-            }
-
-            installCountIn(state, true);
-            applyPlaySong(state);
+            sequencer->setSelectedSongStepIndex(MinSongStepIndex);
+            manager->enqueue(PlaySong{});
         },
         [&](const StopSong &)
         {
@@ -306,9 +290,6 @@ void TransportStateHandler::applyStopSong(TransportState &state) const noexcept
 
     if (state.endOfSong)
     {
-        const auto songScreen =
-            sequencer->getScreens()->get<lcdgui::ScreenId::SongScreen>();
-
-        songScreen->setOffset(songScreen->getOffset() + 1);
+        sequencer->setSelectedSongStepIndex(MaxSongStepIndex);
     }
 }

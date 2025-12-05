@@ -16,53 +16,45 @@ bool Song::isLoopEnabled() const
     return loopEnabled;
 }
 
-void Song::setFirstStep(const int i)
+void Song::setFirstLoopStepIndex(const SongStepIndex i)
 {
-    const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
+    const auto max =
+        std::max(MinSongStepIndex, SongStepIndex(getStepCount() - 1));
 
-    if (firstStep == candidate)
+    firstLoopStepIndex = std::clamp(i, MinSongStepIndex, max);
+
+    if (firstLoopStepIndex > lastLoopStepIndex)
     {
-        return;
-    }
-
-    firstStep = candidate;
-
-    if (firstStep > lastStep)
-    {
-        setLastStep(firstStep);
+        setLastLoopStepIndex(firstLoopStepIndex);
     }
 }
 
-int Song::getFirstStep() const
+mpc::SongStepIndex Song::getFirstLoopStepIndex() const
 {
-    return firstStep;
+    return firstLoopStepIndex;
 }
 
-void Song::setLastStep(const int i)
+void Song::setLastLoopStepIndex(const SongStepIndex i)
 {
-    const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
+    const auto max =
+        std::max(MinSongStepIndex, SongStepIndex(getStepCount() - 1));
 
-    if (lastStep == candidate)
+    lastLoopStepIndex = std::clamp(i, MinSongStepIndex, max);
+
+    if (lastLoopStepIndex < firstLoopStepIndex)
     {
-        return;
-    }
-
-    lastStep = candidate;
-
-    if (lastStep < firstStep)
-    {
-        setFirstStep(lastStep);
+        setFirstLoopStepIndex(lastLoopStepIndex);
     }
 }
 
-int Song::getLastStep() const
+mpc::SongStepIndex Song::getLastLoopStepIndex() const
 {
-    return lastStep;
+    return lastLoopStepIndex;
 }
 
-void Song::setName(const std::string &str)
+void Song::setName(const std::string &nameToUse)
 {
-    name = str;
+    name = nameToUse;
 }
 
 std::string Song::getName()
@@ -75,27 +67,27 @@ std::string Song::getName()
     return name;
 }
 
-void Song::deleteStep(const int stepIndex)
+void Song::deleteStep(const SongStepIndex stepIndex)
 {
-    if (stepIndex >= (int)steps.size())
+    if (stepIndex >= getStepCount())
     {
         return;
     }
 
     steps.erase(steps.begin() + stepIndex);
 
-    if (lastStep >= steps.size())
+    if (lastLoopStepIndex >= getStepCount())
     {
-        setLastStep(steps.size() - 1);
+        setLastLoopStepIndex(SongStepIndex(getStepCount() - 1));
     }
 }
 
-void Song::insertStep(const int stepIndex)
+void Song::insertStep(const SongStepIndex stepIndex)
 {
     steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
 }
 
-std::weak_ptr<Step> Song::getStep(const int i)
+std::weak_ptr<Step> Song::getStep(const SongStepIndex i)
 {
     return steps[i];
 }

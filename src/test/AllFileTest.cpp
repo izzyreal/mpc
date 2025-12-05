@@ -80,12 +80,16 @@ TEST_CASE("ALL file song", "[allfile]")
 
     song->setUsed(true);
     song->setName("TestSong");
-    song->insertStep(0);
-    song->insertStep(1);
-    song->getStep(0).lock()->setSequence(mpc::SequenceIndex(0));
-    song->getStep(0).lock()->setRepeats(1);
-    song->getStep(1).lock()->setSequence(mpc::SequenceIndex(1));
-    song->getStep(1).lock()->setRepeats(2);
+    song->insertStep(mpc::SongStepIndex(0));
+    song->insertStep(mpc::SongStepIndex(1));
+    song->getStep(mpc::SongStepIndex(0))
+        .lock()
+        ->setSequence(mpc::SequenceIndex(0));
+    song->getStep(mpc::SongStepIndex(0)).lock()->setRepeats(1);
+    song->getStep(mpc::SongStepIndex(1))
+        .lock()
+        ->setSequence(mpc::SequenceIndex(1));
+    song->getStep(mpc::SongStepIndex(1)).lock()->setRepeats(2);
 
     auto disk = mpc.getDisk();
 
@@ -96,10 +100,10 @@ TEST_CASE("ALL file song", "[allfile]")
     song = sequencer->getSong(0);
     REQUIRE(song->getName() == "TestSong");
     REQUIRE(song->getStepCount() == 2);
-    REQUIRE(song->getStep(0).lock()->getSequence() == 0);
-    REQUIRE(song->getStep(0).lock()->getRepeats() == 1);
-    REQUIRE(song->getStep(1).lock()->getSequence() == 1);
-    REQUIRE(song->getStep(1).lock()->getRepeats() == 2);
+    REQUIRE(song->getStep(mpc::SongStepIndex(0)).lock()->getSequenceIndex() == 0);
+    REQUIRE(song->getStep(mpc::SongStepIndex(0)).lock()->getRepeats() == 1);
+    REQUIRE(song->getStep(mpc::SongStepIndex(1)).lock()->getSequenceIndex() == 1);
+    REQUIRE(song->getStep(mpc::SongStepIndex(1)).lock()->getRepeats() == 2);
 }
 
 TEST_CASE("ALL file track is on and used", "[allfile]")

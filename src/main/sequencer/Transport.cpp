@@ -8,7 +8,6 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "sequencer/Sequence.hpp"
@@ -39,33 +38,25 @@ bool Transport::isPlayPossible(const bool fromStart) const
 {
     if (sequencer.isSongModeEnabled())
     {
-        const auto songScreen =
-            sequencer.getScreens()->get<ScreenId::SongScreen>();
+        const auto song = sequencer.getSelectedSong();
 
-        const auto currentSong =
-            sequencer.getSong(songScreen->getSelectedSongIndex());
-
-        if (!currentSong->isUsed())
+        if (!song->isUsed())
         {
             return false;
         }
 
-        if (songScreen->getOffset() + 1 >= currentSong->getStepCount() &&
-            !fromStart)
+        if (sequencer.isSelectedSongStepIndexEndOfSong() && !fromStart)
         {
             return false;
         }
 
-        const int step = fromStart ? 0 : songScreen->getOffset() + 1;
+        const SongStepIndex stepIndex =
+            fromStart ? MinSongStepIndex : sequencer.getSelectedSongStepIndex();
 
-        if (step < currentSong->getStepCount())
+        if (const auto step = song->getStep(stepIndex).lock();
+            !sequencer.getSequence(step->getSequenceIndex())->isUsed())
         {
-            if (const std::shared_ptr<Step> currentStep =
-                    currentSong->getStep(step).lock();
-                !sequencer.getSequence(currentStep->getSequence())->isUsed())
-            {
-                return false;
-            }
+            return false;
         }
     }
     else
@@ -258,19 +249,20 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
 {
     PositionQuarterNotes result = NoPositionQuarterNotes;
 
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
+    const auto song = sequencer.getSelectedSong();
+
     uint32_t stepStartTick = 0;
     uint32_t stepEndTick = 0;
     uint64_t songEndTick = 0;
 
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); ++stepIndex)
     {
         stepStartTick = stepEndTick;
-        const auto step = song->getStep(stepIndex);
+
+        const auto step = song->getStep(SongStepIndex(stepIndex));
 
         if (const auto sequence =
-                sequencer.getSequence(step.lock()->getSequence());
+                sequencer.getSequence(step.lock()->getSequenceIndex());
             sequence->isUsed())
         {
             stepEndTick = stepStartTick +
@@ -294,12 +286,13 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
 
     stepEndTick = 0;
 
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); ++stepIndex)
     {
         stepStartTick = stepEndTick;
 
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = sequencer.getSequence(step.lock()->getSequence());
+        const auto step = song->getStep(SongStepIndex(stepIndex));
+        const auto sequence =
+            sequencer.getSequence(step.lock()->getSequenceIndex());
 
         if (sequence->isUsed())
         {
@@ -315,7 +308,7 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
         if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
             wrappedNewPosition < stepEndPositionQuarterNotes)
         {
-            songScreen->setOffset(stepIndex - 1);
+            sequencer.setSelectedSongStepIndex(SongStepIndex(stepIndex));
 
             const auto offsetWithinStepQuarterNotes =
                 wrappedNewPosition - stepStartPositionQuarterNotes;
@@ -335,18 +328,18 @@ mpc::PositionQuarterNotes Transport::getWrappedPositionInSong(
 void Transport::moveSongToStepThatContainsPosition(
     const PositionQuarterNotes positionQuarterNotes) const
 {
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
+    const auto song = sequencer.getSelectedSong();
 
     uint32_t stepStartTick = 0, stepEndTick = 0;
 
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); ++stepIndex)
     {
         stepStartTick = stepEndTick;
 
-        const auto step = song->getStep(stepIndex).lock();
+        const auto step = song->getStep(SongStepIndex(stepIndex)).lock();
 
-        if (const auto sequence = sequencer.getSequence(step->getSequence());
+        if (const auto sequence =
+                sequencer.getSequence(step->getSequenceIndex());
             sequence->isUsed())
         {
             stepEndTick =
@@ -361,7 +354,7 @@ void Transport::moveSongToStepThatContainsPosition(
         if (positionQuarterNotes >= stepStartPositionQuarterNotes &&
             positionQuarterNotes < stepEndPositionQuarterNotes)
         {
-            songScreen->setOffset(stepIndex - 1);
+            sequencer.setSelectedSongStepIndex(SongStepIndex(stepIndex));
             break;
         }
     }

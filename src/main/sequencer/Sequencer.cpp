@@ -19,7 +19,6 @@
 #include "hardware/Component.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -75,10 +74,11 @@ Sequencer::Sequencer(
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled)
-    : flushMidiNoteOffs(flushMidiNoteOffs), getScreens(getScreens), isBouncePrepared(isBouncePrepared),
+    : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), clock(clock),
-      voices(voices), isAudioServerRunning(isAudioServerRunning),
+      flushMidiNoteOffs(flushMidiNoteOffs), voices(voices),
+      isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed),
       performanceManager(performanceManager), sampler(sampler),
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
@@ -554,16 +554,17 @@ void Sequencer::copySong(const int source, const int dest)
 
     s1->setUsed(true);
 
-    for (int i = 0; i < s0->getStepCount(); i++)
+    for (int stepIndex = 0; stepIndex < s0->getStepCount(); ++stepIndex)
     {
-        s1->insertStep(i);
-        const auto step = s1->getStep(i).lock();
-        step->setRepeats(s0->getStep(i).lock()->getRepeats());
-        step->setSequence(s0->getStep(i).lock()->getSequence());
+        const auto sourceStep = s0->getStep(SongStepIndex(stepIndex)).lock();
+        s1->insertStep(SongStepIndex(stepIndex));
+        const auto destStep = s1->getStep(SongStepIndex(stepIndex)).lock();
+        destStep->setRepeats(sourceStep->getRepeats());
+        destStep->setSequence(sourceStep->getSequenceIndex());
     }
 
-    s1->setFirstStep(s0->getFirstStep());
-    s1->setLastStep(s0->getLastStep());
+    s1->setFirstLoopStepIndex(s0->getFirstLoopStepIndex());
+    s1->setLastLoopStepIndex(s0->getLastLoopStepIndex());
     s1->setName(s0->getName());
     s1->setLoopEnabled(s0->isLoopEnabled());
 }
@@ -605,9 +606,7 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
 std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
 {
     if (const bool songMode = isSongModeEnabled();
-        songMode &&
-        songs[getScreens()->get<ScreenId::SongScreen>()->getSelectedSongIndex()]
-                ->getStepCount() != 0)
+        songMode && songs[getSelectedSongIndex()]->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0
                              ? getSongSequenceIndex()
@@ -857,22 +856,16 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
     if (isSongModeEnabled())
     {
-        const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-        const auto song = songs[songScreen->getSelectedSongIndex()];
+        const auto song = songs[getSelectedSongIndex()];
 
-        if (!song->isUsed())
+        if (!song->isUsed() || isSelectedSongStepIndexEndOfSong())
         {
             return NoSequenceIndex;
         }
 
-        int step = songScreen->getOffset() + 1;
-
-        if (step >= song->getStepCount())
-        {
-            step = song->getStepCount() - 1;
-        }
-
-        const auto songSeqIndex = song->getStep(step).lock()->getSequence();
+        const auto currentStep = getSelectedSongStepIndex();
+        const auto songSeqIndex =
+            song->getStep(currentStep).lock()->getSequenceIndex();
         return songSeqIndex;
     }
 
@@ -965,6 +958,11 @@ std::shared_ptr<Song> Sequencer::getSong(const int i)
     return songs[i];
 }
 
+std::shared_ptr<Song> Sequencer::getSelectedSong() const
+{
+    return songs[getSelectedSongIndex()];
+}
+
 bool Sequencer::isSongModeEnabled() const
 {
     return screengroups::isSongScreen(layeredScreen->getCurrentScreenId());
@@ -972,21 +970,13 @@ bool Sequencer::isSongModeEnabled() const
 
 SequenceIndex Sequencer::getSongSequenceIndex() const
 {
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = songs[songScreen->getSelectedSongIndex()];
-    auto step = songScreen->getOffset() + 1;
-
-    if (step >= song->getStepCount())
-    {
-        step = song->getStepCount() - 1;
-    }
-
-    if (step < 0)
+    if (isSelectedSongStepIndexEndOfSong())
     {
         return NoSequenceIndex;
     }
 
-    return song->getStep(step).lock()->getSequence();
+    const auto song = songs[getSelectedSongIndex()];
+    return song->getStep(getSelectedSongStepIndex()).lock()->getSequenceIndex();
 }
 
 bool Sequencer::isSecondSequenceEnabled() const
@@ -1029,6 +1019,53 @@ void Sequencer::resetUndo()
     sequences[UndoSequenceIndex]->setUsed(false);
     undoSeqAvailable = false;
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
+}
+
+SongIndex Sequencer::getSelectedSongIndex() const
+{
+    return stateManager->getSnapshot().getSelectedSongIndex();
+}
+
+void Sequencer::setSelectedSongIndex(const SongIndex songIndex) const
+{
+    const auto song = songs[songIndex];
+    const auto sequenceOfFirstStep =
+        song->getStepCount() == 0
+            ? NoSequenceIndex
+            : song->getStep(MinSongStepIndex).lock()->getSequenceIndex();
+
+    stateManager->enqueue(SetSelectedSongIndex{songIndex, sequenceOfFirstStep});
+}
+
+SongStepIndex Sequencer::getSelectedSongStepIndex() const
+{
+    return stateManager->getSnapshot().getSelectedSongStepIndex();
+}
+
+bool Sequencer::isSelectedSongStepIndexEndOfSong() const
+{
+    const auto stepIndex = getSelectedSongStepIndex();
+    const auto song = getSelectedSong();
+    const auto stepCount = song->getStepCount();
+    return stepIndex >= stepCount;
+}
+
+void Sequencer::setSelectedSongStepIndex(
+    const SongStepIndex newSongStepIndex) const
+{
+    const auto song = getSelectedSong();
+    const auto lastStepIndex = SongStepIndex(song->getStepCount() - 1);
+
+    const auto stepIndexToUse = std::clamp(newSongStepIndex, MinSongStepIndex,
+                                           SongStepIndex(lastStepIndex + 1));
+
+    const auto sequenceIndex =
+        stepIndexToUse > lastStepIndex
+            ? NoSequenceIndex
+            : song->getStep(stepIndexToUse).lock()->getSequenceIndex();
+
+    stateManager->enqueue(
+        SetSelectedSongStepIndex{stepIndexToUse, sequenceIndex});
 }
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()

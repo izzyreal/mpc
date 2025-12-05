@@ -4,7 +4,6 @@
 #include "sequencer/SequencerState.hpp"
 
 #include <memory>
-#include <vector>
 
 namespace mpc::sequencer
 {
@@ -26,6 +25,8 @@ namespace mpc::sequencer
                                                       TrackIndex) const;
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
+        SongIndex getSelectedSongIndex() const noexcept;
+        SongStepIndex getSelectedSongStepIndex() const noexcept;
 
         TransportStateView getTransportStateView() const;
 

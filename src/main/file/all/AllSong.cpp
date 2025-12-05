@@ -9,10 +9,10 @@ using namespace mpc::file::all;
 
 Song::Song(const std::vector<char> &loadBytes)
 {
-    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET,
-                                          NAME_OFFSET + AllParser::NAME_LENGTH);
+    const auto nameBytes = Util::vecCopyOfRange(
+        loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 
-    for (char &c : nameBytes)
+    for (const char &c : nameBytes)
     {
         if (c == 0x00)
         {
@@ -21,11 +21,11 @@ Song::Song(const std::vector<char> &loadBytes)
         name.push_back(c);
     }
 
-    size_t end = name.find_last_not_of(' ');
+    const size_t end = name.find_last_not_of(' ');
     name = end == std::string::npos ? "" : name.substr(0, end + 1);
 
-    auto stepsBytes = Util::vecCopyOfRange(loadBytes, FIRST_STEP_OFFSET,
-                                           FIRST_STEP_OFFSET + STEPS_LENGTH);
+    const auto stepsBytes = Util::vecCopyOfRange(
+        loadBytes, FIRST_STEP_OFFSET, FIRST_STEP_OFFSET + STEPS_LENGTH);
 
     for (int i = 0; i < STEPS_LENGTH; i += STEP_LENGTH)
     {
@@ -58,7 +58,7 @@ Song::Song(const std::vector<char> &loadBytes)
 
 Song::Song(sequencer::Song *mpcSong)
 {
-    auto songName = mpcSong->getName();
+    const auto songName = mpcSong->getName();
 
     for (int i = 0; i < AllParser::NAME_LENGTH; i++)
     {
@@ -80,9 +80,11 @@ Song::Song(sequencer::Song *mpcSong)
             continue;
         }
 
-        auto step = mpcSong->getStep(i).lock();
+        const auto step = mpcSong->getStep(SongStepIndex(i)).lock();
+
         saveBytes[FIRST_STEP_OFFSET + i * 2] =
-            static_cast<char>(step->getSequence());
+            static_cast<char>(step->getSequenceIndex());
+
         saveBytes[FIRST_STEP_OFFSET + i * 2 + 1] =
             static_cast<char>(step->getRepeats());
     }
@@ -91,8 +93,8 @@ Song::Song(sequencer::Song *mpcSong)
     saveBytes[STEPS_TERMINATOR_OFFSET + 1] = static_cast<char>(0xFF);
 
     saveBytes[IS_USED_OFFSET] = mpcSong->isUsed() ? 1 : 0;
-    saveBytes[LOOP_FIRST_STEP_INDEX_OFFSET] = mpcSong->getFirstStep();
-    saveBytes[LOOP_LAST_STEP_INDEX_OFFSET] = mpcSong->getLastStep();
+    saveBytes[LOOP_FIRST_STEP_INDEX_OFFSET] = mpcSong->getFirstLoopStepIndex();
+    saveBytes[LOOP_LAST_STEP_INDEX_OFFSET] = mpcSong->getLastLoopStepIndex();
     saveBytes[LOOP_ENABLED_OFFSET] = mpcSong->isLoopEnabled() ? 1 : 0;
 
     for (int i = LOOP_ENABLED_OFFSET + 1; i < LENGTH; i++)
