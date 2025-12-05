@@ -132,5 +132,13 @@ namespace mpc::sequencer
             }
             printf("================\n");
         }
+
+        void copyNoteEventPropertiesFrom(const EventData *const other)
+        {
+            duration = other->duration;
+            velocity = other->velocity;
+            noteVariationType = other->noteVariationType;
+            noteVariationValue = other->noteVariationValue;
+        }
     };
 } // namespace mpc::sequencer

@@ -212,8 +212,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
             if (existingNoteEvent)
             {
-                *existingNoteEvent = noteEvent;
-                track->insertAcquiredEvent(existingNoteEvent);
+                existingNoteEvent->copyNoteEventPropertiesFrom(&noteEvent);
             }
             else
             {
