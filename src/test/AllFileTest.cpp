@@ -51,13 +51,17 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
     disk->initFiles();
 
     const auto sequencer = mpc.getSequencer();
-
+    const auto stateManager = sequencer->getStateManager();
     sequencer->purgeAllSequences();
+
+    stateManager->drainQueue();
 
     for (int i = 0; i < 20; i++)
     {
         sequencer->deleteSong(i);
     }
+
+    stateManager->drainQueue();
 
     AllLoader::loadEverythingFromFile(mpc, disk->getFile(filename).get());
 }

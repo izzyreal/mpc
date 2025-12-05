@@ -41,6 +41,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -299,7 +300,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         }
     }
 
-    mpcSequencer->setSelectedSongStepIndex(MinSongStepIndex);
+    mpcSequencer->getStateManager()->enqueue(
+        SetSelectedSongStepIndex{SongStepIndex(0), NoSequenceIndex});
 }
 
 std::vector<std::shared_ptr<Sequence>>
