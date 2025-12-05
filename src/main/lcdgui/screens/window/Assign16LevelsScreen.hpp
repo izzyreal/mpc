@@ -6,13 +6,21 @@ namespace mpc::lcdgui::screens::window
 {
     class Assign16LevelsScreen final : public ScreenComponent
     {
-
     public:
+        Assign16LevelsScreen(Mpc &, int layerIndex);
+
         void function(int i) override;
         void turnWheel(int i) override;
         void open() override;
 
-        Assign16LevelsScreen(Mpc &mpc, int layerIndex);
+        void setNote(DrumNoteNumber);
+        void setParam(int i);
+        void setType(int i);
+        void setOriginalKeyPad(PhysicalPadIndex);
+        int getOriginalKeyPad() const;
+        int getType() const;
+        DrumNoteNumber getNote() const;
+        int getParameter() const;
 
     private:
         const std::vector<std::string> typeNames{"TUNING", "DECAY", "ATTACK",
@@ -22,21 +30,11 @@ namespace mpc::lcdgui::screens::window
         DrumNoteNumber note{MinDrumNoteNumber};
         int parameter = 0;
         int type = 0;
-        int originalKeyPad = 3;
+        PhysicalPadIndex originalKeyPad = PhysicalPadIndex(3);
 
         void displayNote() const;
         void displayParameter() const;
         void displayType() const;
         void displayOriginalKeyPad() const;
-
-    public:
-        void setNote(DrumNoteNumber);
-        void setParam(int i);
-        void setType(int i);
-        void setOriginalKeyPad(int i);
-        int getOriginalKeyPad() const;
-        int getType() const;
-        DrumNoteNumber getNote() const;
-        int getParameter() const;
     };
 } // namespace mpc::lcdgui::screens::window

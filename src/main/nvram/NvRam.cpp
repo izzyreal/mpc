@@ -80,7 +80,7 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
 
     const std::vector<char> bytes{
         static_cast<char>(vmpcSettingsScreen->initialPadMapping),
-        static_cast<char>(vmpcSettingsScreen->_16LevelsEraseMode),
+        static_cast<char>(vmpcSettingsScreen->sixteenLevelsEraseMode),
         static_cast<char>(vmpcAutoSaveScreen->autoSaveOnExit),
         static_cast<char>(vmpcAutoSaveScreen->autoLoadOnStart),
         static_cast<char>(engineHost->getRecordLevel()),
@@ -124,7 +124,7 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
     }
     if (bytes.size() > 1)
     {
-        vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
+        vmpcSettingsScreen->sixteenLevelsEraseMode = bytes[1];
     }
     if (bytes.size() > 2)
     {

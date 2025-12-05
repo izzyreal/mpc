@@ -300,7 +300,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             sequencer.lock()->getSelectedSequence()->getTrack(trackIndex).get();
 
         const auto recordingNoteOnEvent =
-            track->findRecordingNoteOnEventByNoteNumber(NoteNumber(noteNumber));
+            track->findRecordingNoteOnEvent(NoteNumber(noteNumber));
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(

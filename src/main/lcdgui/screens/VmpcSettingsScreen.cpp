@@ -31,7 +31,7 @@ void VmpcSettingsScreen::close()
     }
 }
 
-void VmpcSettingsScreen::function(int i)
+void VmpcSettingsScreen::function(const int i)
 {
     switch (i)
     {
@@ -66,10 +66,11 @@ void VmpcSettingsScreen::function(int i)
                 SetDirty();
             }
             break;
+        default:;
     }
 }
 
-void VmpcSettingsScreen::turnWheel(int i)
+void VmpcSettingsScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldName();
@@ -80,7 +81,7 @@ void VmpcSettingsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "16-levels-erase-mode")
     {
-        set16LevelsEraseMode(_16LevelsEraseMode + i);
+        set16LevelsEraseMode(sixteenLevelsEraseMode + i);
     }
     else if (focusedFieldName == "auto-convert-wavs")
     {
@@ -98,7 +99,7 @@ void VmpcSettingsScreen::turnWheel(int i)
     }
 }
 
-void VmpcSettingsScreen::setInitialPadMapping(int i)
+void VmpcSettingsScreen::setInitialPadMapping(const int i)
 {
     if (i < 0 || i > 1)
     {
@@ -119,28 +120,18 @@ void VmpcSettingsScreen::displayInitialPadMapping() const
 void VmpcSettingsScreen::display16LevelsEraseMode() const
 {
     findField("16-levels-erase-mode")
-        ->setText(_16LevelsEraseModeNames[_16LevelsEraseMode]);
+        ->setText(sixteenLevelsEraseModeNames[sixteenLevelsEraseMode]);
 }
 
-void VmpcSettingsScreen::set16LevelsEraseMode(int i)
+void VmpcSettingsScreen::set16LevelsEraseMode(const int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    _16LevelsEraseMode = i;
+    sixteenLevelsEraseMode = std::clamp(i, 0, 1);
     display16LevelsEraseMode();
 }
 
-void VmpcSettingsScreen::setAutoConvertWavs(int i)
+void VmpcSettingsScreen::setAutoConvertWavs(const int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    autoConvertWavs = i;
+    autoConvertWavs = std::clamp(i, 0, 1);
     displayAutoConvertWavs();
 }
 
@@ -150,14 +141,9 @@ void VmpcSettingsScreen::displayAutoConvertWavs() const
         ->setText(autoConvertWavs == 1 ? "YES" : "ASK");
 }
 
-void VmpcSettingsScreen::setMidiControlMode(int i)
+void VmpcSettingsScreen::setMidiControlMode(const int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    midiControlMode = i;
+    midiControlMode = std::clamp(i, 0, 1);
     displayMidiControlMode();
 }
 
@@ -184,7 +170,7 @@ void VmpcSettingsScreen::setNameTypingWithKeyboard(const bool shouldBeEnabled)
     displayNameTypingWithKeyboard();
 }
 
-const bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled() const
+bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled() const
 {
     return nameTypingWithKeyboardEnabled;
 }

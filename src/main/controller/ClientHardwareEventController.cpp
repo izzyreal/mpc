@@ -409,7 +409,7 @@ void ClientHardwareEventController::handlePadRelease(
             sequencer->getSelectedSequence()->getTrack(p->trackIndex).get();
 
         const auto recordingNoteOnEvent =
-            track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
+            track->findRecordingNoteOnEvent(p->noteNumber);
 
         if (p->noteNumber != NoNoteNumber)
         {

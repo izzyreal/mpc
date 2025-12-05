@@ -32,19 +32,16 @@ void Assign16LevelsScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
-    switch (i)
+    if (i != 4)
     {
-        case 4:
-        {
-            mpc.clientEventController->setSixteenLevelsEnabled(true);
-            mpc.getHardware()
-                ->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)
-                ->setEnabled(true);
-            mpc.getLayeredScreen()->closeCurrentScreen();
-            break;
-        }
-        default:;
+        return;
     }
+
+    mpc.clientEventController->setSixteenLevelsEnabled(true);
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)
+        ->setEnabled(true);
+    mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
 void Assign16LevelsScreen::turnWheel(const int i)
@@ -114,9 +111,9 @@ void Assign16LevelsScreen::setType(const int i)
     displayOriginalKeyPad();
 }
 
-void Assign16LevelsScreen::setOriginalKeyPad(const int i)
+void Assign16LevelsScreen::setOriginalKeyPad(const PhysicalPadIndex i)
 {
-    originalKeyPad = std::clamp(i, 3, 12);
+    originalKeyPad = std::clamp(i, PhysicalPadIndex(3), PhysicalPadIndex(12));
     displayOriginalKeyPad();
 }
 

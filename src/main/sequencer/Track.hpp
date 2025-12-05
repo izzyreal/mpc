@@ -140,6 +140,8 @@ namespace mpc::sequencer
         std::vector<EventData> getEventStates() const;
 
         int getNextTick();
+        bool shouldRemovePlayIndexEventDueToRecording() const;
+        bool shouldRemovePlayIndexEventDueToErasePressed() const;
         void playNext() const;
 
         bool isOn() const;
@@ -160,7 +162,7 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventData *findRecordingNoteOnEventByNoteNumber(NoteNumber);
+        EventData *findRecordingNoteOnEvent(NoteNumber);
 
         void printEvents() const;
 
@@ -212,5 +214,16 @@ namespace mpc::sequencer
         int getCorrectedTickPos() const;
 
         void init();
+
+        ///////  Live event insertion helpers
+        void assignTicksToNoteOffs(int noteOffCount, Tick pos);
+        static void correctNoteOnTick(EventData *noteOn, Tick pos,
+                               Tick correctedPos);
+        void adjustNoteOffTiming(const EventData *noteOn, EventData &noteOff) const;
+        bool applyNoteOffAdjustmentForNoteOn(EventData *noteOn,
+                                             int noteOffCount);
+        void insertRecordedNote(EventData *ev, bool wrapped);
+        void finalizeRecordedNote(EventData *noteOn, const EventData &noteOff);
+        ///////  End of live event insertion helpers
     };
 } // namespace mpc::sequencer

@@ -50,27 +50,27 @@ namespace mpc::lcdgui::screens
         void function(int) override;
 
         int getMidiControlMode() const;
-        const bool isNameTypingWithKeyboardEnabled() const;
+        bool isNameTypingWithKeyboardEnabled() const;
 
     private:
         std::shared_ptr<Background> easterEgg;
         const std::vector<std::string> initialPadMappingNames{"VMPC2000XL",
                                                               "ORIGINAL"};
-        const std::vector<std::string> _16LevelsEraseModeNames{
+        const std::vector<std::string> sixteenLevelsEraseModeNames{
             "All levels", "Only pressed level"};
         const std::vector<std::string> midiControlModeNames{
             "VMPC, see MIDI tab", "ORIGINAL"};
 
         int initialPadMapping = 0;
-        int _16LevelsEraseMode = 0;
+        int sixteenLevelsEraseMode = 0;
         int autoConvertWavs = 1;
         int midiControlMode = 0;
         bool nameTypingWithKeyboardEnabled = true;
 
-        void setInitialPadMapping(int i);
-        void set16LevelsEraseMode(int i);
-        void setAutoConvertWavs(int i);
-        void setMidiControlMode(int i);
+        void setInitialPadMapping(int);
+        void set16LevelsEraseMode(int);
+        void setAutoConvertWavs(int);
+        void setMidiControlMode(int);
         void setNameTypingWithKeyboard(bool);
 
         void displayInitialPadMapping() const;
