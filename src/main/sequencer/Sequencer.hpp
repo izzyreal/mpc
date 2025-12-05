@@ -87,7 +87,7 @@ namespace mpc::sequencer
         static uint32_t quarterNotesToTicks(double quarterNotes);
         static double ticksToQuarterNotes(double ticks);
 
-        void playToTick(int targetTick) const;
+        void playTick(Tick) const;
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();

@@ -73,7 +73,7 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
 
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
-    sequencer->playToTick(sequencer->getTransport()->getTickPosition());
+    sequencer->playTick(sequencer->getTransport()->getTickPosition());
     sequencer->setSelectedSequenceIndex(sequencer->getNextSq(), false);
     sequencer->getStateManager()->drainQueue();
     sequencer->setNextSq(NoSequenceIndex);
@@ -223,7 +223,7 @@ bool SequencerPlaybackEngine::processSongMode() const
         return false;
     }
 
-    sequencer->playToTick(seq->getLastTick() - 1);
+    sequencer->playTick(seq->getLastTick() - 1);
     sequencer->getTransport()->incrementPlayedStepRepetitions();
     sequencer->getStateManager()->drainQueue();
     const auto song = sequencer->getSelectedSong();
@@ -275,7 +275,7 @@ bool SequencerPlaybackEngine::processSongMode() const
         }
         else
         {
-            sequencer->playToTick(seq->getLastTick() - 1);
+            sequencer->playTick(seq->getLastTick() - 1);
         }
         setTickPositionEffectiveImmediately(0);
     }
@@ -318,7 +318,7 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
             sequencerScreen->setPunchRectOn(1, true);
         }
 
-        sequencer->playToTick(sequencer->getTransport()->getTickPosition());
+        sequencer->playTick(sequencer->getTransport()->getTickPosition());
         setTickPositionEffectiveImmediately(seq->getLoopStartTick());
 
         if (sequencer->getTransport()->isRecording())
@@ -604,7 +604,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (!songHasStopped && !normalPlayHasStopped)
         {
-            sequencer->playToTick(sequencer->getTransport()->getTickPosition());
+            sequencer->playTick(sequencer->getTransport()->getTickPosition());
             processNoteRepeat();
             sequencer->getTransport()->bumpPositionByTicks(1);
         }

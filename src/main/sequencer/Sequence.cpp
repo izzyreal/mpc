@@ -63,16 +63,13 @@ Sequence::Sequence(
         return getSnapshot()->getTrack(TempoChangeTrackIndex);
     };
 
-    auto tempoChangeTrack = std::make_shared<Track>(
+    tracks.emplace_back(std::make_shared<Track>(
         manager, getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
         getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
         getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
         isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
         getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
-        getPunchInTime, getPunchOutTime, isSoloEnabled);
-    tempoChangeTrack->setUsed(true);
-
-    tracks.push_back(tempoChangeTrack);
+        getPunchInTime, getPunchOutTime, isSoloEnabled));
 
     auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
@@ -503,15 +500,17 @@ void Sequence::insertBars(const int barCount, const BarIndex afterBar,
                           const utils::SimpleAction &nextAction) const
 {
     InsertBars::Callback cb;
-    cb.set([this](const BarIndex newLastBarIndex)
-    {
-        if (newLastBarIndex != NoBarIndex && !isUsed())
+    cb.set(
+        [this](const BarIndex newLastBarIndex)
         {
-            setUsed(true);
-        }
-    });
+            if (newLastBarIndex != NoBarIndex && !isUsed())
+            {
+                setUsed(true);
+            }
+        });
 
-    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar, cb, nextAction});
+    dispatch(
+        InsertBars{getSequenceIndex(), barCount, afterBar, cb, nextAction});
 }
 
 void Sequence::moveTrack(const int source, const int destination)

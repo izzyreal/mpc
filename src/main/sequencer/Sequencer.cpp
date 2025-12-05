@@ -197,8 +197,13 @@ std::shared_ptr<EventHandler> Sequencer::getEventHandler()
     return eventHandler;
 }
 
-void Sequencer::playToTick(const int targetTick) const
+void Sequencer::playTick(const Tick tick) const
 {
+    if (transport->isMetronomeOnlyEnabled())
+    {
+        return;
+    }
+
     const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
                                               : getSelectedSequenceIndex();
     auto seq = sequences[seqIndex].get();
@@ -210,10 +215,9 @@ void Sequencer::playToTick(const int targetTick) const
         if (i == 1)
         {
             if (!secondSequenceEnabled.load() ||
-                transport->isMetronomeOnlyEnabled() ||
                 secondSequenceScreen->sq ==
                     seqIndex) // Real 2KXL would play all events twice (i.e.
-                              // double as loud as normal) for the last clause
+                        // double as loud as normal) for the last clause
             {
                 break;
             }
@@ -226,20 +230,12 @@ void Sequencer::playToTick(const int targetTick) const
             }
         }
 
-        if (!transport->isMetronomeOnlyEnabled())
+        for (const auto &track : seq->getTracks())
         {
-            for (const auto &track : seq->getTracks())
+            while (track->getNextTick() == tick)
             {
-                while (track->getNextTick() <= targetTick)
-                {
-                    track->playNext();
-                }
+                track->playNext();
             }
-        }
-
-        while (seq->getTempoChangeTrack()->getNextTick() <= targetTick)
-        {
-            seq->getTempoChangeTrack()->playNext();
         }
     }
 }
