@@ -220,7 +220,6 @@ namespace mpc::sequencer
         void adjustNoteOffTiming(const EventData *noteOn, EventData &noteOff) const;
         bool applyNoteOffAdjustmentForNoteOn(EventData *noteOn,
                                              int noteOffCount);
-        void insertRecordedNote(EventData *ev, bool wrapped);
         void finalizeRecordedNote(EventData *noteOn, const EventData &noteOff);
         ///////  End of live event insertion helpers
     };

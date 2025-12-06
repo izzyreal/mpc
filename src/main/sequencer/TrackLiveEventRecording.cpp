@@ -71,36 +71,15 @@ bool Track::applyNoteOffAdjustmentForNoteOn(EventData *noteOn,
     return false;
 }
 
-void Track::insertRecordedNote(EventData *ev, const bool wrapped)
-{
-    insertAcquiredEvent(ev);
-
-    if (!wrapped)
-    {
-        return;
-    }
-
-    const auto snapshot = getSnapshot(getIndex());
-    const auto playIndex = snapshot->getPlayEventIndex();
-
-    if (playIndex > 0)
-    {
-        dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(),
-                                   playIndex - 1});
-    }
-}
-
 void Track::finalizeRecordedNote(EventData *noteOn, const EventData &noteOff)
 {
     const auto lastTick = parent->getLastTick();
     auto duration = noteOff.tick - noteOn->tick;
 
-    bool wrapped = false;
     if (noteOff.tick < noteOn->tick)
     {
         duration = lastTick - noteOn->tick;
         noteOn->dontDelete = true;
-        wrapped = true;
     }
 
     if (duration < 1)
@@ -116,7 +95,7 @@ void Track::finalizeRecordedNote(EventData *noteOn, const EventData &noteOff)
 
     if (insert)
     {
-        insertRecordedNote(noteOn, wrapped);
+        insertAcquiredEvent(noteOn);
     }
     else
     {
