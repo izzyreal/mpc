@@ -120,7 +120,7 @@ bool SequenceStateView::isTempoChangeEnabled() const
 std::vector<EventData> SequenceStateView::getTempoChangeEvents() const
 {
     std::vector<EventData> result;
-    const EventData *it = state.tracks[TempoChangeTrackIndex].head;
+    const EventData *it = state.tracks[TempoChangeTrackIndex].eventsHead;
     while (it)
     {
         result.push_back(*it);

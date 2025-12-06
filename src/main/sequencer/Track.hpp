@@ -90,8 +90,6 @@ namespace mpc::sequencer
 
         std::string getActualName();
 
-        void syncEventIndex(int currentTick, int previousTick) const;
-
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
         void flushNoteCache() const;

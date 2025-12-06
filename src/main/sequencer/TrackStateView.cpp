@@ -10,7 +10,7 @@ TrackStateView::TrackStateView(const TrackState &s) noexcept : state(s) {}
 EventData *TrackStateView::findNoteEvent(const int tick,
                                          const NoteNumber note) const
 {
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -30,7 +30,7 @@ EventData *TrackStateView::getEventByIndex(const EventIndex idx) const
 {
     int counter = 0;
 
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -49,7 +49,7 @@ std::vector<EventData *> TrackStateView::getEventRange(const int startTick,
 {
     std::vector<EventData *> result;
 
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -69,14 +69,14 @@ std::vector<EventData *> TrackStateView::getEventRange(const int startTick,
 
 bool TrackStateView::isEventsEmpty() const
 {
-    return state.head == nullptr;
+    return state.eventsHead == nullptr;
 }
 
 int TrackStateView::getEventCount() const
 {
     int result = 0;
 
-    const EventData *it = state.head;
+    const EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -90,7 +90,7 @@ std::vector<EventData *> TrackStateView::getNoteEvents() const
 {
     std::vector<EventData *> result;
 
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -109,7 +109,7 @@ std::vector<EventData *> TrackStateView::getEvents() const
 {
     std::vector<EventData *> result;
 
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -123,7 +123,7 @@ std::vector<EventData *> TrackStateView::getEvents() const
 EventData *TrackStateView::findRecordingNoteOnByNoteNumber(
     const NoteNumber noteNumber) const
 {
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -144,7 +144,7 @@ TrackStateView::findRecordingNoteOn(const EventData *eventState) const
 {
     assert(eventState->type == EventType::NoteOn);
 
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {
@@ -162,7 +162,7 @@ TrackStateView::findRecordingNoteOn(const EventData *eventState) const
 
 EventData *TrackStateView::getEvent(const EventData *eventState) const
 {
-    EventData *it = state.head;
+    EventData *it = state.eventsHead;
 
     while (it)
     {

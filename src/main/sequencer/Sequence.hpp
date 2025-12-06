@@ -116,7 +116,7 @@ namespace mpc::sequencer
                               int den) const;
         void setTimeSignature(int barIndex, int num, int den) const;
 
-        void syncTrackEventIndices(int tick) const;
+        void syncTrackEventIndices() const;
 
         // Replace all time signatures in bulk.
         // Unlike setBarLength and setTimeSignature, this method does not

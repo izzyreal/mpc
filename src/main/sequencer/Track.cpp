@@ -168,50 +168,6 @@ void Track::setOn(const bool b) const
     dispatch(SetTrackOn{parent->getSequenceIndex(), getIndex(), b});
 }
 
-void Track::syncEventIndex(const int currentTick, const int previousTick) const
-{
-    if (currentTick == 0)
-    {
-        dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(),
-                                   EventIndex(0)});
-        return;
-    }
-
-    int startIndex = 0;
-
-    const auto snapshot = getSnapshot(getIndex());
-    const auto eventCount = snapshot->getEventCount();
-    const auto currentPlayEventIndex = snapshot->getPlayEventIndex();
-
-    if (currentTick > previousTick)
-    {
-        if (currentPlayEventIndex == eventCount)
-        {
-            return;
-        }
-
-        startIndex = currentPlayEventIndex;
-    }
-
-    if (currentTick < previousTick && currentPlayEventIndex == 0)
-    {
-        return;
-    }
-
-    auto result{EventIndex(eventCount)};
-
-    for (int i = startIndex; i < eventCount; i++)
-    {
-        if (snapshot->getEventByIndex(EventIndex(i))->tick >= currentTick)
-        {
-            result = EventIndex(i);
-            break;
-        }
-    }
-
-    dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(), result});
-}
-
 void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
 {
     dispatch(RemoveEvent{event->handle});

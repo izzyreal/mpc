@@ -79,7 +79,7 @@ void TrackStateHandler::applyMessage(
 
             EventData *it = state.sequences[m.handle->sequenceIndex]
                                 .tracks[m.handle->trackIndex]
-                                .head;
+                                .eventsHead;
             while (it)
             {
                 if (it->beingRecorded &&
@@ -140,7 +140,7 @@ void TrackStateHandler::applyMessage(
 
             auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            EventData *cur = track.head;
+            EventData *cur = track.eventsHead;
             while (cur)
             {
                 EventData *nxt = cur->next;
@@ -149,7 +149,7 @@ void TrackStateHandler::applyMessage(
                 manager->returnEventToPool(cur);
                 cur = nxt;
             }
-            track.head = nullptr;
+            track.eventsHead = nullptr;
 
             lock.release();
         },
@@ -168,7 +168,7 @@ void TrackStateHandler::applyMessage(
             std::vector<NoteNumber> notesAtTick;
             Tick lastTick = -100;
 
-            EventData *cur = track.head;
+            EventData *cur = track.eventsHead;
 
             while (cur)
             {
@@ -203,7 +203,7 @@ void TrackStateHandler::applyMessage(
                         }
                         else
                         {
-                            track.head = cur->next;
+                            track.eventsHead = cur->next;
                         }
                         if (cur->next)
                         {
@@ -247,7 +247,7 @@ void TrackStateHandler::applyMessage(
                 return;
             }
 
-            EventData *&head = track.head;
+            EventData *&head = track.eventsHead;
 
             if (e->prev)
             {
@@ -316,7 +316,7 @@ void TrackStateHandler::applyMessage(
             auto &track =
                 state.sequences[e->sequenceIndex].tracks[e->trackIndex];
 
-            const EventData * head = track.head;
+            const EventData * head = track.eventsHead;
 
             int removedIndex = 0;
 
@@ -337,8 +337,8 @@ void TrackStateHandler::applyMessage(
             if (e->next)
                 e->next->prev = e->prev;
 
-            if (track.head == e)
-                track.head = e->next;
+            if (track.eventsHead == e)
+                track.eventsHead = e->next;
 
             if (track.playEventIndex > removedIndex)
             {
@@ -367,7 +367,7 @@ void TrackStateHandler::applyMessage(
 
             auto &track = state.sequences[m.sequence].tracks[m.track];
 
-            EventData *cur = track.head;
+            EventData *cur = track.eventsHead;
             while (cur)
             {
                 EventData *nxt = cur->next;
@@ -376,7 +376,7 @@ void TrackStateHandler::applyMessage(
                 manager->returnEventToPool(cur);
                 cur = nxt;
             }
-            track.head = nullptr;
+            track.eventsHead = nullptr;
 
             for (const auto &src : m.snapshot)
             {

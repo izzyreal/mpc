@@ -59,32 +59,26 @@ unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 }
 
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
-    const int newTickPos) const
+    const int newTickPos, const SequenceIndex sequenceIndex) const
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
 
     const auto manager = sequencer->getStateManager();
     manager->drainQueue();
-    manager->enqueue(SyncTrackEventIndices{});
-    manager->drainQueue();
-    // We have to drain the queue once more, because SyncTrackEventIndices
-    // enqueues more messages. We should probably move track event index
-    // synchronization to SequenceStateHandler and do it globally in there.
-    // This keeps the message queue traffic low (rather than one message per
-    // track we have one message for the whole sequence), and we avoid the need
-    // for draining the queue twice.
+    manager->enqueue(SyncTrackEventIndices{sequenceIndex});
     manager->drainQueue();
 }
 
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playTick(sequencer->getTransport()->getTickPosition());
-    sequencer->setSelectedSequenceIndex(sequencer->getNextSq(), false);
+    const auto nextSequenceIndex = sequencer->getNextSq();
+    sequencer->setSelectedSequenceIndex(nextSequenceIndex, false);
     sequencer->getStateManager()->drainQueue();
     sequencer->setNextSq(NoSequenceIndex);
     sequencer->getStateManager()->drainQueue();
-    setTickPositionEffectiveImmediately(0);
+    setTickPositionEffectiveImmediately(0, nextSequenceIndex);
     return sequencer->getCurrentlyPlayingSequence();
 }
 
@@ -205,14 +199,14 @@ void SequencerPlaybackEngine::displayPunchRects() const
     }
 }
 
-void SequencerPlaybackEngine::stopCountingInIfRequired() const
+void SequencerPlaybackEngine::stopCountingInIfRequired(const SequenceIndex sequenceIndex) const
 {
     const auto transport = sequencer->getTransport();
 
     if (transport->getTickPosition() >= transport->getCountInEndPosTicks())
     {
         setTickPositionEffectiveImmediately(
-            transport->getCountInStartPosTicks());
+            transport->getCountInStartPosTicks(), sequenceIndex);
         transport->setCountingIn(false);
         sequencer->getStateManager()->drainQueue();
     }
@@ -233,10 +227,11 @@ bool SequencerPlaybackEngine::processSongMode() const
     sequencer->getStateManager()->drainQueue();
     const auto song = sequencer->getSelectedSong();
     const auto stepIndex = sequencer->getSelectedSongStepIndex();
+    const auto step = song->getStep(stepIndex);
 
     const auto doneRepeating =
         sequencer->getTransport()->getPlayedStepRepetitions() >=
-        song->getStep(stepIndex).repetitionCount;
+        step.repetitionCount;
 
     const auto reachedLastStep = stepIndex == song->getStepCount() - 1;
 
@@ -254,8 +249,10 @@ bool SequencerPlaybackEngine::processSongMode() const
             stopSequencer();
             return true;
         }
-
-        setTickPositionEffectiveImmediately(0);
+        else
+        {
+            setTickPositionEffectiveImmediately(0, newStep.sequenceIndex);
+        }
     }
     else if (doneRepeating && reachedLastStep)
     {
@@ -282,7 +279,8 @@ bool SequencerPlaybackEngine::processSongMode() const
         {
             sequencer->playTick(seq->getLastTick() - 1);
         }
-        setTickPositionEffectiveImmediately(0);
+
+        setTickPositionEffectiveImmediately(0, seq->getSequenceIndex());
     }
 
     return false;
@@ -324,7 +322,7 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
         }
 
         sequencer->playTick(sequencer->getTransport()->getTickPosition());
-        setTickPositionEffectiveImmediately(seq->getLoopStartTick());
+        setTickPositionEffectiveImmediately(seq->getLoopStartTick(), seq->getSequenceIndex());
 
         if (sequencer->getTransport()->isRecording())
         {
@@ -355,7 +353,7 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
         {
             sequencer->getTransport()->stop();
             setTickPositionEffectiveImmediately(
-                Sequencer::ticksToQuarterNotes(seq->getLastTick()));
+                Sequencer::ticksToQuarterNotes(seq->getLastTick()), seq->getSequenceIndex());
         }
 
         return true;
@@ -419,9 +417,9 @@ void SequencerPlaybackEngine::processNoteRepeat() const
 
 void SequencerPlaybackEngine::stopSequencer() const
 {
-    auto seq = sequencer->getCurrentlyPlayingSequence();
+    const auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->getTransport()->stop();
-    setTickPositionEffectiveImmediately(0);
+    setTickPositionEffectiveImmediately(0, seq->getSequenceIndex());
 }
 
 void SequencerPlaybackEngine::work(const int nFrames)
@@ -495,9 +493,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         engineHost->flushNoteOffs();
         sequencer->getTransport()->setPosition(wrappedPosition);
-        seq->syncTrackEventIndices(
-            Sequencer::quarterNotesToTicks(wrappedPosition));
         manager->drainQueue();
+        seq->syncTrackEventIndices();
         manager->drainQueue();
     }
 
@@ -573,7 +570,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->getTransport()->bumpPositionByTicks(1);
             manager->drainQueue();
-            stopCountingInIfRequired();
+            stopCountingInIfRequired(seq->getSequenceIndex());
             continue;
         }
 

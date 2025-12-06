@@ -27,11 +27,34 @@ void SequenceStateHandler::applyMessage(
         {
             manager->trackStateHandler->applyMessage(state, actions, m);
         },
-        [&](const SyncTrackEventIndices &)
+        [&](const SyncTrackEventIndices &m)
         {
-            sequencer->getSelectedSequence()->syncTrackEventIndices(
-                Sequencer::quarterNotesToTicks(
-                    state.transport.positionQuarterNotes));
+            const auto positionTicks = Sequencer::quarterNotesToTicks(
+                    state.transport.positionQuarterNotes);
+
+            auto &tracks = state.sequences[m.sequenceIndex].tracks;
+
+            for (auto &track : tracks)
+            {
+                if (positionTicks == 0 || !track.eventsHead)
+                {
+                    track.playEventIndex = EventIndex(0);
+                    continue;
+                }
+
+                const EventData *ev = track.eventsHead;
+                auto eventCounter = EventIndex(0);
+                while (ev)
+                {
+                    if (ev->tick >= positionTicks)
+                    {
+                        track.playEventIndex = eventCounter;
+                        break;
+                    }
+                    ++eventCounter;
+                    ev = ev->next;
+                }
+            }
         },
         [&](const SetLoopEnabled &m)
         {
@@ -112,7 +135,7 @@ void SequenceStateHandler::applyMessage(
 
             for (const auto &t : state.sequences[m.sequenceIndex].tracks)
             {
-                EventData *it = t.head;
+                EventData *it = t.eventsHead;
                 while (it)
                 {
                     const int tick = it->tick;
@@ -239,7 +262,7 @@ void SequenceStateHandler::applyInsertBars(
 
         for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
         {
-            auto it = seq.tracks[i].head;
+            auto it = seq.tracks[i].eventsHead;
 
             while (it)
             {

@@ -336,8 +336,7 @@ void Transport::moveSongToStepThatContainsPosition(
 
         const auto step = song->getStep(SongStepIndex(stepIndex));
 
-        if (const auto sequence =
-                sequencer.getSequence(step.sequenceIndex);
+        if (const auto sequence = sequencer.getSequence(step.sequenceIndex);
             sequence->isUsed())
         {
             stepEndTick =
@@ -819,12 +818,14 @@ void Transport::setClock(int i) const
 
 void Transport::setPosition(const double positionQuarterNotes) const
 {
-    sequencer.getStateManager()->enqueue(
-        SetPositionQuarterNotes{positionQuarterNotes});
+    const auto stateManager = sequencer.getStateManager();
+
+    stateManager->enqueue(SetPositionQuarterNotes{positionQuarterNotes});
 
     if (!isPlaying())
     {
-        sequencer.getStateManager()->enqueue(SyncTrackEventIndices{});
+        stateManager->enqueue(SyncTrackEventIndices{
+            stateManager->getSnapshot().getSelectedSequenceIndex()});
     }
 }
 

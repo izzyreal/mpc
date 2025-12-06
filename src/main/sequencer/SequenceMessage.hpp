@@ -89,6 +89,7 @@ namespace mpc::sequencer
 
     struct SyncTrackEventIndices
     {
+        SequenceIndex sequenceIndex;
     };
 
     struct MoveTrack

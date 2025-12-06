@@ -69,135 +69,135 @@ void TransportStateHandler::installCountIn(TransportState &state,
 void TransportStateHandler::applyMessage(TransportState &state,
                                          const TransportMessage &msg)
 {
-    const auto visitor = Overload{
-        [&](const SetPositionQuarterNotes &m)
-        {
-            state.positionQuarterNotes = m.positionQuarterNotes;
-        },
-        [&](const StopSequence &)
-        {
-            applyStopSequence(state);
-        },
-        [&](const PlaySequence &)
-        {
-            installCountIn(state, false);
-            applyPlaySequence(state);
-        },
-        [&](const Record &)
-        {
-            state.recordingEnabled = true;
-            applyMessage(state, PlaySequence{});
-        },
-        [&](const RecordFromStart &)
-        {
-            state.recordingEnabled = true;
-            applyMessage(state, PlaySequenceFromStart{});
-        },
-        [&](const Overdub &)
-        {
-            state.overdubbingEnabled = true;
-            applyMessage(state, PlaySequence{});
-        },
-        [&](const OverdubFromStart &)
-        {
-            state.overdubbingEnabled = true;
-            applyMessage(state, PlaySequenceFromStart{});
-        },
-        [&](const SetRecordingEnabled &m)
-        {
-            state.recordingEnabled = m.recording;
-        },
-        [&](const SetOverdubbingEnabled &m)
-        {
-            state.overdubbingEnabled = m.overdubbing;
-        },
-        [&](const SwitchRecordToOverdub &)
-        {
-            state.recordingEnabled = false;
-            state.overdubbingEnabled = true;
-        },
-        [&](const PlaySequenceFromStart &)
-        {
-            state.positionQuarterNotes = 0;
-            installCountIn(state, true);
-            applyPlaySequence(state);
-        },
-        [&](const SetCountEnabled &m)
-        {
-            state.countEnabled = m.enabled;
-        },
-        [&](const SetMetronomeOnlyEnabled &m)
-        {
-            state.metronomeOnlyEnabled = m.enabled;
-        },
-        [&](const SetMetronomeOnlyTickPosition &m)
-        {
-            state.metronomeOnlyPositionTicks = m.position;
-        },
-        [&](const BumpMetronomeOnlyTickPositionOneTick &)
-        {
-            state.metronomeOnlyPositionTicks += 1;
-        },
-        [&](const PlayMetronomeOnly &)
-        {
-            state.metronomeOnlyPositionTicks = 0;
-            state.metronomeOnlyEnabled = true;
-            state.sequencerRunning = true;
-        },
-        [&](const StopMetronomeOnly &)
-        {
-            state.sequencerRunning = false;
-            state.metronomeOnlyEnabled = false;
-            state.metronomeOnlyPositionTicks = 0;
-        },
-        [&](const PlaySong &)
-        {
-            installCountIn(state, false);
-            applyPlaySong(state);
-        },
-        [&](const PlaySongFromStart &)
-        {
-            sequencer->setSelectedSongStepIndex(MinSongStepIndex);
-            manager->enqueue(PlaySong{});
-        },
-        [&](const StopSong &)
-        {
-            applyStopSequence(state);
-            applyStopSong(state);
-        },
-        [&](const SetCountInPositions &m)
-        {
-            state.countInStartPos = m.start;
-            state.countInEndPos = m.end;
-        },
-        [&](const SetEndOfSongEnabled &m)
-        {
-            state.endOfSong = m.endOfSongEnabled;
-        },
-        [&](const SetPlayedSongStepRepetitionCount &m)
-        {
-            state.playedSongStepRepetitionCount = m.count;
-        },
-        [&](const SetMasterTempo &m)
-        {
-            state.masterTempo = m.tempo;
-        },
-        [&](const SetTempoSourceIsSequence &m)
-        {
-            state.tempoSourceIsSequenceEnabled = m.enabled;
-        },
-        [&](const SetShouldWaitForMidiClockLock &m)
-        {
-            state.shouldWaitForMidiClockLock = m.enabled;
-        },
-        [&](const SetPositionTicksToReturnToWhenReleaseRec &m)
-        {
-            state.positionTicksToReturnToWhenReleasingRec = m.pos;
-        },
-        [&](const SetCountingIn &m)
-        {
-            state.countingIn = m.countingIn;
-        }};
+    const auto visitor =
+        Overload{[&](const SetPositionQuarterNotes &m)
+                 {
+                     state.positionQuarterNotes = m.positionQuarterNotes;
+                 },
+                 [&](const StopSequence &)
+                 {
+                     applyStopSequence(state);
+                 },
+                 [&](const PlaySequence &)
+                 {
+                     installCountIn(state, false);
+                     applyPlaySequence(state);
+                 },
+                 [&](const Record &)
+                 {
+                     state.recordingEnabled = true;
+                     applyMessage(state, PlaySequence{});
+                 },
+                 [&](const RecordFromStart &)
+                 {
+                     state.recordingEnabled = true;
+                     applyMessage(state, PlaySequenceFromStart{});
+                 },
+                 [&](const Overdub &)
+                 {
+                     state.overdubbingEnabled = true;
+                     applyMessage(state, PlaySequence{});
+                 },
+                 [&](const OverdubFromStart &)
+                 {
+                     state.overdubbingEnabled = true;
+                     applyMessage(state, PlaySequenceFromStart{});
+                 },
+                 [&](const SetRecordingEnabled &m)
+                 {
+                     state.recordingEnabled = m.recording;
+                 },
+                 [&](const SetOverdubbingEnabled &m)
+                 {
+                     state.overdubbingEnabled = m.overdubbing;
+                 },
+                 [&](const SwitchRecordToOverdub &)
+                 {
+                     state.recordingEnabled = false;
+                     state.overdubbingEnabled = true;
+                 },
+                 [&](const PlaySequenceFromStart &)
+                 {
+                     state.positionQuarterNotes = 0;
+                     installCountIn(state, true);
+                     applyPlaySequence(state);
+                 },
+                 [&](const SetCountEnabled &m)
+                 {
+                     state.countEnabled = m.enabled;
+                 },
+                 [&](const SetMetronomeOnlyEnabled &m)
+                 {
+                     state.metronomeOnlyEnabled = m.enabled;
+                 },
+                 [&](const SetMetronomeOnlyTickPosition &m)
+                 {
+                     state.metronomeOnlyPositionTicks = m.position;
+                 },
+                 [&](const BumpMetronomeOnlyTickPositionOneTick &)
+                 {
+                     state.metronomeOnlyPositionTicks += 1;
+                 },
+                 [&](const PlayMetronomeOnly &)
+                 {
+                     state.metronomeOnlyPositionTicks = 0;
+                     state.metronomeOnlyEnabled = true;
+                     state.sequencerRunning = true;
+                 },
+                 [&](const StopMetronomeOnly &)
+                 {
+                     state.sequencerRunning = false;
+                     state.metronomeOnlyEnabled = false;
+                     state.metronomeOnlyPositionTicks = 0;
+                 },
+                 [&](const PlaySong &)
+                 {
+                     installCountIn(state, false);
+                     applyPlaySong(state);
+                 },
+                 [&](const PlaySongFromStart &)
+                 {
+                     sequencer->setSelectedSongStepIndex(MinSongStepIndex);
+                     manager->enqueue(PlaySong{});
+                 },
+                 [&](const StopSong &)
+                 {
+                     applyStopSequence(state);
+                     applyStopSong(state);
+                 },
+                 [&](const SetCountInPositions &m)
+                 {
+                     state.countInStartPos = m.start;
+                     state.countInEndPos = m.end;
+                 },
+                 [&](const SetEndOfSongEnabled &m)
+                 {
+                     state.endOfSong = m.endOfSongEnabled;
+                 },
+                 [&](const SetPlayedSongStepRepetitionCount &m)
+                 {
+                     state.playedSongStepRepetitionCount = m.count;
+                 },
+                 [&](const SetMasterTempo &m)
+                 {
+                     state.masterTempo = m.tempo;
+                 },
+                 [&](const SetTempoSourceIsSequence &m)
+                 {
+                     state.tempoSourceIsSequenceEnabled = m.enabled;
+                 },
+                 [&](const SetShouldWaitForMidiClockLock &m)
+                 {
+                     state.shouldWaitForMidiClockLock = m.enabled;
+                 },
+                 [&](const SetPositionTicksToReturnToWhenReleaseRec &m)
+                 {
+                     state.positionTicksToReturnToWhenReleasingRec = m.pos;
+                 },
+                 [&](const SetCountingIn &m)
+                 {
+                     state.countingIn = m.countingIn;
+                 }};
 
     std::visit(visitor, msg);
 }
@@ -222,9 +222,11 @@ void TransportStateHandler::applyPlaySequence(
     }
 
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
-    manager->applyMessage(SyncTrackEventIndices{});
+    manager->applyMessage(SyncTrackEventIndices{
+        manager->getSnapshot().getSelectedSequenceIndex()});
 
-    if (sequencer->getScreens()->get<lcdgui::ScreenId::SyncScreen>()->modeOut != 0)
+    if (sequencer->getScreens()->get<lcdgui::ScreenId::SyncScreen>()->modeOut !=
+        0)
     {
         state.shouldWaitForMidiClockLock = true;
     }
@@ -239,8 +241,6 @@ void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
     const auto countMetronomeScreen =
         sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
 
-    const auto activeSequence = sequencer->getSelectedSequence();
-
     sequencer->clock->reset();
 
     if (sequencer->isBouncePrepared())
@@ -249,7 +249,8 @@ void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
     }
 
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
-    manager->applyMessage(SyncTrackEventIndices{});
+    manager->applyMessage(SyncTrackEventIndices{
+        manager->getSnapshot().getSelectedSequenceIndex()});
     state.sequencerRunning = true;
 }
 

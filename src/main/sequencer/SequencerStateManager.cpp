@@ -94,7 +94,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 activeState.selectedSequenceIndex = m.sequenceIndexOfFirstStep;
                 activeState.transport.positionQuarterNotes = 0;
-                applyMessage(SyncTrackEventIndices{});
+                applyMessage(SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
         [&](const SetSelectedSongStepIndex &m)
@@ -105,7 +105,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 activeState.selectedSequenceIndex = m.sequenceIndexForThisStep;
                 activeState.transport.positionQuarterNotes = 0;
-                applyMessage(SyncTrackEventIndices{});
+                applyMessage(SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
         [&](const CopyBars &m)
@@ -190,7 +190,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     if (!m.copyModeMerge)
     {
         EventData *prev = nullptr;
-        EventData *cur = destTrack.head;
+        EventData *cur = destTrack.eventsHead;
 
         while (cur)
         {
@@ -208,7 +208,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
                 }
                 else
                 {
-                    destTrack.head = next;
+                    destTrack.eventsHead = next;
                 }
                 if (next)
                 {
@@ -226,7 +226,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     }
 
     const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
-    const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].head;
+    const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].eventsHead;
 
     while (src)
     {
@@ -373,7 +373,7 @@ void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
     e->prev = nullptr;
     e->next = nullptr;
 
-    EventData*& head = track.head;
+    EventData*& head = track.eventsHead;
 
     if (!head)
     {

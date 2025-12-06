@@ -7,7 +7,7 @@ namespace mpc::sequencer
 {
     struct TrackState
     {
-        EventData *head;
+        EventData *eventsHead;
         EventIndex playEventIndex;
         BusType busType;
         bool on;
@@ -23,7 +23,7 @@ namespace mpc::sequencer
 
         void initializeDefaults()
         {
-            head = nullptr;
+            eventsHead = nullptr;
             playEventIndex = EventIndex(0);
             busType = BusType::DRUM1;
             on = true;

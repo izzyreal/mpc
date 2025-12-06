@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "engine/audio/server/AudioClient.hpp"
 #include "engine/NoteRepeatProcessor.hpp"
 
@@ -73,7 +74,7 @@ namespace mpc::engine
 
         void displayPunchRects() const;
 
-        void stopCountingInIfRequired() const;
+        void stopCountingInIfRequired(SequenceIndex) const;
 
         std::shared_ptr<sequencer::Sequence> switchToNextSequence() const;
 
@@ -85,7 +86,7 @@ namespace mpc::engine
 
         void processNoteRepeat() const;
 
-        void setTickPositionEffectiveImmediately(int newTickPos) const;
+        void setTickPositionEffectiveImmediately(int newTickPos, SequenceIndex) const;
 
         void stopSequencer() const;
     };

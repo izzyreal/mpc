@@ -630,18 +630,7 @@ std::shared_ptr<Track> Sequence::getTempoChangeTrack() const
     return tracks[TempoChangeTrackIndex];
 }
 
-void Sequence::syncTrackEventIndices(const int tick) const
+void Sequence::syncTrackEventIndices() const
 {
-    if (!isUsed() || tick > getLastTick())
-    {
-        return;
-    }
-
-    for (auto &t : tracks)
-    {
-        if (t->isUsed())
-        {
-            t->syncEventIndex(tick, tick);
-        }
-    }
+    dispatch(SyncTrackEventIndices{getSequenceIndex()});
 }
