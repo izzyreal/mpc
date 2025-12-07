@@ -30,15 +30,15 @@ namespace mpc::sequencer
         explicit SequencerStateManager(Sequencer *);
         ~SequencerStateManager() override;
 
-        using EventStateFreeList =
+        using EventPool =
             concurrency::FreeList<EventData,
                                   Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 
-        std::shared_ptr<EventStateFreeList> pool;
+        std::shared_ptr<EventPool> eventPool;
 
-        void returnEventToPool(EventData *e) const;
+        void returnEventToPool(EventData *) const;
 
-        void insertAcquiredEvent(TrackState &track, EventData *e) const;
+        void insertAcquiredEvent(TrackState &, EventData *) const;
 
         EventData *acquireEvent() const;
 

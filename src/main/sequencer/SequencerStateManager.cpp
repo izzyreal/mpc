@@ -18,7 +18,7 @@ using namespace mpc::concurrency;
 SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     : AtomicStateExchange([](SequencerState &) {}), sequencer(sequencer)
 {
-    pool = std::make_shared<EventStateFreeList>();
+    eventPool = std::make_shared<EventPool>();
 
     transportStateHandler =
         std::make_unique<TransportStateHandler>(this, sequencer);
@@ -46,13 +46,13 @@ void SequencerStateManager::returnEventToPool(EventData *e) const
     e->resetToDefaultValues();
 
     // Return pointer to freelist
-    pool->release(e);
+    eventPool->release(e);
 }
 
 EventData *SequencerStateManager::acquireEvent() const
 {
     EventData *e = nullptr;
-    if (!pool->acquire(e))
+    if (!eventPool->acquire(e))
     {
         return nullptr;
     }
