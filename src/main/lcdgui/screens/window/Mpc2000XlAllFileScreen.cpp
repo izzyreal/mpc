@@ -48,5 +48,6 @@ void Mpc2000XlAllFileScreen::function(const int i)
             mpc.getDisk()->readAll2(loadScreen->getSelectedFile(), on_success);
             break;
         }
+        default:;
     }
 }

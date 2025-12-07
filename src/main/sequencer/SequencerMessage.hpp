@@ -58,8 +58,14 @@ namespace mpc::sequencer
         int destinationBarCount;
     };
 
+    struct DeleteSequence
+    {
+        SequenceIndex sequenceIndex;
+    };
+
     using SequencerMessage =
         std::variant<TransportMessage, SequenceMessage, SongMessage, CopyEvents,
                      SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars,
-                     SetSelectedSongIndex, SetSelectedSongStepIndex>;
+                     SetSelectedSongIndex, SetSelectedSongStepIndex,
+                     DeleteSequence>;
 } // namespace mpc::sequencer

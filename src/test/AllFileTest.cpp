@@ -51,7 +51,7 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 
     const auto sequencer = mpc.getSequencer();
     const auto stateManager = sequencer->getStateManager();
-    sequencer->purgeAllSequences();
+    sequencer->deleteAllSequences();
 
     stateManager->drainQueue();
 

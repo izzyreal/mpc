@@ -91,7 +91,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 
     int index = 0;
 
-    mpcSequencer->purgeAllSequences();
+    mpcSequencer->deleteAllSequences();
 
     for (auto &as : allSequences)
     {

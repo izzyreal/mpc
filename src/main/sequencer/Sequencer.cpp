@@ -133,7 +133,7 @@ void Sequencer::init()
 
     soloEnabled = false;
 
-    purgeAllSequences();
+    deleteAllSequences();
 
     const auto dispatch = [manager = stateManager](SongMessage &&m)
     {
@@ -361,7 +361,7 @@ void Sequencer::setSequence(const SequenceIndex sequenceIndex,
     sequences[sequenceIndex].swap(s);
 }
 
-void Sequencer::purgeAllSequences()
+void Sequencer::deleteAllSequences()
 {
     for (int i = 0; i < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT; i++)
     {
@@ -467,6 +467,7 @@ void Sequencer::deleteSequence(const int i)
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
     sequences[i]->setName(res);
+    stateManager->enqueue(DeleteSequence{SequenceIndex(i)});
 }
 
 void Sequencer::copySequence(const int source, const int destination)
