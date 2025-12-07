@@ -3,8 +3,10 @@
 #include "sequencer/SequencerState.hpp"
 #include "sequencer/SequencerStateView.hpp"
 #include "sequencer/SequencerMessage.hpp"
+
 #include "concurrency/AtomicStateExchange.hpp"
 #include "concurrency/FreeList.hpp"
+#include "concurrency/SpinLock.hpp"
 
 #include <functional>
 #include <memory>
@@ -16,36 +18,6 @@ namespace mpc::sequencer
     class SequenceStateHandler;
     class TrackStateHandler;
     class SongStateHandler;
-
-    struct TrackLock
-    {
-        std::atomic<bool> flag{false};
-
-        bool try_acquire()
-        {
-            bool expected = false;
-            return flag.compare_exchange_strong(expected, true,
-                                                std::memory_order_acquire,
-                                                std::memory_order_relaxed);
-        }
-
-        void release()
-        {
-            flag.store(false, std::memory_order_release);
-        }
-
-        void acquire()
-        {
-            for (;;)
-            {
-                if (try_acquire())
-                {
-                    return;
-                }
-                std::this_thread::yield();
-            }
-        }
-    };
 
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
@@ -67,7 +39,7 @@ namespace mpc::sequencer
 
         EventData *acquireEvent() const;
 
-        std::array<std::array<TrackLock, Mpc2000XlSpecs::TOTAL_TRACK_COUNT>,
+        std::array<std::array<concurrency::SpinLock, Mpc2000XlSpecs::TOTAL_TRACK_COUNT>,
                    Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
             trackLocks;
 
