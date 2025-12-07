@@ -19,10 +19,10 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
         busses[i] = loadBytes[BUSSES_OFFSET + i];
         pgms[i] = loadBytes[PGMS_OFFSET + i];
         veloRatios[i] = loadBytes[VELO_RATIOS_OFFSET + i];
-        auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
+        const auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
         std::string name;
 
-        for (char c : Util::vecCopyOfRange(loadBytes, offset,
+        for (const char c : Util::vecCopyOfRange(loadBytes, offset,
                                            offset + AllParser::NAME_LENGTH))
         {
             if (c == 0x00)
@@ -33,7 +33,12 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
         }
 
         names[i] = name;
-        status[i] = loadBytes[STATUS_OFFSET + i];
+
+        const auto statusByte = loadBytes[STATUS_OFFSET + i];
+
+        usednesses[i] = (statusByte >> 0) & 1;
+        ons[i] = (statusByte >> 1) & 1;
+        transmitProgramChangesEnableds[i] = (statusByte >> 2) & 1;
     }
 }
 
@@ -42,11 +47,11 @@ Tracks::Tracks(sequencer::Sequence *seq)
     saveBytes = std::vector<char>(AllSequence::TRACKS_LENGTH);
     for (int i = 0; i < 64; i++)
     {
-        auto t = seq->getTrack(i);
+        const auto t = seq->getTrack(i);
 
         for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
-            auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
+            const auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
             auto name = StrUtil::padRight(t->getActualName(), " ",
                                           AllParser::NAME_LENGTH);
             saveBytes[offset + j] = name[j];
@@ -57,33 +62,11 @@ Tracks::Tracks(sequencer::Sequence *seq)
         saveBytes[PGMS_OFFSET + i] = t->getProgramChange();
         saveBytes[VELO_RATIOS_OFFSET + i] = t->getVelocityRatio();
 
-        /**
-         * 4 == track is unused and off
-         * 5 == track is used and off
-         * 6 == track is unused and on
-         * 7 == track is used and on
-         */
-        int saveStatus = 4;
-
-        if (t->isUsed() && t->isOn())
-        {
-            saveStatus = 7;
-        }
-        else if (t->isUsed())
-        {
-            saveStatus = 5;
-        }
-        else if (t->isOn())
-        {
-            saveStatus = 6;
-        }
-
-        if (t->isUsed() && !t->isOn())
-        {
-            saveStatus = 5;
-        }
-
-        saveBytes[STATUS_OFFSET + i] = saveStatus;
+        uint8_t b = 0;
+        if (t->isUsed())                          b |= 1u << 0;
+        if (t->isOn())                            b |= 1u << 1;
+        if (t->isTransmitProgramChangesEnabled()) b |= 1u << 2;
+        saveBytes[STATUS_OFFSET + i] = b;
     }
 
     for (int i = 0; i < PADDING1.size(); i++)
@@ -91,21 +74,22 @@ Tracks::Tracks(sequencer::Sequence *seq)
         saveBytes[PADDING1_OFFSET + i] = PADDING1[i];
     }
 
-    auto lastTick = seq->getLastTick();
-    auto remainder = lastTick % 65535;
-    auto large = static_cast<int>(floor(lastTick / 65536.0));
-    auto lastTickBytes = ByteUtil::ushort2bytes(remainder);
+    const auto lastTick = seq->getLastTick();
+    const auto remainder = lastTick % 65535;
+    const auto large = static_cast<int>(floor(lastTick / 65536.0));
+    const auto lastTickBytes = ByteUtil::ushort2bytes(remainder);
     saveBytes[LAST_TICK_BYTE1_OFFSET] = lastTickBytes[0];
     saveBytes[LAST_TICK_BYTE2_OFFSET] = lastTickBytes[1];
     saveBytes[LAST_TICK_BYTE3_OFFSET] = large;
 
-    auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
-    auto unknown32BitIntBytes2 =
-        ByteUtil::uint2bytes((int)(seq->getLastTick() * 5208.333333333333));
+    const auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
+    const auto unknown32BitIntBytes2 =
+        ByteUtil::uint2bytes(
+        static_cast<int>(seq->getLastTick() * 5208.333333333333));
 
     for (int j = 0; j < 4; j++)
     {
-        int offset = UNKNOWN32_BIT_INT_OFFSET + j;
+        const int offset = UNKNOWN32_BIT_INT_OFFSET + j;
         saveBytes[offset] = unknown32BitIntBytes1[j];
     }
 
@@ -116,36 +100,46 @@ Tracks::Tracks(sequencer::Sequence *seq)
 }
 
 std::vector<char> Tracks::PADDING1 = std::vector<char>{
-    (char)232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)232, 3};
+    static_cast<char>(232), 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, static_cast<char>(232), 3};
 
-int Tracks::getDevice(int i) const
+int Tracks::getDevice(const int i) const
 {
     return devices[i];
 }
 
-int Tracks::getBus(int i) const
+int Tracks::getBus(const int i) const
 {
     return busses[i];
 }
 
-int Tracks::getVelo(int i) const
+int Tracks::getVelo(const int i) const
 {
     return veloRatios[i];
 }
 
-int Tracks::getPgm(int i) const
+int Tracks::getPgm(const int i) const
 {
     return pgms[i];
 }
 
-std::string Tracks::getName(int i)
+std::string Tracks::getName(const int i)
 {
     return names[i];
 }
 
-int Tracks::getStatus(int i) const
+bool Tracks::isUsed(const int i) const
 {
-    return status[i];
+    return usednesses[i];
+}
+
+bool Tracks::isOn(const int i) const
+{
+    return ons[i];
+}
+
+bool Tracks::isTransmitProgramChangesEnabled(const int i)
+{
+    return transmitProgramChangesEnableds[i];
 }
 
 std::vector<char> &Tracks::getBytes()

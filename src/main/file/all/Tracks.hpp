@@ -30,7 +30,9 @@ namespace mpc::file::all
         std::vector<int> veloRatios = std::vector<int>(64);
         std::vector<int> pgms = std::vector<int>(64);
         std::vector<std::string> names = std::vector<std::string>(64);
-        std::vector<int> status = std::vector<int>(64);
+        std::vector<bool> usednesses = std::vector<bool>(64);
+        std::vector<bool> ons = std::vector<bool>(64);
+        std::vector<bool> transmitProgramChangesEnableds = std::vector<bool>(64);
 
     public:
         std::vector<char> saveBytes{};
@@ -40,11 +42,13 @@ namespace mpc::file::all
         int getVelo(int i) const;
         int getPgm(int i) const;
         std::string getName(int i);
-        int getStatus(int i) const;
+        bool isUsed(int i) const;
+        bool isOn(int i) const;
+        bool isTransmitProgramChangesEnabled(int i);
 
         std::vector<char> &getBytes();
 
-        Tracks(const std::vector<char> &loadBytes);
-        Tracks(sequencer::Sequence *seq);
+        explicit Tracks(const std::vector<char> &loadBytes);
+        explicit Tracks(sequencer::Sequence *seq);
     };
 } // namespace mpc::file::all

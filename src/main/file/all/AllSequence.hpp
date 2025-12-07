@@ -122,7 +122,7 @@ namespace mpc::file::all
 
         void
         applyToMpcSeq(const std::shared_ptr<sequencer::Sequence> &mpcSeq,
-                           sequencer::SequencerStateManager *) const;
+                           const sequencer::SequencerStateManager *) const;
 
         explicit AllSequence(const std::vector<char> &bytes);
         AllSequence(sequencer::Sequence *seq, int number);

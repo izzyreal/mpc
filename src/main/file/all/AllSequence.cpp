@@ -109,7 +109,7 @@ AllSequence::~AllSequence()
 }
 
 void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
-                                SequencerStateManager *manager) const
+                                const SequencerStateManager *manager) const
 {
     mpcSeq->init(barCount - 1);
 
@@ -135,12 +135,12 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
         t->setDeviceIndex(at->getDevice(i), updateUsedness);
         t->setBusType(busIndexToBusType(at->getBus(i)), updateUsedness);
         t->setProgramChange(at->getPgm(i), updateUsedness);
-        t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7, updateUsedness);
+        t->setOn(at->isOn(i), updateUsedness);
         t->setVelocityRatio(at->getVelo(i), updateUsedness);
+        t->setTransmitProgramChangesEnabled(at->isTransmitProgramChangesEnabled(i));
 
-        const bool trackIsUsed = at->getStatus(i) == 5 || at->getStatus(i) == 7;
         manager->enqueue(SetTrackUsed{mpcSeq->getSequenceIndex(), TrackIndex(i),
-                                      trackIsUsed});
+                                      at->isUsed(i)});
     }
 
     for (int j = 0; j < getEventAmount(); j++)
