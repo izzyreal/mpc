@@ -134,6 +134,8 @@ TEST_CASE("ALL file track is on, used and transmits program changes", "[allfile]
 
     saveAndLoadTestAllFile(mpc);
 
+    stateManager->drainQueue();
+
     assert(sequencer->getUsedSequenceCount() == 1);
 
     auto seq1 = sequencer->getSelectedSequence();
@@ -175,6 +177,8 @@ TEST_CASE("ALL file note event", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
+    stateManager->drainQueue();
+
     assert(sequencer->getUsedSequenceCount() == 1);
 
     auto seq1 = sequencer->getSelectedSequence();
@@ -214,6 +218,8 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
     deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
+
+    stateManager->drainQueue();
 
     assert(sequencer->getUsedSequenceCount() == 1);
 
