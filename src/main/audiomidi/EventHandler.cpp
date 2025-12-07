@@ -411,5 +411,10 @@ void EventHandler::handleNoteEventMidiOut(
     mpc.getMidiOutput()->enqueueEvent(msg);
 
     // For the MIDI output monitor screen
-    notifyObservers(midiChannel < 16 ? "a" : "b" + std::to_string(midiChannel));
+    mpc.getLayeredScreen()->postToUiThread(utils::Task(
+        [this, midiChannel]
+        {
+            notifyObservers(
+                midiChannel < 16 ? "a" : "b" + std::to_string(midiChannel));
+        }));
 }
