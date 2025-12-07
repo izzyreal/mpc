@@ -33,6 +33,7 @@ void ChangeBarsScreen::function(const int i)
                 sequencer.lock()->getTransport()->setPosition(0);
             }
 
+            sequencer.lock()->copySelectedSequenceToUndoSequence();
             seq->insertBars(numberOfBars, BarIndex(afterBar));
 
             openScreenById(ScreenId::SequencerScreen);
@@ -45,6 +46,7 @@ void ChangeBarsScreen::function(const int i)
                 sequencer.lock()->getTransport()->setPosition(0);
             }
 
+            sequencer.lock()->copySelectedSequenceToUndoSequence();
             seq->deleteBars(firstBar, lastBar);
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -55,7 +57,6 @@ void ChangeBarsScreen::function(const int i)
 
 void ChangeBarsScreen::turnWheel(const int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "afterbar")

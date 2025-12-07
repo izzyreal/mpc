@@ -43,24 +43,22 @@ void LoadASequenceFromAllScreen::turnWheel(const int i)
 
 void LoadASequenceFromAllScreen::function(const int i)
 {
-
-    switch (i)
+    if (i == 3)
     {
-        case 3:
-            openScreenById(ScreenId::Mpc2000XlAllFileScreen);
-            break;
-        case 4:
-            const auto candidate = sequencesFromAllFile[sourceSeqIndex];
+        openScreenById(ScreenId::Mpc2000XlAllFileScreen);
+    }
+    else if (i == 4)
+    {
+        if (const auto candidate = sequencesFromAllFile[sourceSeqIndex])
+        {
+            const auto loadASequenceScreen =
+                mpc.screens->get<ScreenId::LoadASequenceScreen>();
 
-            if (candidate)
-            {
-                const auto loadASequenceScreen =
-                    mpc.screens->get<ScreenId::LoadASequenceScreen>();
-                sequencer.lock()->setSequence(loadASequenceScreen->loadInto,
-                                              candidate);
-                openScreenById(ScreenId::LoadScreen);
-            }
-            break;
+            sequencer.lock()->copySequence(candidate,
+                                           loadASequenceScreen->loadInto);
+
+            openScreenById(ScreenId::LoadScreen);
+        }
     }
 }
 

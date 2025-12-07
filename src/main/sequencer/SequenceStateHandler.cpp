@@ -95,10 +95,6 @@ void SequenceStateHandler::applyMessage(
         {
             state.sequences[m.sequenceIndex].initialTempo = m.initialTempo;
         },
-        [&](const UpdateBarLength &m)
-        {
-            state.sequences[m.sequenceIndex].barLengths[m.barIndex] = m.length;
-        },
         [&](const UpdateBarLengths &m)
         {
             state.sequences[m.sequenceIndex].barLengths = m.barLengths;
@@ -186,7 +182,7 @@ void SequenceStateHandler::applyMessage(
         },
         [&](const DeleteTrack &m)
         {
-            applyMessage(state, actions, ClearEvents{m.sequenceIndex, m.trackIndex});
+            applyMessage(state, actions, RemoveEvents{m.sequenceIndex, m.trackIndex});
             state.sequences[m.sequenceIndex].tracks[m.trackIndex].initializeDefaults();
         },
         [&](const DeleteAllTracks &m)

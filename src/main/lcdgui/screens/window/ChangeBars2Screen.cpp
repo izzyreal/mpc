@@ -49,6 +49,7 @@ void ChangeBars2Screen::function(const int i)
 
             if (newBars < lastBarIndex)
             {
+                sequencer.lock()->copySelectedSequenceToUndoSequence();
                 seq->deleteBars(newBars + 1, lastBarIndex);
                 lastBarIndex = seq->getLastBarIndex();
                 changed = true;
@@ -56,6 +57,7 @@ void ChangeBars2Screen::function(const int i)
 
             if (newBars > lastBarIndex)
             {
+                sequencer.lock()->copySelectedSequenceToUndoSequence();
                 seq->insertBars(newBars - lastBarIndex,
                                 BarIndex(lastBarIndex + 1));
                 changed = true;

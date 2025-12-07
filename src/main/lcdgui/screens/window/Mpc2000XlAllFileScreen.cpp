@@ -29,8 +29,10 @@ void Mpc2000XlAllFileScreen::function(const int i)
             {
                 const auto loadASequenceFromAllScreen =
                     mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+
                 loadASequenceFromAllScreen->sequencesFromAllFile =
                     result.value();
+
                 openScreenById(ScreenId::LoadASequenceFromAllScreen);
             }
 

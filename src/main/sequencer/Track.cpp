@@ -60,6 +60,7 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
+    name.reserve(Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
 }
 
 Track::~Track() {}
@@ -160,7 +161,7 @@ void Track::removeEvent(EventData *eventState) const
 
 void Track::removeEvents() const
 {
-    dispatch(ClearEvents{getSequenceIndex(), getIndex()});
+    dispatch(RemoveEvents{getSequenceIndex(), getIndex()});
 }
 
 void Track::setVelocityRatio(const int i, const bool updateUsedness)

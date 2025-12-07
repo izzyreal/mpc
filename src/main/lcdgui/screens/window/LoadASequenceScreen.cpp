@@ -63,13 +63,17 @@ void LoadASequenceScreen::function(const int i)
     {
         case 3:
             mpc.getLayeredScreen()->closeCurrentScreen();
-            sequencer.lock()->clearPlaceHolder();
+            sequencer.lock()->getSequence(TempSequenceIndex)->init(0);
             break;
         case 4:
-            sequencer.lock()->movePlaceHolderTo(loadInto);
-            sequencer.lock()->setSelectedSequenceIndex(loadInto, true);
+        {
+            const auto lockedSequencer = sequencer.lock();
+            lockedSequencer->copySequence(
+                lockedSequencer->getSequence(TempSequenceIndex), loadInto);
+            lockedSequencer->setSelectedSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
+        }
         default:;
     }
 }
@@ -89,7 +93,7 @@ void LoadASequenceScreen::displayLoadInto() const
 
 void LoadASequenceScreen::displayFile() const
 {
-    const auto s = sequencer.lock()->getPlaceHolder();
+    const auto s = sequencer.lock()->getSequence(TempSequenceIndex);
     findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +
                                ".MID");
 }

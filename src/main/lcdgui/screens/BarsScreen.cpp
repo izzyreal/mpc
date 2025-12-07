@@ -100,6 +100,12 @@ void BarsScreen::copyBars(const int toSeqIndex, const int copyFirstBar,
                           const int copyAfterBar) const
 {
     const auto fromSequenceIndex = sequencer.lock()->getSelectedSequenceIndex();
+
+    if (toSeqIndex == fromSequenceIndex)
+    {
+        sequencer.lock()->copySelectedSequenceToUndoSequence();
+    }
+
     sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex,
                                  copyFirstBar, copyLastBar, copyCount,
                                  copyAfterBar);

@@ -41,6 +41,7 @@ void DeleteTrackScreen::function(const int i)
             break;
         case 4:
         {
+            sequencer.lock()->copySelectedSequenceToUndoSequence();
             const auto s = sequencer.lock()->getSelectedSequence();
             s->deleteTrack(TrackIndex(tr));
             openScreenById(ScreenId::SequencerScreen);

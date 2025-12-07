@@ -127,7 +127,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
 
             actions.emplace_back(m.onComplete);
         },
-        [&](const ClearEvents &m)
+        [&](const RemoveEvents &m)
         {
             applyClearEvents(m, state);
         },

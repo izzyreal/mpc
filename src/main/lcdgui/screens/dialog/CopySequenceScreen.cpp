@@ -9,11 +9,18 @@ using namespace mpc::lcdgui::screens::dialog;
 CopySequenceScreen::CopySequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-sequence", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displaySq0();
+                        }});
 }
 
 void CopySequenceScreen::open()
 {
-    sq0 = sequencer.lock()->getSelectedSequenceIndex();
     sq1 = sequencer.lock()->getFirstUsedSeqUp(MinSequenceIndex, true);
 
     displaySq0();
@@ -22,20 +29,27 @@ void CopySequenceScreen::open()
 
 void CopySequenceScreen::function(const int i)
 {
+    const auto lockedSequencer = sequencer.lock();
     switch (i)
     {
         case 2:
-            sequencer.lock()->copySequenceParameters(sq0, sq1);
+            lockedSequencer->copySequenceParameters(
+                lockedSequencer->getSelectedSequence(), sq1);
             openScreenById(ScreenId::SequencerScreen);
             break;
         case 3:
             openScreenById(ScreenId::SequenceScreen);
             break;
         case 4:
-            sequencer.lock()->copySequence(sq0, sq1);
-            sequencer.lock()->setSelectedSequenceIndex(sq1, true);
+        {
+            lockedSequencer->copySequence(
+                lockedSequencer->getSelectedSequence(), sq1);
+            constexpr bool shouldSetPositionTo0 = true;
+            lockedSequencer->setSelectedSequenceIndex(sq1,
+                                                      shouldSetPositionTo0);
             openScreenById(ScreenId::SequencerScreen);
             break;
+        }
         default:;
     }
 }
@@ -45,7 +59,7 @@ void CopySequenceScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.find("0") != std::string::npos)
     {
-        setSq0(sq0 + increment);
+        setSq0(sequencer.lock()->getSelectedSequenceIndex() + increment);
     }
     else if (focusedFieldName.find("1") != std::string::npos)
     {
@@ -53,10 +67,11 @@ void CopySequenceScreen::turnWheel(const int increment)
     }
 }
 
-void CopySequenceScreen::setSq0(const SequenceIndex sequenceIndex)
+void CopySequenceScreen::setSq0(const SequenceIndex sequenceIndex) const
 {
-    sq0 = std::clamp(sequenceIndex, MinSequenceIndex, MaxSequenceIndex);
-    displaySq0();
+    constexpr bool shouldSetPositionTo0 = true;
+    sequencer.lock()->setSelectedSequenceIndex(sequenceIndex,
+                                               shouldSetPositionTo0);
 }
 
 void CopySequenceScreen::setSq1(const SequenceIndex sequenceIndex)
@@ -67,9 +82,13 @@ void CopySequenceScreen::setSq1(const SequenceIndex sequenceIndex)
 
 void CopySequenceScreen::displaySq0() const
 {
-    const auto sq0Name = sequencer.lock()->getSequence(sq0)->getName();
+    const auto lockedSequencer = sequencer.lock();
+    const auto sq0Name = lockedSequencer->getSelectedSequence()->getName();
     findField("sq0")->setText(
-        StrUtil::padLeft(std::to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
+        StrUtil::padLeft(
+            std::to_string(lockedSequencer->getSelectedSequenceIndex() + 1),
+            "0", 2) +
+        "-" + sq0Name);
 }
 
 void CopySequenceScreen::displaySq1() const

@@ -126,7 +126,7 @@ void StepEditorScreen::openWindow()
 
 void StepEditorScreen::open()
 {
-    sequencer.lock()->storeSelectedSequenceInUndoPlaceHolder();
+    sequencer.lock()->copySelectedSequenceToUndoSequence();
 
     findField("tonote")->setLocation(115, 0);
     findLabel("fromnote")->Hide(true);

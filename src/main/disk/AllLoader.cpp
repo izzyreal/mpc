@@ -315,6 +315,8 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
     const auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
+    const auto sequencer = mpc.getSequencer();
+
     for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
     {
         if (allSeqNames[i].find("(Unused)") != std::string::npos)
@@ -323,11 +325,13 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i));
+        std::shared_ptr<Sequence> sequence;
 
-        allSequences[counter++]->applyToMpcSeq(mpcSeq, mpc.getSequencer()->getStateManager().get());
+        sequencer->makeNewSequence(sequence);
 
-        mpcSequences.push_back(mpcSeq);
+        allSequences[counter++]->applyToMpcSeq(sequence, sequencer->getStateManager().get());
+
+        mpcSequences.emplace_back(sequence);
     }
 
     return mpcSequences;

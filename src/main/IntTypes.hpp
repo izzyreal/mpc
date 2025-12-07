@@ -103,7 +103,7 @@ namespace mpc
     constexpr SequenceIndex SelectedSequenceIndex{-2};
 
     constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
-    constexpr SequenceIndex PlaceholderSequenceIndex{
+    constexpr SequenceIndex TempSequenceIndex{
         Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
 
     /////////

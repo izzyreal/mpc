@@ -18,6 +18,7 @@ void DeleteAllTracksScreen::function(const int i)
     }
     else if (i == 4)
     {
+        sequencer.lock()->copySelectedSequenceToUndoSequence();
         sequencer.lock()->getSelectedSequence()->deleteAllTracks();
         openScreenById(ScreenId::SequencerScreen);
     }

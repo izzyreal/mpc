@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace mpc
 {
@@ -49,5 +50,8 @@ namespace mpc
         static constexpr int8_t MAX_SONG_COUNT = 20;
         static constexpr uint8_t MAX_SONG_STEP_COUNT = 250;
         static constexpr int8_t MAX_SONG_STEP_REPETITION_COUNT = 99;
+
+        static constexpr int8_t MAX_TRACK_NAME_LENGTH = 16;
+        static constexpr int8_t MAX_SEQUENCE_NAME_LENGTH = 16;
     };
 } // namespace mpc

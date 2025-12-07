@@ -50,9 +50,9 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(const utils::PostToUiThreadFn &, SequenceIndex,
+        Sequence(const utils::PostToUiThreadFn &,
                  std::shared_ptr<SequencerStateManager> manager,
-                 const std::function<std::shared_ptr<SequenceStateView>()>
+                 const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)>
                      &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
@@ -90,6 +90,8 @@ namespace mpc::sequencer
 
         double getInitialTempo() const;
         void setInitialTempo(double initialTempo) const;
+
+        void setSequenceIndex(SequenceIndex);
 
         Tick getLoopStartTick() const;
         Tick getLoopEndTick() const;
@@ -166,10 +168,10 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        const std::function<std::shared_ptr<SequenceStateView>()> getSnapshot;
+        const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)> getSnapshot;
 
     private:
-        SequenceIndex sequenceIndex;
+        SequenceIndex sequenceIndex{NoSequenceIndex};
         std::string name;
         std::shared_ptr<SequencerStateManager> manager;
         const std::function<void(SequenceMessage &&)> dispatch;

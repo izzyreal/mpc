@@ -335,6 +335,7 @@ void TrMoveScreen::cancel()
 
 void TrMoveScreen::insert(sequencer::Sequence *s)
 {
+    sequencer.lock()->copySelectedSequenceToUndoSequence();
     s->moveTrack(selectedTrackIndex, currentTrackIndex);
     selectedTrackIndex = -1;
     displayTrLabels();

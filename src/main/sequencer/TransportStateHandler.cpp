@@ -211,7 +211,7 @@ void TransportStateHandler::applyPlaySequence(
 
     if (transport.isRecordingOrOverdubbing())
     {
-        sequencer->storeSelectedSequenceInUndoPlaceHolder();
+        sequencer->copySelectedSequenceToUndoSequence();
     }
 
     sequencer->clock->reset();

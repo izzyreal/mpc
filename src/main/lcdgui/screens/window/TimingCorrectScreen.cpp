@@ -49,7 +49,7 @@ void TimingCorrectScreen::function(const int i)
     {
         case 4:
         {
-            sequencer.lock()->storeSelectedSequenceInUndoPlaceHolder();
+            sequencer.lock()->copySelectedSequenceToUndoSequence();
 
             std::vector<int> noteRange(2);
 

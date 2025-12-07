@@ -4,7 +4,7 @@
 
 using namespace mpc::sequencer;
 
-void TrackStateHandler::applyClearEvents(const ClearEvents &m,
+void TrackStateHandler::applyClearEvents(const RemoveEvents &m,
                                          SequencerState &state) const
 {
     auto &lock = manager->trackLocks[m.sequence][m.track];

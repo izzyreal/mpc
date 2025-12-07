@@ -9,13 +9,6 @@
 
 namespace mpc::sequencer
 {
-    struct UpdateBarLength
-    {
-        SequenceIndex sequenceIndex;
-        int barIndex;
-        Tick length;
-    };
-
     struct UpdateBarLengths
     {
         SequenceIndex sequenceIndex;
@@ -112,7 +105,7 @@ namespace mpc::sequencer
 
     using SequenceMessage =
         std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
-                     UpdateBarLength, UpdateBarLengths, UpdateTimeSignatures,
+                     UpdateBarLengths, UpdateTimeSignatures,
                      SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
                      SetTempoChangeEnabled, SetFirstLoopBarIndex,
                      SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,

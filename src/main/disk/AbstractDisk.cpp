@@ -637,7 +637,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
         }
 
         const auto fStream = f->getInputStream();
-        auto newSeq = mpc.getSequencer()->createSeqInPlaceHolder();
+        auto newSeq = mpc.getSequencer()->getSequence(TempSequenceIndex);
 
         newSeq->init(0);
 

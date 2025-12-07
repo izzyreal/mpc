@@ -90,10 +90,6 @@ namespace mpc::sequencer
         void playTick(Tick) const;
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
-        std::shared_ptr<Sequence> createSeqInPlaceHolder();
-        void clearPlaceHolder() const;
-        void movePlaceHolderTo(int destIndex);
-        std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(BusType) const;
         std::shared_ptr<Bus> getBus(BusType) const;
         std::shared_ptr<DrumBus> getDrumBus(BusType) const;
@@ -148,26 +144,22 @@ namespace mpc::sequencer
         int selectedTrackIndex = 0;
         SequenceIndex nextSq{NoSequenceIndex};
 
-        std::shared_ptr<Sequence>
-        copySequence(const std::shared_ptr<Sequence> &source,
-                     SequenceIndex destinationIndex);
-
-        static void
-        copySequenceParameters(const std::shared_ptr<Sequence> &source,
-                               const std::shared_ptr<Sequence> &dest);
-        static void copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
-                                          const std::shared_ptr<Sequence> &dst);
         void copyTrack(const std::shared_ptr<Track> &src,
-                              const std::shared_ptr<Track> &dest) const;
+                       const std::shared_ptr<Track> &dest) const;
+
+        void makeNewSequence(SequenceIndex sequenceIndex);
 
     public:
+        void makeNewSequence(std::shared_ptr<Sequence> &destination);
+
         void copyTrackParameters(const std::shared_ptr<Track> &source,
-                                        const std::shared_ptr<Track> &dest) const;
+                                 const std::shared_ptr<Track> &dest) const;
+
+        void copySequenceParameters(const std::shared_ptr<Sequence> &source,
+                                    SequenceIndex destIndex) const;
 
         std::shared_ptr<SequencerStateManager> getStateManager() const;
         std::shared_ptr<Transport> getTransport();
-
-        std::shared_ptr<Sequence> makeNewSequence(SequenceIndex sequenceIndex);
 
         void init();
         bool isSoloEnabled() const;
@@ -175,8 +167,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setSelectedSequenceIndex(SequenceIndex,
-                                      bool shouldSetPositionTo0) const;
+        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
@@ -184,16 +175,16 @@ namespace mpc::sequencer
         int getSelectedTrackIndex() const;
 
         void undoSeq();
-        void setSequence(SequenceIndex, std::shared_ptr<Sequence>);
         void deleteAllSequences();
-        void deleteSequence(int i);
-        void copySequence(int source, int destination);
-        void copySequenceParameters(int source, int dest) const;
+        void deleteSequence(int i) const;
+
+        void copySequence(const std::shared_ptr<Sequence> &source,
+                          SequenceIndex destIndex) const;
+
         void copySong(int source, int dest) const;
 
         void copyTrack(int sourceTrackIndex, int destTrackIndex,
-                       int sourceSequenceIndex,
-                       int destSequenceIndex) const;
+                       int sourceSequenceIndex, int destSequenceIndex) const;
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
         void setDefaultTrackName(const std::string &s, int i);
@@ -225,7 +216,7 @@ namespace mpc::sequencer
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
         void flushTrackNoteCache() const;
-        void storeSelectedSequenceInUndoPlaceHolder();
+        void copySelectedSequenceToUndoSequence();
         void resetUndo();
         SongIndex getSelectedSongIndex() const;
         void setSelectedSongIndex(SongIndex) const;

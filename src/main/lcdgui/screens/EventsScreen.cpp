@@ -678,20 +678,27 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
                                const bool copyModeMerge, const int copyCount,
                                const int copyNote0, const int copyNote1) const
 {
+    const auto lockedSequencer = sequencer.lock();
     const auto segLength = sourceEnd - sourceStart;
-    const auto sourceTrack = sequencer.lock()->getSelectedTrack();
+    const auto sourceTrack = lockedSequencer->getSelectedTrack();
 
-    const auto fromSequence = sequencer.lock()->getSelectedSequence();
+    const auto fromSequence = lockedSequencer->getSelectedSequence();
+
     if (!fromSequence->isUsed())
     {
         return;
+    }
+
+    if (lockedSequencer->getSelectedSequenceIndex() == toSequenceIndex)
+    {
+        lockedSequencer->copySelectedSequenceToUndoSequence();
     }
 
     const int fromSequenceLastBarIndex = fromSequence->getLastBarIndex();
 
     const auto destOffset = destStart - sourceStart;
 
-    const auto toSequence = sequencer.lock()->getSequence(toSequenceIndex);
+    const auto toSequence = lockedSequencer->getSequence(toSequenceIndex);
 
     auto oldToSequenceLastTick = toSequence->getLastTick();
 
@@ -713,7 +720,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     auto destDenominator = -1;
     auto destBarLength = -1;
 
-    const auto snapshot = toSequence->getSnapshot();
+    const auto snapshot = toSequence->getSnapshot(toSequenceIndex);
 
     for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
     {
@@ -815,5 +822,5 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         }
     }
 
-    sequencer.lock()->setSelectedSequenceIndex(toSequenceIndex, true);
+    lockedSequencer->setSelectedSequenceIndex(toSequenceIndex, true);
 }

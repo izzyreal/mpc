@@ -9,7 +9,7 @@
 
 namespace mpc::sequencer
 {
-    struct ClearEvents
+    struct RemoveEvents
     {
         SequenceIndex sequence;
         TrackIndex track;
@@ -114,7 +114,7 @@ namespace mpc::sequencer
     };
 
     using TrackMessage = std::variant<
-        InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
+        InsertAcquiredEvent, RemoveEvents, RemoveEvent, UpdateEventTick,
         RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, UpdateEvents,
         SetTrackUsed, SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
         SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex,

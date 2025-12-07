@@ -3,22 +3,19 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-
     class CopySequenceScreen final : public ScreenComponent
     {
-
     public:
+        CopySequenceScreen(Mpc &, int layerIndex);
+
         void function(int i) override;
         void turnWheel(int increment) override;
-
-        CopySequenceScreen(Mpc &, int layerIndex);
 
         void open() override;
 
     private:
-        SequenceIndex sq0{MinSequenceIndex};
         SequenceIndex sq1{MinSequenceIndex};
-        void setSq0(SequenceIndex);
+        void setSq0(SequenceIndex) const;
         void setSq1(SequenceIndex);
 
         void displaySq0() const;
