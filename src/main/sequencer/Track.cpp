@@ -44,8 +44,8 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : manager(manager), getSnapshot(getSnapshot), dispatch(dispatch),
-      trackIndex(trackIndex), parent(parent),
+    : parent(parent), manager(manager), getSnapshot(getSnapshot),
+      dispatch(dispatch), trackIndex(trackIndex),
       getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
@@ -60,12 +60,12 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
-    init();
+    initializeTrackName();
 }
 
 Track::~Track() {}
 
-void Track::init()
+void Track::initializeTrackName()
 {
     name = trackIndex == TempoChangeTrackIndex
                ? "tempo"
@@ -74,7 +74,7 @@ void Track::init()
 
 void Track::purge()
 {
-    init();
+    initializeTrackName();
     removeEvents();
 }
 

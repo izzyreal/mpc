@@ -178,7 +178,6 @@ namespace mpc::sequencer
 
         void updateEventTick(EventData *, int newTick) const;
 
-        void init();
-
+        void initializeTrackName();
     };
 } // namespace mpc::sequencer
