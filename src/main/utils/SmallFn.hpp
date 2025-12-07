@@ -33,4 +33,7 @@ namespace mpc::utils
             return invoke(storage, std::forward<Args>(as)...);
         }
     };
+
+    using Task = SmallFn<96, void()>;
+    using PostToUiThreadFn = SmallFn<16, void(Task &&)>;
 } // namespace mpc::utils

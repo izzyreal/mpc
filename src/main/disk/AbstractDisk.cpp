@@ -641,7 +641,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 
         newSeq->init(0);
 
-        MidiReader midiReader(fStream, newSeq);
+        const MidiReader midiReader(fStream, newSeq);
         midiReader.parseSequence(mpc);
 
         if (newSeq->getName().empty())

@@ -40,7 +40,12 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-LayeredScreen::LayeredScreen(Mpc &mpc) : mpc(mpc)
+LayeredScreen::LayeredScreen(Mpc &mpc)
+    : mpc(mpc), postToUiThread(
+                    [this](const utils::Task &&task)
+                    {
+                        uiTasks.post(task);
+                    })
 {
     const auto fntPath = "fonts/mpc2000xl-font.fnt";
     auto fntData = MpcResourceUtil::get_resource_data(fntPath);
@@ -62,11 +67,6 @@ LayeredScreen::LayeredScreen(Mpc &mpc) : mpc(mpc)
         layers.push_back(layer);
         root->addChild(layer);
     }
-}
-
-void LayeredScreen::postToUiThread(const concurrency::Task &task)
-{
-    uiTasks.post(task);
 }
 
 bool LayeredScreen::isPreviousScreen(
@@ -117,8 +117,7 @@ bool LayeredScreen::isCurrentScreen(
     return false;
 }
 
-bool LayeredScreen::isCurrentScreenOrChildOf(
-    const ScreenId id) const
+bool LayeredScreen::isCurrentScreenOrChildOf(const ScreenId id) const
 {
     if (isCurrentScreen({id}))
     {
@@ -298,7 +297,8 @@ void LayeredScreen::closeCurrentScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
-    const auto controller = mpc.clientEventController->clientHardwareEventController;
+    const auto controller =
+        mpc.clientEventController->clientHardwareEventController;
 
     if (controller->isRecPressed() || controller->isOverdubPressed())
     {

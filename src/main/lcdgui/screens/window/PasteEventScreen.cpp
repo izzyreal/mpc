@@ -48,14 +48,12 @@ void PasteEventScreen::function(const int i)
             onComplete = utils::SimpleAction(
                 [ls = ls]
                 {
-                    concurrency::Task uiTask;
-                    uiTask.set(
+                    ls.lock()->postToUiThread(utils::Task(
                         [ls]
                         {
                             ls.lock()->openScreenById(
                                 ScreenId::StepEditorScreen);
-                        });
-                    ls.lock()->postToUiThread(uiTask);
+                        }));
                 });
         }
 

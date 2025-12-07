@@ -52,6 +52,8 @@ namespace mpc::sequencer
 
         bool isUsed() const;
 
+        bool isTransmitProgramChangesEnabled() const;
+
     private:
         const TrackState &state;
     };

@@ -17,7 +17,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
-    SequenceIndex sequenceIndex, std::shared_ptr<SequencerStateManager> manager,
+    const utils::PostToUiThreadFn &postToUiThread, SequenceIndex sequenceIndex,
+    std::shared_ptr<SequencerStateManager> manager,
     const std::function<std::shared_ptr<SequenceStateView>()> &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
@@ -40,7 +41,8 @@ Sequence::Sequence(
     std::function<int()> getCurrentBarIndex)
     : getSnapshot(getSnapshot), sequenceIndex(sequenceIndex), manager(manager),
       dispatch(dispatch), getScreens(getScreens),
-      getCurrentBarIndex(getCurrentBarIndex)
+      getCurrentBarIndex(getCurrentBarIndex),
+      getDefaultTrackName(getDefaultTrackName)
 {
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
@@ -49,8 +51,8 @@ Sequence::Sequence(
             return getSnapshot()->getTrack(idx);
         };
         tracks.emplace_back(std::make_shared<Track>(
-            manager, getTrackSnapshot, dispatch, trackIndex, this,
-            getDefaultTrackName, getTickPosition, getScreens,
+            postToUiThread, getDefaultTrackName, manager, getTrackSnapshot,
+            dispatch, trackIndex, this, getTickPosition, getScreens,
             isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
             isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
             isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
@@ -64,12 +66,12 @@ Sequence::Sequence(
     };
 
     tracks.emplace_back(std::make_shared<Track>(
-        manager, getTempoTrackSnapshot, dispatch, TempoChangeTrackIndex, this,
-        getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti,
-        getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
-        isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
-        getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
-        getPunchInTime, getPunchOutTime, isSoloEnabled));
+        postToUiThread, getDefaultTrackName, manager, getTempoTrackSnapshot,
+        dispatch, TempoChangeTrackIndex, this, getTickPosition, getScreens,
+        isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
+        isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
+        isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing,
+        isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled));
 
     auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
@@ -187,16 +189,20 @@ bool Sequence::isUsed() const
     return getSnapshot()->isUsed();
 }
 
-void Sequence::init(const int newLastBarIndex)
+void Sequence::init(const int newLastBarIndex) const
 {
     const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     setInitialTempo(userScreen->tempo);
     setLoopEnabled(userScreen->loop);
 
-    purgeAllTracks();
-
     for (const auto &t : tracks)
     {
+        if (t->getIndex() == TempoChangeTrackIndex)
+        {
+            continue;
+        }
+
+        t->setName(getDefaultTrackName(t->getIndex()));
         t->setDeviceIndex(userScreen->device);
         t->setProgramChange(userScreen->pgm);
         t->setBusType(userScreen->busType);
@@ -370,20 +376,6 @@ TimeSignature Sequence::getTimeSignatureFromTickPos(const Tick pos) const
     return getSnapshot()->getTimeSignature(bar);
 }
 
-void Sequence::purgeAllTracks()
-{
-    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
-    {
-        purgeTrack(i);
-    }
-}
-
-std::shared_ptr<Track> Sequence::purgeTrack(const int i)
-{
-    tracks[i]->purge();
-    return tracks[i];
-}
-
 int Sequence::getDenominator(const int i) const
 {
     return getSnapshot()->getTimeSignature(i).denominator;
@@ -494,6 +486,16 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
     {
         setUsed(false);
     }
+}
+
+void Sequence::deleteTrack(const TrackIndex trackIndex) const
+{
+    dispatch(DeleteTrack{getSequenceIndex(), trackIndex});
+}
+
+void Sequence::deleteAllTracks() const
+{
+    dispatch(DeleteAllTracks{getSequenceIndex()});
 }
 
 void Sequence::insertBars(const int barCount, const BarIndex afterBar,

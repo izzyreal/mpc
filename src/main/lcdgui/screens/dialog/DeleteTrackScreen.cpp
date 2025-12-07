@@ -42,9 +42,10 @@ void DeleteTrackScreen::function(const int i)
         case 4:
         {
             const auto s = sequencer.lock()->getSelectedSequence();
-            s->purgeTrack(tr);
+            s->deleteTrack(TrackIndex(tr));
             openScreenById(ScreenId::SequencerScreen);
         }
+        default:;
     }
 }
 

@@ -50,7 +50,8 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(SequenceIndex, std::shared_ptr<SequencerStateManager> manager,
+        Sequence(const utils::PostToUiThreadFn &,
+            SequenceIndex, std::shared_ptr<SequencerStateManager> manager,
                  const std::function<std::shared_ptr<SequenceStateView>()>
                      &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
@@ -108,7 +109,7 @@ namespace mpc::sequencer
         std::shared_ptr<Track> getTrack(int i);
         void setUsed(bool b) const;
         bool isUsed() const;
-        void init(int newLastBarIndex);
+        void init(int newLastBarIndex) const;
         BarIndex getBarIndexForPositionQN(PositionQuarterNotes) const;
         BarIndex getBarIndexForPositionTicks(Tick) const;
 
@@ -140,11 +141,11 @@ namespace mpc::sequencer
         int getLastTick() const;
         TimeSignature getTimeSignatureFromBarIndex(int barIndex) const;
         TimeSignature getTimeSignatureFromTickPos(Tick) const;
-        void purgeAllTracks();
-        std::shared_ptr<Track> purgeTrack(int i);
         int getDenominator(int i) const;
         int getNumerator(int i) const;
         void deleteBars(int firstBar, int lastBarToDelete) const;
+        void deleteTrack(TrackIndex) const;
+        void deleteAllTracks() const;
         void insertBars(
             int barCount, BarIndex afterBar,
                         const utils::SimpleAction &nextAction = utils::SimpleAction([] {})) const;
@@ -170,6 +171,7 @@ namespace mpc::sequencer
 
     private:
         SequenceIndex sequenceIndex;
+        std::string name;
         std::shared_ptr<SequencerStateManager> manager;
         const std::function<void(SequenceMessage &&)> dispatch;
         StartTime startTime{0, 0, 0, 0, 0};
@@ -180,7 +182,6 @@ namespace mpc::sequencer
 
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<int()> getCurrentBarIndex;
-
-        std::string name;
+        std::function<std::string(int)> getDefaultTrackName;
     };
 } // namespace mpc::sequencer

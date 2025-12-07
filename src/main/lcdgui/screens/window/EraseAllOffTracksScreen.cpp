@@ -2,6 +2,7 @@
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -15,23 +16,25 @@ void EraseAllOffTracksScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
-    switch (i)
+    if (i != 4)
     {
-        case 4:
-        {
-            const auto seq = sequencer.lock()->getSelectedSequence();
-            int trackCounter = 0;
-
-            for (const auto &track : seq->getTracks())
-            {
-                if (!track->isOn())
-                {
-                    seq->purgeTrack(trackCounter);
-                }
-                trackCounter++;
-            }
-            openScreenById(ScreenId::SequencerScreen);
-            break;
-        }
+        return;
     }
+
+    const auto lockedSequencer = sequencer.lock();
+    const auto seq = lockedSequencer->getSelectedSequence();
+    int trackCounter = 0;
+
+    for (const auto &track : seq->getTracks())
+    {
+        if (!track->isOn())
+        {
+            track->removeEvents();
+            lockedSequencer->getStateManager()->enqueue(sequencer::SetTrackUsed{
+                seq->getSequenceIndex(), track->getIndex(), false});
+        }
+
+        trackCounter++;
+    }
+    openScreenById(ScreenId::SequencerScreen);
 }

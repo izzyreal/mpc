@@ -1,6 +1,6 @@
 #include "DiskRecorder.hpp"
 
-#include "WavOutputFileStream.hpp"
+#include "audiomidi/WavOutputFileStream.hpp"
 
 #include "engine/EngineHost.hpp"
 #include "engine/audio/core/AudioFormat.hpp"

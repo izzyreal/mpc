@@ -39,7 +39,7 @@ void ReleaseFunctionCommand::execute()
             if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
                 ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
-                concurrency::Task task;
+                utils::Task task;
                 task.set(
                     [ls, engineHost = mpc.getEngineHost()]
                     {
@@ -47,13 +47,11 @@ void ReleaseFunctionCommand::execute()
                         {
                             engineHost->getSoundPlayer()->enableStopEarly();
 
-                            concurrency::Task uiTask;
-                            uiTask.set(
+                            ls->postToUiThread(utils::Task(
                                 [ls]
                                 {
                                     ls->openScreenById(ScreenId::LoadScreen);
-                                });
-                            ls->postToUiThread(uiTask);
+                                }));
                         }
                     });
 
@@ -86,26 +84,24 @@ void ReleaseFunctionCommand::execute()
                 if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
                     ls->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
                 {
-                    concurrency::Task task;
-                    task.set(
+                    utils::Task audioTask;
+                    audioTask.set(
                         [ls, engineHost = mpc.getEngineHost()]
                         {
                             if (ls->isCurrentScreenPopupFor(
                                     ScreenId::DirectoryScreen))
                             {
                                 engineHost->getSoundPlayer()->enableStopEarly();
-                                concurrency::Task uiTask;
-                                uiTask.set(
+                                ls->postToUiThread(utils::Task(
                                     [ls]
                                     {
                                         ls->openScreenById(
                                             ScreenId::DirectoryScreen);
-                                    });
-                                ls->postToUiThread(uiTask);
+                                    }));
                             }
                         });
 
-                    mpc.getEngineHost()->postToAudioThread(task);
+                    mpc.getEngineHost()->postToAudioThread(audioTask);
                 }
             }
             break;

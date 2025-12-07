@@ -77,7 +77,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     userScreen->setSequenceName(defaults->getDefaultSeqName());
     auto defTrackNames = defaults->getDefaultTrackNames();
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
         userScreen->setTrackName(i, defTrackNames[i]);
     }
@@ -91,7 +91,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 
     int index = 0;
 
-    mpc.getSequencer()->purgeAllSequences();
+    mpcSequencer->purgeAllSequences();
 
     for (auto &as : allSequences)
     {
@@ -101,8 +101,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer()->getSequence(index++);
-        as->applyToMpcSeq(mpcSeq);
+        auto mpcSeq = mpcSequencer->getSequence(index++);
+        as->applyToMpcSeq(mpcSeq, mpcSequencer->getStateManager().get());
     }
 
     auto allParserSequencer = allParser.getSequencer();
@@ -315,7 +315,7 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
     const auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
-    for (int i = 0; i < 99; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
     {
         if (allSeqNames[i].find("(Unused)") != std::string::npos)
         {
@@ -325,7 +325,7 @@ AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
 
         auto mpcSeq = mpc.getSequencer()->makeNewSequence(SequenceIndex(i));
 
-        allSequences[counter++]->applyToMpcSeq(mpcSeq);
+        allSequences[counter++]->applyToMpcSeq(mpcSeq, mpc.getSequencer()->getStateManager().get());
 
         mpcSequences.push_back(mpcSeq);
     }

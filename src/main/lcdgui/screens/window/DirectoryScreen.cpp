@@ -240,7 +240,7 @@ void DirectoryScreen::function(const int f)
                     return;
                 }
 
-                concurrency::Task audioTask;
+                utils::Task audioTask;
                 audioTask.set(
                     [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
                     {
@@ -254,7 +254,7 @@ void DirectoryScreen::function(const int f)
                                       : audiomidi::SoundPlayerFileFormat::WAV,
                                 audioServerSampleRate);
 
-                        concurrency::Task uiTask;
+                        utils::Task uiTask;
                         uiTask.set(
                             [started, file, ls]
                             {
@@ -271,7 +271,7 @@ void DirectoryScreen::function(const int f)
                                         "Can't play " + name);
                                 }
                             });
-                        ls.lock()->postToUiThread(uiTask);
+                        ls.lock()->postToUiThread(std::move(uiTask));
                     });
 
                 mpc.getEngineHost()->postToAudioThread(audioTask);

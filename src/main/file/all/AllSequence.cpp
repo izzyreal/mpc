@@ -16,6 +16,7 @@
 #include "file/ByteUtil.hpp"
 #include "StrUtil.hpp"
 #include "Util.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -107,7 +108,8 @@ AllSequence::~AllSequence()
     }
 }
 
-void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
+void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
+                                SequencerStateManager *manager) const
 {
     mpcSeq->init(barCount - 1);
 
@@ -122,10 +124,12 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq) const
     mpcSeq->setInitialTempo(tempo);
     const auto at = tracks;
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
         const auto t = mpcSeq->getTrack(i);
-        t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
+        const bool trackIsUsed = at->getStatus(i) == 5 || at->getStatus(i) == 7;
+        manager->enqueue(SetTrackUsed{mpcSeq->getSequenceIndex(), TrackIndex(i),
+                                      trackIsUsed});
         t->setName(at->getName(i));
         t->setDeviceIndex(at->getDevice(i));
         t->setBusType(busIndexToBusType(at->getBus(i)));

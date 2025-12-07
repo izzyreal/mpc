@@ -23,7 +23,6 @@ namespace mpc::lcdgui::screens
         void tap();
 
     private:
-        void setTrackToUsedIfItIsCurrentlyUnused() const;
         void displaySq() const;
         void displayTempoSource() const;
         void displayVelo() const;

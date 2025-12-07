@@ -19,13 +19,13 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 Track::Track(
+    const utils::PostToUiThreadFn &postToUiThread,
+    const std::function<std::string(int)> &getDefaultTrackName,
     const std::shared_ptr<SequencerStateManager> &manager,
     const std::function<std::shared_ptr<TrackStateView>(TrackIndex)>
         &getSnapshot,
     const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
-    Sequence *parent,
-    const std::function<std::string(int)> &getDefaultTrackName,
-    const std::function<int64_t()> &getTickPosition,
+    Sequence *parent, const std::function<int64_t()> &getTickPosition,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
     const std::function<bool()> &isRecordingModeMulti,
     const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
@@ -44,9 +44,9 @@ Track::Track(
     const std::function<int64_t()> &getPunchInTime,
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
-    : parent(parent), manager(manager), getSnapshot(getSnapshot),
+    : postToUiThread(postToUiThread), getDefaultTrackName(getDefaultTrackName),
+      parent(parent), manager(manager), getSnapshot(getSnapshot),
       dispatch(dispatch), trackIndex(trackIndex),
-      getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
       getActiveSequence(getActiveSequence), getAutoPunchMode(getAutoPunchMode),
@@ -60,24 +60,9 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
-    initializeTrackName();
 }
 
 Track::~Track() {}
-
-void Track::initializeTrackName()
-{
-    name = trackIndex == TempoChangeTrackIndex
-               ? "tempo"
-               : getDefaultTrackName(trackIndex);
-}
-
-void Track::purge()
-{
-    initializeTrackName();
-    removeEvents();
-}
-
 
 void Track::printEvents() const
 {
@@ -99,6 +84,33 @@ mpc::SequenceIndex Track::getSequenceIndex() const
     return parent->getSequenceIndex();
 }
 
+void Track::setUsedIfCurrentlyUnused()
+{
+    if (isUsed())
+    {
+        return;
+    }
+
+    dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
+    postToUiThread(utils::Task(
+        [this]
+        {
+            setName(getDefaultTrackName(getIndex()));
+        }));
+}
+
+bool Track::isTransmitProgramChangesEnabled() const
+{
+    return getSnapshot(getIndex())->isTransmitProgramChangesEnabled();
+}
+
+void Track::setTransmitProgramChangesEnabled(const bool b)
+{
+    dispatch(SetTrackTransmitProgramChangesEnabled{getSequenceIndex(),
+                                                   getIndex(), b});
+    setUsedIfCurrentlyUnused();
+}
+
 void Track::setTrackIndex(const TrackIndex i)
 {
     if (trackIndex == i)
@@ -113,19 +125,10 @@ mpc::TrackIndex Track::getIndex() const
     return trackIndex;
 }
 
-void Track::setUsed(const bool b)
-{
-    if (!isUsed() && b && trackIndex < 64)
-    {
-        name = getDefaultTrackName(trackIndex);
-    }
-
-    dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), b});
-}
-
-void Track::setOn(const bool b) const
+void Track::setOn(const bool b)
 {
     dispatch(SetTrackOn{getSequenceIndex(), getIndex(), b});
+    setUsedIfCurrentlyUnused();
 }
 
 void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
@@ -145,11 +148,12 @@ void Track::removeEvents() const
     dispatch(ClearEvents{getSequenceIndex(), getIndex()});
 }
 
-void Track::setVelocityRatio(const int i) const
+void Track::setVelocityRatio(const int i)
 {
     dispatch(
         SetTrackVelocityRatio{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 1, 200))});
+    setUsedIfCurrentlyUnused();
 }
 
 int Track::getVelocityRatio() const
@@ -157,11 +161,12 @@ int Track::getVelocityRatio() const
     return getSnapshot(getIndex())->getVelocityRatio();
 }
 
-void Track::setProgramChange(const int i) const
+void Track::setProgramChange(const int i)
 {
     dispatch(
         SetTrackProgramChange{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 0, 128))});
+    setUsedIfCurrentlyUnused();
 }
 
 int Track::getProgramChange() const
@@ -169,17 +174,18 @@ int Track::getProgramChange() const
     return getSnapshot(getIndex())->getProgramChange();
 }
 
-void Track::setBusType(BusType bt) const
+void Track::setBusType(BusType busType)
 {
     using U = std::underlying_type_t<BusType>;
     constexpr U MIN = static_cast<U>(BusType::MIDI);
     constexpr U MAX = static_cast<U>(BusType::DRUM4);
 
-    const U raw = static_cast<U>(bt);
+    const U raw = static_cast<U>(busType);
     const U clamped = std::clamp(raw, MIN, MAX);
 
     dispatch(SetTrackBusType{getSequenceIndex(), getIndex(),
                              static_cast<BusType>(clamped)});
+    setUsedIfCurrentlyUnused();
 }
 
 BusType Track::getBusType() const
@@ -187,11 +193,11 @@ BusType Track::getBusType() const
     return getSnapshot(getIndex())->getBusType();
 }
 
-void Track::setDeviceIndex(const int i) const
+void Track::setDeviceIndex(const int i)
 {
-
     dispatch(SetTrackDeviceIndex{getSequenceIndex(), getIndex(),
                                  static_cast<uint8_t>(std::clamp(i, 0, 32))});
+    setUsedIfCurrentlyUnused();
 }
 
 int Track::getDeviceIndex() const
@@ -368,23 +374,17 @@ void Track::playNext() const
     }
 
     playEventIndex = playEventIndex + 1;
-    dispatch(SetPlayEventIndex{getSequenceIndex(), getIndex(),
-                               playEventIndex});
+    dispatch(SetPlayEventIndex{getSequenceIndex(), getIndex(), playEventIndex});
     manager->drainQueue();
 }
 
 void Track::insertAcquiredEvent(EventData *event,
                                 const utils::SimpleAction &onComplete)
 {
-    if (!isUsed())
-    {
-        setUsed(true);
-    }
-
     event->sequenceIndex = getSequenceIndex();
     event->trackIndex = trackIndex;
-
     dispatch(InsertAcquiredEvent{event, onComplete});
+    setUsedIfCurrentlyUnused();
 }
 
 void Track::acquireAndInsertEvent(const EventData &eventState,

@@ -15,6 +15,7 @@ namespace mpc::sequencer
         uint8_t programChange;
         uint8_t device;
         bool used;
+        bool transmitProgramChangesEnabled = true;
 
         TrackState()
         {

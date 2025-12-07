@@ -147,7 +147,7 @@ void LoadScreen::function(const int i)
                     return;
                 }
 
-                concurrency::Task audioTask;
+                utils::Task audioTask;
                 audioTask.set(
                     [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
                     {
@@ -161,7 +161,7 @@ void LoadScreen::function(const int i)
                                       : audiomidi::SoundPlayerFileFormat::WAV,
                                 audioServerSampleRate);
 
-                        concurrency::Task uiTask;
+                        utils::Task uiTask;
                         uiTask.set(
                             [started, file, ls]
                             {
@@ -178,7 +178,7 @@ void LoadScreen::function(const int i)
                                         "Can't play " + name);
                                 }
                             });
-                        ls.lock()->postToUiThread(uiTask);
+                        ls.lock()->postToUiThread(std::move(uiTask));
                     });
 
                 mpc.getEngineHost()->postToAudioThread(audioTask);

@@ -199,7 +199,8 @@ void SequencerPlaybackEngine::displayPunchRects() const
     }
 }
 
-void SequencerPlaybackEngine::stopCountingInIfRequired(const SequenceIndex sequenceIndex) const
+void SequencerPlaybackEngine::stopCountingInIfRequired(
+    const SequenceIndex sequenceIndex) const
 {
     const auto transport = sequencer->getTransport();
 
@@ -242,8 +243,7 @@ bool SequencerPlaybackEngine::processSongMode() const
         sequencer->setSelectedSongStepIndex(song->getFirstLoopStepIndex());
         sequencer->getStateManager()->drainQueue();
 
-        if (const auto newStep =
-                song->getStep(song->getFirstLoopStepIndex());
+        if (const auto newStep = song->getStep(song->getFirstLoopStepIndex());
             !sequencer->getSequence(newStep.sequenceIndex)->isUsed())
         {
             stopSequencer();
@@ -322,7 +322,8 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
         }
 
         sequencer->playTick(sequencer->getTransport()->getTickPosition());
-        setTickPositionEffectiveImmediately(seq->getLoopStartTick(), seq->getSequenceIndex());
+        setTickPositionEffectiveImmediately(seq->getLoopStartTick(),
+                                            seq->getSequenceIndex());
 
         if (sequencer->getTransport()->isRecording())
         {
@@ -353,7 +354,8 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
         {
             sequencer->getTransport()->stop();
             setTickPositionEffectiveImmediately(
-                Sequencer::ticksToQuarterNotes(seq->getLastTick()), seq->getSequenceIndex());
+                Sequencer::ticksToQuarterNotes(seq->getLastTick()),
+                seq->getSequenceIndex());
         }
 
         return true;
@@ -556,15 +558,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         triggerClickIfNeeded();
 
-        concurrency::Task uiTask;
-
-        uiTask.set(
+        layeredScreen->postToUiThread(utils::Task(
             [this]
             {
                 displayPunchRects();
-            });
-
-        layeredScreen->postToUiThread(uiTask);
+            }));
 
         if (sequencer->getTransport()->isCountingIn())
         {

@@ -239,8 +239,8 @@ void Sequencer::playTick(const Tick tick) const
             }
         }
 
-        stateManager->processLiveNoteEventRecordingQueues(
-            tick, *seq->getSnapshot());
+        stateManager->processLiveNoteEventRecordingQueues(tick,
+                                                          *seq->getSnapshot());
 
         for (const auto &track : seq->getTracks())
         {
@@ -385,7 +385,8 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
     };
 
     return std::make_shared<Sequence>(
-        sequenceIndex, stateManager, getSnapshot, dispatch,
+        layeredScreen->postToUiThread, sequenceIndex, stateManager, getSnapshot,
+        dispatch,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -525,20 +526,18 @@ void Sequencer::copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
     }
 }
 
-void Sequencer::copyTrack(const int sourceTrackIndex,
-                          const int destinationTrackIndex,
+void Sequencer::copyTrack(const int sourceTrackIndex, const int destTrackIndex,
                           const int sourceSequenceIndex,
-                          const int destinationSequenceIndex) const
+                          const int destSequenceIndex) const
 {
-    if (sourceSequenceIndex == destinationSequenceIndex &&
-        sourceTrackIndex == destinationTrackIndex)
+    if (sourceSequenceIndex == destSequenceIndex &&
+        sourceTrackIndex == destTrackIndex)
     {
         return;
     }
 
     const auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
-    const auto dest =
-        sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex);
+    const auto dest = sequences[destSequenceIndex]->getTrack(destTrackIndex);
     copyTrack(src, dest);
 }
 
@@ -579,22 +578,23 @@ void Sequencer::copySong(const int source, const int dest) const
 }
 
 void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
-                          const std::shared_ptr<Track> &dest)
+                          const std::shared_ptr<Track> &dest) const
 {
     dest->setEventStates(src->getEventStates());
     copyTrackParameters(src, dest);
 }
 
 void Sequencer::copyTrackParameters(const std::shared_ptr<Track> &source,
-                                    const std::shared_ptr<Track> &dest)
+                                    const std::shared_ptr<Track> &dest) const
 {
-    dest->setUsed(source->isUsed());
     dest->setOn(source->isOn());
     dest->setDeviceIndex(source->getDeviceIndex());
     dest->setBusType(source->getBusType());
     dest->setVelocityRatio(source->getVelocityRatio());
     dest->setProgramChange(source->getProgramChange());
     dest->setName(source->getName());
+    stateManager->enqueue(SetTrackUsed{dest->getSequenceIndex(),
+                                       dest->getIndex(), source->isUsed()});
 }
 
 std::string Sequencer::getDefaultTrackName(const int i)
@@ -1008,14 +1008,12 @@ void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    concurrency::Task uiTask;
-    uiTask.set(
+    layeredScreen->postToUiThread(utils::Task(
         [this]
         {
             hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
-        });
-    layeredScreen->postToUiThread(uiTask);
+        }));
 }
 
 void Sequencer::resetUndo()

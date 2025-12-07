@@ -43,12 +43,13 @@ namespace mpc::sequencer
     {
     public:
         Track(
+            const utils::PostToUiThreadFn &,
+            const std::function<std::string(int)> &getDefaultTrackName,
             const std::shared_ptr<SequencerStateManager> &,
             const std::function<std::shared_ptr<TrackStateView>(TrackIndex)>
                 &getSnapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
-            const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
             const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens,
             const std::function<bool()> &isRecordingModeMulti,
@@ -74,11 +75,13 @@ namespace mpc::sequencer
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
-        void timingCorrect(const SequenceStateView &, int fromBar, int toBar, EventData *, Tick eventTick,
-                           int stepLength, int swingPercentage) const;
+        void timingCorrect(const SequenceStateView &, int fromBar, int toBar,
+                           EventData *, Tick eventTick, int stepLength,
+                           int swingPercentage) const;
 
-        static int timingCorrectTick(const SequenceStateView &, int fromBar, int toBar, int tick, int stepLength,
-                              int swingPercentage);
+        static int timingCorrectTick(const SequenceStateView &, int fromBar,
+                                     int toBar, int tick, int stepLength,
+                                     int swingPercentage);
 
         void shiftTiming(EventData *, Tick eventTick, bool later, int amount,
                          int lastTick) const;
@@ -87,16 +90,11 @@ namespace mpc::sequencer
 
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
-        void setUsed(bool b);
-        void setOn(bool b) const;
+        void setOn(bool b);
 
-        void insertAcquiredEvent(
-            EventData *event,
-            const utils::SimpleAction &onComplete = utils::SimpleAction([] {}));
-
-        void acquireAndInsertEvent(
-            const EventData &,
-            const utils::SimpleAction &onComplete = utils::SimpleAction([] {}));
+        void acquireAndInsertEvent(const EventData &,
+                                   const utils::SimpleAction &onComplete =
+                                       utils::SimpleAction([] {}));
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0);
@@ -106,13 +104,13 @@ namespace mpc::sequencer
         void removeEvent(EventData *) const;
         void removeEvent(const std::shared_ptr<EventRef> &event) const;
         void removeEvents() const;
-        void setVelocityRatio(int i) const;
+        void setVelocityRatio(int i);
         int getVelocityRatio() const;
-        void setProgramChange(int i) const;
+        void setProgramChange(int i);
         int getProgramChange() const;
-        void setBusType(BusType) const;
+        void setBusType(BusType);
         BusType getBusType() const;
-        void setDeviceIndex(int i) const;
+        void setDeviceIndex(int i);
         int getDeviceIndex() const;
         std::shared_ptr<EventRef> getEvent(int i) const;
         void setName(const std::string &s);
@@ -141,23 +139,29 @@ namespace mpc::sequencer
         // Do not call from audio thread
         void removeDoubles() const;
 
-        void purge();
-
         void printEvents() const;
 
         void setEventStates(const std::vector<EventData> &eventStates) const;
 
         SequenceIndex getSequenceIndex() const;
 
+        void setUsedIfCurrentlyUnused();
+
+        bool isTransmitProgramChangesEnabled() const;
+
+        void setTransmitProgramChangesEnabled(bool);
+
     private:
+        utils::PostToUiThreadFn postToUiThread;
+        const std::function<std::string(int)> getDefaultTrackName;
         Sequence *parent{nullptr};
         std::shared_ptr<SequencerStateManager> manager;
         std::function<std::shared_ptr<TrackStateView>(TrackIndex)> getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
+
         std::string name;
         TrackIndex trackIndex{0};
 
-        std::function<std::string(int)> getDefaultTrackName;
         std::function<int64_t()> getTickPosition;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<bool()> isRecordingModeMulti;
@@ -179,6 +183,8 @@ namespace mpc::sequencer
 
         void updateEventTick(EventData *, int newTick) const;
 
-        void initializeTrackName();
+        void insertAcquiredEvent(EventData *event,
+                                 const utils::SimpleAction &onComplete =
+                                     utils::SimpleAction([] {}));
     };
 } // namespace mpc::sequencer

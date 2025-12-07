@@ -4,7 +4,6 @@
 
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 
@@ -163,7 +162,7 @@ void EngineHost::start()
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 
-void EngineHost::postToAudioThread(const concurrency::Task &task)
+void EngineHost::postToAudioThread(const utils::Task &task)
 {
     audioTasks.post(task);
 }
@@ -176,12 +175,11 @@ void EngineHost::postSamplePreciseTaskToAudioThread(
 
 void EngineHost::flushNoteOffs()
 {
-    concurrency::Task audioTask;
-    audioTask.set([this]
-    {
-        preciseTasks.flushNoteOffs();
-    });
-    postToAudioThread(audioTask);
+    postToAudioThread(utils::Task(
+        [this]
+        {
+            preciseTasks.flushNoteOffs();
+        }));
 }
 
 void EngineHost::prepareProcessBlock(const int nFrames)
@@ -444,19 +442,15 @@ void EngineHost::stopBouncing()
         directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
 
-    concurrency::Task task;
-    task.set(
+    postToAudioThread(utils::Task(
         [&]
         {
-            concurrency::Task uiTask;
-            uiTask.set(
+            mpc.getLayeredScreen()->postToUiThread(utils::Task(
                 [ls = mpc.getLayeredScreen()]
                 {
                     ls->openScreenById(ScreenId::VmpcRecordingFinishedScreen);
-                });
-            mpc.getLayeredScreen()->postToUiThread(uiTask);
-        });
-    postToAudioThread(task);
+                }));
+        }));
 }
 
 void EngineHost::stopBouncingEarly()
@@ -496,13 +490,11 @@ bool EngineHost::isBouncePrepared() const
 
 void EngineHost::finishPreviewSoundPlayerVoice()
 {
-    concurrency::Task task;
-    task.set(
+    postToAudioThread(utils::Task(
         [&]
         {
             getPreviewSoundPlayer()->finishVoice();
-        });
-    postToAudioThread(task);
+        }));
 }
 
 bool EngineHost::isBouncing() const

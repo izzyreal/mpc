@@ -74,7 +74,7 @@ namespace mpc::engine
         // local note events are currently active.
         void prepareProcessBlock(int nFrames);
 
-        void postToAudioThread(const concurrency::Task &);
+        void postToAudioThread(const utils::Task &);
         void postSamplePreciseTaskToAudioThread(const concurrency::SamplePreciseTask &);
 
         void flushNoteOffs();

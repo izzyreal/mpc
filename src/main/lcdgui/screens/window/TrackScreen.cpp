@@ -31,14 +31,13 @@ void TrackScreen::open()
 void TrackScreen::function(const int i)
 {
     ScreenComponent::function(i);
-    switch (i)
+    if (i == 1)
     {
-        case 1:
-            openScreenById(ScreenId::DeleteTrackScreen);
-            break;
-        case 4:
-            openScreenById(ScreenId::CopyTrackScreen);
-            break;
+        openScreenById(ScreenId::DeleteTrackScreen);
+    }
+    else if (i == 4)
+    {
+        openScreenById(ScreenId::CopyTrackScreen);
     }
 }
 
@@ -63,12 +62,7 @@ void TrackScreen::openNameScreen()
     }
     else
     {
-        auto track = sequencer.lock()->getSelectedTrack();
-
-        if (!track->isUsed())
-        {
-            track->setUsed(true);
-        }
+        const auto track = sequencer.lock()->getSelectedTrack();
 
         initialNameScreenName = track->getName();
 

@@ -85,15 +85,13 @@ void LoadASoundScreen::function(const int i)
         }
         case 3:
         {
-            concurrency::Task audioTask;
-            audioTask.set(
+            mpc.getEngineHost()->postToAudioThread(utils::Task(
                 [&]
                 {
                     mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
                     sampler.lock()->deleteSound(
                         sampler.lock()->getPreviewSound());
-                });
-            mpc.getEngineHost()->postToAudioThread(audioTask);
+                }));
 
             openScreenById(ScreenId::LoadScreen);
             break;

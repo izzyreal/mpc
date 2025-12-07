@@ -24,13 +24,11 @@ void LoadApsFileScreen::function(const int i)
         {
             const std::function on_success = [&]
             {
-                concurrency::Task uiTask;
-                uiTask.set(
+                ls.lock()->postToUiThread(utils::Task(
                     [ls = ls]
                     {
                         ls.lock()->closeRecentScreensUntilReachingLayer(0);
-                    });
-                ls.lock()->postToUiThread(uiTask);
+                    }));
             };
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             constexpr bool headless = false;

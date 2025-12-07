@@ -88,6 +88,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             displayTrackProps();
                         }});
 
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedTrack()->getName();
+                        },
+                        [&](auto)
+                        {
+                            displayTr();
+                        }});
+
     addReactiveBinding(
         {[&]
          {
@@ -620,11 +629,11 @@ void SequencerScreen::displayOn() const
 
 void SequencerScreen::displayTr() const
 {
-
+    const auto lockedSequencer = sequencer.lock();
     auto result = StrUtil::padLeft(
-        std::to_string(sequencer.lock()->getSelectedTrackIndex() + 1), "0", 2);
+        std::to_string(lockedSequencer->getSelectedTrackIndex() + 1), "0", 2);
     result.append("-");
-    result.append(sequencer.lock()->getSelectedTrack()->getName());
+    result.append(lockedSequencer->getSelectedTrack()->getName());
     findField("tr")->setText(result);
 }
 
@@ -687,7 +696,6 @@ void SequencerScreen::pressEnter()
         }
         else if (focusedFieldName == "velo")
         {
-            setTrackToUsedIfItIsCurrentlyUnused();
             mpc.getSequencer()->getSelectedTrack()->setVelocityRatio(candidate);
         }
     }
@@ -756,16 +764,6 @@ void SequencerScreen::function(const int i)
     }
 }
 
-void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused() const
-{
-    if (const auto track = mpc.getSequencer()->getSelectedTrack();
-        !track->isUsed())
-    {
-        track->setUsed(true);
-        displayTr();
-    }
-}
-
 void SequencerScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -800,7 +798,6 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "devicenumber")
     {
-        setTrackToUsedIfItIsCurrentlyUnused();
         track->setDeviceIndex(track->getDeviceIndex() + i);
     }
     else if (focusedFieldName == "tr")
@@ -810,8 +807,6 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "bus")
     {
-        setTrackToUsedIfItIsCurrentlyUnused();
-
         track->setBusType(track->getBusType() + i);
 
         if (const auto lastFocus = getLastFocus("step-editor");
@@ -838,12 +833,10 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        setTrackToUsedIfItIsCurrentlyUnused();
         track->setProgramChange(track->getProgramChange() + i);
     }
     else if (focusedFieldName == "velo")
     {
-        setTrackToUsedIfItIsCurrentlyUnused();
         track->setVelocityRatio(track->getVelocityRatio() + i);
     }
     else if (focusedFieldName == "timing")
@@ -923,7 +916,6 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "on")
     {
-        setTrackToUsedIfItIsCurrentlyUnused();
         track->setOn(i > 0);
     }
 }
@@ -967,12 +959,7 @@ void SequencerScreen::openWindow()
     }
     else if (focusedFieldName == "tr")
     {
-        if (const auto track = mpc.getSequencer()->getSelectedTrack();
-            !track->isUsed())
-        {
-            track->setUsed(true);
-        }
-
+        mpc.getSequencer()->getSelectedTrack()->setUsedIfCurrentlyUnused();
         openScreenById(ScreenId::TrackScreen);
     }
     else if (focusedFieldName == "on")

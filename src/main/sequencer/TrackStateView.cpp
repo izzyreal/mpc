@@ -210,3 +210,8 @@ bool TrackStateView::isUsed() const
 {
     return state.used;
 }
+
+bool TrackStateView::isTransmitProgramChangesEnabled() const
+{
+    return state.transmitProgramChangesEnabled;
+}

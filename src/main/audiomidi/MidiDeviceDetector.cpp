@@ -68,8 +68,9 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         MLOG("A new MIDI device was connected: " + name);
 
                         fs::path path;
-                        const auto knownControllerDetectedScreen = mpc.screens->get<
-                            ScreenId::VmpcKnownControllerDetectedScreen>();
+                        const auto knownControllerDetectedScreen =
+                            mpc.screens->get<
+                                ScreenId::VmpcKnownControllerDetectedScreen>();
 
                         if (name.find("MPD16") != std::string::npos)
                         {
@@ -109,15 +110,13 @@ void MidiDeviceDetector::start(Mpc &mpc)
                                 path, vmpcMidiScreen->switchToPreset);
 
                             auto layeredScreen = mpc.getLayeredScreen();
-                            concurrency::Task uiTask;
-                            uiTask.set(
+                            layeredScreen->postToUiThread(utils::Task(
                                 [layeredScreen]
                                 {
                                     layeredScreen->openScreenById(
                                         ScreenId::
                                             VmpcKnownControllerDetectedScreen);
-                                });
-                            layeredScreen->postToUiThread(uiTask);
+                                }));
                         }
                     }
                 }

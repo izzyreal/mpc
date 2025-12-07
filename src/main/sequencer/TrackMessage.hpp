@@ -106,9 +106,17 @@ namespace mpc::sequencer
         uint8_t deviceIndex;
     };
 
+    struct SetTrackTransmitProgramChangesEnabled
+    {
+        SequenceIndex sequenceIndex;
+        TrackIndex trackIndex;
+        bool enabled;
+    };
+
     using TrackMessage = std::variant<
         InsertAcquiredEvent, ClearEvents, RemoveEvent, UpdateEventTick,
         RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, UpdateEvents,
         SetTrackUsed, SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
-        SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex>;
+        SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex,
+        SetTrackTransmitProgramChangesEnabled>;
 } // namespace mpc::sequencer

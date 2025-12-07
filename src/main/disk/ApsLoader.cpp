@@ -346,15 +346,14 @@ void ApsLoader::showPopup(Mpc &mpc, const std::string &name,
     const std::string msg =
         "Loading " +
         StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
-    auto ls = mpc.getLayeredScreen();
 
-    concurrency::Task uiTask;
-    uiTask.set(
+    const auto ls = mpc.getLayeredScreen();
+
+    ls->postToUiThread(utils::Task(
         [ls, msg]
         {
             ls->showPopup(msg);
-        });
-    ls->postToUiThread(uiTask);
+        }));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
@@ -365,17 +364,14 @@ void ApsLoader::handleSoundNotFound(Mpc &mpc, const std::string &soundFileName)
 
     if (const auto skipAll = cantFindFileScreen->skipAll; !skipAll)
     {
-        auto ls = mpc.getLayeredScreen();
-
-        concurrency::Task uiTask;
-        uiTask.set(
+        const auto ls = mpc.getLayeredScreen();
+        ls->postToUiThread(utils::Task(
             [ls, cantFindFileScreen, soundFileName]
             {
                 cantFindFileScreen->waitingForUser = true;
                 cantFindFileScreen->fileName = soundFileName;
                 ls->openScreenById(ScreenId::CantFindFileScreen);
-            });
-        ls->postToUiThread(uiTask);
+            }));
 
         while (cantFindFileScreen->waitingForUser)
         {

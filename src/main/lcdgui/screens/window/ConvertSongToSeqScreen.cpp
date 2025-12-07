@@ -310,7 +310,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
         {
             auto referenceTrack = referenceSequence->getTrack(trackIndex);
             auto destTrack = destinationSequence->getTrack(trackIndex);
-            Sequencer::copyTrackParameters(referenceTrack, destTrack);
+            lockedSequencer->copyTrackParameters(referenceTrack, destTrack);
 
             if (trackStatus == 1)
             {

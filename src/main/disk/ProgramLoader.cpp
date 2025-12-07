@@ -191,14 +191,12 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                         performance::PerformanceMessage{std::move(payload)});
                 }
 
-                auto ls = mpc.getLayeredScreen();
-                concurrency::Task uiTask;
-                uiTask.set(
+                const auto ls = mpc.getLayeredScreen();
+                ls->postToUiThread(utils::Task(
                     [ls]
                     {
                         ls->openScreenById(ScreenId::LoadScreen);
-                    });
-                ls->postToUiThread(uiTask);
+                    }));
                 return p;
             });
 }
@@ -209,14 +207,12 @@ void ProgramLoader::showLoadingSoundNamePopup(Mpc &mpc, const std::string &name,
     const std::string msg =
         "Loading " +
         StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
-    auto ls = mpc.getLayeredScreen();
-    concurrency::Task uiTask;
-    uiTask.set(
+    const auto ls = mpc.getLayeredScreen();
+    ls->postToUiThread(utils::Task(
         [ls, msg]
         {
             ls->showPopup(msg);
-        });
-    ls->postToUiThread(uiTask);
+        }));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 

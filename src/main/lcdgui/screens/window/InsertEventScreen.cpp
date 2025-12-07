@@ -100,7 +100,7 @@ void InsertEventScreen::insertEvent() const
 
     const utils::SimpleAction onComplete([ls = ls]
     {
-        ls.lock()->postToUiThread(concurrency::Task(
+        ls.lock()->postToUiThread(utils::Task(
             [ls]
             {
                 ls.lock()->openScreenById(ScreenId::StepEditorScreen);

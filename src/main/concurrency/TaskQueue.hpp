@@ -6,18 +6,17 @@
 
 namespace mpc::concurrency
 {
-    using Task = utils::SmallFn<96, void()>;
     class TaskQueue
     {
     public:
-        void post(const Task &task)
+        void post(const utils::Task &task)
         {
             queue.enqueue(task);
         }
 
         void drain()
         {
-            Task task;
+            utils::Task task;
             while (queue.try_dequeue(task))
             {
                 task();
@@ -25,6 +24,6 @@ namespace mpc::concurrency
         }
 
     private:
-        moodycamel::ConcurrentQueue<Task> queue;
+        moodycamel::ConcurrentQueue<utils::Task> queue;
     };
 } // namespace mpc::concurrency

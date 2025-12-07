@@ -54,7 +54,7 @@ namespace mpc::lcdgui
         bool transfer(int direction);
 
     public:
-        void postToUiThread(const concurrency::Task &);
+        utils::PostToUiThreadFn postToUiThread;
         void transferLeft();
         void transferRight();
         void transferUp();

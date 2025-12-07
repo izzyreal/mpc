@@ -157,12 +157,12 @@ namespace mpc::sequencer
                                const std::shared_ptr<Sequence> &dest);
         static void copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
                                           const std::shared_ptr<Sequence> &dst);
-        static void copyTrack(const std::shared_ptr<Track> &src,
-                              const std::shared_ptr<Track> &dest);
+        void copyTrack(const std::shared_ptr<Track> &src,
+                              const std::shared_ptr<Track> &dest) const;
 
     public:
-        static void copyTrackParameters(const std::shared_ptr<Track> &source,
-                                        const std::shared_ptr<Track> &dest);
+        void copyTrackParameters(const std::shared_ptr<Track> &source,
+                                        const std::shared_ptr<Track> &dest) const;
 
         std::shared_ptr<SequencerStateManager> getStateManager() const;
         std::shared_ptr<Transport> getTransport();
@@ -191,9 +191,9 @@ namespace mpc::sequencer
         void copySequenceParameters(int source, int dest) const;
         void copySong(int source, int dest) const;
 
-        void copyTrack(int sourceTrackIndex, int destinationTrackIndex,
+        void copyTrack(int sourceTrackIndex, int destTrackIndex,
                        int sourceSequenceIndex,
-                       int destinationSequenceIndex) const;
+                       int destSequenceIndex) const;
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
         void setDefaultTrackName(const std::string &s, int i);

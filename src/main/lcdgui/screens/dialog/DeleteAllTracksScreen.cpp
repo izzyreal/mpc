@@ -12,14 +12,13 @@ DeleteAllTracksScreen::DeleteAllTracksScreen(Mpc &mpc, const int layerIndex)
 
 void DeleteAllTracksScreen::function(const int i)
 {
-    switch (i)
+    if (i == 3)
     {
-        case 3:
-            openScreenById(ScreenId::DeleteTrackScreen);
-            break;
-        case 4:
-            sequencer.lock()->getSelectedSequence()->purgeAllTracks();
-            openScreenById(ScreenId::SequencerScreen);
-            break;
+        openScreenById(ScreenId::DeleteTrackScreen);
+    }
+    else if (i == 4)
+    {
+        sequencer.lock()->getSelectedSequence()->deleteAllTracks();
+        openScreenById(ScreenId::SequencerScreen);
     }
 }

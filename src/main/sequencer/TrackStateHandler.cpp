@@ -25,9 +25,9 @@ void updateEvent(EventData *const e, const EventData &replacement)
     e->next = next;
 }
 
-void TrackStateHandler::applyMessage(
-    SequencerState &state, std::vector<utils::SimpleAction> &actions,
-    const TrackMessage &msg) const
+void TrackStateHandler::applyMessage(SequencerState &state,
+                                     std::vector<utils::SimpleAction> &actions,
+                                     const TrackMessage &msg) const
 {
     const auto visitor = Overload{
         [&](const SetTrackDeviceIndex &m)
@@ -82,8 +82,7 @@ void TrackStateHandler::applyMessage(
                                 .eventsHead;
             while (it)
             {
-                if (it->beingRecorded &&
-                    it->noteNumber == m.handle->noteNumber)
+                if (it->beingRecorded && it->noteNumber == m.handle->noteNumber)
                 {
                     it->duration = m.duration;
                     it->beingRecorded = false;
@@ -147,6 +146,12 @@ void TrackStateHandler::applyMessage(
         [&](const UpdateEvents &m)
         {
             applyUpdateEvents(m, state);
+        },
+        [&](const SetTrackTransmitProgramChangesEnabled &m)
+        {
+            state.sequences[m.sequenceIndex]
+                .tracks[m.trackIndex]
+                .transmitProgramChangesEnabled = m.enabled;
         }};
 
     std::visit(visitor, msg);

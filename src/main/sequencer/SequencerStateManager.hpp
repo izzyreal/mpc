@@ -38,7 +38,7 @@ namespace mpc::sequencer
 
         void returnEventToPool(EventData *e) const;
 
-        static void insertAcquiredEvent(TrackState &track, EventData *e);
+        void insertAcquiredEvent(TrackState &track, EventData *e) const;
 
         EventData *acquireEvent() const;
 

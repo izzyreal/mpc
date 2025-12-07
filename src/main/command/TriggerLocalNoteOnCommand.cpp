@@ -137,6 +137,8 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->sequencerStateManager.lock()->recordNoteEventLive(
                 ctx->track->getSequenceIndex(), ctx->track->getIndex(),
                 ctx->note, velo);
+
+        ctx->track->setUsedIfCurrentlyUnused();
     }
     else if (ctx->isStepRecording &&
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||

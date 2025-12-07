@@ -183,6 +183,18 @@ void SequenceStateHandler::applyMessage(
         [&](const InsertBars &m)
         {
             applyInsertBars(m, state, actions);
+        },
+        [&](const DeleteTrack &m)
+        {
+            applyMessage(state, actions, ClearEvents{m.sequenceIndex, m.trackIndex});
+            state.sequences[m.sequenceIndex].tracks[m.trackIndex].initializeDefaults();
+        },
+        [&](const DeleteAllTracks &m)
+        {
+            for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
+            {
+                applyMessage(state, actions, DeleteTrack{m.sequenceIndex, TrackIndex(i)});
+            }
         }};
 
     std::visit(visitor, msg);

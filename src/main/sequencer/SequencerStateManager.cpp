@@ -338,10 +338,9 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
 
         const auto t2 = toSequence.getTrack(i);
 
-        if (!t2->isUsed())
-        {
-            sequencer->getSequence(m.toSeqIndex)->getTrack(i)->setUsed(true);
-        }
+        sequencer->getSequence(m.toSeqIndex)
+            ->getTrack(i)
+            ->setUsedIfCurrentlyUnused();
 
         const auto toSequenceLastTick = toSequence.getLastTick();
 
@@ -377,7 +376,8 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
     }
 }
 
-void SequencerStateManager::insertAcquiredEvent(TrackState &track, EventData *e)
+void SequencerStateManager::insertAcquiredEvent(TrackState &track,
+                                                EventData *e) const
 {
     assert(e);
 
