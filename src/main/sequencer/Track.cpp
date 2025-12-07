@@ -84,10 +84,16 @@ mpc::SequenceIndex Track::getSequenceIndex() const
     return parent->getSequenceIndex();
 }
 
-void Track::setUsedIfCurrentlyUnused(utils::SmallSimpleAction &&onCompleteNameSetting)
+void Track::setUsedIfCurrentlyUnused(
+    utils::SmallSimpleAction &&onCompleteNameSetting)
 {
     if (isUsed())
     {
+        postToUiThread(utils::Task(
+            [onCompleteNameSetting]() mutable
+            {
+                onCompleteNameSetting();
+            }));
         return;
     }
 
@@ -105,7 +111,8 @@ bool Track::isTransmitProgramChangesEnabled() const
     return getSnapshot(getIndex())->isTransmitProgramChangesEnabled();
 }
 
-void Track::setTransmitProgramChangesEnabled(const bool b, const bool updateUsedness)
+void Track::setTransmitProgramChangesEnabled(const bool b,
+                                             const bool updateUsedness)
 {
     dispatch(SetTrackTransmitProgramChangesEnabled{getSequenceIndex(),
                                                    getIndex(), b});
