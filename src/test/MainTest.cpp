@@ -20,9 +20,9 @@ SCENARIO("A Sequence initializes correctly", "[sequence]")
     {
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
-        const auto seq = mpc.getSequencer()->makeNewSequence(SequenceIndex(0));
-        seq->init(1);
+        mpc.getSequencer()->getSelectedSequence()->init(1);
         mpc.getSequencer()->getStateManager()->drainQueue();
-        REQUIRE(seq->getInitialTempo() == 120.0);
+        REQUIRE(mpc.getSequencer()->getSelectedSequence()->getInitialTempo() ==
+                120.0);
     }
 }
