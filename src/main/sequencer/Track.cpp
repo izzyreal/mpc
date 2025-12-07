@@ -84,7 +84,7 @@ mpc::SequenceIndex Track::getSequenceIndex() const
     return parent->getSequenceIndex();
 }
 
-void Track::setUsedIfCurrentlyUnused()
+void Track::setUsedIfCurrentlyUnused(utils::SmallSimpleAction &&onCompleteNameSetting)
 {
     if (isUsed())
     {
@@ -93,9 +93,10 @@ void Track::setUsedIfCurrentlyUnused()
 
     dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
     postToUiThread(utils::Task(
-        [this]
+        [this, onCompleteNameSetting]() mutable
         {
             setName(getDefaultTrackName(getIndex()));
+            onCompleteNameSetting();
         }));
 }
 
@@ -104,11 +105,14 @@ bool Track::isTransmitProgramChangesEnabled() const
     return getSnapshot(getIndex())->isTransmitProgramChangesEnabled();
 }
 
-void Track::setTransmitProgramChangesEnabled(const bool b)
+void Track::setTransmitProgramChangesEnabled(const bool b, const bool updateUsedness)
 {
     dispatch(SetTrackTransmitProgramChangesEnabled{getSequenceIndex(),
                                                    getIndex(), b});
-    setUsedIfCurrentlyUnused();
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 void Track::setTrackIndex(const TrackIndex i)
@@ -125,10 +129,14 @@ mpc::TrackIndex Track::getIndex() const
     return trackIndex;
 }
 
-void Track::setOn(const bool b)
+void Track::setOn(const bool b, const bool updateUsedness)
 {
     dispatch(SetTrackOn{getSequenceIndex(), getIndex(), b});
-    setUsedIfCurrentlyUnused();
+
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
@@ -148,12 +156,16 @@ void Track::removeEvents() const
     dispatch(ClearEvents{getSequenceIndex(), getIndex()});
 }
 
-void Track::setVelocityRatio(const int i)
+void Track::setVelocityRatio(const int i, const bool updateUsedness)
 {
     dispatch(
         SetTrackVelocityRatio{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 1, 200))});
-    setUsedIfCurrentlyUnused();
+
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 int Track::getVelocityRatio() const
@@ -161,12 +173,15 @@ int Track::getVelocityRatio() const
     return getSnapshot(getIndex())->getVelocityRatio();
 }
 
-void Track::setProgramChange(const int i)
+void Track::setProgramChange(const int i, const bool updateUsedness)
 {
     dispatch(
         SetTrackProgramChange{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 0, 128))});
-    setUsedIfCurrentlyUnused();
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 int Track::getProgramChange() const
@@ -174,7 +189,7 @@ int Track::getProgramChange() const
     return getSnapshot(getIndex())->getProgramChange();
 }
 
-void Track::setBusType(BusType busType)
+void Track::setBusType(BusType busType, const bool updateUsedness)
 {
     using U = std::underlying_type_t<BusType>;
     constexpr U MIN = static_cast<U>(BusType::MIDI);
@@ -185,7 +200,10 @@ void Track::setBusType(BusType busType)
 
     dispatch(SetTrackBusType{getSequenceIndex(), getIndex(),
                              static_cast<BusType>(clamped)});
-    setUsedIfCurrentlyUnused();
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 BusType Track::getBusType() const
@@ -193,11 +211,14 @@ BusType Track::getBusType() const
     return getSnapshot(getIndex())->getBusType();
 }
 
-void Track::setDeviceIndex(const int i)
+void Track::setDeviceIndex(const int i, const bool updateUsedness)
 {
     dispatch(SetTrackDeviceIndex{getSequenceIndex(), getIndex(),
                                  static_cast<uint8_t>(std::clamp(i, 0, 32))});
-    setUsedIfCurrentlyUnused();
+    if (updateUsedness)
+    {
+        setUsedIfCurrentlyUnused();
+    }
 }
 
 int Track::getDeviceIndex() const

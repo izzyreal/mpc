@@ -365,7 +365,7 @@ void Sequencer::purgeAllSequences()
 {
     for (int i = 0; i < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT; i++)
     {
-        purgeSequence(i);
+        deleteSequence(i);
     }
 
     setSelectedSequenceIndex(MinSequenceIndex, true);
@@ -461,7 +461,7 @@ Sequencer::makeNewSequence(SequenceIndex sequenceIndex)
         });
 }
 
-void Sequencer::purgeSequence(const int i)
+void Sequencer::deleteSequence(const int i)
 {
     sequences[i] = makeNewSequence(SequenceIndex(i));
     std::string res = defaultSequenceName;

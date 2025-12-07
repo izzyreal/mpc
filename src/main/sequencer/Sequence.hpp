@@ -50,8 +50,8 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(const utils::PostToUiThreadFn &,
-            SequenceIndex, std::shared_ptr<SequencerStateManager> manager,
+        Sequence(const utils::PostToUiThreadFn &, SequenceIndex,
+                 std::shared_ptr<SequencerStateManager> manager,
                  const std::function<std::shared_ptr<SequenceStateView>()>
                      &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
@@ -146,9 +146,8 @@ namespace mpc::sequencer
         void deleteBars(int firstBar, int lastBarToDelete) const;
         void deleteTrack(TrackIndex) const;
         void deleteAllTracks() const;
-        void insertBars(
-            int barCount, BarIndex afterBar,
-                        const utils::SimpleAction &nextAction = utils::SimpleAction([] {})) const;
+        void insertBars(int barCount, BarIndex afterBar,
+                        const utils::SimpleAction &nextAction = {}) const;
         void moveTrack(int source, int destination);
 
         int getEventCount() const;
@@ -182,6 +181,5 @@ namespace mpc::sequencer
 
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<int()> getCurrentBarIndex;
-        std::function<std::string(int)> getDefaultTrackName;
     };
 } // namespace mpc::sequencer

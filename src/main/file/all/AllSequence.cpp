@@ -127,15 +127,20 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
     for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
         const auto t = mpcSeq->getTrack(i);
+
+        constexpr bool updateUsedness = false;
+
+        t->setName(at->getName(i));
+
+        t->setDeviceIndex(at->getDevice(i), updateUsedness);
+        t->setBusType(busIndexToBusType(at->getBus(i)), updateUsedness);
+        t->setProgramChange(at->getPgm(i), updateUsedness);
+        t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7, updateUsedness);
+        t->setVelocityRatio(at->getVelo(i), updateUsedness);
+
         const bool trackIsUsed = at->getStatus(i) == 5 || at->getStatus(i) == 7;
         manager->enqueue(SetTrackUsed{mpcSeq->getSequenceIndex(), TrackIndex(i),
                                       trackIsUsed});
-        t->setName(at->getName(i));
-        t->setDeviceIndex(at->getDevice(i));
-        t->setBusType(busIndexToBusType(at->getBus(i)));
-        t->setProgramChange(at->getPgm(i));
-        t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7);
-        t->setVelocityRatio(at->getVelo(i));
     }
 
     for (int j = 0; j < getEventAmount(); j++)

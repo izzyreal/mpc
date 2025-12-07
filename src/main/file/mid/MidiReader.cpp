@@ -227,7 +227,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
         std::vector<EventData> noteOns;
 
         auto track = sequence->getTrack(trackIndex);
-        track->setDeviceIndex(deviceIndex);
+        constexpr bool updateUsedness = false;
+        track->setDeviceIndex(deviceIndex, updateUsedness);
 
         if (isMpc2000XlMidiFile)
         {

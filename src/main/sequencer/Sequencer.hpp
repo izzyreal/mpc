@@ -186,7 +186,7 @@ namespace mpc::sequencer
         void undoSeq();
         void setSequence(SequenceIndex, std::shared_ptr<Sequence>);
         void purgeAllSequences();
-        void purgeSequence(int i);
+        void deleteSequence(int i);
         void copySequence(int source, int destination);
         void copySequenceParameters(int source, int dest) const;
         void copySong(int source, int dest) const;

@@ -41,8 +41,7 @@ Sequence::Sequence(
     std::function<int()> getCurrentBarIndex)
     : getSnapshot(getSnapshot), sequenceIndex(sequenceIndex), manager(manager),
       dispatch(dispatch), getScreens(getScreens),
-      getCurrentBarIndex(getCurrentBarIndex),
-      getDefaultTrackName(getDefaultTrackName)
+      getCurrentBarIndex(getCurrentBarIndex)
 {
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
@@ -202,11 +201,14 @@ void Sequence::init(const int newLastBarIndex) const
             continue;
         }
 
-        t->setName(getDefaultTrackName(t->getIndex()));
-        t->setDeviceIndex(userScreen->device);
-        t->setProgramChange(userScreen->pgm);
-        t->setBusType(userScreen->busType);
-        t->setVelocityRatio(userScreen->velo);
+        constexpr bool updateUsedness = false;
+
+        t->setOn(true, updateUsedness);
+        t->setDeviceIndex(userScreen->device, updateUsedness);
+        t->setProgramChange(userScreen->pgm, updateUsedness);
+        t->setBusType(userScreen->busType, updateUsedness);
+        t->setVelocityRatio(userScreen->velo, updateUsedness);
+        t->setTransmitProgramChangesEnabled(true, updateUsedness);
     }
 
     setLastBarIndex(newLastBarIndex);

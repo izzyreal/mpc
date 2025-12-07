@@ -41,10 +41,11 @@ void DeleteSequenceScreen::function(const int i)
             break;
         case 4:
             sequencer.lock()->getTransport()->setPosition(0);
-            sequencer.lock()->purgeSequence(
+            sequencer.lock()->deleteSequence(
                 sequencer.lock()->getSelectedSequenceIndex());
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
