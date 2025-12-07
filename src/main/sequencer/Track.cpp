@@ -91,7 +91,12 @@ void Track::printEvents() const
 
 void Track::setEventStates(const std::vector<EventData> &eventStates) const
 {
-    dispatch(UpdateEvents{parent->getSequenceIndex(), getIndex(), eventStates});
+    dispatch(UpdateEvents{getSequenceIndex(), getIndex(), eventStates});
+}
+
+mpc::SequenceIndex Track::getSequenceIndex() const
+{
+    return parent->getSequenceIndex();
 }
 
 void Track::setTrackIndex(const TrackIndex i)
@@ -115,12 +120,12 @@ void Track::setUsed(const bool b)
         name = getDefaultTrackName(trackIndex);
     }
 
-    dispatch(SetTrackUsed{parent->getSequenceIndex(), getIndex(), b});
+    dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), b});
 }
 
 void Track::setOn(const bool b) const
 {
-    dispatch(SetTrackOn{parent->getSequenceIndex(), getIndex(), b});
+    dispatch(SetTrackOn{getSequenceIndex(), getIndex(), b});
 }
 
 void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
@@ -131,19 +136,19 @@ void Track::removeEvent(const std::shared_ptr<EventRef> &event) const
 void Track::removeEvent(EventData *eventState) const
 {
     assert(eventState && eventState->trackIndex == getIndex() &&
-           eventState->sequenceIndex == parent->getSequenceIndex());
+           eventState->sequenceIndex == getSequenceIndex());
     dispatch(RemoveEvent{eventState});
 }
 
 void Track::removeEvents() const
 {
-    dispatch(ClearEvents{parent->getSequenceIndex(), getIndex()});
+    dispatch(ClearEvents{getSequenceIndex(), getIndex()});
 }
 
 void Track::setVelocityRatio(const int i) const
 {
     dispatch(
-        SetTrackVelocityRatio{parent->getSequenceIndex(), getIndex(),
+        SetTrackVelocityRatio{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 1, 200))});
 }
 
@@ -155,7 +160,7 @@ int Track::getVelocityRatio() const
 void Track::setProgramChange(const int i) const
 {
     dispatch(
-        SetTrackProgramChange{parent->getSequenceIndex(), getIndex(),
+        SetTrackProgramChange{getSequenceIndex(), getIndex(),
                               static_cast<uint8_t>(std::clamp(i, 0, 128))});
 }
 
@@ -173,7 +178,7 @@ void Track::setBusType(BusType bt) const
     const U raw = static_cast<U>(bt);
     const U clamped = std::clamp(raw, MIN, MAX);
 
-    dispatch(SetTrackBusType{parent->getSequenceIndex(), getIndex(),
+    dispatch(SetTrackBusType{getSequenceIndex(), getIndex(),
                              static_cast<BusType>(clamped)});
 }
 
@@ -185,7 +190,7 @@ BusType Track::getBusType() const
 void Track::setDeviceIndex(const int i) const
 {
 
-    dispatch(SetTrackDeviceIndex{parent->getSequenceIndex(), getIndex(),
+    dispatch(SetTrackDeviceIndex{getSequenceIndex(), getIndex(),
                                  static_cast<uint8_t>(std::clamp(i, 0, 32))});
 }
 
@@ -234,7 +239,7 @@ std::vector<EventData> Track::getEventStates() const
 std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
 {
     std::vector<std::shared_ptr<EventRef>> result;
-    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
     lock.acquire();
 
     const auto snapshot = getSnapshot(getIndex());
@@ -268,7 +273,7 @@ bool Track::isUsed() const
 std::vector<std::shared_ptr<EventRef>>
 Track::getEventRange(const int startTick, const int endTick) const
 {
-    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
     lock.acquire();
 
     std::vector<std::shared_ptr<EventRef>> result;
@@ -286,7 +291,7 @@ Track::getEventRange(const int startTick, const int endTick) const
 
 void Track::removeDoubles() const
 {
-    dispatch(RemoveDoubles{parent->getSequenceIndex(), getIndex()});
+    dispatch(RemoveDoubles{getSequenceIndex(), getIndex()});
 }
 
 void Track::updateEventTick(EventData *handle, const int newTick) const
@@ -298,7 +303,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 {
     std::vector<std::shared_ptr<NoteOnEvent>> result;
 
-    auto &lock = manager->trackLocks[parent->getSequenceIndex()][getIndex()];
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
     lock.acquire();
 
     for (const auto &eventHandle : getSnapshot(getIndex())->getNoteEvents())
@@ -363,7 +368,7 @@ void Track::playNext() const
     }
 
     playEventIndex = playEventIndex + 1;
-    dispatch(SetPlayEventIndex{parent->getSequenceIndex(), getIndex(),
+    dispatch(SetPlayEventIndex{getSequenceIndex(), getIndex(),
                                playEventIndex});
     manager->drainQueue();
 }
@@ -376,7 +381,7 @@ void Track::insertAcquiredEvent(EventData *event,
         setUsed(true);
     }
 
-    event->sequenceIndex = parent->getSequenceIndex();
+    event->sequenceIndex = getSequenceIndex();
     event->trackIndex = trackIndex;
 
     dispatch(InsertAcquiredEvent{event, onComplete});
@@ -408,7 +413,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
     result->noteNumber = note;
     result->velocity = velocity;
     result->duration = Duration(1);
-    result->sequenceIndex = parent->getSequenceIndex();
+    result->sequenceIndex = getSequenceIndex();
     result->trackIndex = trackIndex;
     result->tick = tick;
     result->beingRecorded = true;

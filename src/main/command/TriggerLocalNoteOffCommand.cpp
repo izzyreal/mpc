@@ -76,8 +76,13 @@ void TriggerLocalNoteOffCommand::execute()
 
                 const auto bar = ctx->currentBarIndex + 1;
 
+                const auto sequenceStateView =
+                    ctx->sequencerStateManager.lock()
+                        ->getSnapshot()
+                        .getSequenceState(ctx->track->getSequenceIndex());
+
                 nextPos = ctx->track->timingCorrectTick(
-                    *ctx->track->parent->getSnapshot(), 0, bar, nextPos,
+                    *sequenceStateView, 0, bar, nextPos,
                     ctx->noteValueLengthInTicks, ctx->swing);
 
                 if (const auto lastTick =

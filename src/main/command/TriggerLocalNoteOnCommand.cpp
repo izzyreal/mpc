@@ -1,19 +1,23 @@
-#include "TriggerLocalNoteOnCommand.hpp"
-#include "sequencer/Transport.hpp"
+#include "command/TriggerLocalNoteOnCommand.hpp"
 
 #include "command/context/TriggerLocalNoteOnContext.hpp"
 
 #include "audiomidi/EventHandler.hpp"
+
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+
 #include "sampler/Program.hpp"
+
+#include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequenceStateView.hpp"
-#include "Util.hpp"
-#include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
+
+#include "Util.hpp"
+
 #include <memory>
 #include <utility>
 
@@ -131,7 +135,7 @@ void TriggerLocalNoteOnCommand::execute()
     {
         recordNoteOnEvent =
             ctx->sequencerStateManager.lock()->recordNoteEventLive(
-                ctx->track->parent->getSequenceIndex(), ctx->track->getIndex(),
+                ctx->track->getSequenceIndex(), ctx->track->getIndex(),
                 ctx->note, velo);
     }
     else if (ctx->isStepRecording &&
@@ -158,9 +162,14 @@ void TriggerLocalNoteOnCommand::execute()
             stepLength != 1)
         {
             const int bar = transport->getCurrentBarIndex() + 1;
-            const auto sequenceStateView = *ctx->track->parent->getSnapshot();
+
+            const auto sequenceStateView =
+                ctx->sequencerStateManager.lock()
+                    ->getSnapshot()
+                    .getSequenceState(ctx->track->getSequenceIndex());
+
             const auto correctedTick = ctx->track->timingCorrectTick(
-                sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
+                *sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
                 timingCorrectScreen->getSwing());
 
             if (ctx->positionTicks != correctedTick)

@@ -147,9 +147,10 @@ namespace mpc::sequencer
 
         void setEventStates(const std::vector<EventData> &eventStates) const;
 
-        Sequence *parent{nullptr};
+        SequenceIndex getSequenceIndex() const;
 
     private:
+        Sequence *parent{nullptr};
         std::shared_ptr<SequencerStateManager> manager;
         std::function<std::shared_ptr<TrackStateView>(TrackIndex)> getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
