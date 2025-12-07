@@ -46,13 +46,13 @@ TEST_CASE("timing-correct", "[track]")
 
     int swingPercentage = 50;
 
-    tr->timingCorrect(0, 0, note88, note88->tick, 24, swingPercentage);
+    tr->timingCorrect(*seq->getSnapshot(), 0, 0, note88, note88->tick, 24, swingPercentage);
     stateManager->drainQueue();
 
-    tr->timingCorrect(0, 0, note89, note89->tick, 24, swingPercentage);
+    tr->timingCorrect(*seq->getSnapshot(), 0, 0, note89, note89->tick, 24, swingPercentage);
     stateManager->drainQueue();
 
-    tr->timingCorrect(0, 0, note91, note91->tick, 24, swingPercentage);
+    tr->timingCorrect(*seq->getSnapshot(), 0, 0, note91, note91->tick, 24, swingPercentage);
     stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[0]->getNote().get() == 88);
@@ -91,7 +91,7 @@ TEST_CASE("swing1", "[track]")
 
     REQUIRE(tr->getEvent(0)->snapshot.noteNumber == n2->noteNumber);
 
-    tr->timingCorrect(0, 0, n2, n2->tick, 24, 71);
+    tr->timingCorrect(*seq->getSnapshot(), 0, 0, n2, n2->tick, 24, 71);
     stateManager->drainQueue();
 
     REQUIRE(tr->getEvent(0)->getTick() == 23);
@@ -100,7 +100,7 @@ TEST_CASE("swing1", "[track]")
     REQUIRE(tr->getNoteEvents()[1]->getTick() == 34);
     REQUIRE(tr->getNoteEvents()[1]->getNote() == n2->noteNumber);
 
-    tr->timingCorrect(0, 0, n2, tr->getNoteEvents()[1]->getTick(), 24, 60);
+    tr->timingCorrect(*seq->getSnapshot(), 0, 0, n2, tr->getNoteEvents()[1]->getTick(), 24, 60);
     stateManager->drainQueue();
 
     REQUIRE(tr->getNoteEvents()[1]->getNote() == n2->noteNumber);
@@ -127,7 +127,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
+        tr->timingCorrect(*seq->getSnapshot(), 0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 0);
     }
@@ -136,7 +136,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
+        tr->timingCorrect(*seq->getSnapshot(), 0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 24);
     }
@@ -145,7 +145,7 @@ TEST_CASE("quantize", "[track]")
     {
         tr->getEvent(0)->setTick(i);
         stateManager->drainQueue();
-        tr->timingCorrect(0, 0, tr->getEvent(0)->handle, i, 24, 50);
+        tr->timingCorrect(*seq->getSnapshot(), 0, 0, tr->getEvent(0)->handle, i, 24, 50);
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 48);
     }

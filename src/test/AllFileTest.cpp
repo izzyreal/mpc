@@ -90,11 +90,15 @@ TEST_CASE("ALL file song", "[allfile]")
     song->setStepSequenceIndex(mpc::SongStepIndex(1), mpc::SequenceIndex(1));
     song->setStepRepetitionCount(mpc::SongStepIndex(1), 2);
 
+    stateManager->drainQueue();
+
     auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
+
+    stateManager->drainQueue();
 
     song = sequencer->getSong(0);
     REQUIRE(song->getName() == "TestSong");
@@ -105,7 +109,7 @@ TEST_CASE("ALL file song", "[allfile]")
     REQUIRE(song->getStep(mpc::SongStepIndex(1)).repetitionCount == 2);
 }
 
-TEST_CASE("ALL file track is on and used", "[allfile]")
+TEST_CASE("ALL file track is on, used and transmits program changes", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -113,13 +117,13 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     auto stateManager = sequencer->getStateManager();
     auto seq = sequencer->getSequence(0);
     seq->init(1);
-    seq->getTrack(60)->setUsed(false);
+    seq->getTrack(42)->setTransmitProgramChangesEnabled(true);
+    seq->getTrack(43)->setTransmitProgramChangesEnabled(false);
     seq->getTrack(60)->setOn(true);
-    seq->getTrack(61)->setUsed(false);
     seq->getTrack(61)->setOn(false);
-    seq->getTrack(62)->setUsed(true);
+    seq->getTrack(62)->setUsedIfCurrentlyUnused();
     seq->getTrack(62)->setOn(true);
-    seq->getTrack(63)->setUsed(true);
+    seq->getTrack(63)->setUsedIfCurrentlyUnused();
     seq->getTrack(63)->setOn(false);
 
     stateManager->drainQueue();
@@ -133,9 +137,11 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     assert(sequencer->getUsedSequenceCount() == 1);
 
     auto seq1 = sequencer->getSelectedSequence();
-    REQUIRE(!seq1->getTrack(60)->isUsed());
+    REQUIRE(seq1->getTrack(42)->isTransmitProgramChangesEnabled());
+    REQUIRE(!seq1->getTrack(43)->isTransmitProgramChangesEnabled());
+    REQUIRE(seq1->getTrack(60)->isUsed());
     REQUIRE(seq1->getTrack(60)->isOn());
-    REQUIRE(!seq1->getTrack(61)->isUsed());
+    REQUIRE(seq1->getTrack(61)->isUsed());
     REQUIRE(!seq1->getTrack(61)->isOn());
     REQUIRE(seq1->getTrack(62)->isUsed());
     REQUIRE(seq1->getTrack(62)->isOn());

@@ -33,7 +33,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         stateManager->drainQueue();
         auto track0 = sequence->getTrack(0);
         auto track1 = sequence->getTrack(1);
-        track0->setUsed(true);
+        track0->setUsedIfCurrentlyUnused();
         track0->setDeviceIndex(2);
 
         EventData eventData;
