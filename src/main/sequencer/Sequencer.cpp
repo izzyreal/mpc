@@ -239,6 +239,9 @@ void Sequencer::playTick(const Tick tick) const
             }
         }
 
+        stateManager->processLiveNoteEventRecordingQueues(
+            tick, *seq->getSnapshot());
+
         for (const auto &track : seq->getTracks())
         {
             while (track->getNextTick() == tick)
@@ -993,12 +996,9 @@ void Sequencer::setSecondSequenceEnabled(const bool b)
     secondSequenceEnabled.store(b);
 }
 
-void Sequencer::flushTrackNoteCache()
+void Sequencer::flushTrackNoteCache() const
 {
-    for (const auto &t : getCurrentlyPlayingSequence()->getTracks())
-    {
-        t->flushNoteCache();
-    }
+    stateManager->flushNoteCache();
 }
 
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()

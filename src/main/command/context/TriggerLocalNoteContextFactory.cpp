@@ -92,6 +92,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{source,
                                   performanceManager,
+                                  lockedSequencer->getStateManager(),
                                   registryNoteOnEvent,
                                   isSequencerScreen,
                                   programPadIndex,
@@ -175,6 +176,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
         TriggerLocalNoteOffContext{
             source,
             performanceManager,
+            lockedSequencer->getStateManager(),
             lockedSequencer->getBus(busType),
             program,
             programPadIndex,

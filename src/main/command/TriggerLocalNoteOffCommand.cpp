@@ -6,6 +6,9 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerStateManager.hpp"
+
 #include <memory>
 
 using namespace mpc::command;
@@ -41,8 +44,8 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->sequencerIsRecordingOrOverdubbing)
         {
-            ctx->track->finalizeNoteEventLive(ctx->recordOnEvent,
-                                              ctx->positionTicks);
+            ctx->sequencerStateManager.lock()->finalizeNoteEventLive(
+                ctx->recordOnEvent, ctx->positionTicks);
         }
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
@@ -74,7 +77,8 @@ void TriggerLocalNoteOffCommand::execute()
                 const auto bar = ctx->currentBarIndex + 1;
 
                 nextPos = ctx->track->timingCorrectTick(
-                    0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
+                    *ctx->track->parent->getSnapshot(), 0, bar, nextPos,
+                    ctx->noteValueLengthInTicks, ctx->swing);
 
                 if (const auto lastTick =
                         ctx->sequencerGetActiveSequenceLastTick();

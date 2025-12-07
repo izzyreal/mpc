@@ -36,6 +36,7 @@ namespace mpc::sequencer
     class Bus;
     class Sequencer;
     class Track;
+    class SequencerStateManager;
 } // namespace mpc::sequencer
 
 namespace mpc::audiomidi
@@ -49,6 +50,7 @@ namespace mpc::command::context
     {
         performance::PerformanceEventSource source;
         std::weak_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<sequencer::SequencerStateManager> sequencerStateManager;
         performance::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
         std::optional<ProgramPadIndex> programPadIndex;

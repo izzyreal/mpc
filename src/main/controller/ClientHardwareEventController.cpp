@@ -409,11 +409,14 @@ void ClientHardwareEventController::handlePadRelease(
 
         const auto programPadIndex =
             physicalPadAndBankToProgramPadIndex(p->padIndex, p->bank);
-        const auto track =
-            sequencer->getSelectedSequence()->getTrack(p->trackIndex).get();
+
+        const auto seq = sequencer->getSelectedSequence();
+
+        const auto track = seq->getTrack(p->trackIndex).get();
 
         const auto recordingNoteOnEvent =
-            track->findRecordingNoteOnEvent(p->noteNumber);
+            sequencer->getStateManager()->findRecordingNoteOnEvent(
+                seq->getSequenceIndex(), p->trackIndex, p->noteNumber);
 
         if (p->noteNumber != NoNoteNumber)
         {

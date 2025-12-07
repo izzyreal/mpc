@@ -224,7 +224,7 @@ namespace mpc::sequencer
         SequenceIndex getSongSequenceIndex() const;
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
-        void flushTrackNoteCache();
+        void flushTrackNoteCache() const;
         void storeSelectedSequenceInUndoPlaceHolder();
         void resetUndo();
         SongIndex getSelectedSongIndex() const;

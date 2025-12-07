@@ -61,8 +61,6 @@ Track::Track(
       isSoloEnabled(isSoloEnabled)
 {
     init();
-    tempLiveNoteOnRecordingEvents.resize(20);
-    tempLiveNoteOffRecordingEvents.resize(20);
 }
 
 Track::~Track() {}
@@ -72,57 +70,14 @@ void Track::init()
     name = trackIndex == TempoChangeTrackIndex
                ? "tempo"
                : getDefaultTrackName(trackIndex);
-    liveNoteOnEventRecordingQueue =
-        std::make_shared<moodycamel::ConcurrentQueue<EventData *>>(20);
-    liveNoteOffEventRecordingQueue =
-        std::make_shared<moodycamel::ConcurrentQueue<EventData>>(20);
 }
 
 void Track::purge()
 {
     init();
-    tempLiveNoteOnRecordingEvents.clear();
-    tempLiveNoteOnRecordingEvents.resize(20);
-    tempLiveNoteOffRecordingEvents.clear();
-    tempLiveNoteOffRecordingEvents.resize(20);
     removeEvents();
 }
 
-EventData *Track::findRecordingNoteOnEvent(const NoteNumber noteNumber)
-{
-    EventData *found = nullptr;
-
-    const auto count = liveNoteOnEventRecordingQueue->try_dequeue_bulk(
-        tempLiveNoteOnRecordingEvents.begin(),
-        tempLiveNoteOnRecordingEvents.size());
-
-    for (int i = 0; i < count; i++)
-    {
-        const auto e = tempLiveNoteOnRecordingEvents[i];
-        if (e->noteNumber == noteNumber)
-        {
-            found = e;
-            break;
-        }
-    }
-
-    for (size_t i = 0; i < count; i++)
-    {
-        liveNoteOnEventRecordingQueue->enqueue(
-            tempLiveNoteOnRecordingEvents[i]);
-    }
-
-    tempLiveNoteOnRecordingEvents.clear();
-    tempLiveNoteOnRecordingEvents.resize(20);
-
-    if (!found)
-    {
-        found = getSnapshot(getIndex())
-                    ->findRecordingNoteOnByNoteNumber(noteNumber);
-    }
-
-    return found;
-}
 
 void Track::printEvents() const
 {
@@ -364,18 +319,16 @@ std::string Track::getActualName()
     return name;
 }
 
-int Track::getNextTick()
+int Track::getNextTick() const
 {
     const auto snapshot = getSnapshot(getIndex());
     const auto playEventIndex = snapshot->getPlayEventIndex();
 
     if (playEventIndex >= snapshot->getEventCount())
     {
-        processLiveNoteEventRecordingQueues();
         return std::numeric_limits<int>::max();
     }
 
-    processLiveNoteEventRecordingQueues();
     return snapshot->getEventByIndex(playEventIndex)->tick;
 }
 

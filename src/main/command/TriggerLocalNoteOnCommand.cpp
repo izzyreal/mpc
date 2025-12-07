@@ -9,7 +9,10 @@
 #include "sampler/Program.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequenceStateView.hpp"
 #include "Util.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 #include <memory>
 #include <utility>
@@ -126,7 +129,10 @@ void TriggerLocalNoteOnCommand::execute()
 
     if (transport->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventLive(ctx->note, velo);
+        recordNoteOnEvent =
+            ctx->sequencerStateManager.lock()->recordNoteEventLive(
+                ctx->track->parent->getSequenceIndex(), ctx->track->getIndex(),
+                ctx->note, velo);
     }
     else if (ctx->isStepRecording &&
              (sequencer::isMidiBusType(ctx->track->getBusType()) ||
@@ -152,8 +158,9 @@ void TriggerLocalNoteOnCommand::execute()
             stepLength != 1)
         {
             const int bar = transport->getCurrentBarIndex() + 1;
+            const auto sequenceStateView = *ctx->track->parent->getSnapshot();
             const auto correctedTick = ctx->track->timingCorrectTick(
-                0, bar, ctx->positionTicks, stepLength,
+                sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
                 timingCorrectScreen->getSwing());
 
             if (ctx->positionTicks != correctedTick)

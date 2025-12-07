@@ -15,12 +15,6 @@
 #include <functional>
 #include <cstdint>
 
-namespace moodycamel
-{
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits> class ConcurrentQueue;
-} // namespace moodycamel
-
 namespace mpc::lcdgui
 {
     class Screens;
@@ -43,6 +37,7 @@ namespace mpc::sequencer
     class EventRef;
     class NoteOnEvent;
     class Bus;
+    class SequenceStateView;
 
     class Track
     {
@@ -79,11 +74,11 @@ namespace mpc::sequencer
         // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
-        void timingCorrect(int fromBar, int toBar, EventData *, Tick eventTick,
+        void timingCorrect(const SequenceStateView &, int fromBar, int toBar, EventData *, Tick eventTick,
                            int stepLength, int swingPercentage) const;
 
-        int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
-                              int swingPercentage) const;
+        static int timingCorrectTick(const SequenceStateView &, int fromBar, int toBar, int tick, int stepLength,
+                              int swingPercentage);
 
         void shiftTiming(EventData *, Tick eventTick, bool later, int amount,
                          int lastTick) const;
@@ -92,7 +87,6 @@ namespace mpc::sequencer
 
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
-        void flushNoteCache() const;
         void setUsed(bool b);
         void setOn(bool b) const;
 
@@ -106,17 +100,6 @@ namespace mpc::sequencer
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0);
-
-        EventData *recordNoteEventLive(NoteNumber, Velocity) const;
-
-        // Only to be used for note events that are being recorded while the
-        // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
-        // other input.
-        // For non-live note event recording, i.e. in the step editor and in the
-        // MAIN screen when the sequencer is not running, use
-        // finalizeNoteEventNonLive.
-        void finalizeNoteEventLive(const EventData *,
-                                   Tick noteOffPositionTicks) const;
 
         void finalizeNoteEventNonLive(EventData *, Duration) const;
 
@@ -137,7 +120,7 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<EventRef>> getEvents() const;
         std::vector<EventData> getEventStates() const;
 
-        int getNextTick();
+        int getNextTick() const;
         bool shouldRemovePlayIndexEventDueToRecording() const;
         bool shouldRemovePlayIndexEventDueToErasePressed() const;
         void playNext() const;
@@ -160,13 +143,11 @@ namespace mpc::sequencer
 
         void purge();
 
-        EventData *findRecordingNoteOnEvent(NoteNumber);
-
         void printEvents() const;
 
         void setEventStates(const std::vector<EventData> &eventStates) const;
 
-        void processLiveNoteEventRecordingQueues();
+        Sequence *parent{nullptr};
 
     private:
         std::shared_ptr<SequencerStateManager> manager;
@@ -175,15 +156,6 @@ namespace mpc::sequencer
         std::string name;
         TrackIndex trackIndex{0};
 
-        std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventData *, moodycamel::ConcurrentQueueDefaultTraits>>
-            liveNoteOnEventRecordingQueue;
-
-        std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventData, moodycamel::ConcurrentQueueDefaultTraits>>
-            liveNoteOffEventRecordingQueue;
-
-        Sequence *parent{nullptr};
         std::function<std::string(int)> getDefaultTrackName;
         std::function<int64_t()> getTickPosition;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
@@ -204,23 +176,9 @@ namespace mpc::sequencer
         std::function<int64_t()> getPunchOutTime;
         std::function<bool()> isSoloEnabled;
 
-        std::vector<EventData *> tempLiveNoteOnRecordingEvents;
-        std::vector<EventData> tempLiveNoteOffRecordingEvents;
-
         void updateEventTick(EventData *, int newTick) const;
-
-        int getCorrectedTickPos() const;
 
         void init();
 
-        ///////  Live event insertion helpers
-        void assignTicksToNoteOffs(int noteOffCount, Tick pos);
-        static void correctNoteOnTick(EventData *noteOn, Tick pos,
-                               Tick correctedPos);
-        void adjustNoteOffTiming(const EventData *noteOn, EventData &noteOff) const;
-        bool applyNoteOffAdjustmentForNoteOn(EventData *noteOn,
-                                             int noteOffCount);
-        void finalizeRecordedNote(EventData *noteOn, const EventData &noteOff);
-        ///////  End of live event insertion helpers
     };
 } // namespace mpc::sequencer

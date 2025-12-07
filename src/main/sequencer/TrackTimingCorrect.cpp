@@ -1,60 +1,11 @@
+#include "SequenceStateView.hpp"
 #include "sequencer/Track.hpp"
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TrackStateView.hpp"
 
-#include "lcdgui/ScreenId.hpp"
-#include "lcdgui/Screens.hpp"
-#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
-
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
-
-int Track::getCorrectedTickPos() const
-{
-    const auto pos = getTickPosition();
-    auto correctedTickPos = NoTick;
-
-    const auto timingCorrectScreen =
-        getScreens()->get<ScreenId::TimingCorrectScreen>();
-    const auto swingPercentage = timingCorrectScreen->getSwing();
-    const auto noteValueLengthInTicks =
-        timingCorrectScreen->getNoteValueLengthInTicks();
-
-    if (noteValueLengthInTicks > 1)
-    {
-        correctedTickPos =
-            timingCorrectTick(0, parent->getLastBarIndex(), pos,
-                              noteValueLengthInTicks, swingPercentage);
-    }
-
-    if (timingCorrectScreen->getAmount() != 0)
-    {
-        auto shiftedTick = correctedTickPos != NoTick ? correctedTickPos : pos;
-        auto amount = timingCorrectScreen->getAmount();
-
-        if (!timingCorrectScreen->isShiftTimingLater())
-        {
-            amount *= -1;
-        }
-
-        shiftedTick += amount;
-
-        if (shiftedTick < 0)
-        {
-            shiftedTick = 0;
-        }
-
-        if (const auto lastTick = parent->getLastTick(); shiftedTick > lastTick)
-        {
-            shiftedTick = lastTick;
-        }
-
-        correctedTickPos = shiftedTick;
-    }
-
-    return correctedTickPos;
-}
 
 void Track::correctTimeRange(const int startPos, const int endPos,
                              const int stepLength, const int swingPercentage,
@@ -97,31 +48,30 @@ void Track::correctTimeRange(const int startPos, const int endPos,
         if (event->tick >= startPos && event->tick < endPos &&
             event->noteNumber >= lowestNote && event->noteNumber <= highestNote)
         {
-            timingCorrect(fromBar, toBar, event, event->tick, stepLength,
-                          swingPercentage);
+            timingCorrect(*parent->getSnapshot(), fromBar, toBar, event,
+                          event->tick, stepLength, swingPercentage);
         }
     }
 
     removeDoubles();
 }
 
-void Track::timingCorrect(const int fromBar, const int toBar, EventData *e,
-                          const Tick eventTick, const int stepLength,
-                          const int swingPercentage) const
+void Track::timingCorrect(const SequenceStateView &seq, const int fromBar,
+                          const int toBar, EventData *e, const Tick eventTick,
+                          const int stepLength, const int swingPercentage) const
 {
-    updateEventTick(e, timingCorrectTick(fromBar, toBar, eventTick, stepLength,
-                                         swingPercentage));
+    updateEventTick(e, timingCorrectTick(seq, fromBar, toBar, eventTick,
+                                         stepLength, swingPercentage));
 }
 
-int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
-                             const int stepLength,
-                             const int swingPercentage) const
+int Track::timingCorrectTick(const SequenceStateView &seq, const int fromBar,
+                             const int toBar, int tick, const int stepLength,
+                             const int swingPercentage)
 {
     int accumBarLengths = 0;
     int previousAccumBarLengths = 0;
     auto barNumber = 0;
     auto numberOfSteps = 0;
-    const auto seq = getActiveSequence();
     int segmentStart = 0;
     int segmentEnd = 0;
 
@@ -129,12 +79,12 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
     {
         if (i < fromBar)
         {
-            segmentStart += seq->getBarLength(i);
+            segmentStart += seq.getBarLength(i);
         }
 
         if (i <= toBar)
         {
-            segmentEnd += seq->getBarLength(i);
+            segmentEnd += seq.getBarLength(i);
         }
         else
         {
@@ -144,7 +94,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
     {
-        accumBarLengths += seq->getBarLength(i);
+        accumBarLengths += seq.getBarLength(i);
 
         if (tick < accumBarLengths && tick >= previousAccumBarLengths)
         {
@@ -157,7 +107,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 1; i < 1000; i++)
     {
-        if (seq->getBarLength(barNumber) - i * stepLength < 0)
+        if (seq.getBarLength(barNumber) - i * stepLength < 0)
         {
             numberOfSteps = i - 1;
             break;
@@ -168,7 +118,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 0; i < barNumber; i++)
     {
-        currentBarStart += seq->getBarLength(i);
+        currentBarStart += seq.getBarLength(i);
     }
 
     for (int i = 0; i <= numberOfSteps; i++)

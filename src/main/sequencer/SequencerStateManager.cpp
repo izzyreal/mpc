@@ -5,6 +5,8 @@
 #include "Track.hpp"
 #include "TrackStateHandler.hpp"
 #include "TrackStateView.hpp"
+#include "lcdgui/Screens.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TransportStateHandler.hpp"
@@ -27,6 +29,13 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     trackStateHandler = std::make_unique<TrackStateHandler>(this, sequencer);
 
     songStateHandler = std::make_unique<SongStateHandler>();
+
+    liveNoteOnEventRecordingQueue = moodycamel::ConcurrentQueue<EventData *>(
+        LIVE_NOTE_EVENT_RECORDING_CAPACITY);
+    liveNoteOffEventRecordingQueue = moodycamel::ConcurrentQueue<EventData>(
+        LIVE_NOTE_EVENT_RECORDING_CAPACITY);
+    tempLiveNoteOnRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
+    tempLiveNoteOffRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
 }
 
 SequencerStateManager::~SequencerStateManager() {}
@@ -94,7 +103,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 activeState.selectedSequenceIndex = m.sequenceIndexOfFirstStep;
                 activeState.transport.positionQuarterNotes = 0;
-                applyMessage(SyncTrackEventIndices{activeState.selectedSequenceIndex});
+                applyMessage(
+                    SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
         [&](const SetSelectedSongStepIndex &m)
@@ -105,7 +115,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 activeState.selectedSequenceIndex = m.sequenceIndexForThisStep;
                 activeState.transport.positionQuarterNotes = 0;
-                applyMessage(SyncTrackEventIndices{activeState.selectedSequenceIndex});
+                applyMessage(
+                    SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
         [&](const CopyBars &m)
@@ -366,14 +377,14 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
     }
 }
 
-void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
+void SequencerStateManager::insertAcquiredEvent(TrackState &track, EventData *e)
 {
     assert(e);
 
     e->prev = nullptr;
     e->next = nullptr;
 
-    EventData*& head = track.eventsHead;
+    EventData *&head = track.eventsHead;
 
     if (!head)
     {
@@ -390,12 +401,14 @@ void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
         head = e;
 
         if (track.playEventIndex >= 0)
+        {
             ++track.playEventIndex;
+        }
 
         return;
     }
 
-    EventData* it = head;
+    EventData *it = head;
     int currentIndex = 0;
 
     while (it->next && it->next->tick <= e->tick)
@@ -406,17 +419,107 @@ void SequencerStateManager::insertAcquiredEvent(TrackState& track, EventData* e)
 
     insertIndex = currentIndex + 1;
 
-    EventData* n = it->next;
+    EventData *n = it->next;
 
     it->next = e;
     e->prev = it;
 
     e->next = n;
 
-    if (n) n->prev = e;
+    if (n)
+    {
+        n->prev = e;
+    }
 
     if (track.playEventIndex >= insertIndex)
     {
         ++track.playEventIndex;
     }
+}
+
+EventData *SequencerStateManager::findRecordingNoteOnEvent(
+    const SequenceIndex sequenceIndex, const TrackIndex trackIndex,
+    const NoteNumber noteNumber)
+{
+    EventData *found = nullptr;
+
+    const auto count = liveNoteOnEventRecordingQueue.try_dequeue_bulk(
+        tempLiveNoteOnRecordingEvents.begin(),
+        tempLiveNoteOnRecordingEvents.size());
+
+    for (int i = 0; i < count; i++)
+    {
+        const auto e = tempLiveNoteOnRecordingEvents[i];
+        if (e->noteNumber == noteNumber)
+        {
+            found = e;
+            break;
+        }
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        liveNoteOnEventRecordingQueue.enqueue(tempLiveNoteOnRecordingEvents[i]);
+    }
+
+    tempLiveNoteOnRecordingEvents.clear();
+    tempLiveNoteOnRecordingEvents.resize(20);
+
+    if (!found)
+    {
+        const TrackStateView trackStateView(
+            activeState.sequences[sequenceIndex].tracks[trackIndex]);
+        found = trackStateView.findRecordingNoteOnByNoteNumber(noteNumber);
+    }
+
+    return found;
+}
+
+mpc::Tick
+SequencerStateManager::getCorrectedTickPos(const Tick currentPositionTicks,
+                                           const SequenceStateView &seq) const
+{
+    const auto pos = currentPositionTicks;
+    auto correctedTickPos = NoTick;
+
+    const auto timingCorrectScreen =
+        sequencer->getScreens()->get<lcdgui::ScreenId::TimingCorrectScreen>();
+
+    const auto swingPercentage = timingCorrectScreen->getSwing();
+    const auto noteValueLengthInTicks =
+        timingCorrectScreen->getNoteValueLengthInTicks();
+
+    if (noteValueLengthInTicks > 1)
+    {
+        correctedTickPos =
+            Track::timingCorrectTick(seq, 0, seq.getLastBarIndex(), pos,
+                                     noteValueLengthInTicks, swingPercentage);
+    }
+
+    if (timingCorrectScreen->getAmount() != 0)
+    {
+        auto shiftedTick = correctedTickPos != NoTick ? correctedTickPos : pos;
+        auto amount = timingCorrectScreen->getAmount();
+
+        if (!timingCorrectScreen->isShiftTimingLater())
+        {
+            amount *= -1;
+        }
+
+        shiftedTick += amount;
+
+        if (shiftedTick < 0)
+        {
+            shiftedTick = 0;
+        }
+
+        if (const auto lastTick = seq.getLastTick(); shiftedTick > lastTick)
+        {
+            shiftedTick = lastTick;
+        }
+
+        correctedTickPos = shiftedTick;
+    }
+
+    return correctedTickPos;
 }

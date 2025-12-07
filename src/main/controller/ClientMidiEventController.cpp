@@ -53,8 +53,7 @@ ClientMidiEventController::ClientMidiEventController(
       performanceManager(performanceManager), midiInputScreen(midiInputScreen),
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
-      layeredScreen(layeredScreen),
-      hardware(hardware), screens(screens),
+      layeredScreen(layeredScreen), hardware(hardware), screens(screens),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
@@ -250,8 +249,9 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
-    const auto transport = sequencer.lock()
-                               ->getStateManager()
+    const auto lockedSequencer = sequencer.lock();
+
+    const auto transport = lockedSequencer->getStateManager()
                                ->getSnapshot()
                                .getTransportStateView();
     const auto positionTicks = transport.getPositionTicks();
@@ -259,7 +259,8 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         transport.getMetronomeOnlyPositionTicks();
 
     const std::function action = [this, noteNumber, positionTicks,
-                                  metronomeOnlyPositionTicks](void *userData)
+                                  metronomeOnlyPositionTicks,
+                                  lockedSequencer](void *userData)
     {
         const auto noteEventInfo =
             static_cast<performance::NoteOnEvent *>(userData);
@@ -296,11 +297,12 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         }
 
         const auto screen = screens->getScreenById(noteEventInfo->screenId);
-        const auto track =
-            sequencer.lock()->getSelectedSequence()->getTrack(trackIndex).get();
+        const auto seq = lockedSequencer->getSelectedSequence();
+        const auto track = seq->getTrack(trackIndex).get();
 
         const auto recordingNoteOnEvent =
-            track->findRecordingNoteOnEvent(NoteNumber(noteNumber));
+            lockedSequencer->getStateManager()->findRecordingNoteOnEvent(
+                seq->getSequenceIndex(), trackIndex, NoteNumber(noteNumber));
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(

@@ -23,6 +23,7 @@ namespace mpc::sequencer
     class Bus;
     class Track;
     class DrumBus;
+    class SequencerStateManager;
 } // namespace mpc::sequencer
 
 namespace mpc::audiomidi
@@ -36,6 +37,7 @@ namespace mpc::command::context
     {
         performance::PerformanceEventSource source;
         std::weak_ptr<performance::PerformanceManager> performanceManager;
+        std::weak_ptr<sequencer::SequencerStateManager> sequencerStateManager;
         std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;
