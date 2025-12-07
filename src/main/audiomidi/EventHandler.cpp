@@ -223,7 +223,7 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
         std::optional<int> transposeAmount = std::nullopt;
 
         if (transScreen->getTransposeAmount() != 0 &&
-            (transScreen->getTr() == AllTrackIndex ||
+            (transScreen->getTr() == AllTracks ||
              transScreen->getTr() == trackIndex))
         {
             transposeAmount = transScreen->getTransposeAmount();

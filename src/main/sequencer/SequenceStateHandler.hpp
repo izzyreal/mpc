@@ -26,6 +26,6 @@ namespace mpc::sequencer
 
         void applyInsertBars(
             const InsertBars &, const SequencerState &,
-            std::vector<utils::SimpleAction> &actions) const noexcept;
+            std::vector<utils::SimpleAction> &) const noexcept;
     };
 } // namespace mpc::sequencer

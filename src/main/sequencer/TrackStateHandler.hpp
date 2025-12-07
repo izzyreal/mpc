@@ -23,5 +23,11 @@ namespace mpc::sequencer
     private:
         SequencerStateManager *manager;
         Sequencer *sequencer;
+
+        void applyClearEvents(const ClearEvents &, SequencerState &) const;
+        void applyUpdateEvents(const UpdateEvents &, SequencerState &) const;
+        void applyRemoveEvent(const RemoveEvent &, SequencerState &) const;
+        void applyUpdateEventTick(const UpdateEventTick &, SequencerState &) const;
+        void applyRemoveDoubles(const RemoveDoubles &, SequencerState &) const;
     };
 } // namespace mpc::sequencer

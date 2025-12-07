@@ -31,7 +31,7 @@ namespace mpc::sequencer
     struct InsertAcquiredEvent
     {
         EventData *handle;
-        utils::SimpleAction onComplete{[]{}};
+        utils::SimpleAction onComplete{[] {}};
     };
 
     struct RemoveEvent

@@ -195,7 +195,7 @@ void EraseScreen::displayNotes()
 
 void EraseScreen::setTrack(const int i)
 {
-    track = std::clamp(i, static_cast<int>(AllTrackIndex),
+    track = std::clamp(i, static_cast<int>(AllTracks),
                        static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX));
     displayTrack();
     displayNotes();

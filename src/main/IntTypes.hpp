@@ -71,7 +71,7 @@ namespace mpc
                                       Mpc2000XlSpecs::LAST_TRACK_INDEX +
                                           Mpc2000XlSpecs::META_TRACK_COUNT>;
     constexpr TrackIndex NoTrackIndex{-1};
-    constexpr TrackIndex AllTrackIndex{-1};
+    constexpr TrackIndex AllTracks{-1};
     constexpr TrackIndex TempoChangeTrackIndex{
         Mpc2000XlSpecs::LAST_TRACK_INDEX + 1};
 
