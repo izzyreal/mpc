@@ -22,7 +22,7 @@ void Mpc2000XlAllFileScreen::function(const int i)
     {
         case 2:
         {
-            auto result = mpc.getDisk()->readSequencesFromAll2(
+            auto result = mpc.getDisk()->readSequenceMetaInfosFromAllFile(
                 loadScreen->getSelectedFile());
 
             if (result.has_value())
@@ -30,7 +30,7 @@ void Mpc2000XlAllFileScreen::function(const int i)
                 const auto loadASequenceFromAllScreen =
                     mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
 
-                loadASequenceFromAllScreen->sequencesFromAllFile =
+                loadASequenceFromAllScreen->sequenceMetaInfos =
                     result.value();
 
                 openScreenById(ScreenId::LoadASequenceFromAllScreen);

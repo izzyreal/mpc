@@ -1,11 +1,12 @@
 #pragma once
+
 #include "lcdgui/ScreenComponent.hpp"
+#include "sequencer/SequenceMetaInfo.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
     class LoadASequenceFromAllScreen final : public ScreenComponent
     {
-
     public:
         void turnWheel(int i) override;
         void function(int i) override;
@@ -14,7 +15,7 @@ namespace mpc::lcdgui::screens::window
 
         void open() override;
 
-        std::vector<std::shared_ptr<sequencer::Sequence>> sequencesFromAllFile;
+        std::vector<sequencer::SequenceMetaInfo> sequenceMetaInfos;
 
     private:
         int sourceSeqIndex = 0;

@@ -712,14 +712,27 @@ void AbstractDisk::readAll2(std::shared_ptr<MpcFile> f,
     performIoOrOpenErrorPopupNonReturning(readFunc);
 }
 
-sequences_or_error
-AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> f)
+sequence_meta_infos_or_error
+AbstractDisk::readSequenceMetaInfosFromAllFile(std::shared_ptr<MpcFile> f)
 {
-    const std::function<sequences_or_error()> readFunc = [this, f]
+    const std::function<sequence_meta_infos_or_error()> readFunc = [this, f]
     {
-        auto result = AllLoader::loadOnlySequencesFromFile(mpc, f.get());
-        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-        loadScreen->fileLoad = 0;
+        return AllLoader::loadSequenceMetaInfosFromFile(mpc, f.get());
+    };
+
+    return performIoOrOpenErrorPopup(readFunc);
+}
+
+sequence_or_error
+AbstractDisk::loadOneSequenceFromAllFile(std::shared_ptr<MpcFile> f,
+                                         SequenceIndex sourceIndexInAllFile,
+                                         SequenceIndex destIndexInMpcMemory)
+{
+    const std::function<sequence_or_error()> readFunc =
+        [this, f, sourceIndexInAllFile, destIndexInMpcMemory]
+    {
+        auto result = AllLoader::loadOneSequenceFromFile(
+            mpc, f.get(), sourceIndexInAllFile, destIndexInMpcMemory);
         return result;
     };
 

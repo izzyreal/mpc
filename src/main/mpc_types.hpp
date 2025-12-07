@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sequencer/SequenceMetaInfo.hpp"
+
 #include <tl/expected.hpp>
 
 #include <memory>
@@ -48,12 +50,19 @@ using program_or_error = tl::expected<std::shared_ptr<mpc::sampler::Program>,
 using sequence_or_error =
     tl::expected<std::shared_ptr<mpc::sequencer::Sequence>,
                  mpc::disk::mpc_io_error_msg>;
+
 using sequences_or_error =
     tl::expected<std::vector<std::shared_ptr<mpc::sequencer::Sequence>>,
                  mpc::disk::mpc_io_error_msg>;
+
+using sequence_meta_infos_or_error =
+    tl::expected<std::vector<mpc::sequencer::SequenceMetaInfo>,
+                 mpc::disk::mpc_io_error_msg>;
+
 using preset_or_error =
     tl::expected<std::shared_ptr<mpc::nvram::MidiControlPreset>,
                  mpc::disk::mpc_io_error_msg>;
+
 using wav_or_error = tl::expected<std::shared_ptr<mpc::file::wav::WavFile>,
                                   mpc::disk::mpc_io_error_msg>;
 

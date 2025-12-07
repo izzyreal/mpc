@@ -1,7 +1,9 @@
 #include "LoadASequenceFromAllScreen.hpp"
 
 #include "Mpc.hpp"
+#include "disk/AbstractDisk.hpp"
 #include "lcdgui/Label.hpp"
+#include "lcdgui/screens/LoadScreen.hpp"
 #include "sequencer/Sequence.hpp"
 
 #include "lcdgui/screens/window/LoadASequenceScreen.hpp"
@@ -49,31 +51,33 @@ void LoadASequenceFromAllScreen::function(const int i)
     }
     else if (i == 4)
     {
-        if (const auto candidate = sequencesFromAllFile[sourceSeqIndex])
+        if (!sequenceMetaInfos[sourceSeqIndex].used)
         {
-            const auto loadASequenceScreen =
-                mpc.screens->get<ScreenId::LoadASequenceScreen>();
-
-            sequencer.lock()->copySequence(candidate,
-                                           loadASequenceScreen->loadInto);
-
-            openScreenById(ScreenId::LoadScreen);
+            return;
         }
+
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadASequenceScreen =
+            mpc.screens->get<ScreenId::LoadASequenceScreen>();
+
+        (void) mpc.getDisk()->loadOneSequenceFromAllFile(
+            loadScreen->getSelectedFile(), SequenceIndex(sourceSeqIndex),
+            loadASequenceScreen->loadInto);
+
+        openScreenById(ScreenId::LoadScreen);
     }
 }
 
 void LoadASequenceFromAllScreen::displayFile() const
 {
-    if (sourceSeqIndex >= sequencesFromAllFile.size())
+    if (sourceSeqIndex >= sequenceMetaInfos.size())
     {
         return;
     }
 
     findField("file")->setTextPadded(sourceSeqIndex + 1, "0");
 
-    const auto candidate = sequencesFromAllFile[sourceSeqIndex];
-
-    const auto name = candidate ? candidate->getName() : "(Unused)";
+    const auto name = sequenceMetaInfos[sourceSeqIndex].name;
 
     findLabel("file0")->setText("-" + name);
 }
@@ -92,11 +96,7 @@ void LoadASequenceFromAllScreen::displayLoadInto() const
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(const int i)
 {
-    if (i < 0 || i >= sequencesFromAllFile.size())
-    {
-        return;
-    }
-
-    sourceSeqIndex = i;
+    sourceSeqIndex =
+        std::clamp(i, 0, static_cast<int>(sequenceMetaInfos.size() - 1));
     displayFile();
 }

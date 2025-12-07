@@ -21,7 +21,6 @@
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Transport.hpp"
-#include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -285,7 +284,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             {
                 const auto idx = SongStepIndex(stepIndex);
                 mpcSong->insertStep(idx);
-                mpcSong->setStepSequenceIndex(idx, SequenceIndex(steps[stepIndex].first));
+                mpcSong->setStepSequenceIndex(
+                    idx, SequenceIndex(steps[stepIndex].first));
                 mpcSong->setStepRepetitionCount(idx, steps[stepIndex].second);
             }
 
@@ -303,36 +303,39 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         SetSelectedSongStepIndex{SongStepIndex(0), NoSequenceIndex});
 }
 
-std::vector<std::shared_ptr<Sequence>>
-AllLoader::loadOnlySequencesFromFile(Mpc &mpc, MpcFile *f)
+std::vector<SequenceMetaInfo> AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc,
+                                                              MpcFile *f)
 {
-    std::vector<std::shared_ptr<Sequence>> mpcSequences;
+    std::vector<SequenceMetaInfo> result;
+    const AllParser allParser(mpc, f->getBytes());
 
+    const auto allSeqNames = allParser.getSeqNames()->getNames();
+    const auto allSeqUsednesses = allParser.getSeqNames()->getUsednesses();
+
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
+    {
+        result.push_back({allSeqUsednesses[i], allSeqNames[i]});
+    }
+
+    return result;
+}
+
+std::shared_ptr<Sequence> AllLoader::loadOneSequenceFromFile(
+    Mpc &mpc, MpcFile *f, const SequenceIndex sourceIndexInAllFile,
+    const SequenceIndex destIndexInMpcMemory)
+{
     AllParser allParser(mpc, f->getBytes());
 
     const auto allSequences = allParser.getAllSequences();
 
     const auto allSeqNames = allParser.getSeqNames()->getNames();
-    int counter = 0;
 
     const auto sequencer = mpc.getSequencer();
 
-    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
-    {
-        if (allSeqNames[i].find("(Unused)") != std::string::npos)
-        {
-            mpcSequences.push_back({});
-            continue;
-        }
+    const auto sequence = sequencer->getSequence(destIndexInMpcMemory);
 
-        std::shared_ptr<Sequence> sequence;
+    allSequences[sourceIndexInAllFile]->applyToMpcSeq(
+        sequence, sequencer->getStateManager().get());
 
-        sequencer->makeNewSequence(sequence);
-
-        allSequences[counter++]->applyToMpcSeq(sequence, sequencer->getStateManager().get());
-
-        mpcSequences.emplace_back(sequence);
-    }
-
-    return mpcSequences;
+    return sequence;
 }

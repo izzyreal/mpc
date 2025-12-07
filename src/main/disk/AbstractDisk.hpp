@@ -119,6 +119,10 @@ namespace mpc::disk
         void readPgm2(std::shared_ptr<MpcFile>,
                       std::shared_ptr<sampler::Program>, int programIndex);
 
+        sequence_or_error loadOneSequenceFromAllFile(std::shared_ptr<MpcFile>,
+                                        SequenceIndex sourceIndexInAllFile,
+                                        SequenceIndex destIndexInMpcMemory);
+
     private:
         std::thread programSoundsSaveThread = std::thread([] {});
         std::thread readApsThread = std::thread([] {});
@@ -159,6 +163,7 @@ namespace mpc::disk
                       bool headless);
         void readAll2(std::shared_ptr<MpcFile>,
                       std::function<void()> onSuccess);
-        sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);
+
+        sequence_meta_infos_or_error readSequenceMetaInfosFromAllFile(std::shared_ptr<MpcFile>);
     };
 } // namespace mpc::disk
