@@ -47,6 +47,31 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
+                            return sequencer.lock()->getSelectedSong()->getStepCount();
+                        },
+                        [&](auto)
+                        {
+                            displaySongName();
+                            displayLoop();
+                            displaySteps();
+                            displayTempo();
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
+
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSong()->isUsed();
+         },
+         [&](auto)
+         {
+             displaySongName();
+         }});
+
+    addReactiveBinding({[&]
+                        {
                             return sequencer.lock()->getSelectedSongIndex();
                         },
                         [&](auto)
@@ -89,6 +114,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
          },
          [&](auto isPlaying)
          {
+             displaySteps();
              findField("sequence1")->setBlinking(isPlaying, 10);
              findField("reps1")->setBlinking(isPlaying, 10);
          }});
@@ -102,6 +128,9 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
                         [&](auto)
                         {
                             displaySteps();
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
                         }});
 
     addReactiveBinding({[&]
@@ -180,6 +209,14 @@ void SongScreen::up()
         const auto currentStepIndex =
             lockedSequencer->getSelectedSongStepIndex();
 
+        lockedSequencer->getTransport()->setBar(0);
+        lockedSequencer->getTransport()->resetPlayedStepRepetitions();
+
+        if (currentStepIndex == 0)
+        {
+            return;
+        }
+
         lockedSequencer->setSelectedSongStepIndex(currentStepIndex - 1);
     }
     else
@@ -204,6 +241,14 @@ void SongScreen::down()
         const auto currentStepIndex =
             lockedSequencer->getSelectedSongStepIndex();
 
+        if (currentStepIndex >=
+            lockedSequencer->getSelectedSong()->getStepCount())
+        {
+            return;
+        }
+
+        lockedSequencer->getTransport()->setBar(0);
+        lockedSequencer->getTransport()->resetPlayedStepRepetitions();
         lockedSequencer->setSelectedSongStepIndex(currentStepIndex + 1);
     }
     else
@@ -306,6 +351,7 @@ void SongScreen::openWindow()
 void SongScreen::turnWheel(const int increment)
 {
     const auto lockedSequencer = sequencer.lock();
+    const auto transport = lockedSequencer->getTransport();
 
     const auto selectedStepIndex = lockedSequencer->getSelectedSongStepIndex();
     const bool isEndOfSong =
@@ -316,9 +362,16 @@ void SongScreen::turnWheel(const int increment)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.find("sequence") != std::string::npos)
     {
+        if (transport->isPlaying())
+        {
+            return;
+        }
+
         if (isEndOfSong)
         {
             song->insertStep(SongStepIndex(stepCount));
+            transport->setBar(0);
+            transport->resetPlayedStepRepetitions();
             lockedSequencer->setSelectedSongStepIndex(SongStepIndex(stepCount));
 
             if (!song->isUsed())
@@ -350,12 +403,14 @@ void SongScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName.find("reps") != std::string::npos)
     {
-        if (isEndOfSong)
+        if (isEndOfSong || transport->isPlaying())
         {
             return;
         }
 
         const auto selectedStep = song->getStep(selectedStepIndex);
+        transport->resetPlayedStepRepetitions();
+        transport->setBar(0);
         song->setStepRepetitionCount(selectedStepIndex,
                                      selectedStep.repetitionCount + increment);
     }
@@ -364,16 +419,13 @@ void SongScreen::turnWheel(const int increment)
         lockedSequencer->setSelectedSongIndex(
             lockedSequencer->getSelectedSongIndex() + increment);
     }
-    else if (focusedFieldName == "tempo" &&
-             !sequencer.lock()->getTransport()->isTempoSourceSequence())
+    else if (focusedFieldName == "tempo" && !transport->isTempoSourceSequence())
     {
-        sequencer.lock()->getTransport()->setTempo(
-            sequencer.lock()->getTransport()->getTempo() + increment * 0.1);
+        transport->setTempo(transport->getTempo() + increment * 0.1);
     }
     else if (focusedFieldName == "tempo-source")
     {
-        sequencer.lock()->getTransport()->setTempoSourceIsSequence(increment >
-                                                                   0);
+        transport->setTempoSourceIsSequence(increment > 0);
         displayTempoSource();
         displayTempo();
     }
@@ -383,10 +435,147 @@ void SongScreen::turnWheel(const int increment)
     }
     else if (focusedFieldName == "step1")
     {
+        if (transport->isPlaying())
+        {
+            return;
+        }
+
         const auto currentStepIndex =
             lockedSequencer->getSelectedSongStepIndex();
 
         lockedSequencer->setSelectedSongStepIndex(currentStepIndex + increment);
+    }
+    else if (focusedFieldName == "now0")
+    {
+        if (transport->isPlaying())
+        {
+            return;
+        }
+
+        const auto selectedSongStepIndex =
+            lockedSequencer->getSelectedSongStepIndex();
+
+        if (isEndOfSong && increment > 0)
+        {
+            return;
+        }
+
+        int globalBar = 0;
+
+        for (int i = 0; i < selectedSongStepIndex; i++)
+        {
+            if (i >= song->getStepCount())
+            {
+                break;
+            }
+            const auto step = song->getStep(SongStepIndex(i));
+
+            const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
+            if (!seq->isUsed())
+            {
+                continue;
+            }
+
+            const int barsPerSeq = seq->getLastBarIndex() + 1;
+            globalBar += barsPerSeq * step.repetitionCount;
+        }
+
+        if (!isEndOfSong)
+        {
+            const auto step = song->getStep(selectedSongStepIndex);
+            const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
+            const int barsPerSeq = seq->getLastBarIndex() + 1;
+
+            globalBar += transport->getPlayedStepRepetitions() * barsPerSeq;
+            globalBar += transport->getCurrentBarIndex();
+        }
+
+        int totalBars = 0;
+
+        for (int i = 0; i < song->getStepCount(); i++)
+        {
+            const auto step = song->getStep(SongStepIndex(i));
+            const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
+
+            if (!seq->isUsed())
+            {
+                continue;
+            }
+
+            const int barsPerSeq = seq->getLastBarIndex() + 1;
+            totalBars += barsPerSeq * step.repetitionCount;
+        }
+
+        int newGlobalBar = globalBar + increment;
+        if (newGlobalBar < 0)
+        {
+            newGlobalBar = 0;
+        }
+
+        if (newGlobalBar >= totalBars)
+        {
+            mpc.getEngineHost()->postToAudioThread(utils::Task(
+                [transport, lockedSequencer, stepCount = song->getStepCount()]
+                {
+                    transport->setPosition(0);
+                    lockedSequencer->getStateManager()->drainQueue();
+                    lockedSequencer->setSelectedSongStepIndex(
+                        SongStepIndex(stepCount));
+                }));
+            return;
+        }
+
+        int remaining = newGlobalBar;
+        SongStepIndex targetStep{0};
+
+        for (int i = 0; i < song->getStepCount(); i++)
+        {
+            const auto step = song->getStep(SongStepIndex(i));
+            const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
+            if (!seq->isUsed())
+            {
+                continue;
+            }
+
+            const int barsPerSeq = seq->getLastBarIndex() + 1;
+            const int barsInStep = barsPerSeq * step.repetitionCount;
+
+            if (remaining < barsInStep)
+            {
+                targetStep = SongStepIndex(i);
+                break;
+            }
+
+            remaining -= barsInStep;
+        }
+
+        const int flatBarInStep = remaining;
+
+        mpc.getEngineHost()->postToAudioThread(utils::Task(
+            [targetStep, flatBarInStep, song, lockedSequencer, transport]
+            {
+                const auto step = song->getStep(targetStep);
+                const auto seq =
+                    lockedSequencer->getSequence(step.sequenceIndex);
+                const int barsPerSeq = seq->getLastBarIndex() + 1;
+
+                const int repetition = flatBarInStep / barsPerSeq;
+                const int barInSeq = flatBarInStep % barsPerSeq;
+
+                lockedSequencer->setSelectedSongStepIndex(targetStep);
+                lockedSequencer->getStateManager()->drainQueue();
+                lockedSequencer->getStateManager()->enqueue(
+                    sequencer::SetPlayedSongStepRepetitionCount{repetition});
+                transport->setBar(barInSeq);
+            }));
+    }
+    else if (focusedFieldName == "now1")
+    {
+        transport->setBeat(transport->getCurrentBeatIndex() + increment);
+    }
+    else if (focusedFieldName == "now2")
+    {
+        transport->setClock(transport->getCurrentClockNumber() + increment);
     }
 }
 
@@ -418,11 +607,8 @@ void SongScreen::function(const int i)
             }
 
             song->deleteStep(selectedSongStepIndex);
-            displaySteps();
-            displayNow0();
-            displayNow1();
-            displayNow2();
-            displayTempo();
+            transport->setBar(0);
+            transport->resetPlayedStepRepetitions();
             break;
         case 5:
         {
@@ -447,10 +633,6 @@ void SongScreen::function(const int i)
                         "0", 2);
                 song->setName(songName);
             }
-
-            displaySongName();
-            displaySteps();
-            displayTempo();
             break;
         }
         default:;

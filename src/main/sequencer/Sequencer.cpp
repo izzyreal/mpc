@@ -1076,10 +1076,13 @@ void Sequencer::setSelectedSongStepIndex(
     const SongStepIndex newSongStepIndex) const
 {
     const auto song = getSelectedSong();
+
     const auto lastStepIndex = SongStepIndex(song->getStepCount() - 1);
 
-    const auto stepIndexToUse = std::clamp(newSongStepIndex, MinSongStepIndex,
-                                           SongStepIndex(lastStepIndex + 1));
+    const auto stepIndexToUse = std::clamp(
+        newSongStepIndex, MinSongStepIndex,
+        song->getStepCount() == 0 ? SongStepIndex(0)
+                                  : SongStepIndex(lastStepIndex + 1));
 
     const auto sequenceIndex =
         stepIndexToUse > lastStepIndex
