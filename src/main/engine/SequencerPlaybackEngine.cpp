@@ -478,24 +478,27 @@ void SequencerPlaybackEngine::work(const int nFrames)
         const auto hostPositionQuarterNotes =
             clock->getLastProcessedHostPositionQuarterNotes();
 
-        PositionQuarterNotes wrappedPosition;
-
         if (sequencer->isSongModeEnabled())
         {
-            wrappedPosition =
+            const auto wrappedPosition =
                 sequencer->getTransport()->getWrappedPositionInSong(
                     hostPositionQuarterNotes);
+            sequencer->setSelectedSongStepIndex(wrappedPosition.stepIndex);
+            sequencer->getTransport()->setPosition(wrappedPosition.position);
+            sequencer->getStateManager()->enqueue(
+                    SetPlayedSongStepRepetitionCount{wrappedPosition.playedRepetitionCount});
         }
         else
         {
-            wrappedPosition =
+            const auto wrappedPosition =
                 sequencer->getTransport()->getWrappedPositionInSequence(
                     hostPositionQuarterNotes);
+
+            sequencer->getTransport()->setPosition(wrappedPosition);
         }
 
-        engineHost->flushNoteOffs();
-        sequencer->getTransport()->setPosition(wrappedPosition);
         manager->drainQueue();
+        seq = sequencer->getCurrentlyPlayingSequence();
         seq->syncTrackEventIndices();
         manager->drainQueue();
     }

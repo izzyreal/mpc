@@ -12,6 +12,13 @@ namespace mpc::sequencer
 {
     class Sequencer;
 
+    struct WrappedSongPosition
+    {
+        PositionQuarterNotes position;
+        SongStepIndex stepIndex;
+        int playedRepetitionCount;
+    };
+
     class Transport
     {
     public:
@@ -40,7 +47,7 @@ namespace mpc::sequencer
         PositionQuarterNotes
             getWrappedPositionInSequence(PositionQuarterNotes) const;
 
-        PositionQuarterNotes
+        WrappedSongPosition
             getWrappedPositionInSong(PositionQuarterNotes) const;
 
         void moveSongToStepThatContainsPosition(PositionQuarterNotes) const;
