@@ -9,18 +9,6 @@
 
 namespace mpc::sequencer
 {
-    struct UpdateBarLengths
-    {
-        SequenceIndex sequenceIndex;
-        std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths;
-    };
-
-    struct UpdateTimeSignatures
-    {
-        SequenceIndex sequenceIndex;
-        std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures;
-    };
-
     struct SetTimeSignature
     {
         SequenceIndex sequenceIndex;
@@ -42,6 +30,13 @@ namespace mpc::sequencer
         BarIndex afterBar;
         Callback onComplete{[](BarIndex) {}};
         utils::SimpleAction nextAction{[] {}};
+    };
+
+    struct DeleteBars
+    {
+        SequenceIndex sequenceIndex;
+        BarIndex firstBarIndex; // inclusive
+        BarIndex lastBarIndex; // inclusive
     };
 
     struct SetInitialTempo
@@ -105,9 +100,8 @@ namespace mpc::sequencer
 
     using SequenceMessage =
         std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
-                     UpdateBarLengths, UpdateTimeSignatures, SetTimeSignature,
-                     SetLoopEnabled, SetSequenceUsed, SetTempoChangeEnabled,
-                     SetFirstLoopBarIndex, SetLastLoopBarIndex,
-                     SyncTrackEventIndices, MoveTrack, DeleteTrack,
-                     DeleteAllTracks>;
+                     SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
+                     SetTempoChangeEnabled, SetFirstLoopBarIndex,
+                     SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,
+                     DeleteTrack, DeleteAllTracks, DeleteBars>;
 } // namespace mpc::sequencer

@@ -7,81 +7,67 @@
 using namespace mpc::sequencer;
 
 void SequenceStateHandler::applyInsertBars(
-    const InsertBars &m, const SequencerState &state,
+    const InsertBars &m, SequencerState &state,
     std::vector<utils::SimpleAction> &actions) const noexcept
 {
-    const auto &seq = state.sequences[m.sequenceIndex];
+    auto &seq = state.sequences[m.sequenceIndex];
     const SequenceStateView seqView(seq);
 
     const auto oldLastBarIndex = seqView.getLastBarIndex();
     const bool isAppending = m.afterBar - 1 == oldLastBarIndex;
 
     auto barCountToUse = m.barCount;
-
     if (oldLastBarIndex + barCountToUse > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
-    {
         barCountToUse = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
-    }
 
     if (barCountToUse == 0)
-    {
         return;
-    }
-
-    const auto &oldTs = seqView.getTimeSignatures();
 
     const auto newLastBarIndex = oldLastBarIndex + barCountToUse;
 
     manager->applyMessage(
         SetLastBarIndex{m.sequenceIndex, BarIndex(newLastBarIndex)});
 
-    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
+    auto &ts = seq.timeSignatures;
+    auto &bl = seq.barLengths;
 
-    int out = 0;
+    const int insertPos = m.afterBar;
+    const int shiftCount = barCountToUse;
+    const int activeCount = oldLastBarIndex + 1;
 
-    for (int i = 0; i <= oldLastBarIndex; ++i)
+    if (activeCount > insertPos)
     {
-        if (i == m.afterBar)
-        {
-            for (int j = 0;
-                 j < barCountToUse && out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++j)
-            {
-                newTs[out++] =
-                    TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
-            }
-        }
-        if (out < Mpc2000XlSpecs::MAX_BAR_COUNT)
-        {
-            newTs[out++] = oldTs[i];
-        }
+        const int end = insertPos + shiftCount + (activeCount - insertPos);
+        const int realEnd = std::min<int>(end, Mpc2000XlSpecs::MAX_BAR_COUNT);
+
+        std::rotate(ts.begin() + insertPos,
+                    ts.begin() + activeCount,
+                    ts.begin() + realEnd);
+
+        std::rotate(bl.begin() + insertPos,
+                    bl.begin() + activeCount,
+                    bl.begin() + realEnd);
     }
 
-    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
+    for (int i = 0; i < shiftCount; ++i)
     {
-        newTs[out] = TimeSignature{};
+        ts[insertPos + i] = TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
+        bl[insertPos + i] = ts[insertPos + i].getBarLength();
     }
-
-    manager->applyMessage(UpdateTimeSignatures{m.sequenceIndex, newTs});
 
     int barStart = 0;
-
     for (int i = 0; i < m.afterBar; ++i)
-    {
         barStart += seqView.getBarLength(i);
-    }
 
     if (!isAppending)
     {
         int newBarStart = 0;
         for (int i = 0; i < m.afterBar + barCountToUse; ++i)
-        {
             newBarStart += seqView.getBarLength(i);
-        }
 
         for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
         {
             auto it = seq.tracks[i].eventsHead;
-
             while (it)
             {
                 if (it->tick >= barStart)
@@ -89,7 +75,6 @@ void SequenceStateHandler::applyInsertBars(
                     const Tick newTick = it->tick + (newBarStart - barStart);
                     manager->enqueue(UpdateEventTick{it, newTick});
                 }
-
                 it = it->next;
             }
         }

@@ -327,8 +327,17 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     dest->setUsed(source->isUsed());
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
-    dest->setBarLengths(source->getBarLengths());
-    dest->setTimeSignatures(source->getTimeSignatures());
+
+    dest->setLastBarIndex(NoBarIndex);
+
+    const auto sourceTimeSigs = source->getTimeSignatures();
+
+    for (int i = 0; i < source->getBarCount(); ++i)
+    {
+        dest->insertBars(1, BarIndex(i));
+        dest->setTimeSignature(i, sourceTimeSigs[i].numerator, sourceTimeSigs[i].denominator);
+    }
+
     dest->setFirstLoopBarIndex(source->getFirstLoopBarIndex());
     dest->setLastLoopBarIndex(source->getLastLoopBarIndex());
     dest->setTempoChangeOn(source->isTempoChangeOn());

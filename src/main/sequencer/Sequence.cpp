@@ -222,17 +222,11 @@ void Sequence::init(const int newLastBarIndex) const
     setLastBarIndex(newLastBarIndex);
     addTempoChangeEvent(0, 1000);
 
-    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures{};
-    std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths{};
-
     for (int i = 0; i <= newLastBarIndex; ++i)
     {
-        timeSignatures[i] = userScreen->timeSig;
-        barLengths[i] = timeSignatures[i].getBarLength();
+        manager->enqueue(SetTimeSignature{getSequenceIndex(), BarIndex(i),
+                                          userScreen->timeSig});
     }
-
-    setTimeSignatures(timeSignatures);
-    setBarLengths(barLengths);
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);
@@ -268,12 +262,6 @@ mpc::BarIndex Sequence::getBarIndexForPositionTicks(const Tick posTicks) const
     return BarIndex(0);
 }
 
-void Sequence::setBarLengths(
-    const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> &barLengths) const
-{
-    dispatch(UpdateBarLengths{getSequenceIndex(), barLengths});
-}
-
 void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
                                 const int num, const int den) const
 {
@@ -290,13 +278,6 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
         TimeSignature{TimeSigNumerator(num), TimeSigDenominator(den)};
 
     dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(barIndex), ts});
-}
-
-void Sequence::setTimeSignatures(
-    const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
-        &timeSignatures) const
-{
-    dispatch(UpdateTimeSignatures{getSequenceIndex(), timeSignatures});
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()
@@ -401,26 +382,26 @@ int Sequence::getNumerator(const int i) const
     return getSnapshot(sequenceIndex)->getTimeSignature(i).numerator;
 }
 
-void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
+void Sequence::deleteBars(const int firstBar, const int lastBar) const
 {
-    if (getLastBarIndex() == NoBarIndex)
+    const auto snapshot = getSnapshot(sequenceIndex);
+
+    const auto oldLastBarIndex = snapshot->getLastBarIndex();
+
+    if (oldLastBarIndex == NoBarIndex)
     {
         return;
     }
 
-    lastBarToDelete++;
-
-    const auto snapshot = getSnapshot(sequenceIndex);
-    const auto &oldTs = snapshot->getTimeSignatures();
-
     int deleteFirstTick = 0;
+
     for (int i = 0; i < firstBar; i++)
     {
         deleteFirstTick += snapshot->getBarLength(i);
     }
 
     int deleteLastTick = deleteFirstTick;
-    for (int i = firstBar; i < lastBarToDelete; i++)
+    for (int i = firstBar; i <= lastBar; i++)
     {
         deleteLastTick += snapshot->getBarLength(i);
     }
@@ -438,10 +419,8 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
         }
     }
 
-    const int difference = lastBarToDelete - firstBar;
-
     int oldBarStartPos = 0;
-    for (int i = 0; i < lastBarToDelete; ++i)
+    for (int i = 0; i <= lastBar; ++i)
     {
         oldBarStartPos += snapshot->getBarLength(i);
     }
@@ -469,38 +448,10 @@ void Sequence::deleteBars(const int firstBar, int lastBarToDelete) const
         }
     }
 
-    std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> newTs{};
-
-    int out = 0;
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-    {
-        if (i >= firstBar && i < lastBarToDelete)
-        {
-            continue;
-        }
-        if (out >= Mpc2000XlSpecs::MAX_BAR_COUNT)
-        {
-            break;
-        }
-        newTs[out++] = oldTs[i];
-    }
-    for (; out < Mpc2000XlSpecs::MAX_BAR_COUNT; ++out)
-    {
-        newTs[out] = TimeSignature{};
-    }
-
-    setTimeSignatures(newTs);
-
-    const int newLastBarIndex = getLastBarIndex() - difference;
-    dispatch(SetLastBarIndex{getSequenceIndex(), BarIndex(newLastBarIndex)});
+    dispatch(DeleteBars{getSequenceIndex(), BarIndex(firstBar), BarIndex(lastBar)});
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);
-
-    if (newLastBarIndex == NoBarIndex)
-    {
-        setUsed(false);
-    }
 }
 
 void Sequence::deleteTrack(const TrackIndex trackIndex) const

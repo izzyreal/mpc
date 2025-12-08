@@ -95,21 +95,6 @@ void SequenceStateHandler::applyMessage(
         {
             state.sequences[m.sequenceIndex].initialTempo = m.initialTempo;
         },
-        [&](const UpdateBarLengths &m)
-        {
-            state.sequences[m.sequenceIndex].barLengths = m.barLengths;
-        },
-        [&](const UpdateTimeSignatures &m)
-        {
-            auto &seq = state.sequences[m.sequenceIndex];
-
-            seq.timeSignatures = m.timeSignatures;
-
-            for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; ++i)
-            {
-                seq.barLengths[i] = seq.timeSignatures[i].getBarLength();
-            }
-        },
         [&](const SetTimeSignature &m)
         {
             const SequenceStateView stateView(state.sequences[m.sequenceIndex]);
@@ -179,6 +164,40 @@ void SequenceStateHandler::applyMessage(
         [&](const InsertBars &m)
         {
             applyInsertBars(m, state, actions);
+        },
+        [&](const DeleteBars &m)
+        {
+            auto &seq = state.sequences[m.sequenceIndex];
+            auto &ts = seq.timeSignatures;
+            auto &bl = seq.barLengths;
+
+            const int first = m.firstBarIndex;
+            const int last = m.lastBarIndex;    // inclusive
+            const int count = last - first + 1; // number of bars to remove
+
+            const int total = seq.lastBarIndex + 1; // active bars count
+
+            const int tailBegin = last + 1;
+            const int tailEnd = total;
+
+            if (tailBegin < tailEnd)
+            {
+                std::rotate(ts.begin() + first, ts.begin() + tailBegin,
+                            ts.begin() + tailEnd);
+
+                std::rotate(bl.begin() + first, bl.begin() + tailBegin,
+                            bl.begin() + tailEnd);
+            }
+
+            applyMessage(
+                state, actions,
+                SetLastBarIndex{m.sequenceIndex, seq.lastBarIndex - count});
+
+            if (seq.lastBarIndex == NoBarIndex)
+            {
+                applyMessage(state, actions,
+                             SetSequenceUsed{m.sequenceIndex, false});
+            }
         },
         [&](const DeleteTrack &m)
         {

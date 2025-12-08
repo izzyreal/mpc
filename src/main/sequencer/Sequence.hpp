@@ -81,13 +81,6 @@ namespace mpc::sequencer
 
         SequenceIndex getSequenceIndex() const;
 
-        // Replace all bar lengths in bulk.
-        // Unlike setBarLength and setTimeSignature, this method does not
-        // modify tick positions of events. It just replaces the bar lengths,
-        // nothing more.
-        void setBarLengths(const std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT>
-                               &barLengths) const;
-
         double getInitialTempo() const;
         void setInitialTempo(double initialTempo) const;
 
@@ -121,15 +114,6 @@ namespace mpc::sequencer
 
         void syncTrackEventIndices() const;
 
-        // Replace all time signatures in bulk.
-        // Unlike setBarLength and setTimeSignature, this method does not
-        // modify tick positions of events. And unlike setTimeSignature, it
-        // does not modify any bar lengths. It just replaces the time
-        // signatures, nothing more.
-        void setTimeSignatures(
-            const std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> &)
-            const;
-
         std::vector<std::shared_ptr<Track>> getTracks();
         std::vector<std::string> &getDeviceNames();
         void setDeviceNames(const std::vector<std::string> &sa);
@@ -145,7 +129,10 @@ namespace mpc::sequencer
         TimeSignature getTimeSignatureFromTickPos(Tick) const;
         int getDenominator(int i) const;
         int getNumerator(int i) const;
-        void deleteBars(int firstBar, int lastBarToDelete) const;
+
+        // firstBar and lastBar are inclusive
+        void deleteBars(int firstBar, int lastBar) const;
+
         void deleteTrack(TrackIndex) const;
         void deleteAllTracks() const;
         void insertBars(int barCount, BarIndex afterBar,
