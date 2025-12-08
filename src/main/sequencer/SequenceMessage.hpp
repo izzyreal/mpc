@@ -41,7 +41,7 @@ namespace mpc::sequencer
         int barCount;
         BarIndex afterBar;
         Callback onComplete{[](BarIndex) {}};
-        utils::SimpleAction nextAction{[]{}};
+        utils::SimpleAction nextAction{[] {}};
     };
 
     struct SetInitialTempo
@@ -105,9 +105,9 @@ namespace mpc::sequencer
 
     using SequenceMessage =
         std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
-                     UpdateBarLengths, UpdateTimeSignatures,
-                     SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
-                     SetTempoChangeEnabled, SetFirstLoopBarIndex,
-                     SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,
-                     DeleteTrack, DeleteAllTracks>;
+                     UpdateBarLengths, UpdateTimeSignatures, SetTimeSignature,
+                     SetLoopEnabled, SetSequenceUsed, SetTempoChangeEnabled,
+                     SetFirstLoopBarIndex, SetLastLoopBarIndex,
+                     SyncTrackEventIndices, MoveTrack, DeleteTrack,
+                     DeleteAllTracks>;
 } // namespace mpc::sequencer

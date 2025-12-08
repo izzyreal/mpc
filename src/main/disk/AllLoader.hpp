@@ -35,8 +35,8 @@ namespace mpc::disk
     public:
         static void loadEverythingFromFile(Mpc &, MpcFile *);
         static void loadEverythingFromAllParser(Mpc &, file::all::AllParser &);
-        static std::vector<sequencer::SequenceMetaInfo> loadSequenceMetaInfosFromFile(Mpc &,
-                                                                  MpcFile *f);
+        static std::vector<sequencer::SequenceMetaInfo>
+        loadSequenceMetaInfosFromFile(Mpc &, MpcFile *f);
         static std::shared_ptr<sequencer::Sequence>
         loadOneSequenceFromFile(Mpc &, MpcFile *,
                                 SequenceIndex sourceIndexInAllFile,

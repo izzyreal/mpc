@@ -303,8 +303,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         SetSelectedSongStepIndex{SongStepIndex(0), NoSequenceIndex});
 }
 
-std::vector<SequenceMetaInfo> AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc,
-                                                              MpcFile *f)
+std::vector<SequenceMetaInfo>
+AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc, MpcFile *f)
 {
     std::vector<SequenceMetaInfo> result;
     const AllParser allParser(mpc, f->getBytes());
@@ -320,9 +320,10 @@ std::vector<SequenceMetaInfo> AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc,
     return result;
 }
 
-std::shared_ptr<Sequence> AllLoader::loadOneSequenceFromFile(
-    Mpc &mpc, MpcFile *f, const SequenceIndex sourceIndexInAllFile,
-    const SequenceIndex destIndexInMpcMemory)
+std::shared_ptr<Sequence>
+AllLoader::loadOneSequenceFromFile(Mpc &mpc, MpcFile *f,
+                                   const SequenceIndex sourceIndexInAllFile,
+                                   const SequenceIndex destIndexInMpcMemory)
 {
     AllParser allParser(mpc, f->getBytes());
 

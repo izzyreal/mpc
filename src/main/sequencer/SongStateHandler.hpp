@@ -17,7 +17,7 @@ namespace mpc::sequencer
         ~SongStateHandler();
 
         static void applyMessage(SequencerState &,
-                          std::vector<utils::SimpleAction> &actions,
-                          const SongMessage &);
+                                 std::vector<utils::SimpleAction> &actions,
+                                 const SongMessage &);
     };
 } // namespace mpc::sequencer

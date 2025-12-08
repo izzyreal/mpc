@@ -103,20 +103,23 @@ namespace mpc
     constexpr SequenceIndex SelectedSequenceIndex{-2};
 
     constexpr SequenceIndex UndoSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT};
-    constexpr SequenceIndex TempSequenceIndex{
-        Mpc2000XlSpecs::SEQUENCE_COUNT + 1};
+    constexpr SequenceIndex TempSequenceIndex{Mpc2000XlSpecs::SEQUENCE_COUNT +
+                                              1};
 
     /////////
 
-    using SongIndex = ConstrainedInt<int8_t, 0, Mpc2000XlSpecs::MAX_SONG_COUNT - 1>;
+    using SongIndex =
+        ConstrainedInt<int8_t, 0, Mpc2000XlSpecs::MAX_SONG_COUNT - 1>;
     constexpr SongIndex MinSongIndex{0};
     constexpr SongIndex MaxStepIndex{Mpc2000XlSpecs::MAX_SONG_COUNT - 1};
 
     /////////
 
-    using SongStepIndex = ConstrainedInt<uint8_t, 0, Mpc2000XlSpecs::MAX_SONG_STEP_COUNT>;
+    using SongStepIndex =
+        ConstrainedInt<uint8_t, 0, Mpc2000XlSpecs::MAX_SONG_STEP_COUNT>;
     constexpr SongStepIndex MinSongStepIndex{0};
-    constexpr SongStepIndex MaxSongStepIndex{Mpc2000XlSpecs::MAX_SONG_STEP_COUNT};
+    constexpr SongStepIndex MaxSongStepIndex{
+        Mpc2000XlSpecs::MAX_SONG_STEP_COUNT};
 
     /////////
 

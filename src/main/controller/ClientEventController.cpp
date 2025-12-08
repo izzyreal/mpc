@@ -42,9 +42,8 @@ void ClientEventController::init()
         clientHardwareEventController, screens->get<ScreenId::MidiSwScreen>(),
         mpc.getSequencer(), mpc.getSampler(),
         screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
-        screens->get<ScreenId::MultiRecordingSetupScreen>(),
-        layeredScreen, hardware,
-        screens, mpc.getEngineHost()->getPreviewSoundPlayer().get());
+        screens->get<ScreenId::MultiRecordingSetupScreen>(), layeredScreen,
+        hardware, screens, mpc.getEngineHost()->getPreviewSoundPlayer().get());
 }
 
 void ClientEventController::dispatchHostInput(

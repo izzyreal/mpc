@@ -1514,13 +1514,14 @@ void StepEditorScreen::adhocPlayNoteEvent(const EventData &noteEvent) const
     const auto trackBusType = track->getBusType();
     const auto trackDeviceIndex = track->getDeviceIndex();
 
-    // TODO We do playback on the audio thread, because downstream we're looking up
-    // properties in Program, and the migration of the state in sampler::Program
-    // (in particular sampler::Pad) to performance/Drum.hpp is not complete yet.
-    // Once that is complete, and sampler::Pad and sampler::Program don't hold any
-    // state that should be owned by the audio thread (i.e. probably everything
-    // except program name), we can invoke handleFinalizedEvent directly from any
-    // thread we like, and delegation to the audio task queue is unnecessary.
+    // TODO We do playback on the audio thread, because downstream we're looking
+    // up properties in Program, and the migration of the state in
+    // sampler::Program (in particular sampler::Pad) to performance/Drum.hpp is
+    // not complete yet. Once that is complete, and sampler::Pad and
+    // sampler::Program don't hold any state that should be owned by the audio
+    // thread (i.e. probably everything except program name), we can invoke
+    // handleFinalizedEvent directly from any thread we like, and delegation to
+    // the audio task queue is unnecessary.
     utils::Task audioTask;
     audioTask.set(
         [this, e = noteEvent, trackIndex, trackVelocityRatio, trackBusType,

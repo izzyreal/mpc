@@ -52,8 +52,8 @@ namespace mpc::sequencer
 
         Sequence(const utils::PostToUiThreadFn &,
                  std::shared_ptr<SequencerStateManager> manager,
-                 const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)>
-                     &getSnapshot,
+                 const std::function<std::shared_ptr<SequenceStateView>(
+                     SequenceIndex)> &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
@@ -168,7 +168,8 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)> getSnapshot;
+        const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)>
+            getSnapshot;
 
     private:
         SequenceIndex sequenceIndex{NoSequenceIndex};

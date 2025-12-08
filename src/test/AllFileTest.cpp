@@ -109,7 +109,8 @@ TEST_CASE("ALL file song", "[allfile]")
     REQUIRE(song->getStep(mpc::SongStepIndex(1)).repetitionCount == 2);
 }
 
-TEST_CASE("ALL file track is on, used and transmits program changes", "[allfile]")
+TEST_CASE("ALL file track is on, used and transmits program changes",
+          "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);

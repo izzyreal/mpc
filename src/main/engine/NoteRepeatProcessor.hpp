@@ -58,9 +58,9 @@ namespace mpc::engine
             const std::function<bool()> &isFullLevelEnabled,
             const std::function<bool()> &isSixteenLevelsEnabled);
 
-        void process(EngineHost *, unsigned int tickPosition,
-                     int durationTicks, unsigned short eventFrameOffset,
-                     double tempo, float sampleRate) const;
+        void process(EngineHost *, unsigned int tickPosition, int durationTicks,
+                     unsigned short eventFrameOffset, double tempo,
+                     float sampleRate) const;
 
     private:
         const std::weak_ptr<sequencer::Sequencer> sequencer;

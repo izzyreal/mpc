@@ -218,7 +218,8 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &ctx)
         return;
     }
 
-    auto startDecayForNote = [&](const int noteToStop, const uint64_t noteEventId)
+    auto startDecayForNote =
+        [&](const int noteToStop, const uint64_t noteEventId)
     {
         for (const auto &voice : *ctx.voices)
         {
@@ -229,7 +230,8 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &ctx)
                     sampler::VoiceOverlapMode::NOTE_OFF &&
                 !voice->isDecaying() &&
                 ctx.drumIndex == voice->getMuteInfo().getDrum() &&
-                (ctx.noteEventId == 0 || voice->getNoteEventId() == noteEventId))
+                (ctx.noteEventId == 0 ||
+                 voice->getNoteEventId() == noteEventId))
             {
                 voice->startDecay();
                 break;
@@ -239,13 +241,15 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &ctx)
 
     startDecayForNote(ctx.note, ctx.noteEventId);
 
-    if (const auto it = ctx.drumSimultA->find(ctx.note); it != ctx.drumSimultA->end())
+    if (const auto it = ctx.drumSimultA->find(ctx.note);
+        it != ctx.drumSimultA->end())
     {
         startDecayForNote(it->second, ctx.noteEventId);
         ctx.drumSimultA->erase(it);
     }
 
-    if (const auto it = ctx.drumSimultB->find(ctx.note); it != ctx.drumSimultB->end())
+    if (const auto it = ctx.drumSimultB->find(ctx.note);
+        it != ctx.drumSimultB->end())
     {
         startDecayForNote(it->second, ctx.noteEventId);
         ctx.drumSimultB->erase(it);

@@ -9,4 +9,4 @@ namespace mpc::sequencer
         bool used;
         std::string name;
     };
-}
+} // namespace mpc::sequencer

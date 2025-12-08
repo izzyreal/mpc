@@ -11,6 +11,7 @@ namespace mpc::client::event
     class SeqEventToMidiEventMapper
     {
     public:
-        static void mapSeqEventToMidiEvent(const sequencer::EventData &, ClientMidiEvent &);
+        static void mapSeqEventToMidiEvent(const sequencer::EventData &,
+                                           ClientMidiEvent &);
     };
-}
+} // namespace mpc::client::event

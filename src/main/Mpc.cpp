@@ -144,7 +144,10 @@ void Mpc::init()
 
     sequencer = std::make_shared<Sequencer>(
         engineHost->postToAudioThread,
-        [&]{ engineHost->flushNoteOffs(); },
+        [&]
+        {
+            engineHost->flushNoteOffs();
+        },
         clock, layeredScreen,
         [&]
         {

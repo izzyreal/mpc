@@ -35,7 +35,8 @@ namespace mpc::engine
     public:
         explicit SequencerPlaybackEngine(
             EngineHost *,
-            std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
+            std::function<std::shared_ptr<audiomidi::MidiOutput>()>
+                getMidiOutput,
             sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
@@ -86,7 +87,8 @@ namespace mpc::engine
 
         void processNoteRepeat() const;
 
-        void setTickPositionEffectiveImmediately(int newTickPos, SequenceIndex) const;
+        void setTickPositionEffectiveImmediately(int newTickPos,
+                                                 SequenceIndex) const;
 
         void stopSequencer() const;
     };

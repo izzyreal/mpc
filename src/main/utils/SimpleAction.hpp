@@ -8,5 +8,4 @@ namespace mpc::utils
 
     using SimpleAction = SmallFn<96, void()>;
     using SmallSimpleAction = SmallFn<32, void()>;
-}
-
+} // namespace mpc::utils

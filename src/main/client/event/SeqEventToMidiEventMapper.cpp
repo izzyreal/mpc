@@ -7,7 +7,8 @@
 using namespace mpc::client::event;
 using namespace mpc::sequencer;
 
-void SeqEventToMidiEventMapper::mapSeqEventToMidiEvent(const EventData &e, ClientMidiEvent &c)
+void SeqEventToMidiEventMapper::mapSeqEventToMidiEvent(const EventData &e,
+                                                       ClientMidiEvent &c)
 {
     if (e.type == EventType::NoteOn)
     {

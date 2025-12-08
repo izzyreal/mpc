@@ -34,4 +34,4 @@ namespace mpc::concurrency
             }
         }
     };
-}
+} // namespace mpc::concurrency

@@ -1,4 +1,7 @@
 #include "SequencerScreen.hpp"
+
+#include "engine/EngineHost.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "controller/ClientEventController.hpp"
@@ -88,14 +91,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             displayTrackProps();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getSelectedTrack()->getName();
-                        },
-                        [&](auto)
-                        {
-                            displayTr();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedTrack()->getName();
+         },
+         [&](auto)
+         {
+             displayTr();
+         }});
 
     addReactiveBinding(
         {[&]
@@ -931,7 +935,16 @@ void SequencerScreen::openWindow()
         focusedFieldName == "sq")
     {
         Util::initSequence(mpc);
-        openScreenById(ScreenId::SequenceScreen);
+        mpc.getEngineHost()->postToAudioThread(utils::Task(
+            [this]
+            {
+                sequencer.lock()->getStateManager()->drainQueue();
+                ls.lock()->postToUiThread(utils::Task(
+                    [this]
+                    {
+                        openScreenById(ScreenId::SequenceScreen);
+                    }));
+            }));
     }
     else if (focusedFieldName.find("now") != std::string::npos)
     {
@@ -960,10 +973,11 @@ void SequencerScreen::openWindow()
     else if (focusedFieldName == "tr")
     {
         mpc.getSequencer()->getSelectedTrack()->setUsedIfCurrentlyUnused(
-            utils::SmallSimpleAction([layeredScreen = ls.lock()]() mutable
-            {
-                layeredScreen->openScreenById(ScreenId::TrackScreen);
-            }));
+            utils::SmallSimpleAction(
+                [layeredScreen = ls.lock()]() mutable
+                {
+                    layeredScreen->openScreenById(ScreenId::TrackScreen);
+                }));
     }
     else if (focusedFieldName == "on")
     {

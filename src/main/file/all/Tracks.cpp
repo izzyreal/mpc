@@ -22,8 +22,8 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
         const auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
         std::string name;
 
-        for (const char c : Util::vecCopyOfRange(loadBytes, offset,
-                                           offset + AllParser::NAME_LENGTH))
+        for (const char c : Util::vecCopyOfRange(
+                 loadBytes, offset, offset + AllParser::NAME_LENGTH))
         {
             if (c == 0x00)
             {
@@ -63,9 +63,18 @@ Tracks::Tracks(sequencer::Sequence *seq)
         saveBytes[VELO_RATIOS_OFFSET + i] = t->getVelocityRatio();
 
         uint8_t b = 0;
-        if (t->isUsed())                          b |= 1u << 0;
-        if (t->isOn())                            b |= 1u << 1;
-        if (t->isTransmitProgramChangesEnabled()) b |= 1u << 2;
+        if (t->isUsed())
+        {
+            b |= 1u << 0;
+        }
+        if (t->isOn())
+        {
+            b |= 1u << 1;
+        }
+        if (t->isTransmitProgramChangesEnabled())
+        {
+            b |= 1u << 2;
+        }
         saveBytes[STATUS_OFFSET + i] = b;
     }
 
@@ -83,8 +92,7 @@ Tracks::Tracks(sequencer::Sequence *seq)
     saveBytes[LAST_TICK_BYTE3_OFFSET] = large;
 
     const auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
-    const auto unknown32BitIntBytes2 =
-        ByteUtil::uint2bytes(
+    const auto unknown32BitIntBytes2 = ByteUtil::uint2bytes(
         static_cast<int>(seq->getLastTick() * 5208.333333333333));
 
     for (int j = 0; j < 4; j++)
@@ -100,7 +108,8 @@ Tracks::Tracks(sequencer::Sequence *seq)
 }
 
 std::vector<char> Tracks::PADDING1 = std::vector<char>{
-    static_cast<char>(232), 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, static_cast<char>(232), 3};
+    static_cast<char>(232), 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    static_cast<char>(232), 3};
 
 int Tracks::getDevice(const int i) const
 {

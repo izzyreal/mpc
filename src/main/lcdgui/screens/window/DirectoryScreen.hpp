@@ -44,7 +44,7 @@ namespace mpc::lcdgui::screens::window
         void setYOffset0(int i);
         void setYPos0(int i);
         static std::string padFileName(const std::string &s,
-                                const std::string &pad);
+                                       const std::string &pad);
         void drawGraphicsLeft() const;
         void drawGraphicsRight() const;
     };

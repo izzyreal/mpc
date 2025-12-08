@@ -32,7 +32,8 @@ namespace mpc::file::all
         std::vector<std::string> names = std::vector<std::string>(64);
         std::vector<bool> usednesses = std::vector<bool>(64);
         std::vector<bool> ons = std::vector<bool>(64);
-        std::vector<bool> transmitProgramChangesEnableds = std::vector<bool>(64);
+        std::vector<bool> transmitProgramChangesEnableds =
+            std::vector<bool>(64);
 
     public:
         std::vector<char> saveBytes{};

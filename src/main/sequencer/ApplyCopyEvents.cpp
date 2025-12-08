@@ -156,4 +156,3 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }
-

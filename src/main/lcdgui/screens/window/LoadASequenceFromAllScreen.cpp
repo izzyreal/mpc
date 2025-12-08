@@ -60,7 +60,7 @@ void LoadASequenceFromAllScreen::function(const int i)
         const auto loadASequenceScreen =
             mpc.screens->get<ScreenId::LoadASequenceScreen>();
 
-        (void) mpc.getDisk()->loadOneSequenceFromAllFile(
+        (void)mpc.getDisk()->loadOneSequenceFromAllFile(
             loadScreen->getSelectedFile(), SequenceIndex(sourceSeqIndex),
             loadASequenceScreen->loadInto);
 

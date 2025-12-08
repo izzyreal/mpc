@@ -27,4 +27,4 @@ namespace mpc::controller
 
         std::unordered_map<hardware::ComponentId, Session> sessions;
     };
-}
+} // namespace mpc::controller

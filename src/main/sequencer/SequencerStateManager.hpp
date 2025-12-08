@@ -49,7 +49,8 @@ namespace mpc::sequencer
 
         void applyCopyBars(const CopyBars &) noexcept;
 
-        EventData *recordNoteEventLive(SequenceIndex, TrackIndex, NoteNumber, Velocity);
+        EventData *recordNoteEventLive(SequenceIndex, TrackIndex, NoteNumber,
+                                       Velocity);
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or

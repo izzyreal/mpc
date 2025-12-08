@@ -3,7 +3,8 @@
 using namespace mpc::controller;
 
 void ButtonConsumptionTracker::addConsumptionRule(
-    const hardware::ComponentId watchedId, const hardware::ComponentId consumerId)
+    const hardware::ComponentId watchedId,
+    const hardware::ComponentId consumerId)
 {
     sessions[watchedId].consumables.push_back(consumerId);
 }

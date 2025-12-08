@@ -47,8 +47,8 @@ AllSequencer::AllSequencer(Mpc &mpc)
 
     mpcSequencer->getTransport()->setTempoSourceIsSequence(false);
 
-    const auto masterTempoBytes =
-        ByteUtil::ushort2bytes(mpcSequencer->getTransport()->getMasterTempo() * 10.0);
+    const auto masterTempoBytes = ByteUtil::ushort2bytes(
+        mpcSequencer->getTransport()->getMasterTempo() * 10.0);
 
     mpcSequencer->getTransport()->setTempoSourceIsSequence(
         tempoSourceIsSequence);

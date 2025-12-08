@@ -5,9 +5,7 @@
 
 using namespace mpc::sequencer;
 
-SongStateHandler::SongStateHandler()
-{
-}
+SongStateHandler::SongStateHandler() {}
 
 SongStateHandler::~SongStateHandler() {}
 

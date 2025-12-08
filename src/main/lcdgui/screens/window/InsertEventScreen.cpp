@@ -98,14 +98,15 @@ void InsertEventScreen::insertEvent() const
         e.mixerValue = 0;
     }
 
-    const utils::SimpleAction onComplete([ls = ls]
-    {
-        ls.lock()->postToUiThread(utils::Task(
-            [ls]
-            {
-                ls.lock()->openScreenById(ScreenId::StepEditorScreen);
-            }));
-    });
+    const utils::SimpleAction onComplete(
+        [ls = ls]
+        {
+            ls.lock()->postToUiThread(utils::Task(
+                [ls]
+                {
+                    ls.lock()->openScreenById(ScreenId::StepEditorScreen);
+                }));
+        });
 
     sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e, onComplete);
 }

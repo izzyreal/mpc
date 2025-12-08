@@ -114,7 +114,7 @@ namespace mpc::concurrency
         // Use with care! May only be called by the thread
         // that owns the state.
         // Circumvents the queue and applies the message immediately.
-        void applyMessageImmediate(Message&& msg) noexcept
+        void applyMessageImmediate(Message &&msg) noexcept
         {
             applyMessage(msg);
             publishState();

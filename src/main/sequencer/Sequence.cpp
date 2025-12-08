@@ -19,7 +19,8 @@ using namespace mpc::lcdgui::screens;
 Sequence::Sequence(
     const utils::PostToUiThreadFn &postToUiThread,
     std::shared_ptr<SequencerStateManager> manager,
-    const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)> &getSnapshot,
+    const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)>
+        &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
@@ -39,15 +40,15 @@ Sequence::Sequence(
     std::function<int64_t()> getPunchOutTime,
     std::function<bool()> isSoloEnabled,
     std::function<int()> getCurrentBarIndex)
-    : getSnapshot(getSnapshot), manager(manager),
-      dispatch(dispatch), getScreens(getScreens),
-      getCurrentBarIndex(getCurrentBarIndex)
+    : getSnapshot(getSnapshot), manager(manager), dispatch(dispatch),
+      getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
 {
     name.reserve(Mpc2000XlSpecs::MAX_SEQUENCE_NAME_LENGTH);
 
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
-        std::function getTrackSnapshot = [getSnapshot, this](const TrackIndex idx)
+        std::function getTrackSnapshot =
+            [getSnapshot, this](const TrackIndex idx)
         {
             return getSnapshot(this->sequenceIndex)->getTrack(idx);
         };
@@ -63,7 +64,8 @@ Sequence::Sequence(
 
     std::function getTempoTrackSnapshot = [getSnapshot, this](TrackIndex)
     {
-        return getSnapshot(this->sequenceIndex)->getTrack(TempoChangeTrackIndex);
+        return getSnapshot(this->sequenceIndex)
+            ->getTrack(TempoChangeTrackIndex);
     };
 
     tracks.emplace_back(std::make_shared<Track>(
@@ -602,7 +604,8 @@ int Sequence::getEventCount() const
 int Sequence::getFirstTickOfBeat(const int barIndex, const int beat) const
 {
     const auto barStart = getFirstTickOfBar(barIndex);
-    const auto den = getSnapshot(sequenceIndex)->getTimeSignature(barIndex).denominator;
+    const auto den =
+        getSnapshot(sequenceIndex)->getTimeSignature(barIndex).denominator;
     const auto beatTicks = static_cast<int>(96 * (4.0 / den));
     return barStart + beat * beatTicks;
 }

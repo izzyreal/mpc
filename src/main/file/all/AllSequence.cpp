@@ -137,7 +137,8 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
         t->setProgramChange(at->getPgm(i), updateUsedness);
         t->setOn(at->isOn(i), updateUsedness);
         t->setVelocityRatio(at->getVelo(i), updateUsedness);
-        t->setTransmitProgramChangesEnabled(at->isTransmitProgramChangesEnabled(i));
+        t->setTransmitProgramChangesEnabled(
+            at->isTransmitProgramChangesEnabled(i));
 
         manager->enqueue(SetTrackUsed{mpcSeq->getSequenceIndex(), TrackIndex(i),
                                       at->isUsed(i)});

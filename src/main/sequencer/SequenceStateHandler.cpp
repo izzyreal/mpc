@@ -30,7 +30,7 @@ void SequenceStateHandler::applyMessage(
         [&](const SyncTrackEventIndices &m)
         {
             const auto positionTicks = Sequencer::quarterNotesToTicks(
-                    state.transport.positionQuarterNotes);
+                state.transport.positionQuarterNotes);
 
             auto &tracks = state.sequences[m.sequenceIndex].tracks;
 
@@ -182,14 +182,18 @@ void SequenceStateHandler::applyMessage(
         },
         [&](const DeleteTrack &m)
         {
-            applyMessage(state, actions, RemoveEvents{m.sequenceIndex, m.trackIndex});
-            state.sequences[m.sequenceIndex].tracks[m.trackIndex].initializeDefaults();
+            applyMessage(state, actions,
+                         RemoveEvents{m.sequenceIndex, m.trackIndex});
+            state.sequences[m.sequenceIndex]
+                .tracks[m.trackIndex]
+                .initializeDefaults();
         },
         [&](const DeleteAllTracks &m)
         {
             for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
             {
-                applyMessage(state, actions, DeleteTrack{m.sequenceIndex, TrackIndex(i)});
+                applyMessage(state, actions,
+                             DeleteTrack{m.sequenceIndex, TrackIndex(i)});
             }
         }};
 
