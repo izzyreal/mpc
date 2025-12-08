@@ -1,4 +1,6 @@
 #include "SongScreen.hpp"
+
+#include "Mpc.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
@@ -9,6 +11,8 @@
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
+#include "engine/EngineHost.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -282,7 +286,16 @@ void SongScreen::openWindow()
     }
     else if (focusedFieldName == "song")
     {
-        openScreenById(ScreenId::SongWindow);
+        mpc.getEngineHost()->postToAudioThread(utils::Task(
+            [this]
+            {
+                sequencer.lock()->getStateManager()->drainQueue();
+                ls.lock()->postToUiThread(utils::Task(
+                    [this]
+                    {
+                        openScreenById(ScreenId::SongWindow);
+                    }));
+            }));
     }
     else if (focusedFieldName == "tempo" || focusedFieldName == "tempo-source")
     {
@@ -502,7 +515,8 @@ void SongScreen::displaySteps() const
 
         int8_t repetitionCount = step.repetitionCount;
 
-        if (visibleStepIndex == 1 && lockedSequencer->getTransport()->isPlaying())
+        if (visibleStepIndex == 1 &&
+            lockedSequencer->getTransport()->isPlaying())
         {
             repetitionCount -=
                 lockedSequencer->getTransport()->getPlayedStepRepetitions();

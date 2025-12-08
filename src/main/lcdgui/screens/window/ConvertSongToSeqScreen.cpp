@@ -56,7 +56,6 @@ void ConvertSongToSeqScreen::function(const int i)
             break;
         case 4:
             convertSongToSeq();
-            openScreenById(ScreenId::SongScreen);
             break;
         default:;
     }
@@ -161,6 +160,11 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
             if (!song->isUsed())
             {
+                ls.lock()->postToUiThread(utils::Task(
+                    [this]
+                    {
+                        openScreenById(ScreenId::SongScreen);
+                    }));
                 return;
             }
 
@@ -224,8 +228,8 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                     {
                         if (e->tick >= destinationFirstBarStartTick)
                         {
-                            destinationSequence->getTempoChangeTrack()->removeEvent(
-                                e);
+                            destinationSequence->getTempoChangeTrack()
+                                ->removeEvent(e);
                             stateManager->drainQueue();
                         }
                     }
@@ -391,6 +395,11 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
             {
                 destinationSequence->setUsed(false);
                 stateManager->drainQueue();
+                ls.lock()->postToUiThread(utils::Task(
+                    [this]
+                    {
+                        openScreenById(ScreenId::SequencerScreen);
+                    }));
                 return;
             }
 
@@ -426,8 +435,14 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
             }
 
             constexpr bool shouldSetPositionTo0 = true;
-            lockedSequencer->setSelectedSequenceIndex(toSequenceIndex, shouldSetPositionTo0);
+            lockedSequencer->setSelectedSequenceIndex(toSequenceIndex,
+                                                      shouldSetPositionTo0);
             stateManager->drainQueue();
+            ls.lock()->postToUiThread(utils::Task(
+                [this]
+                {
+                    openScreenById(ScreenId::SequencerScreen);
+                }));
         });
 
     mpc.getEngineHost()->postToAudioThread(std::move(audioTask));
