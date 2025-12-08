@@ -207,12 +207,50 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
 
                 if (trackStatus == 0 || trackStatus == 1)
                 {
+                    const auto destinationFirstBarStartTick =
+                        destinationSequence->getFirstTickOfBar(
+                            destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
+
                     SeqUtil::copyBars(
                         mpc, sourceSequenceIndex, toSequenceIndex, 0,
                         sourceSequencelastBarIndex, repetitionCount,
                         destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
 
                     stateManager->drainQueue();
+
+                    for (const auto &e :
+                         destinationSequence->getTempoChangeTrack()
+                             ->getEventHandles())
+                    {
+                        if (e->tick >= destinationFirstBarStartTick)
+                        {
+                            destinationSequence->getTempoChangeTrack()->removeEvent(
+                                e);
+                            stateManager->drainQueue();
+                        }
+                    }
+
+                    for (const auto &e : sourceSequence->getTempoChangeTrack()
+                                             ->getEventHandles())
+                    {
+                        EventData copy = *e;
+                        copy.tick += destinationFirstBarStartTick;
+
+                        const auto tempoInSourceSequence =
+                            sourceSequence->getInitialTempo() * e->amount *
+                            0.001;
+
+                        const auto ratioInDestinationSequence =
+                            (tempoInSourceSequence /
+                             destinationSequence->getInitialTempo()) *
+                            1000;
+
+                        copy.amount =
+                            static_cast<int>(ratioInDestinationSequence);
+                        destinationSequence->getTempoChangeTrack()
+                            ->acquireAndInsertEvent(copy);
+                        stateManager->drainQueue();
+                    }
 
                     if (trackStatus == 1)
                     {
@@ -322,6 +360,18 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                             if (sourceTrack->getSequenceIndex() ==
                                 TempoChangeTrackIndex)
                             {
+                                const auto tempoInSourceSequence =
+                                    sourceSequence->getInitialTempo() *
+                                    eventState.amount * 0.001;
+
+                                const auto ratioInDestinationSequence =
+                                    (tempoInSourceSequence /
+                                     destinationSequence->getInitialTempo()) *
+                                    1000;
+
+                                eventState.amount = static_cast<int>(
+                                    ratioInDestinationSequence);
+
                                 destinationSequence
                                     ->getTrack(TempoChangeTrackIndex)
                                     ->acquireAndInsertEvent(eventState);
@@ -375,6 +425,8 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                 }
             }
 
+            constexpr bool shouldSetPositionTo0 = true;
+            lockedSequencer->setSelectedSequenceIndex(toSequenceIndex, shouldSetPositionTo0);
             stateManager->drainQueue();
         });
 

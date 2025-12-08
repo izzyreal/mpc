@@ -155,6 +155,14 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track,
 
     if (e->tick < head->tick)
     {
+        if (e->type == EventType::TempoChange &&
+            head->type == EventType::TempoChange &&
+            head->amount == e->amount)
+        {
+            returnEventToPool(e);
+            return;
+        }
+
         e->next = head;
         head->prev = e;
         head = e;
@@ -177,6 +185,14 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track,
     }
 
     insertIndex = currentIndex + 1;
+
+    if (e->type == EventType::TempoChange &&
+        it->type == EventType::TempoChange &&
+        it->amount == e->amount)
+    {
+        returnEventToPool(e);
+        return;
+    }
 
     EventData *n = it->next;
 

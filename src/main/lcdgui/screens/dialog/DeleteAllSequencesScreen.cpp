@@ -1,6 +1,10 @@
 #include "DeleteAllSequencesScreen.hpp"
+
+#include "Mpc.hpp"
+#include "engine/EngineHost.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -12,15 +16,24 @@ DeleteAllSequencesScreen::DeleteAllSequencesScreen(Mpc &mpc,
 
 void DeleteAllSequencesScreen::function(const int i)
 {
-    switch (i)
+    if (i == 3)
     {
-        case 3:
-            openScreenById(ScreenId::DeleteSequenceScreen);
-            break;
-        case 4:
-            sequencer.lock()->getTransport()->setPosition(0);
-            sequencer.lock()->deleteAllSequences();
-            openScreenById(ScreenId::SequencerScreen);
-            break;
+        openScreenById(ScreenId::DeleteSequenceScreen);
+    }
+    else if (i == 4)
+    {
+        const auto lockedSequencer = sequencer.lock();
+        lockedSequencer->getTransport()->setPosition(0);
+        mpc.getEngineHost()->postToAudioThread(utils::Task(
+            [this, lockedSequencer]
+            {
+                lockedSequencer->deleteAllSequences();
+                lockedSequencer->getStateManager()->drainQueue();
+                ls.lock()->postToUiThread(utils::Task(
+                    [this]
+                    {
+                        openScreenById(ScreenId::SequencerScreen);
+                    }));
+            }));
     }
 }
