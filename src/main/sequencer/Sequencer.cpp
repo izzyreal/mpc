@@ -507,18 +507,19 @@ int Sequencer::getSelectedTrackIndex() const
 
 void Sequencer::undoSeq()
 {
-    const auto selectedSequenceIndex = getSelectedSequenceIndex();
+    const auto selectedSequence = getSelectedSequence();
+    const auto selectedSequenceIndex = selectedSequence->getSequenceIndex();
 
     if (transport->isPlaying() || !sequences[UndoSequenceIndex]->isUsed() ||
-        !sequences[selectedSequenceIndex])
+        !selectedSequence)
     {
         return;
     }
 
     postToAudioThread(utils::Task(
-        [this, selectedSequenceIndex]
+        [this, selectedSequence, selectedSequenceIndex]
         {
-            copySequence(getSelectedSequence(), TempSequenceIndex);
+            copySequence(selectedSequence, TempSequenceIndex);
             stateManager->drainQueue();
             copySequence(sequences[UndoSequenceIndex], selectedSequenceIndex);
             stateManager->drainQueue();
