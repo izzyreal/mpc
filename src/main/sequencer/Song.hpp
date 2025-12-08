@@ -5,7 +5,6 @@
 
 #include "sequencer/SongMessage.hpp"
 
-#include <vector>
 #include <string>
 #include <functional>
 

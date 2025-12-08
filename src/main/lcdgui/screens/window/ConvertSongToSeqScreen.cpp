@@ -2,11 +2,13 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "engine/EngineHost.hpp"
 
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Track.hpp"
 
@@ -121,9 +123,10 @@ void ConvertSongToSeqScreen::displayTrackStatus() const
     findField("trackstatus")->setText(trackStatusNames[trackStatus]);
 }
 
-void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
-                    const std::shared_ptr<Sequence> &sourceSequence,
-                    const std::shared_ptr<Sequence> &destinationSequence)
+void eraseEventsFromOffTracks(
+    const int firstBarToRemove, const int firstBarToKeep,
+    const std::shared_ptr<Sequence> &sourceSequence,
+    const std::shared_ptr<Sequence> &destinationSequence)
 {
     const auto startTick =
         destinationSequence->getFirstTickOfBar(firstBarToRemove);
@@ -136,12 +139,11 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
             continue;
         }
 
-        for (int i = track->getEvents().size() - 1; i >= 0; i--)
+        for (const auto &e : track->getEventHandles())
         {
-            if (const auto event = track->getEvent(i);
-                event->getTick() >= startTick && event->getTick() < endTick)
+            if (e->tick >= startTick && e->tick < endTick)
             {
-                track->removeEvent(event);
+                track->removeEvent(e);
             }
         }
     }
@@ -149,173 +151,232 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
-    const auto lockedSequencer = sequencer.lock();
-
-    const auto song = lockedSequencer->getSelectedSong();
-
-    if (!song->isUsed())
-    {
-        return;
-    }
-
-    const auto destinationSequence =
-        lockedSequencer->getSequence(toSequenceIndex);
-
-    destinationSequence->init(0);
-    destinationSequence->setName(song->getName());
-
-    for (int stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        const auto step = song->getStep(SongStepIndex(stepIndex));
-        const auto sourceSequenceIndex = step.sequenceIndex;
-        const auto sourceSequence =
-            lockedSequencer->getSequence(sourceSequenceIndex);
-        const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
-            destinationSequence->getLastBarIndex();
-
-        if (!sourceSequence->isUsed())
+    utils::Task audioTask(
+        [this]
         {
-            break;
-        }
+            const auto lockedSequencer = sequencer.lock();
+            const auto stateManager = lockedSequencer->getStateManager();
 
-        if (stepIndex == 0)
-        {
-            destinationSequence->setInitialTempo(
-                sourceSequence->getInitialTempo());
-        }
+            const auto song = lockedSequencer->getSelectedSong();
 
-        const auto sourceSequencelastBarIndex =
-            sourceSequence->getLastBarIndex();
-
-        const auto repetitionCount = step.repetitionCount;
-
-        if (trackStatus == 0 || trackStatus == 1)
-        {
-            SeqUtil::copyBars(
-                mpc, sourceSequenceIndex, toSequenceIndex, 0,
-                sourceSequencelastBarIndex, repetitionCount,
-                destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
-
-            if (trackStatus == 1)
+            if (!song->isUsed())
             {
-                const auto firstBarIndexToRemove =
-                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
-                const auto addedBarCount =
-                    sourceSequence->getBarCount() * repetitionCount;
-                const auto firstBarIndexToKeep =
-                    firstBarIndexToRemove + addedBarCount;
-
-                eraseOffTracks(firstBarIndexToRemove, firstBarIndexToKeep,
-                               sourceSequence, destinationSequence);
+                return;
             }
-        }
-        else /* if (trackStatus == 3) */
-        {
-            { // Append bars with correct time signatures to destination
-              // sequence
-                const auto barCountToAdd =
-                    sourceSequence->getBarCount() * repetitionCount;
-                destinationSequence->setLastBarIndex(
-                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep +
-                    barCountToAdd);
-                auto destinationBarIndex =
-                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
 
-                for (int repetition = 0; repetition < repetitionCount; repetition++)
+            const auto destinationSequence =
+                lockedSequencer->getSequence(toSequenceIndex);
+
+            destinationSequence->init(0);
+
+            stateManager->drainQueue();
+
+            destinationSequence->getTempoChangeTrack()->removeEvents();
+
+            stateManager->drainQueue();
+
+            destinationSequence->setName(song->getName());
+
+            for (int stepIndex = 0; stepIndex < song->getStepCount();
+                 ++stepIndex)
+            {
+                const auto step = song->getStep(SongStepIndex(stepIndex));
+                const auto sourceSequenceIndex = step.sequenceIndex;
+                const auto sourceSequence =
+                    lockedSequencer->getSequence(sourceSequenceIndex);
+                const auto
+                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
+                        destinationSequence->getLastBarIndex();
+
+                if (!sourceSequence->isUsed())
                 {
-                    for (int barCounter = 0;
-                         barCounter < sourceSequence->getBarCount();
-                         barCounter++)
+                    break;
+                }
+
+                if (stepIndex == 0)
+                {
+                    destinationSequence->setInitialTempo(
+                        sourceSequence->getInitialTempo());
+                    stateManager->drainQueue();
+                }
+
+                const auto sourceSequencelastBarIndex =
+                    sourceSequence->getLastBarIndex();
+
+                const auto repetitionCount = step.repetitionCount;
+
+                if (trackStatus == 0 || trackStatus == 1)
+                {
+                    SeqUtil::copyBars(
+                        mpc, sourceSequenceIndex, toSequenceIndex, 0,
+                        sourceSequencelastBarIndex, repetitionCount,
+                        destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
+
+                    stateManager->drainQueue();
+
+                    if (trackStatus == 1)
                     {
-                        const auto numerator =
-                            sourceSequence->getNumerator(barCounter);
-                        const auto denominator =
-                            sourceSequence->getDenominator(barCounter);
+                        const auto firstBarIndexToRemove =
+                            destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+                        const auto addedBarCount =
+                            sourceSequence->getBarCount() * repetitionCount;
+                        const auto firstBarIndexToKeep =
+                            firstBarIndexToRemove + addedBarCount;
 
-                        destinationSequence->setTimeSignature(
-                            destinationBarIndex, numerator, denominator);
+                        eraseEventsFromOffTracks(
+                            firstBarIndexToRemove, firstBarIndexToKeep,
+                            sourceSequence, destinationSequence);
+                        stateManager->drainQueue();
+                    }
+                }
+                else /* if (trackStatus == 3) */
+                {
+                    { // Append bars with correct time signatures to destination
+                      // sequence
+                        const auto barCountToAdd =
+                            sourceSequence->getBarCount() * repetitionCount;
 
-                        destinationBarIndex++;
+                        destinationSequence->setLastBarIndex(
+                            destinationSequenceLastBarIndexBeforeProcessingCurrentStep +
+                            barCountToAdd);
+
+                        stateManager->drainQueue();
+
+                        auto destinationBarIndex =
+                            destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+
+                        for (int repetition = 0; repetition < repetitionCount;
+                             repetition++)
+                        {
+                            for (int barCounter = 0;
+                                 barCounter < sourceSequence->getBarCount();
+                                 barCounter++)
+                            {
+                                const auto numerator =
+                                    sourceSequence->getNumerator(barCounter);
+
+                                const auto denominator =
+                                    sourceSequence->getDenominator(barCounter);
+
+                                destinationSequence->setTimeSignature(
+                                    destinationBarIndex, numerator,
+                                    denominator);
+
+                                stateManager->drainQueue();
+
+                                destinationBarIndex++;
+                            }
+                        }
+                    }
+
+                    for (const auto &sourceTrack : sourceSequence->getTracks())
+                    {
+                        const auto midiChannel =
+                            sourceTrack->getDeviceIndex() - 1;
+
+                        std::shared_ptr<Track> destinationTrack;
+
+                        if (midiChannel >= 0)
+                        {
+                            // copy to track indexes 0 - 31
+                            destinationTrack =
+                                destinationSequence->getTrack(midiChannel);
+                        }
+                        else
+                        {
+                            // copy to destination track indexes 32 - 35 as per
+                            // source track drum bus
+                            if (sourceTrack->getBusType() == BusType::MIDI &&
+                                sourceTrack->getIndex() !=
+                                    TempoChangeTrackIndex)
+                            {
+                                // The source track has neither a MIDI out
+                                // device, nor a DRUM bus. Nothing to copy to
+                                // the destination sequence in this case.
+                                continue;
+                            }
+
+                            const auto drumBusIndex = drumBusTypeToDrumIndex(
+                                sourceTrack->getBusType());
+
+                            destinationTrack = destinationSequence->getTrack(
+                                32 + drumBusIndex);
+                        }
+
+                        const auto destinationFirstBarIndex =
+                            destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+
+                        const auto destinationFirstBarStartTick =
+                            destinationSequence->getFirstTickOfBar(
+                                destinationFirstBarIndex);
+
+                        for (const auto &sourceEvent : sourceTrack->getEvents())
+                        {
+                            const auto destinationTick =
+                                destinationFirstBarStartTick +
+                                sourceEvent->getTick();
+
+                            EventData eventState = *sourceEvent->handle;
+                            eventState.tick = destinationTick;
+
+                            if (sourceTrack->getSequenceIndex() ==
+                                TempoChangeTrackIndex)
+                            {
+                                destinationSequence
+                                    ->getTrack(TempoChangeTrackIndex)
+                                    ->acquireAndInsertEvent(eventState);
+                            }
+                            else
+                            {
+                                destinationTrack->acquireAndInsertEvent(
+                                    eventState);
+                            }
+                            stateManager->drainQueue();
+                        }
                     }
                 }
             }
 
-            for (const auto &sourceTrack : sourceSequence->getTracks())
+            if (destinationSequence->getLastBarIndex() == 0)
             {
-                const auto midiChannel = sourceTrack->getDeviceIndex() - 1;
+                destinationSequence->setUsed(false);
+                stateManager->drainQueue();
+                return;
+            }
 
-                std::shared_ptr<Track> destinationTrack;
+            destinationSequence->setLastBarIndex(
+                destinationSequence->getLastBarIndex() - 1);
 
-                if (midiChannel >= 0)
+            stateManager->drainQueue();
+
+            if (trackStatus == 0 || trackStatus == 1)
+            {
+                const auto referenceStep = song->getStep(MinSongStepIndex);
+                const auto referenceSequence =
+                    lockedSequencer->getSequence(referenceStep.sequenceIndex);
+
+                for (int trackIndex = 0;
+                     trackIndex < Mpc2000XlSpecs::TRACK_COUNT; ++trackIndex)
                 {
-                    // copy to track indexes 0 - 31
-                    destinationTrack =
-                        destinationSequence->getTrack(midiChannel);
-                }
-                else
-                {
-                    // copy to destination track indexes 32 - 35 as per source
-                    // track drum bus
-                    if (sourceTrack->getBusType() == BusType::MIDI)
+                    auto referenceTrack =
+                        referenceSequence->getTrack(trackIndex);
+
+                    auto destTrack = destinationSequence->getTrack(trackIndex);
+
+                    lockedSequencer->copyTrackParameters(referenceTrack,
+                                                         destTrack);
+
+                    stateManager->drainQueue();
+
+                    if (trackStatus == 1)
                     {
-                        // The source track has neither a MIDI out device, nor a
-                        // DRUM bus. Nothing to copy to the destination sequence
-                        // in this case.
-                        continue;
+                        destTrack->setOn(true);
                     }
-
-                    const auto drumBusIndex =
-                        drumBusTypeToDrumIndex(sourceTrack->getBusType());
-
-                    destinationTrack =
-                        destinationSequence->getTrack(32 + drumBusIndex);
-                }
-
-                const auto destinationFirstBarIndex =
-                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
-                const auto destinationFirstBarStartTick =
-                    destinationSequence->getFirstTickOfBar(
-                        destinationFirstBarIndex);
-
-                for (const auto &sourceEvent : sourceTrack->getEvents())
-                {
-                    const auto destinationTick =
-                        destinationFirstBarStartTick + sourceEvent->getTick();
-
-                    EventData eventState = *sourceEvent->handle;
-                    eventState.tick = destinationTick;
-
-                    destinationTrack->acquireAndInsertEvent(eventState);
                 }
             }
-        }
-    }
 
-    if (destinationSequence->getLastBarIndex() == 0)
-    {
-        destinationSequence->setUsed(false);
-        return;
-    }
+            stateManager->drainQueue();
+        });
 
-    destinationSequence->setLastBarIndex(
-        destinationSequence->getLastBarIndex() - 1);
-
-    if (trackStatus == 0 || trackStatus == 1)
-    {
-        const auto referenceStep = song->getStep(MinSongStepIndex);
-        const auto referenceSequence =
-            lockedSequencer->getSequence(referenceStep.sequenceIndex);
-
-        for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT; trackIndex++)
-        {
-            auto referenceTrack = referenceSequence->getTrack(trackIndex);
-            auto destTrack = destinationSequence->getTrack(trackIndex);
-            lockedSequencer->copyTrackParameters(referenceTrack, destTrack);
-
-            if (trackStatus == 1)
-            {
-                destTrack->setOn(true);
-            }
-        }
-    }
+    mpc.getEngineHost()->postToAudioThread(std::move(audioTask));
 }

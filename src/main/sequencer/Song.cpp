@@ -11,6 +11,7 @@ Song::Song(const SongIndex songIndex,
            const std::function<void(SongMessage &&)> &dispatch)
     : songIndex(songIndex), getSnapshot(getSnapshot), dispatch(dispatch)
 {
+    name.reserve(Mpc2000XlSpecs::MAX_SONG_NAME_LENGTH);
 }
 
 void Song::setLoopEnabled(const bool b) const

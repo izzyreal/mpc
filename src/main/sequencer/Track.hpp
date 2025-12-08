@@ -117,6 +117,7 @@ namespace mpc::sequencer
         std::string getName();
         std::vector<std::shared_ptr<EventRef>> getEvents() const;
         std::vector<EventData> getEventStates() const;
+        std::vector<EventData*> getEventHandles() const;
 
         int getNextTick() const;
         bool shouldRemovePlayIndexEventDueToRecording() const;

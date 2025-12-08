@@ -88,7 +88,7 @@ mpc::SequenceIndex Track::getSequenceIndex() const
 void Track::setUsedIfCurrentlyUnused(
     utils::SmallSimpleAction &&onCompleteNameSetting)
 {
-    if (isUsed())
+    if (isUsed() && getIndex() != TempoChangeTrackIndex)
     {
         postToUiThread(utils::Task(
             [onCompleteNameSetting]() mutable
@@ -99,6 +99,12 @@ void Track::setUsedIfCurrentlyUnused(
     }
 
     dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
+
+    if (getIndex() == TempoChangeTrackIndex)
+    {
+        return;
+    }
+
     postToUiThread(utils::Task(
         [this, onCompleteNameSetting]() mutable
         {
@@ -269,6 +275,11 @@ std::vector<EventData> Track::getEventStates() const
         result.push_back(*e);
     }
     return result;
+}
+
+std::vector<EventData *> Track::getEventHandles() const
+{
+    return getSnapshot(getIndex())->getEvents();
 }
 
 std::vector<std::shared_ptr<EventRef>> Track::getEvents() const

@@ -20,6 +20,8 @@ Program::Program(
     : index(programIndex), slider(new PgmSlider()), sampler(samplerToUse),
       getSnapshot(getSnapshot), dispatch(dispatch)
 {
+    name.reserve(Mpc2000XlSpecs::MAX_PROGRAM_NAME_LENGTH);
+
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
         auto getNoteParametersSnapshot =

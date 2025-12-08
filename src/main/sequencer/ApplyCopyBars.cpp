@@ -48,7 +48,7 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
 
     const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
 
-    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
     {
         const auto t1 = fromSequence.getTrack(i);
 

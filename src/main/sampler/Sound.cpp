@@ -1,11 +1,14 @@
 #include "sampler/Sound.hpp"
 
+#include "MpcSpecs.hpp"
+
 #include <cassert>
 
 using namespace mpc::sampler;
 
 Sound::Sound(const int rate)
 {
+    name.reserve(Mpc2000XlSpecs::MAX_SOUND_NAME_LENGTH);
     setSampleRate(rate);
     sampleData = std::make_shared<std::vector<float>>();
 }
