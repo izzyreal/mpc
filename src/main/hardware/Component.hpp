@@ -5,6 +5,7 @@
 
 #include <optional>
 #include <utility>
+#include <atomic>
 
 namespace mpc::hardware
 {
@@ -113,9 +114,9 @@ namespace mpc::hardware
         }
     };
 
-    class Led : public Component
+    class Led final : public Component
     {
-        bool enabled = false;
+        std::atomic<bool> enabled{false};
 
     public:
         explicit Led(ComponentId id);

@@ -57,6 +57,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
+    const utils::PostToAudioThreadFn &postToAudioThread,
     const std::function<void()> &flushMidiNoteOffs,
     const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
@@ -76,7 +77,8 @@ Sequencer::Sequencer(
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), clock(clock),
-      flushMidiNoteOffs(flushMidiNoteOffs), voices(voices),
+      flushMidiNoteOffs(flushMidiNoteOffs),
+      postToAudioThread(postToAudioThread), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed),
       performanceManager(performanceManager), sampler(sampler),
@@ -120,8 +122,8 @@ void Sequencer::playTick(const Tick tick) const
             }
         }
 
-        stateManager->processLiveNoteEventRecordingQueues(tick,
-                                                          *seq->getSnapshot(seq->getSequenceIndex()));
+        stateManager->processLiveNoteEventRecordingQueues(
+            tick, *seq->getSnapshot(seq->getSequenceIndex()));
 
         for (const auto &track : seq->getTracks())
         {
@@ -233,15 +235,13 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
         stateManager->enqueue(std::move(m));
     };
 
-    const std::function getSnapshot =
-        [this](const SequenceIndex sequenceIndex)
+    const std::function getSnapshot = [this](const SequenceIndex sequenceIndex)
     {
         return stateManager->getSnapshot().getSequenceState(sequenceIndex);
     };
 
     destination = std::make_shared<Sequence>(
-        layeredScreen->postToUiThread,
-        stateManager, getSnapshot, dispatch,
+        layeredScreen->postToUiThread, stateManager, getSnapshot, dispatch,
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -515,14 +515,18 @@ void Sequencer::undoSeq()
         return;
     }
 
-    copySequence(getSelectedSequence(), TempSequenceIndex);
-    copySequence(sequences[UndoSequenceIndex], selectedSequenceIndex);
-    copySequence(sequences[TempSequenceIndex], UndoSequenceIndex);
-
-    undoSeqAvailable = !undoSeqAvailable;
-
-    hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
-        ->setEnabled(undoSeqAvailable);
+    postToAudioThread(utils::Task(
+        [this, selectedSequenceIndex]
+        {
+            copySequence(getSelectedSequence(), TempSequenceIndex);
+            stateManager->drainQueue();
+            copySequence(sequences[UndoSequenceIndex], selectedSequenceIndex);
+            stateManager->drainQueue();
+            copySequence(sequences[TempSequenceIndex], UndoSequenceIndex);
+            undoSeqAvailable = !undoSeqAvailable;
+            hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+                ->setEnabled(undoSeqAvailable);
+        }));
 }
 
 void Sequencer::deleteAllSequences()

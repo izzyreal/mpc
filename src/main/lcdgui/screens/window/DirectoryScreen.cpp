@@ -274,7 +274,7 @@ void DirectoryScreen::function(const int f)
                         ls.lock()->postToUiThread(std::move(uiTask));
                     });
 
-                mpc.getEngineHost()->postToAudioThread(audioTask);
+                mpc.getEngineHost()->postToAudioThread(std::move(audioTask));
             }
 
             break;

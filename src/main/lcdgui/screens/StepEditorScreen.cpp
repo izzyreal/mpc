@@ -1530,7 +1530,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const EventData &noteEvent) const
                 e, trackIndex, trackVelocityRatio, trackBusType,
                 trackDeviceIndex);
         });
-    mpc.getEngineHost()->postToAudioThread(audioTask);
+    mpc.getEngineHost()->postToAudioThread(std::move(audioTask));
 }
 
 void StepEditorScreen::resetYPosAndYOffset()

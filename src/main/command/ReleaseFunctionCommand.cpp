@@ -55,7 +55,7 @@ void ReleaseFunctionCommand::execute()
                         }
                     });
 
-                mpc.getEngineHost()->postToAudioThread(task);
+                mpc.getEngineHost()->postToAudioThread(std::move(task));
             }
             break;
         }
@@ -101,7 +101,8 @@ void ReleaseFunctionCommand::execute()
                             }
                         });
 
-                    mpc.getEngineHost()->postToAudioThread(audioTask);
+                    mpc.getEngineHost()->postToAudioThread(
+                        std::move(audioTask));
                 }
             }
             break;

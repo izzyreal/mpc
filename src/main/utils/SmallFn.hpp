@@ -42,4 +42,5 @@ namespace mpc::utils
 
     using Task = SmallFn<96, void()>;
     using PostToUiThreadFn = SmallFn<16, void(Task &&)>;
+    using PostToAudioThreadFn = SmallFn<16, void(Task &&)>;
 } // namespace mpc::utils

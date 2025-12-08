@@ -58,7 +58,12 @@ using namespace mpc::engine;
 
 using namespace mpc::sequencer;
 
-EngineHost::EngineHost(Mpc &mpcToUse) : mpc(mpcToUse)
+EngineHost::EngineHost(Mpc &mpcToUse)
+    : mpc(mpcToUse), postToAudioThread(
+                         [&](const utils::Task &task)
+                         {
+                             audioTasks.post(task);
+                         })
 {
     VoiceUtil::freqTable();
 }
@@ -160,11 +165,6 @@ void EngineHost::start()
     compoundAudioClient->add(sequencerPlaybackEngine.get());
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
-}
-
-void EngineHost::postToAudioThread(const utils::Task &task)
-{
-    audioTasks.post(task);
 }
 
 void EngineHost::postSamplePreciseTaskToAudioThread(

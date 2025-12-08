@@ -181,7 +181,7 @@ void LoadScreen::function(const int i)
                         ls.lock()->postToUiThread(std::move(uiTask));
                     });
 
-                mpc.getEngineHost()->postToAudioThread(audioTask);
+                mpc.getEngineHost()->postToAudioThread(std::move(audioTask));
             }
             break;
         }

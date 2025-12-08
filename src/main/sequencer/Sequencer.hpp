@@ -2,6 +2,7 @@
 
 #include "BusType.hpp"
 #include "IntTypes.hpp"
+#include "utils/SmallFn.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -64,7 +65,8 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(const std::function<void()> &flushMidiNoteOffs,
+        Sequencer(const utils::PostToAudioThreadFn &,
+                  const std::function<void()> &flushMidiNoteOffs,
                   const std::shared_ptr<Clock> &,
                   const std::shared_ptr<lcdgui::LayeredScreen> &,
                   const std::function<std::shared_ptr<lcdgui::Screens>()> &,
@@ -108,6 +110,7 @@ namespace mpc::sequencer
         const std::function<void()> flushMidiNoteOffs;
 
     private:
+        utils::PostToAudioThreadFn postToAudioThread;
         std::vector<std::shared_ptr<engine::Voice>> *voices;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;

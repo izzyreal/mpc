@@ -137,12 +137,12 @@ Led::Led(const ComponentId id) : Component(id) {}
 
 void Led::setEnabled(const bool enabledToUse)
 {
-    enabled = enabledToUse;
+    enabled.store(enabledToUse);
 }
 
 bool Led::isEnabled() const
 {
-    return enabled;
+    return enabled.load();
 }
 
 Button::Button(const ComponentId id) : Component(id) {}

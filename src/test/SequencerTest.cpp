@@ -356,14 +356,16 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
 
-    stateManager->drainQueue();
+    mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
 
     REQUIRE(sequencer->getSelectedSequence()->isUsed());
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
     REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().empty());
 
     sequencer->undoSeq();
-    stateManager->drainQueue();
+
+    mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
+
     REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() ==
             10);
 }
