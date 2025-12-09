@@ -4,6 +4,7 @@
 #include "engine/audio/core/AudioFormat.hpp"
 
 #include <cstdlib>
+#include <cstdint>
 
 using namespace mpc::engine::audio::core;
 

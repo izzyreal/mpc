@@ -4,6 +4,7 @@
 #include "performance/Drum.hpp"
 
 #include <memory>
+#include <optional>
 
 namespace mpc::performance
 {

@@ -3,6 +3,7 @@
 #include "sequencer/EventData.hpp"
 
 #include <cstdint>
+#include <vector>
 
 namespace mpc::file::all
 {

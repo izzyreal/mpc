@@ -1,6 +1,8 @@
 #pragma once
+
 #include <string>
 #include <vector>
+#include <cstdint>
 
 namespace mpc::file
 {

@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <atomic>
 
 #include "hardware/ComponentId.hpp"
 

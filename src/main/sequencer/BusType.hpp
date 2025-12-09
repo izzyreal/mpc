@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <cassert>
+#include <algorithm>
 
 namespace mpc::sequencer
 {

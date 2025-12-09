@@ -1,5 +1,7 @@
 #include "VoiceUtil.hpp"
 
+#include <cmath>
+
 using namespace mpc::engine;
 
 float VoiceUtil::getInverseNyquist(const int sampleRate)

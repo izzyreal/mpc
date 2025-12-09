@@ -5,6 +5,7 @@
 #include "engine/control/LogLaw.hpp"
 
 #include <cfloat>
+#include <cmath>
 
 using namespace mpc::engine;
 using namespace mpc::engine::control;

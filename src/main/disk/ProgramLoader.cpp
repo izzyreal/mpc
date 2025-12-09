@@ -20,7 +20,7 @@
 #include "performance/PerformanceManager.hpp"
 
 #ifdef __linux__
-#include <pthread.hpp>
+#include <pthread.h>
 #endif // __linux__
 
 using namespace mpc::sampler;

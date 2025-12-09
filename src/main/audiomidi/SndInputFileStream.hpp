@@ -4,7 +4,7 @@
 #include <vector>
 
 #ifdef __linux__
-#include <string.hpp> // For strcmp
+#include <string.h> // For strcmp
 #endif
 
 const char ID[] = {0x01, 0x04, '\0'};

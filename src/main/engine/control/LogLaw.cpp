@@ -3,6 +3,7 @@
 #include "engine/control/ControlLaw.hpp"
 
 #include <cassert>
+#include <cmath>
 
 using namespace mpc::engine::control;
 using namespace std;

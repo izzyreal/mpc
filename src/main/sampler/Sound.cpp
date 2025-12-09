@@ -3,6 +3,7 @@
 #include "MpcSpecs.hpp"
 
 #include <cassert>
+#include <algorithm>
 
 using namespace mpc::sampler;
 

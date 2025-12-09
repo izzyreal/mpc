@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <cstdint>
 
 namespace mpc::lcdgui
 {

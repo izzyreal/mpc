@@ -2,6 +2,8 @@
 
 #include "sequencer/SequencerStateManager.hpp"
 
+#include <cstring>
+
 using namespace mpc::sequencer;
 
 void TrackStateHandler::applyUpdateEvents(const UpdateEvents &m,

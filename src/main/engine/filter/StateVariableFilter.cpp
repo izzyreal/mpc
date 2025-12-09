@@ -3,6 +3,8 @@
 
 #include "mpc_types.hpp"
 
+#include <cmath>
+
 using namespace mpc::engine::filter;
 
 StateVariableFilter::StateVariableFilter(FilterControls *variables)

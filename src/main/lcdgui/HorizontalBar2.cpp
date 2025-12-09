@@ -1,5 +1,7 @@
 #include "HorizontalBar2.hpp"
 
+#include <cmath>
+
 using namespace mpc::lcdgui;
 
 HorizontalBar2::HorizontalBar2(MRECT rect) : Component("horizontal-bar")

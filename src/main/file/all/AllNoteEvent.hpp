@@ -2,6 +2,8 @@
 
 #include "sequencer/EventData.hpp"
 
+#include <vector>
+
 namespace mpc::file::all
 {
     class AllEvent;

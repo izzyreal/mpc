@@ -1,6 +1,7 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
+#include <atomic>
 #include <map>
 
 namespace mpc::audiomidi

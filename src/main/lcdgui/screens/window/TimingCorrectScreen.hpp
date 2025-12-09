@@ -1,13 +1,16 @@
 #pragma once
+
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/WithTimesAndNotes.hpp"
+
+#include <atomic>
+#include <cstdint>
 
 namespace mpc::lcdgui::screens::window
 {
     class TimingCorrectScreen final : public ScreenComponent,
                                       public WithTimesAndNotes
     {
-
     public:
         void function(int i) override;
         void turnWheel(int i) override;

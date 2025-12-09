@@ -4,6 +4,8 @@
 
 #include "mpc_types.hpp"
 
+#include <cmath>
+
 using namespace mpc::engine::audio::mixer;
 
 PanControl::PanControl() : LCRControl("Pan", control::LinearLaw::UNITY(), 0.5f)

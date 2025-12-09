@@ -8,6 +8,8 @@
 #include "sequencer/SequencerState.hpp"
 #include "utils/VariantUtils.hpp"
 
+#include <cstring>
+
 using namespace mpc::sequencer;
 
 SequenceStateHandler::SequenceStateHandler(SequencerStateManager *manager,

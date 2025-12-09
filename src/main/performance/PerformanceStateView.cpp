@@ -2,6 +2,8 @@
 
 #include "performance/PerformanceState.hpp"
 
+#include <stdexcept>
+
 using namespace mpc;
 using namespace mpc::performance;
 

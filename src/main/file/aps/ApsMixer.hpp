@@ -3,6 +3,7 @@
 #include "performance/Drum.hpp"
 
 #include <vector>
+#include <memory>
 
 namespace mpc::engine
 {

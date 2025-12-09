@@ -1,5 +1,7 @@
 #include "HorizontalBar.hpp"
 
+#include <cmath>
+
 using namespace mpc::lcdgui;
 
 HorizontalBar::HorizontalBar(MRECT rect, int value)
