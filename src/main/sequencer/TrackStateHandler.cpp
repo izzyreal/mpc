@@ -129,7 +129,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
         },
         [&](const RemoveEvents &m)
         {
-            applyClearEvents(m, state);
+            applyRemoveEvents(m, state);
         },
         [&](const RemoveDoubles &m)
         {

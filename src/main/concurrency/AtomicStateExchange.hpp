@@ -34,7 +34,7 @@ namespace mpc::concurrency
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
-                                     size_t messageQueueCapacity = 128)
+                                     size_t messageQueueCapacity = 512)
         {
             actions.reserve(10);
             reserveFn(activeState);
