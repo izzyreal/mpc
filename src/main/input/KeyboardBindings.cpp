@@ -16,7 +16,7 @@ KeyboardBindings::lookupComponent(hardware::ComponentId id) const
     {
         if (binding.componentId == id)
         {
-            if (binding.direction == Direction::None)
+            if (binding.direction == Direction::NoDirection)
             {
                 result.push_back(key);
                 break; // only first one for non-directional bindings

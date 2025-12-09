@@ -4,7 +4,7 @@ namespace mpc::sequencer
 {
     enum class RecordingMode
     {
-        None,
+        NoRecordingMode,
         Overdub,
         Step,
         RecMainWithoutPlaying

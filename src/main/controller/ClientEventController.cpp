@@ -105,7 +105,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
         return RecordingMode::RecMainWithoutPlaying;
     }
 
-    return RecordingMode::None;
+    return RecordingMode::NoRecordingMode;
 }
 
 std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()

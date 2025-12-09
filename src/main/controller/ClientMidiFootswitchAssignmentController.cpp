@@ -47,7 +47,7 @@ void ClientMidiFootswitchAssignmentController::pressButton(ComponentId id) const
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = id;
-    ev.type = ClientHardwareEvent::Type::ButtonPress;
+    ev.type = ClientHardwareEvent::Type::MpcButtonPress;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
@@ -57,7 +57,7 @@ void ClientMidiFootswitchAssignmentController::releaseButton(
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = id;
-    ev.type = ClientHardwareEvent::Type::ButtonRelease;
+    ev.type = ClientHardwareEvent::Type::MpcButtonRelease;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 

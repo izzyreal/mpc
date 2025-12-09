@@ -135,10 +135,10 @@ void ClientHardwareEventController::handleClientHardwareEvent(
         case ClientHardwareEvent::Type::PotMove:
             handlePot(event);
             break;
-        case ClientHardwareEvent::Type::ButtonPress:
+        case ClientHardwareEvent::Type::MpcButtonPress:
             handleButtonPress(event);
             break;
-        case ClientHardwareEvent::Type::ButtonRelease:
+        case ClientHardwareEvent::Type::MpcButtonRelease:
             handleButtonRelease(event);
             break;
         case ClientHardwareEvent::Type::ButtonDoublePress:

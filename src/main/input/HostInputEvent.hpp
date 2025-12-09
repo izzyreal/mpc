@@ -43,7 +43,7 @@ namespace mpc::input
 
         enum class Movement
         {
-            None,     // No movement data (e.g. BEGIN/END/REPEAT events).
+            NoMovement,     // No movement data (e.g. BEGIN/END/REPEAT events).
             Absolute, // Absolute motion in normalized coordinates (e.g. mouse
                       // drag along a slider).
             Relative  // Relative motion in continuous deltas (e.g. mouse wheel
@@ -60,7 +60,7 @@ namespace mpc::input
         Type type;
 
         // Specifies whether this event represents absolute or relative motion.
-        Movement movement = Movement::None;
+        Movement movement = Movement::NoMovement;
 
         // Normalized pointer position in [0, 1] relative to the component's
         // bounds

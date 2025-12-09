@@ -133,13 +133,13 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     else
                     {
                         clientHardwareEvent.type =
-                            ClientHardwareEvent::Type::ButtonPress;
+                            ClientHardwareEvent::Type::MpcButtonPress;
                     }
                 }
                 else if (gesture.type == GestureEvent::Type::END)
                 {
                     clientHardwareEvent.type =
-                        ClientHardwareEvent::Type::ButtonRelease;
+                        ClientHardwareEvent::Type::MpcButtonRelease;
                 }
                 else
                 {
@@ -292,7 +292,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
                 const auto direction = binding->direction;
 
-                if (direction == Direction::None)
+                if (direction == Direction::NoDirection)
                 {
                     throw std::invalid_argument(
                         "DataWheel bindings must have a Direction");
@@ -318,8 +318,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             else
             {
                 clientHardwareEvent.type =
-                    keyDown ? ClientHardwareEvent::Type::ButtonPress
-                            : ClientHardwareEvent::Type::ButtonRelease;
+                    keyDown ? ClientHardwareEvent::Type::MpcButtonPress
+                            : ClientHardwareEvent::Type::MpcButtonRelease;
             }
             break;
         }
@@ -342,8 +342,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             "both.");
     }
 
-    if (clientHardwareEvent.type == ClientHardwareEvent::Type::ButtonPress ||
-        clientHardwareEvent.type == ClientHardwareEvent::Type::ButtonRelease ||
+    if (clientHardwareEvent.type == ClientHardwareEvent::Type::MpcButtonPress ||
+        clientHardwareEvent.type == ClientHardwareEvent::Type::MpcButtonRelease ||
         clientHardwareEvent.type ==
             ClientHardwareEvent::Type::ButtonDoublePress)
     {

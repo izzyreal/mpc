@@ -35,8 +35,8 @@ namespace mpc::client::event
             DataWheelTurn,
             SliderMove,
             PotMove,
-            ButtonPress,
-            ButtonRelease,
+            MpcButtonPress,
+            MpcButtonRelease,
             ButtonDoublePress,
             HostFocusLost,
             ButtonPressAndRelease

@@ -12,7 +12,7 @@ namespace mpc::input
 
     enum class Direction
     {
-        None,
+        NoDirection,
         Positive,
         Negative
     };
@@ -25,7 +25,7 @@ namespace mpc::input
                 return +1;
             case Direction::Negative:
                 return -1;
-            case Direction::None:
+            case Direction::NoDirection:
             default:
                 return 0;
         }
@@ -34,7 +34,7 @@ namespace mpc::input
     struct KeyboardBinding
     {
         hardware::ComponentId componentId;
-        Direction direction = Direction::None;
+        Direction direction = Direction::NoDirection;
     };
 
     class KeyboardBindings
