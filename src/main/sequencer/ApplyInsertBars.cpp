@@ -70,6 +70,12 @@ void SequenceStateHandler::applyInsertBars(
             auto it = seq.tracks[i].eventsHead;
             while (it)
             {
+                if (i == TempoChangeTrackIndex && it->tick == 0)
+                {
+                    it = it->next;
+                    continue;
+                }
+
                 if (it->tick >= barStart)
                 {
                     const Tick newTick = it->tick + (newBarStart - barStart);

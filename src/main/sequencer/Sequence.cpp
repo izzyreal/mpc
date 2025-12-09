@@ -220,13 +220,13 @@ void Sequence::init(const int newLastBarIndex) const
     }
 
     setLastBarIndex(newLastBarIndex);
-    addTempoChangeEvent(0, 1000);
 
     for (int i = 0; i <= newLastBarIndex; ++i)
     {
-        manager->enqueue(SetTimeSignature{getSequenceIndex(), BarIndex(i),
-                                          userScreen->timeSig});
+        dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(i), userScreen->timeSig});
     }
+
+    addTempoChangeEvent(0, 1000);
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);
