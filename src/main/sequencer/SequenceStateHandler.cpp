@@ -236,7 +236,7 @@ void SequenceStateHandler::applyUpdateSequenceEvents(const UpdateSequenceEvents 
 
     for (auto &[trackIndex, events] : m.trackSnapshots)
     {
-        assert(trackIndex >= 0 && trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
+        assert(trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
         assert(trackIndex != TempoChangeTrackIndex);
 
         auto &track = state.sequences[m.sequence].tracks[trackIndex];

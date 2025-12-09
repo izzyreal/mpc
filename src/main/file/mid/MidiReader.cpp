@@ -21,6 +21,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::file::mid;
 using namespace mpc::file::mid::event;
@@ -48,6 +49,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
     auto sequence = dest.lock();
     sequence->setUsed(true);
+
+    UpdateSequenceEvents updateSequenceEvents{sequence->getSequenceIndex()};
 
     bool isMpc2000XlMidiFile = false;
 
@@ -375,7 +378,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     e.mixerParameter = sysExEventBytes[4] - 1;
                     e.mixerPad = sysExEventBytes[5];
                     e.mixerValue = sysExEventBytes[6];
-                    track->acquireAndInsertEvent(e);
+                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                        .push_back(e);
                 }
                 else
                 {
@@ -401,7 +405,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     //
                     // e->setBytes(tmp);
 
-                    track->acquireAndInsertEvent(e);
+                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                        .push_back(e);
                 }
             }
             else if (const auto noteAfterTouch =
@@ -413,7 +418,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.tick = noteAfterTouch->getTick();
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
                 e.amount = noteAfterTouch->getAmount();
-                track->acquireAndInsertEvent(e);
+                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    .push_back(e);
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
@@ -423,7 +429,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
-                track->acquireAndInsertEvent(e);
+                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    .push_back(e);
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
@@ -433,7 +440,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ProgramChange;
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
-                track->acquireAndInsertEvent(e);
+                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    .push_back(e);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
@@ -449,7 +457,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ControlChange;
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
-                track->acquireAndInsertEvent(e);
+                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    .push_back(e);
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
@@ -458,10 +467,13 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
-                track->acquireAndInsertEvent(e);
+                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    .push_back(e);
             }
         }
     }
+
+    mpc.getSequencer()->getStateManager()->enqueue(updateSequenceEvents);
 }
 
 bool MidiReader::isInteger(const std::string &s)

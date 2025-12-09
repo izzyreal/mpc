@@ -335,7 +335,8 @@ void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
     for (int i = 0; i < source->getBarCount(); ++i)
     {
         dest->insertBars(1, BarIndex(i));
-        dest->setTimeSignature(i, sourceTimeSigs[i].numerator, sourceTimeSigs[i].denominator);
+        dest->setTimeSignature(i, sourceTimeSigs[i].numerator,
+                               sourceTimeSigs[i].denominator);
     }
 
     dest->setFirstLoopBarIndex(source->getFirstLoopBarIndex());
@@ -566,10 +567,22 @@ void Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
 
     copySequenceParameters(source, destIndex);
 
-    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; i++)
+    copyTrack(source->getTrack(TempoChangeTrackIndex),
+              sequences[destIndex]->getTrack(TempoChangeTrackIndex));
+
+    UpdateSequenceEvents updateSequenceEvents{destIndex};
+
+    for (const auto &t : source->getTracks())
     {
-        copyTrack(source->getTrack(i), sequences[destIndex]->getTrack(i));
+        if (t->getIndex() > Mpc2000XlSpecs::LAST_TRACK_INDEX)
+        {
+            break;
+        }
+
+        updateSequenceEvents.trackSnapshots[t->getIndex()] = t->getEventStates();
     }
+
+    getStateManager()->enqueue(updateSequenceEvents);
 }
 
 void Sequencer::copySong(const int source, const int dest) const
