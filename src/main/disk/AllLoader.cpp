@@ -101,7 +101,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         }
 
         auto mpcSeq = mpcSequencer->getSequence(index++);
-        as->applyToMpcSeq(mpcSeq, mpcSequencer->getStateManager().get());
+        as->applyToInMemorySequence(mpcSeq, mpcSequencer->getStateManager().get());
     }
 
     auto allParserSequencer = allParser.getSequencer();
@@ -335,7 +335,7 @@ AllLoader::loadOneSequenceFromFile(Mpc &mpc, MpcFile *f,
 
     const auto sequence = sequencer->getSequence(destIndexInMpcMemory);
 
-    allSequences[sourceIndexInAllFile]->applyToMpcSeq(
+    allSequences[sourceIndexInAllFile]->applyToInMemorySequence(
         sequence, sequencer->getStateManager().get());
 
     return sequence;

@@ -108,25 +108,26 @@ AllSequence::~AllSequence()
     }
 }
 
-void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
-                                const SequencerStateManager *manager) const
+void AllSequence::applyToInMemorySequence(
+    const std::shared_ptr<Sequence> &inMemorySequence,
+    const SequencerStateManager *manager) const
 {
-    mpcSeq->init(barCount - 1);
+    inMemorySequence->init(barCount - 1);
 
     for (int i = 0; i < barCount; i++)
     {
         const auto num = barList->getBars()[i]->getNumerator();
         const auto den = barList->getBars()[i]->getDenominator();
-        mpcSeq->setTimeSignature(i, num, den);
+        inMemorySequence->setTimeSignature(i, num, den);
     }
 
-    mpcSeq->setName(name);
-    mpcSeq->setInitialTempo(tempo);
+    inMemorySequence->setName(name);
+    inMemorySequence->setInitialTempo(tempo);
     const auto at = tracks;
 
     for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
-        const auto t = mpcSeq->getTrack(i);
+        const auto t = inMemorySequence->getTrack(i);
 
         constexpr bool updateUsedness = false;
 
@@ -140,10 +141,12 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
         t->setTransmitProgramChangesEnabled(
             at->isTransmitProgramChangesEnabled(i));
 
-        manager->enqueue(SetTrackUsed{mpcSeq->getSequenceIndex(), TrackIndex(i),
-                                      at->isUsed(i)});
+        manager->enqueue(SetTrackUsed{inMemorySequence->getSequenceIndex(),
+                                      TrackIndex(i), at->isUsed(i)});
     }
 
+    UpdateSequenceEvents updateSequenceEvents{
+        inMemorySequence->getSequenceIndex()};
     for (int j = 0; j < getEventAmount(); j++)
     {
         auto e = allEvents[j];
@@ -153,31 +156,31 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq,
             continue;
         }
 
-        const int track = e.trackIndex;
-
-        mpcSeq->getTrack(track)->acquireAndInsertEvent(e);
+        updateSequenceEvents.trackSnapshots[e.trackIndex].push_back(e);
     }
+
+    manager->enqueue(updateSequenceEvents);
 
     for (int i = 0; i < 32; i++)
     {
-        mpcSeq->setDeviceName(i, devNames[i]);
+        inMemorySequence->setDeviceName(i, devNames[i]);
     }
 
-    mpcSeq->setFirstLoopBarIndex(BarIndex(loopFirst));
-    mpcSeq->setLastLoopBarIndex(BarIndex(loopLast));
-    mpcSeq->setLastLoopBarIndex(BarIndex(loopLast));
+    inMemorySequence->setFirstLoopBarIndex(BarIndex(loopFirst));
+    inMemorySequence->setLastLoopBarIndex(BarIndex(loopLast));
+    inMemorySequence->setLastLoopBarIndex(BarIndex(loopLast));
 
     if (loopLastEnd)
     {
-        mpcSeq->setLastLoopBarIndex(EndOfSequence);
+        inMemorySequence->setLastLoopBarIndex(EndOfSequence);
     }
 
-    mpcSeq->setLoopEnabled(loop);
-    mpcSeq->getStartTime().hours = startTime.hours;
-    mpcSeq->getStartTime().minutes = startTime.minutes;
-    mpcSeq->getStartTime().seconds = startTime.seconds;
-    mpcSeq->getStartTime().frames = startTime.frames;
-    mpcSeq->getStartTime().frameDecimals = startTime.frameDecimals;
+    inMemorySequence->setLoopEnabled(loop);
+    inMemorySequence->getStartTime().hours = startTime.hours;
+    inMemorySequence->getStartTime().minutes = startTime.minutes;
+    inMemorySequence->getStartTime().seconds = startTime.seconds;
+    inMemorySequence->getStartTime().frames = startTime.frames;
+    inMemorySequence->getStartTime().frameDecimals = startTime.frameDecimals;
 }
 
 AllSequence::AllSequence(Sequence *seq, int number)

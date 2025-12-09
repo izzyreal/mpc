@@ -19,12 +19,14 @@ namespace mpc::sequencer
         void applyMessage(SequencerState &,
                           std::vector<utils::SimpleAction> &actions,
                           const SequenceMessage &) const;
-
     private:
         SequencerStateManager *manager;
         Sequencer *sequencer;
 
         void applyInsertBars(const InsertBars &, SequencerState &,
                              std::vector<utils::SimpleAction> &) const noexcept;
+
+        void applyUpdateSequenceEvents(const UpdateSequenceEvents &m,
+                                       SequencerState &state) const;
     };
 } // namespace mpc::sequencer

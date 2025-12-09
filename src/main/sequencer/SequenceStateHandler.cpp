@@ -214,7 +214,44 @@ void SequenceStateHandler::applyMessage(
                 applyMessage(state, actions,
                              DeleteTrack{m.sequenceIndex, TrackIndex(i)});
             }
+        },
+        [&](const UpdateSequenceEvents &m)
+        {
+            applyUpdateSequenceEvents(m, state);
         }};
 
     std::visit(visitor, msg);
+}
+
+void SequenceStateHandler::applyUpdateSequenceEvents(const UpdateSequenceEvents &m,
+                                          SequencerState &state) const
+{
+    auto &lock = manager->sequenceLocks[m.sequence];
+
+    if (!lock.try_acquire())
+    {
+        manager->enqueue(m);
+        return;
+    }
+
+    for (auto &[trackIndex, events] : m.trackSnapshots)
+    {
+        assert(trackIndex >= 0 && trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
+        assert(trackIndex != TempoChangeTrackIndex);
+
+        auto &track = state.sequences[m.sequence].tracks[trackIndex];
+
+        for (const auto &src : events)
+        {
+            EventData *e = manager->acquireEvent();
+            std::memcpy(e, &src, sizeof(EventData));
+            e->sequenceIndex = m.sequence;
+            e->trackIndex = TrackIndex(trackIndex);
+            e->prev = nullptr;
+            e->next = nullptr;
+            manager->insertAcquiredEvent(track, e);
+        }
+    }
+
+    lock.release();
 }

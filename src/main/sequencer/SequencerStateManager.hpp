@@ -47,6 +47,9 @@ namespace mpc::sequencer
                    Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
             trackLocks;
 
+        std::array<concurrency::SpinLock, Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
+            sequenceLocks;
+
         void applyCopyBars(const CopyBars &) noexcept;
 
         EventData *recordNoteEventLive(SequenceIndex, TrackIndex, NoteNumber,
