@@ -87,15 +87,6 @@ namespace mpc::performance
     {
     };
 
-    struct UpdateProgramsBulk
-    {
-        std::array<Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT> programs{};
-
-        UpdateProgramsBulk() = default;
-
-        MPC_NON_COPYABLE(UpdateProgramsBulk)
-    };
-
     struct UpdateProgramMidiProgramChange
     {
         ProgramIndex programIndex;
@@ -156,7 +147,7 @@ namespace mpc::performance
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramsBulk, UpdateProgramMidiProgramChange,
+        UpdateProgramBulk, UpdateProgramMidiProgramChange,
         SetProgramUsed, RepairProgramReferences>;
 
     struct PerformanceMessage

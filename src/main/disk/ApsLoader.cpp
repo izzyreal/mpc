@@ -138,14 +138,13 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         }
     }
 
-    std::array<performance::Program, Mpc2000XlSpecs::MAX_PROGRAM_COUNT>
-        perfPrograms{};
-
     for (auto &apsProgram : apsParser.getPrograms())
     {
         sampler->getProgram(apsProgram->index)->setName(apsProgram->getName());
 
-        auto &perfProgram = perfPrograms[apsProgram->index];
+        performance::UpdateProgramBulk msg;
+        auto &perfProgram = msg.program;
+        msg.programIndex = ProgramIndex(apsProgram->index);
         perfProgram.used = true;
 
         auto assignTable = apsProgram->getAssignTable()->get();
@@ -254,11 +253,10 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         perfProgram.slider.tuneHighRange =
             apsProgram->getSlider()->getTuneHigh();
         perfProgram.slider.tuneLowRange = apsProgram->getSlider()->getTuneLow();
-    }
 
-    performance::UpdateProgramsBulk payload{perfPrograms};
-    mpc.getPerformanceManager().lock()->enqueue(
-        performance::PerformanceMessage(std::move(payload)));
+        mpc.getPerformanceManager().lock()->enqueue(
+            performance::PerformanceMessage{std::move(msg)});
+    }
 
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
