@@ -110,12 +110,14 @@ void Mpc::init()
 
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
 
+    performanceManager = std::make_shared<performance::PerformanceManager>();
+
     sampler = std::make_shared<Sampler>(
         *this,
-        [&](const ProgramIndex programIndex)
+        GetProgramFn([manager = performanceManager.get()](const ProgramIndex programIndex)
         {
-            return performanceManager->getSnapshot().getProg(programIndex);
-        },
+            return manager->getSnapshot().getProg(programIndex);
+        }),
         [&](performance::PerformanceMessage &&m)
         {
             performanceManager->enqueue(std::move(m));
@@ -132,8 +134,6 @@ void Mpc::init()
 
     eventHandler = std::make_shared<audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
-
-    performanceManager = std::make_shared<performance::PerformanceManager>();
 
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);

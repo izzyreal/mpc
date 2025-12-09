@@ -9,7 +9,7 @@ using namespace mpc::sampler;
 
 NoteParameters::NoteParameters(
     const int index, const std::function<ProgramIndex()> &getProgramIndex,
-    const std::function<performance::NoteParameters()> &getSnapshot,
+    const GetNoteParametersFn &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : index(index), getProgramIndex(getProgramIndex), getSnapshot(getSnapshot),
       dispatch(dispatch)

@@ -42,7 +42,7 @@ void PerformanceManager::registerPhysicalPadPress(
     const Velocity velocity, const TrackIndex trackIndex,
     const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
     const std::optional<NoteNumber> noteNumber,
-    const std::function<void(void *)> &action) const
+    const std::function<void(const void *)> &action) const
 {
     PhysicalPadPressEvent e{padIndex,
                             source,
@@ -65,7 +65,7 @@ void PerformanceManager::registerPhysicalPadPress(
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
     const PerformanceEventSource source,
-    const std::function<void(void *)> &action) const
+    const std::function<void(const void *)> &action) const
 {
     PhysicalPadAftertouchEvent e{padIndex, pressure};
 
@@ -78,7 +78,7 @@ void PerformanceManager::registerPhysicalPadAftertouch(
 
 void PerformanceManager::registerPhysicalPadRelease(
     const PhysicalPadIndex padIndex, const PerformanceEventSource source,
-    const std::function<void(void *)> &action) const
+    const std::function<void(const void *)> &action) const
 {
     PhysicalPadReleaseEvent e{padIndex};
 
@@ -129,7 +129,7 @@ void PerformanceManager::registerProgramPadAftertouch(
 
 void PerformanceManager::registerProgramPadRelease(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
-    const ProgramIndex program, const std::function<void(void *)> &action) const
+    const ProgramIndex program, const std::function<void(const void *)> &action) const
 {
     ProgramPadReleaseEvent e{padIndex, program};
 
@@ -146,7 +146,7 @@ NoteOnEvent PerformanceManager::registerNoteOn(
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
     const Velocity velocity, const std::optional<ProgramIndex> programIndex,
-    const std::function<void(void *)> &action) const
+    const std::function<void(const void *)> &action) const
 {
     NoteOnEvent e{noteNumber,
                   source,
@@ -183,7 +183,7 @@ void PerformanceManager::registerNoteAftertouch(
 void PerformanceManager::registerNoteOff(
     const PerformanceEventSource source, const NoteNumber noteNumber,
     const std::optional<MidiChannel> midiInputChannel,
-    const std::function<void(void *)> &action) const
+    const std::function<void(const void *)> &action) const
 {
     NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel)};
 
@@ -394,7 +394,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.physicalPadEvents.push_back(payload);
                 actions.emplace_back(
-                    [a = msg.action, ev = payload]() mutable
+                    [a = msg.action, ev = payload]
                     {
                         a(&ev);
                     });
@@ -408,7 +408,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     {
                         e.pressure = payload.pressure;
                         actions.emplace_back(
-                            [a = msg.action, e]() mutable
+                            [a = msg.action, e]
                             {
                                 a(&e);
                             });
@@ -428,7 +428,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 if (it == activeState.physicalPadEvents.end())
                 {
                     actions.emplace_back(
-                        [a = msg.action]() mutable
+                        [a = msg.action]
                         {
                             a(nullptr);
                         });
@@ -436,7 +436,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 }
 
                 actions.emplace_back(
-                    [a = msg.action, e = *it]() mutable
+                    [a = msg.action, e = *it]
                     {
                         a(&e);
                     });
@@ -446,7 +446,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.programPadEvents.push_back(payload);
                 actions.emplace_back(
-                    [a = msg.action, ev = payload]() mutable
+                    [a = msg.action, ev = payload]
                     {
                         a(&ev);
                     });
@@ -460,7 +460,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     {
                         e.pressure = payload.pressure;
                         actions.emplace_back(
-                            [a = msg.action, e]() mutable
+                            [a = msg.action, e]
                             {
                                 a(&e);
                             });
@@ -482,7 +482,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 if (it == activeState.programPadEvents.end())
                 {
                     actions.emplace_back(
-                        [a = msg.action]() mutable
+                        [a = msg.action]
                         {
                             a(nullptr);
                         });
@@ -490,7 +490,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 }
 
                 actions.emplace_back(
-                    [a = msg.action, e = *it]() mutable
+                    [a = msg.action, e = *it]
                     {
                         a(&e);
                     });
@@ -500,7 +500,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.noteEvents.push_back(payload);
                 actions.emplace_back(
-                    [a = msg.action, ev = payload]() mutable
+                    [a = msg.action, ev = payload]
                     {
                         a(&ev);
                     });
@@ -515,7 +515,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                     {
                         e.pressure = payload.pressure;
                         actions.emplace_back(
-                            [a = msg.action, e]() mutable
+                            [a = msg.action, e]
                             {
                                 a(&e);
                             });
@@ -538,7 +538,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 if (it == activeState.noteEvents.end())
                 {
                     actions.emplace_back(
-                        [a = msg.action]() mutable
+                        [a = msg.action]
                         {
                             a(nullptr);
                         });
@@ -546,7 +546,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 }
 
                 actions.emplace_back(
-                    [a = msg.action, e = *it]() mutable
+                    [a = msg.action, e = *it]
                     {
                         a(&e);
                     });

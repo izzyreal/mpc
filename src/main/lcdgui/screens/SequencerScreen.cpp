@@ -974,7 +974,7 @@ void SequencerScreen::openWindow()
     {
         mpc.getSequencer()->getSelectedTrack()->setUsedIfCurrentlyUnused(
             utils::SmallSimpleAction(
-                [layeredScreen = ls.lock()]() mutable
+                [layeredScreen = ls.lock()]
                 {
                     layeredScreen->openScreenById(ScreenId::TrackScreen);
                 }));

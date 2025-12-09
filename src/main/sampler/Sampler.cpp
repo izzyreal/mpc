@@ -44,7 +44,7 @@ using namespace mpc::engine;
 
 Sampler::Sampler(
     Mpc &mpc,
-    const std::function<performance::Program(ProgramIndex)> &getSnapshot,
+    const GetProgramFn &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : mpc(mpc), getSnapshot(getSnapshot), dispatch(dispatch)
 {
@@ -180,12 +180,8 @@ void Sampler::init()
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; ++i)
     {
-        auto getProgramSnapshot = [this, programIndex = ProgramIndex(i)]
-        {
-            return getSnapshot(programIndex);
-        };
         programs[i] = std::make_shared<Program>(ProgramIndex(i), mpc, this,
-                                                getProgramSnapshot, dispatch);
+                                                getSnapshot, dispatch);
     }
 
     const auto program = createNewProgramAddFirstAvailableSlot().lock();

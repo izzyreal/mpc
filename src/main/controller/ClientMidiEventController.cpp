@@ -213,10 +213,10 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
     const std::function action = [noteNumber = e.getNoteNumber(),
                                   velocity = e.getVelocity(), track, screen,
                                   programPadIndex, program, this, positionTicks,
-                                  metronomeOnlyPositionTicks](void *userData)
+                                  metronomeOnlyPositionTicks](const void *userData)
     {
-        const performance::NoteOnEvent *registryNoteOnEvent =
-            static_cast<performance::NoteOnEvent *>(userData);
+        const auto registryNoteOnEvent =
+            static_cast<const performance::NoteOnEvent *>(userData);
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
@@ -260,10 +260,10 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     const std::function action = [this, noteNumber, positionTicks,
                                   metronomeOnlyPositionTicks,
-                                  lockedSequencer](void *userData)
+                                  lockedSequencer](const void *userData)
     {
         const auto noteEventInfo =
-            static_cast<performance::NoteOnEvent *>(userData);
+            static_cast<const performance::NoteOnEvent *>(userData);
 
         if (!noteEventInfo)
         {
@@ -292,7 +292,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                 performanceManager.lock()->registerProgramPadRelease(
                     PerformanceEventSource::MidiInput,
                     ProgramPadIndex(programPadIndex), programIndex,
-                    [](void *) {});
+                    [](const void *) {});
             }
         }
 

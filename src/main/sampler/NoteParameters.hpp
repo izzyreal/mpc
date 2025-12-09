@@ -4,6 +4,8 @@
 #include "sampler/VoiceOverlapMode.hpp"
 #include "performance/PerformanceMessage.hpp"
 
+#include "utils/SmallFn.hpp"
+
 #include <memory>
 #include <functional>
 
@@ -15,6 +17,8 @@ namespace mpc::engine
 
 namespace mpc::sampler
 {
+    using GetNoteParametersFn = utils::SmallFn<16, performance::NoteParameters()>;
+
     class Sampler;
 
     class NoteParameters
@@ -22,7 +26,7 @@ namespace mpc::sampler
     public:
         explicit NoteParameters(
             int index, const std::function<ProgramIndex()> &getProgramIndex,
-            const std::function<performance::NoteParameters()> &getSnapshot,
+            const GetNoteParametersFn &getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
@@ -133,7 +137,7 @@ namespace mpc::sampler
     private:
         const int index;
         const std::function<ProgramIndex()> getProgramIndex;
-        const std::function<performance::NoteParameters()> getSnapshot;
+        const GetNoteParametersFn getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;
         std::shared_ptr<engine::StereoMixer> stereoMixer;
         std::shared_ptr<engine::IndivFxMixer> indivFxMixer;

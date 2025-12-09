@@ -91,7 +91,7 @@ void Track::setUsedIfCurrentlyUnused(
     if (isUsed() && getIndex() != TempoChangeTrackIndex)
     {
         postToUiThread(utils::Task(
-            [onCompleteNameSetting]() mutable
+            [onCompleteNameSetting]
             {
                 onCompleteNameSetting();
             }));
@@ -106,7 +106,7 @@ void Track::setUsedIfCurrentlyUnused(
     }
 
     postToUiThread(utils::Task(
-        [this, onCompleteNameSetting]() mutable
+        [this, onCompleteNameSetting]
         {
             setName(getDefaultTrackName(getIndex()));
             onCompleteNameSetting();

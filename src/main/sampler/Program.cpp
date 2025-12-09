@@ -15,7 +15,7 @@ using namespace mpc::engine;
 
 Program::Program(
     const ProgramIndex programIndex, Mpc &mpc, Sampler *const samplerToUse,
-    const std::function<performance::Program()> &getSnapshot,
+    const GetProgramFn &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : index(programIndex), slider(new PgmSlider()), sampler(samplerToUse),
       getSnapshot(getSnapshot), dispatch(dispatch)
@@ -24,11 +24,14 @@ Program::Program(
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto getNoteParametersSnapshot =
-            [this, drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber)]
-        {
-            return this->getSnapshot().getNoteParameters(drumNoteNumber);
-        };
+        const GetNoteParametersFn getNoteParametersSnapshot(
+            [this, programIndex,
+             drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber)]
+            {
+                return this->getSnapshot(programIndex)
+                    .getNoteParameters(drumNoteNumber);
+            });
+
         auto n = new NoteParameters(
             i,
             [this]
@@ -48,12 +51,13 @@ Program::Program(
 
 bool Program::isUsed() const
 {
-    return getSnapshot().used;
+    return getSnapshot(index).used;
 }
+
 void Program::setUsed() const
 {
     performance::PerformanceMessage msg;
-    auto p = getSnapshot();
+    auto p = getSnapshot(index);
     p.resetValuesToDefaults();
     performance::SetProgramUsed payload{index};
     msg.payload = std::move(payload);
@@ -63,7 +67,7 @@ void Program::setUsed() const
 void Program::resetToDefaultValues() const
 {
     performance::PerformanceMessage msg;
-    auto p = getSnapshot();
+    auto p = getSnapshot(index);
     p.resetValuesToDefaults();
     performance::UpdateProgramBulk payload{index, p};
     msg.payload = std::move(payload);
@@ -165,7 +169,7 @@ void Program::setNoteParameters(const int noteParametersIndex,
 
 int Program::getMidiProgramChange() const
 {
-    return getSnapshot().midiProgramChange;
+    return getSnapshot(index).midiProgramChange;
 }
 
 void Program::setMidiProgramChange(const int i) const

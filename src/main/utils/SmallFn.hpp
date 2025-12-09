@@ -11,7 +11,7 @@ namespace mpc::utils
     struct SmallFn<MaxBytes, R(Args...)>
     {
         alignas(void *) unsigned char storage[MaxBytes];
-        R (*invoke)(void *, Args...);
+        R (*invoke)(const void *, Args...);
 
         SmallFn() : storage{}, invoke(nullptr) {}
 
@@ -24,13 +24,21 @@ namespace mpc::utils
         {
             static_assert(sizeof(F) <= MaxBytes);
             new (storage) F(std::move(f));
-            invoke = [](void *p, Args... as) -> R
-            {
-                return (*static_cast<F *>(p))(std::forward<Args>(as)...);
+            invoke = [](const void *p, Args... as) -> R {
+                return (*static_cast<const F *>(p))(std::forward<Args>(as)...);
             };
         }
 
         R operator()(Args... as)
+        {
+            if (!invoke)
+            {
+                return R();
+            }
+            return invoke(storage, std::forward<Args>(as)...);
+        }
+
+        R operator()(Args... as) const
         {
             if (!invoke)
             {

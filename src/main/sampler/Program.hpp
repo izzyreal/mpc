@@ -5,8 +5,9 @@
 #include "sampler/PgmSlider.hpp"
 #include "performance/PerformanceMessage.hpp"
 
+#include "utils/SmallFn.hpp"
+
 #include <memory>
-#include <functional>
 
 namespace mpc::engine
 {
@@ -23,11 +24,13 @@ namespace mpc::sampler
 {
     class Pad;
 
+    using GetProgramFn = utils::SmallFn<8, performance::Program(ProgramIndex)>;
+
     class Program
     {
     public:
         Program(ProgramIndex, Mpc &mpc, Sampler *samplerToUse,
-                const std::function<performance::Program()> &getSnapshot,
+                const GetProgramFn &getSnapshot,
                 const std::function<void(performance::PerformanceMessage &&)>
                     &dispatch);
 
@@ -47,7 +50,7 @@ namespace mpc::sampler
         PgmSlider *const slider;
         Sampler *const sampler;
 
-        const std::function<performance::Program()> getSnapshot;
+        const GetProgramFn getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;
 
         std::vector<NoteParameters *> noteParameters;

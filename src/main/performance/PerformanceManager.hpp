@@ -33,15 +33,15 @@ namespace mpc::performance
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
             PhysicalPadIndex, Velocity, TrackIndex, controller::Bank,
             std::optional<ProgramIndex>, std::optional<NoteNumber>,
-            const std::function<void(void *)> &action) const;
+            const std::function<void(const void *)> &action) const;
 
         void registerPhysicalPadAftertouch(
             PhysicalPadIndex, Pressure, PerformanceEventSource,
-            const std::function<void(void *)> &action) const;
+            const std::function<void(const void *)> &action) const;
 
         void registerPhysicalPadRelease(
             PhysicalPadIndex, PerformanceEventSource,
-            const std::function<void(void *)> &action) const;
+            const std::function<void(const void *)> &action) const;
 
         void registerProgramPadPress(
             PerformanceEventSource, std::optional<MidiChannel> midiInputChannel,
@@ -54,14 +54,14 @@ namespace mpc::performance
 
         void registerProgramPadRelease(
             PerformanceEventSource, ProgramPadIndex, ProgramIndex,
-            const std::function<void(void *)> &action) const;
+            const std::function<void(const void *)> &action) const;
 
         NoteOnEvent
         registerNoteOn(PerformanceEventSource,
                        std::optional<MidiChannel> midiInputChannel,
                        lcdgui::ScreenId, TrackIndex, sequencer::BusType,
                        NoteNumber, Velocity, std::optional<ProgramIndex>,
-                       const std::function<void(void *)> &action) const;
+                       const std::function<void(const void *)> &action) const;
 
         void registerNoteAftertouch(
             PerformanceEventSource, NoteNumber, Pressure,
@@ -69,7 +69,7 @@ namespace mpc::performance
 
         void registerNoteOff(PerformanceEventSource, NoteNumber,
                              std::optional<MidiChannel> midiInputChannel,
-                             const std::function<void(void *)> &action) const;
+                             const std::function<void(const void *)> &action) const;
 
         void clear() const;
 

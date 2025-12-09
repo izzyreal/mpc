@@ -140,7 +140,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     mpc.getPerformanceManager().lock()->registerNoteOn(
         performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
         trackIndex, drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), note,
-        Velocity(velocityToUse), programIndex, [](void *) {});
+        Velocity(velocityToUse), programIndex, [](const void *) {});
 
     if (programPadIndex != -1)
     {
@@ -168,13 +168,13 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
             performanceManager.lock()->registerNoteOff(
                 performance::PerformanceEventSource::Sequence, note,
-                noMidiChannel, [](void *) {});
+                noMidiChannel, [](const void *) {});
 
             if (programPadIndex != -1)
             {
                 performanceManager.lock()->registerProgramPadRelease(
                     performance::PerformanceEventSource::Sequence,
-                    programPadIndex, programIndex, [](void *) {});
+                    programPadIndex, programIndex, [](const void *) {});
             }
 
             DrumNoteEventHandler::noteOff(noteOffCtx);

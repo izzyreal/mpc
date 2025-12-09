@@ -81,7 +81,7 @@ void SequenceStateHandler::applyInsertBars(
     }
 
     actions.emplace_back(
-        [a = m.onComplete, newLastBarIndex]() mutable
+        [a = m.onComplete, newLastBarIndex]
         {
             a(newLastBarIndex);
         });

@@ -154,7 +154,7 @@ namespace mpc::performance
     {
         PerformanceMessagePayload payload{};
         PerformanceEventSource source{};
-        std::function<void(void *)> action = [](void *) {};
+        std::function<void(const void *)> action = [](const void *) {};
 
         PerformanceMessage() = default;
         explicit PerformanceMessage(PerformanceMessagePayload &&payloadToUse)
