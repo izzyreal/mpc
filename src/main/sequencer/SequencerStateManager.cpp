@@ -12,6 +12,8 @@
 #include "sequencer/TransportStateHandler.hpp"
 #include "utils/VariantUtils.hpp"
 
+#include <cstring>
+
 using namespace mpc::sequencer;
 using namespace mpc::concurrency;
 
