@@ -112,7 +112,7 @@ bool Track::isTransmitProgramChangesEnabled() const
 }
 
 void Track::setTransmitProgramChangesEnabled(const bool b,
-                                             const bool updateUsedness)
+                                             const bool updateUsedness) const
 {
     dispatch(SetTrackTransmitProgramChangesEnabled{getSequenceIndex(),
                                                    getIndex(), b});
@@ -136,7 +136,7 @@ mpc::TrackIndex Track::getIndex() const
     return trackIndex;
 }
 
-void Track::setOn(const bool b, const bool updateUsedness)
+void Track::setOn(const bool b, const bool updateUsedness) const
 {
     dispatch(SetTrackOn{getSequenceIndex(), getIndex(), b});
 
@@ -163,7 +163,7 @@ void Track::removeEvents() const
     dispatch(RemoveEvents{getSequenceIndex(), getIndex()});
 }
 
-void Track::setVelocityRatio(const int i, const bool updateUsedness)
+void Track::setVelocityRatio(const int i, const bool updateUsedness) const
 {
     dispatch(
         SetTrackVelocityRatio{getSequenceIndex(), getIndex(),
@@ -180,7 +180,7 @@ int Track::getVelocityRatio() const
     return getSnapshot(getIndex())->getVelocityRatio();
 }
 
-void Track::setProgramChange(const int i, const bool updateUsedness)
+void Track::setProgramChange(const int i, const bool updateUsedness) const
 {
     dispatch(
         SetTrackProgramChange{getSequenceIndex(), getIndex(),
@@ -196,7 +196,7 @@ int Track::getProgramChange() const
     return getSnapshot(getIndex())->getProgramChange();
 }
 
-void Track::setBusType(BusType busType, const bool updateUsedness)
+void Track::setBusType(BusType busType, const bool updateUsedness) const
 {
     using U = std::underlying_type_t<BusType>;
     constexpr U MIN = static_cast<U>(BusType::MIDI);
@@ -218,7 +218,7 @@ BusType Track::getBusType() const
     return getSnapshot(getIndex())->getBusType();
 }
 
-void Track::setDeviceIndex(const int i, const bool updateUsedness)
+void Track::setDeviceIndex(const int i, const bool updateUsedness) const
 {
     dispatch(SetTrackDeviceIndex{getSequenceIndex(), getIndex(),
                                  static_cast<uint8_t>(std::clamp(i, 0, 32))});
@@ -410,7 +410,7 @@ void Track::playNext() const
 }
 
 void Track::insertAcquiredEvent(EventData *event,
-                                const utils::SimpleAction &onComplete)
+                                const utils::SimpleAction &onComplete) const
 {
     event->sequenceIndex = getSequenceIndex();
     event->trackIndex = trackIndex;
@@ -419,7 +419,7 @@ void Track::insertAcquiredEvent(EventData *event,
 }
 
 void Track::acquireAndInsertEvent(const EventData &eventState,
-                                  const utils::SimpleAction &onComplete)
+                                  const utils::SimpleAction &onComplete) const
 {
     const auto e = manager->acquireEvent();
     *e = eventState;
@@ -428,7 +428,7 @@ void Track::acquireAndInsertEvent(const EventData &eventState,
 
 EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
                                          const Velocity velocity,
-                                         const int64_t metronomeOnlyTick)
+                                         const int64_t metronomeOnlyTick) const
 {
     if (const auto result = getSnapshot(getIndex())->findNoteEvent(tick, note))
     {

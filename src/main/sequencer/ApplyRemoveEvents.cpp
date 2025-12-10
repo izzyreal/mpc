@@ -7,14 +7,6 @@ using namespace mpc::sequencer;
 void TrackStateHandler::applyRemoveEvents(const RemoveEvents &m,
                                          SequencerState &state) const
 {
-    auto &lock = manager->trackLocks[m.sequence][m.track];
-
-    if (!lock.try_acquire())
-    {
-        manager->enqueue(m);
-        return;
-    }
-
     auto &track = state.sequences[m.sequence].tracks[m.track];
 
     EventData *cur = track.eventsHead;
@@ -27,6 +19,4 @@ void TrackStateHandler::applyRemoveEvents(const RemoveEvents &m,
         cur = nxt;
     }
     track.eventsHead = nullptr;
-
-    lock.release();
 }

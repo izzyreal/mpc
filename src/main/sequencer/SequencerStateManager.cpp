@@ -390,6 +390,8 @@ void SequencerStateManager::applyCopyTrack(const CopyTrack &m)
     t2.transmitProgramChangesEnabled = t1.transmitProgramChangesEnabled;
     t2.velocityRatio = t1.velocityRatio;
 
+    applyMessageImmediate(RemoveEvents{m.destSequenceIndex, m.destTrackIndex});
+
     const EventData *it = t1.eventsHead;
 
     while (it)

@@ -88,26 +88,26 @@ namespace mpc::sequencer
 
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
-        void setOn(bool b, bool updateUsedness = true);
+        void setOn(bool b, bool updateUsedness = true) const;
 
         void acquireAndInsertEvent(const EventData &,
-                                   const utils::SimpleAction &onComplete = {});
+                                   const utils::SimpleAction &onComplete = {}) const;
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
-                                          int64_t metronomeOnlyTick = 0);
+                                          int64_t metronomeOnlyTick = 0) const;
 
         void finalizeNoteEventNonLive(EventData *, Duration) const;
 
         void removeEvent(EventData *) const;
         void removeEvent(const std::shared_ptr<EventRef> &event) const;
         void removeEvents() const;
-        void setVelocityRatio(int i, bool updateUsedness = true);
+        void setVelocityRatio(int i, bool updateUsedness = true) const;
         int getVelocityRatio() const;
-        void setProgramChange(int i, bool updateUsedness = true);
+        void setProgramChange(int i, bool updateUsedness = true) const;
         int getProgramChange() const;
-        void setBusType(BusType, bool updateUsedness = true);
+        void setBusType(BusType, bool updateUsedness = true) const;
         BusType getBusType() const;
-        void setDeviceIndex(int i, bool updateUsedness = true);
+        void setDeviceIndex(int i, bool updateUsedness = true) const;
         int getDeviceIndex() const;
         std::shared_ptr<EventRef> getEvent(int i) const;
         void setName(const std::string &s) const;
@@ -148,7 +148,7 @@ namespace mpc::sequencer
 
         bool isTransmitProgramChangesEnabled() const;
 
-        void setTransmitProgramChangesEnabled(bool, bool updateUsedness = true);
+        void setTransmitProgramChangesEnabled(bool, bool updateUsedness = true) const;
 
     private:
         utils::PostToUiThreadFn postToUiThread;
@@ -182,6 +182,6 @@ namespace mpc::sequencer
         void updateEventTick(EventData *, int newTick) const;
 
         void insertAcquiredEvent(EventData *event,
-                                 const utils::SimpleAction &onComplete = {});
+                                 const utils::SimpleAction &onComplete = {}) const;
     };
 } // namespace mpc::sequencer
