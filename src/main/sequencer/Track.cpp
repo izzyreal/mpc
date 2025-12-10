@@ -60,7 +60,6 @@ Track::Track(
       getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
       isSoloEnabled(isSoloEnabled)
 {
-    name.reserve(Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
 }
 
 Track::~Track() {}
@@ -253,18 +252,21 @@ std::shared_ptr<EventRef> Track::getEvent(const int i) const
     return mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
 }
 
-void Track::setName(const std::string &s)
+void Track::setName(const std::string &s) const
 {
-    name = s;
+    SetTrackName msg{getSequenceIndex(), getIndex()};
+    std::snprintf(msg.name, sizeof(msg.name), "%s", s.c_str());
+    dispatch(msg);
 }
 
-std::string Track::getName()
+std::string Track::getName() const
 {
-    if (!isUsed())
+    const auto snapshot = getSnapshot(getIndex());
+    if (!snapshot->isUsed())
     {
         return "(Unused)";
     }
-    return name;
+    return std::string(snapshot->getName());
 }
 
 std::vector<EventData> Track::getEventStates() const
@@ -363,11 +365,6 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     lock.release();
 
     return result;
-}
-
-std::string Track::getActualName()
-{
-    return name;
 }
 
 int Track::getNextTick() const

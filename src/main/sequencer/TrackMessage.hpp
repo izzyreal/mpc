@@ -113,10 +113,17 @@ namespace mpc::sequencer
         bool enabled;
     };
 
+    struct SetTrackName
+    {
+        SequenceIndex sequenceIndex;
+        TrackIndex trackIndex;
+        char name[Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH + 1];
+    };
+
     using TrackMessage = std::variant<
         InsertAcquiredEvent, RemoveEvents, RemoveEvent, UpdateEventTick,
         RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, UpdateEvents,
         SetTrackUsed, SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
         SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex,
-        SetTrackTransmitProgramChangesEnabled>;
+        SetTrackTransmitProgramChangesEnabled, SetTrackName>;
 } // namespace mpc::sequencer

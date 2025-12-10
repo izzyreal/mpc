@@ -68,8 +68,7 @@ void LoadASequenceScreen::function(const int i)
         case 4:
         {
             const auto lockedSequencer = sequencer.lock();
-            lockedSequencer->copySequence(
-                lockedSequencer->getSequence(TempSequenceIndex), loadInto);
+            lockedSequencer->copySequence(TempSequenceIndex, loadInto);
             lockedSequencer->setSelectedSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;

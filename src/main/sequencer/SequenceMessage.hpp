@@ -112,11 +112,17 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
     };
 
+    struct SetSequenceName
+    {
+        SequenceIndex sequenceIndex;
+        char name[Mpc2000XlSpecs::MAX_SEQUENCE_NAME_LENGTH + 1];
+    };
+
     using SequenceMessage =
         std::variant<TrackMessage, SetLastBarIndex, InsertBars, SetInitialTempo,
                      SetTimeSignature, SetLoopEnabled, SetSequenceUsed,
                      SetTempoChangeEnabled, SetFirstLoopBarIndex,
                      SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,
                      DeleteTrack, DeleteAllTracks, DeleteBars,
-                     UpdateSequenceEvents>;
+                     UpdateSequenceEvents, SetSequenceName>;
 } // namespace mpc::sequencer

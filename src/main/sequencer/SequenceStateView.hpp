@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <vector>
+#include <string_view>
 
 namespace mpc::sequencer
 {
@@ -15,6 +16,8 @@ namespace mpc::sequencer
     {
     public:
         explicit SequenceStateView(const SequenceState &s) noexcept;
+
+        std::string_view getName() const;
 
         std::shared_ptr<TrackStateView> getTrack(int trackIndex) const;
         Tick getBarLength(int barIndex) const;

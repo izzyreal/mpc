@@ -122,7 +122,7 @@ void Sequencer::playTick(const Tick tick) const
             }
         }
 
-        stateManager->processLiveNoteEventRecordingQueues(
+        getStateManager()->processLiveNoteEventRecordingQueues(
             tick, *seq->getSnapshot(seq->getSequenceIndex()));
 
         for (const auto &track : seq->getTracks())
@@ -137,7 +137,7 @@ void Sequencer::playTick(const Tick tick) const
 
 SequenceIndex Sequencer::getSelectedSequenceIndex() const
 {
-    return stateManager->getSnapshot().getSelectedSequenceIndex();
+    return getStateManager()->getSnapshot().getSelectedSequenceIndex();
 }
 
 std::shared_ptr<Track> Sequencer::getSelectedTrack()
@@ -215,13 +215,6 @@ std::shared_ptr<EventHandler> Sequencer::getEventHandler()
     return eventHandler;
 }
 
-void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
-                          const std::shared_ptr<Track> &dest) const
-{
-    dest->setEventStates(src->getEventStates());
-    copyTrackParameters(src, dest);
-}
-
 void Sequencer::makeNewSequence(const SequenceIndex sequenceIndex)
 {
     makeNewSequence(sequences[sequenceIndex]);
@@ -232,12 +225,12 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
 {
     const std::function dispatch = [this](SequencerMessage &&m)
     {
-        stateManager->enqueue(std::move(m));
+        getStateManager()->enqueue(std::move(m));
     };
 
     const std::function getSnapshot = [this](const SequenceIndex sequenceIndex)
     {
-        return stateManager->getSnapshot().getSequenceState(sequenceIndex);
+        return getStateManager()->getSnapshot().getSequenceState(sequenceIndex);
     };
 
     destination = std::make_shared<Sequence>(
@@ -353,8 +346,8 @@ void Sequencer::copyTrackParameters(const std::shared_ptr<Track> &source,
     dest->setVelocityRatio(source->getVelocityRatio());
     dest->setProgramChange(source->getProgramChange());
     dest->setName(source->getName());
-    stateManager->enqueue(SetTrackUsed{dest->getSequenceIndex(),
-                                       dest->getIndex(), source->isUsed()});
+    getStateManager()->enqueue(SetTrackUsed{
+        dest->getSequenceIndex(), dest->getIndex(), source->isUsed()});
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
@@ -477,7 +470,7 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 }
 
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
-                                         const bool shouldSetPositionTo0)
+                                         const bool shouldSetPositionTo0) const
 {
     if (!transport->isPlaying() &&
         sequenceIndexToUse != getSelectedSequenceIndex())
@@ -485,7 +478,7 @@ void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
         resetUndo();
     }
 
-    stateManager->enqueue(SetSelectedSequenceIndex{
+    getStateManager()->enqueue(SetSelectedSequenceIndex{
         std::clamp(sequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex),
         shouldSetPositionTo0});
 }
@@ -515,32 +508,24 @@ int Sequencer::getSelectedTrackIndex() const
     return selectedTrackIndex;
 }
 
-void Sequencer::undoSeq()
+void Sequencer::undoSeq() const
 {
-    const auto selectedSequence = getSelectedSequence();
-    const auto selectedSequenceIndex = selectedSequence->getSequenceIndex();
-
-    if (transport->isPlaying() || !sequences[UndoSequenceIndex]->isUsed() ||
-        !selectedSequence)
+    if (transport->isPlaying() || !sequences[UndoSequenceIndex]->isUsed())
     {
         return;
     }
 
-    postToAudioThread(utils::Task(
-        [this, selectedSequence, selectedSequenceIndex]
+    getStateManager()->enqueue(UndoSequence{});
+    getStateManager()->enqueueCallback(utils::SimpleAction(
+        [this]
         {
-            copySequence(selectedSequence, TempSequenceIndex);
-            stateManager->drainQueue();
-            copySequence(sequences[UndoSequenceIndex], selectedSequenceIndex);
-            stateManager->drainQueue();
-            copySequence(sequences[TempSequenceIndex], UndoSequenceIndex);
-            undoSeqAvailable = !undoSeqAvailable;
             hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
-                ->setEnabled(undoSeqAvailable);
+                ->setEnabled(
+                    getStateManager()->getSnapshot().isUndoSequenceAvailable());
         }));
 }
 
-void Sequencer::deleteAllSequences()
+void Sequencer::deleteAllSequences() const
 {
     for (int i = 0; i < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT; ++i)
     {
@@ -557,32 +542,16 @@ void Sequencer::deleteSequence(const int i) const
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
     sequences[i]->setName(res);
-    stateManager->enqueue(DeleteSequence{SequenceIndex(i)});
+    getStateManager()->enqueue(DeleteSequence{SequenceIndex(i)});
 }
 
-void Sequencer::copySequence(const std::shared_ptr<Sequence> &source,
-                             const SequenceIndex destIndex) const
+void Sequencer::copySequence(const SequenceIndex sourceIndex,
+                             const SequenceIndex destIndex,
+                             const utils::SimpleAction &onComplete) const
 {
-    sequences[destIndex]->init(source->getLastBarIndex());
-
-    copySequenceParameters(source, destIndex);
-
-    copyTrack(source->getTrack(TempoChangeTrackIndex),
-              sequences[destIndex]->getTrack(TempoChangeTrackIndex));
-
-    UpdateSequenceEvents updateSequenceEvents{destIndex};
-
-    for (const auto &t : source->getTracks())
-    {
-        if (t->getIndex() > Mpc2000XlSpecs::LAST_TRACK_INDEX)
-        {
-            break;
-        }
-
-        updateSequenceEvents.trackSnapshots[t->getIndex()] = t->getEventStates();
-    }
-
-    getStateManager()->enqueue(updateSequenceEvents);
+    CopySequence msg{sourceIndex, destIndex};
+    getStateManager()->enqueue(msg);
+    getStateManager()->enqueueCallback(onComplete);
 }
 
 void Sequencer::copySong(const int source, const int dest) const
@@ -631,9 +600,11 @@ void Sequencer::copyTrack(const int sourceTrackIndex, const int destTrackIndex,
         return;
     }
 
-    const auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
-    const auto dest = sequences[destSequenceIndex]->getTrack(destTrackIndex);
-    copyTrack(src, dest);
+    CopyTrack msg{SequenceIndex(sourceSequenceIndex),
+                  SequenceIndex(destSequenceIndex),
+                  TrackIndex(sourceTrackIndex), TrackIndex(destTrackIndex)};
+
+    getStateManager()->enqueue(msg);
 }
 
 std::vector<std::string> &Sequencer::getDefaultTrackNames()
@@ -1011,7 +982,7 @@ std::shared_ptr<Song> Sequencer::getSelectedSong() const
 
 void Sequencer::deleteSong(const int i) const
 {
-    stateManager->enqueue(DeleteSong{SongIndex(i)});
+    getStateManager()->enqueue(DeleteSong{SongIndex(i)});
 }
 
 bool Sequencer::isSongModeEnabled() const
@@ -1042,32 +1013,32 @@ void Sequencer::setSecondSequenceEnabled(const bool b)
 
 void Sequencer::flushTrackNoteCache() const
 {
-    stateManager->flushNoteCache();
+    getStateManager()->flushNoteCache();
 }
 
-void Sequencer::copySelectedSequenceToUndoSequence()
+void Sequencer::copySelectedSequenceToUndoSequence() const
 {
-    copySequence(getSelectedSequence(), UndoSequenceIndex);
-
-    undoSeqAvailable = true;
-
-    layeredScreen->postToUiThread(utils::Task(
+    const utils::SimpleAction onComplete(
         [this]
         {
+            getStateManager()->applyMessageImmediate(
+                SetUndoSequenceAvailable{true});
             hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
-        }));
+        });
+
+    copySequence(getSelectedSequenceIndex(), UndoSequenceIndex, onComplete);
 }
 
-void Sequencer::resetUndo()
+void Sequencer::resetUndo() const
 {
-    undoSeqAvailable = false;
+    getStateManager()->enqueue(SetUndoSequenceAvailable{false});
     hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
 SongIndex Sequencer::getSelectedSongIndex() const
 {
-    return stateManager->getSnapshot().getSelectedSongIndex();
+    return getStateManager()->getSnapshot().getSelectedSongIndex();
 }
 
 void Sequencer::setSelectedSongIndex(const SongIndex songIndex) const
@@ -1078,12 +1049,13 @@ void Sequencer::setSelectedSongIndex(const SongIndex songIndex) const
             ? NoSequenceIndex
             : song->getStep(MinSongStepIndex).sequenceIndex;
 
-    stateManager->enqueue(SetSelectedSongIndex{songIndex, sequenceOfFirstStep});
+    getStateManager()->enqueue(
+        SetSelectedSongIndex{songIndex, sequenceOfFirstStep});
 }
 
 SongStepIndex Sequencer::getSelectedSongStepIndex() const
 {
-    return stateManager->getSnapshot().getSelectedSongStepIndex();
+    return getStateManager()->getSnapshot().getSelectedSongStepIndex();
 }
 
 bool Sequencer::isSelectedSongStepIndexEndOfSong() const
@@ -1111,7 +1083,7 @@ void Sequencer::setSelectedSongStepIndex(
             ? NoSequenceIndex
             : song->getStep(stepIndexToUse).sequenceIndex;
 
-    stateManager->enqueue(
+    getStateManager()->enqueue(
         SetSelectedSongStepIndex{stepIndexToUse, sequenceIndex});
 }
 

@@ -2,6 +2,7 @@
 
 #include "BusType.hpp"
 #include "IntTypes.hpp"
+#include "utils/SimpleAction.hpp"
 #include "utils/SmallFn.hpp"
 
 #include <cstdint>
@@ -133,7 +134,6 @@ namespace mpc::sequencer
         std::shared_ptr<SequencerStateManager> stateManager;
 
         std::atomic<bool> secondSequenceEnabled{false};
-        bool undoSeqAvailable = false;
 
         std::string defaultSequenceName;
         int timeDisplayStyle = 0;
@@ -147,9 +147,6 @@ namespace mpc::sequencer
         std::vector<std::string> defaultTrackNames;
         int selectedTrackIndex = 0;
         SequenceIndex nextSq{NoSequenceIndex};
-
-        void copyTrack(const std::shared_ptr<Track> &src,
-                       const std::shared_ptr<Track> &dest) const;
 
         void makeNewSequence(SequenceIndex sequenceIndex);
 
@@ -171,19 +168,19 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
+        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0) const;
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
         bool isRecordingModeMulti() const;
         int getSelectedTrackIndex() const;
 
-        void undoSeq();
-        void deleteAllSequences();
+        void undoSeq() const;
+        void deleteAllSequences() const;
         void deleteSequence(int i) const;
 
-        void copySequence(const std::shared_ptr<Sequence> &source,
-                          SequenceIndex destIndex) const;
+        void copySequence(SequenceIndex sourceIndex, SequenceIndex destIndex,
+                          const utils::SimpleAction &onComplete = {}) const;
 
         void copySong(int source, int dest) const;
 
@@ -220,8 +217,8 @@ namespace mpc::sequencer
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
         void flushTrackNoteCache() const;
-        void copySelectedSequenceToUndoSequence();
-        void resetUndo();
+        void copySelectedSequenceToUndoSequence() const;
+        void resetUndo() const;
         SongIndex getSelectedSongIndex() const;
         void setSelectedSongIndex(SongIndex) const;
         SongStepIndex getSelectedSongStepIndex() const;

@@ -86,8 +86,6 @@ namespace mpc::sequencer
         void shiftTiming(EventData *, Tick eventTick, bool later, int amount,
                          int lastTick) const;
 
-        std::string getActualName();
-
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
         void setOn(bool b, bool updateUsedness = true);
@@ -112,8 +110,8 @@ namespace mpc::sequencer
         void setDeviceIndex(int i, bool updateUsedness = true);
         int getDeviceIndex() const;
         std::shared_ptr<EventRef> getEvent(int i) const;
-        void setName(const std::string &s);
-        std::string getName();
+        void setName(const std::string &s) const;
+        std::string getName() const;
         std::vector<std::shared_ptr<EventRef>> getEvents() const;
         std::vector<EventData> getEventStates() const;
         std::vector<EventData *> getEventHandles() const;
@@ -160,7 +158,6 @@ namespace mpc::sequencer
         std::function<std::shared_ptr<TrackStateView>(TrackIndex)> getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
 
-        std::string name;
         TrackIndex trackIndex{0};
 
         std::function<int64_t()> getTickPosition;

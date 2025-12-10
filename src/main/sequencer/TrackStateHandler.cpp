@@ -152,6 +152,10 @@ void TrackStateHandler::applyMessage(SequencerState &state,
             state.sequences[m.sequenceIndex]
                 .tracks[m.trackIndex]
                 .transmitProgramChangesEnabled = m.enabled;
+        },
+        [&](const SetTrackName &m)
+        {
+            state.sequences[m.sequenceIndex].tracks[m.trackIndex].name.assign(m.name);
         }};
 
     std::visit(visitor, msg);

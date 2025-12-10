@@ -52,7 +52,7 @@ Tracks::Tracks(sequencer::Sequence *seq)
         for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
             const auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
-            auto name = StrUtil::padRight(t->getActualName(), " ",
+            auto name = StrUtil::padRight(t->getName(), " ",
                                           AllParser::NAME_LENGTH);
             saveBytes[offset + j] = name[j];
         }

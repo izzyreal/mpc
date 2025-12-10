@@ -86,7 +86,7 @@ void EraseScreen::displayTrack() const
     else
     {
         const auto sequence = sequencer.lock()->getSelectedSequence();
-        trackName = sequence->getTrack(track)->getActualName();
+        trackName = sequence->getTrack(track)->getName();
     }
 
     findField("track")->setTextPadded(track + 1, " ");

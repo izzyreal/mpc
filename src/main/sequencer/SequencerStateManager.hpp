@@ -91,6 +91,8 @@ namespace mpc::sequencer
 
         void applyCopyEvents(const CopyEvents &) noexcept;
 
+        void applyCopyTrack(const CopyTrack &m);
+
         ///////  Live event recording helpers
 
         void assignTicksToNoteOffs(int noteOffCount, Tick pos);

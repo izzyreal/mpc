@@ -52,3 +52,8 @@ SongStateView SequencerStateView::getSongStateView(const SongIndex idx) const
 {
     return SongStateView(state->songs[idx]);
 }
+
+bool SequencerStateView::isUndoSequenceAvailable() const noexcept
+{
+    return state->undoSequenceAvailable;
+}

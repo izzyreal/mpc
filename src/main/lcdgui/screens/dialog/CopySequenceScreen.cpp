@@ -43,7 +43,7 @@ void CopySequenceScreen::function(const int i)
         case 4:
         {
             lockedSequencer->copySequence(
-                lockedSequencer->getSelectedSequence(), sq1);
+                lockedSequencer->getSelectedSequenceIndex(), sq1);
             constexpr bool shouldSetPositionTo0 = true;
             lockedSequencer->setSelectedSequenceIndex(sq1,
                                                       shouldSetPositionTo0);

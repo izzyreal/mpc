@@ -29,12 +29,15 @@ namespace mpc::concurrency
         };
 
         using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
+
+        using CallbackQueue = moodycamel::ConcurrentQueue<utils::SimpleAction>;
+
         mutable std::atomic<uint64_t> globalSeq{0};
         std::vector<SequencedMessage> sequencedMessages;
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
-                                     size_t messageQueueCapacity = 512)
+                                     size_t queueCapacity = 512)
         {
             actions.reserve(10);
             reserveFn(activeState);
@@ -48,15 +51,16 @@ namespace mpc::concurrency
             writeBuffer = &pool[1];
 
             eventMessageQueue =
-                std::make_shared<MessageQueue>(messageQueueCapacity);
-            sequencedMessages.reserve(messageQueueCapacity);
+                std::make_shared<MessageQueue>(queueCapacity);
+
+            callbackQueue =
+                std::make_shared<CallbackQueue>(queueCapacity);
+
+            sequencedMessages.reserve(queueCapacity);
         }
 
     public:
-        virtual ~AtomicStateExchange()
-        {
-            //            printf("Deleting atomic state exchange\n");
-        }
+        virtual ~AtomicStateExchange() {}
 
         virtual void enqueue(Message &&msg) const noexcept
         {
@@ -64,6 +68,11 @@ namespace mpc::concurrency
             sm.seq = globalSeq.fetch_add(1, std::memory_order_relaxed);
             sm.payload = std::move(msg);
             eventMessageQueue->enqueue(std::move(sm));
+        }
+
+        void enqueueCallback(utils::SimpleAction cb) const noexcept
+        {
+            callbackQueue->enqueue(std::move(cb));
         }
 
         void drainQueue() noexcept
@@ -102,6 +111,12 @@ namespace mpc::concurrency
             }
 
             actions.clear();
+
+            utils::SimpleAction cb;
+            while (callbackQueue->try_dequeue(cb))
+            {
+                cb();
+            }
         }
 
         View getSnapshot() const noexcept
@@ -111,9 +126,6 @@ namespace mpc::concurrency
             return View{std::move(s)};
         }
 
-        // Use with care! May only be called by the thread
-        // that owns the state.
-        // Circumvents the queue and applies the message immediately.
         void applyMessageImmediate(Message &&msg) noexcept
         {
             applyMessage(msg);
@@ -125,6 +137,12 @@ namespace mpc::concurrency
             }
 
             actions.clear();
+
+            utils::SimpleAction cb;
+            while (callbackQueue->try_dequeue(cb))
+            {
+                cb();
+            }
         }
 
     protected:
@@ -135,6 +153,7 @@ namespace mpc::concurrency
         std::shared_ptr<State> currentSnapshot;
         State *writeBuffer;
         size_t writeIndex = 1;
+
         std::vector<utils::SimpleAction> actions;
 
         void publishState() noexcept
@@ -168,7 +187,10 @@ namespace mpc::concurrency
 
     private:
         std::atomic<uint64_t> publishCount{0};
+
         std::shared_ptr<MessageQueue> eventMessageQueue;
+
+        std::shared_ptr<CallbackQueue> callbackQueue;
     };
 
 } // namespace mpc::concurrency

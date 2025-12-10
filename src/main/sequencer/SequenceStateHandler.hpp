@@ -19,6 +19,7 @@ namespace mpc::sequencer
         void applyMessage(SequencerState &,
                           std::vector<utils::SimpleAction> &actions,
                           const SequenceMessage &) const;
+
     private:
         SequencerStateManager *manager;
         Sequencer *sequencer;

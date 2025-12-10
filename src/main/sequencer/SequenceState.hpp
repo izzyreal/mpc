@@ -12,6 +12,7 @@ namespace mpc::sequencer
 {
     struct SequenceState
     {
+        std::string name;
         std::array<TrackState, Mpc2000XlSpecs::TOTAL_TRACK_COUNT> tracks;
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT> timeSignatures;
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> barLengths;
@@ -25,11 +26,13 @@ namespace mpc::sequencer
 
         SequenceState()
         {
+            name.reserve(Mpc2000XlSpecs::MAX_SEQUENCE_NAME_LENGTH);
             initializeDefaults();
         }
 
         void initializeDefaults()
         {
+            name.clear();
             tracks = {};
             timeSignatures = {};
             barLengths = {};

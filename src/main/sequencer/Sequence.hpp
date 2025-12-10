@@ -93,8 +93,8 @@ namespace mpc::sequencer
         void setLastLoopBarIndex(BarIndex) const;
         BarIndex getLastLoopBarIndex() const;
         bool isLoopEnabled() const;
-        void setName(const std::string &s);
-        std::string getName();
+        void setName(const std::string &s) const;
+        std::string getName() const;
         void setDeviceName(int i, const std::string &s);
         std::string getDeviceName(int i);
         void setLastBarIndex(int i) const;
@@ -160,7 +160,6 @@ namespace mpc::sequencer
 
     private:
         SequenceIndex sequenceIndex{NoSequenceIndex};
-        std::string name;
         std::shared_ptr<SequencerStateManager> manager;
         const std::function<void(SequenceMessage &&)> dispatch;
         StartTime startTime{0, 0, 0, 0, 0};

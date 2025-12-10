@@ -130,6 +130,83 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         [&](const DeleteSequence &m)
         {
             activeState.sequences[m.sequenceIndex].initializeDefaults();
+        },
+        [&](const CopySequence &m)
+        {
+            auto &seqLock1 = sequenceLocks[m.sourceIndex];
+            auto &seqLock2 = sequenceLocks[m.destIndex];
+
+            if (!seqLock1.try_acquire() || !seqLock2.try_acquire())
+            {
+                enqueue(m);
+                return;
+            }
+
+            const auto &source = activeState.sequences[m.sourceIndex];
+            auto &dest = activeState.sequences[m.destIndex];
+            dest.name.assign(source.name.data(), source.name.size());
+            dest.lastBarIndex = source.lastBarIndex;
+            dest.timeSignatures = source.timeSignatures;
+            dest.barLengths = source.barLengths;
+            dest.loopEnabled = source.loopEnabled;
+            dest.firstLoopBarIndex = source.firstLoopBarIndex;
+            dest.lastLoopBarIndex = source.lastLoopBarIndex;
+            dest.initialTempo = source.initialTempo;
+            dest.tempoChangeEnabled = source.tempoChangeEnabled;
+            dest.used = source.used;
+
+            for (int8_t idx = 0; idx < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++idx)
+            {
+                CopyTrack copyTrack{m.sourceIndex, m.destIndex, TrackIndex(idx),
+                                    TrackIndex(idx)};
+                applyCopyTrack(copyTrack);
+            }
+
+            seqLock1.release();
+            seqLock2.release();
+        },
+        [&](const CopyTrack &m)
+        {
+            auto &trackLock1 =
+                trackLocks[m.sourceSequenceIndex][m.sourceTrackIndex];
+            auto &trackLock2 =
+                trackLocks[m.destSequenceIndex][m.destTrackIndex];
+
+            if (!trackLock1.try_acquire() || !trackLock2.try_acquire())
+            {
+                enqueue(m);
+                return;
+            }
+
+            applyCopyTrack(m);
+
+            trackLock1.release();
+            trackLock2.release();
+        },
+        [&](const UndoSequence &m)
+        {
+            auto &seqLock1 = sequenceLocks[activeState.selectedSequenceIndex];
+            auto &seqLock2 = sequenceLocks[UndoSequenceIndex];
+
+            if (!seqLock1.try_acquire() || !seqLock2.try_acquire())
+            {
+                enqueue(m);
+                return;
+            }
+
+            auto &seqs = activeState.sequences;
+
+            std::swap(seqs[activeState.selectedSequenceIndex],
+                      seqs[UndoSequenceIndex]);
+
+            activeState.undoSequenceAvailable = !activeState.undoSequenceAvailable;
+
+            seqLock1.release();
+            seqLock2.release();
+        },
+        [&](const SetUndoSequenceAvailable &m)
+        {
+            activeState.undoSequenceAvailable = m.available;
         }};
 
     std::visit(visitor, msg);
@@ -295,4 +372,35 @@ SequencerStateManager::getCorrectedTickPos(const Tick currentPositionTicks,
     }
 
     return correctedTickPos;
+}
+
+void SequencerStateManager::applyCopyTrack(const CopyTrack &m)
+{
+    const auto &t1 =
+        activeState.sequences[m.sourceSequenceIndex].tracks[m.sourceTrackIndex];
+    auto &t2 =
+        activeState.sequences[m.destSequenceIndex].tracks[m.destTrackIndex];
+
+    t2.used = t1.used;
+    t2.name.assign(t1.name.data(), t1.name.size());
+    t2.busType = t1.busType;
+    t2.device = t1.device;
+    t2.on = t1.on;
+    t2.programChange = t1.programChange;
+    t2.transmitProgramChangesEnabled = t1.transmitProgramChangesEnabled;
+    t2.velocityRatio = t1.velocityRatio;
+
+    const EventData *it = t1.eventsHead;
+
+    while (it)
+    {
+        EventData *e = acquireEvent();
+        std::memcpy(e, it, sizeof(EventData));
+        e->sequenceIndex = m.destSequenceIndex;
+        e->trackIndex = m.destTrackIndex;
+        e->prev = nullptr;
+        e->next = nullptr;
+        insertAcquiredEvent(t2, e);
+        it = it->next;
+    }
 }

@@ -43,9 +43,8 @@ Sequence::Sequence(
     : getSnapshot(getSnapshot), manager(manager), dispatch(dispatch),
       getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
 {
-    name.reserve(Mpc2000XlSpecs::MAX_SEQUENCE_NAME_LENGTH);
-
-    for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
+    for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT;
+         ++trackIndex)
     {
         std::function getTrackSnapshot =
             [getSnapshot, this](const TrackIndex idx)
@@ -132,19 +131,23 @@ bool Sequence::isLoopEnabled() const
     return getSnapshot(sequenceIndex)->isLoopEnabled();
 }
 
-void Sequence::setName(const std::string &s)
+void Sequence::setName(const std::string &s) const
 {
-    name = s;
+    SetSequenceName msg{getSequenceIndex()};
+    std::snprintf(msg.name, sizeof(msg.name), "%s", s.c_str());
+    dispatch(msg);
 }
 
-std::string Sequence::getName()
+std::string Sequence::getName() const
 {
-    if (!isUsed())
+    const auto snapshot = getSnapshot(getSequenceIndex());
+
+    if (!snapshot->isUsed())
     {
         return std::string("(Unused)");
     }
 
-    return name;
+    return std::string(snapshot->getName());
 }
 
 void Sequence::setDeviceName(const int i, const std::string &s)
@@ -223,7 +226,8 @@ void Sequence::init(const int newLastBarIndex) const
 
     for (int i = 0; i <= newLastBarIndex; ++i)
     {
-        dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(i), userScreen->timeSig});
+        dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(i),
+                                  userScreen->timeSig});
     }
 
     addTempoChangeEvent(0, 1000);
@@ -448,7 +452,8 @@ void Sequence::deleteBars(const int firstBar, const int lastBar) const
         }
     }
 
-    dispatch(DeleteBars{getSequenceIndex(), BarIndex(firstBar), BarIndex(lastBar)});
+    dispatch(
+        DeleteBars{getSequenceIndex(), BarIndex(firstBar), BarIndex(lastBar)});
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);

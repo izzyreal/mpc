@@ -54,6 +54,8 @@ namespace mpc::sequencer
 
         bool isTransmitProgramChangesEnabled() const;
 
+        std::string_view getName() const;
+
     private:
         const TrackState &state;
     };

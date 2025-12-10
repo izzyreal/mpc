@@ -32,6 +32,8 @@ namespace mpc::sequencer
 
         SongStateView getSongStateView(SongIndex) const;
 
+        bool isUndoSequenceAvailable() const noexcept;
+
     private:
         const std::shared_ptr<const SequencerState> state;
     };

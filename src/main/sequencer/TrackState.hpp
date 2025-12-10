@@ -9,6 +9,8 @@ namespace mpc::sequencer
     {
         EventData *eventsHead;
         EventIndex playEventIndex;
+
+        std::string name;
         BusType busType;
         bool on;
         uint8_t velocityRatio;
@@ -19,6 +21,7 @@ namespace mpc::sequencer
 
         TrackState()
         {
+            name.reserve(Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
             initializeDefaults();
         }
 
@@ -26,6 +29,7 @@ namespace mpc::sequencer
         {
             eventsHead = nullptr;
             playEventIndex = EventIndex(0);
+            name.clear();
             busType = BusType::DRUM1;
             on = true;
             velocityRatio = 100;

@@ -10,6 +10,11 @@ SequenceStateView::SequenceStateView(const SequenceState &s) noexcept : state(s)
 {
 }
 
+std::string_view SequenceStateView::getName() const
+{
+    return state.name;
+}
+
 std::shared_ptr<TrackStateView>
 SequenceStateView::getTrack(const int trackIndex) const
 {

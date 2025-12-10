@@ -1,10 +1,10 @@
 #include "sequencer/SequenceStateHandler.hpp"
 
-#include "Sequence.hpp"
-#include "SequenceStateView.hpp"
-#include "Sequencer.hpp"
-#include "SequencerStateManager.hpp"
-#include "TrackStateHandler.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/SequenceStateView.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/TrackStateHandler.hpp"
 #include "sequencer/SequencerState.hpp"
 #include "utils/VariantUtils.hpp"
 
@@ -220,13 +220,17 @@ void SequenceStateHandler::applyMessage(
         [&](const UpdateSequenceEvents &m)
         {
             applyUpdateSequenceEvents(m, state);
+        },
+        [&](const SetSequenceName &m)
+        {
+            state.sequences[m.sequenceIndex].name.assign(m.name);
         }};
 
     std::visit(visitor, msg);
 }
 
-void SequenceStateHandler::applyUpdateSequenceEvents(const UpdateSequenceEvents &m,
-                                          SequencerState &state) const
+void SequenceStateHandler::applyUpdateSequenceEvents(
+    const UpdateSequenceEvents &m, SequencerState &state) const
 {
     auto &lock = manager->sequenceLocks[m.sequence];
 

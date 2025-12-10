@@ -215,3 +215,8 @@ bool TrackStateView::isTransmitProgramChangesEnabled() const
 {
     return state.transmitProgramChangesEnabled;
 }
+
+std::string_view TrackStateView::getName() const
+{
+    return state.name;
+}

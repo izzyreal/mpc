@@ -122,7 +122,7 @@ namespace mpc::sequencer
             printf("     type: %s\n", eventTypeToString(type).c_str());
             printf(" sequence: %i\n", sequenceIndex.get());
             printf("    track: %i\n", trackIndex.get());
-            printf("     tick: %ld\n", tick);
+            printf("     tick: %i\n", static_cast<int>(tick));
 
             if (type == EventType::NoteOn)
             {
