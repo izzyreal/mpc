@@ -2,6 +2,7 @@
 
 #include "MpcSpecs.hpp"
 
+#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
@@ -123,7 +124,7 @@ void Sequencer::playTick(const Tick tick) const
         }
 
         getStateManager()->processLiveNoteEventRecordingQueues(
-            tick, *seq->getSnapshot(seq->getSequenceIndex()));
+            tick, seq->getSnapshot(seq->getSequenceIndex()));
 
         for (const auto &track : seq->getTracks())
         {

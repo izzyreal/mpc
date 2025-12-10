@@ -2,7 +2,7 @@
 
 #include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "SequencerMessage.hpp"
+#include "SequenceMessage.hpp"
 #include "SequencerStateView.hpp"
 
 #include <vector>
@@ -52,7 +52,7 @@ namespace mpc::sequencer
 
         Sequence(const utils::PostToUiThreadFn &,
                  std::shared_ptr<SequencerStateManager> manager,
-                 const std::function<std::shared_ptr<SequenceStateView>(
+                 const std::function<SequenceStateView(
                      SequenceIndex)> &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
@@ -155,7 +155,7 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        const std::function<std::shared_ptr<SequenceStateView>(SequenceIndex)>
+        const std::function<SequenceStateView(SequenceIndex)>
             getSnapshot;
 
     private:

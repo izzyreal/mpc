@@ -3,7 +3,6 @@
 #include "performance/EventTypes.hpp"
 #include "performance/Drum.hpp"
 
-#include <memory>
 #include <optional>
 
 namespace mpc::performance
@@ -14,7 +13,7 @@ namespace mpc::performance
     {
     public:
         explicit PerformanceStateView(
-            const std::shared_ptr<const PerformanceState> &s) noexcept;
+            const PerformanceState *) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
@@ -40,6 +39,6 @@ namespace mpc::performance
             findPhysicalPadPress(PhysicalPadIndex);
 
     private:
-        std::shared_ptr<const PerformanceState> state;
+        const PerformanceState *const state;
     };
 } // namespace mpc::performance

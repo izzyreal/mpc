@@ -2,29 +2,28 @@
 
 #include "SequenceStateView.hpp"
 #include "TrackStateView.hpp"
-#include "Sequencer.hpp"
 #include "TransportStateView.hpp"
 #include "sequencer/SequencerState.hpp"
 
 using namespace mpc::sequencer;
 
 SequencerStateView::SequencerStateView(
-    const std::shared_ptr<const SequencerState> &s) noexcept
+    const SequencerState *const s) noexcept
     : state(s)
 {
 }
 
-std::shared_ptr<SequenceStateView>
+SequenceStateView
 SequencerStateView::getSequenceState(const SequenceIndex i) const
 {
-    return std::make_shared<SequenceStateView>(state->sequences[i]);
+    return SequenceStateView(state->sequences[i]);
 }
 
-std::shared_ptr<TrackStateView>
+TrackStateView
 SequencerStateView::getTrackState(const SequenceIndex sequenceIndex,
                                   const TrackIndex trackIndex) const
 {
-    return std::make_shared<TrackStateView>(
+    return TrackStateView(
         state->sequences[sequenceIndex].tracks[trackIndex]);
 }
 

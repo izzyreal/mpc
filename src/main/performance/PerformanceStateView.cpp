@@ -8,7 +8,7 @@ using namespace mpc;
 using namespace mpc::performance;
 
 PerformanceStateView::PerformanceStateView(
-    const std::shared_ptr<const PerformanceState> &s) noexcept
+    const PerformanceState *const s) noexcept
     : state(s)
 {
 }

@@ -8,11 +8,10 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 #include "sampler/Program.hpp"
-
+#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
@@ -171,7 +170,7 @@ void TriggerLocalNoteOnCommand::execute()
                     .getSequenceState(ctx->track->getSequenceIndex());
 
             const auto correctedTick = ctx->track->timingCorrectTick(
-                *sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
+                sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
                 timingCorrectScreen->getSwing());
 
             if (ctx->positionTicks != correctedTick)

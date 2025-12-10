@@ -726,7 +726,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     {
         const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
 
-        if (const auto barLength = snapshot->getBarLength(i);
+        if (const auto barLength = snapshot.getBarLength(i);
             destStart >= firstTickOfBar &&
             destStart <= firstTickOfBar + barLength)
         {

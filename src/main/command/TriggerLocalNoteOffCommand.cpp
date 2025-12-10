@@ -3,6 +3,7 @@
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOffContext.hpp"
 #include "performance/PerformanceManager.hpp"
+#include "sequencer/SequenceStateView.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
@@ -82,7 +83,7 @@ void TriggerLocalNoteOffCommand::execute()
                         .getSequenceState(ctx->track->getSequenceIndex());
 
                 nextPos = ctx->track->timingCorrectTick(
-                    *sequenceStateView, 0, bar, nextPos,
+                    sequenceStateView, 0, bar, nextPos,
                     ctx->noteValueLengthInTicks, ctx->swing);
 
                 if (const auto lastTick =

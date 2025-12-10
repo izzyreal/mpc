@@ -4,8 +4,6 @@
 #include "sequencer/TransportStateView.hpp"
 #include "sequencer/SequencerState.hpp"
 
-#include <memory>
-
 namespace mpc::sequencer
 {
     class TrackStateView;
@@ -16,12 +14,12 @@ namespace mpc::sequencer
     {
     public:
         explicit SequencerStateView(
-            const std::shared_ptr<const SequencerState> &s) noexcept;
+            const SequencerState *const) noexcept;
 
-        std::shared_ptr<SequenceStateView>
+        SequenceStateView
             getSequenceState(SequenceIndex) const;
 
-        std::shared_ptr<TrackStateView> getTrackState(SequenceIndex,
+        TrackStateView getTrackState(SequenceIndex,
                                                       TrackIndex) const;
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
@@ -35,6 +33,6 @@ namespace mpc::sequencer
         bool isUndoSequenceAvailable() const noexcept;
 
     private:
-        const std::shared_ptr<const SequencerState> state;
+        const SequencerState *const state;
     };
 } // namespace mpc::sequencer

@@ -4,8 +4,8 @@
 
 #include "utils/SimpleAction.hpp"
 
-#include <atomic>
 #include <memory>
+#include <atomic>
 #include <functional>
 #include <cstdio>
 #include <cstdint>
@@ -29,7 +29,6 @@ namespace mpc::concurrency
         };
 
         using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
-
         using CallbackQueue = moodycamel::ConcurrentQueue<utils::SimpleAction>;
 
         mutable std::atomic<uint64_t> globalSeq{0};
@@ -47,7 +46,7 @@ namespace mpc::concurrency
                 reserveFn(s);
             }
 
-            currentSnapshot = std::shared_ptr<State>(&pool[0], [](State *) {});
+            currentSnapshot.store(&pool[0], std::memory_order_relaxed);
             writeBuffer = &pool[1];
 
             eventMessageQueue =
@@ -121,9 +120,8 @@ namespace mpc::concurrency
 
         View getSnapshot() const noexcept
         {
-            auto s = std::atomic_load_explicit(&currentSnapshot,
-                                               std::memory_order_acquire);
-            return View{std::move(s)};
+            State *s = currentSnapshot.load(std::memory_order_acquire);
+            return View{s};
         }
 
         void applyMessageImmediate(Message &&msg) noexcept
@@ -150,7 +148,7 @@ namespace mpc::concurrency
 
         State activeState;
         std::array<State, PoolSize> pool;
-        std::shared_ptr<State> currentSnapshot;
+        std::atomic<State *> currentSnapshot{nullptr};
         State *writeBuffer;
         size_t writeIndex = 1;
 
@@ -161,10 +159,10 @@ namespace mpc::concurrency
             size_t nextIndex = (writeIndex + 1) % PoolSize;
             State *dst = &pool[nextIndex];
 
-            auto oldSnap = std::atomic_load_explicit(&currentSnapshot,
-                                                     std::memory_order_acquire);
+            State *oldSnap =
+                currentSnapshot.load(std::memory_order_acquire);
 
-            if (oldSnap.get() == dst)
+            if (oldSnap == dst)
             {
                 const uint64_t n =
                     publishCount.fetch_add(1, std::memory_order_relaxed) + 1;
@@ -178,8 +176,7 @@ namespace mpc::concurrency
             }
 
             *dst = activeState;
-            auto newShared = std::shared_ptr<State>(dst, [](State *) {});
-            std::atomic_store(&currentSnapshot, newShared);
+            currentSnapshot.store(dst, std::memory_order_release);
 
             writeIndex = nextIndex;
             writeBuffer = dst;
@@ -189,8 +186,8 @@ namespace mpc::concurrency
         std::atomic<uint64_t> publishCount{0};
 
         std::shared_ptr<MessageQueue> eventMessageQueue;
-
         std::shared_ptr<CallbackQueue> callbackQueue;
     };
 
 } // namespace mpc::concurrency
+

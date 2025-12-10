@@ -48,7 +48,7 @@ void Track::correctTimeRange(const int startPos, const int endPos,
         if (event->tick >= startPos && event->tick < endPos &&
             event->noteNumber >= lowestNote && event->noteNumber <= highestNote)
         {
-            timingCorrect(*parent->getSnapshot(parent->getSequenceIndex()),
+            timingCorrect(parent->getSnapshot(parent->getSequenceIndex()),
                           fromBar, toBar, event, event->tick, stepLength,
                           swingPercentage);
         }

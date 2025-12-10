@@ -208,7 +208,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
                     ->getSnapshot()
                     .getTrackState(lockedSequencer->getSelectedSequenceIndex(),
                                    track->getIndex())
-                    ->findNoteEvent(noteEvent.tick, noteEvent.noteNumber);
+                    .findNoteEvent(noteEvent.tick, noteEvent.noteNumber);
 
             if (existingNoteEvent)
             {
