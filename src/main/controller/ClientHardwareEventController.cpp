@@ -447,12 +447,12 @@ void ClientHardwareEventController::handlePadRelease(
                             eventHandler, screens, hardware,
                             metronomeOnlyPositionTicks, positionTicks);
 
-                    constexpr std::optional<MidiChannel> noMidiChannel =
-                        std::nullopt;
+                    PerformanceMessage msg;
+                    msg.payload = NoteOffEvent{p.noteNumber, NoMidiChannel};
+                    msg.source = PerformanceEventSource::VirtualMpcHardware;
 
-                    performanceManager.lock()->registerNoteOff(
-                        PerformanceEventSource::VirtualMpcHardware,
-                        p.noteNumber, noMidiChannel);
+                    performanceManager.lock()->applyMessageImmediate(
+                        std::move(msg));
 
                     const utils::SimpleAction noteOffAction(
                         [ctx]
