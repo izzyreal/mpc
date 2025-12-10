@@ -10,7 +10,6 @@
 #include "sequencer/BusType.hpp"
 
 #include <optional>
-#include <functional>
 
 namespace mpc::sampler
 {
@@ -32,16 +31,13 @@ namespace mpc::performance
         void registerPhysicalPadPress(
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
             PhysicalPadIndex, Velocity, TrackIndex, controller::Bank,
-            std::optional<ProgramIndex>, std::optional<NoteNumber>,
-            const std::function<void(const void *)> &action) const;
+            std::optional<ProgramIndex>, std::optional<NoteNumber>) const;
 
         void registerPhysicalPadAftertouch(
-            PhysicalPadIndex, Pressure, PerformanceEventSource,
-            const std::function<void(const void *)> &action) const;
+            PhysicalPadIndex, Pressure, PerformanceEventSource) const;
 
         void registerPhysicalPadRelease(
-            PhysicalPadIndex, PerformanceEventSource,
-            const std::function<void(const void *)> &action) const;
+            PhysicalPadIndex, PerformanceEventSource) const;
 
         void registerProgramPadPress(
             PerformanceEventSource, std::optional<MidiChannel> midiInputChannel,
@@ -53,23 +49,20 @@ namespace mpc::performance
                                           Pressure) const;
 
         void registerProgramPadRelease(
-            PerformanceEventSource, ProgramPadIndex, ProgramIndex,
-            const std::function<void(const void *)> &action) const;
+            PerformanceEventSource, ProgramPadIndex, ProgramIndex) const;
 
         NoteOnEvent
         registerNoteOn(PerformanceEventSource,
                        std::optional<MidiChannel> midiInputChannel,
                        lcdgui::ScreenId, TrackIndex, sequencer::BusType,
-                       NoteNumber, Velocity, std::optional<ProgramIndex>,
-                       const std::function<void(const void *)> &action) const;
+                       NoteNumber, Velocity, std::optional<ProgramIndex>) const;
 
         void registerNoteAftertouch(
             PerformanceEventSource, NoteNumber, Pressure,
             std::optional<MidiChannel> midiInputChannel) const;
 
         void registerNoteOff(PerformanceEventSource, NoteNumber,
-                             std::optional<MidiChannel> midiInputChannel,
-                             const std::function<void(const void *)> &action) const;
+                             std::optional<MidiChannel> midiInputChannel) const;
 
         void clear() const;
 

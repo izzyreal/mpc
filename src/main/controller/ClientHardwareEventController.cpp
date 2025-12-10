@@ -294,12 +294,11 @@ void ClientHardwareEventController::handlePadPress(
                 mpc.getPerformanceManager().lock()->registerNoteOn(
                     PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
                     screenId, track->getIndex(), screen->getBus()->busType,
-                    *note, Velocity(clampedVelocity), programIndex,
-                    [](const void *) {});
+                    *note, Velocity(clampedVelocity), programIndex);
         }
     }
 
-    std::function action = [](const void *) {};
+    std::optional<utils::SimpleAction> action = std::nullopt;
 
     if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
     {
@@ -319,28 +318,34 @@ void ClientHardwareEventController::handlePadPress(
                                        ->getStateManager()
                                        ->getSnapshot()
                                        .getTransportStateView();
+
             const auto metronomeOnlyPositionTicks =
                 transport.getMetronomeOnlyPositionTicks();
 
             const auto positionTicks = transport.getPositionTicks();
 
-            auto ctx =
-                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                    PerformanceEventSource::VirtualMpcHardware,
-                    *registryNoteOnEvent,
-                    NoteNumber(program->getNoteFromPad(
-                        ProgramPadIndex(programPadIndex))),
-                    Velocity(clampedVelocity), track.get(), screen->getBus(),
-                    screen, ProgramPadIndex(programPadIndex), program,
-                    mpc.getSequencer(), mpc.getPerformanceManager(),
-                    mpc.clientEventController, mpc.getEventHandler(),
-                    mpc.screens, mpc.getHardware(), metronomeOnlyPositionTicks,
-                    positionTicks);
+            action = utils::SimpleAction(
+                [noteEventInfo = *registryNoteOnEvent, clampedVelocity,
+                 tr = track.get(), screen, program, programPadIndex, this,
+                 metronomeOnlyPositionTicks, positionTicks]
+                {
+                    const DrumNoteNumber drumNoteNumber =
+                        program->getNoteFromPad(
+                            ProgramPadIndex(programPadIndex));
 
-            action = [ctx](const void *)
-            {
-                TriggerLocalNoteOnCommand(ctx).execute();
-            };
+                    const auto ctx = TriggerLocalNoteContextFactory::
+                        buildTriggerLocalNoteOnContext(
+                            PerformanceEventSource::VirtualMpcHardware,
+                            noteEventInfo, drumNoteNumber,
+                            Velocity(clampedVelocity), tr, screen->getBus(),
+                            screen, ProgramPadIndex(programPadIndex), program,
+                            mpc.getSequencer(), mpc.getPerformanceManager(),
+                            mpc.clientEventController, mpc.getEventHandler(),
+                            mpc.screens, mpc.getHardware(),
+                            metronomeOnlyPositionTicks, positionTicks);
+
+                    TriggerLocalNoteOnCommand(ctx).execute();
+                });
         }
     }
 
@@ -348,7 +353,12 @@ void ClientHardwareEventController::handlePadPress(
         PerformanceEventSource::VirtualMpcHardware, screenId,
         screen->getBus()->busType, PhysicalPadIndex(physicalPadIndex),
         Velocity(clampedVelocity), track->getIndex(), activeBank,
-        screen->getProgramIndex(), note, action);
+        screen->getProgramIndex(), note);
+
+    if (action)
+    {
+        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+    }
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -381,77 +391,95 @@ void ClientHardwareEventController::handlePadRelease(
         transport.getMetronomeOnlyPositionTicks();
     const auto positionTicks = transport.getPositionTicks();
 
-    auto action =
-        [performanceManager = mpc.getPerformanceManager(),
-         sampler = mpc.getSampler(), eventHandler = mpc.getEventHandler(),
-         screens = mpc.screens, sequencer = mpc.getSequencer(),
-         hardware = mpc.getHardware(),
-         clientEventController = mpc.clientEventController,
-         previewSoundPlayer = mpc.getEngineHost()->getPreviewSoundPlayer(),
-         metronomeOnlyPositionTicks, positionTicks](const void *userData)
+    std::optional<utils::SimpleAction> action = std::nullopt;
+
+    const std::optional<PhysicalPadPressEvent> physicalPadPressEvent =
+        mpc.getPerformanceManager().lock()->getSnapshot().findPhysicalPadPress(
+            PhysicalPadIndex(physicalPadIndex));
+
+    if (physicalPadPressEvent)
     {
-        const auto p = static_cast<const PhysicalPadPressEvent *>(userData);
+        action = utils::SimpleAction(
+            [this, p = *physicalPadPressEvent, metronomeOnlyPositionTicks,
+             positionTicks]
+            {
+                const auto performanceManager = mpc.getPerformanceManager();
+                const auto sampler = mpc.getSampler();
+                const auto eventHandler = mpc.getEventHandler();
+                const auto screens = mpc.screens;
+                const auto sequencer = mpc.getSequencer();
+                const auto hardware = mpc.getHardware();
+                const auto clientEventController = mpc.clientEventController;
+                const auto previewSoundPlayer =
+                    mpc.getEngineHost()->getPreviewSoundPlayer();
 
-        if (!p)
-        {
-            // TODO What to do with orphaned physical pad presses?
-            return;
-        }
-
-        if (screengroups::isSoundScreen(p->screenId))
-        {
-            previewSoundPlayer->finishVoiceIfSoundIsLooping();
-        }
-        else if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screenId))
-        {
-            return;
-        }
-
-        const auto programPadIndex =
-            physicalPadAndBankToProgramPadIndex(p->padIndex, p->bank);
-
-        const auto seq = sequencer->getSelectedSequence();
-
-        const auto track = seq->getTrack(p->trackIndex).get();
-
-        const auto recordingNoteOnEvent =
-            sequencer->getStateManager()->findRecordingNoteOnEvent(
-                seq->getSequenceIndex(), p->trackIndex, p->noteNumber);
-
-        if (p->noteNumber != NoNoteNumber)
-        {
-            const auto ctx =
-                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                    PerformanceEventSource::VirtualMpcHardware, p->noteNumber,
-                    recordingNoteOnEvent, track, p->busType,
-                    screens->getScreenById(p->screenId), programPadIndex,
-                    sampler->getProgram(p->programIndex), sequencer,
-                    performanceManager, clientEventController, eventHandler,
-                    screens, hardware, metronomeOnlyPositionTicks,
-                    positionTicks);
-
-            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
-
-            performanceManager.lock()->registerNoteOff(
-                PerformanceEventSource::VirtualMpcHardware, p->noteNumber,
-                noMidiChannel,
-                [ctx](const void *)
+                if (screengroups::isSoundScreen(p.screenId))
                 {
-                    TriggerLocalNoteOffCommand(ctx).execute();
-                });
-        }
+                    previewSoundPlayer->finishVoiceIfSoundIsLooping();
+                }
+                else if (screengroups::isPadDoesNotTriggerNoteEventScreen(
+                             p.screenId))
+                {
+                    return;
+                }
 
-        if (p->programIndex != NoProgramIndex)
-        {
-            performanceManager.lock()->registerProgramPadRelease(
-                PerformanceEventSource::VirtualMpcHardware, programPadIndex,
-                p->programIndex, [](const void *) {});
-        }
-    };
+                const auto programPadIndex =
+                    physicalPadAndBankToProgramPadIndex(p.padIndex, p.bank);
+
+                const auto seq = sequencer->getSelectedSequence();
+
+                const auto track = seq->getTrack(p.trackIndex).get();
+
+                const auto recordingNoteOnEvent =
+                    sequencer->getStateManager()->findRecordingNoteOnEvent(
+                        seq->getSequenceIndex(), p.trackIndex, p.noteNumber);
+
+                if (p.noteNumber != NoNoteNumber)
+                {
+                    const auto ctx = TriggerLocalNoteContextFactory::
+                        buildTriggerLocalNoteOffContext(
+                            PerformanceEventSource::VirtualMpcHardware,
+                            p.noteNumber, recordingNoteOnEvent, track,
+                            p.busType, screens->getScreenById(p.screenId),
+                            programPadIndex,
+                            sampler->getProgram(p.programIndex), sequencer,
+                            performanceManager, clientEventController,
+                            eventHandler, screens, hardware,
+                            metronomeOnlyPositionTicks, positionTicks);
+
+                    constexpr std::optional<MidiChannel> noMidiChannel =
+                        std::nullopt;
+
+                    performanceManager.lock()->registerNoteOff(
+                        PerformanceEventSource::VirtualMpcHardware,
+                        p.noteNumber, noMidiChannel);
+
+                    const utils::SimpleAction noteOffAction(
+                        [ctx]
+                        {
+                            TriggerLocalNoteOffCommand(ctx).execute();
+                        });
+
+                    performanceManager.lock()->enqueueCallback(noteOffAction);
+                }
+
+                if (p.programIndex != NoProgramIndex)
+                {
+                    performanceManager.lock()->registerProgramPadRelease(
+                        PerformanceEventSource::VirtualMpcHardware,
+                        programPadIndex, p.programIndex);
+                }
+            });
+    }
 
     mpc.getPerformanceManager().lock()->registerPhysicalPadRelease(
         PhysicalPadIndex(physicalPadIndex),
-        PerformanceEventSource::VirtualMpcHardware, action);
+        PerformanceEventSource::VirtualMpcHardware);
+
+    if (action)
+    {
+        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+    }
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
@@ -470,32 +498,45 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 
-    const std::function action =
-        [performanceManager = mpc.getPerformanceManager(),
-         pressureToUse](const void *userData)
+    const std::optional<PhysicalPadPressEvent> padPressEvent =
+        mpc.getPerformanceManager().lock()->getSnapshot().findPhysicalPadPress(
+            PhysicalPadIndex(padIndex));
+
+    std::optional<utils::SimpleAction> action = std::nullopt;
+
+    if (padPressEvent)
     {
-        const auto padPress = static_cast<const PhysicalPadPressEvent *>(userData);
+        action = utils::SimpleAction(
+            [performanceManager = mpc.getPerformanceManager(), pressureToUse,
+             padPress = *padPressEvent]
+            {
+                if (padPress.programIndex != NoProgramIndex)
+                {
+                    performanceManager.lock()->registerProgramPadAftertouch(
+                        PerformanceEventSource::VirtualMpcHardware,
+                        physicalPadAndBankToProgramPadIndex(padPress.padIndex,
+                                                            padPress.bank),
+                        padPress.programIndex, Pressure(pressureToUse));
+                }
 
-        if (padPress->programIndex != NoProgramIndex)
-        {
-            performanceManager.lock()->registerProgramPadAftertouch(
-                PerformanceEventSource::VirtualMpcHardware,
-                physicalPadAndBankToProgramPadIndex(padPress->padIndex,
-                                                    padPress->bank),
-                padPress->programIndex, Pressure(pressureToUse));
-        }
-
-        if (padPress->noteNumber != NoNoteNumber)
-        {
-            performanceManager.lock()->registerNoteAftertouch(
-                PerformanceEventSource::VirtualMpcHardware,
-                padPress->noteNumber, Pressure(pressureToUse), std::nullopt);
-        }
-    };
+                if (padPress.noteNumber != NoNoteNumber)
+                {
+                    performanceManager.lock()->registerNoteAftertouch(
+                        PerformanceEventSource::VirtualMpcHardware,
+                        padPress.noteNumber, Pressure(pressureToUse),
+                        std::nullopt);
+                }
+            });
+    }
 
     mpc.getPerformanceManager().lock()->registerPhysicalPadAftertouch(
         PhysicalPadIndex(padIndex), Pressure(pressureToUse),
-        PerformanceEventSource::VirtualMpcHardware, action);
+        PerformanceEventSource::VirtualMpcHardware);
+
+    if (action)
+    {
+        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+    }
 }
 
 void ClientHardwareEventController::handleDataWheel(

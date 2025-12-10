@@ -132,3 +132,41 @@ Drum PerformanceStateView::getDrum(const DrumBusIndex drumBusIndex) const
 {
     return state->drums[drumBusIndex];
 }
+
+std::optional<NoteOnEvent>
+PerformanceStateView::findNoteOnEvent(PerformanceEventSource source,
+                                      NoteNumber noteNumber,
+                                      MidiChannel midiInputChannel)
+{
+    if (const auto it = std::find_if(
+            state->noteEvents.begin(), state->noteEvents.end(),
+            [&](const auto &n)
+            {
+                return n.source == source && n.noteNumber == noteNumber &&
+                       (n.source != PerformanceEventSource::MidiInput ||
+                        n.midiInputChannel == midiInputChannel);
+            });
+        it != state->noteEvents.end())
+    {
+        return *it;
+    }
+
+    return std::nullopt;
+}
+
+std::optional<PhysicalPadPressEvent>
+PerformanceStateView::findPhysicalPadPress(PhysicalPadIndex padIndex)
+{
+    if (const auto it = std::find_if(state->physicalPadEvents.begin(),
+                                     state->physicalPadEvents.end(),
+                                     [&](const auto &n)
+                                     {
+                                         return n.padIndex == padIndex;
+                                     });
+        it != state->physicalPadEvents.end())
+    {
+        return *it;
+    }
+
+    return std::nullopt;
+}

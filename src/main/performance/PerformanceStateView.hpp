@@ -32,6 +32,13 @@ namespace mpc::performance
         Program getDrumProgram(DrumBusIndex) const;
         Drum getDrum(DrumBusIndex) const;
 
+        std::optional<NoteOnEvent>
+        findNoteOnEvent(PerformanceEventSource, NoteNumber,
+                        MidiChannel midiInputChannel);
+
+        std::optional<PhysicalPadPressEvent>
+            findPhysicalPadPress(PhysicalPadIndex);
+
     private:
         std::shared_ptr<const PerformanceState> state;
     };

@@ -200,6 +200,12 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         }
     }
 
+    const auto noteOnEvent = performanceManager.lock()->registerNoteOn(
+        PerformanceEventSource::MidiInput,
+        std::optional<MidiChannel>(e.getChannel()), screenId, track->getIndex(),
+        screen->getBus()->busType, NoteNumber(e.getNoteNumber()),
+        Velocity(e.getVelocity()), std::optional(programIndex));
+
     const auto transport = sequencer.lock()
                                ->getStateManager()
                                ->getSnapshot()
@@ -210,30 +216,23 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     const auto positionTicks = transport.getPositionTicks();
 
-    const std::function action = [noteNumber = e.getNoteNumber(),
-                                  velocity = e.getVelocity(), track, screen,
-                                  programPadIndex, program, this, positionTicks,
-                                  metronomeOnlyPositionTicks](const void *userData)
-    {
-        const auto registryNoteOnEvent =
-            static_cast<const performance::NoteOnEvent *>(userData);
+    const utils::SimpleAction action(
+        [track, screen, programPadIndex, program, this, positionTicks,
+         metronomeOnlyPositionTicks, noteOnEvent]
+        {
+            const auto ctx =
+                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
+                    PerformanceEventSource::MidiInput, noteOnEvent,
+                    noteOnEvent.noteNumber, noteOnEvent.velocity, track.get(),
+                    screen->getBus(), screen, programPadIndex, program,
+                    sequencer, performanceManager.lock(), clientEventController,
+                    eventHandler, screens, hardware, metronomeOnlyPositionTicks,
+                    positionTicks);
 
-        const auto ctx =
-            TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                PerformanceEventSource::MidiInput, *registryNoteOnEvent,
-                NoteNumber(noteNumber), Velocity(velocity), track.get(),
-                screen->getBus(), screen, programPadIndex, program, sequencer,
-                performanceManager.lock(), clientEventController, eventHandler,
-                screens, hardware, metronomeOnlyPositionTicks, positionTicks);
+            command::TriggerLocalNoteOnCommand(ctx).execute();
+        });
 
-        command::TriggerLocalNoteOnCommand(ctx).execute();
-    };
-
-    performanceManager.lock()->registerNoteOn(
-        PerformanceEventSource::MidiInput,
-        std::optional<MidiChannel>(e.getChannel()), screenId, track->getIndex(),
-        screen->getBus()->busType, NoteNumber(e.getNoteNumber()),
-        Velocity(e.getVelocity()), std::optional(programIndex), action);
+    performanceManager.lock()->enqueueCallback(action);
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
@@ -249,6 +248,15 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
+    const auto registeredNoteOnEvent =
+        performanceManager.lock()->getSnapshot().findNoteOnEvent(
+            PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
+            MidiChannel(midiChannel));
+
+    performanceManager.lock()->registerNoteOff(
+        PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
+        std::optional<MidiChannel>(midiChannel));
+
     const auto lockedSequencer = sequencer.lock();
 
     const auto transport = lockedSequencer->getStateManager()
@@ -258,66 +266,63 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const auto metronomeOnlyPositionTicks =
         transport.getMetronomeOnlyPositionTicks();
 
-    const std::function action = [this, noteNumber, positionTicks,
-                                  metronomeOnlyPositionTicks,
-                                  lockedSequencer](const void *userData)
+    if (!registeredNoteOnEvent)
     {
-        const auto noteEventInfo =
-            static_cast<const performance::NoteOnEvent *>(userData);
+        // TODO Should we do anything special for orphaned note offs?
+        return;
+    }
 
-        if (!noteEventInfo)
+    const utils::SimpleAction action(
+        [this, noteEventInfo = *registeredNoteOnEvent, positionTicks,
+         metronomeOnlyPositionTicks, lockedSequencer]
         {
-            // TODO What do we do with orphaned note offs?
-            return;
-        }
+            ProgramPadIndex programPadIndex = NoProgramPadIndex;
+            std::shared_ptr<Program> program;
 
-        ProgramPadIndex programPadIndex = NoProgramPadIndex;
-        std::shared_ptr<Program> program;
+            const auto programIndex = noteEventInfo.programIndex;
+            const auto trackIndex = noteEventInfo.trackIndex;
 
-        const auto programIndex = noteEventInfo->programIndex;
-        const auto trackIndex = noteEventInfo->trackIndex;
-
-        if (programIndex != NoProgramIndex)
-        {
-            program = sampler->getProgram(programIndex);
-        }
-
-        if (program->isUsed())
-        {
-            programPadIndex =
-                program->getPadIndexFromNote(DrumNoteNumber(noteNumber));
-
-            if (programPadIndex != NoProgramPadIndex)
+            if (programIndex != NoProgramIndex)
             {
-                performanceManager.lock()->registerProgramPadRelease(
-                    PerformanceEventSource::MidiInput,
-                    ProgramPadIndex(programPadIndex), programIndex,
-                    [](const void *) {});
+                program = sampler->getProgram(programIndex);
+                assert(isDrumNote(noteEventInfo.noteNumber));
             }
-        }
 
-        const auto screen = screens->getScreenById(noteEventInfo->screenId);
-        const auto seq = lockedSequencer->getSelectedSequence();
-        const auto track = seq->getTrack(trackIndex).get();
+            if (program->isUsed())
+            {
+                programPadIndex = program->getPadIndexFromNote(
+                    DrumNoteNumber(noteEventInfo.noteNumber));
 
-        const auto recordingNoteOnEvent =
-            lockedSequencer->getStateManager()->findRecordingNoteOnEvent(
-                seq->getSequenceIndex(), trackIndex, NoteNumber(noteNumber));
+                if (programPadIndex != NoProgramPadIndex)
+                {
+                    performanceManager.lock()->registerProgramPadRelease(
+                        PerformanceEventSource::MidiInput,
+                        ProgramPadIndex(programPadIndex), programIndex);
+                }
+            }
 
-        const auto ctx =
-            TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-                recordingNoteOnEvent, track, noteEventInfo->busType, screen,
-                programPadIndex, program, sequencer, performanceManager.lock(),
-                clientEventController, eventHandler, screens, hardware,
-                metronomeOnlyPositionTicks, positionTicks);
+            const auto screen = screens->getScreenById(noteEventInfo.screenId);
+            const auto seq = lockedSequencer->getSelectedSequence();
+            const auto track = seq->getTrack(trackIndex).get();
 
-        command::TriggerLocalNoteOffCommand(ctx).execute();
-    };
+            const auto recordingNoteOnEvent =
+                lockedSequencer->getStateManager()->findRecordingNoteOnEvent(
+                    seq->getSequenceIndex(), trackIndex,
+                    noteEventInfo.noteNumber);
 
-    performanceManager.lock()->registerNoteOff(
-        PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-        std::optional<MidiChannel>(midiChannel), action);
+            const auto ctx =
+                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
+                    PerformanceEventSource::MidiInput, noteEventInfo.noteNumber,
+                    recordingNoteOnEvent, track, noteEventInfo.busType, screen,
+                    programPadIndex, program, sequencer,
+                    performanceManager.lock(), clientEventController,
+                    eventHandler, screens, hardware, metronomeOnlyPositionTicks,
+                    positionTicks);
+
+            command::TriggerLocalNoteOffCommand(ctx).execute();
+        });
+
+    performanceManager.lock()->enqueueCallback(action);
 }
 
 void ClientMidiEventController::handleKeyAftertouch(

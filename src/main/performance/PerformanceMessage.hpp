@@ -5,7 +5,6 @@
 
 #include "MpcMacros.hpp"
 
-#include <functional>
 #include <variant>
 
 namespace mpc::sampler
@@ -154,7 +153,6 @@ namespace mpc::performance
     {
         PerformanceMessagePayload payload{};
         PerformanceEventSource source{};
-        std::function<void(const void *)> action = [](const void *) {};
 
         PerformanceMessage() = default;
         explicit PerformanceMessage(PerformanceMessagePayload &&payloadToUse)

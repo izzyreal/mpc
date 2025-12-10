@@ -41,8 +41,7 @@ void PerformanceManager::registerPhysicalPadPress(
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
     const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
-    const std::optional<NoteNumber> noteNumber,
-    const std::function<void(const void *)> &action) const
+    const std::optional<NoteNumber> noteNumber) const
 {
     PhysicalPadPressEvent e{padIndex,
                             source,
@@ -58,34 +57,29 @@ void PerformanceManager::registerPhysicalPadPress(
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
 }
 
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
-    const PerformanceEventSource source,
-    const std::function<void(const void *)> &action) const
+    const PerformanceEventSource source) const
 {
     PhysicalPadAftertouchEvent e{padIndex, pressure};
 
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
 }
 
 void PerformanceManager::registerPhysicalPadRelease(
-    const PhysicalPadIndex padIndex, const PerformanceEventSource source,
-    const std::function<void(const void *)> &action) const
+    const PhysicalPadIndex padIndex, const PerformanceEventSource source) const
 {
     PhysicalPadReleaseEvent e{padIndex};
 
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
 }
 
@@ -129,14 +123,13 @@ void PerformanceManager::registerProgramPadAftertouch(
 
 void PerformanceManager::registerProgramPadRelease(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
-    const ProgramIndex program, const std::function<void(const void *)> &action) const
+    const ProgramIndex program) const
 {
     ProgramPadReleaseEvent e{padIndex, program};
 
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
 }
 
@@ -145,8 +138,8 @@ NoteOnEvent PerformanceManager::registerNoteOn(
     const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
-    const Velocity velocity, const std::optional<ProgramIndex> programIndex,
-    const std::function<void(const void *)> &action) const
+    const Velocity velocity,
+    const std::optional<ProgramIndex> programIndex) const
 {
     NoteOnEvent e{noteNumber,
                   source,
@@ -161,7 +154,6 @@ NoteOnEvent PerformanceManager::registerNoteOn(
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
     return e;
 }
@@ -182,15 +174,13 @@ void PerformanceManager::registerNoteAftertouch(
 
 void PerformanceManager::registerNoteOff(
     const PerformanceEventSource source, const NoteNumber noteNumber,
-    const std::optional<MidiChannel> midiInputChannel,
-    const std::function<void(const void *)> &action) const
+    const std::optional<MidiChannel> midiInputChannel) const
 {
     NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel)};
 
     PerformanceMessage msg;
     msg.payload = e;
     msg.source = source;
-    msg.action = action;
     enqueue(std::move(msg));
 }
 
@@ -393,11 +383,11 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
                 activeState.physicalPadEvents.push_back(payload);
-                actions.emplace_back(
-                    [a = msg.action, ev = payload]
-                    {
-                        a(&ev);
-                    });
+                // actions.emplace_back(
+                //     [a = msg.action, ev = payload]
+                //     {
+                //         a(&ev);
+                //     });
             }
             else if constexpr (std::is_same_v<T, PhysicalPadAftertouchEvent>)
             {
@@ -407,49 +397,52 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.source == msg.source)
                     {
                         e.pressure = payload.pressure;
-                        actions.emplace_back(
-                            [a = msg.action, e]
-                            {
-                                a(&e);
-                            });
+                        // actions.emplace_back(
+                        //     [a = msg.action, e]
+                        //     {
+                        //         a(&e);
+                        //     });
                     }
                 }
             }
             else if constexpr (std::is_same_v<T, PhysicalPadReleaseEvent>)
             {
-                auto it =
-                    std::find_if(activeState.physicalPadEvents.begin(),
-                                 activeState.physicalPadEvents.end(),
-                                 [&](const auto &e)
-                                 {
-                                     return e.padIndex == payload.padIndex;
-                                 });
-
-                if (it == activeState.physicalPadEvents.end())
+                if (auto it =
+                        std::find_if(activeState.physicalPadEvents.begin(),
+                                     activeState.physicalPadEvents.end(),
+                                     [&](const auto &e)
+                                     {
+                                         return e.padIndex == payload.padIndex;
+                                     });
+                    it != activeState.physicalPadEvents.end())
                 {
-                    actions.emplace_back(
-                        [a = msg.action]
-                        {
-                            a(nullptr);
-                        });
-                    return;
+                    activeState.physicalPadEvents.erase(it);
                 }
 
-                actions.emplace_back(
-                    [a = msg.action, e = *it]
-                    {
-                        a(&e);
-                    });
-                activeState.physicalPadEvents.erase(it);
+                // if (it == activeState.physicalPadEvents.end())
+                // {
+                //     actions.emplace_back(
+                //         [a = msg.action]
+                //         {
+                //             a(nullptr);
+                //         });
+                //     return;
+                // }
+                //
+                // actions.emplace_back(
+                //     [a = msg.action, e = *it]
+                //     {
+                //         a(&e);
+                //     });
             }
             else if constexpr (std::is_same_v<T, ProgramPadPressEvent>)
             {
                 activeState.programPadEvents.push_back(payload);
-                actions.emplace_back(
-                    [a = msg.action, ev = payload]
-                    {
-                        a(&ev);
-                    });
+                // actions.emplace_back(
+                //     [a = msg.action, ev = payload]
+                //     {
+                //         a(&ev);
+                //     });
             }
             else if constexpr (std::is_same_v<T, ProgramPadAftertouchEvent>)
             {
@@ -459,51 +452,55 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.source == msg.source)
                     {
                         e.pressure = payload.pressure;
-                        actions.emplace_back(
-                            [a = msg.action, e]
-                            {
-                                a(&e);
-                            });
+                        // actions.emplace_back(
+                        //     [a = msg.action, e]
+                        //     {
+                        //         a(&e);
+                        //     });
                     }
                 }
             }
             else if constexpr (std::is_same_v<T, ProgramPadReleaseEvent>)
             {
-                auto it = std::find_if(
-                    activeState.programPadEvents.begin(),
-                    activeState.programPadEvents.end(),
-                    [&](const auto &e)
-                    {
-                        return e.padIndex == payload.padIndex &&
-                               e.source == msg.source &&
-                               e.programIndex == payload.programIndex;
-                    });
-
-                if (it == activeState.programPadEvents.end())
+                if (auto it = std::find_if(activeState.programPadEvents.begin(),
+                                           activeState.programPadEvents.end(),
+                                           [&](const auto &e)
+                                           {
+                                               return e.padIndex ==
+                                                          payload.padIndex &&
+                                                      e.source == msg.source &&
+                                                      e.programIndex ==
+                                                          payload.programIndex;
+                                           });
+                    it != activeState.programPadEvents.end())
                 {
-                    actions.emplace_back(
-                        [a = msg.action]
-                        {
-                            a(nullptr);
-                        });
-                    return;
+                    activeState.programPadEvents.erase(it);
                 }
 
-                actions.emplace_back(
-                    [a = msg.action, e = *it]
-                    {
-                        a(&e);
-                    });
-                activeState.programPadEvents.erase(it);
+                // if (it == activeState.programPadEvents.end())
+                // {
+                //     actions.emplace_back(
+                //         [a = msg.action]
+                //         {
+                //             a(nullptr);
+                //         });
+                //     return;
+                // }
+                //
+                // actions.emplace_back(
+                //     [a = msg.action, e = *it]
+                //     {
+                //         a(&e);
+                //     });
             }
             else if constexpr (std::is_same_v<T, NoteOnEvent>)
             {
                 activeState.noteEvents.push_back(payload);
-                actions.emplace_back(
-                    [a = msg.action, ev = payload]
-                    {
-                        a(&ev);
-                    });
+                // actions.emplace_back(
+                //     [a = msg.action, ev = payload]
+                //     {
+                //         a(&ev);
+                //     });
             }
             else if constexpr (std::is_same_v<T, NoteAftertouchEvent>)
             {
@@ -514,43 +511,48 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         e.midiInputChannel == payload.midiInputChannel)
                     {
                         e.pressure = payload.pressure;
-                        actions.emplace_back(
-                            [a = msg.action, e]
-                            {
-                                a(&e);
-                            });
+                        // actions.emplace_back(
+                        //     [a = msg.action, e]
+                        //     {
+                        //         a(&e);
+                        //     });
                     }
                 }
             }
             else if constexpr (std::is_same_v<T, NoteOffEvent>)
             {
-                auto it = std::find_if(
-                    activeState.noteEvents.begin(),
-                    activeState.noteEvents.end(),
-                    [&](const auto &n)
-                    {
-                        return n.source == msg.source &&
-                               n.noteNumber == payload.noteNumber &&
-                               (n.source != PerformanceEventSource::MidiInput ||
-                                n.midiInputChannel == payload.midiInputChannel);
-                    });
-
-                if (it == activeState.noteEvents.end())
-                {
-                    actions.emplace_back(
-                        [a = msg.action]
+                if (auto it = std::find_if(
+                        activeState.noteEvents.begin(),
+                        activeState.noteEvents.end(),
+                        [&](const auto &n)
                         {
-                            a(nullptr);
+                            return n.source == msg.source &&
+                                   n.noteNumber == payload.noteNumber &&
+                                   (n.source !=
+                                        PerformanceEventSource::MidiInput ||
+                                    n.midiInputChannel ==
+                                        payload.midiInputChannel);
                         });
-                    return;
+                    it != activeState.noteEvents.end())
+                {
+                    activeState.noteEvents.erase(it);
                 }
 
-                actions.emplace_back(
-                    [a = msg.action, e = *it]
-                    {
-                        a(&e);
-                    });
-                activeState.noteEvents.erase(it);
+                // if (it == activeState.noteEvents.end())
+                // {
+                //     actions.emplace_back(
+                //         [a = msg.action]
+                //         {
+                //             a(nullptr);
+                //         });
+                //     return;
+                // }
+                //
+                // actions.emplace_back(
+                //     [a = msg.action, e = *it]
+                //     {
+                //         a(&e);
+                //     });
             }
             else if constexpr (std::is_same_v<T, UpdateDrumProgram>)
             {
