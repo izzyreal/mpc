@@ -31,6 +31,13 @@ void SequenceStateHandler::applyMessage(
         },
         [&](const SyncTrackEventIndices &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             const auto positionTicks = Sequencer::quarterNotesToTicks(
                 state.transport.positionQuarterNotes);
 
@@ -57,33 +64,78 @@ void SequenceStateHandler::applyMessage(
                     ev = ev->next;
                 }
             }
+
+            lock.release();
         },
         [&](const SetLoopEnabled &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             seq.loopEnabled = m.loopEnabled;
+
+            lock.release();
         },
         [&](const SetSequenceUsed &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             seq.used = m.used;
+
+            lock.release();
         },
         [&](const SetTempoChangeEnabled &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             seq.tempoChangeEnabled = m.tempoChangeEnabled;
+
+            lock.release();
         },
         [&](const SetFirstLoopBarIndex &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             seq.firstLoopBarIndex = m.barIndex;
             if (m.barIndex > seq.lastLoopBarIndex)
             {
                 seq.lastLoopBarIndex = m.barIndex;
             }
+
+            lock.release();
         },
         [&](const SetLastLoopBarIndex &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             seq.lastLoopBarIndex = m.barIndex;
 
@@ -92,13 +144,31 @@ void SequenceStateHandler::applyMessage(
             {
                 seq.firstLoopBarIndex = m.barIndex;
             }
+
+            lock.release();
         },
         [&](const SetInitialTempo &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             state.sequences[m.sequenceIndex].initialTempo = m.initialTempo;
+
+            lock.release();
         },
         [&](const SetTimeSignature &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             const SequenceStateView stateView(state.sequences[m.sequenceIndex]);
 
             const auto barStart = stateView.getFirstTickOfBar(m.barIndex);
@@ -140,13 +210,31 @@ void SequenceStateHandler::applyMessage(
                 m.timeSignature;
             state.sequences[m.sequenceIndex].barLengths[m.barIndex] =
                 m.timeSignature.getBarLength();
+
+            lock.release();
         },
         [&](const SetLastBarIndex &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             state.sequences[m.sequenceIndex].lastBarIndex = m.barIndex;
+
+            lock.release();
         },
         [&](const MoveTrack &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &tracks = state.sequences[m.sequenceIndex].tracks;
             const auto source = m.source;
             const auto dest = m.destination;
@@ -162,22 +250,40 @@ void SequenceStateHandler::applyMessage(
                 std::rotate(tracks.begin() + dest, tracks.begin() + source,
                             tracks.begin() + source + 1);
             }
+
+            lock.release();
         },
         [&](const InsertBars &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             applyInsertBars(m, state, actions);
+
+            lock.release();
         },
         [&](const DeleteBars &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             auto &seq = state.sequences[m.sequenceIndex];
             auto &ts = seq.timeSignatures;
             auto &bl = seq.barLengths;
 
             const int first = m.firstBarIndex;
-            const int last = m.lastBarIndex;    // inclusive
-            const int count = last - first + 1; // number of bars to remove
+            const int last = m.lastBarIndex;
+            const int count = last - first + 1;
 
-            const int total = seq.lastBarIndex + 1; // active bars count
+            const int total = seq.lastBarIndex + 1;
 
             const int tailBegin = last + 1;
             const int tailEnd = total;
@@ -200,30 +306,65 @@ void SequenceStateHandler::applyMessage(
                 applyMessage(state, actions,
                              SetSequenceUsed{m.sequenceIndex, false});
             }
+
+            lock.release();
         },
         [&](const DeleteTrack &m)
         {
-            applyMessage(state, actions,
-                         RemoveEvents{m.sequenceIndex, m.trackIndex});
-            state.sequences[m.sequenceIndex]
-                .tracks[m.trackIndex]
-                .initializeDefaults();
+            auto &lock = manager->trackLocks[m.sequenceIndex][m.trackIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
+            applyDeleteTrack(m, state);
+
+            lock.release();
         },
         [&](const DeleteAllTracks &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
             {
-                applyMessage(state, actions,
-                             DeleteTrack{m.sequenceIndex, TrackIndex(i)});
+                applyDeleteTrack(DeleteTrack{m.sequenceIndex, TrackIndex(i),
+                                         m.deviceIndex, m.programChange,
+                                         m.busType, m.velocityRatio}, state);
             }
+
+            lock.release();
         },
         [&](const UpdateSequenceEvents &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             applyUpdateSequenceEvents(m, state);
+
+            lock.release();
         },
         [&](const SetSequenceName &m)
         {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
             state.sequences[m.sequenceIndex].name.assign(m.name);
+
+            lock.release();
         }};
 
     std::visit(visitor, msg);
@@ -232,7 +373,7 @@ void SequenceStateHandler::applyMessage(
 void SequenceStateHandler::applyUpdateSequenceEvents(
     const UpdateSequenceEvents &m, SequencerState &state) const
 {
-    auto &lock = manager->sequenceLocks[m.sequence];
+    auto &lock = manager->sequenceLocks[m.sequenceIndex];
 
     if (!lock.try_acquire())
     {
@@ -245,13 +386,13 @@ void SequenceStateHandler::applyUpdateSequenceEvents(
         assert(trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
         assert(trackIndex != TempoChangeTrackIndex);
 
-        auto &track = state.sequences[m.sequence].tracks[trackIndex];
+        auto &track = state.sequences[m.sequenceIndex].tracks[trackIndex];
 
         for (const auto &src : events)
         {
             EventData *e = manager->acquireEvent();
             std::memcpy(e, &src, sizeof(EventData));
-            e->sequenceIndex = m.sequence;
+            e->sequenceIndex = m.sequenceIndex;
             e->trackIndex = TrackIndex(trackIndex);
             e->prev = nullptr;
             e->next = nullptr;
@@ -260,4 +401,19 @@ void SequenceStateHandler::applyUpdateSequenceEvents(
     }
 
     lock.release();
+}
+void SequenceStateHandler::applyDeleteTrack(const DeleteTrack &m,
+                                            SequencerState &state) const
+{
+    manager->trackStateHandler->applyRemoveEvents(
+        RemoveEvents{m.sequenceIndex, m.trackIndex}, state);
+
+    auto &track = state.sequences[m.sequenceIndex].tracks[m.trackIndex];
+
+    track.initializeDefaults();
+
+    track.device = m.deviceIndex;
+    track.velocityRatio = m.velocityRatio;
+    track.busType = m.busType;
+    track.programChange = m.programChange;
 }

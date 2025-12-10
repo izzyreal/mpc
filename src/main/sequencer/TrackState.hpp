@@ -29,13 +29,14 @@ namespace mpc::sequencer
         {
             eventsHead = nullptr;
             playEventIndex = EventIndex(0);
-            name.clear();
-            busType = BusType::DRUM1;
+            name = "(Unused)";
+            used = false;
             on = true;
+
+            busType = BusType::DRUM1;
             velocityRatio = 100;
             programChange = 0;
             device = 0;
-            used = false;
         }
     };
 } // namespace mpc::sequencer

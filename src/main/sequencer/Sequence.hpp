@@ -138,8 +138,24 @@ namespace mpc::sequencer
         // firstBar and lastBar are inclusive
         void deleteBars(int firstBar, int lastBar) const;
 
+        // Deletes a track and sets the following values according to the
+        // USER screen defaults:
+        // - Program change (0 - 128)
+        // - Velocity ratio (0 - 200)
+        // - Bus type (MIDI, DRUM1...DRUM4)
+        // - MIDI device index i.e. MIDI output port and channel (0 - 32)
+        // Other track properties have fixed defaults that they are set to:
+        // - On/Off status is set to On
+        // - Name is set to "(Unused)"
+        // - Usedness is set to false
+        // - All events are removed
         void deleteTrack(TrackIndex) const;
+
+        // Deletes all 64 non-meta tracks with the same behaviour as
+        // `deleteTrack`. Note that the tempo track at index 64 (the 65th
+        // track) has to be treated separatedly.
         void deleteAllTracks() const;
+
         void insertBars(int barCount, BarIndex afterBar,
                         const utils::SimpleAction &nextAction = {}) const;
         void moveTrack(int source, int destination);

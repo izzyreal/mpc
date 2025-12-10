@@ -977,7 +977,7 @@ void SequencerScreen::openWindow()
                 [layeredScreen = ls.lock()]
                 {
                     layeredScreen->postToUiThread(utils::Task(
-                        [&]
+                        [layeredScreen]
                         {
                             layeredScreen->openScreenById(
                                 ScreenId::TrackScreen);

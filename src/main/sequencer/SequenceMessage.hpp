@@ -26,7 +26,7 @@ namespace mpc::sequencer
     // handler will acquire memory slots for the events from the event pool.
     struct UpdateSequenceEvents
     {
-        SequenceIndex sequence;
+        SequenceIndex sequenceIndex;
         std::unordered_map<uint8_t, std::vector<EventData>> trackSnapshots;
     };
 
@@ -105,11 +105,19 @@ namespace mpc::sequencer
     {
         SequenceIndex sequenceIndex;
         TrackIndex trackIndex;
+        int8_t deviceIndex;
+        uint8_t programChange;
+        BusType busType;
+        uint8_t velocityRatio;
     };
 
     struct DeleteAllTracks
     {
         SequenceIndex sequenceIndex;
+        int8_t deviceIndex;
+        uint8_t programChange;
+        BusType busType;
+        uint8_t velocityRatio;
     };
 
     struct SetSequenceName

@@ -28,6 +28,8 @@ namespace mpc::sequencer
                              std::vector<utils::SimpleAction> &) const noexcept;
 
         void applyUpdateSequenceEvents(const UpdateSequenceEvents &m,
-                                       SequencerState &state) const;
+                                       SequencerState &) const;
+
+        void applyDeleteTrack(const DeleteTrack &, SequencerState &) const;
     };
 } // namespace mpc::sequencer

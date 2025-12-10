@@ -258,12 +258,7 @@ void Track::setName(const std::string &s) const
 
 std::string Track::getName() const
 {
-    const auto snapshot = getSnapshot(getIndex());
-    if (!snapshot.isUsed())
-    {
-        return "(Unused)";
-    }
-    return std::string(snapshot.getName());
+    return std::string(getSnapshot(getIndex()).getName());
 }
 
 std::vector<EventData> Track::getEventStates() const

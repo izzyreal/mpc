@@ -61,10 +61,12 @@ Sequence::Sequence(
             isSoloEnabled));
     }
 
-    GetTrackSnapshotFn getTempoTrackSnapshot([this](TrackIndex)
-    {
-        return this->getSnapshot(this->sequenceIndex).getTrack(TempoChangeTrackIndex);
-    });
+    GetTrackSnapshotFn getTempoTrackSnapshot(
+        [this](TrackIndex)
+        {
+            return this->getSnapshot(this->sequenceIndex)
+                .getTrack(TempoChangeTrackIndex);
+        });
 
     tracks.emplace_back(std::make_shared<Track>(
         postToUiThread, getDefaultTrackName, manager, getTempoTrackSnapshot,
@@ -200,26 +202,8 @@ void Sequence::init(const int newLastBarIndex) const
     setInitialTempo(userScreen->tempo);
     setLoopEnabled(userScreen->loop);
 
-    for (const auto &t : tracks)
-    {
-        t->removeEvents();
-
-        if (t->getIndex() == TempoChangeTrackIndex)
-        {
-            continue;
-        }
-
-        constexpr bool updateUsedness = false;
-
-        t->setOn(true, updateUsedness);
-        t->setDeviceIndex(userScreen->device, updateUsedness);
-        t->setProgramChange(userScreen->pgm, updateUsedness);
-        t->setBusType(userScreen->busType, updateUsedness);
-        t->setVelocityRatio(userScreen->velo, updateUsedness);
-        t->setTransmitProgramChangesEnabled(true, updateUsedness);
-
-        dispatch(SetTrackUsed{getSequenceIndex(), t->getIndex(), false});
-    }
+    deleteAllTracks();
+    deleteTrack(TempoChangeTrackIndex);
 
     setLastBarIndex(newLastBarIndex);
 
@@ -460,12 +444,20 @@ void Sequence::deleteBars(const int firstBar, const int lastBar) const
 
 void Sequence::deleteTrack(const TrackIndex trackIndex) const
 {
-    dispatch(DeleteTrack{getSequenceIndex(), trackIndex});
+    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+    dispatch(DeleteTrack{
+        getSequenceIndex(), trackIndex, static_cast<int8_t>(userScreen->device),
+        static_cast<uint8_t>(userScreen->pgm), userScreen->busType,
+        static_cast<uint8_t>(userScreen->velo)});
 }
 
 void Sequence::deleteAllTracks() const
 {
-    dispatch(DeleteAllTracks{getSequenceIndex()});
+    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+    dispatch(DeleteAllTracks{
+        getSequenceIndex(), static_cast<int8_t>(userScreen->device),
+        static_cast<uint8_t>(userScreen->pgm), userScreen->busType,
+        static_cast<uint8_t>(userScreen->velo)});
 }
 
 void Sequence::insertBars(const int barCount, const BarIndex afterBar,

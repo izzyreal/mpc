@@ -8,6 +8,7 @@ namespace mpc::sequencer
     struct SequencerState;
 
     class SequencerStateManager;
+    class SequenceStateHandler;
     class Sequencer;
 
     class TrackStateHandler final
@@ -30,5 +31,7 @@ namespace mpc::sequencer
         void applyUpdateEventTick(const UpdateEventTick &,
                                   SequencerState &) const;
         void applyRemoveDoubles(const RemoveDoubles &, SequencerState &) const;
+
+        friend class SequenceStateHandler;
     };
 } // namespace mpc::sequencer
