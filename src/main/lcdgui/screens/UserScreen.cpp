@@ -281,7 +281,7 @@ void UserScreen::setBus(const BusType busTypeToUse)
 
 void UserScreen::setDeviceNumber(const int i)
 {
-    device = std::clamp(i, 0, 33);
+    device = std::clamp(i, 0, 32);
     displayDeviceNumber();
     displayDeviceName();
 }
