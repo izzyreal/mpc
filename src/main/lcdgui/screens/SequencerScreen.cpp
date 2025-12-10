@@ -973,10 +973,15 @@ void SequencerScreen::openWindow()
     else if (focusedFieldName == "tr")
     {
         mpc.getSequencer()->getSelectedTrack()->setUsedIfCurrentlyUnused(
-            utils::SmallSimpleAction(
+            utils::SimpleAction(
                 [layeredScreen = ls.lock()]
                 {
-                    layeredScreen->openScreenById(ScreenId::TrackScreen);
+                    layeredScreen->postToUiThread(utils::Task(
+                        [&]
+                        {
+                            layeredScreen->openScreenById(
+                                ScreenId::TrackScreen);
+                        }));
                 }));
     }
     else if (focusedFieldName == "on")

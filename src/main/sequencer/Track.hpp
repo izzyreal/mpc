@@ -144,7 +144,7 @@ namespace mpc::sequencer
         SequenceIndex getSequenceIndex() const;
 
         void setUsedIfCurrentlyUnused(
-            utils::SmallSimpleAction &&onCompleteNameSetting = {});
+            utils::SimpleAction &&onCompleteNameSetting = {}) const;
 
         bool isTransmitProgramChangesEnabled() const;
 

@@ -85,31 +85,25 @@ mpc::SequenceIndex Track::getSequenceIndex() const
 }
 
 void Track::setUsedIfCurrentlyUnused(
-    utils::SmallSimpleAction &&onCompleteNameSetting)
+    utils::SimpleAction &&onCompleteNameSetting) const
 {
     if (isUsed() && getIndex() != TempoChangeTrackIndex)
     {
-        postToUiThread(utils::Task(
-            [onCompleteNameSetting]
-            {
-                onCompleteNameSetting();
-            }));
+        onCompleteNameSetting();
         return;
+    }
+
+    if (getIndex() != TempoChangeTrackIndex)
+    {
+        setName(getDefaultTrackName(getIndex()));
     }
 
     dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
 
-    if (getIndex() == TempoChangeTrackIndex)
+    if (getIndex() != TempoChangeTrackIndex)
     {
-        return;
+        manager->enqueueCallback(onCompleteNameSetting);
     }
-
-    postToUiThread(utils::Task(
-        [this, onCompleteNameSetting]
-        {
-            setName(getDefaultTrackName(getIndex()));
-            onCompleteNameSetting();
-        }));
 }
 
 bool Track::isTransmitProgramChangesEnabled() const
