@@ -143,24 +143,18 @@ namespace mpc::utils
             return *this;
         }
 
-        R operator()(Args... as)
+        template <class T = R, class = std::enable_if_t<std::is_void_v<T> && sizeof...(Args) == 0>>
+        void operator()()
         {
-            assert(invoke);
-            return invoke(storage, std::forward<Args>(as)...);
+            if (invoke)
+                invoke(storage);
         }
 
+        template <class T = R, class = std::enable_if_t<!std::is_void_v<T> || sizeof...(Args) != 0>>
         R operator()(Args... as) const
         {
             assert(invoke);
             return invoke(storage, std::forward<Args>(as)...);
-        }
-
-        template <class T = R>
-        std::enable_if_t<std::is_void_v<T>, void>
-        operator()()
-        {
-            if (invoke)
-                invoke(storage);
         }
     };
 
