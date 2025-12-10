@@ -52,15 +52,13 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
     {
         const auto t1 = fromSequence.getTrack(i);
 
-        if (!t1->isUsed())
+        if (!t1.isUsed())
         {
             continue;
         }
 
         auto t1Events =
-            t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
-
-        const auto t2 = toSequence.getTrack(i);
+            t1.getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
 
         sequencer->getSequence(m.toSeqIndex)
             ->getTrack(i)

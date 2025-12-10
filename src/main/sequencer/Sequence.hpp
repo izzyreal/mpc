@@ -1,9 +1,12 @@
 #pragma once
 
-#include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
-#include "SequenceMessage.hpp"
-#include "SequencerStateView.hpp"
+
+#include "sequencer/BusType.hpp"
+#include "sequencer/SequenceMessage.hpp"
+#include "sequencer/SequencerStateView.hpp"
+
+#include "utils/SmallFn.hpp"
 
 #include <vector>
 #include <memory>
@@ -38,6 +41,9 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    using GetSequenceSnapshotFn =
+        const utils::SmallFn<8, SequenceStateView const(SequenceIndex)>;
+
     class Sequence final
     {
     public:
@@ -52,8 +58,7 @@ namespace mpc::sequencer
 
         Sequence(const utils::PostToUiThreadFn &,
                  std::shared_ptr<SequencerStateManager> manager,
-                 const std::function<SequenceStateView(
-                     SequenceIndex)> &getSnapshot,
+                 const GetSequenceSnapshotFn &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
                  std::function<std::string(int)> getDefaultTrackName,
                  std::function<int64_t()> getTickPosition,
@@ -155,8 +160,7 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        const std::function<SequenceStateView(SequenceIndex)>
-            getSnapshot;
+        const GetSequenceSnapshotFn getSnapshot;
 
     private:
         SequenceIndex sequenceIndex{NoSequenceIndex};

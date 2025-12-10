@@ -22,8 +22,7 @@ Track::Track(
     const utils::PostToUiThreadFn &postToUiThread,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::shared_ptr<SequencerStateManager> &manager,
-    const std::function<std::shared_ptr<TrackStateView>(TrackIndex)>
-        &getSnapshot,
+    const GetTrackSnapshotFn &getSnapshot,
     const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
     Sequence *parent, const std::function<int64_t()> &getTickPosition,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
@@ -108,7 +107,11 @@ void Track::setUsedIfCurrentlyUnused(
 
 bool Track::isTransmitProgramChangesEnabled() const
 {
-    return getSnapshot(getIndex())->isTransmitProgramChangesEnabled();
+    // return getSnapshot(getIndex()).isTransmitProgramChangesEnabled();
+
+    // const auto snapshot = getSnapshot(TrackIndex(0));
+
+    return true;
 }
 
 void Track::setTransmitProgramChangesEnabled(const bool b,
@@ -177,7 +180,7 @@ void Track::setVelocityRatio(const int i, const bool updateUsedness) const
 
 int Track::getVelocityRatio() const
 {
-    return getSnapshot(getIndex())->getVelocityRatio();
+    return getSnapshot(getIndex()).getVelocityRatio();
 }
 
 void Track::setProgramChange(const int i, const bool updateUsedness) const
@@ -193,7 +196,7 @@ void Track::setProgramChange(const int i, const bool updateUsedness) const
 
 int Track::getProgramChange() const
 {
-    return getSnapshot(getIndex())->getProgramChange();
+    return getSnapshot(getIndex()).getProgramChange();
 }
 
 void Track::setBusType(BusType busType, const bool updateUsedness) const
@@ -215,7 +218,7 @@ void Track::setBusType(BusType busType, const bool updateUsedness) const
 
 BusType Track::getBusType() const
 {
-    return getSnapshot(getIndex())->getBusType();
+    return getSnapshot(getIndex()).getBusType();
 }
 
 void Track::setDeviceIndex(const int i, const bool updateUsedness) const
@@ -230,13 +233,13 @@ void Track::setDeviceIndex(const int i, const bool updateUsedness) const
 
 int Track::getDeviceIndex() const
 {
-    return getSnapshot(getIndex())->getDeviceIndex();
+    return getSnapshot(getIndex()).getDeviceIndex();
 }
 
 std::shared_ptr<EventRef> Track::getEvent(const int i) const
 {
     const auto eventHandle =
-        getSnapshot(getIndex())->getEventByIndex(EventIndex(i));
+        getSnapshot(getIndex()).getEventByIndex(EventIndex(i));
     auto &lock =
         manager
             ->trackLocks[eventHandle->sequenceIndex][eventHandle->trackIndex];
@@ -256,17 +259,17 @@ void Track::setName(const std::string &s) const
 std::string Track::getName() const
 {
     const auto snapshot = getSnapshot(getIndex());
-    if (!snapshot->isUsed())
+    if (!snapshot.isUsed())
     {
         return "(Unused)";
     }
-    return std::string(snapshot->getName());
+    return std::string(snapshot.getName());
 }
 
 std::vector<EventData> Track::getEventStates() const
 {
     std::vector<EventData> result;
-    for (const auto e : getSnapshot(getIndex())->getEvents())
+    for (const auto e : getSnapshot(getIndex()).getEvents())
     {
         result.push_back(*e);
     }
@@ -275,7 +278,7 @@ std::vector<EventData> Track::getEventStates() const
 
 std::vector<EventData *> Track::getEventHandles() const
 {
-    return getSnapshot(getIndex())->getEvents();
+    return getSnapshot(getIndex()).getEvents();
 }
 
 std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
@@ -286,11 +289,11 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
 
     const auto snapshot = getSnapshot(getIndex());
 
-    const int eventCount = snapshot->getEventCount();
+    const int eventCount = snapshot.getEventCount();
 
     for (int i = 0; i < eventCount; ++i)
     {
-        const auto eventHandle = snapshot->getEventByIndex(EventIndex(i));
+        const auto eventHandle = snapshot.getEventByIndex(EventIndex(i));
         const auto eventSnapshot = *eventHandle;
         auto event =
             mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
@@ -304,12 +307,12 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
 
 bool Track::isOn() const
 {
-    return getSnapshot(getIndex())->isOn();
+    return getSnapshot(getIndex()).isOn();
 }
 
 bool Track::isUsed() const
 {
-    return getSnapshot(getIndex())->isUsed();
+    return getSnapshot(getIndex()).isUsed();
 }
 
 std::vector<std::shared_ptr<EventRef>>
@@ -320,7 +323,7 @@ Track::getEventRange(const int startTick, const int endTick) const
 
     std::vector<std::shared_ptr<EventRef>> result;
     for (const auto &eventHandle :
-         getSnapshot(getIndex())->getEventRange(startTick, endTick))
+         getSnapshot(getIndex()).getEventRange(startTick, endTick))
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
@@ -348,7 +351,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
     lock.acquire();
 
-    for (const auto &eventHandle : getSnapshot(getIndex())->getNoteEvents())
+    for (const auto &eventHandle : getSnapshot(getIndex()).getNoteEvents())
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
@@ -364,21 +367,21 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 int Track::getNextTick() const
 {
     const auto snapshot = getSnapshot(getIndex());
-    const auto playEventIndex = snapshot->getPlayEventIndex();
+    const auto playEventIndex = snapshot.getPlayEventIndex();
 
-    if (playEventIndex >= snapshot->getEventCount())
+    if (playEventIndex >= snapshot.getEventCount())
     {
         return std::numeric_limits<int>::max();
     }
 
-    return snapshot->getEventByIndex(playEventIndex)->tick;
+    return snapshot.getEventByIndex(playEventIndex)->tick;
 }
 
 void Track::playNext() const
 {
     const auto snapshot = getSnapshot(getIndex());
-    auto playEventIndex = snapshot->getPlayEventIndex();
-    const auto event = snapshot->getEventByIndex(playEventIndex);
+    auto playEventIndex = snapshot.getPlayEventIndex();
+    const auto event = snapshot.getEventByIndex(playEventIndex);
 
     if (!event)
     {
@@ -430,7 +433,7 @@ EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,
                                          const Velocity velocity,
                                          const int64_t metronomeOnlyTick) const
 {
-    if (const auto result = getSnapshot(getIndex())->findNoteEvent(tick, note))
+    if (const auto result = getSnapshot(getIndex()).findNoteEvent(tick, note))
     {
         result->beingRecorded = true;
         result->velocity = velocity;

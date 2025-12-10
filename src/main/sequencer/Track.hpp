@@ -3,11 +3,12 @@
 #include "IntTypes.hpp"
 
 #include "sequencer/BusType.hpp"
-#include "sequencer/SequencerStateView.hpp"
+#include "sequencer/TrackStateView.hpp"
 #include "sequencer/TrackMessage.hpp"
 #include "sequencer/EventData.hpp"
 
 #include "utils/SimpleAction.hpp"
+#include "utils/SmallFn.hpp"
 
 #include <vector>
 #include <memory>
@@ -39,6 +40,8 @@ namespace mpc::sequencer
     class Bus;
     class SequenceStateView;
 
+    using GetTrackSnapshotFn = const utils::SmallFn<8, TrackStateView const(TrackIndex)>;
+
     class Track
     {
     public:
@@ -46,8 +49,7 @@ namespace mpc::sequencer
             const utils::PostToUiThreadFn &,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::shared_ptr<SequencerStateManager> &,
-            const std::function<std::shared_ptr<TrackStateView>(TrackIndex)>
-                &getSnapshot,
+            const GetTrackSnapshotFn &getSnapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<int64_t()> &getTickPosition,
@@ -90,8 +92,9 @@ namespace mpc::sequencer
         TrackIndex getIndex() const;
         void setOn(bool b, bool updateUsedness = true) const;
 
-        void acquireAndInsertEvent(const EventData &,
-                                   const utils::SimpleAction &onComplete = {}) const;
+        void
+        acquireAndInsertEvent(const EventData &,
+                              const utils::SimpleAction &onComplete = {}) const;
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0) const;
@@ -148,14 +151,15 @@ namespace mpc::sequencer
 
         bool isTransmitProgramChangesEnabled() const;
 
-        void setTransmitProgramChangesEnabled(bool, bool updateUsedness = true) const;
+        void setTransmitProgramChangesEnabled(bool,
+                                              bool updateUsedness = true) const;
 
     private:
         utils::PostToUiThreadFn postToUiThread;
         const std::function<std::string(int)> getDefaultTrackName;
         Sequence *parent{nullptr};
         std::shared_ptr<SequencerStateManager> manager;
-        std::function<std::shared_ptr<TrackStateView>(TrackIndex)> getSnapshot;
+        const GetTrackSnapshotFn getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
 
         TrackIndex trackIndex{0};
@@ -181,7 +185,8 @@ namespace mpc::sequencer
 
         void updateEventTick(EventData *, int newTick) const;
 
-        void insertAcquiredEvent(EventData *event,
-                                 const utils::SimpleAction &onComplete = {}) const;
+        void
+        insertAcquiredEvent(EventData *event,
+                            const utils::SimpleAction &onComplete = {}) const;
     };
 } // namespace mpc::sequencer

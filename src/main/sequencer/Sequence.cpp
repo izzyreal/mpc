@@ -19,8 +19,7 @@ using namespace mpc::lcdgui::screens;
 Sequence::Sequence(
     const utils::PostToUiThreadFn &postToUiThread,
     std::shared_ptr<SequencerStateManager> manager,
-    const std::function<SequenceStateView(SequenceIndex)>
-        &getSnapshot,
+    const GetSequenceSnapshotFn &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
@@ -46,11 +45,12 @@ Sequence::Sequence(
     for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT;
          ++trackIndex)
     {
-        std::function getTrackSnapshot =
-            [getSnapshot, this](const TrackIndex idx)
-        {
-            return getSnapshot(this->sequenceIndex).getTrack(idx);
-        };
+        GetTrackSnapshotFn getTrackSnapshot(
+            [this](const TrackIndex idx)
+            {
+                return this->getSnapshot(this->sequenceIndex).getTrack(idx);
+            });
+
         tracks.emplace_back(std::make_shared<Track>(
             postToUiThread, getDefaultTrackName, manager, getTrackSnapshot,
             dispatch, trackIndex, this, getTickPosition, getScreens,
@@ -61,11 +61,10 @@ Sequence::Sequence(
             isSoloEnabled));
     }
 
-    std::function getTempoTrackSnapshot = [getSnapshot, this](TrackIndex)
+    GetTrackSnapshotFn getTempoTrackSnapshot([this](TrackIndex)
     {
-        return getSnapshot(this->sequenceIndex)
-            .getTrack(TempoChangeTrackIndex);
-    };
+        return this->getSnapshot(this->sequenceIndex).getTrack(TempoChangeTrackIndex);
+    });
 
     tracks.emplace_back(std::make_shared<Track>(
         postToUiThread, getDefaultTrackName, manager, getTempoTrackSnapshot,

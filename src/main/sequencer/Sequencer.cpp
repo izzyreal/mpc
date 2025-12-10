@@ -229,10 +229,10 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
         getStateManager()->enqueue(std::move(m));
     };
 
-    const std::function getSnapshot = [this](const SequenceIndex sequenceIndex)
+    const GetSequenceSnapshotFn getSnapshot([this](const SequenceIndex sequenceIndex)
     {
         return getStateManager()->getSnapshot().getSequenceState(sequenceIndex);
-    };
+    });
 
     destination = std::make_shared<Sequence>(
         layeredScreen->postToUiThread, stateManager, getSnapshot, dispatch,

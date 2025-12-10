@@ -38,7 +38,7 @@ void Track::correctTimeRange(const int startPos, const int endPos,
         }
     }
 
-    for (const auto &event : getSnapshot(getIndex())->getNoteEvents())
+    for (const auto &event : getSnapshot(getIndex()).getNoteEvents())
     {
         if (event->tick >= endPos)
         {

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cassert>
 
 namespace mpc::utils
 {
@@ -144,14 +145,22 @@ namespace mpc::utils
 
         R operator()(Args... as)
         {
-            if (!invoke) return R();
+            assert(invoke);
             return invoke(storage, std::forward<Args>(as)...);
         }
 
         R operator()(Args... as) const
         {
-            if (!invoke) return R();
+            assert(invoke);
             return invoke(storage, std::forward<Args>(as)...);
+        }
+
+        template <class T = R>
+        std::enable_if_t<std::is_void_v<T>, void>
+        operator()()
+        {
+            if (invoke)
+                invoke(storage);
         }
     };
 

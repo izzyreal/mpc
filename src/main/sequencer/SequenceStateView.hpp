@@ -4,7 +4,6 @@
 #include "IntTypes.hpp"
 #include "TimeSignature.hpp"
 
-#include <memory>
 #include <vector>
 #include <string_view>
 
@@ -19,7 +18,7 @@ namespace mpc::sequencer
 
         std::string_view getName() const;
 
-        std::shared_ptr<TrackStateView> getTrack(int trackIndex) const;
+        TrackStateView getTrack(int trackIndex) const;
         Tick getBarLength(int barIndex) const;
         std::array<Tick, Mpc2000XlSpecs::MAX_BAR_COUNT> getBarLengths() const;
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>

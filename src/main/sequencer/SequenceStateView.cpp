@@ -15,10 +15,10 @@ std::string_view SequenceStateView::getName() const
     return state.name;
 }
 
-std::shared_ptr<TrackStateView>
+TrackStateView
 SequenceStateView::getTrack(const int trackIndex) const
 {
-    return std::make_shared<TrackStateView>(state.tracks[trackIndex]);
+    return TrackStateView(state.tracks[trackIndex]);
 }
 
 mpc::Tick SequenceStateView::getBarLength(const int barIndex) const

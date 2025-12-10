@@ -66,8 +66,8 @@ bool Track::shouldRemovePlayIndexEventDueToErasePressed() const
     }
 
     const auto snapshot = getSnapshot(getIndex());
-    const auto playEventIndex = snapshot->getPlayEventIndex();
-    const auto event = snapshot->getEventByIndex(playEventIndex);
+    const auto playEventIndex = snapshot.getPlayEventIndex();
+    const auto event = snapshot.getEventByIndex(playEventIndex);
 
     if (!event || event->type != EventType::NoteOn)
     {
