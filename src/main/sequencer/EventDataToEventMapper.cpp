@@ -1,4 +1,4 @@
-#include "sequencer/EventStateToEventMapper.hpp"
+#include "sequencer/EventDataToEventMapper.hpp"
 
 #include "sequencer/EventType.hpp"
 
@@ -16,7 +16,7 @@ namespace mpc::sequencer
 {
     class SequencerStateManager;
     std::shared_ptr<EventRef>
-    mapEventStateToEvent(EventData *const ptr, const EventData &snapshot,
+    mapEventDataToEvent(EventData *const ptr, const EventData &snapshot,
                          const std::function<void(TrackMessage &&)> &dispatch,
                          Sequence *parent)
     {

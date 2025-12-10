@@ -55,6 +55,11 @@ namespace mpc
         static constexpr int8_t MAX_SEQUENCE_NAME_LENGTH = 16;
         static constexpr int8_t MAX_SONG_NAME_LENGTH = 16;
         static constexpr int8_t MAX_PROGRAM_NAME_LENGTH = 16;
+
         static constexpr int8_t MAX_SOUND_NAME_LENGTH = 16;
+
+        static constexpr double MIN_TEMPO = 30.0;
+        static constexpr double MAX_TEMPO = 300.0;
+        static constexpr double DEFAULT_TEMPO = 120.0;
     };
 } // namespace mpc

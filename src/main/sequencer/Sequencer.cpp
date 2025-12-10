@@ -1,5 +1,6 @@
 #include "Sequencer.hpp"
 
+#include "EventDataToEventMapper.hpp"
 #include "MpcSpecs.hpp"
 
 #include "sequencer/SequenceStateView.hpp"
@@ -183,32 +184,32 @@ Sequencer::getDrumBus(const DrumBusIndex drumBusIndex) const
 
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
-    auto index = -1;
-    const auto s = getSelectedSequence();
 
-    if (!s->isUsed())
+    const std::function dispatch = [this](TrackMessage &&m)
+    {
+        getStateManager()->enqueue(std::move(m));
+    };
+
+    const auto eventData = getCurrentTempoChangeEventData();
+
+    return std::dynamic_pointer_cast<TempoChangeEvent>(mapEventDataToEvent(
+        eventData, *eventData, dispatch, getSelectedSequence().get()));
+}
+
+EventData *Sequencer::getCurrentTempoChangeEventData() const
+{
+    const auto snapshot = getStateManager()->getSnapshot();
+    const auto sequence =
+        snapshot.getSequenceState(snapshot.getSelectedSequenceIndex());
+
+    if (!sequence.isUsed())
     {
         return {};
     }
 
-    for (const auto &tce : s->getTempoChangeEvents())
-    {
-        if (transport->getTickPosition() >= tce->getTick())
-        {
-            index++;
-        }
-        else
-        {
-            break;
-        }
-    }
+    const auto pos = snapshot.getTransportStateView().getPositionTicks();
 
-    if (index == -1)
-    {
-        return {};
-    }
-
-    return s->getTempoChangeEvents()[index];
+    return sequence.getTempoChangeEventForPositionTicks(pos);
 }
 
 std::shared_ptr<EventHandler> Sequencer::getEventHandler()
@@ -229,10 +230,12 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
         getStateManager()->enqueue(std::move(m));
     };
 
-    const GetSequenceSnapshotFn getSnapshot([this](const SequenceIndex sequenceIndex)
-    {
-        return getStateManager()->getSnapshot().getSequenceState(sequenceIndex);
-    });
+    const GetSequenceSnapshotFn getSnapshot(
+        [this](const SequenceIndex sequenceIndex)
+        {
+            return getStateManager()->getSnapshot().getSequenceState(
+                sequenceIndex);
+        });
 
     destination = std::make_shared<Sequence>(
         layeredScreen->postToUiThread, stateManager, getSnapshot, dispatch,

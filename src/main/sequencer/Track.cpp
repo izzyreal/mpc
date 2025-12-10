@@ -1,6 +1,6 @@
 #include "sequencer/Track.hpp"
 
-#include "EventStateToEventMapper.hpp"
+#include "EventDataToEventMapper.hpp"
 #include "SequencerStateManager.hpp"
 #include "TrackStateView.hpp"
 #include "sampler/Sampler.hpp"
@@ -246,7 +246,7 @@ std::shared_ptr<EventRef> Track::getEvent(const int i) const
     lock.acquire();
     const auto eventSnapshot = *eventHandle;
     lock.release();
-    return mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
+    return mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent);
 }
 
 void Track::setName(const std::string &s) const
@@ -291,7 +291,7 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
         const auto eventHandle = snapshot.getEventByIndex(EventIndex(i));
         const auto eventSnapshot = *eventHandle;
         auto event =
-            mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent);
+            mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent);
         result.emplace_back(event);
     }
 
@@ -322,7 +322,7 @@ Track::getEventRange(const int startTick, const int endTick) const
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
-            mapEventStateToEvent(eventHandle, eventSnapshot, dispatch, parent));
+            mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent));
     }
 
     lock.release();
@@ -350,7 +350,7 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     {
         const auto eventSnapshot = *eventHandle;
         result.emplace_back(
-            std::dynamic_pointer_cast<NoteOnEvent>(mapEventStateToEvent(
+            std::dynamic_pointer_cast<NoteOnEvent>(mapEventDataToEvent(
                 eventHandle, eventSnapshot, dispatch, parent)));
     }
 

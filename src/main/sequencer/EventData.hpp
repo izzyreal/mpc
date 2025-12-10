@@ -1,7 +1,11 @@
 #pragma once
 
-#include "IntTypes.hpp"
 #include "sequencer/EventType.hpp"
+
+#include "FloatTypes.hpp"
+#include "IntTypes.hpp"
+
+#include <cassert>
 
 namespace mpc::sequencer
 {
@@ -139,6 +143,13 @@ namespace mpc::sequencer
             velocity = other->velocity;
             noteVariationType = other->noteVariationType;
             noteVariationValue = other->noteVariationValue;
+        }
+
+        double getTempo(const double baseTempo) const
+        {
+            assert(type == EventType::TempoChange);
+            return std::clamp(baseTempo * amount * 0.001, MinTempo,
+                              MaxTempo);
         }
     };
 } // namespace mpc::sequencer

@@ -56,3 +56,8 @@ bool SequencerStateView::isUndoSequenceAvailable() const noexcept
 {
     return state->undoSequenceAvailable;
 }
+
+SequenceStateView SequencerStateView::getSelectedSequenceStateView() const
+{
+    return SequenceStateView(state->sequences[state->selectedSequenceIndex]);
+}

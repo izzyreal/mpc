@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BusType.hpp"
+#include "EventData.hpp"
 #include "IntTypes.hpp"
 #include "utils/SimpleAction.hpp"
 #include "utils/SmallFn.hpp"
@@ -106,6 +107,7 @@ namespace mpc::sequencer
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
+        EventData *getCurrentTempoChangeEventData() const;
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
 
         std::shared_ptr<Clock> clock;

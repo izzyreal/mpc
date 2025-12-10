@@ -15,8 +15,7 @@ std::string_view SequenceStateView::getName() const
     return state.name;
 }
 
-TrackStateView
-SequenceStateView::getTrack(const int trackIndex) const
+TrackStateView SequenceStateView::getTrack(const int trackIndex) const
 {
     return TrackStateView(state.tracks[trackIndex]);
 }
@@ -133,4 +132,17 @@ std::vector<EventData> SequenceStateView::getTempoChangeEvents() const
     }
 
     return result;
+}
+
+EventData *
+SequenceStateView::getTempoChangeEventForPositionTicks(const Tick pos) const
+{
+    EventData *it = state.tracks[TempoChangeTrackIndex].eventsHead;
+
+    while (it && it->next && it->next->tick < pos)
+    {
+        it = it->next;
+    }
+
+    return it;
 }

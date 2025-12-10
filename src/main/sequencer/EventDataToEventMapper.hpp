@@ -13,7 +13,7 @@ namespace mpc::sequencer
     class Sequence;
 
     std::shared_ptr<EventRef>
-    mapEventStateToEvent(EventData *ptr, const EventData &snapshot,
+    mapEventDataToEvent(EventData *ptr, const EventData &snapshot,
                          const std::function<void(TrackMessage &&)> &dispatch,
                          Sequence *parent);
 } // namespace mpc::sequencer

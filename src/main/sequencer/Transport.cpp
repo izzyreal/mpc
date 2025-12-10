@@ -5,9 +5,7 @@
 #include "SequencerStateManager.hpp"
 #include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
-#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "sequencer/Sequence.hpp"
@@ -250,7 +248,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
 
     const auto song = sequencer.getSelectedSong();
     if (!song || song->getStepCount() == 0)
+    {
         return result;
+    }
 
     uint64_t songEndTick = 0;
 
@@ -259,7 +259,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
         const auto step = song->getStep(SongStepIndex(stepIndex));
         const auto sequence = sequencer.getSequence(step.sequenceIndex);
         if (!sequence->isUsed())
+        {
             continue;
+        }
 
         const uint64_t seqTicks = sequence->getLastTick();
         songEndTick += seqTicks * step.repetitionCount;
@@ -268,7 +270,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
     const double songLengthQuarterNotes =
         Sequencer::ticksToQuarterNotes(songEndTick);
     if (songLengthQuarterNotes <= 0.0)
+    {
         return result;
+    }
 
     auto wrapped = positionQuarterNotes;
 
@@ -276,7 +280,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
     {
         wrapped = std::fmod(wrapped, songLengthQuarterNotes);
         if (wrapped < 0.0)
+        {
             wrapped += songLengthQuarterNotes;
+        }
     }
 
     uint64_t stepStartTick = 0;
@@ -286,7 +292,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
         const auto step = song->getStep(SongStepIndex(stepIndex));
         const auto sequence = sequencer.getSequence(step.sequenceIndex);
         if (!sequence->isUsed())
+        {
             continue;
+        }
 
         const uint64_t seqTicks = sequence->getLastTick();
         const uint64_t stepTicks = seqTicks * step.repetitionCount;
@@ -294,14 +302,12 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
 
         const double stepStartQN =
             Sequencer::ticksToQuarterNotes(stepStartTick);
-        const double stepEndQN =
-            Sequencer::ticksToQuarterNotes(stepEndTick);
+        const double stepEndQN = Sequencer::ticksToQuarterNotes(stepEndTick);
 
         if (wrapped >= stepStartQN && wrapped < stepEndQN)
         {
             const double offsetWithinStepQN = wrapped - stepStartQN;
-            const double seqLengthQN =
-                Sequencer::ticksToQuarterNotes(seqTicks);
+            const double seqLengthQN = Sequencer::ticksToQuarterNotes(seqTicks);
 
             int playedRepetitionCount = 0;
             if (seqLengthQN > 0.0)
@@ -309,7 +315,9 @@ WrappedSongPosition Transport::getWrappedPositionInSong(
                 playedRepetitionCount =
                     static_cast<int>(offsetWithinStepQN / seqLengthQN);
                 if (playedRepetitionCount >= step.repetitionCount)
+                {
                     playedRepetitionCount = step.repetitionCount - 1;
+                }
             }
 
             result.position = fmod(offsetWithinStepQN, seqLengthQN);
@@ -868,53 +876,49 @@ void Transport::setTempo(const double newTempo) const
 
 double Transport::getTempo() const
 {
-    const auto snapshot =
-        sequencer.getStateManager()->getSnapshot().getTransportStateView();
+    const auto sequencerSnapshot = sequencer.getStateManager()->getSnapshot();
 
-    if (!snapshot.isTempoSourceSequenceEnabled())
+    const auto transportSnapshot = sequencerSnapshot.getTransportStateView();
+
+    if (!transportSnapshot.isTempoSourceSequenceEnabled())
     {
-        return snapshot.getMasterTempo();
+        return transportSnapshot.getMasterTempo();
     }
 
-    const auto seq = sequencer.getSelectedSequence();
+    const auto sequenceSnapshot =
+        sequencerSnapshot.getSelectedSequenceStateView();
 
-    if (!seq->isUsed())
+    if (!sequenceSnapshot.isUsed())
     {
-        return 120.0;
+        return DefaultTempo;
     }
 
-    if (screengroups::isSongScreen(
-            sequencer.layeredScreen->getCurrentScreenId()))
-    {
-        if (!seq->isUsed())
-        {
-            return 120.0;
-        }
-    }
+    const auto tempoChangeEvent = sequencer.getCurrentTempoChangeEventData();
 
-    const auto tce = sequencer.getCurrentTempoChangeEvent();
-
-    if (snapshot.isTempoSourceSequenceEnabled())
+    if (transportSnapshot.isTempoSourceSequenceEnabled())
     {
         const auto ignoreTempoChangeScreen =
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
-        if (seq->isTempoChangeOn() || (sequencer.isSongModeEnabled() &&
-                                       !ignoreTempoChangeScreen->getIgnore()))
+        if (sequenceSnapshot.isTempoChangeEnabled() ||
+            (sequencer.isSongModeEnabled() &&
+             !ignoreTempoChangeScreen->getIgnore()))
         {
-            if (tce)
+            if (tempoChangeEvent)
             {
-                return tce->getTempo();
+
+                return tempoChangeEvent->getTempo(
+                    sequenceSnapshot.getInitialTempo());
             }
         }
 
-        return sequencer.getSelectedSequence()->getInitialTempo();
+        return sequenceSnapshot.getInitialTempo();
     }
 
-    if (seq->isTempoChangeOn() && tce)
+    if (sequenceSnapshot.isTempoChangeEnabled() && tempoChangeEvent)
     {
-        return snapshot.getMasterTempo() * tce->getRatio() * 0.001;
+        return tempoChangeEvent->getTempo(transportSnapshot.getMasterTempo());
     }
 
-    return snapshot.getMasterTempo();
+    return transportSnapshot.getMasterTempo();
 }

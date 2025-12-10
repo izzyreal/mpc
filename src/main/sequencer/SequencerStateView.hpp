@@ -14,7 +14,7 @@ namespace mpc::sequencer
     {
     public:
         explicit SequencerStateView(
-            const SequencerState *const) noexcept;
+            const SequencerState *) noexcept;
 
         SequenceStateView
             getSequenceState(SequenceIndex) const;
@@ -31,6 +31,8 @@ namespace mpc::sequencer
         SongStateView getSongStateView(SongIndex) const;
 
         bool isUndoSequenceAvailable() const noexcept;
+
+        SequenceStateView getSelectedSequenceStateView() const;
 
     private:
         const SequencerState *const state;
