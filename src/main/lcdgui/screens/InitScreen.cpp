@@ -27,8 +27,8 @@ void InitScreen::function(int i)
             const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
             userScreen->resetPreferences();
 
-            const auto setupScreen = mpc.screens->get<ScreenId::SetupScreen>();
-            setupScreen->resetPreferences();
+            // const auto setupScreen = mpc.screens->get<ScreenId::SetupScreen>();
+            // setupScreen->resetPreferences();
 
             openScreenById(ScreenId::SequencerScreen);
             break;
