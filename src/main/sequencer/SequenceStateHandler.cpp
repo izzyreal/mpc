@@ -373,14 +373,6 @@ void SequenceStateHandler::applyMessage(
 void SequenceStateHandler::applyUpdateSequenceEvents(
     const UpdateSequenceEvents &m, SequencerState &state) const
 {
-    auto &lock = manager->sequenceLocks[m.sequenceIndex];
-
-    if (!lock.try_acquire())
-    {
-        manager->enqueue(m);
-        return;
-    }
-
     for (auto &[trackIndex, events] : m.trackSnapshots)
     {
         assert(trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
@@ -399,9 +391,8 @@ void SequenceStateHandler::applyUpdateSequenceEvents(
             manager->insertAcquiredEvent(track, e);
         }
     }
-
-    lock.release();
 }
+
 void SequenceStateHandler::applyDeleteTrack(const DeleteTrack &m,
                                             SequencerState &state) const
 {
