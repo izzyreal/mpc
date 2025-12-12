@@ -40,7 +40,7 @@ namespace mpc::sequencer
     class Bus;
     class SequenceStateView;
 
-    using GetTrackSnapshotFn = const utils::SmallFn<8, TrackStateView const(TrackIndex)>;
+    using GetTrackSnapshotFn = utils::SmallFn<8, TrackStateView(TrackIndex)>;
 
     class Track
     {
@@ -49,7 +49,7 @@ namespace mpc::sequencer
             const utils::PostToUiThreadFn &,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::shared_ptr<SequencerStateManager> &,
-            const GetTrackSnapshotFn &getSnapshot,
+            GetTrackSnapshotFn &&getSnapshot,
             const std::function<void(TrackMessage &&)> &dispatch,
             int trackIndex, Sequence *parent,
             const std::function<int64_t()> &getTickPosition,
@@ -94,7 +94,7 @@ namespace mpc::sequencer
 
         void
         acquireAndInsertEvent(const EventData &,
-                              const utils::SimpleAction &onComplete = {}) const;
+                              utils::SimpleAction &&onComplete = {}) const;
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0) const;
@@ -153,11 +153,11 @@ namespace mpc::sequencer
                                               bool updateUsedness = true) const;
 
     private:
-        utils::PostToUiThreadFn postToUiThread;
+        const utils::PostToUiThreadFn &postToUiThread;
         const std::function<std::string(int)> getDefaultTrackName;
         Sequence *parent{nullptr};
         std::shared_ptr<SequencerStateManager> manager;
-        const GetTrackSnapshotFn getSnapshot;
+        GetTrackSnapshotFn getSnapshot;
         std::function<void(TrackMessage &&)> dispatch;
 
         TrackIndex trackIndex{0};
@@ -185,6 +185,6 @@ namespace mpc::sequencer
 
         void
         insertAcquiredEvent(EventData *event,
-                            const utils::SimpleAction &onComplete = {}) const;
+                            utils::SimpleAction &&onComplete = {}) const;
     };
 } // namespace mpc::sequencer

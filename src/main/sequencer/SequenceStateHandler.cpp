@@ -27,7 +27,7 @@ void SequenceStateHandler::applyMessage(
     const auto visitor = Overload{
         [&](const TrackMessage &m)
         {
-            manager->trackStateHandler->applyMessage(state, actions, m);
+            manager->trackStateHandler->applyMessage(state, m);
         },
         [&](const SyncTrackEventIndices &m)
         {
@@ -262,7 +262,7 @@ void SequenceStateHandler::applyMessage(
                 return;
             }
 
-            applyInsertBars(m, state, actions);
+            applyInsertBars(m, state);
 
             lock.release();
         },

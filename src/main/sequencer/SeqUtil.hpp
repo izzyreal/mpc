@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lcdgui/ScreenId.hpp"
+
 #include <memory>
 #include <string>
 
@@ -59,7 +61,7 @@ namespace mpc::sequencer
 
         static bool isRecMainWithoutPlaying(
             const std::shared_ptr<Sequencer> &sequencer,
-            const std::string &currentScreenName,
+            lcdgui::ScreenId screenId,
             const std::shared_ptr<controller::ClientHardwareEventController>
                 &clientHardwareEventController);
 

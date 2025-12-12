@@ -98,7 +98,7 @@ void InsertEventScreen::insertEvent() const
         e.mixerValue = 0;
     }
 
-    const utils::SimpleAction onComplete(
+    utils::SimpleAction onComplete(
         [ls = ls]
         {
             ls.lock()->postToUiThread(utils::Task(
@@ -108,7 +108,8 @@ void InsertEventScreen::insertEvent() const
                 }));
         });
 
-    sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(e, onComplete);
+    sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(
+        e, std::move(onComplete));
 }
 
 void InsertEventScreen::turnWheel(const int i)

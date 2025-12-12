@@ -59,7 +59,7 @@ uint64_t currentTimeMillis()
 }
 
 Sequencer::Sequencer(
-    const utils::PostToAudioThreadFn &postToAudioThread,
+    utils::PostToAudioThreadFn &postToAudioThread,
     const std::function<void()> &flushMidiNoteOffs,
     const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
@@ -237,7 +237,7 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
         getStateManager()->enqueue(std::move(m));
     };
 
-    const GetSequenceSnapshotFn getSnapshot(
+    GetSequenceSnapshotFn getSnapshot(
         [this](const SequenceIndex sequenceIndex)
         {
             return getStateManager()->getSnapshot().getSequenceState(
@@ -548,11 +548,11 @@ void Sequencer::deleteSequence(const int i) const
 
 void Sequencer::copySequence(const SequenceIndex sourceIndex,
                              const SequenceIndex destIndex,
-                             const utils::SimpleAction &onComplete) const
+                             utils::SimpleAction &&onComplete) const
 {
     CopySequence msg{sourceIndex, destIndex};
     getStateManager()->enqueue(msg);
-    getStateManager()->enqueueCallback(onComplete);
+    getStateManager()->enqueueCallback(std::move(onComplete));
 }
 
 void Sequencer::copySong(const int source, const int dest) const
@@ -1019,7 +1019,7 @@ void Sequencer::flushTrackNoteCache() const
 
 void Sequencer::copySelectedSequenceToUndoSequence() const
 {
-    const utils::SimpleAction onComplete(
+    utils::SimpleAction onComplete(
         [this]
         {
             getStateManager()->applyMessageImmediate(
@@ -1028,7 +1028,7 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
                 ->setEnabled(true);
         });
 
-    copySequence(getSelectedSequenceIndex(), UndoSequenceIndex, onComplete);
+    copySequence(getSelectedSequenceIndex(), UndoSequenceIndex, std::move(onComplete));
 }
 
 void Sequencer::resetUndo() const

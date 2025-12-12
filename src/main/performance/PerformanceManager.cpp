@@ -378,6 +378,15 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                         payload.voiceOverlapMode;
                 }
             }
+            else if constexpr (std::is_same_v<T,
+                                              UpdateNoteParametersBySnapshot>)
+            {
+                auto &p = activeState.programs[payload.programIndex];
+                const size_t noteParametersIndex =
+                    payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                auto &noteParameters = p.noteParameters[noteParametersIndex];
+                noteParameters = payload.snapshot;
+            }
             else if constexpr (std::is_same_v<T, PhysicalPadPressEvent>)
             {
                 activeState.physicalPadEvents.push_back(payload);

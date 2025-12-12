@@ -15,16 +15,16 @@ using namespace mpc::engine;
 
 Program::Program(
     const ProgramIndex programIndex, Mpc &mpc, Sampler *const samplerToUse,
-    const GetProgramFn &getSnapshot,
+    GetProgramFn &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : index(programIndex), slider(new PgmSlider()), sampler(samplerToUse),
-      getSnapshot(getSnapshot), dispatch(dispatch)
+    : dispatch(dispatch), index(programIndex), slider(new PgmSlider()),
+      sampler(samplerToUse), getSnapshot(getSnapshot)
 {
     name.reserve(Mpc2000XlSpecs::MAX_PROGRAM_NAME_LENGTH);
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        const GetNoteParametersFn getNoteParametersSnapshot(
+        GetNoteParametersFn getNoteParametersSnapshot(
             [this, programIndex,
              drumNoteNumber = DrumNoteNumber(i + MinDrumNoteNumber)]
             {
@@ -98,6 +98,22 @@ void Program::setName(const std::string &s)
 std::string Program::getName()
 {
     return name;
+}
+
+mpc::ProgramIndex Program::getProgramIndex() const
+{
+    return index;
+}
+
+void Program::cloneNoteParameters(const DrumNoteNumber sourceNote,
+                                  const Program *dst,
+                                  const DrumNoteNumber destNote) const
+{
+    const auto snapshot = getSnapshot(index).getNoteParameters(sourceNote);
+
+    dispatch(performance::PerformanceMessage(
+        performance::UpdateNoteParametersBySnapshot{dst->getProgramIndex(),
+                                                    destNote, snapshot}));
 }
 
 NoteParameters *Program::getNoteParameters(const int noteNumber) const

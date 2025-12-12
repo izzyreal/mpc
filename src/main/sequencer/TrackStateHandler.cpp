@@ -26,7 +26,6 @@ void updateEvent(EventData *const e, const EventData &replacement)
 }
 
 void TrackStateHandler::applyMessage(SequencerState &state,
-                                     std::vector<utils::SimpleAction> &actions,
                                      const TrackMessage &msg) const
 {
     const auto visitor = Overload{
@@ -124,8 +123,6 @@ void TrackStateHandler::applyMessage(SequencerState &state,
             manager->insertAcquiredEvent(track, m.handle);
 
             lock.release();
-
-            actions.emplace_back(m.onComplete);
         },
         [&](const RemoveEvents &m)
         {

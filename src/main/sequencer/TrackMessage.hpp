@@ -2,10 +2,8 @@
 
 #include "sequencer/EventData.hpp"
 #include "sequencer/BusType.hpp"
-#include "utils/SimpleAction.hpp"
 
 #include <variant>
-#include <vector>
 
 namespace mpc::sequencer
 {
@@ -24,7 +22,6 @@ namespace mpc::sequencer
     struct InsertAcquiredEvent
     {
         EventData *handle;
-        utils::SimpleAction onComplete{[] {}};
     };
 
     struct RemoveEvent

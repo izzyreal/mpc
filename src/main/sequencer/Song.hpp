@@ -30,9 +30,7 @@ namespace mpc::sequencer
         void deleteStep(SongStepIndex) const;
         void insertStep(SongStepIndex) const;
 
-        void setStepSequenceIndex(SongStepIndex, SequenceIndex,
-                                  const utils::SimpleAction &onComplete =
-                                      utils::SimpleAction([] {})) const;
+        void setStepSequenceIndex(SongStepIndex, SequenceIndex) const;
 
         void setStepRepetitionCount(SongStepIndex, int8_t reptitionCount) const;
 

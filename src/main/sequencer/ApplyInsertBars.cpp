@@ -6,9 +6,8 @@
 
 using namespace mpc::sequencer;
 
-void SequenceStateHandler::applyInsertBars(
-    const InsertBars &m, SequencerState &state,
-    std::vector<utils::SimpleAction> &actions) const noexcept
+void SequenceStateHandler::applyInsertBars(const InsertBars &m,
+                                           SequencerState &state) const noexcept
 {
     auto &seq = state.sequences[m.sequenceIndex];
     const SequenceStateView seqView(seq);
@@ -85,12 +84,4 @@ void SequenceStateHandler::applyInsertBars(
             }
         }
     }
-
-    actions.emplace_back(
-        [a = m.onComplete, newLastBarIndex]
-        {
-            a(newLastBarIndex);
-        });
-
-    actions.emplace_back(m.nextAction);
 }

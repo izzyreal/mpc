@@ -18,7 +18,6 @@ void SongStateHandler::applyMessage(SequencerState &state,
         {
             state.songs[m.songIndex].steps[m.stepIndex].sequenceIndex =
                 m.sequenceIndex;
-            actions.emplace_back(m.onComplete);
         },
         [&](const SetSongStepRepetitionCount &m)
         {

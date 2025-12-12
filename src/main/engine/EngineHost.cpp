@@ -59,11 +59,12 @@ using namespace mpc::engine;
 using namespace mpc::sequencer;
 
 EngineHost::EngineHost(Mpc &mpcToUse)
-    : mpc(mpcToUse), postToAudioThread(
-                         [&](const utils::Task &task)
-                         {
-                             audioTasks.post(task);
-                         })
+    : postToAudioThread(
+          [&](utils::Task &&task)
+          {
+              audioTasks.post(task);
+          }),
+      mpc(mpcToUse)
 {
     VoiceUtil::freqTable();
 }
@@ -168,9 +169,9 @@ void EngineHost::start()
 }
 
 void EngineHost::postSamplePreciseTaskToAudioThread(
-    const concurrency::SamplePreciseTask &task)
+    concurrency::SamplePreciseTask &task)
 {
-    preciseTasks.post(task);
+    preciseTasks.post(std::move(task));
 }
 
 void EngineHost::flushNoteOffs()

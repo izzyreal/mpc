@@ -98,7 +98,7 @@ ClientEventController::getClientMidiEventController()
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(
-        mpc.getSequencer(), layeredScreen->getCurrentScreenName(),
+        mpc.getSequencer(), layeredScreen->getCurrentScreenId(),
         clientHardwareEventController);
 }
 

@@ -78,8 +78,8 @@ namespace mpc::command::context
 
         bool allowCentralNoteAndPadUpdate;
         lcdgui::ScreenComponent *screenComponent;
-        controller::SetSelectedNoteFn setSelectedNote;
-        controller::SetSelectedPadFn setSelectedPad;
+        const controller::SetSelectedNoteFn &setSelectedNote;
+        const controller::SetSelectedPadFn &setSelectedPad;
 
         int hardwareSliderValue;
         Tick metronomeOnlyPositionTicks;

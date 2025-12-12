@@ -72,7 +72,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         },
         [&](const TrackMessage &m)
         {
-            trackStateHandler->applyMessage(activeState, actions, m);
+            trackStateHandler->applyMessage(activeState, m);
         },
         [&](const SongMessage &m)
         {
@@ -299,25 +299,37 @@ EventData* SequencerStateManager::findRecordingNoteOnEvent(
 {
     EventData* found = nullptr;
 
-    // Drain as many queued events as available, up to temp buffer size.
+    size_t count = 0;
+
     for (size_t i = 0; i < tempLiveNoteOnRecordingEvents.size(); ++i)
     {
         EventData* e;
+
         if (!liveNoteOnEventRecordingQueue.dequeue(e))
+        {
             break;
+        }
 
         tempLiveNoteOnRecordingEvents[i] = e;
+        count++;
 
-        if (e->noteNumber == noteNumber && !found)
+        if (e->noteNumber == noteNumber)
+        {
             found = e;
+            break;
+        }
     }
 
-    // Push them all back into the queue
-    for (auto* e : tempLiveNoteOnRecordingEvents)
-        liveNoteOnEventRecordingQueue.enqueue(e);
+    for (size_t i = 0; i < count; ++i)
+    {
+        EventData* e = tempLiveNoteOnRecordingEvents[i];
+
+        if (e != found)
+            liveNoteOnEventRecordingQueue.enqueue(e);
+    }
 
     tempLiveNoteOnRecordingEvents.clear();
-    tempLiveNoteOnRecordingEvents.resize(20);
+    tempLiveNoteOnRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
 
     if (!found)
     {

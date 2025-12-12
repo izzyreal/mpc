@@ -5,7 +5,7 @@
 #include "sequencer/BusType.hpp"
 #include "sequencer/SequenceMessage.hpp"
 #include "sequencer/SequencerStateView.hpp"
-
+#include "utils/SimpleAction.hpp"
 #include "utils/SmallFn.hpp"
 
 #include <vector>
@@ -42,7 +42,7 @@ namespace mpc::audiomidi
 namespace mpc::sequencer
 {
     using GetSequenceSnapshotFn =
-        const utils::SmallFn<8, SequenceStateView const(SequenceIndex)>;
+        utils::SmallFn<8, SequenceStateView(SequenceIndex)>;
 
     class Sequence final
     {
@@ -58,7 +58,7 @@ namespace mpc::sequencer
 
         Sequence(const utils::PostToUiThreadFn &,
                  std::shared_ptr<SequencerStateManager> manager,
-                 const GetSequenceSnapshotFn &getSnapshot,
+                 GetSequenceSnapshotFn &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
                  const std::function<std::string()> &getDefaultSequenceName,
                  const std::function<std::string(int)> &getDefaultTrackName,
@@ -158,7 +158,8 @@ namespace mpc::sequencer
         void deleteAllTracks() const;
 
         void insertBars(int barCount, BarIndex afterBar,
-                        const utils::SimpleAction &nextAction = {}) const;
+                        utils::SimpleAction &&nextAction = {}) const;
+
         void moveTrack(int source, int destination);
 
         int getEventCount() const;
@@ -177,7 +178,7 @@ namespace mpc::sequencer
         std::array<TimeSignature, Mpc2000XlSpecs::MAX_BAR_COUNT>
         getTimeSignatures() const;
 
-        const GetSequenceSnapshotFn getSnapshot;
+        GetSequenceSnapshotFn getSnapshot;
 
     private:
         std::function<std::string()> getDefaultSequenceName;

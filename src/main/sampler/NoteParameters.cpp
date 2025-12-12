@@ -9,10 +9,10 @@ using namespace mpc::sampler;
 
 NoteParameters::NoteParameters(
     const int index, const std::function<ProgramIndex()> &getProgramIndex,
-    const GetNoteParametersFn &getSnapshot,
+    GetNoteParametersFn &getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
-    : index(index), getProgramIndex(getProgramIndex), getSnapshot(getSnapshot),
-      dispatch(dispatch)
+    : index(index), getProgramIndex(getProgramIndex),
+      getSnapshot(std::move(getSnapshot)), dispatch(dispatch)
 {
     stereoMixer = std::make_shared<engine::StereoMixer>(
         [this]
@@ -44,13 +44,6 @@ NoteParameters::NoteParameters(
             return DrumNoteNumber(this->index + MinDrumNoteNumber);
         },
         dispatch);
-}
-
-NoteParameters *NoteParameters::clone(const int newIndex) const
-{
-    const auto res =
-        new NoteParameters(newIndex, getProgramIndex, getSnapshot, dispatch);
-    return res;
 }
 
 mpc::DrumNoteNumber NoteParameters::getNumber() const

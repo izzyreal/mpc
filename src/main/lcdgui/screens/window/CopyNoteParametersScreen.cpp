@@ -65,12 +65,11 @@ void CopyNoteParametersScreen::function(const int i)
     {
         case 4:
         {
-            const auto source =
-                sampler.lock()->getProgram(prog0)->getNoteParameters(
-                    mpc.clientEventController->getSelectedNote());
-            const auto dest = sampler.lock()->getProgram(prog1);
-            const auto clone = source->clone(note1);
-            dest->setNoteParameters(note1, clone);
+            const auto source = sampler.lock()->getProgram(prog0);
+            const auto dest = sampler.lock()->getProgram(prog1).get();
+            source->cloneNoteParameters(
+                mpc.clientEventController->getSelectedNote(), dest,
+                DrumNoteNumber(note1 + MinDrumNoteNumber));
             openScreenById(ScreenId::PgmAssignScreen);
             break;
         }

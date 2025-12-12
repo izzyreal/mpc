@@ -26,8 +26,8 @@ namespace mpc::sampler
     public:
         explicit Sampler(
             Mpc &,
-            const GetProgramFn
-                &getSnapshot,
+            GetProgramFn
+                &&getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 
@@ -129,7 +129,7 @@ namespace mpc::sampler
 
     private:
         Mpc &mpc;
-        const GetProgramFn getSnapshot;
+        GetProgramFn getSnapshot;
         const std::function<void(performance::PerformanceMessage &&)> dispatch;
         int soundIndex = 0;
         int playXMode = 0;

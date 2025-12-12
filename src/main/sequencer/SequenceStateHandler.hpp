@@ -24,8 +24,8 @@ namespace mpc::sequencer
         SequencerStateManager *manager;
         Sequencer *sequencer;
 
-        void applyInsertBars(const InsertBars &, SequencerState &,
-                             std::vector<utils::SimpleAction> &) const noexcept;
+        void applyInsertBars(const InsertBars &,
+                             SequencerState &) const noexcept;
 
         void applyUpdateSequenceEvents(const UpdateSequenceEvents &m,
                                        SequencerState &) const;

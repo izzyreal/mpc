@@ -20,7 +20,7 @@ using namespace mpc::lcdgui::screens;
 Sequence::Sequence(
     const utils::PostToUiThreadFn &postToUiThread,
     std::shared_ptr<SequencerStateManager> manager,
-    const GetSequenceSnapshotFn &getSnapshot,
+    GetSequenceSnapshotFn &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
     const std::function<std::string()> &getDefaultSequenceName,
     const std::function<std::string(int)> &getDefaultTrackName,
@@ -44,8 +44,9 @@ Sequence::Sequence(
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled,
     const std::function<int()> &getCurrentBarIndex)
-    : getSnapshot(getSnapshot), getDefaultSequenceName(getDefaultSequenceName),
-      manager(manager), dispatch(dispatch), getScreens(getScreens),
+    : getSnapshot(std::move(getSnapshot)),
+      getDefaultSequenceName(getDefaultSequenceName), manager(manager),
+      dispatch(dispatch), getScreens(getScreens),
       getCurrentBarIndex(getCurrentBarIndex)
 {
     for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT;
@@ -58,13 +59,13 @@ Sequence::Sequence(
             });
 
         tracks.emplace_back(std::make_shared<Track>(
-            postToUiThread, getDefaultTrackName, manager, getTrackSnapshot,
-            dispatch, trackIndex, this, getTickPosition, getScreens,
-            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
-            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
-            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
-            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
-            isSoloEnabled));
+            postToUiThread, getDefaultTrackName, manager,
+            std::move(getTrackSnapshot), dispatch, trackIndex, this,
+            getTickPosition, getScreens, isRecordingModeMulti,
+            getActiveSequence, getAutoPunchMode, getBus, isEraseButtonPressed,
+            isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled,
+            getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled,
+            getPunchInTime, getPunchOutTime, isSoloEnabled));
     }
 
     GetTrackSnapshotFn getTempoTrackSnapshot(
@@ -75,12 +76,13 @@ Sequence::Sequence(
         });
 
     tracks.emplace_back(std::make_shared<Track>(
-        postToUiThread, getDefaultTrackName, manager, getTempoTrackSnapshot,
-        dispatch, TempoChangeTrackIndex, this, getTickPosition, getScreens,
-        isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
-        isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
-        isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing,
-        isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled));
+        postToUiThread, getDefaultTrackName, manager,
+        std::move(getTempoTrackSnapshot), dispatch, TempoChangeTrackIndex, this,
+        getTickPosition, getScreens, isRecordingModeMulti, getActiveSequence,
+        getAutoPunchMode, getBus, isEraseButtonPressed, isProgramPadPressed,
+        sampler, eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex,
+        isRecording, isOverdubbing, isPunchEnabled, getPunchInTime,
+        getPunchOutTime, isSoloEnabled));
 
     for (int i = 0; i < 32; i++)
     {
@@ -466,20 +468,21 @@ void Sequence::deleteAllTracks() const
 }
 
 void Sequence::insertBars(const int barCount, const BarIndex afterBar,
-                          const utils::SimpleAction &nextAction) const
+                          utils::SimpleAction &&nextAction) const
 {
-    InsertBars::Callback cb;
-    cb.set(
-        [this](const BarIndex newLastBarIndex)
+    utils::SimpleAction cb(
+        [this]
         {
-            if (newLastBarIndex != NoBarIndex && !isUsed())
+            if (getLastBarIndex() != NoBarIndex && !isUsed())
             {
                 setUsed(true);
             }
         });
 
-    dispatch(
-        InsertBars{getSequenceIndex(), barCount, afterBar, cb, nextAction});
+    dispatch(InsertBars{getSequenceIndex(), barCount, afterBar});
+
+    manager->enqueueCallback(std::move(cb));
+    manager->enqueueCallback(std::move(nextAction));
 }
 
 void Sequence::moveTrack(const int source, const int destination)

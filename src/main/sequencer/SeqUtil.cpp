@@ -323,14 +323,14 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                                            toSequence->getLastBarIndex();
         }
 
-        const utils::SimpleAction nextAction(
+        utils::SimpleAction nextAction(
             [stateManager = sequencer->getStateManager(), copyBars]
             {
                 stateManager->enqueue(copyBars);
             });
 
         toSequence->insertBars(destinationBarCount, BarIndex(copyAfterBar),
-                               nextAction);
+                               std::move(nextAction));
     }
     else
     {
@@ -341,7 +341,7 @@ void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
 
 bool SeqUtil::isRecMainWithoutPlaying(
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::string &currentScreenName,
+    const lcdgui::ScreenId screenId,
     const std::shared_ptr<controller::ClientHardwareEventController>
         &clientHardwareEventController)
 {
@@ -352,7 +352,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
         clientHardwareEventController->isRecLockedOrPressed();
 
     const bool recMainWithoutPlaying =
-        currentScreenName == "sequencer" &&
+        screenId == lcdgui::ScreenId::SequencerScreen &&
         (!sequencer->getTransport()->isPlaying() ||
          sequencer->getTransport()->isMetronomeOnlyEnabled()) &&
         recIsPressedOrLocked && !posIsLastTick;

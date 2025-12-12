@@ -42,7 +42,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 
 LayeredScreen::LayeredScreen(Mpc &mpc)
     : mpc(mpc), postToUiThread(
-                    [this](const utils::Task &&task)
+                    [this](utils::Task &&task)
                     {
                         uiTasks.post(task);
                     })

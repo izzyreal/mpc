@@ -217,7 +217,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     const auto positionTicks = transport.getPositionTicks();
 
-    const utils::SimpleAction action(
+    utils::SimpleAction action(
         [track, screen, programPadIndex, program, this, positionTicks,
          metronomeOnlyPositionTicks, noteOnEvent]
         {
@@ -233,7 +233,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             command::TriggerLocalNoteOnCommand(ctx).execute();
         });
 
-    performanceManager.lock()->enqueueCallback(action);
+    performanceManager.lock()->enqueueCallback(std::move(action));
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
@@ -273,7 +273,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         return;
     }
 
-    const utils::SimpleAction action(
+    utils::SimpleAction action(
         [this, noteEventInfo = *registeredNoteOnEvent, positionTicks,
          metronomeOnlyPositionTicks, lockedSequencer]
         {
@@ -328,7 +328,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             command::TriggerLocalNoteOffCommand(ctx).execute();
         });
 
-    performanceManager.lock()->enqueueCallback(action);
+    performanceManager.lock()->enqueueCallback(std::move(action));
 }
 
 void ClientMidiEventController::handleKeyAftertouch(

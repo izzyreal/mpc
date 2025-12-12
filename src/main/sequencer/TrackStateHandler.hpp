@@ -17,9 +17,7 @@ namespace mpc::sequencer
         explicit TrackStateHandler(SequencerStateManager *, Sequencer *);
         ~TrackStateHandler();
 
-        void applyMessage(SequencerState &,
-                          std::vector<utils::SimpleAction> &actions,
-                          const TrackMessage &) const;
+        void applyMessage(SequencerState &, const TrackMessage &) const;
 
     private:
         SequencerStateManager *manager;

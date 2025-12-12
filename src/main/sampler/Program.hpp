@@ -30,7 +30,7 @@ namespace mpc::sampler
     {
     public:
         Program(ProgramIndex, Mpc &mpc, Sampler *samplerToUse,
-                const GetProgramFn &getSnapshot,
+                GetProgramFn &getSnapshot,
                 const std::function<void(performance::PerformanceMessage &&)>
                     &dispatch);
 
@@ -44,14 +44,15 @@ namespace mpc::sampler
 
         ProgramPadIndex getPadIndexFromNote(DrumNoteNumber) const;
 
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
+
     private:
         const ProgramIndex index;
         std::string name;
         PgmSlider *const slider;
         Sampler *const sampler;
 
-        const GetProgramFn getSnapshot;
-        const std::function<void(performance::PerformanceMessage &&)> dispatch;
+        GetProgramFn &getSnapshot;
 
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;
@@ -68,6 +69,11 @@ namespace mpc::sampler
         void setName(const std::string &s);
 
         std::string getName();
+
+        ProgramIndex getProgramIndex() const;
+
+        void cloneNoteParameters(DrumNoteNumber sourceNote, const Program *dst,
+                                 DrumNoteNumber destNote) const;
 
         Pad *getPad(int i) const;
 

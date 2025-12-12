@@ -2,8 +2,6 @@
 
 #include "IntTypes.hpp"
 
-#include "utils/SimpleAction.hpp"
-
 #include <variant>
 #include <cstdint>
 
@@ -14,7 +12,6 @@ namespace mpc::sequencer
         SongIndex songIndex;
         SongStepIndex stepIndex;
         SequenceIndex sequenceIndex;
-        utils::SimpleAction onComplete;
     };
 
     struct SetSongStepRepetitionCount

@@ -26,11 +26,9 @@ namespace mpc::sampler
     public:
         explicit NoteParameters(
             int index, const std::function<ProgramIndex()> &getProgramIndex,
-            const GetNoteParametersFn &getSnapshot,
+            GetNoteParametersFn &getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
-
-        NoteParameters *clone(int newIndex) const;
 
         DrumNoteNumber getNumber() const;
 

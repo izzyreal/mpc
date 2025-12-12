@@ -83,11 +83,9 @@ void Song::insertStep(const SongStepIndex stepIndex) const
 }
 
 void Song::setStepSequenceIndex(const SongStepIndex stepIndex,
-                                const SequenceIndex sequenceIndex,
-                                const utils::SimpleAction &onComplete) const
+                                const SequenceIndex sequenceIndex) const
 {
-    dispatch(SetSongStepSequenceIndex{songIndex, stepIndex, sequenceIndex,
-                                      onComplete});
+    dispatch(SetSongStepSequenceIndex{songIndex, stepIndex, sequenceIndex});
 }
 
 void Song::setStepRepetitionCount(const SongStepIndex stepIndex,

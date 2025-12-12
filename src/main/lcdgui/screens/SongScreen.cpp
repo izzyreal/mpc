@@ -45,20 +45,21 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
                             displayNow2();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getSelectedSong()->getStepCount();
-                        },
-                        [&](auto)
-                        {
-                            displaySongName();
-                            displayLoop();
-                            displaySteps();
-                            displayTempo();
-                            displayNow0();
-                            displayNow1();
-                            displayNow2();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSong()->getStepCount();
+         },
+         [&](auto)
+         {
+             displaySongName();
+             displayLoop();
+             displaySteps();
+             displayTempo();
+             displayNow0();
+             displayNow1();
+             displayNow2();
+         }});
 
     addReactiveBinding(
         {[&]
@@ -391,15 +392,16 @@ void SongScreen::turnWheel(const int increment)
 
         const auto selectedStep = song->getStep(selectedStepIndex);
 
-        const auto onComplete = utils::SimpleAction(
+        auto onComplete = utils::SimpleAction(
             [s = lockedSequencer, selectedStepIndex]
             {
                 s->setSelectedSongStepIndex(selectedStepIndex);
             });
 
         song->setStepSequenceIndex(selectedStepIndex,
-                                   selectedStep.sequenceIndex + increment,
-                                   onComplete);
+                                   selectedStep.sequenceIndex + increment);
+        lockedSequencer->getStateManager()->enqueueCallback(
+            std::move(onComplete));
     }
     else if (focusedFieldName.find("reps") != std::string::npos)
     {

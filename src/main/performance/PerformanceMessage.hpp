@@ -52,6 +52,16 @@ namespace mpc::performance
         UpdateNoteParameters() = default;
     };
 
+    struct UpdateNoteParametersBySnapshot
+    {
+        ProgramIndex programIndex{};
+        DrumNoteNumber drumNoteNumber{};
+
+        NoteParameters snapshot;
+
+        UpdateNoteParametersBySnapshot() = default;
+    };
+
     struct UpdateNoteParametersBulk
     {
         ProgramIndex programIndex{};
@@ -132,8 +142,9 @@ namespace mpc::performance
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramMidiProgramChange,
-        SetProgramUsed, RepairProgramReferences, UpdateDrumBulk>;
+        UpdateProgramBulk, UpdateProgramMidiProgramChange, SetProgramUsed,
+        RepairProgramReferences, UpdateDrumBulk,
+        UpdateNoteParametersBySnapshot>;
 
     struct PerformanceMessage
     {

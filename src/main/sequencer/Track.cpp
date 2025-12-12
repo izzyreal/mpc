@@ -20,7 +20,7 @@ Track::Track(
     const utils::PostToUiThreadFn &postToUiThread,
     const std::function<std::string(int)> &getDefaultTrackName,
     const std::shared_ptr<SequencerStateManager> &manager,
-    const GetTrackSnapshotFn &getSnapshot,
+    GetTrackSnapshotFn &&getSnapshot,
     const std::function<void(TrackMessage &&)> &dispatch, const int trackIndex,
     Sequence *parent, const std::function<int64_t()> &getTickPosition,
     const std::function<std::shared_ptr<Screens>()> &getScreens,
@@ -42,7 +42,7 @@ Track::Track(
     const std::function<int64_t()> &getPunchOutTime,
     const std::function<bool()> &isSoloEnabled)
     : postToUiThread(postToUiThread), getDefaultTrackName(getDefaultTrackName),
-      parent(parent), manager(manager), getSnapshot(getSnapshot),
+      parent(parent), manager(manager), getSnapshot(std::move(getSnapshot)),
       dispatch(dispatch), trackIndex(trackIndex),
       getTickPosition(getTickPosition), getScreens(getScreens),
       isRecordingModeMulti(isRecordingModeMulti),
@@ -94,7 +94,7 @@ void Track::setUsedIfCurrentlyUnused(
 
     if (getIndex() != TempoChangeTrackIndex)
     {
-        manager->enqueueCallback(onCompleteNameSetting);
+        manager->enqueueCallback(std::move(onCompleteNameSetting));
     }
 }
 
@@ -401,20 +401,21 @@ void Track::playNext() const
 }
 
 void Track::insertAcquiredEvent(EventData *event,
-                                const utils::SimpleAction &onComplete) const
+                                utils::SimpleAction &&onComplete) const
 {
     event->sequenceIndex = getSequenceIndex();
     event->trackIndex = trackIndex;
-    dispatch(InsertAcquiredEvent{event, onComplete});
+    dispatch(InsertAcquiredEvent{event});
+    manager->enqueueCallback(std::move(onComplete));
     setUsedIfCurrentlyUnused();
 }
 
 void Track::acquireAndInsertEvent(const EventData &eventState,
-                                  const utils::SimpleAction &onComplete) const
+                                  utils::SimpleAction &&onComplete) const
 {
     const auto e = manager->acquireEvent();
     *e = eventState;
-    insertAcquiredEvent(e, onComplete);
+    insertAcquiredEvent(e, std::move(onComplete));
 }
 
 EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,

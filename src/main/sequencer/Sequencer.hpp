@@ -68,7 +68,7 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(const utils::PostToAudioThreadFn &,
+        Sequencer(utils::PostToAudioThreadFn &,
                   const std::function<void()> &flushMidiNoteOffs,
                   const std::shared_ptr<Clock> &,
                   const std::shared_ptr<lcdgui::LayeredScreen> &,
@@ -114,7 +114,7 @@ namespace mpc::sequencer
         const std::function<void()> flushMidiNoteOffs;
 
     private:
-        utils::PostToAudioThreadFn postToAudioThread;
+        const utils::PostToAudioThreadFn &postToAudioThread;
         std::vector<std::shared_ptr<engine::Voice>> *voices;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
@@ -182,7 +182,7 @@ namespace mpc::sequencer
         void deleteSequence(int i) const;
 
         void copySequence(SequenceIndex sourceIndex, SequenceIndex destIndex,
-                          const utils::SimpleAction &onComplete = {}) const;
+                          utils::SimpleAction &&onComplete = {}) const;
 
         void copySong(int source, int dest) const;
 

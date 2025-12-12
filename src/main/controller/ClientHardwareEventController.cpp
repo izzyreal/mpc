@@ -357,7 +357,7 @@ void ClientHardwareEventController::handlePadPress(
 
     if (action)
     {
-        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+        mpc.getPerformanceManager().lock()->enqueueCallback(std::move(*action));
     }
 }
 
@@ -449,7 +449,7 @@ void ClientHardwareEventController::handlePadRelease(
                     auto screenComponent =
                         screens->getScreenById(p.screenId).get();
 
-                    const utils::SimpleAction noteOffAction(
+                    utils::SimpleAction noteOffAction(
                         [this, recordingNoteOnEvent, track, p, isSamplerScreen,
                          screenComponent, programPadIndex,
                          program = sampler->getProgram(p.programIndex).get(),
@@ -471,7 +471,8 @@ void ClientHardwareEventController::handlePadRelease(
                             TriggerLocalNoteOffCommand(ctx).execute();
                         });
 
-                    performanceManager.lock()->enqueueCallback(noteOffAction);
+                    performanceManager.lock()->enqueueCallback(
+                        std::move(noteOffAction));
                 }
 
                 if (p.programIndex != NoProgramIndex)
@@ -489,7 +490,7 @@ void ClientHardwareEventController::handlePadRelease(
 
     if (action)
     {
-        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+        mpc.getPerformanceManager().lock()->enqueueCallback(std::move(*action));
     }
 }
 
@@ -546,7 +547,7 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     if (action)
     {
-        mpc.getPerformanceManager().lock()->enqueueCallback(*action);
+        mpc.getPerformanceManager().lock()->enqueueCallback(std::move(*action));
     }
 }
 

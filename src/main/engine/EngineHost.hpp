@@ -76,7 +76,7 @@ namespace mpc::engine
 
         utils::PostToAudioThreadFn postToAudioThread;
         void postSamplePreciseTaskToAudioThread(
-            const concurrency::SamplePreciseTask &);
+            concurrency::SamplePreciseTask &);
 
         void flushNoteOffs();
 
