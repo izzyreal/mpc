@@ -325,7 +325,7 @@ bool Mpc::isPluginModeEnabled() const
 }
 
 std::weak_ptr<performance::PerformanceManager>
-Mpc::getPerformanceManager() const
+Mpc::getPerformanceManager()
 {
     return performanceManager;
 }

@@ -9,6 +9,42 @@ namespace mpc::lcdgui::screengroups
                screenId == ScreenId::PopupScreen;
     }
 
+    bool isSamplerScreen(const ScreenId screenId)
+    {
+        return screenId == ScreenId::CreateNewProgramScreen ||
+               screenId == ScreenId::AssignmentViewScreen ||
+               screenId == ScreenId::AutoChromaticAssignmentScreen ||
+               screenId == ScreenId::CopyNoteParametersScreen ||
+               screenId == ScreenId::EditSoundScreen ||
+               screenId == ScreenId::EndFineScreen ||
+               screenId == ScreenId::InitPadAssignScreen ||
+               screenId == ScreenId::KeepOrRetryScreen ||
+               screenId == ScreenId::LoopEndFineScreen ||
+               screenId == ScreenId::LoopToFineScreen ||
+               screenId == ScreenId::MuteAssignScreen ||
+               screenId == ScreenId::ProgramScreen ||
+               screenId == ScreenId::DeleteProgramScreen ||
+               screenId == ScreenId::CopyProgramScreen ||
+               screenId == ScreenId::StartFineScreen ||
+               screenId == ScreenId::VeloEnvFilterScreen ||
+               screenId == ScreenId::VeloPitchScreen ||
+               screenId == ScreenId::VelocityModulationScreen ||
+               screenId == ScreenId::ZoneEndFineScreen ||
+               screenId == ScreenId::ZoneStartFineScreen ||
+               screenId == ScreenId::DrumScreen ||
+               screenId == ScreenId::LoopScreen ||
+               screenId == ScreenId::MixerScreen ||
+               screenId == ScreenId::MixerSetupScreen ||
+               screenId == ScreenId::ChannelSettingsScreen ||
+               screenId == ScreenId::PgmAssignScreen ||
+               screenId == ScreenId::PgmParamsScreen ||
+               screenId == ScreenId::SelectDrumScreen ||
+               screenId == ScreenId::SelectMixerDrumScreen ||
+               screenId == ScreenId::TrimScreen ||
+               screenId == ScreenId::ZoneScreen ||
+               screenId == ScreenId::LoadASoundScreen;
+    }
+
     bool isSoundScreen(const ScreenId screenId)
     {
         return screenId == ScreenId::TrimScreen ||

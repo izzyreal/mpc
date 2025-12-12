@@ -108,18 +108,34 @@ void SequencerStateManager::finalizeRecordedNote(EventData *noteOn,
 }
 
 void SequencerStateManager::processLiveNoteEventRecordingQueues(
-    const Tick currentPositionTicks, const SequenceStateView &seq)
+    const Tick currentPositionTicks,
+    const SequenceStateView& seq)
 {
-    const int noteOnCount = liveNoteOnEventRecordingQueue.try_dequeue_bulk(
-        tempLiveNoteOnRecordingEvents.begin(), 20);
+    int noteOnCount = 0;
+    for (; noteOnCount < LIVE_NOTE_EVENT_RECORDING_CAPACITY; ++noteOnCount)
+    {
+        EventData* ptr;
+        if (!liveNoteOnEventRecordingQueue.dequeue(ptr))
+            break;
 
-    const int noteOffCount = liveNoteOffEventRecordingQueue.try_dequeue_bulk(
-        tempLiveNoteOffRecordingEvents.begin(), 20);
+        tempLiveNoteOnRecordingEvents[noteOnCount] = ptr;
+    }
+
+    int noteOffCount = 0;
+    for (; noteOffCount < LIVE_NOTE_EVENT_RECORDING_CAPACITY; ++noteOffCount)
+    {
+        alignas(EventData) unsigned char buf[sizeof(EventData)];
+        const auto ev = reinterpret_cast<EventData*>(buf);
+
+        if (!liveNoteOffEventRecordingQueue.dequeue(*ev))
+            break;
+
+        tempLiveNoteOffRecordingEvents[noteOffCount] = *ev;
+        ev->~EventData();
+    }
 
     if (!noteOnCount && !noteOffCount)
-    {
         return;
-    }
 
     const Tick pos = currentPositionTicks;
     const Tick correctedPos = getCorrectedTickPos(currentPositionTicks, seq);
@@ -128,17 +144,18 @@ void SequencerStateManager::processLiveNoteEventRecordingQueues(
 
     for (int i = 0; i < noteOnCount; ++i)
     {
-        auto noteOn = tempLiveNoteOnRecordingEvents[i];
+        EventData* noteOn = tempLiveNoteOnRecordingEvents[i];
 
         correctNoteOnTick(noteOn, pos, correctedPos);
 
-        const bool matched = applyNoteOffAdjustmentForNoteOn(
-            noteOn, noteOffCount, seq.getLastTick());
+        const bool matched =
+            applyNoteOffAdjustmentForNoteOn(
+                noteOn,
+                noteOffCount,
+                seq.getLastTick());
 
         if (!matched)
-        {
             liveNoteOnEventRecordingQueue.enqueue(noteOn);
-        }
     }
 }
 
@@ -170,11 +187,16 @@ void SequencerStateManager::finalizeNoteEventLive(
 
 void SequencerStateManager::flushNoteCache()
 {
-    EventData *e;
-    while (liveNoteOnEventRecordingQueue.try_dequeue(e))
+    EventData* ptr;
+    while (liveNoteOnEventRecordingQueue.dequeue(ptr))
     {
     }
-    while (liveNoteOffEventRecordingQueue.try_dequeue(*e))
+
+    alignas(EventData) unsigned char buf[sizeof(EventData)];
+    const auto ev = reinterpret_cast<EventData*>(buf);
+
+    while (liveNoteOffEventRecordingQueue.dequeue(*ev))
     {
+        ev->~EventData();
     }
 }

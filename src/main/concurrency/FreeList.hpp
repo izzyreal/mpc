@@ -1,11 +1,11 @@
 #pragma once
 #include <cstddef>
 #include <type_traits>
-#include <concurrentqueue.h>
+
+#include "concurrency/BoundedMpmcQueue.hpp"
 
 namespace mpc::concurrency
 {
-
     template <typename T, std::size_t Capacity> class FreeList
     {
     public:
@@ -25,7 +25,7 @@ namespace mpc::concurrency
         // Get one object (uninitialized)
         bool acquire(T *&out)
         {
-            return queue_.try_dequeue(out);
+            return queue_.dequeue(out);
         }
 
         // Return the object (user must ensure T is "destroyed" if needed)
@@ -43,7 +43,7 @@ namespace mpc::concurrency
         using Storage = std::aligned_storage_t<sizeof(T), alignof(T)>;
         Storage storage[Capacity];
 
-        moodycamel::ConcurrentQueue<T *> queue_;
+        BoundedMpmcQueue<T *, Capacity> queue_;
     };
 
 } // namespace mpc::concurrency

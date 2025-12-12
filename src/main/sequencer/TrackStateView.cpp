@@ -193,7 +193,7 @@ uint8_t TrackStateView::getProgramChange() const
 
 uint8_t TrackStateView::getDeviceIndex() const
 {
-    return state.device;
+    return state.deviceIndex;
 }
 
 BusType TrackStateView::getBusType() const

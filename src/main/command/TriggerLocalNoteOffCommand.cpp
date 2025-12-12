@@ -7,16 +7,14 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
-
-#include <memory>
+#include "sequencer/Transport.hpp"
 
 using namespace mpc::command;
 using namespace mpc::command::context;
 
 TriggerLocalNoteOffCommand::TriggerLocalNoteOffCommand(
-    const std::shared_ptr<TriggerLocalNoteOffContext> &ctx)
+    const TriggerLocalNoteOffContext &ctx)
     : ctx(ctx)
 {
 }
@@ -25,79 +23,76 @@ void TriggerLocalNoteOffCommand::execute()
 {
     std::optional<DrumBusIndex> drumIndex = std::nullopt;
 
-    if (const auto drumBus =
-            std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
+    if (const auto drumBus = dynamic_cast<sequencer::DrumBus *>(ctx.bus);
         drumBus)
     {
         drumIndex = drumBus->getIndex();
     }
 
-    ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-        ctx->noteNumber, ctx->track->getDeviceIndex(), drumIndex);
+    ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
+        ctx.noteNumber, ctx.track->getDeviceIndex(), drumIndex);
 
-    if (ctx->recordOnEvent &&
-        !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
+    if (ctx.recordOnEvent &&
+        !(ctx.sequencerIsRecordingOrOverdubbing && ctx.isErasePressed))
     {
-        const auto snapshot = ctx->performanceManager.lock()->getSnapshot();
+        const auto snapshot = ctx.performanceManager->getSnapshot();
 
         const bool thisIsTheLastActiveNoteOn =
             snapshot.getTotalNoteOnCount() == 0;
 
-        if (ctx->sequencerIsRecordingOrOverdubbing)
+        if (ctx.sequencerIsRecordingOrOverdubbing)
         {
-            ctx->sequencerStateManager.lock()->finalizeNoteEventLive(
-                ctx->recordOnEvent, ctx->positionTicks);
+            ctx.sequencerStateManager->finalizeNoteEventLive(
+                ctx.recordOnEvent, ctx.positionTicks);
         }
 
-        if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
+        if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
         {
-            auto newDuration = ctx->metronomeOnlyPositionTicks -
-                               ctx->recordOnEvent->metronomeOnlyTickPosition;
-            ctx->recordOnEvent->tick = ctx->sequencerPositionTicks;
+            auto newDuration = ctx.metronomeOnlyPositionTicks -
+                               ctx.recordOnEvent->metronomeOnlyTickPosition;
+            ctx.recordOnEvent->tick = ctx.sequencerPositionTicks;
 
-            if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
+            if (ctx.isStepRecording && ctx.isDurationOfRecordedNotesTcValue)
             {
-                newDuration = static_cast<int>(ctx->noteValueLengthInTicks *
-                                               (ctx->tcValuePercentage * 0.01));
+                newDuration = static_cast<int>(ctx.noteValueLengthInTicks *
+                                               (ctx.tcValuePercentage * 0.01));
                 if (newDuration < 1)
                 {
                     newDuration = 1;
                 }
             }
 
-            ctx->track->finalizeNoteEventNonLive(ctx->recordOnEvent,
+            ctx.track->finalizeNoteEventNonLive(ctx.recordOnEvent,
                                                  Duration(newDuration));
 
-            if (((ctx->isStepRecording && ctx->isAutoStepIncrementEnabled) ||
-                 ctx->isRecMainWithoutPlaying) &&
+            if (((ctx.isStepRecording && ctx.isAutoStepIncrementEnabled) ||
+                 ctx.isRecMainWithoutPlaying) &&
                 thisIsTheLastActiveNoteOn)
             {
                 int nextPos =
-                    ctx->sequencerPositionTicks + ctx->noteValueLengthInTicks;
+                    ctx.sequencerPositionTicks + ctx.noteValueLengthInTicks;
 
-                const auto bar = ctx->currentBarIndex + 1;
+                const auto bar = ctx.currentBarIndex + 1;
 
                 const auto sequenceStateView =
-                    ctx->sequencerStateManager.lock()
-                        ->getSnapshot()
-                        .getSequenceState(ctx->track->getSequenceIndex());
+                    ctx.sequencerStateManager->getSnapshot().getSequenceState(
+                        ctx.track->getSequenceIndex());
 
-                nextPos = ctx->track->timingCorrectTick(
+                nextPos = ctx.track->timingCorrectTick(
                     sequenceStateView, 0, bar, nextPos,
-                    ctx->noteValueLengthInTicks, ctx->swing);
+                    ctx.noteValueLengthInTicks, ctx.swing);
 
-                if (const auto lastTick =
-                        ctx->sequencerGetActiveSequenceLastTick();
+                if (const auto lastTick = sequenceStateView.getLastTick();
                     nextPos != 0 && nextPos < lastTick)
                 {
                     const double nextPosQuarterNotes =
                         sequencer::Sequencer::ticksToQuarterNotes(nextPos);
-                    ctx->sequencerMoveToQuarterNotePosition(
+                    ctx.sequencer->getTransport()->setPosition(
                         nextPosQuarterNotes);
                 }
                 else
                 {
-                    ctx->sequencerMoveToQuarterNotePosition(
+                    ctx.sequencer->getTransport()->setPosition(
                         sequencer::Sequencer::ticksToQuarterNotes(lastTick));
                 }
             }
@@ -105,7 +100,7 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (thisIsTheLastActiveNoteOn)
         {
-            ctx->sequencerStopMetronomeTrack();
+            ctx.sequencer->getTransport()->stopMetronomeOnly();
         }
     }
 }

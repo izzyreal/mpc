@@ -46,7 +46,7 @@ namespace mpc::command::context
     class TriggerLocalNoteContextFactory
     {
     public:
-        static std::shared_ptr<TriggerLocalNoteOnContext>
+        static TriggerLocalNoteOnContext
         buildTriggerLocalNoteOnContext(
             performance::PerformanceEventSource,
             const performance::NoteOnEvent &, NoteNumber note,
@@ -63,20 +63,21 @@ namespace mpc::command::context
             const std::shared_ptr<hardware::Hardware> &,
             Tick metronomeOnlyPositionTicks, Tick positionTicks);
 
-        static std::shared_ptr<TriggerLocalNoteOffContext>
+        static TriggerLocalNoteOffContext
         buildTriggerLocalNoteOffContext(
             performance::PerformanceEventSource source, NoteNumber noteNumber,
             sequencer::EventData *recordedNoteOnEvent, sequencer::Track *,
             sequencer::BusType,
-            const std::shared_ptr<lcdgui::ScreenComponent> &,
+            const lcdgui::ScreenComponent *,
+            bool isSamplerScreen,
             ProgramPadIndex programPadIndex,
-            const std::shared_ptr<sampler::Program> &,
-            const std::weak_ptr<sequencer::Sequencer> &,
-            const std::weak_ptr<performance::PerformanceManager> &,
-            const std::shared_ptr<controller::ClientEventController> &,
-            const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
-            const std::shared_ptr<lcdgui::Screens> &,
-            const std::shared_ptr<hardware::Hardware> &,
+            sampler::Program *,
+            sequencer::Sequencer *,
+            performance::PerformanceManager *,
+            const controller::ClientEventController *,
+            audiomidi::EventHandler *,
+            lcdgui::Screens *,
+            hardware::Hardware *,
             Tick metronomeOnlyPositionTicks, Tick positionTicks);
     };
 } // namespace mpc::command::context

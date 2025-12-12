@@ -26,7 +26,6 @@ namespace mpc::sequencer
         Sequencer *sequencer;
 
         void applyRemoveEvents(const RemoveEvents &, SequencerState &) const;
-        void applyUpdateEvents(const UpdateEvents &, SequencerState &) const;
         void applyRemoveEvent(const RemoveEvent &, SequencerState &) const;
         void applyUpdateEventTick(const UpdateEventTick &,
                                   SequencerState &) const;

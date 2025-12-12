@@ -111,7 +111,7 @@ std::vector<char> Tracks::PADDING1 = std::vector<char>{
     static_cast<char>(232), 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     static_cast<char>(232), 3};
 
-int Tracks::getDevice(const int i) const
+int Tracks::getDeviceIndex(const int i) const
 {
     return devices[i];
 }

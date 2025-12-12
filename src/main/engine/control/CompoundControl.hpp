@@ -17,7 +17,7 @@ namespace mpc::engine::control
 
         void remove(const std::shared_ptr<Control> &control);
 
-        std::vector<std::shared_ptr<Control>> getControls();
+        std::vector<std::shared_ptr<Control>> &getControls();
 
         std::shared_ptr<Control> find(const std::string &name);
 

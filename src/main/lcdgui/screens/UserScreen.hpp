@@ -61,10 +61,10 @@ namespace mpc::lcdgui::screens
         void displayBars() const;
         void displayPgm() const;
         void displayRecordingMode() const;
-        void displayBus();
+        void displayBus() const;
         void displayDeviceNumber() const;
         void displayVelo() const;
-        void displayDeviceName();
+        void displayDeviceName() const;
 
         double tempo = 0.0;
         bool loop = false;
@@ -73,11 +73,8 @@ namespace mpc::lcdgui::screens
         int pgm = 0;
         int velo = 0;
         bool recordingModeMulti = false;
-        std::string sequenceName;
-        std::vector<std::string> trackNames;
         int lastBar = 0;
         sequencer::TimeSignature timeSig;
-        std::vector<std::string> deviceNames;
 
         void setTempo(double newTempo);
         void setLoop(bool b);
@@ -87,13 +84,8 @@ namespace mpc::lcdgui::screens
         void setLastBar(int i);
         void setPgm(int i);
         void setVelo(int i);
-        void setDeviceName(int i, const std::string &s);
-        void setSequenceName(const std::string &name);
         void setTimeSig(int num, int den);
-        void setTrackName(int i, const std::string &s);
 
-        std::string getDeviceName(int i);
-        std::string getTrackName(int i);
         int8_t getTrackStatus() const;
 
         void resetPreferences();

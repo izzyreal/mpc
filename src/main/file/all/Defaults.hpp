@@ -75,7 +75,7 @@ namespace mpc::file::all
         int getTimeSigDen() const;
         int getBarCount() const;
         bool isLoopEnabled() const;
-        std::vector<std::string> getDefaultDevNames();
+
         std::vector<std::string> getDefaultTrackNames();
         std::vector<int> getDevices();
         std::vector<int> getBusses();

@@ -436,17 +436,6 @@ void ClientHardwareEventController::handlePadRelease(
 
                 if (p.noteNumber != NoNoteNumber)
                 {
-                    const auto ctx = TriggerLocalNoteContextFactory::
-                        buildTriggerLocalNoteOffContext(
-                            PerformanceEventSource::VirtualMpcHardware,
-                            p.noteNumber, recordingNoteOnEvent, track,
-                            p.busType, screens->getScreenById(p.screenId),
-                            programPadIndex,
-                            sampler->getProgram(p.programIndex), sequencer,
-                            performanceManager, clientEventController,
-                            eventHandler, screens, hardware,
-                            metronomeOnlyPositionTicks, positionTicks);
-
                     PerformanceMessage msg;
                     msg.payload = NoteOffEvent{p.noteNumber, NoMidiChannel};
                     msg.source = PerformanceEventSource::VirtualMpcHardware;
@@ -454,9 +443,31 @@ void ClientHardwareEventController::handlePadRelease(
                     performanceManager.lock()->applyMessageImmediate(
                         std::move(msg));
 
+                    const bool isSamplerScreen =
+                        screengroups::isSamplerScreen(p.screenId);
+
+                    auto screenComponent =
+                        screens->getScreenById(p.screenId).get();
+
                     const utils::SimpleAction noteOffAction(
-                        [ctx]
+                        [this, recordingNoteOnEvent, track, p, isSamplerScreen,
+                         screenComponent, programPadIndex,
+                         program = sampler->getProgram(p.programIndex).get(),
+                         metronomeOnlyPositionTicks, positionTicks]
                         {
+                            const auto ctx = TriggerLocalNoteContextFactory::
+                                buildTriggerLocalNoteOffContext(
+                                    PerformanceEventSource::VirtualMpcHardware,
+                                    p.noteNumber, recordingNoteOnEvent, track,
+                                    p.busType, screenComponent, isSamplerScreen,
+                                    programPadIndex, program,
+                                    mpc.getSequencer().get(),
+                                    mpc.getPerformanceManager().lock().get(),
+                                    mpc.clientEventController.get(),
+                                    mpc.getEventHandler().get(),
+                                    mpc.screens.get(), mpc.getHardware().get(),
+                                    metronomeOnlyPositionTicks, positionTicks);
+
                             TriggerLocalNoteOffCommand(ctx).execute();
                         });
 

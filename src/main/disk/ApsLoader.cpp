@@ -24,7 +24,6 @@
 #include "engine/StereoMixer.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Sampler.hpp"
-#include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;
@@ -261,30 +260,27 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
         auto m = apsParser.getDrumMixers()[i];
-        auto drum = mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
+
+        performance::Drum perfDrum;
+        perfDrum.drumBusIndex = DrumBusIndex(i);
 
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
-            auto apsStereoMixer = m->getStereoMixerChannel(noteIndex);
-            auto apsIndivFxMixer = m->getIndivFxMixerChannel(noteIndex);
-            auto drumStereoMixer = drum->getStereoMixerChannels()[noteIndex];
-            auto drumIndivFxMixer = drum->getIndivFxMixerChannels()[noteIndex];
-
-            drumIndivFxMixer->setFxPath(apsIndivFxMixer.fxPath);
-            drumStereoMixer->setLevel(apsStereoMixer.level);
-            drumStereoMixer->setPanning(apsStereoMixer.panning);
-            drumIndivFxMixer->setVolumeIndividualOut(
-                apsIndivFxMixer.individualOutLevel);
-            drumIndivFxMixer->setOutput(apsIndivFxMixer.individualOutput);
-            drumIndivFxMixer->setFxSendLevel(apsIndivFxMixer.fxSendLevel);
+            perfDrum.stereoMixers[noteIndex] =
+                m->getStereoMixerChannel(noteIndex);
+            perfDrum.indivFxMixers[noteIndex] =
+                m->getIndivFxMixerChannel(noteIndex);
         }
 
-        auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
-        drum->setProgramIndex(ProgramIndex(pgm));
-        drum->setReceivePgmChange(
-            apsParser.getDrumConfiguration(i)->getReceivePgmChange());
-        drum->setReceiveMidiVolume(
-            apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
+        auto pgm = apsParser.getDrumConfiguration(i)->getProgramIndex();
+        perfDrum.programIndex = ProgramIndex(pgm);
+        perfDrum.receivePgmChangeEnabled =
+            apsParser.getDrumConfiguration(i)->isReceivePgmChangeEnabled();
+        perfDrum.receiveMidiVolumeEnabled =
+            apsParser.getDrumConfiguration(i)->isReceiveMidiVolumeEnabled();
+
+        mpc.getPerformanceManager().lock()->enqueue(
+            performance::UpdateDrumBulk{perfDrum});
     }
 
     auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();

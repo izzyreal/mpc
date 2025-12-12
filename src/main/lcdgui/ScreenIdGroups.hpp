@@ -10,6 +10,7 @@ namespace mpc::lcdgui
 namespace mpc::lcdgui::screengroups
 {
     bool isSoundScreen(ScreenId);
+    bool isSamplerScreen(ScreenId);
     bool isSongScreen(ScreenId);
     bool isPadDoesNotTriggerNoteEventScreen(ScreenId);
 } // namespace mpc::lcdgui::screengroups

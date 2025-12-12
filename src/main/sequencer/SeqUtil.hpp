@@ -64,6 +64,6 @@ namespace mpc::sequencer
                 &clientHardwareEventController);
 
         static bool isStepRecording(const std::string &currentScreenName,
-                                    const std::shared_ptr<Sequencer> &);
+                                    Sequencer *);
     };
 } // namespace mpc::sequencer
