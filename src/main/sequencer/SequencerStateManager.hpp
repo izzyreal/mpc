@@ -72,8 +72,11 @@ namespace mpc::sequencer
 
         void flushNoteCache();
 
-        SequenceTrackEventsSnapshot trackEventsSnapshots;
-        SequenceTrackStatesSnapshot trackStatesSnapshots;
+        std::array<SequenceTrackEventsSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+            trackEventsSnapshots;
+
+        std::array<SequenceTrackStatesSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+            trackStatesSnapshots;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

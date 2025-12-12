@@ -50,14 +50,16 @@ void MidiReader::parseSequence(Mpc &mpc) const
     auto sequence = dest.lock();
     sequence->setUsed(true);
 
-    UpdateSequenceEvents updateSequenceEvents{sequence->getSequenceIndex()};
+    const auto sequenceIndex = sequence->getSequenceIndex();
+
+    UpdateSequenceEvents updateSequenceEvents{sequenceIndex};
     updateSequenceEvents.trackSnapshots =
-        &lSequencer->getStateManager()->trackEventsSnapshots;
+        &lSequencer->getStateManager()->trackEventsSnapshots[sequenceIndex];
     updateSequenceEvents.trackSnapshots->clear();
 
     UpdateSequenceTracks updateSequenceTracks{sequence->getSequenceIndex()};
     updateSequenceTracks.trackStates =
-        &lSequencer->getStateManager()->trackStatesSnapshots;
+        &lSequencer->getStateManager()->trackStatesSnapshots[sequenceIndex];
     *updateSequenceTracks.trackStates = SequenceTrackStatesSnapshot();
 
     bool isMpc2000XlMidiFile = false;
