@@ -110,7 +110,7 @@ AllSequence::~AllSequence()
 
 void AllSequence::applyToInMemorySequence(
     const std::shared_ptr<Sequence> &inMemorySequence,
-    const SequencerStateManager *manager) const
+    SequencerStateManager *const manager) const
 {
     inMemorySequence->init(barCount - 1);
 
@@ -147,6 +147,11 @@ void AllSequence::applyToInMemorySequence(
 
     UpdateSequenceEvents updateSequenceEvents{
         inMemorySequence->getSequenceIndex()};
+
+    updateSequenceEvents.trackSnapshots = &manager->trackSnapshots;
+
+    updateSequenceEvents.trackSnapshots->clear();
+
     for (int j = 0; j < getEventAmount(); j++)
     {
         auto e = allEvents[j];
@@ -156,7 +161,7 @@ void AllSequence::applyToInMemorySequence(
             continue;
         }
 
-        updateSequenceEvents.trackSnapshots[e.trackIndex].push_back(e);
+        (*updateSequenceEvents.trackSnapshots)[e.trackIndex].push_back(e);
     }
 
     manager->enqueue(updateSequenceEvents);

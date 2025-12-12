@@ -6,8 +6,8 @@
 #include "utils/SmallFn.hpp"
 
 #include <variant>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 
 namespace mpc::sequencer
 {
@@ -27,7 +27,7 @@ namespace mpc::sequencer
     struct UpdateSequenceEvents
     {
         SequenceIndex sequenceIndex;
-        std::unordered_map<uint8_t, std::vector<EventData>> trackSnapshots;
+        std::unordered_map<uint8_t, std::vector<EventData>> *trackSnapshots;
     };
 
     struct SetLastBarIndex

@@ -3,8 +3,6 @@
 #include "performance/EventTypes.hpp"
 #include "performance/Drum.hpp"
 
-#include "MpcMacros.hpp"
-
 #include <variant>
 
 namespace mpc::sampler
@@ -17,7 +15,6 @@ namespace mpc::performance
     struct DeleteSoundAndReindex
     {
         int deletedIndex;
-        MPC_NON_COPYABLE(DeleteSoundAndReindex)
     };
 
     struct AddProgramSound
@@ -26,8 +23,6 @@ namespace mpc::performance
         DrumNoteNumber drumNoteNumber;
         std::vector<std::pair<int, std::string>> localTable;
         std::vector<std::pair<int, std::string>> convertedTable;
-
-        MPC_NON_COPYABLE(AddProgramSound)
     };
 
     struct UpdateDrumProgram
@@ -36,8 +31,6 @@ namespace mpc::performance
         ProgramIndex programIndex{};
 
         UpdateDrumProgram() = default;
-
-        MPC_NON_COPYABLE(UpdateDrumProgram)
     };
 
     struct UpdateNoteParameters
@@ -57,8 +50,6 @@ namespace mpc::performance
         sampler::VoiceOverlapMode voiceOverlapMode;
 
         UpdateNoteParameters() = default;
-
-        MPC_NON_COPYABLE(UpdateNoteParameters)
     };
 
     struct UpdateNoteParametersBulk
@@ -68,8 +59,6 @@ namespace mpc::performance
         NoteParameters noteParameters{};
 
         UpdateNoteParametersBulk() = default;
-
-        MPC_NON_COPYABLE(UpdateNoteParametersBulk)
     };
 
     struct UpdateProgramBulk
@@ -78,8 +67,6 @@ namespace mpc::performance
         Program program{};
 
         UpdateProgramBulk() = default;
-
-        MPC_NON_COPYABLE(UpdateProgramBulk)
     };
 
     struct RepairProgramReferences
@@ -90,8 +77,6 @@ namespace mpc::performance
     {
         ProgramIndex programIndex;
         int midiProgramChange;
-
-        MPC_NON_COPYABLE(UpdateProgramMidiProgramChange)
     };
 
     struct UpdateStereoMixer
@@ -106,8 +91,6 @@ namespace mpc::performance
         Value0To100 newValue;
 
         UpdateStereoMixer() = default;
-
-        MPC_NON_COPYABLE(UpdateStereoMixer)
     };
 
     struct UpdateIndivFxMixer
@@ -130,8 +113,6 @@ namespace mpc::performance
         bool followStereo;
 
         UpdateIndivFxMixer() = default;
-
-        MPC_NON_COPYABLE(UpdateIndivFxMixer)
     };
 
     struct SetProgramUsed
@@ -159,7 +140,5 @@ namespace mpc::performance
             : payload{std::move(payloadToUse)}
         {
         }
-
-        MPC_NON_COPYABLE(PerformanceMessage)
     };
 } // namespace mpc::performance

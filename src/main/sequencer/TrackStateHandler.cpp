@@ -153,10 +153,6 @@ void TrackStateHandler::applyMessage(SequencerState &state,
         {
             applyRemoveEvent(m, state);
         },
-        [&](const UpdateEvents &m)
-        {
-            applyUpdateEvents(m, state);
-        },
         [&](const SetTrackTransmitProgramChangesEnabled &m)
         {
             state.sequences[m.sequenceIndex]

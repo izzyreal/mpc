@@ -52,6 +52,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
     UpdateSequenceEvents updateSequenceEvents{sequence->getSequenceIndex()};
 
+    updateSequenceEvents.trackSnapshots = &lSequencer->getStateManager()->trackSnapshots;
+
+    updateSequenceEvents.trackSnapshots->clear();
+
     bool isMpc2000XlMidiFile = false;
 
     for (auto &event : midiTracks[0].lock()->getEvents())
@@ -378,7 +382,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     e.mixerParameter = sysExEventBytes[4] - 1;
                     e.mixerPad = sysExEventBytes[5];
                     e.mixerValue = sysExEventBytes[6];
-                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                         .push_back(e);
                 }
                 else
@@ -405,7 +409,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     //
                     // e->setBytes(tmp);
 
-                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                         .push_back(e);
                 }
             }
@@ -418,7 +422,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.tick = noteAfterTouch->getTick();
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
                 e.amount = noteAfterTouch->getAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                     .push_back(e);
             }
             else if (const auto channelAfterTouch =
@@ -429,7 +433,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                     .push_back(e);
             }
             else if (const auto programChange =
@@ -440,7 +444,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ProgramChange;
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                     .push_back(e);
             }
             else if (const auto trackName =
@@ -457,7 +461,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ControlChange;
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                     .push_back(e);
             }
             else if (const auto pitchBend =
@@ -467,7 +471,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[track->getIndex()]
                     .push_back(e);
             }
         }

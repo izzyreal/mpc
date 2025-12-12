@@ -10,8 +10,6 @@
 #include "sequencer/NoteOnEvent.hpp"
 #include "audiomidi/EventHandler.hpp"
 
-#include <concurrentqueue.h>
-
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;
@@ -71,11 +69,6 @@ void Track::printEvents() const
         printf("Track event at tick %lld with note number %i\n",
                eventState->tick, eventState->noteNumber.get());
     }
-}
-
-void Track::setEventStates(const std::vector<EventData> &eventStates) const
-{
-    dispatch(UpdateEvents{getSequenceIndex(), getIndex(), eventStates});
 }
 
 mpc::SequenceIndex Track::getSequenceIndex() const

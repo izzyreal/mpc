@@ -28,7 +28,7 @@ void PerformanceManager::reserveState(PerformanceState &s)
 }
 
 void PerformanceManager::registerUpdateDrumProgram(
-    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex) const
+    const DrumBusIndex drumBusIndex, const ProgramIndex programIndex)
 {
     UpdateDrumProgram payload{drumBusIndex, programIndex};
     PerformanceMessage msg;
@@ -41,7 +41,7 @@ void PerformanceManager::registerPhysicalPadPress(
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
     const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
-    const std::optional<NoteNumber> noteNumber) const
+    const std::optional<NoteNumber> noteNumber)
 {
     PhysicalPadPressEvent e{padIndex,
                             source,
@@ -62,7 +62,7 @@ void PerformanceManager::registerPhysicalPadPress(
 
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
-    const PerformanceEventSource source) const
+    const PerformanceEventSource source)
 {
     PhysicalPadAftertouchEvent e{padIndex, pressure};
 
@@ -73,7 +73,7 @@ void PerformanceManager::registerPhysicalPadAftertouch(
 }
 
 void PerformanceManager::registerPhysicalPadRelease(
-    const PhysicalPadIndex padIndex, const PerformanceEventSource source) const
+    const PhysicalPadIndex padIndex, const PerformanceEventSource source)
 {
     PhysicalPadReleaseEvent e{padIndex};
 
@@ -89,7 +89,7 @@ void PerformanceManager::registerProgramPadPress(
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const ProgramPadIndex padIndex,
     const Velocity velocity, const ProgramIndex program,
-    const PhysicalPadIndex physicalPadIndex) const
+    const PhysicalPadIndex physicalPadIndex)
 {
     ProgramPadPressEvent e{padIndex,
                            source,
@@ -111,7 +111,7 @@ void PerformanceManager::registerProgramPadPress(
 
 void PerformanceManager::registerProgramPadAftertouch(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
-    const ProgramIndex program, const Pressure pressure) const
+    const ProgramIndex program, const Pressure pressure)
 {
     ProgramPadAftertouchEvent e{padIndex, program, pressure};
 
@@ -123,7 +123,7 @@ void PerformanceManager::registerProgramPadAftertouch(
 
 void PerformanceManager::registerProgramPadRelease(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
-    const ProgramIndex program) const
+    const ProgramIndex program)
 {
     ProgramPadReleaseEvent e{padIndex, program};
 
@@ -139,7 +139,7 @@ NoteOnEvent PerformanceManager::registerNoteOn(
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
     const Velocity velocity,
-    const std::optional<ProgramIndex> programIndex) const
+    const std::optional<ProgramIndex> programIndex)
 {
     NoteOnEvent e{noteNumber,
                   source,
@@ -161,7 +161,7 @@ NoteOnEvent PerformanceManager::registerNoteOn(
 void PerformanceManager::registerNoteAftertouch(
     const PerformanceEventSource source, const NoteNumber noteNumber,
     const Pressure pressure,
-    const std::optional<MidiChannel> midiInputChannel) const
+    const std::optional<MidiChannel> midiInputChannel)
 {
     NoteAftertouchEvent e{noteNumber, pressure,
                           midiInputChannel.value_or(NoMidiChannel)};
@@ -174,7 +174,7 @@ void PerformanceManager::registerNoteAftertouch(
 
 void PerformanceManager::registerNoteOff(
     const PerformanceEventSource source, const NoteNumber noteNumber,
-    const std::optional<MidiChannel> midiInputChannel) const
+    const std::optional<MidiChannel> midiInputChannel)
 {
     NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel)};
 
@@ -184,7 +184,7 @@ void PerformanceManager::registerNoteOff(
     enqueue(std::move(msg));
 }
 
-void PerformanceManager::clear() const
+void PerformanceManager::clear()
 {
     PerformanceMessage msg;
     msg.payload = std::monostate{};

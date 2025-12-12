@@ -119,7 +119,7 @@ namespace mpc::sequencer
 
         void syncTrackEventIndices() const;
 
-        std::vector<std::shared_ptr<Track>> getTracks();
+        std::vector<std::shared_ptr<Track>> &getTracks();
         std::vector<std::string> &getDeviceNames();
         void setDeviceNames(const std::vector<std::string> &sa);
         std::vector<std::shared_ptr<TempoChangeEvent>>

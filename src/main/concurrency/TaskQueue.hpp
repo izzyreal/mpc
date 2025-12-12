@@ -2,7 +2,7 @@
 
 #include "utils/SmallFn.hpp"
 
-#include <concurrentqueue.h>
+#include "concurrency/BoundedMpmcQueue.hpp"
 
 namespace mpc::concurrency
 {
@@ -17,13 +17,15 @@ namespace mpc::concurrency
         void drain()
         {
             utils::Task task;
-            while (queue.try_dequeue(task))
+
+            while (queue.dequeue(task))
             {
                 task();
             }
         }
 
     private:
-        moodycamel::ConcurrentQueue<utils::Task> queue;
+        static constexpr size_t CAPACITY = 64;
+        BoundedMpmcQueue<utils::Task, CAPACITY> queue;
     };
 } // namespace mpc::concurrency

@@ -267,7 +267,7 @@ void Sequence::setTimeSignature(const int barIndex, const int num,
     dispatch(SetTimeSignature{getSequenceIndex(), BarIndex(barIndex), ts});
 }
 
-std::vector<std::shared_ptr<Track>> Sequence::getTracks()
+std::vector<std::shared_ptr<Track>> &Sequence::getTracks()
 {
     return tracks;
 }

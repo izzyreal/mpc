@@ -373,7 +373,7 @@ void SequenceStateHandler::applyMessage(
 void SequenceStateHandler::applyUpdateSequenceEvents(
     const UpdateSequenceEvents &m, SequencerState &state) const
 {
-    for (auto &[trackIndex, events] : m.trackSnapshots)
+    for (auto &[trackIndex, events] : *m.trackSnapshots)
     {
         assert(trackIndex <= Mpc2000XlSpecs::LAST_TRACK_INDEX);
         assert(trackIndex != TempoChangeTrackIndex);
