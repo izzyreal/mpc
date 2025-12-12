@@ -1,8 +1,7 @@
 #pragma once
 
+#include "concurrency/BoundedMpmcQueue.hpp"
 #include "utils/SmallFn.hpp"
-
-#include <concurrentqueue.h>
 
 #include <cstdint>
 
@@ -19,11 +18,6 @@ namespace mpc::concurrency
     class SamplePreciseTaskQueue
     {
     public:
-        SamplePreciseTaskQueue()
-        {
-            queue = moodycamel::ConcurrentQueue<SamplePreciseTask>(Capacity);
-        }
-
         void post(const SamplePreciseTask &task)
         {
             queue.enqueue(task);
@@ -31,26 +25,21 @@ namespace mpc::concurrency
 
         void flushNoteOffs()
         {
-            SamplePreciseTask batch[Capacity];
+            SamplePreciseTask task;
             SamplePreciseTask temp[Capacity];
+            size_t reinsertIndex = 0;
 
-            const size_t queueSize = queue.try_dequeue_bulk(batch, Capacity);
-            size_t reinsertSize = 0;
-
-            for (size_t i = 0; i < queueSize; ++i)
+            while (queue.dequeue(task))
             {
-                auto &task = batch[i];
-
                 if (task.noteOff)
                 {
                     task.f(0);
                     continue;
                 }
-
-                temp[reinsertSize++] = task;
+                temp[reinsertIndex++] = task;
             }
 
-            for (size_t i = 0; i < reinsertSize; ++i)
+            for (size_t i = 0; i < reinsertIndex; ++i)
             {
                 queue.enqueue(std::move(temp[i]));
             }
@@ -58,41 +47,32 @@ namespace mpc::concurrency
 
         void processTasks(const int nFrames)
         {
-            SamplePreciseTask batch[Capacity];
+            SamplePreciseTask task;
             SamplePreciseTask temp[Capacity];
+            size_t reinsertIndex = 0;
 
-            const size_t queueSize = queue.try_dequeue_bulk(batch, Capacity);
-            size_t reinsertSize = 0;
-
-            for (size_t i = 0; i < queueSize; ++i)
+            while (queue.dequeue(task))
             {
-                auto &task = batch[i];
-
-                if (const auto candidatePosInBuffer =
-                        task.frameCounter + nFrames - task.nFrames;
-                    candidatePosInBuffer >= 0)
+                if (auto c = task.frameCounter + nFrames - task.nFrames; c >= 0)
                 {
-                    const auto posInBuffer =
-                        std::min(candidatePosInBuffer,
-                                 static_cast<int64_t>(nFrames - 1));
-
-                    task.f(posInBuffer);
+                    const auto p =
+                        std::min(c, static_cast<int64_t>(nFrames - 1));
+                    task.f(p);
                     continue;
                 }
 
                 task.frameCounter += nFrames;
-
-                temp[reinsertSize++] = task;
+                temp[reinsertIndex++] = task;
             }
 
-            for (size_t i = 0; i < reinsertSize; ++i)
+            for (size_t i = 0; i < reinsertIndex; ++i)
             {
                 queue.enqueue(std::move(temp[i]));
             }
         }
 
     private:
-        static constexpr int Capacity = 100;
-        moodycamel::ConcurrentQueue<SamplePreciseTask> queue;
+        static constexpr int Capacity = 128;
+        BoundedMpmcQueue<SamplePreciseTask, Capacity> queue;
     };
 } // namespace mpc::concurrency

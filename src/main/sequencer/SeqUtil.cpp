@@ -361,7 +361,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
 }
 
 bool SeqUtil::isStepRecording(const std::string &currentScreenName,
-                              const std::shared_ptr<Sequencer> &sequencer)
+                              Sequencer *sequencer)
 {
     auto posIsLastTick = [&]
     {

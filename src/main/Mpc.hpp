@@ -106,7 +106,7 @@ namespace mpc
         bool isPluginModeEnabled() const;
 
         std::weak_ptr<performance::PerformanceManager>
-        getPerformanceManager() const;
+        getPerformanceManager();
 
         std::shared_ptr<input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<controller::ClientEventController>

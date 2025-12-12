@@ -50,7 +50,17 @@ void MidiReader::parseSequence(Mpc &mpc) const
     auto sequence = dest.lock();
     sequence->setUsed(true);
 
-    UpdateSequenceEvents updateSequenceEvents{sequence->getSequenceIndex()};
+    const auto sequenceIndex = sequence->getSequenceIndex();
+
+    UpdateSequenceEvents updateSequenceEvents{sequenceIndex};
+    updateSequenceEvents.trackSnapshots =
+        &lSequencer->getStateManager()->trackEventsSnapshots[sequenceIndex];
+    updateSequenceEvents.trackSnapshots->clear();
+
+    UpdateSequenceTracks updateSequenceTracks{sequence->getSequenceIndex()};
+    updateSequenceTracks.trackStates =
+        &lSequencer->getStateManager()->trackStatesSnapshots[sequenceIndex];
+    *updateSequenceTracks.trackStates = SequenceTrackStatesSnapshot();
 
     bool isMpc2000XlMidiFile = false;
 
@@ -226,12 +236,22 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
             }
         }
+
+        auto &track = (*updateSequenceTracks.trackStates)[trackIndex];
+        track.deviceIndex = deviceIndex;
+
+        struct OpenNote
+        {
+            int noteValue;
+            int tick;
+            int velocity;
+            NoteVariationType nvType;
+            NoteVariationValue nvValue;
+        };
+
+        std::vector<OpenNote> openNotes;
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
         std::vector<EventData> noteOns;
-
-        auto track = sequence->getTrack(trackIndex);
-        constexpr bool updateUsedness = false;
-        track->setDeviceIndex(deviceIndex, updateUsedness);
 
         if (isMpc2000XlMidiFile)
         {
@@ -250,40 +270,21 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 {
                     if (noteOn->getVelocity() == 0)
                     {
-                        if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) >
-                            getNumberOfNoteOns(noteOn->getNoteValue(),
-                                               noteOffs))
-                        {
-                            noteOffs.push_back(noteOn);
-                        }
+                        noteOffs.push_back(noteOn);
                     }
                     else
                     {
-                        if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) >
-                            getNumberOfNoteOns(noteOn->getNoteValue(),
-                                               noteOffs))
-                        {
-                            noteOffs.emplace_back(std::make_shared<NoteOn>(
-                                noteOn->getTick(), 0, noteOn->getNoteValue(),
-                                0));
-                        }
-
-                        EventData ne;
-                        ne.type = EventType::NoteOn;
-                        ne.noteNumber = NoteNumber(noteOn->getNoteValue());
-
-                        ne.tick = noteOn->getTick();
-                        ne.velocity = Velocity(noteOn->getVelocity());
-
-                        ne.noteVariationType = noteVariationData.first;
-                        ne.noteVariationValue = noteVariationData.second;
-
-                        noteOns.emplace_back(ne);
+                        openNotes.push_back(OpenNote{
+                            noteOn->getNoteValue(),
+                            noteOn->getTick(),
+                            noteOn->getVelocity(),
+                            noteVariationData.first,
+                            noteVariationData.second});
                     }
                 }
             }
         }
-        else // if !isMpc2000XlMidiFile
+        else
         {
             for (auto &me : mt->getEvents())
             {
@@ -296,69 +297,87 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
                 else if (noteOn)
                 {
-                    EventData ne;
-                    ne.type = EventType::NoteOn;
-                    ne.noteNumber = NoteNumber(noteOn->getNoteValue());
-                    ne.tick = noteOn->getTick();
-                    ne.velocity = Velocity(noteOn->getVelocity());
-                    noteOns.emplace_back(ne);
+                    openNotes.push_back(OpenNote{
+                        noteOn->getNoteValue(),
+                        noteOn->getTick(),
+                        noteOn->getVelocity(),
+                        noteVariationData.first,
+                        noteVariationData.second});
                 }
             }
         }
 
-        for (auto &n : noteOns)
+        //
+        // Resolve durations and build EventData
+        //
+        for (auto &on : openNotes)
         {
-            auto noteOn = track->recordNoteEventNonLive(n.tick, n.noteNumber,
-                                                        n.velocity, 0);
-
-            int indexCandidate = -1;
+            int bestIdx = -1;
+            int endTick = -1;
 
             for (int k = 0; k < noteOffs.size(); k++)
             {
-                int noteValue;
-                int tick;
+                int offVal;
+                int offTick;
 
-                if (auto noteOff1 =
+                if (auto nOn =
                         std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
                 {
                     // isMpc2000XlMidiFile == true. MPC2000XL MIDI files use
                     // MIDI Note On events to indicate the end of a note.
-                    noteValue = noteOff1->getNoteValue();
-                    tick = noteOff1->getTick();
+                    offVal = nOn->getNoteValue();
+                    offTick = nOn->getTick();
                 }
                 else
                 {
                     // Ordinary MIDI file. The end of a note is indicated by a
                     // note off event.
-                    auto noteOff2 =
+                    auto nOff =
                         std::dynamic_pointer_cast<NoteOff>(noteOffs[k]);
-                    noteValue = noteOff2->getNoteValue();
-                    tick = noteOff2->getTick();
+                    offVal = nOff->getNoteValue();
+                    offTick = nOff->getTick();
                 }
 
-                if (noteValue == noteOn->noteNumber && tick >= noteOn->tick)
+                if (offVal == on.noteValue && offTick >= on.tick)
                 {
-                    if (constexpr int maxNoteOffTick = 999999999;
-                        tick < maxNoteOffTick)
-                    {
-                        indexCandidate = k;
-                        break;
-                    }
+                    endTick = offTick;
+                    bestIdx = k;
+                    break;
                 }
             }
 
-            if (indexCandidate != -1)
+            EventData ne;
+            ne.type = EventType::NoteOn;
+            ne.noteNumber = NoteNumber(on.noteValue);
+            ne.tick = on.tick;
+            ne.velocity = Velocity(on.velocity);
+            ne.noteVariationType = on.nvType;
+            ne.noteVariationValue = on.nvValue;
+
+            if (bestIdx != -1)
             {
-                noteOn->duration = Duration(
-                    noteOffs[indexCandidate]->getTick() - noteOn->tick);
-                noteOffs.erase(noteOffs.begin() + indexCandidate);
+                ne.duration = Duration(endTick - on.tick);
+                noteOffs.erase(noteOffs.begin() + bestIdx);
             }
             else
             {
-                noteOn->duration = Duration(24);
+                ne.duration = Duration(24);
             }
+
+            noteOns.emplace_back(ne);
         }
 
+        //
+        // Add final resolved notes into updateSequenceEvents
+        //
+        for (auto &n : noteOns)
+        {
+            (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(n);
+        }
+
+        //
+        // Non-note events
+        //
         for (auto &me : mt->getEvents())
         {
             if (const auto sysEx =
@@ -378,34 +397,21 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     e.mixerParameter = sysExEventBytes[4] - 1;
                     e.mixerPad = sysExEventBytes[5];
                     e.mixerValue = sysExEventBytes[6];
-                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
                         .push_back(e);
                 }
                 else
                 {
-                    sysExEventBytes =
-                        std::vector<char>(sysEx->getData().size() + 1);
-                    sysExEventBytes[0] = 0xF0;
-
+                    std::vector<char> bytes(sysEx->getData().size() + 1);
+                    bytes[0] = 0xF0;
                     for (int j = 0; j < sysEx->getData().size(); j++)
-                    {
-                        sysExEventBytes[j + 1] = sysEx->getData()[j];
-                    }
+                        bytes[j + 1] = sysEx->getData()[j];
 
                     EventData e;
                     e.type = EventType::SystemExclusive;
                     e.tick = sysEx->getTick();
 
-                    // std::vector<unsigned char> tmp;
-                    //
-                    // for (char c : sysExEventBytes)
-                    // {
-                    //     tmp.push_back(static_cast<unsigned char>(c));
-                    // }
-                    //
-                    // e->setBytes(tmp);
-
-                    updateSequenceEvents.trackSnapshots[track->getIndex()]
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
                         .push_back(e);
                 }
             }
@@ -418,7 +424,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.tick = noteAfterTouch->getTick();
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
                 e.amount = noteAfterTouch->getAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[trackIndex]
                     .push_back(e);
             }
             else if (const auto channelAfterTouch =
@@ -429,7 +435,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[trackIndex]
                     .push_back(e);
             }
             else if (const auto programChange =
@@ -440,14 +446,14 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ProgramChange;
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[trackIndex]
                     .push_back(e);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
                      trackName && !trackName->getTrackName().empty())
             {
-                track->setName(trackName->getTrackName());
+                track.name = trackName->getTrackName();
             }
             else if (const auto controller =
                          std::dynamic_pointer_cast<Controller>(me.lock());
@@ -457,7 +463,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ControlChange;
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[trackIndex]
                     .push_back(e);
             }
             else if (const auto pitchBend =
@@ -467,12 +473,13 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
-                updateSequenceEvents.trackSnapshots[track->getIndex()]
+                (*updateSequenceEvents.trackSnapshots)[trackIndex]
                     .push_back(e);
             }
         }
     }
 
+    mpc.getSequencer()->getStateManager()->enqueue(updateSequenceTracks);
     mpc.getSequencer()->getStateManager()->enqueue(updateSequenceEvents);
 }
 

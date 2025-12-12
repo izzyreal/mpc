@@ -38,7 +38,7 @@ namespace mpc::file::all
     public:
         std::vector<char> saveBytes{};
 
-        int getDevice(int i) const;
+        int getDeviceIndex(int i) const;
         int getBus(int i) const;
         int getVelo(int i) const;
         int getPgm(int i) const;

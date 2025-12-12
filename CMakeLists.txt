@@ -65,13 +65,6 @@ FetchContent_Declare(platformfolders
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/platformfolders
 )
 
-FetchContent_Declare(concurrentqueue
-    GIT_REPOSITORY https://github.com/cameron314/concurrentqueue.git
-    GIT_TAG        master
-    GIT_SHALLOW    ON
-    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
-)
-
 FetchContent_Declare(readerwriterqueue
     GIT_REPOSITORY https://github.com/cameron314/readerwriterqueue.git
     GIT_TAG        master
@@ -114,9 +107,6 @@ FetchContent_MakeAvailable(json)
 
 message(STATUS "Downloading json-schema-validator...")
 FetchContent_MakeAvailable(json-schema-validator)
-
-message(STATUS "Downloading concurrentqueue...")
-FetchContent_MakeAvailable(concurrentqueue)
 
 message(STATUS "Downloading readerwriterqueue...")
 FetchContent_MakeAvailable(readerwriterqueue)
@@ -177,7 +167,6 @@ target_include_directories(mpc PUBLIC
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include
-    ${concurrentqueue_SOURCE_DIR}
     ${readerwriterqueue_SOURCE_DIR}
 )
 

@@ -26,45 +26,45 @@ namespace mpc::performance
         PerformanceManager();
         ~PerformanceManager() override;
 
-        void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex) const;
+        void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex);
 
         void registerPhysicalPadPress(
             PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
             PhysicalPadIndex, Velocity, TrackIndex, controller::Bank,
-            std::optional<ProgramIndex>, std::optional<NoteNumber>) const;
+            std::optional<ProgramIndex>, std::optional<NoteNumber>);
 
         void registerPhysicalPadAftertouch(
-            PhysicalPadIndex, Pressure, PerformanceEventSource) const;
+            PhysicalPadIndex, Pressure, PerformanceEventSource);
 
         void registerPhysicalPadRelease(
-            PhysicalPadIndex, PerformanceEventSource) const;
+            PhysicalPadIndex, PerformanceEventSource);
 
         void registerProgramPadPress(
             PerformanceEventSource, std::optional<MidiChannel> midiInputChannel,
             lcdgui::ScreenId, TrackIndex, sequencer::BusType, ProgramPadIndex,
-            Velocity, ProgramIndex, PhysicalPadIndex) const;
+            Velocity, ProgramIndex, PhysicalPadIndex);
 
         void registerProgramPadAftertouch(PerformanceEventSource,
                                           ProgramPadIndex, ProgramIndex,
-                                          Pressure) const;
+                                          Pressure);
 
         void registerProgramPadRelease(
-            PerformanceEventSource, ProgramPadIndex, ProgramIndex) const;
+            PerformanceEventSource, ProgramPadIndex, ProgramIndex);
 
         NoteOnEvent
         registerNoteOn(PerformanceEventSource,
                        std::optional<MidiChannel> midiInputChannel,
                        lcdgui::ScreenId, TrackIndex, sequencer::BusType,
-                       NoteNumber, Velocity, std::optional<ProgramIndex>) const;
+                       NoteNumber, Velocity, std::optional<ProgramIndex>);
 
         void registerNoteAftertouch(
             PerformanceEventSource, NoteNumber, Pressure,
-            std::optional<MidiChannel> midiInputChannel) const;
+            std::optional<MidiChannel> midiInputChannel);
 
         void registerNoteOff(PerformanceEventSource, NoteNumber,
-                             std::optional<MidiChannel> midiInputChannel) const;
+                             std::optional<MidiChannel> midiInputChannel);
 
-        void clear() const;
+        void clear();
 
     protected:
         void applyMessage(const PerformanceMessage &) noexcept override;

@@ -56,7 +56,7 @@ void TrackScreen::openNameScreen()
         enterAction = [this](const std::string &nameScreenName)
         {
             sequencer.lock()->setDefaultTrackName(
-                nameScreenName, sequencer.lock()->getSelectedTrackIndex());
+                sequencer.lock()->getSelectedTrackIndex(), nameScreenName);
             openScreenById(ScreenId::SequencerScreen);
         };
     }

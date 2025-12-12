@@ -25,22 +25,22 @@ using namespace mpc::command::context;
 using namespace mpc::sampler;
 
 TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
-    std::shared_ptr<TriggerLocalNoteOnContext> ctx)
-    : ctx(std::move(ctx))
+    const TriggerLocalNoteOnContext &ctx)
+    : ctx(ctx)
 {
 }
 
 void TriggerLocalNoteOnCommand::execute()
 {
-    const auto transport = ctx->sequencer.lock()->getTransport();
+    const auto transport = ctx.sequencer->getTransport();
 
-    if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
+    if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
         transport->isPlaying())
     {
         return;
     }
 
-    if (ctx->isRecordingOrOverdubbing && ctx->isErasePressed)
+    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
     {
         return;
     }
@@ -48,11 +48,11 @@ void TriggerLocalNoteOnCommand::execute()
     auto apply16LevelsAndSliderNoteVariation =
         [&](sequencer::EventData &noteEventToApplyTo)
     {
-        if (ctx->program && ctx->programPadIndex)
+        if (ctx.program && ctx.programPadIndex)
         {
-            const bool is16LevelsEnabled = ctx->isSixteenLevelsEnabled;
+            const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 
-            const auto assign16LevelsScreen = ctx->assign16LevelsScreen;
+            const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
 
             const Util::SixteenLevelsContext sixteenLevelsContext{
                 is16LevelsEnabled,
@@ -60,21 +60,21 @@ void TriggerLocalNoteOnCommand::execute()
                 assign16LevelsScreen->getOriginalKeyPad(),
                 assign16LevelsScreen->getNote(),
                 assign16LevelsScreen->getParameter(),
-                *ctx->programPadIndex % 16};
+                *ctx.programPadIndex % 16};
 
             Util::set16LevelsValues(sixteenLevelsContext, noteEventToApplyTo);
         }
 
-        if (ctx->program)
+        if (ctx.program)
         {
             const bool isSliderNote =
-                ctx->program &&
-                ctx->program->getSlider()->getNote() == ctx->note;
+                ctx.program &&
+                ctx.program->getSlider()->getNote() == ctx.note;
 
-            const auto programSlider = ctx->program->getSlider();
+            const auto programSlider = ctx.program->getSlider();
 
             const Util::SliderNoteVariationContext sliderNoteVariationContext{
-                ctx->hardwareSliderValue,
+                ctx.hardwareSliderValue,
                 programSlider->getNote(),
                 programSlider->getParameter(),
                 programSlider->getTuneLowRange(),
@@ -86,7 +86,7 @@ void TriggerLocalNoteOnCommand::execute()
                 programSlider->getFilterLowRange(),
                 programSlider->getFilterHighRange()};
 
-            if (ctx->program && isSliderNote)
+            if (ctx.program && isSliderNote)
             {
                 auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
                     sliderNoteVariationContext);
@@ -97,66 +97,64 @@ void TriggerLocalNoteOnCommand::execute()
         }
     };
 
-    const auto velo = ctx->isFullLevelEnabled ? MaxVelocity : ctx->velocity;
+    const auto velo = ctx.isFullLevelEnabled ? MaxVelocity : ctx.velocity;
 
     sequencer::EventData noteOnEvent;
     noteOnEvent.type = sequencer::EventType::NoteOn;
-    noteOnEvent.noteNumber = ctx->note;
+    noteOnEvent.noteNumber = ctx.note;
     noteOnEvent.velocity = velo;
 
     apply16LevelsAndSliderNoteVariation(noteOnEvent);
 
-    if (ctx->isSamplerScreen)
+    if (ctx.isSamplerScreen)
     {
-        ctx->eventHandler->handleUnfinalizedNoteOn(noteOnEvent,
-                                                   ctx->track->getDeviceIndex(),
-                                                   ctx->drumScreenSelectedDrum);
+        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent,
+                                                   ctx.track->getDeviceIndex(),
+                                                   ctx.drumScreenSelectedDrum);
     }
     else
     {
         std::optional<sequencer::BusType> drumBusType = std::nullopt;
 
-        if (const auto drumBus =
-                std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
+        if (const auto drumBus = dynamic_cast<sequencer::DrumBus *>(ctx.bus);
             drumBus)
         {
             drumBusType =
                 sequencer::drumBusIndexToDrumBusType(drumBus->getIndex());
         }
 
-        ctx->eventHandler->handleUnfinalizedNoteOn(
-            noteOnEvent, ctx->track->getDeviceIndex(), drumBusType);
+        ctx.eventHandler->handleUnfinalizedNoteOn(
+            noteOnEvent, ctx.track->getDeviceIndex(), drumBusType);
     }
 
     sequencer::EventData *recordNoteOnEvent = nullptr;
 
     if (transport->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent =
-            ctx->sequencerStateManager.lock()->recordNoteEventLive(
-                ctx->track->getSequenceIndex(), ctx->track->getIndex(),
-                ctx->note, velo);
+        recordNoteOnEvent = ctx.sequencerStateManager->recordNoteEventLive(
+            ctx.track->getSequenceIndex(), ctx.track->getIndex(), ctx.note,
+            velo);
 
-        ctx->track->setUsedIfCurrentlyUnused();
+        ctx.track->setUsedIfCurrentlyUnused();
     }
-    else if (ctx->isStepRecording &&
-             (sequencer::isMidiBusType(ctx->track->getBusType()) ||
-              isDrumNote(ctx->note)))
+    else if (ctx.isStepRecording &&
+             (sequencer::isMidiBusType(ctx.track->getBusType()) ||
+              isDrumNote(ctx.note)))
     {
         transport->playMetronomeOnly();
 
-        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->positionTicks, ctx->note, velo,
-            ctx->metronomeOnlyPositionTicks);
+        recordNoteOnEvent = ctx.track->recordNoteEventNonLive(
+            ctx.positionTicks, ctx.note, velo,
+            ctx.metronomeOnlyPositionTicks);
     }
-    else if (ctx->isRecMainWithoutPlaying)
+    else if (ctx.isRecMainWithoutPlaying)
     {
         transport->playMetronomeOnly();
-        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
-            ctx->positionTicks, ctx->note, velo,
-            ctx->metronomeOnlyPositionTicks);
+        recordNoteOnEvent = ctx.track->recordNoteEventNonLive(
+            ctx.positionTicks, ctx.note, velo,
+            ctx.metronomeOnlyPositionTicks);
 
-        const auto timingCorrectScreen = ctx->timingCorrectScreen;
+        const auto timingCorrectScreen = ctx.timingCorrectScreen;
 
         if (const int stepLength =
                 timingCorrectScreen->getNoteValueLengthInTicks();
@@ -165,15 +163,14 @@ void TriggerLocalNoteOnCommand::execute()
             const int bar = transport->getCurrentBarIndex() + 1;
 
             const auto sequenceStateView =
-                ctx->sequencerStateManager.lock()
-                    ->getSnapshot()
-                    .getSequenceState(ctx->track->getSequenceIndex());
+                ctx.sequencerStateManager->getSnapshot().getSequenceState(
+                    ctx.track->getSequenceIndex());
 
-            const auto correctedTick = ctx->track->timingCorrectTick(
-                sequenceStateView, 0, bar, ctx->positionTicks, stepLength,
+            const auto correctedTick = ctx.track->timingCorrectTick(
+                sequenceStateView, 0, bar, ctx.positionTicks, stepLength,
                 timingCorrectScreen->getSwing());
 
-            if (ctx->positionTicks != correctedTick)
+            if (ctx.positionTicks != correctedTick)
             {
                 transport->setPosition(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));

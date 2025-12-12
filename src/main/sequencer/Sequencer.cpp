@@ -87,6 +87,13 @@ Sequencer::Sequencer(
       eventHandler(eventHandler), isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
+
+    for (int i = 0; i < 64; i++)
+    {
+        std::string name = "Track-";
+        name = name.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
+        defaultTrackNames.push_back(name);
+    }
 }
 
 Sequencer::~Sequencer() {}
@@ -239,6 +246,10 @@ void Sequencer::makeNewSequence(std::shared_ptr<Sequence> &destination)
 
     destination = std::make_shared<Sequence>(
         layeredScreen->postToUiThread, stateManager, getSnapshot, dispatch,
+        [&]
+        {
+            return defaultSequenceName;
+        },
         [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
@@ -384,18 +395,9 @@ void Sequencer::init()
     lastTap = currentTimeMillis();
     nextSq = NoSequenceIndex;
 
-    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
-    defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
-
-    for (int i = 0; i < 64; i++)
-    {
-        std::string name = "Track-";
-        name = name.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
-        defaultTrackNames.push_back(name);
-    }
-
     selectedTrackIndex = 0;
 
+    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     recordingModeMulti = userScreen->recordingModeMulti;
 
     soloEnabled = false;
@@ -541,11 +543,6 @@ void Sequencer::deleteAllSequences() const
 
 void Sequencer::deleteSequence(const int i) const
 {
-    sequences[i]->init(0);
-    sequences[i]->setUsed(false);
-    std::string res = defaultSequenceName;
-    res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
-    sequences[i]->setName(res);
     getStateManager()->enqueue(DeleteSequence{SequenceIndex(i)});
 }
 
@@ -621,7 +618,7 @@ std::string Sequencer::getDefaultTrackName(const int i)
     return defaultTrackNames[i];
 }
 
-void Sequencer::setDefaultTrackName(const std::string &s, const int i)
+void Sequencer::setDefaultTrackName(const int i, const std::string &s)
 {
     defaultTrackNames[i] = s;
 }

@@ -40,7 +40,7 @@ void CompoundControl::remove(const std::shared_ptr<Control> &c)
     }
 }
 
-std::vector<std::shared_ptr<Control>> CompoundControl::getControls()
+std::vector<std::shared_ptr<Control>> &CompoundControl::getControls()
 {
     return controls;
 }

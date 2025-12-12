@@ -11,6 +11,8 @@
 
 #include "Observer.hpp"
 
+#include "controller/FnAlias.hpp"
+
 #include <memory>
 
 namespace mpc
@@ -81,13 +83,14 @@ namespace mpc::controller
         void setSixteenLevelsEnabled(bool);
         void setActiveBank(Bank);
         Bank getActiveBank() const;
-        void setSelectedNote(DrumNoteNumber);
-        void setSelectedPad(ProgramPadIndex);
         DrumNoteNumber getSelectedNote() const;
         ProgramPadIndex getSelectedPad() const;
 
         bool isRecMainWithoutPlaying() const;
         bool isEraseButtonPressed() const;
+
+        const SetSelectedNoteFn setSelectedNote;
+        const SetSelectedPadFn setSelectedPad;
 
     private:
         Mpc &mpc;

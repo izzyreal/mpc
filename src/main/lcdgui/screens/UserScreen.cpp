@@ -146,7 +146,7 @@ void UserScreen::displayRecordingMode() const
     findField("recordingmode")->setText(recordingModeMulti ? "M" : "S");
 }
 
-void UserScreen::displayBus()
+void UserScreen::displayBus() const
 {
     findField("bus")->setText(busTypeToString(busType));
     displayDeviceName();
@@ -176,17 +176,21 @@ void UserScreen::displayVelo() const
     findField("velo")->setText(std::to_string(velo));
 }
 
-void UserScreen::displayDeviceName()
+void UserScreen::displayDeviceName() const
 {
+    const auto deviceName = "Device" +
+                          StrUtil::padLeft(std::to_string(device), "0", 2);
+
     if (busType == BusType::MIDI)
     {
-        if (device != 0)
+        if (device == 0)
         {
-            findLabel("devicename")->setText(getDeviceName(device));
+            findLabel("devicename")->setText("");
         }
         else
         {
-            findLabel("devicename")->setText("");
+            findLabel("devicename")
+                ->setText(deviceName);
         }
     }
     else
@@ -202,14 +206,13 @@ void UserScreen::displayDeviceName()
         }
         else
         {
-            findLabel("devicename")->setText(getDeviceName(device));
+            findLabel("devicename")->setText(deviceName);
         }
     }
 }
 
 void UserScreen::resetPreferences()
 {
-    sequenceName = std::string("Sequence");
     busType = BusType::DRUM1;
     tempo = 120.0;
     velo = 100;
@@ -218,32 +221,9 @@ void UserScreen::resetPreferences()
     loop = true;
     device = 0;
 
-    trackNames.clear();
-
-    for (int i = 0; i < 64; i++)
-    {
-        trackNames.push_back(std::string(
-            "Track-" + StrUtil::padLeft(std::to_string(i + 1), "0", 2)));
-    }
-
     lastBar = 1;
     timeSig.numerator = TimeSigNumerator(4);
     timeSig.denominator = TimeSigDenominator(4);
-
-    deviceNames.clear();
-
-    deviceNames.push_back(std::string("        "));
-
-    for (int i = 1; i < 33; i++)
-    {
-        deviceNames.push_back("Device" +
-                              StrUtil::padLeft(std::to_string(i), "0", 2));
-    }
-}
-
-std::string UserScreen::getDeviceName(const int i)
-{
-    return deviceNames[i];
 }
 
 void UserScreen::setTempo(const double newTempo)
@@ -311,36 +291,16 @@ void UserScreen::setVelo(const int i)
     displayVelo();
 }
 
-std::string UserScreen::getTrackName(const int i)
-{
-    return trackNames[i];
-}
-
 int8_t UserScreen::getTrackStatus() const
 {
     // This number is so magic that I forgot what it's for.
     return 6;
 }
 
-void UserScreen::setDeviceName(const int i, const std::string &s)
-{
-    deviceNames[i] = s;
-}
-
-void UserScreen::setSequenceName(const std::string &name)
-{
-    sequenceName = name;
-}
-
 void UserScreen::setTimeSig(const int num, const int den)
 {
     timeSig.numerator = TimeSigNumerator(num);
     timeSig.denominator = TimeSigDenominator(den);
-}
-
-void UserScreen::setTrackName(const int i, const std::string &s)
-{
-    trackNames[i] = s;
 }
 
 double UserScreen::getTempo() const

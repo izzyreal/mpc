@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
-#include "audiomidi/MidiOutput.hpp"
+
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
@@ -24,16 +24,7 @@ void MidiOutputScreen::open()
             {ScreenId::NameScreen, ScreenId::MidiOutputMonitorScreen}))
     {
         const auto track = sequencer.lock()->getSelectedTrack();
-        const auto dev = track->getDeviceIndex();
-
-        if (dev > 0)
-        {
-            deviceIndex = dev - 1;
-        }
-        else
-        {
-            deviceIndex = 0;
-        }
+        deviceIndex = std::clamp(track->getDeviceIndex() - 1, 0 , 31);
     }
 
     displaySoftThru();
@@ -46,19 +37,17 @@ void MidiOutputScreen::openNameScreen()
 
     if (focusedFieldName == "firstletter")
     {
-        auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
-
         const auto enterAction =
-            [this, renameDeviceIndex](const std::string &nameScreenName)
+            [this](const std::string &nameScreenName)
         {
             sequencer.lock()->getSelectedSequence()->setDeviceName(
-                renameDeviceIndex, nameScreenName);
+                deviceIndex, nameScreenName);
             openScreenById(ScreenId::MidiOutputScreen);
         };
 
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         const auto seq = sequencer.lock()->getSelectedSequence();
-        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8,
+        nameScreen->initialize(seq->getDeviceName(deviceIndex), 8,
                                enterAction, "midi-output");
         openScreenById(ScreenId::NameScreen);
     }
@@ -117,7 +106,7 @@ void MidiOutputScreen::displaySoftThru() const
 void MidiOutputScreen::displayDeviceName() const
 {
     const auto sequence = sequencer.lock()->getSelectedSequence();
-    const auto devName = sequence->getDeviceName(deviceIndex + 1);
+    const auto devName = sequence->getDeviceName(deviceIndex);
 
     findField("firstletter")->setText(devName.substr(0, 1));
     findLabel("devicename")->setText(devName.substr(1, devName.length()));
@@ -127,7 +116,7 @@ void MidiOutputScreen::displayDeviceName() const
     if (deviceIndex >= 16)
     {
         devNumber =
-            StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
+            StrUtil::padLeft(std::to_string(deviceIndex - 16 + 1), " ", 2) + "B";
     }
     else
     {

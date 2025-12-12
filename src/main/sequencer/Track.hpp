@@ -142,8 +142,6 @@ namespace mpc::sequencer
 
         void printEvents() const;
 
-        void setEventStates(const std::vector<EventData> &eventStates) const;
-
         SequenceIndex getSequenceIndex() const;
 
         void setUsedIfCurrentlyUnused(

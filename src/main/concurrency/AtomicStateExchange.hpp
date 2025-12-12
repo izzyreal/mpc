@@ -1,42 +1,27 @@
 #pragma once
 
-#include "MpcMacros.hpp"
+#include "concurrency/BoundedMpmcQueue.hpp"
 
 #include "utils/SimpleAction.hpp"
 
-#include <memory>
 #include <atomic>
 #include <functional>
 #include <cstdio>
 #include <cstdint>
 #include <array>
-#include <concurrentqueue.h>
 
 namespace mpc::concurrency
 {
     template <typename State, typename View, typename Message,
-              size_t PoolSize = 3>
+              size_t PoolSize = 3, size_t MessageQueueCapacity = 512>
     class AtomicStateExchange
     {
-        struct SequencedMessage
-        {
-            uint64_t seq;
-            Message payload;
-
-            SequencedMessage() = default;
-
-            MPC_NON_COPYABLE(SequencedMessage)
-        };
-
-        using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
-        using CallbackQueue = moodycamel::ConcurrentQueue<utils::SimpleAction>;
-
-        mutable std::atomic<uint64_t> globalSeq{0};
-        std::vector<SequencedMessage> sequencedMessages;
+        using MessageQueue = BoundedMpmcQueue<Message, MessageQueueCapacity>;
+        using CallbackQueue =
+            BoundedMpmcQueue<utils::SimpleAction, MessageQueueCapacity>;
 
     protected:
-        explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
-                                     size_t queueCapacity = 512)
+        explicit AtomicStateExchange(std::function<void(State &)> reserveFn)
         {
             actions.reserve(10);
             reserveFn(activeState);
@@ -48,56 +33,32 @@ namespace mpc::concurrency
 
             currentSnapshot.store(&pool[0], std::memory_order_relaxed);
             writeBuffer = &pool[1];
-
-            eventMessageQueue =
-                std::make_shared<MessageQueue>(queueCapacity);
-
-            callbackQueue =
-                std::make_shared<CallbackQueue>(queueCapacity);
-
-            sequencedMessages.reserve(queueCapacity);
         }
 
     public:
         virtual ~AtomicStateExchange() {}
 
-        virtual void enqueue(Message &&msg) const noexcept
+        template <class M> void enqueue(M &&msg) noexcept
         {
-            SequencedMessage sm;
-            sm.seq = globalSeq.fetch_add(1, std::memory_order_relaxed);
-            sm.payload = std::move(msg);
-            eventMessageQueue->enqueue(std::move(sm));
+            eventMessageQueue.enqueue(Message{std::forward<M>(msg)});
         }
 
-        void enqueueCallback(utils::SimpleAction cb) const noexcept
+        void enqueueCallback(const utils::SimpleAction &cb) noexcept
         {
-            callbackQueue->enqueue(std::move(cb));
+            callbackQueue.enqueue(cb);
         }
 
         void drainQueue() noexcept
         {
-            SequencedMessage sm;
+            Message msg;
 
             bool shouldPublish = false;
 
-            while (eventMessageQueue->try_dequeue(sm))
+            while (eventMessageQueue.dequeue(msg))
             {
-                sequencedMessages.push_back(std::move(sm));
+                applyMessage(msg);
                 shouldPublish = true;
             }
-
-            std::sort(sequencedMessages.begin(), sequencedMessages.end(),
-                      [](const auto &a, const auto &b)
-                      {
-                          return a.seq < b.seq;
-                      });
-
-            for (auto &msg : sequencedMessages)
-            {
-                applyMessage(msg.payload);
-            }
-
-            sequencedMessages.clear();
 
             if (shouldPublish)
             {
@@ -112,7 +73,8 @@ namespace mpc::concurrency
             actions.clear();
 
             utils::SimpleAction cb;
-            while (callbackQueue->try_dequeue(cb))
+
+            while (callbackQueue.dequeue(cb))
             {
                 cb();
             }
@@ -137,7 +99,8 @@ namespace mpc::concurrency
             actions.clear();
 
             utils::SimpleAction cb;
-            while (callbackQueue->try_dequeue(cb))
+
+            while (callbackQueue.dequeue(cb))
             {
                 cb();
             }
@@ -159,8 +122,7 @@ namespace mpc::concurrency
             size_t nextIndex = (writeIndex + 1) % PoolSize;
             State *dst = &pool[nextIndex];
 
-            State *oldSnap =
-                currentSnapshot.load(std::memory_order_acquire);
+            State *oldSnap = currentSnapshot.load(std::memory_order_acquire);
 
             if (oldSnap == dst)
             {
@@ -185,9 +147,8 @@ namespace mpc::concurrency
     private:
         std::atomic<uint64_t> publishCount{0};
 
-        std::shared_ptr<MessageQueue> eventMessageQueue;
-        std::shared_ptr<CallbackQueue> callbackQueue;
+        MessageQueue eventMessageQueue;
+        CallbackQueue callbackQueue;
     };
 
 } // namespace mpc::concurrency
-

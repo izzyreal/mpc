@@ -10,6 +10,7 @@
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
+#include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Program.hpp"
@@ -310,13 +311,18 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     seq->getSequenceIndex(), trackIndex,
                     noteEventInfo.noteNumber);
 
+            const bool isSamplerScreen =
+                screengroups::isSamplerScreen(noteEventInfo.screenId);
+
             const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     PerformanceEventSource::MidiInput, noteEventInfo.noteNumber,
-                    recordingNoteOnEvent, track, noteEventInfo.busType, screen,
-                    programPadIndex, program, sequencer,
-                    performanceManager.lock(), clientEventController,
-                    eventHandler, screens, hardware, metronomeOnlyPositionTicks,
+                    recordingNoteOnEvent, track, noteEventInfo.busType,
+                    screen.get(), isSamplerScreen, programPadIndex,
+                    program.get(), sequencer.lock().get(),
+                    performanceManager.lock().get(),
+                    clientEventController.get(), eventHandler.get(),
+                    screens.get(), hardware.get(), metronomeOnlyPositionTicks,
                     positionTicks);
 
             command::TriggerLocalNoteOffCommand(ctx).execute();

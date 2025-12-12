@@ -3,9 +3,6 @@
 #include "performance/PerformanceEventSource.hpp"
 #include "sequencer/EventData.hpp"
 
-#include <memory>
-#include <functional>
-#include <cstdint>
 #include <optional>
 
 namespace mpc::performance
@@ -23,6 +20,7 @@ namespace mpc::sequencer
     class Bus;
     class Track;
     class DrumBus;
+    class Sequencer;
     class SequencerStateManager;
 } // namespace mpc::sequencer
 
@@ -36,14 +34,14 @@ namespace mpc::command::context
     struct TriggerLocalNoteOffContext
     {
         performance::PerformanceEventSource source;
-        std::weak_ptr<performance::PerformanceManager> performanceManager;
-        std::weak_ptr<sequencer::SequencerStateManager> sequencerStateManager;
-        std::shared_ptr<sequencer::Bus> bus;
-        std::shared_ptr<sampler::Program> program;
+        performance::PerformanceManager *performanceManager;
+        sequencer::SequencerStateManager *sequencerStateManager;
+        sequencer::Bus *bus;
+        sampler::Program *program;
         std::optional<int> programPadIndex;
         const bool currentScreenIsSamplerScreen;
         NoteNumber noteNumber;
-        std::shared_ptr<audiomidi::EventHandler> eventHandler;
+        audiomidi::EventHandler *eventHandler;
         sequencer::EventData *recordOnEvent = nullptr;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
@@ -58,9 +56,7 @@ namespace mpc::command::context
         const bool isAutoStepIncrementEnabled;
         const int currentBarIndex;
         const int swing;
-        std::function<int()> sequencerGetActiveSequenceLastTick;
-        std::function<void(double)> sequencerMoveToQuarterNotePosition;
-        std::function<void()> sequencerStopMetronomeTrack;
+        sequencer::Sequencer *sequencer;
         Tick positionTicks;
     };
 } // namespace mpc::command::context

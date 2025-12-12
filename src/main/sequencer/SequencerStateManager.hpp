@@ -7,8 +7,7 @@
 #include "concurrency/AtomicStateExchange.hpp"
 #include "concurrency/FreeList.hpp"
 #include "concurrency/SpinLock.hpp"
-
-#include <concurrentqueue.h>
+#include "concurrency/BoundedMpmcQueue.hpp"
 
 #include <functional>
 #include <memory>
@@ -72,6 +71,12 @@ namespace mpc::sequencer
 
         void flushNoteCache();
 
+        std::array<SequenceTrackEventsSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+            trackEventsSnapshots;
+
+        std::array<SequenceTrackStatesSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+            trackStatesSnapshots;
+
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;
 
@@ -84,8 +89,14 @@ namespace mpc::sequencer
         std::unique_ptr<TrackStateHandler> trackStateHandler;
         std::unique_ptr<SongStateHandler> songStateHandler;
 
-        moodycamel::ConcurrentQueue<EventData *> liveNoteOnEventRecordingQueue;
-        moodycamel::ConcurrentQueue<EventData> liveNoteOffEventRecordingQueue;
+        concurrency::BoundedMpmcQueue<EventData *,
+                                      LIVE_NOTE_EVENT_RECORDING_CAPACITY>
+            liveNoteOnEventRecordingQueue;
+
+        concurrency::BoundedMpmcQueue<EventData,
+                                      LIVE_NOTE_EVENT_RECORDING_CAPACITY>
+            liveNoteOffEventRecordingQueue;
+
         std::vector<EventData *> tempLiveNoteOnRecordingEvents;
         std::vector<EventData> tempLiveNoteOffRecordingEvents;
 

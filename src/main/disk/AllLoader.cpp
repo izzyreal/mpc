@@ -68,17 +68,12 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     userScreen->setLoop(defaults->isLoopEnabled());
     userScreen->setBus(busIndexToBusType(defaults->getBusses()[0]));
 
-    for (int i = 0; i < 33; i++)
-    {
-        userScreen->setDeviceName(i, defaults->getDefaultDevNames()[i]);
-    }
-
-    userScreen->setSequenceName(defaults->getDefaultSeqName());
+    mpcSequencer->setDefaultSequenceName(defaults->getDefaultSeqName());
     auto defTrackNames = defaults->getDefaultTrackNames();
 
     for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
-        userScreen->setTrackName(i, defTrackNames[i]);
+        mpcSequencer->setDefaultTrackName(i, defTrackNames[i]);
     }
 
     userScreen->setDeviceNumber(defaults->getDevices()[0]);
