@@ -18,6 +18,7 @@ namespace mpc
     class Observer
     {
     public:
+        virtual ~Observer() = default;
         virtual void update(Observable *, Message) {}
     };
 

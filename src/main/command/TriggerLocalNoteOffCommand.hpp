@@ -2,8 +2,6 @@
 
 #include "Command.hpp"
 
-#include <memory>
-
 namespace mpc::command::context
 {
     struct TriggerLocalNoteOffContext;
@@ -11,13 +9,13 @@ namespace mpc::command::context
 
 namespace mpc::command
 {
-    class TriggerLocalNoteOffCommand : public Command
+    class TriggerLocalNoteOffCommand final : public Command
     {
-        std::shared_ptr<context::TriggerLocalNoteOffContext> ctx;
+        const context::TriggerLocalNoteOffContext &ctx;
 
     public:
         explicit TriggerLocalNoteOffCommand(
-            const std::shared_ptr<context::TriggerLocalNoteOffContext> &);
+            const context::TriggerLocalNoteOffContext &);
 
         // Should be invoked from the audio thread only
         void execute() override;

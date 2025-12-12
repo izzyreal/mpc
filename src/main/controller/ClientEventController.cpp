@@ -25,7 +25,21 @@ using namespace mpc::hardware;
 using namespace mpc::lcdgui;
 
 ClientEventController::ClientEventController(Mpc &mpcToUse)
-    : mpc(mpcToUse),
+    : setSelectedNote(
+          [this](const DrumNoteNumber selectedNoteToUse)
+          {
+              selectedNote = std::clamp(selectedNoteToUse, MinDrumNoteNumber,
+                                        MaxDrumNoteNumber);
+              notifyObservers(std::string("note"));
+          }),
+      setSelectedPad(
+          [this](const ProgramPadIndex programPadIndex)
+          {
+              selectedPad = std::clamp(programPadIndex, MinProgramPadIndex,
+                                       MaxProgramPadIndex);
+              notifyObservers(std::string("pad"));
+          }),
+      mpc(mpcToUse),
       keyboardBindings(std::make_shared<input::KeyboardBindings>()),
       screens(mpc.screens), layeredScreen(mpc.getLayeredScreen()),
       hardware(mpc.getHardware())
@@ -95,7 +109,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
         return RecordingMode::Overdub;
     }
     if (SeqUtil::isStepRecording(layeredScreen->getCurrentScreenName(),
-                                 mpc.getSequencer()))
+                                 mpc.getSequencer().get()))
     {
         return RecordingMode::Step;
     }
@@ -113,14 +127,6 @@ std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()
     return layeredScreen;
 }
 
-void ClientEventController::setSelectedPad(
-    const ProgramPadIndex programPadIndex)
-{
-    selectedPad =
-        std::clamp(programPadIndex, MinProgramPadIndex, MaxProgramPadIndex);
-    notifyObservers(std::string("pad"));
-}
-
 void ClientEventController::setActiveBank(const Bank activeBankToUse)
 {
     activeBank = activeBankToUse;
@@ -136,14 +142,6 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
 Bank ClientEventController::getActiveBank() const
 {
     return activeBank;
-}
-
-void ClientEventController::setSelectedNote(
-    const DrumNoteNumber selectedNoteToUse)
-{
-    selectedNote =
-        std::clamp(selectedNoteToUse, MinDrumNoteNumber, MaxDrumNoteNumber);
-    notifyObservers(std::string("note"));
 }
 
 mpc::DrumNoteNumber ClientEventController::getSelectedNote() const
