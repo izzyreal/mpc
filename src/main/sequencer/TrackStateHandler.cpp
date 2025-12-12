@@ -33,7 +33,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
         [&](const SetTrackDeviceIndex &m)
         {
             auto &track = state.sequences[m.sequence].tracks[m.track];
-            track.device = m.deviceIndex;
+            track.deviceIndex = m.deviceIndex;
         },
         [&](const SetTrackBusType &m)
         {

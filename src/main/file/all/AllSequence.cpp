@@ -123,32 +123,31 @@ void AllSequence::applyToInMemorySequence(
 
     inMemorySequence->setName(name);
     inMemorySequence->setInitialTempo(tempo);
-    const auto at = tracks;
+
+    UpdateSequenceTracks updateSequenceTracks {inMemorySequence->getSequenceIndex()};
+    manager->trackStatesSnapshots = SequenceTrackStatesSnapshot();
+    updateSequenceTracks.trackStates = &manager->trackStatesSnapshots;
+
+    auto &trackStates = *updateSequenceTracks.trackStates;
 
     for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
     {
-        const auto t = inMemorySequence->getTrack(i);
+        const auto inMemoryTrack = inMemorySequence->getTrack(i);
 
-        constexpr bool updateUsedness = false;
-
-        t->setName(at->getName(i));
-
-        t->setDeviceIndex(at->getDevice(i), updateUsedness);
-        t->setBusType(busIndexToBusType(at->getBus(i)), updateUsedness);
-        t->setProgramChange(at->getPgm(i), updateUsedness);
-        t->setOn(at->isOn(i), updateUsedness);
-        t->setVelocityRatio(at->getVelo(i), updateUsedness);
-        t->setTransmitProgramChangesEnabled(
-            at->isTransmitProgramChangesEnabled(i));
-
-        manager->enqueue(SetTrackUsed{inMemorySequence->getSequenceIndex(),
-                                      TrackIndex(i), at->isUsed(i)});
+        trackStates[i].name = tracks->getName(i);
+        trackStates[i].deviceIndex = tracks->getDeviceIndex(i);
+        trackStates[i].busType = busIndexToBusType(tracks->getBus(i));
+        trackStates[i].programChange = tracks->getPgm(i);
+        trackStates[i].on = tracks->isOn(i);
+        trackStates[i].velocityRatio = tracks->getVelo(i);
+        trackStates[i].transmitProgramChangesEnabled = tracks->isTransmitProgramChangesEnabled(i);
+        trackStates[i].used = tracks->isUsed(i);
     }
 
     UpdateSequenceEvents updateSequenceEvents{
         inMemorySequence->getSequenceIndex()};
 
-    updateSequenceEvents.trackSnapshots = &manager->trackSnapshots;
+    updateSequenceEvents.trackSnapshots = &manager->trackEventsSnapshots;
 
     updateSequenceEvents.trackSnapshots->clear();
 

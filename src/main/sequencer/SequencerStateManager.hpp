@@ -22,8 +22,6 @@ namespace mpc::sequencer
     class SongStateHandler;
     class SequenceStateView;
 
-    using TrackSnapshots = std::unordered_map<uint8_t, std::vector<EventData>>;
-
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
               SequencerState, SequencerStateView, SequencerMessage>
@@ -74,7 +72,8 @@ namespace mpc::sequencer
 
         void flushNoteCache();
 
-        TrackSnapshots trackSnapshots;
+        SequenceTrackEventsSnapshot trackEventsSnapshots;
+        SequenceTrackStatesSnapshot trackStatesSnapshots;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

@@ -120,6 +120,11 @@ namespace mpc::performance
         ProgramIndex programIndex;
     };
 
+    struct UpdateDrumBulk
+    {
+        Drum drum{};
+    };
+
     using PerformanceMessagePayload = std::variant<
         std::monostate, PhysicalPadPressEvent, PhysicalPadAftertouchEvent,
         PhysicalPadReleaseEvent, ProgramPadPressEvent,
@@ -128,7 +133,7 @@ namespace mpc::performance
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
         UpdateProgramBulk, UpdateProgramMidiProgramChange,
-        SetProgramUsed, RepairProgramReferences>;
+        SetProgramUsed, RepairProgramReferences, UpdateDrumBulk>;
 
     struct PerformanceMessage
     {

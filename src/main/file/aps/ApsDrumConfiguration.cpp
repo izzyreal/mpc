@@ -6,9 +6,9 @@ using namespace mpc::file::aps;
 
 ApsDrumConfiguration::ApsDrumConfiguration(const std::vector<char> &loadBytes)
 {
-    program = loadBytes[5];
-    receivePgmChange = BitUtil::getBits(loadBytes[2])[7] == '1';
-    receiveMidiVolume = BitUtil::getBits(loadBytes[3])[7] == '1';
+    programIndex = loadBytes[5];
+    receivePgmChangeEnabled = BitUtil::getBits(loadBytes[2])[7] == '1';
+    receiveMidiVolumeEnabled = BitUtil::getBits(loadBytes[3])[7] == '1';
 }
 
 ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange,
@@ -35,19 +35,19 @@ std::vector<char> ApsDrumConfiguration::TEMPLATE =
     std::vector<char>{0, 0, 1, 1, 127, 0, 1, 1, 127};
 std::vector<char> ApsDrumConfiguration::PADDING = std::vector<char>{64, 0, 6};
 
-int ApsDrumConfiguration::getProgram() const
+int ApsDrumConfiguration::getProgramIndex() const
 {
-    return program;
+    return programIndex;
 }
 
-bool ApsDrumConfiguration::getReceivePgmChange() const
+bool ApsDrumConfiguration::isReceivePgmChangeEnabled() const
 {
-    return receivePgmChange;
+    return receivePgmChangeEnabled;
 }
 
-bool ApsDrumConfiguration::getReceiveMidiVolume() const
+bool ApsDrumConfiguration::isReceiveMidiVolumeEnabled() const
 {
-    return receiveMidiVolume;
+    return receiveMidiVolumeEnabled;
 }
 
 std::vector<char> ApsDrumConfiguration::getBytes()

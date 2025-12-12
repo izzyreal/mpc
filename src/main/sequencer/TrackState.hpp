@@ -15,7 +15,7 @@ namespace mpc::sequencer
         bool on;
         uint8_t velocityRatio;
         uint8_t programChange;
-        uint8_t device;
+        uint8_t deviceIndex;
         bool used;
         bool transmitProgramChangesEnabled = true;
 
@@ -36,7 +36,7 @@ namespace mpc::sequencer
             busType = BusType::DRUM1;
             velocityRatio = 100;
             programChange = 0;
-            device = 0;
+            deviceIndex = 0;
         }
     };
 } // namespace mpc::sequencer

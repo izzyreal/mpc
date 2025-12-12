@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sequencer/TrackState.hpp"
 #include "sequencer/TimeSignature.hpp"
 #include "sequencer/TrackMessage.hpp"
 
@@ -11,6 +12,9 @@
 
 namespace mpc::sequencer
 {
+    using SequenceTrackEventsSnapshot = std::unordered_map<uint8_t, std::vector<EventData>>;
+    using SequenceTrackStatesSnapshot = std::array<TrackState, Mpc2000XlSpecs::TRACK_COUNT>;
+
     struct SetTimeSignature
     {
         SequenceIndex sequenceIndex;
@@ -27,7 +31,13 @@ namespace mpc::sequencer
     struct UpdateSequenceEvents
     {
         SequenceIndex sequenceIndex;
-        std::unordered_map<uint8_t, std::vector<EventData>> *trackSnapshots;
+        SequenceTrackEventsSnapshot *trackSnapshots;
+    };
+
+    struct UpdateSequenceTracks
+    {
+        SequenceIndex sequenceIndex;
+        SequenceTrackStatesSnapshot *trackStates;
     };
 
     struct SetLastBarIndex
@@ -132,5 +142,6 @@ namespace mpc::sequencer
                      SetTempoChangeEnabled, SetFirstLoopBarIndex,
                      SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,
                      DeleteTrack, DeleteAllTracks, DeleteBars,
-                     UpdateSequenceEvents, SetSequenceName>;
+                     UpdateSequenceEvents, UpdateSequenceTracks,
+                     SetSequenceName>;
 } // namespace mpc::sequencer

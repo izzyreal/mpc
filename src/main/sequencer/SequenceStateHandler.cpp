@@ -353,6 +353,22 @@ void SequenceStateHandler::applyMessage(
 
             lock.release();
         },
+        [&](const UpdateSequenceTracks &m)
+        {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
+            for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
+            {
+                state.sequences[m.sequenceIndex].tracks[i] = (*m.trackStates)[i];
+            }
+
+            lock.release();
+        },
         [&](const SetSequenceName &m)
         {
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
@@ -403,7 +419,7 @@ void SequenceStateHandler::applyDeleteTrack(const DeleteTrack &m,
 
     track.initializeDefaults();
 
-    track.device = m.deviceIndex;
+    track.deviceIndex = m.deviceIndex;
     track.velocityRatio = m.velocityRatio;
     track.busType = m.busType;
     track.programChange = m.programChange;

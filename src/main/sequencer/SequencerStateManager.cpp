@@ -393,7 +393,7 @@ void SequencerStateManager::applyCopyTrack(const CopyTrack &m)
     t2.used = t1.used;
     t2.name.assign(t1.name.data(), t1.name.size());
     t2.busType = t1.busType;
-    t2.device = t1.device;
+    t2.deviceIndex = t1.deviceIndex;
     t2.on = t1.on;
     t2.programChange = t1.programChange;
     t2.transmitProgramChangesEnabled = t1.transmitProgramChangesEnabled;

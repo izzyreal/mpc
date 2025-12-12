@@ -8,9 +8,9 @@ namespace mpc::file::aps
     {
 
     public:
-        int program;
-        bool receivePgmChange;
-        bool receiveMidiVolume;
+        int programIndex;
+        bool receivePgmChangeEnabled;
+        bool receiveMidiVolumeEnabled;
         std::vector<char> saveBytes;
 
     private:
@@ -18,9 +18,9 @@ namespace mpc::file::aps
         static std::vector<char> PADDING;
 
     public:
-        int getProgram() const;
-        bool getReceivePgmChange() const;
-        bool getReceiveMidiVolume() const;
+        int getProgramIndex() const;
+        bool isReceivePgmChangeEnabled() const;
+        bool isReceiveMidiVolumeEnabled() const;
 
         std::vector<char> getBytes();
 
