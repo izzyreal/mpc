@@ -15,7 +15,6 @@
 #include "engine/DrumNoteEventContextBuilder.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "Util.hpp"
-#include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/TrackStateView.hpp"
 
