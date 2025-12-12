@@ -32,10 +32,6 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 
     songStateHandler = std::make_unique<SongStateHandler>();
 
-    liveNoteOnEventRecordingQueue = moodycamel::ConcurrentQueue<EventData *>(
-        LIVE_NOTE_EVENT_RECORDING_CAPACITY);
-    liveNoteOffEventRecordingQueue = moodycamel::ConcurrentQueue<EventData>(
-        LIVE_NOTE_EVENT_RECORDING_CAPACITY);
     tempLiveNoteOnRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
     tempLiveNoteOffRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
 }
@@ -296,30 +292,29 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track,
     }
 }
 
-EventData *SequencerStateManager::findRecordingNoteOnEvent(
-    const SequenceIndex sequenceIndex, const TrackIndex trackIndex,
+EventData* SequencerStateManager::findRecordingNoteOnEvent(
+    const SequenceIndex sequenceIndex,
+    const TrackIndex trackIndex,
     const NoteNumber noteNumber)
 {
-    EventData *found = nullptr;
+    EventData* found = nullptr;
 
-    const auto count = liveNoteOnEventRecordingQueue.try_dequeue_bulk(
-        tempLiveNoteOnRecordingEvents.begin(),
-        tempLiveNoteOnRecordingEvents.size());
-
-    for (int i = 0; i < count; i++)
+    // Drain as many queued events as available, up to temp buffer size.
+    for (size_t i = 0; i < tempLiveNoteOnRecordingEvents.size(); ++i)
     {
-        const auto e = tempLiveNoteOnRecordingEvents[i];
-        if (e->noteNumber == noteNumber)
-        {
-            found = e;
+        EventData* e;
+        if (!liveNoteOnEventRecordingQueue.dequeue(e))
             break;
-        }
+
+        tempLiveNoteOnRecordingEvents[i] = e;
+
+        if (e->noteNumber == noteNumber && !found)
+            found = e;
     }
 
-    for (size_t i = 0; i < count; i++)
-    {
-        liveNoteOnEventRecordingQueue.enqueue(tempLiveNoteOnRecordingEvents[i]);
-    }
+    // Push them all back into the queue
+    for (auto* e : tempLiveNoteOnRecordingEvents)
+        liveNoteOnEventRecordingQueue.enqueue(e);
 
     tempLiveNoteOnRecordingEvents.clear();
     tempLiveNoteOnRecordingEvents.resize(20);
