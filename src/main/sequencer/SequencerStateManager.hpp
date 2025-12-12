@@ -81,7 +81,7 @@ namespace mpc::sequencer
         void applyMessage(const SequencerMessage &msg) noexcept override;
 
     private:
-        static constexpr uint8_t LIVE_NOTE_EVENT_RECORDING_CAPACITY = 127;
+        static constexpr uint8_t LIVE_NOTE_EVENT_RECORDING_CAPACITY = 128;
 
         Sequencer *sequencer;
         std::unique_ptr<TransportStateHandler> transportStateHandler;
