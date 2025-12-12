@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 
     private:
         int softThru = 0;
-        int deviceIndex = 1;
+        int deviceIndex = 0;
         std::vector<std::string> softThruNames = {"OFF", "AS TRACK", "OMNI-A",
                                                   "OMNI-B", "OMNI-AB"};
         void displaySoftThru() const;

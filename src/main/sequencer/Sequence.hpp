@@ -60,27 +60,28 @@ namespace mpc::sequencer
                  std::shared_ptr<SequencerStateManager> manager,
                  const GetSequenceSnapshotFn &getSnapshot,
                  const std::function<void(SequenceMessage &&)> &dispatch,
-                 std::function<std::string(int)> getDefaultTrackName,
-                 std::function<int64_t()> getTickPosition,
-                 std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
-                 std::function<bool()> isRecordingModeMulti,
-                 std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-                 std::function<int()> getAutoPunchMode,
-                 std::function<std::shared_ptr<Bus>(BusType)> getBus,
-                 std::function<bool()> isEraseButtonPressed,
-                 std::function<bool(ProgramPadIndex, ProgramIndex)>
-                     isProgramPadPressed,
-                 std::shared_ptr<sampler::Sampler> sampler,
-                 std::shared_ptr<audiomidi::EventHandler> eventHandler,
-                 std::function<bool()> isSixteenLevelsEnabled,
-                 std::function<int()> getActiveTrackIndex,
-                 std::function<bool()> isRecording,
-                 std::function<bool()> isOverdubbing,
-                 std::function<bool()> isPunchEnabled,
-                 std::function<int64_t()> getPunchInTime,
-                 std::function<int64_t()> getPunchOutTime,
-                 std::function<bool()> isSoloEnabled,
-                 std::function<int()> getCurrentBarIndex);
+                 const std::function<std::string()> &getDefaultSequenceName,
+                 const std::function<std::string(int)> &getDefaultTrackName,
+                 const std::function<int64_t()> &getTickPosition,
+                 const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens,
+                 const std::function<bool()> &isRecordingModeMulti,
+                 const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
+                 const std::function<int()> &getAutoPunchMode,
+                 const std::function<std::shared_ptr<Bus>(BusType)> &getBus,
+                 const std::function<bool()> &isEraseButtonPressed,
+                 const std::function<bool(ProgramPadIndex, ProgramIndex)>
+                     &isProgramPadPressed,
+                 const std::shared_ptr<sampler::Sampler> &sampler,
+                 const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
+                 const std::function<bool()> &isSixteenLevelsEnabled,
+                 const std::function<int()> &getActiveTrackIndex,
+                 const std::function<bool()> &isRecording,
+                 const std::function<bool()> &isOverdubbing,
+                 const std::function<bool()> &isPunchEnabled,
+                 const std::function<int64_t()> &getPunchInTime,
+                 const std::function<int64_t()> &getPunchOutTime,
+                 const std::function<bool()> &isSoloEnabled,
+                 const std::function<int()> &getCurrentBarIndex);
 
         ~Sequence();
 
@@ -109,7 +110,7 @@ namespace mpc::sequencer
         std::shared_ptr<Track> getTrack(int i);
         void setUsed(bool b) const;
         bool isUsed() const;
-        void init(int newLastBarIndex) const;
+        void init(int newLastBarIndex);
         BarIndex getBarIndexForPositionQN(PositionQuarterNotes) const;
         BarIndex getBarIndexForPositionTicks(Tick) const;
 
@@ -179,6 +180,7 @@ namespace mpc::sequencer
         const GetSequenceSnapshotFn getSnapshot;
 
     private:
+        std::function<std::string()> getDefaultSequenceName;
         SequenceIndex sequenceIndex{NoSequenceIndex};
         std::shared_ptr<SequencerStateManager> manager;
         const std::function<void(SequenceMessage &&)> dispatch;
@@ -186,7 +188,10 @@ namespace mpc::sequencer
 
         std::vector<std::shared_ptr<Track>> tracks;
 
-        std::vector<std::string> deviceNames = std::vector<std::string>(33);
+        std::vector<std::string> defaultDeviceNames =
+            std::vector<std::string>(32);
+
+        std::vector<std::string> deviceNames = std::vector<std::string>(32);
 
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<int()> getCurrentBarIndex;

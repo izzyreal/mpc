@@ -8,31 +8,106 @@
 
 #include "file/ByteUtil.hpp"
 #include "StrUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 std::vector<char> Defaults::UNKNOWN1 = {1, 0, 0, 1, 1, 0};
-std::vector<char> Defaults::UNKNOWN2 = {
-    0, 0, (char)0xFF, (char)0xFF, 1, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
-    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
-    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
-    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
-    0, 0, 0,          0,          0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32};
+std::vector<char> Defaults::UNKNOWN2 = {0,
+                                        0,
+                                        static_cast<char>(0xFF),
+                                        static_cast<char>(0xFF),
+                                        1,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        32,
+                                        32,
+                                        32,
+                                        32,
+                                        32,
+                                        32,
+                                        32,
+                                        32};
 
 Defaults::Defaults(Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
 {
     parseNames(loadBytes);
 
-    auto tempoBytes = std::vector{loadBytes[TEMPO_BYTE1_OFFSET],
-                                  loadBytes[TEMPO_BYTE2_OFFSET]};
+    const auto tempoBytes = std::vector{loadBytes[TEMPO_BYTE1_OFFSET],
+                                        loadBytes[TEMPO_BYTE2_OFFSET]};
     tempo = ByteUtil::bytes2ushort(tempoBytes);
     timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
     timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
 
-    auto barCountBytes = std::vector{loadBytes[BAR_COUNT_BYTE1_OFFSET],
-                                     loadBytes[BAR_COUNT_BYTE2_OFFSET]};
+    const auto barCountBytes = std::vector{loadBytes[BAR_COUNT_BYTE1_OFFSET],
+                                           loadBytes[BAR_COUNT_BYTE2_OFFSET]};
 
     barCount = ByteUtil::bytes2ushort(barCountBytes);
     loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 0x01;
@@ -63,7 +138,7 @@ Defaults::Defaults(Mpc &mpc) : mpc(mpc)
     setBarCount();
     setLastTick();
 
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     auto lastBar = userScreen->lastBar;
 
     if (lastBar == 1)
@@ -73,7 +148,8 @@ Defaults::Defaults(Mpc &mpc) : mpc(mpc)
         lastBar = 0;
     }
 
-    auto unknownNumberBytes = ByteUtil::uint2bytes((lastBar + 1) * 2000000);
+    const auto unknownNumberBytes =
+        ByteUtil::uint2bytes((lastBar + 1) * 2000000);
 
     for (int i = 0; i < 4; i++)
     {
@@ -96,15 +172,13 @@ Defaults::Defaults(Mpc &mpc) : mpc(mpc)
 
 void Defaults::parseNames(const std::vector<char> &loadBytes)
 {
-    std::vector<char> stringBuffer;
-
-    stringBuffer =
+    std::vector<char> stringBuffer =
         Util::vecCopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET,
                              DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
 
     defaultSeqName = "";
 
-    for (char c : stringBuffer)
+    for (const char c : stringBuffer)
     {
         if (c == 0x00)
         {
@@ -123,7 +197,7 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
             loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
         std::string s;
 
-        for (char c : stringBuffer)
+        for (const char c : stringBuffer)
         {
             if (c == 0x00)
             {
@@ -143,7 +217,7 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
                                             offset + AllParser::NAME_LENGTH);
         std::string s;
 
-        for (char c : stringBuffer)
+        for (const char c : stringBuffer)
         {
             if (c == 0x00)
             {
@@ -186,11 +260,6 @@ bool Defaults::isLoopEnabled() const
     return loopEnabled;
 }
 
-std::vector<std::string> Defaults::getDefaultDevNames()
-{
-    return devNames;
-}
-
 std::vector<std::string> Defaults::getDefaultTrackNames()
 {
     return trackNames;
@@ -218,7 +287,7 @@ std::vector<int> Defaults::getTrVelos()
 
 void Defaults::setTrackSettings()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     for (int i = 0; i < 64; i++)
     {
         saveBytes[DEVICES_OFFSET + i] = userScreen->device;
@@ -232,10 +301,10 @@ void Defaults::setTrackSettings()
 
 void Defaults::setLastTick()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    auto lastTick = (userScreen->lastBar + 1) * 384;
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto lastTick = (userScreen->lastBar + 1) * 384;
 
-    auto b = ByteUtil::ushort2bytes(lastTick);
+    const auto b = ByteUtil::ushort2bytes(lastTick);
 
     saveBytes[LAST_TICK_BYTE1_OFFSET] = b[0];
     saveBytes[LAST_TICK_BYTE2_OFFSET] = b[1];
@@ -243,62 +312,63 @@ void Defaults::setLastTick()
 
 void Defaults::setBarCount()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    auto ba = ByteUtil::ushort2bytes(userScreen->lastBar + 1);
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto ba = ByteUtil::ushort2bytes(userScreen->lastBar + 1);
     saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
     saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
 
 void Defaults::setTimeSig()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     saveBytes[TIMESIG_NUM_OFFSET] = userScreen->timeSig.numerator;
     saveBytes[TIMESIG_DEN_OFFSET] = userScreen->timeSig.denominator;
 }
 
 void Defaults::setNames()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    auto const defSeqName = StrUtil::padRight(userScreen->sequenceName, " ",
-                                              AllParser::NAME_LENGTH);
+    auto const defSeqName =
+        StrUtil::padRight(mpc.getSequencer()->getDefaultSequenceName(), " ",
+                          AllParser::NAME_LENGTH);
 
     for (int i = 0; i < 16; i++)
     {
         saveBytes[DEF_SEQ_NAME_OFFSET + i] = defSeqName[i];
     }
 
-    std::string stringBuffer;
-
     for (int i = 0; i < 33; i++)
     {
-        auto const defDevName = userScreen->getDeviceName(i);
-        stringBuffer =
-            StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
-        auto offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        auto const deviceName =
+            i == 0 ? "        "
+                   : "Device" + StrUtil::padLeft(std::to_string(i), "0", 2);
+
+        const auto offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
 
         for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
         {
-            saveBytes[j] = stringBuffer[j - offset];
+            saveBytes[j] = deviceName[j - offset];
         }
     }
+
     for (int i = 0; i < 64; i++)
     {
-        auto const defTrackName = userScreen->getTrackName(i);
-        stringBuffer =
-            StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
-        auto offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
+        const auto trackName =
+            StrUtil::padRight(mpc.getSequencer()->getDefaultTrackName(i), " ",
+                              AllParser::NAME_LENGTH);
+
+        const auto offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
 
         for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
         {
-            saveBytes[j] = stringBuffer[j - offset];
+            saveBytes[j] = trackName[j - offset];
         }
     }
 }
 
 void Defaults::setTempo()
 {
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    auto tempoBytes =
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto tempoBytes =
         ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
     saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
     saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];

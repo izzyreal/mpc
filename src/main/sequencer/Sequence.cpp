@@ -3,6 +3,7 @@
 #include "Mpc.hpp"
 #include "SequenceStateView.hpp"
 #include "SequencerStateManager.hpp"
+#include "StrUtil.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -21,26 +22,31 @@ Sequence::Sequence(
     std::shared_ptr<SequencerStateManager> manager,
     const GetSequenceSnapshotFn &getSnapshot,
     const std::function<void(SequenceMessage &&)> &dispatch,
-    std::function<std::string(int)> getDefaultTrackName,
-    std::function<int64_t()> getTickPosition,
-    std::function<std::shared_ptr<Screens>()> getScreens,
-    std::function<bool()> isRecordingModeMulti,
-    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-    std::function<int()> getAutoPunchMode,
-    std::function<std::shared_ptr<Bus>(BusType)> getBus,
-    std::function<bool()> isEraseButtonPressed,
-    std::function<bool(ProgramPadIndex, ProgramIndex)> isProgramPadPressed,
-    std::shared_ptr<Sampler> sampler,
-    std::shared_ptr<audiomidi::EventHandler> eventHandler,
-    std::function<bool()> isSixteenLevelsEnabled,
-    std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
-    std::function<bool()> isOverdubbing, std::function<bool()> isPunchEnabled,
-    std::function<int64_t()> getPunchInTime,
-    std::function<int64_t()> getPunchOutTime,
-    std::function<bool()> isSoloEnabled,
-    std::function<int()> getCurrentBarIndex)
-    : getSnapshot(getSnapshot), manager(manager), dispatch(dispatch),
-      getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
+    const std::function<std::string()> &getDefaultSequenceName,
+    const std::function<std::string(int)> &getDefaultTrackName,
+    const std::function<int64_t()> &getTickPosition,
+    const std::function<std::shared_ptr<Screens>()> &getScreens,
+    const std::function<bool()> &isRecordingModeMulti,
+    const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
+    const std::function<int()> &getAutoPunchMode,
+    const std::function<std::shared_ptr<Bus>(BusType)> &getBus,
+    const std::function<bool()> &isEraseButtonPressed,
+    const std::function<bool(ProgramPadIndex, ProgramIndex)>
+        &isProgramPadPressed,
+    const std::shared_ptr<Sampler> &sampler,
+    const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
+    const std::function<bool()> &isSixteenLevelsEnabled,
+    const std::function<int()> &getActiveTrackIndex,
+    const std::function<bool()> &isRecording,
+    const std::function<bool()> &isOverdubbing,
+    const std::function<bool()> &isPunchEnabled,
+    const std::function<int64_t()> &getPunchInTime,
+    const std::function<int64_t()> &getPunchOutTime,
+    const std::function<bool()> &isSoloEnabled,
+    const std::function<int()> &getCurrentBarIndex)
+    : getSnapshot(getSnapshot), getDefaultSequenceName(getDefaultSequenceName),
+      manager(manager), dispatch(dispatch), getScreens(getScreens),
+      getCurrentBarIndex(getCurrentBarIndex)
 {
     for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TRACK_COUNT;
          ++trackIndex)
@@ -76,11 +82,13 @@ Sequence::Sequence(
         isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing,
         isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled));
 
-    auto userScreen = getScreens()->get<ScreenId::UserScreen>();
-
-    for (int i = 0; i < 33; i++)
+    for (int i = 0; i < 32; i++)
     {
-        deviceNames[i] = userScreen->getDeviceName(i);
+        {
+            std::string name =
+                "Device" + StrUtil::padLeft(std::to_string(i + 1), "0", 2);
+            defaultDeviceNames[i] = name;
+        }
     }
 }
 
@@ -141,14 +149,7 @@ void Sequence::setName(const std::string &s) const
 
 std::string Sequence::getName() const
 {
-    const auto snapshot = getSnapshot(getSequenceIndex());
-
-    if (!snapshot.isUsed())
-    {
-        return std::string("(Unused)");
-    }
-
-    return std::string(snapshot.getName());
+    return std::string(getSnapshot(getSequenceIndex()).getName());
 }
 
 void Sequence::setDeviceName(const int i, const std::string &s)
@@ -196,7 +197,7 @@ bool Sequence::isUsed() const
     return getSnapshot(sequenceIndex).isUsed();
 }
 
-void Sequence::init(const int newLastBarIndex) const
+void Sequence::init(const int newLastBarIndex)
 {
     const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     setInitialTempo(userScreen->tempo);
@@ -217,6 +218,10 @@ void Sequence::init(const int newLastBarIndex) const
 
     setFirstLoopBarIndex(BarIndex(0));
     setLastLoopBarIndex(EndOfSequence);
+    setName(getDefaultSequenceName() +
+            StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2));
+
+    deviceNames = defaultDeviceNames;
 
     setUsed(true);
 }

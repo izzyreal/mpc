@@ -63,6 +63,10 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
     };
 
+    struct DeleteAllSequences
+    {
+    };
+
     struct CopySequence
     {
         SequenceIndex sourceIndex;
@@ -89,5 +93,5 @@ namespace mpc::sequencer
                      SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars,
                      SetSelectedSongIndex, SetSelectedSongStepIndex,
                      DeleteSequence, CopySequence, UndoSequence, CopyTrack,
-                     SetUndoSequenceAvailable>;
+                     SetUndoSequenceAvailable, DeleteAllSequences>;
 } // namespace mpc::sequencer

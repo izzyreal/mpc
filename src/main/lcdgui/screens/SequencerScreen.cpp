@@ -489,21 +489,21 @@ void SequencerScreen::displayDeviceName() const
             findLabel("devicename")
                 ->setText(
                     sequencer.lock()->getSelectedSequence()->getDeviceName(
-                        track->getDeviceIndex()));
+                        track->getDeviceIndex() - 1));
         }
     }
     else
     {
         if (track->getDeviceIndex() == 0)
         {
-            findLabel("devicename")->setText("NewPgm-A");
+            findLabel("devicename")->setText("        ");
         }
         else
         {
             findLabel("devicename")
                 ->setText(
                     sequencer.lock()->getSelectedSequence()->getDeviceName(
-                        track->getDeviceIndex()));
+                        track->getDeviceIndex() - 1));
         }
     }
 }

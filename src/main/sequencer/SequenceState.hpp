@@ -32,7 +32,7 @@ namespace mpc::sequencer
 
         void initializeDefaults()
         {
-            name.clear();
+            name = "(Unused)";
             tracks = {};
             timeSignatures = {};
             barLengths = {};

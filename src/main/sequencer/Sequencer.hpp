@@ -137,7 +137,6 @@ namespace mpc::sequencer
 
         std::atomic<bool> secondSequenceEnabled{false};
 
-        std::string defaultSequenceName;
         int timeDisplayStyle = 0;
         bool recordingModeMulti = false;
         int frameRate = 0;
@@ -146,6 +145,7 @@ namespace mpc::sequencer
         uint64_t lastTap = 0;
         int tapIndex = 0;
 
+        std::string defaultSequenceName = "Sequence";
         std::vector<std::string> defaultTrackNames;
         int selectedTrackIndex = 0;
         SequenceIndex nextSq{NoSequenceIndex};
@@ -190,7 +190,7 @@ namespace mpc::sequencer
                        int sourceSequenceIndex, int destSequenceIndex) const;
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
-        void setDefaultTrackName(const std::string &s, int i);
+        void setDefaultTrackName(int i, const std::string &);
         std::shared_ptr<Sequence> getSelectedSequence();
         int getUsedSequenceCount() const;
         std::vector<std::shared_ptr<Sequence>> getUsedSequences() const;

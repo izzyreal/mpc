@@ -133,6 +133,13 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         {
             activeState.sequences[m.sequenceIndex].initializeDefaults();
         },
+        [&](const DeleteAllSequences &)
+        {
+            for (auto &seq : activeState.sequences)
+            {
+                seq.initializeDefaults();
+            }
+        },
         [&](const CopySequence &m)
         {
             auto &seqLock1 = sequenceLocks[m.sourceIndex];

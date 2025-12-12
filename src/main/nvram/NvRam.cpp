@@ -37,20 +37,8 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
     userScreen->lastBar = defaults.getBarCount() - 1;
     userScreen->busType = sequencer::busIndexToBusType(defaults.getBusses()[0]);
 
-    for (int i = 0; i < 33; i++)
-    {
-        userScreen->setDeviceName(i, defaults.getDefaultDevNames()[i]);
-    }
-
-    userScreen->setSequenceName(defaults.getDefaultSeqName());
-    const auto defTrackNames = defaults.getDefaultTrackNames();
-
-    for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; i++)
-    {
-        userScreen->setTrackName(i, defTrackNames[i]);
-    }
-
     userScreen->device = defaults.getDevices()[0];
+
     sequencer::TimeSignature timeSignature;
     timeSignature.numerator = TimeSigNumerator(defaults.getTimeSigNum());
     timeSignature.denominator = TimeSigDenominator(defaults.getTimeSigDen());
