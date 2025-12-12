@@ -32,7 +32,7 @@ namespace mpc
         static constexpr uint16_t MAX_LAST_BAR_INDEX = MAX_BAR_COUNT - 1;
         static constexpr int8_t LAST_SEQUENCE_INDEX = SEQUENCE_COUNT - 1;
         static constexpr uint16_t MAX_NOTE_EVENT_DURATION = 9999;
-        static constexpr int64_t GLOBAL_EVENT_CAPACITY = 300'000;
+        static constexpr int64_t GLOBAL_EVENT_CAPACITY = 262'144;
         static constexpr int16_t SEQUENCER_RESOLUTION_PPQ = 96;
 
         // We use just one meta track in our sequences: tempo change.

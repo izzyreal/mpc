@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cassert>
 #include <utility>
-#include <stdexcept>
 
 namespace mpc::concurrency
 {
@@ -31,16 +30,16 @@ namespace mpc::concurrency
             delete[] buffer_;
         }
 
-        void enqueue(const T& data) {
-            enqueue_impl(data);
+        bool enqueue(const T& data) {
+            return enqueue_impl(data);
         }
 
-        void enqueue(T&& data) {
-            enqueue_impl(std::move(data));
+        bool enqueue(T&& data) {
+            return enqueue_impl(std::move(data));
         }
 
         template <class U>
-        void enqueue_impl(U&& data) {
+        bool enqueue_impl(U&& data) {
             cell_t* cell;
             size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
 
@@ -59,17 +58,15 @@ namespace mpc::concurrency
                         break;
                             }
                 } else if (dif < 0) {
-#ifndef NDEBUG
-                    throw std::runtime_error("BoundedMpmcQueue enqueue failed");
-#endif
+                    return false;
                 } else {
                     pos = enqueue_pos_.load(std::memory_order_relaxed);
                 }
             }
 
             cell->data_ = std::forward<U>(data);
-
             cell->sequence_.store(pos + 1, std::memory_order_release);
+            return true;
         }
 
         bool dequeue(T &data)
