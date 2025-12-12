@@ -70,7 +70,6 @@ namespace mpc::concurrency
 
             for (;;) {
                 cell = &buffer_[pos & buffer_mask_];
-
                 size_t seq = cell->sequence_.load(std::memory_order_acquire);
                 intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
 
@@ -79,17 +78,13 @@ namespace mpc::concurrency
                             pos, pos + 1, std::memory_order_relaxed))
                         break;
                 }
-                else if (dif < 0) {
-                    return false;
-                }
-                else {
-                    pos = dequeue_pos_.load(std::memory_order_relaxed);
-                }
+                else if (dif < 0) return false;
+                else              pos = dequeue_pos_.load(std::memory_order_relaxed);
             }
 
             T* p = cell->ptr();
-            out = std::move(*p);    // move out
-            p->~T();                // destroy ONLY on consumer thread
+            new (&out) T(std::move(*p));  // construct out in-place
+            p->~T();                      // destroy queue copy
 
             cell->sequence_.store(pos + buffer_mask_ + 1,
                                   std::memory_order_release);

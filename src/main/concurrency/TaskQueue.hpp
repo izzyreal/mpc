@@ -16,11 +16,15 @@ namespace mpc::concurrency
 
         void drain()
         {
-            utils::Task task;
+            alignas(utils::Task) unsigned char buf[sizeof(utils::Task)];
 
-            while (queue.dequeue(task))
-            {
-                task();
+            while (true) {
+                if (!queue.dequeue(*reinterpret_cast<utils::Task*>(buf)))
+                    break;
+
+                auto* task = reinterpret_cast<utils::Task*>(buf);
+                (*task)();
+                task->~SmallFn();
             }
         }
 
