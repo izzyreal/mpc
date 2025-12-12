@@ -2,14 +2,9 @@
 
 #include "client/event/ClientMidiEvent.hpp"
 
-#include <vector>
-#include <memory>
+#include "concurrency/BoundedMpmcQueue.hpp"
 
-namespace moodycamel
-{
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits> class ConcurrentQueue;
-} // namespace moodycamel
+#include <vector>
 
 namespace mpc::audiomidi
 {
@@ -19,15 +14,15 @@ namespace mpc::audiomidi
         MidiOutput();
 
     private:
+        static constexpr size_t QueueCapacity = 128;
         using MidiEvent = client::event::ClientMidiEvent;
-        using MidiEventQueue = moodycamel::ConcurrentQueue<
-            MidiEvent, moodycamel::ConcurrentQueueDefaultTraits>;
+        using MidiEventQueue = concurrency::BoundedMpmcQueue<MidiEvent, QueueCapacity>;
 
-        std::shared_ptr<MidiEventQueue> queue;
+        MidiEventQueue queue;
 
     public:
-        void enqueueEvent(const MidiEvent &) const;
-        int dequeue(std::vector<MidiEvent> &) const;
+        void enqueueEvent(const MidiEvent &);
+        int dequeue(std::vector<MidiEvent> &);
         void panic() const;
     };
 } // namespace mpc::audiomidi
