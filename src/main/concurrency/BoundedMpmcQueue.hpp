@@ -2,6 +2,9 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cassert>
+#include <utility>
+#include <stdexcept>
 
 namespace mpc::concurrency
 {
