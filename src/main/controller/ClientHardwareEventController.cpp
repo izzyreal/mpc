@@ -27,6 +27,7 @@
 #include "lcdgui/screens/window/KeepOrRetryScreen.hpp"
 #include "lcdgui/screens/window/LoadASoundScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
@@ -317,9 +318,11 @@ void ClientHardwareEventController::handlePadPress(
                                    ->getSnapshot()
                                    .getTransportStateView();
 
-        const bool isNoteRepeatMode = screenId == ScreenId::SequencerScreen &&
-                                      isNoteRepeatLockedOrPressed() &&
-                                      transport.isSequencerRunning();
+        const bool isNoteRepeatMode =
+            screenId == ScreenId::SequencerScreen &&
+            isNoteRepeatLockedOrPressed() && transport.isSequencerRunning() &&
+            mpc.screens->get<ScreenId::TimingCorrectScreen>()
+                    ->getNoteValueLengthInTicks() > 1;
 
         const bool isLiveEraseMode =
             transport.isRecordingOrOverdubbing() &&
@@ -406,11 +409,23 @@ void ClientHardwareEventController::handlePadRelease(
         mpc.getPerformanceManager().lock()->getSnapshot().findPhysicalPadPress(
             PhysicalPadIndex(physicalPadIndex));
 
+    const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
+
+    const bool isNoteRepeatMode =
+        screenId == ScreenId::SequencerScreen &&
+        isNoteRepeatLockedOrPressed() && transport.isSequencerRunning() &&
+        mpc.screens->get<ScreenId::TimingCorrectScreen>()
+                ->getNoteValueLengthInTicks() > 1;
+
+    const bool isLiveEraseMode =
+        transport.isRecordingOrOverdubbing() &&
+        mpc.clientEventController->isEraseButtonPressed();
+
     if (physicalPadPressEvent)
     {
         action = utils::SimpleAction(
             [this, p = *physicalPadPressEvent, metronomeOnlyPositionTicks,
-             positionTicks]
+             positionTicks, isNoteRepeatMode]
             {
                 const auto performanceManager = mpc.getPerformanceManager();
                 const auto sampler = mpc.getSampler();
@@ -446,7 +461,8 @@ void ClientHardwareEventController::handlePadRelease(
                     programPadPressEvent.has_value() &&
                     programPadPressEvent->quantizedLockActivated;
 
-                if (p.noteNumber != NoNoteNumber && !quantizedLockActivated)
+                if (p.noteNumber != NoNoteNumber && !quantizedLockActivated &&
+                    !isNoteRepeatMode)
                 {
                     const auto selectedSequence =
                         sequencer->getSelectedSequence();

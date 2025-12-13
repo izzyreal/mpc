@@ -167,11 +167,9 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
                                       (track->getVelocityRatio() * 0.01));
 
         const auto durationFrames = static_cast<int>(
-            durationTicks == -1
-                ? -1
-                : SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
+            SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
 
-        if (drumBus && noteNumber != 34)
+        if (drumBus && noteNumber != NoDrumNoteAssigned)
         {
             const auto noteParameters = program->getNoteParameters(noteNumber);
             const auto sound =
@@ -256,13 +254,12 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
             });
 
         const auto gapBetweenTwoAdjacentNoteEvents =
-            ((sampleRate * 0.001) * 10.0);
+            ((sampleRate * 0.001) * 2.0);
 
         task.nFrames = durationFrames - gapBetweenTwoAdjacentNoteEvents;
 
-        task.nFrames += eventFrameOffset;
-
-        task.nFrames -= mixer->getSharedBuffer()->getSampleCount();
+        task.nFrames -=
+            (mixer->getSharedBuffer()->getSampleCount() - eventFrameOffset);
 
         engineHost->postSamplePreciseTaskToAudioThread(task);
     }

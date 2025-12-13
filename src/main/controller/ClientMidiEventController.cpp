@@ -14,6 +14,7 @@
 #include "client/event/ClientHardwareEvent.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
@@ -217,7 +218,9 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
     const bool isNoteRepeatMode =
         screenId == ScreenId::SequencerScreen &&
         clientHardwareEventController->isNoteRepeatLockedOrPressed() &&
-        transport.isSequencerRunning();
+        transport.isSequencerRunning() &&
+        screens->get<ScreenId::TimingCorrectScreen>()
+                ->getNoteValueLengthInTicks() > 1;
 
     const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
                                  clientEventController->isEraseButtonPressed();
@@ -233,14 +236,14 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             [track, screen, programPadIndex, program, this, positionTicks,
              metronomeOnlyPositionTicks, noteOnEvent]
             {
-                const auto ctx =
-                    TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
+                const auto ctx = TriggerLocalNoteContextFactory::
+                    buildTriggerLocalNoteOnContext(
                         PerformanceEventSource::MidiInput, noteOnEvent,
-                        noteOnEvent.noteNumber, noteOnEvent.velocity, track.get(),
-                        screen->getBus(), screen, programPadIndex, program,
-                        sequencer, performanceManager.lock(), clientEventController,
-                        eventHandler, screens, hardware, metronomeOnlyPositionTicks,
-                        positionTicks);
+                        noteOnEvent.noteNumber, noteOnEvent.velocity,
+                        track.get(), screen->getBus(), screen, programPadIndex,
+                        program, sequencer, performanceManager.lock(),
+                        clientEventController, eventHandler, screens, hardware,
+                        metronomeOnlyPositionTicks, positionTicks);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();
             });
@@ -280,9 +283,25 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const auto metronomeOnlyPositionTicks =
         transport.getMetronomeOnlyPositionTicks();
 
+
     if (!registeredNoteOnEvent)
     {
         // TODO Should we do anything special for orphaned note offs?
+        return;
+    }
+
+    const bool isNoteRepeatMode =
+    registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
+    clientHardwareEventController->isNoteRepeatLockedOrPressed() &&
+    transport.isSequencerRunning() &&
+    screens->get<ScreenId::TimingCorrectScreen>()
+            ->getNoteValueLengthInTicks() > 1;
+
+    const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
+                                 clientEventController->isEraseButtonPressed();
+
+    if (isNoteRepeatMode)
+    {
         return;
     }
 

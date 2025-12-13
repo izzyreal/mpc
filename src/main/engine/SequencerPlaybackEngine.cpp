@@ -428,6 +428,7 @@ void SequencerPlaybackEngine::stopSequencer() const
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
+    // printf("BUFFER\n");
     const auto manager = sequencer->getStateManager();
     manager->drainQueue();
 
