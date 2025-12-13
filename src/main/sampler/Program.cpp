@@ -56,21 +56,17 @@ bool Program::isUsed() const
 
 void Program::setUsed() const
 {
-    performance::PerformanceMessage msg;
     auto p = getSnapshot(index);
     p.resetValuesToDefaults();
-    performance::SetProgramUsed payload{index};
-    msg.payload = std::move(payload);
+    performance::SetProgramUsed msg{index};
     dispatch(std::move(msg));
 }
 
 void Program::resetToDefaultValues() const
 {
-    performance::PerformanceMessage msg;
     auto p = getSnapshot(index);
     p.resetValuesToDefaults();
-    performance::UpdateProgramBulk payload{index, p};
-    msg.payload = std::move(payload);
+    performance::UpdateProgramBulk msg{index, p};
     dispatch(std::move(msg));
 }
 
@@ -190,10 +186,8 @@ int Program::getMidiProgramChange() const
 
 void Program::setMidiProgramChange(const int i) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateProgramMidiProgramChange payload{index,
-                                                        std::clamp(i, 1, 128)};
-    msg.payload = std::move(payload);
+    performance::UpdateProgramMidiProgramChange msg{index,
+                                                    std::clamp(i, 1, 128)};
     dispatch(std::move(msg));
 }
 

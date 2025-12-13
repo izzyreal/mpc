@@ -34,6 +34,7 @@ namespace mpc::performance
     {
         PhysicalPadIndex padIndex;
         Pressure pressure;
+        PerformanceEventSource source;
     };
 
     struct PhysicalPadReleaseEvent
@@ -61,12 +62,14 @@ namespace mpc::performance
         ProgramPadIndex padIndex;
         ProgramIndex programIndex;
         Pressure pressure;
+        PerformanceEventSource source;
     };
 
     struct ProgramPadReleaseEvent
     {
         ProgramPadIndex padIndex;
         ProgramIndex programIndex;
+        PerformanceEventSource source;
     };
 
     struct NoteOnEvent
@@ -87,12 +90,14 @@ namespace mpc::performance
         NoteNumber noteNumber;
         Pressure pressure;
         MidiChannel midiInputChannel;
+        PerformanceEventSource source;
     };
 
     struct NoteOffEvent
     {
         NoteNumber noteNumber;
         MidiChannel midiInputChannel;
+        PerformanceEventSource source;
     };
 
     using PhysicalPadPressEvents = std::vector<PhysicalPadPressEvent>;

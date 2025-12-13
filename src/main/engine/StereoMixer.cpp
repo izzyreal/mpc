@@ -16,12 +16,10 @@ StereoMixer::StereoMixer(
 
 void StereoMixer::setPanning(const DrumMixerPanning panning) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateStereoMixer payload{getDrumIndex(), getProgramIndex(),
-                                           getDrumNoteNumber()};
-    payload.member = &performance::StereoMixer::panning;
-    payload.newValue = panning;
-    msg.payload = std::move(payload);
+    performance::UpdateStereoMixer msg{getDrumIndex(), getProgramIndex(),
+                                       getDrumNoteNumber()};
+    msg.member = &performance::StereoMixer::panning;
+    msg.newValue = panning;
     dispatch(std::move(msg));
 }
 
@@ -32,12 +30,10 @@ mpc::DrumMixerPanning StereoMixer::getPanning() const
 
 void StereoMixer::setLevel(const DrumMixerLevel level) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateStereoMixer payload{getDrumIndex(), getProgramIndex(),
-                                           getDrumNoteNumber()};
-    payload.member = &performance::StereoMixer::level;
-    payload.newValue = level;
-    msg.payload = std::move(payload);
+    performance::UpdateStereoMixer msg{getDrumIndex(), getProgramIndex(),
+                                       getDrumNoteNumber()};
+    msg.member = &performance::StereoMixer::level;
+    msg.newValue = level;
     dispatch(std::move(msg));
 }
 

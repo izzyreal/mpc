@@ -135,7 +135,7 @@ namespace mpc::performance
         Drum drum{};
     };
 
-    using PerformanceMessagePayload = std::variant<
+    using PerformanceMessage = std::variant<
         std::monostate, PhysicalPadPressEvent, PhysicalPadAftertouchEvent,
         PhysicalPadReleaseEvent, ProgramPadPressEvent,
         ProgramPadAftertouchEvent, ProgramPadReleaseEvent, NoteOnEvent,
@@ -145,16 +145,4 @@ namespace mpc::performance
         UpdateProgramBulk, UpdateProgramMidiProgramChange, SetProgramUsed,
         RepairProgramReferences, UpdateDrumBulk,
         UpdateNoteParametersBySnapshot>;
-
-    struct PerformanceMessage
-    {
-        PerformanceMessagePayload payload{};
-        PerformanceEventSource source{};
-
-        PerformanceMessage() = default;
-        explicit PerformanceMessage(PerformanceMessagePayload &&payloadToUse)
-            : payload{std::move(payloadToUse)}
-        {
-        }
-    };
 } // namespace mpc::performance

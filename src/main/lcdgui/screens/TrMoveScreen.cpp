@@ -25,15 +25,16 @@ TrMoveScreen::TrMoveScreen(Mpc &mpc, const int layerIndex)
                             displayTrFields();
                             displayTrLabels();
                         }});
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()->getSelectedTrack()->getVersion();
-                        },
-                        [&](auto)
-                        {
-                            displayTrFields();
-                            displayTrLabels();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedTrack()->getVersion();
+         },
+         [&](auto)
+         {
+             displayTrFields();
+             displayTrLabels();
+         }});
 }
 
 void TrMoveScreen::open()

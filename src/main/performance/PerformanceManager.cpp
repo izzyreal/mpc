@@ -33,9 +33,7 @@ void PerformanceManager::reserveState(PerformanceState &s)
 void PerformanceManager::registerUpdateDrumProgram(
     const DrumBusIndex drumBusIndex, const ProgramIndex programIndex)
 {
-    UpdateDrumProgram payload{drumBusIndex, programIndex};
-    PerformanceMessage msg;
-    msg.payload = std::move(payload);
+    UpdateDrumProgram msg{drumBusIndex, programIndex};
     enqueue(std::move(msg));
 }
 
@@ -57,33 +55,22 @@ void PerformanceManager::registerPhysicalPadPress(
                             noteNumber.value_or(NoNoteNumber),
                             NoPressure};
 
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerPhysicalPadAftertouch(
     const PhysicalPadIndex padIndex, const Pressure pressure,
     const PerformanceEventSource source)
 {
-    PhysicalPadAftertouchEvent e{padIndex, pressure};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    PhysicalPadAftertouchEvent e{padIndex, pressure, source};
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerPhysicalPadRelease(
-    const PhysicalPadIndex padIndex, const PerformanceEventSource source)
+    const PhysicalPadIndex padIndex)
 {
     PhysicalPadReleaseEvent e{padIndex};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerProgramPadPress(
@@ -105,35 +92,23 @@ void PerformanceManager::registerProgramPadPress(
                            NoPressure,
                            utils::nowInMilliseconds(),
                            physicalPadIndex};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerProgramPadAftertouch(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
     const ProgramIndex program, const Pressure pressure)
 {
-    ProgramPadAftertouchEvent e{padIndex, program, pressure};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    ProgramPadAftertouchEvent e{padIndex, program, pressure, source};
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerProgramPadRelease(
     const PerformanceEventSource source, const ProgramPadIndex padIndex,
     const ProgramIndex program)
 {
-    ProgramPadReleaseEvent e{padIndex, program};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    ProgramPadReleaseEvent e{padIndex, program, source};
+    enqueue(std::move(e));
 }
 
 NoteOnEvent PerformanceManager::registerNoteOn(
@@ -152,12 +127,9 @@ NoteOnEvent PerformanceManager::registerNoteOn(
                   velocity,
                   programIndex.value_or(NoProgramIndex),
                   NoPressure};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
-    return e;
+    const NoteOnEvent copy = e;
+    enqueue(std::move(e));
+    return copy;
 }
 
 void PerformanceManager::registerNoteAftertouch(
@@ -165,43 +137,34 @@ void PerformanceManager::registerNoteAftertouch(
     const Pressure pressure, const std::optional<MidiChannel> midiInputChannel)
 {
     NoteAftertouchEvent e{noteNumber, pressure,
-                          midiInputChannel.value_or(NoMidiChannel)};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+                          midiInputChannel.value_or(NoMidiChannel), source};
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::registerNoteOff(
     const PerformanceEventSource source, const NoteNumber noteNumber,
     const std::optional<MidiChannel> midiInputChannel)
 {
-    NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel)};
-
-    PerformanceMessage msg;
-    msg.payload = e;
-    msg.source = source;
-    enqueue(std::move(msg));
+    NoteOffEvent e{noteNumber, midiInputChannel.value_or(NoMidiChannel),
+                   source};
+    enqueue(std::move(e));
 }
 
 void PerformanceManager::clear()
 {
-    PerformanceMessage msg;
-    msg.payload = std::monostate{};
-    enqueue(std::move(msg));
+    enqueue(std::monostate{});
 }
 
 void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 {
     auto visitor = Overload{
-        [&](const UpdateProgramBulk &payload)
+        [&](const UpdateProgramBulk &m)
         {
-            activeState.programs[payload.programIndex] = payload.program;
+            activeState.programs[m.programIndex] = m.program;
         },
-        [&](const SetProgramUsed &payload)
+        [&](const SetProgramUsed &m)
         {
-            activeState.programs[payload.programIndex].used = true;
+            activeState.programs[m.programIndex].used = true;
         },
         [&](const RepairProgramReferences &)
         {
@@ -225,21 +188,21 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 }
             }
         },
-        [&](const UpdateProgramMidiProgramChange &payload)
+        [&](const UpdateProgramMidiProgramChange &m)
         {
-            activeState.programs[payload.programIndex].midiProgramChange =
-                payload.midiProgramChange;
+            activeState.programs[m.programIndex].midiProgramChange =
+                m.midiProgramChange;
         },
-        [&](const UpdateNoteParametersBulk &payload)
+        [&](const UpdateNoteParametersBulk &m)
         {
             const int noteParametersIdx =
-                payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
-            activeState.programs[payload.programIndex]
-                .noteParameters[noteParametersIdx] = payload.noteParameters;
+                m.drumNoteNumber.get() - MinDrumNoteNumber.get();
+            activeState.programs[m.programIndex]
+                .noteParameters[noteParametersIdx] = m.noteParameters;
         },
-        [&](const DeleteSoundAndReindex &payload)
+        [&](const DeleteSoundAndReindex &m)
         {
-            const int idx = payload.deletedIndex;
+            const int idx = m.deletedIndex;
             for (auto &program : activeState.programs)
             {
                 for (auto &np : program.noteParameters)
@@ -256,10 +219,10 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 }
             }
         },
-        [&](const AddProgramSound &payload)
+        [&](const AddProgramSound &m)
         {
-            const auto p = payload.programIndex;
-            const auto n = payload.drumNoteNumber;
+            const auto p = m.programIndex;
+            const auto n = m.drumNoteNumber;
             auto &srcNoteParams =
                 activeState.programs[p]
                     .noteParameters[n.get() - MinDrumNoteNumber.get()];
@@ -267,7 +230,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
             std::string localSoundName;
 
-            for (auto &localEntry : payload.localTable)
+            for (auto &localEntry : m.localTable)
             {
                 if (localEntry.first == localSoundIndex)
                 {
@@ -280,7 +243,7 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
             if (!localSoundName.empty())
             {
-                for (auto &convertedEntry : payload.convertedTable)
+                for (auto &convertedEntry : m.convertedTable)
                 {
                     if (convertedEntry.second == localSoundName)
                     {
@@ -292,219 +255,215 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
 
             publishState();
         },
-        [&](const UpdateStereoMixer &payload)
+        [&](const UpdateStereoMixer &m)
         {
-            StereoMixer *m;
+            StereoMixer *mixer;
 
-            if (payload.drumBusIndex == NoDrumBusIndex)
+            if (m.drumBusIndex == NoDrumBusIndex)
             {
-                m = &activeState.programs[payload.programIndex]
-                         .noteParameters[payload.drumNoteNumber.get() -
-                                         MinDrumNoteNumber.get()]
-                         .stereoMixer;
+                mixer = &activeState.programs[m.programIndex]
+                             .noteParameters[m.drumNoteNumber.get() -
+                                             MinDrumNoteNumber.get()]
+                             .stereoMixer;
             }
             else
             {
-                m = &activeState.drums[payload.drumBusIndex]
-                         .stereoMixers[payload.drumNoteNumber.get() -
-                                       MinDrumNoteNumber.get()];
+                mixer = &activeState.drums[m.drumBusIndex]
+                             .stereoMixers[m.drumNoteNumber.get() -
+                                           MinDrumNoteNumber.get()];
             }
 
-            m->*payload.member = payload.newValue;
+            mixer->*m.member = m.newValue;
         },
-        [&](const UpdateIndivFxMixer &payload)
+        [&](const UpdateIndivFxMixer &m)
         {
-            IndivFxMixer *m;
+            IndivFxMixer *mixer;
 
-            if (payload.drumBusIndex == NoDrumBusIndex)
+            if (m.drumBusIndex == NoDrumBusIndex)
             {
-                m = &activeState.programs[payload.programIndex]
-                         .noteParameters[payload.drumNoteNumber.get() -
-                                         MinDrumNoteNumber.get()]
-                         .indivFxMixer;
+                mixer = &activeState.programs[m.programIndex]
+                             .noteParameters[m.drumNoteNumber.get() -
+                                             MinDrumNoteNumber.get()]
+                             .indivFxMixer;
             }
             else
             {
-                m = &activeState.drums[payload.drumBusIndex]
-                         .indivFxMixers[payload.drumNoteNumber.get() -
-                                        MinDrumNoteNumber.get()];
+                mixer = &activeState.drums[m.drumBusIndex]
+                             .indivFxMixers[m.drumNoteNumber.get() -
+                                            MinDrumNoteNumber.get()];
             }
 
-            if (payload.value0To100Member)
+            if (m.value0To100Member)
             {
-                m->*payload.value0To100Member = payload.newValue;
+                mixer->*m.value0To100Member = m.newValue;
             }
-            else if (payload.individualOutputMember)
+            else if (m.individualOutputMember)
             {
-                m->*payload.individualOutputMember = payload.individualOutput;
+                mixer->*m.individualOutputMember = m.individualOutput;
             }
-            else if (payload.individualFxPathMember)
+            else if (m.individualFxPathMember)
             {
-                m->*payload.individualFxPathMember = payload.individualFxPath;
+                mixer->*m.individualFxPathMember = m.individualFxPath;
             }
-            else /*if (payload.followStereoMember)*/
+            else /*if (m.followStereoMember)*/
             {
-                m->*payload.followStereoMember = payload.followStereo;
+                mixer->*m.followStereoMember = m.followStereo;
             }
         },
-        [&](const UpdateNoteParameters &payload)
+        [&](const UpdateNoteParameters &m)
         {
-            auto &p = activeState.programs[payload.programIndex];
+            auto &p = activeState.programs[m.programIndex];
             const size_t noteParametersIndex =
-                payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                m.drumNoteNumber.get() - MinDrumNoteNumber.get();
             auto &noteParameters = p.noteParameters[noteParametersIndex];
 
-            if (payload.int8_tMemberToUpdate != nullptr)
+            if (m.int8_tMemberToUpdate != nullptr)
             {
-                noteParameters.*payload.int8_tMemberToUpdate =
-                    payload.int8_tValue;
+                noteParameters.*m.int8_tMemberToUpdate = m.int8_tValue;
             }
-            else if (payload.int16_tMemberToUpdate != nullptr)
+            else if (m.int16_tMemberToUpdate != nullptr)
             {
-                noteParameters.*payload.int16_tMemberToUpdate =
-                    payload.int16_tValue;
+                noteParameters.*m.int16_tMemberToUpdate = m.int16_tValue;
             }
-            else if (payload.drumNoteMemberToUpdate != nullptr)
+            else if (m.drumNoteMemberToUpdate != nullptr)
             {
-                noteParameters.*payload.drumNoteMemberToUpdate =
-                    payload.drumNoteValue;
+                noteParameters.*m.drumNoteMemberToUpdate = m.drumNoteValue;
             }
-            else if (payload.voiceOverlapModeMemberToUpdate != nullptr)
+            else if (m.voiceOverlapModeMemberToUpdate != nullptr)
             {
-                noteParameters.*payload.voiceOverlapModeMemberToUpdate =
-                    payload.voiceOverlapMode;
+                noteParameters.*m.voiceOverlapModeMemberToUpdate =
+                    m.voiceOverlapMode;
             }
         },
-        [&](const UpdateNoteParametersBySnapshot &payload)
+        [&](const UpdateNoteParametersBySnapshot &m)
         {
-            auto &p = activeState.programs[payload.programIndex];
+            auto &p = activeState.programs[m.programIndex];
             const size_t noteParametersIndex =
-                payload.drumNoteNumber.get() - MinDrumNoteNumber.get();
+                m.drumNoteNumber.get() - MinDrumNoteNumber.get();
             auto &noteParameters = p.noteParameters[noteParametersIndex];
-            noteParameters = payload.snapshot;
+            noteParameters = m.snapshot;
         },
-        [&](const PhysicalPadPressEvent &payload)
+        [&](const PhysicalPadPressEvent &m)
         {
-            activeState.physicalPadEvents.push_back(payload);
+            activeState.physicalPadEvents.push_back(m);
         },
-        [&](const PhysicalPadAftertouchEvent &payload)
+        [&](const PhysicalPadAftertouchEvent &m)
         {
             for (auto &e : activeState.physicalPadEvents)
             {
-                if (e.padIndex == payload.padIndex && e.source == msg.source)
+                if (e.padIndex == m.padIndex && e.source == m.source)
                 {
-                    e.pressure = payload.pressure;
+                    e.pressure = m.pressure;
                 }
             }
         },
-        [&](const PhysicalPadReleaseEvent &payload)
+        [&](const PhysicalPadReleaseEvent &m)
         {
             if (const auto it =
                     std::find_if(activeState.physicalPadEvents.begin(),
                                  activeState.physicalPadEvents.end(),
                                  [&](const auto &e)
                                  {
-                                     return e.padIndex == payload.padIndex;
+                                     return e.padIndex == m.padIndex;
                                  });
                 it != activeState.physicalPadEvents.end())
             {
                 activeState.physicalPadEvents.erase(it);
             }
         },
-        [&](const ProgramPadPressEvent &payload)
+        [&](const ProgramPadPressEvent &m)
         {
-            activeState.programPadEvents.push_back(payload);
+            activeState.programPadEvents.push_back(m);
 
             postToUiThread(utils::Task(
-                [this, padIndex = payload.padIndex, velocity = payload.velocity,
-                 source = payload.source]
+                [this, padIndex = m.padIndex, velocity = m.velocity,
+                 source = m.source]
                 {
                     programPadEventUiCallback(padIndex, velocity, source,
                                               ProgramPadEventType::Press);
                 }));
         },
-        [&](const ProgramPadAftertouchEvent &payload)
+        [&](const ProgramPadAftertouchEvent &m)
         {
             for (auto &e : activeState.programPadEvents)
             {
-                if (e.padIndex == payload.padIndex && e.source == msg.source)
+                if (e.padIndex == m.padIndex && e.source == m.source)
                 {
-                    e.pressure = payload.pressure;
+                    e.pressure = m.pressure;
                 }
             }
 
             postToUiThread(utils::Task(
-                [this, padIndex = payload.padIndex, pressure = payload.pressure,
-                 source = msg.source]
+                [this, padIndex = m.padIndex, pressure = m.pressure,
+                 source = m.source]
                 {
                     programPadEventUiCallback(padIndex, pressure, source,
                                               ProgramPadEventType::Aftertouch);
                 }));
         },
-        [&](const ProgramPadReleaseEvent &payload)
+        [&](const ProgramPadReleaseEvent &m)
         {
-            if (const auto it = std::find_if(
-                    activeState.programPadEvents.begin(),
-                    activeState.programPadEvents.end(),
-                    [&](const auto &e)
-                    {
-                        return e.padIndex == payload.padIndex &&
-                               e.source == msg.source &&
-                               e.programIndex == payload.programIndex;
-                    });
+            if (const auto it =
+                    std::find_if(activeState.programPadEvents.begin(),
+                                 activeState.programPadEvents.end(),
+                                 [&](const auto &e)
+                                 {
+                                     return e.padIndex == m.padIndex &&
+                                            e.source == m.source &&
+                                            e.programIndex == m.programIndex;
+                                 });
                 it != activeState.programPadEvents.end())
             {
                 activeState.programPadEvents.erase(it);
             }
 
             postToUiThread(utils::Task(
-                [this, padIndex = payload.padIndex, source = msg.source]
+                [this, padIndex = m.padIndex, source = m.source]
                 {
                     programPadEventUiCallback(padIndex, NoVelocityOrPressure,
-                                              source, ProgramPadEventType::Release);
+                                              source,
+                                              ProgramPadEventType::Release);
                 }));
         },
-        [&](const NoteOnEvent &payload)
+        [&](const NoteOnEvent &m)
         {
-            activeState.noteEvents.push_back(payload);
+            activeState.noteEvents.push_back(m);
         },
-        [&](const NoteAftertouchEvent &payload)
+        [&](const NoteAftertouchEvent &m)
         {
             for (auto &e : activeState.noteEvents)
             {
-                if (e.noteNumber == payload.noteNumber &&
-                    e.source == msg.source &&
-                    e.midiInputChannel == payload.midiInputChannel)
+                if (e.noteNumber == m.noteNumber && e.source == m.source &&
+                    e.midiInputChannel == m.midiInputChannel)
                 {
-                    e.pressure = payload.pressure;
+                    e.pressure = m.pressure;
                 }
             }
         },
-        [&](const NoteOffEvent &payload)
+        [&](const NoteOffEvent &m)
         {
             if (const auto it = std::find_if(
                     activeState.noteEvents.begin(),
                     activeState.noteEvents.end(),
                     [&](const auto &n)
                     {
-                        return n.source == msg.source &&
-                               n.noteNumber == payload.noteNumber &&
+                        return n.source == m.source &&
+                               n.noteNumber == m.noteNumber &&
                                (n.source != PerformanceEventSource::MidiInput ||
-                                n.midiInputChannel == payload.midiInputChannel);
+                                n.midiInputChannel == m.midiInputChannel);
                     });
                 it != activeState.noteEvents.end())
             {
                 activeState.noteEvents.erase(it);
             }
         },
-        [&](const UpdateDrumProgram &payload)
+        [&](const UpdateDrumProgram &m)
         {
-            activeState.drums[payload.drumBusIndex].programIndex =
-                payload.programIndex;
+            activeState.drums[m.drumBusIndex].programIndex = m.programIndex;
         },
-        [&](const UpdateDrumBulk &payload)
+        [&](const UpdateDrumBulk &m)
         {
-            activeState.drums[payload.drum.drumBusIndex] = payload.drum;
+            activeState.drums[m.drum.drumBusIndex] = m.drum;
         },
         [&](const std::monostate &)
         {
@@ -513,5 +472,5 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             activeState.noteEvents.clear();
         }};
 
-    std::visit(visitor, msg.payload);
+    std::visit(visitor, msg);
 }

@@ -16,12 +16,10 @@ IndivFxMixer::IndivFxMixer(
 
 void IndivFxMixer::setFollowStereo(const bool b) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
-                                            getDrumNoteNumber()};
-    payload.followStereoMember = &performance::IndivFxMixer::followStereo;
-    payload.followStereo = b;
-    msg.payload = std::move(payload);
+    performance::UpdateIndivFxMixer msg{getDrumIndex(), getProgramIndex(),
+                                        getDrumNoteNumber()};
+    msg.followStereoMember = &performance::IndivFxMixer::followStereo;
+    msg.followStereo = b;
     dispatch(std::move(msg));
 }
 
@@ -37,24 +35,19 @@ mpc::DrumMixerIndividualOutput IndivFxMixer::getOutput() const
 
 void IndivFxMixer::setOutput(const DrumMixerIndividualOutput output) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
-                                            getDrumNoteNumber()};
-    payload.individualOutputMember =
-        &performance::IndivFxMixer::individualOutput;
-    payload.individualOutput = output;
-    msg.payload = std::move(payload);
+    performance::UpdateIndivFxMixer msg{getDrumIndex(), getProgramIndex(),
+                                        getDrumNoteNumber()};
+    msg.individualOutputMember = &performance::IndivFxMixer::individualOutput;
+    msg.individualOutput = output;
     dispatch(std::move(msg));
 }
 
 void IndivFxMixer::setVolumeIndividualOut(const DrumMixerLevel level) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
-                                            getDrumNoteNumber()};
-    payload.value0To100Member = &performance::IndivFxMixer::individualOutLevel;
-    payload.newValue = level;
-    msg.payload = std::move(payload);
+    performance::UpdateIndivFxMixer msg{getDrumIndex(), getProgramIndex(),
+                                        getDrumNoteNumber()};
+    msg.value0To100Member = &performance::IndivFxMixer::individualOutLevel;
+    msg.newValue = level;
     dispatch(std::move(msg));
 }
 
@@ -65,12 +58,10 @@ mpc::DrumMixerLevel IndivFxMixer::getVolumeIndividualOut() const
 
 void IndivFxMixer::setFxPath(const DrumMixerIndividualFxPath path) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
-                                            getDrumNoteNumber()};
-    payload.individualFxPathMember = &performance::IndivFxMixer::fxPath;
-    payload.individualFxPath = path;
-    msg.payload = std::move(payload);
+    performance::UpdateIndivFxMixer msg{getDrumIndex(), getProgramIndex(),
+                                        getDrumNoteNumber()};
+    msg.individualFxPathMember = &performance::IndivFxMixer::fxPath;
+    msg.individualFxPath = path;
     dispatch(std::move(msg));
 }
 
@@ -81,12 +72,10 @@ mpc::DrumMixerIndividualFxPath IndivFxMixer::getFxPath() const
 
 void IndivFxMixer::setFxSendLevel(const DrumMixerLevel level) const
 {
-    performance::PerformanceMessage msg;
-    performance::UpdateIndivFxMixer payload{getDrumIndex(), getProgramIndex(),
-                                            getDrumNoteNumber()};
-    payload.value0To100Member = &performance::IndivFxMixer::fxSendLevel;
-    payload.newValue = level;
-    msg.payload = std::move(payload);
+    performance::UpdateIndivFxMixer msg{getDrumIndex(), getProgramIndex(),
+                                        getDrumNoteNumber()};
+    msg.value0To100Member = &performance::IndivFxMixer::fxSendLevel;
+    msg.newValue = level;
     dispatch(std::move(msg));
 }
 

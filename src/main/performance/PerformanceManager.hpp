@@ -20,7 +20,12 @@ namespace mpc::sampler
 
 namespace mpc::performance
 {
-    enum class ProgramPadEventType { Press, Release, Aftertouch };
+    enum class ProgramPadEventType
+    {
+        Press,
+        Release,
+        Aftertouch
+    };
     using ProgramPadEventUiCallback =
         utils::SmallFn<8, void(ProgramPadIndex, VelocityOrPressure,
                                PerformanceEventSource, ProgramPadEventType)>;
@@ -44,8 +49,7 @@ namespace mpc::performance
         void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure,
                                            PerformanceEventSource);
 
-        void registerPhysicalPadRelease(PhysicalPadIndex,
-                                        PerformanceEventSource);
+        void registerPhysicalPadRelease(PhysicalPadIndex);
 
         void registerProgramPadPress(
             PerformanceEventSource, std::optional<MidiChannel> midiInputChannel,

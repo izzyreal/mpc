@@ -436,9 +436,9 @@ void ClientHardwareEventController::handlePadRelease(
 
                 if (p.noteNumber != NoNoteNumber)
                 {
-                    PerformanceMessage msg;
-                    msg.payload = NoteOffEvent{p.noteNumber, NoMidiChannel};
-                    msg.source = PerformanceEventSource::VirtualMpcHardware;
+                    NoteOffEvent msg{
+                        p.noteNumber, NoMidiChannel,
+                        PerformanceEventSource::VirtualMpcHardware};
 
                     performanceManager.lock()->applyMessageImmediate(
                         std::move(msg));
@@ -485,8 +485,7 @@ void ClientHardwareEventController::handlePadRelease(
     }
 
     mpc.getPerformanceManager().lock()->registerPhysicalPadRelease(
-        PhysicalPadIndex(physicalPadIndex),
-        PerformanceEventSource::VirtualMpcHardware);
+        PhysicalPadIndex(physicalPadIndex));
 
     if (action)
     {

@@ -22,17 +22,16 @@ LoopSongScreen::LoopSongScreen(Mpc &mpc, const int layerIndex)
                             displayFirstStep();
                             displayNumberOfSteps();
                         }});
-    addReactiveBinding({[&]
-                        {
-                            return sequencer.lock()
-                                ->getSelectedSong()
-                                ->getLastLoopStepIndex();
-                        },
-                        [&](auto)
-                        {
-                            displayLastStep();
-                            displayNumberOfSteps();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSong()->getLastLoopStepIndex();
+         },
+         [&](auto)
+         {
+             displayLastStep();
+             displayNumberOfSteps();
+         }});
 }
 
 void LoopSongScreen::open()

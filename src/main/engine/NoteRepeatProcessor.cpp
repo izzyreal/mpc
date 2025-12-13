@@ -66,8 +66,9 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
     const auto snapshot = performanceManager.lock()->getSnapshot();
 
-    static constexpr std::initializer_list<PerformanceEventSource> sourcesToExclude{
-        PerformanceEventSource::NoteRepeat, PerformanceEventSource::Sequence};
+    static constexpr std::initializer_list<PerformanceEventSource>
+        sourcesToExclude{PerformanceEventSource::NoteRepeat,
+                         PerformanceEventSource::Sequence};
 
     for (int programPadIndex = 0;
          programPadIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;

@@ -240,7 +240,7 @@ void SequenceStateHandler::applyMessage(
             const auto dest = m.destination;
 
             size_t begin = std::min(source, dest);
-            size_t end   = std::max(source, dest);
+            size_t end = std::max(source, dest);
 
             if (source < dest)
             {
@@ -255,7 +255,9 @@ void SequenceStateHandler::applyMessage(
             }
 
             for (size_t i = begin; i <= end; i++)
+            {
                 tracks[i].version++;
+            }
 
             lock.release();
         },
