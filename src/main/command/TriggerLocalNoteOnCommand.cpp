@@ -34,17 +34,6 @@ void TriggerLocalNoteOnCommand::execute()
 {
     const auto transport = ctx.sequencer->getTransport();
 
-    if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
-        transport->isPlaying())
-    {
-        return;
-    }
-
-    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
-    {
-        return;
-    }
-
     auto apply16LevelsAndSliderNoteVariation =
         [&](sequencer::EventData &noteEventToApplyTo)
     {
@@ -128,7 +117,7 @@ void TriggerLocalNoteOnCommand::execute()
 
     sequencer::EventData *recordNoteOnEvent = nullptr;
 
-    if (transport->isRecordingOrOverdubbing())
+    if (ctx.isRecordingOrOverdubbing)
     {
         recordNoteOnEvent = ctx.sequencerStateManager->recordNoteEventLive(
             ctx.track->getSequenceIndex(), ctx.track->getIndex(), ctx.note,

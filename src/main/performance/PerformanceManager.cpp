@@ -465,6 +465,17 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         {
             activeState.drums[m.drum.drumBusIndex] = m.drum;
         },
+        [&](const ActivateQuantizedLock &)
+        {
+            for (auto &e : activeState.programPadEvents)
+            {
+                if (e.source == PerformanceEventSource::MidiInput ||
+                    e.source == PerformanceEventSource::VirtualMpcHardware)
+                {
+                    e.quantizedLockActivated = true;
+                }
+            }
+        },
         [&](const std::monostate &)
         {
             activeState.physicalPadEvents.clear();

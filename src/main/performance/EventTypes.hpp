@@ -55,6 +55,7 @@ namespace mpc::performance
         Pressure pressure;
         TimeInMilliseconds pressTimeMs;
         PhysicalPadIndex physicalPadIndex;
+        bool quantizedLockActivated = false;
     };
 
     struct ProgramPadAftertouchEvent

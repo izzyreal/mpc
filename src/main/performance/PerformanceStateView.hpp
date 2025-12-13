@@ -37,6 +37,10 @@ namespace mpc::performance
         std::optional<PhysicalPadPressEvent>
             findPhysicalPadPress(PhysicalPadIndex);
 
+        std::optional<ProgramPadPressEvent>
+            findProgramPadPress(PerformanceEventSource, ProgramPadIndex,
+                                ProgramIndex) const;
+
     private:
         const PerformanceState *const state;
     };

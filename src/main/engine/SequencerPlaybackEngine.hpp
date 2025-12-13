@@ -12,6 +12,11 @@ namespace mpc::audiomidi
     class MidiOutput;
 }
 
+namespace mpc::performance
+{
+    class PerformanceManager;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;
@@ -34,6 +39,7 @@ namespace mpc::engine
     {
     public:
         explicit SequencerPlaybackEngine(
+            performance::PerformanceManager *,
             EngineHost *,
             std::function<std::shared_ptr<audiomidi::MidiOutput>()>
                 getMidiOutput,
@@ -53,6 +59,7 @@ namespace mpc::engine
         unsigned short getEventFrameOffset() const;
 
     private:
+        performance::PerformanceManager *performanceManager;
         EngineHost *engineHost;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;

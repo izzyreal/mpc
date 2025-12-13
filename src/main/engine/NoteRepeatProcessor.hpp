@@ -8,6 +8,12 @@ namespace mpc::engine::audio::mixer
 {
     class AudioMixer;
 }
+
+namespace mpc::audiomidi
+{
+    class EventHandler;
+}
+
 namespace mpc::engine
 {
     class EngineHost;
@@ -46,6 +52,7 @@ namespace mpc::engine
     {
     public:
         NoteRepeatProcessor(
+            audiomidi::EventHandler *,
             std::weak_ptr<sequencer::Sequencer>,
             std::shared_ptr<sampler::Sampler>,
             std::shared_ptr<audio::mixer::AudioMixer>,
@@ -63,6 +70,7 @@ namespace mpc::engine
                      float sampleRate) const;
 
     private:
+        audiomidi::EventHandler *eventHandler;
         const std::weak_ptr<sequencer::Sequencer> sequencer;
         const std::shared_ptr<sampler::Sampler> sampler;
         const std::shared_ptr<audio::mixer::AudioMixer> mixer;

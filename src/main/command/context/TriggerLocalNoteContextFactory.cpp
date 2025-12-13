@@ -45,17 +45,11 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::shared_ptr<Hardware> &hardware,
     const Tick metronomeOnlyPositionTicks, const Tick positionTicks)
 {
-    const bool isSequencerScreen =
-        std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
         screengroups::isCentralNoteAndPadUpdateScreen(screen);
     const bool isFullLevelEnabled = controller->isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = controller->isSixteenLevelsEnabled();
-    const bool isNoteRepeatLockedOrPressed =
-        controller->clientHardwareEventController->isNoteRepeatLocked() ||
-        hardware->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
-    const bool isErasePressed = hardware->getButton(ERASE)->isPressed();
 
     const auto lockedSequencer = sequencer.lock();
 
@@ -83,13 +77,10 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         performanceManager.lock().get(),
         lockedSequencer->getStateManager().get(),
         registryNoteOnEvent,
-        isSequencerScreen,
         programPadIndex,
         velocity,
         isFullLevelEnabled,
         isSixteenLevelsEnabled,
-        isNoteRepeatLockedOrPressed,
-        isErasePressed,
         isStepRecording,
         isRecMainWithoutPlaying,
         transportSnapshot.isRecordingOrOverdubbing(),

@@ -52,13 +52,10 @@ namespace mpc::command::context
         performance::PerformanceManager *performanceManager;
         sequencer::SequencerStateManager *sequencerStateManager;
         performance::NoteOnEvent registryNoteOnEvent;
-        bool isSequencerScreen;
         std::optional<ProgramPadIndex> programPadIndex;
         Velocity velocity;
         bool isFullLevelEnabled;
         bool isSixteenLevelsEnabled;
-        bool isNoteRepeatLockedOrPressed;
-        bool isErasePressed;
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
         bool isRecordingOrOverdubbing;

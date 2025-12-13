@@ -1,4 +1,6 @@
 #include "controller/ClientMidiEventController.hpp"
+
+#include "ClientHardwareEventController.hpp"
 #include "sequencer/Transport.hpp"
 #include "command/TriggerLocalNoteOffCommand.hpp"
 #include "command/TriggerLocalNoteOnCommand.hpp"
@@ -212,28 +214,39 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                                ->getSnapshot()
                                .getTransportStateView();
 
-    const auto metronomeOnlyPositionTicks =
-        transport.getMetronomeOnlyPositionTicks();
+    const bool isNoteRepeatMode =
+        screenId == ScreenId::SequencerScreen &&
+        clientHardwareEventController->isNoteRepeatLockedOrPressed() &&
+        transport.isSequencerRunning();
 
-    const auto positionTicks = transport.getPositionTicks();
+    const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
+                                 clientEventController->isEraseButtonPressed();
 
-    utils::SimpleAction action(
-        [track, screen, programPadIndex, program, this, positionTicks,
-         metronomeOnlyPositionTicks, noteOnEvent]
-        {
-            const auto ctx =
-                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                    PerformanceEventSource::MidiInput, noteOnEvent,
-                    noteOnEvent.noteNumber, noteOnEvent.velocity, track.get(),
-                    screen->getBus(), screen, programPadIndex, program,
-                    sequencer, performanceManager.lock(), clientEventController,
-                    eventHandler, screens, hardware, metronomeOnlyPositionTicks,
-                    positionTicks);
+    if (!isNoteRepeatMode && !isLiveEraseMode)
+    {
+        const auto metronomeOnlyPositionTicks =
+            transport.getMetronomeOnlyPositionTicks();
 
-            command::TriggerLocalNoteOnCommand(ctx).execute();
-        });
+        const auto positionTicks = transport.getPositionTicks();
 
-    performanceManager.lock()->enqueueCallback(std::move(action));
+        utils::SimpleAction action(
+            [track, screen, programPadIndex, program, this, positionTicks,
+             metronomeOnlyPositionTicks, noteOnEvent]
+            {
+                const auto ctx =
+                    TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
+                        PerformanceEventSource::MidiInput, noteOnEvent,
+                        noteOnEvent.noteNumber, noteOnEvent.velocity, track.get(),
+                        screen->getBus(), screen, programPadIndex, program,
+                        sequencer, performanceManager.lock(), clientEventController,
+                        eventHandler, screens, hardware, metronomeOnlyPositionTicks,
+                        positionTicks);
+
+                command::TriggerLocalNoteOnCommand(ctx).execute();
+            });
+
+        performanceManager.lock()->enqueueCallback(std::move(action));
+    }
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)

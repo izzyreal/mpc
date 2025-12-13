@@ -135,6 +135,11 @@ namespace mpc::performance
         Drum drum{};
     };
 
+
+    struct ActivateQuantizedLock
+    {
+    };
+
     using PerformanceMessage = std::variant<
         std::monostate, PhysicalPadPressEvent, PhysicalPadAftertouchEvent,
         PhysicalPadReleaseEvent, ProgramPadPressEvent,
@@ -144,5 +149,5 @@ namespace mpc::performance
         DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
         UpdateProgramBulk, UpdateProgramMidiProgramChange, SetProgramUsed,
         RepairProgramReferences, UpdateDrumBulk,
-        UpdateNoteParametersBySnapshot>;
+        UpdateNoteParametersBySnapshot, ActivateQuantizedLock>;
 } // namespace mpc::performance

@@ -1,22 +1,29 @@
-#include "NoteRepeatProcessor.hpp"
+#include "engine/NoteRepeatProcessor.hpp"
 
-#include "EngineHost.hpp"
-#include "sequencer/Transport.hpp"
+#include "engine/EngineHost.hpp"
+#include "engine/DrumNoteEventHandler.hpp"
+#include "engine/DrumNoteEventContextBuilder.hpp"
+
+#include "audiomidi/EventHandler.hpp"
+
 #include "performance/PerformanceManager.hpp"
 #include "hardware/Component.hpp"
+
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
+
 #include "sampler/Sampler.hpp"
+
+#include "sequencer/Transport.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
-
-#include "engine/DrumNoteEventHandler.hpp"
-#include "engine/DrumNoteEventContextBuilder.hpp"
 #include "sequencer/SeqUtil.hpp"
-#include "Util.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/TrackStateView.hpp"
+
+#include "Util.hpp"
+#include "audio/mixer/AudioMixer.hpp"
 
 using namespace mpc;
 using namespace mpc::engine;
@@ -29,15 +36,17 @@ using namespace mpc::performance;
 using namespace mpc::engine::audio::mixer;
 
 NoteRepeatProcessor::NoteRepeatProcessor(
-    std::weak_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
-    std::shared_ptr<AudioMixer> m, std::shared_ptr<Assign16LevelsScreen> a,
+    audiomidi::EventHandler *eventHandler, std::weak_ptr<Sequencer> s,
+    std::shared_ptr<Sampler> sa, std::shared_ptr<AudioMixer> m,
+    std::shared_ptr<Assign16LevelsScreen> a,
     std::shared_ptr<MixerSetupScreen> ms,
     const std::weak_ptr<PerformanceManager> &performanceManager,
     std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
     std::vector<MixerInterconnection *> &mi,
     const std::function<bool()> &isFullLevelEnabled,
     const std::function<bool()> &isSixteenLevelsEnabled)
-    : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
+    : eventHandler(eventHandler), sequencer(std::move(s)),
+      sampler(std::move(sa)), mixer(std::move(m)),
       assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
       performanceManager(performanceManager), hardwareSlider(std::move(h)),
       voices(v), mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
@@ -62,7 +71,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
         program = sampler->getProgram(drumBus->getProgramIndex());
     }
 
-    DrumNoteNumber note = assign16LevelsScreen->getNote();
+    DrumNoteNumber noteNumber = assign16LevelsScreen->getNote();
 
     const auto snapshot = performanceManager.lock()->getSnapshot();
 
@@ -83,19 +92,20 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
             continue;
         }
 
-        if (!isSixteenLevelsEnabled() && program->isUsed())
+        if (!isSixteenLevelsEnabled() && program && program->isUsed())
         {
-            note = program->getNoteFromPad(ProgramPadIndex(programPadIndex));
+            noteNumber =
+                program->getNoteFromPad(ProgramPadIndex(programPadIndex));
         }
 
         EventData noteEvent;
         noteEvent.type = EventType::NoteOn;
-        noteEvent.noteNumber = note;
+        noteEvent.noteNumber = noteNumber;
         noteEvent.tick = tickPosition;
         noteEvent.trackIndex = track->getIndex();
 
         const bool isSliderNote =
-            program && program->getSlider()->getNote() == note;
+            program && program->getSlider()->getNote() == noteNumber;
 
         if (program && isSliderNote)
         {
@@ -161,9 +171,9 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
                 ? -1
                 : SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
 
-        if (drumBus && note != 34)
+        if (drumBus && noteNumber != 34)
         {
-            const auto noteParameters = program->getNoteParameters(note);
+            const auto noteParameters = program->getNoteParameters(noteNumber);
             const auto sound =
                 sampler->getSound(noteParameters->getSoundIndex());
             const auto voiceOverlap =
@@ -177,7 +187,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
-                voices, mixerConnections, note, noteEvent.velocity,
+                voices, mixerConnections, noteNumber, noteEvent.velocity,
                 noteEvent.noteVariationType, noteEvent.noteVariationValue,
                 eventFrameOffset,
                 /* firstGeneration */ true, // Always true for invokers that
@@ -193,10 +203,9 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
         if (track->getDeviceIndex() > 0)
         {
-            // const auto noteOnMsg = noteEvent->createShortMessage(
-            //(track->getDeviceIndex() - 1) % 16);
-            // noteOnMsg->bufferPos = eventFrameOffset;
-            // mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
+            eventHandler->handleNoteEventMidiOut(
+                noteEvent, track->getDeviceIndex(), std::nullopt, std::nullopt,
+                eventFrameOffset);
         }
 
         if (lockedSequencer->getTransport()->isRecordingOrOverdubbing())
@@ -223,27 +232,37 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
         concurrency::SamplePreciseTask task;
 
         task.f.set(
-            [voices = voices, track, note, tickPosition, drumBus](int)
+            [this, track, noteNumber, tickPosition,
+             drumBus](const int frameOffset)
             {
                 if (drumBus)
                 {
                     const auto ctx =
                         DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-                            0, drumBus, voices, note, tickPosition);
+                            0, drumBus, voices, noteNumber, tickPosition);
 
                     DrumNoteEventHandler::noteOff(ctx);
                 }
 
                 if (track->getDeviceIndex() > 0)
                 {
-                    // const auto noteOffMsg =
-                    // noteEvent->getNoteOff()->createShortMessage(
-                    //(track->getDeviceIndex() - 1) % 16);
-                    // mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
+                    EventData noteOffEvent;
+                    noteOffEvent.type = EventType::NoteOff;
+                    noteOffEvent.noteNumber = noteNumber;
+                    eventHandler->handleNoteEventMidiOut(
+                        noteOffEvent, track->getDeviceIndex(), std::nullopt,
+                        std::nullopt, frameOffset);
                 }
             });
 
-        task.nFrames = durationFrames - 1;
+        const auto gapBetweenTwoAdjacentNoteEvents =
+            ((sampleRate * 0.001) * 10.0);
+
+        task.nFrames = durationFrames - gapBetweenTwoAdjacentNoteEvents;
+
+        task.nFrames += eventFrameOffset;
+
+        task.nFrames -= mixer->getSharedBuffer()->getSampleCount();
 
         engineHost->postSamplePreciseTaskToAudioThread(task);
     }

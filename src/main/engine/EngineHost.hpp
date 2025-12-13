@@ -103,7 +103,7 @@ namespace mpc::engine
         bool prepareBouncing(const audiomidi::DirectToDiskSettings *settings);
         bool isBouncePrepared() const;
 
-        void finishPreviewSoundPlayerVoice();
+        void finishPreviewSoundPlayerVoice() const;
 
     private:
         Mpc &mpc;

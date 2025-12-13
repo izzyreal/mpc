@@ -312,13 +312,22 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
-        if (program && registryNoteOnEvent)
-        {
-            const auto transport = mpc.getSequencer()
-                                       ->getStateManager()
-                                       ->getSnapshot()
-                                       .getTransportStateView();
+        const auto transport = mpc.getSequencer()
+                                   ->getStateManager()
+                                   ->getSnapshot()
+                                   .getTransportStateView();
 
+        const bool isNoteRepeatMode = screenId == ScreenId::SequencerScreen &&
+                                      isNoteRepeatLockedOrPressed() &&
+                                      transport.isSequencerRunning();
+
+        const bool isLiveEraseMode =
+            transport.isRecordingOrOverdubbing() &&
+            mpc.clientEventController->isEraseButtonPressed();
+
+        if (program && registryNoteOnEvent && !isNoteRepeatMode &&
+            !isLiveEraseMode)
+        {
             const auto metronomeOnlyPositionTicks =
                 transport.getMetronomeOnlyPositionTicks();
 
@@ -426,16 +435,27 @@ void ClientHardwareEventController::handlePadRelease(
                 const auto programPadIndex =
                     physicalPadAndBankToProgramPadIndex(p.padIndex, p.bank);
 
-                const auto seq = sequencer->getSelectedSequence();
+                const auto programPadPressEvent =
+                    performanceManager.lock()
+                        ->getSnapshot()
+                        .findProgramPadPress(
+                            PerformanceEventSource::VirtualMpcHardware,
+                            p.padIndex, p.programIndex);
 
-                const auto track = seq->getTrack(p.trackIndex).get();
+                const auto quantizedLockActivated =
+                    programPadPressEvent.has_value() &&
+                    programPadPressEvent->quantizedLockActivated;
 
-                const auto recordingNoteOnEvent =
-                    sequencer->getStateManager()->findRecordingNoteOnEvent(
-                        seq->getSequenceIndex(), p.trackIndex, p.noteNumber);
-
-                if (p.noteNumber != NoNoteNumber)
+                if (p.noteNumber != NoNoteNumber && !quantizedLockActivated)
                 {
+                    const auto selectedSequence =
+                        sequencer->getSelectedSequence();
+
+                    const auto recordingNoteOnEvent =
+                        sequencer->getStateManager()->findRecordingNoteOnEvent(
+                            selectedSequence->getSequenceIndex(), p.trackIndex,
+                            p.noteNumber);
+
                     NoteOffEvent msg{
                         p.noteNumber, NoMidiChannel,
                         PerformanceEventSource::VirtualMpcHardware};
@@ -448,6 +468,9 @@ void ClientHardwareEventController::handlePadRelease(
 
                     auto screenComponent =
                         screens->getScreenById(p.screenId).get();
+
+                    const auto track =
+                        selectedSequence->getTrack(p.trackIndex).get();
 
                     utils::SimpleAction noteOffAction(
                         [this, recordingNoteOnEvent, track, p, isSamplerScreen,

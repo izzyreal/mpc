@@ -170,3 +170,19 @@ PerformanceStateView::findPhysicalPadPress(PhysicalPadIndex padIndex)
 
     return std::nullopt;
 }
+
+std::optional<ProgramPadPressEvent>
+PerformanceStateView::findProgramPadPress(const PerformanceEventSource source,
+                                          const ProgramPadIndex programPadIndex,
+                                          const ProgramIndex programIndex) const
+{
+    for (auto &p : state->programPadEvents)
+    {
+        if (p.source == source && p.padIndex == programPadIndex && p.programIndex == programIndex)
+        {
+            return p;
+        }
+    }
+
+    return std::nullopt;
+}

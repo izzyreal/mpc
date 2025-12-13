@@ -110,6 +110,7 @@ void EngineHost::start()
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
 
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
+        mpc.getEventHandler().get(),
         mpc.getSequencer(), mpc.getSampler(), mixer,
         mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
@@ -125,7 +126,7 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-        this,
+        mpc.getPerformanceManager().lock().get(), this,
         [&]
         {
             return mpc.getMidiOutput();
@@ -489,7 +490,7 @@ bool EngineHost::isBouncePrepared() const
     return bouncePrepared;
 }
 
-void EngineHost::finishPreviewSoundPlayerVoice()
+void EngineHost::finishPreviewSoundPlayerVoice() const
 {
     postToAudioThread(utils::Task(
         [&]

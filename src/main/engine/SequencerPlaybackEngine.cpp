@@ -1,24 +1,24 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 
-#include "EngineHost.hpp"
-#include "Logger.hpp"
-#include "sequencer/Transport.hpp"
-
+#include "engine/EngineHost.hpp"
 #include "engine/NoteRepeatProcessor.hpp"
 
-#include "lcdgui/LayeredScreen.hpp"
-#include "lcdgui/screens/SyncScreen.hpp"
+#include "sequencer/Transport.hpp"
+#include "sequencer/MidiClockOutput.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Clock.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
-#include "sequencer/MidiClockOutput.hpp"
+#include "performance/PerformanceManager.hpp"
+#include "performance/PerformanceMessage.hpp"
 
 using namespace mpc::engine;
 using namespace mpc::lcdgui;
@@ -27,7 +27,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
-    EngineHost *engineHost,
+    performance::PerformanceManager *performanceManager, EngineHost *engineHost,
     std::function<std::shared_ptr<audiomidi::MidiOutput>()> getMidiOutput,
     Sequencer *sequencer, const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
@@ -38,9 +38,10 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
     const std::function<bool()> &isAudioServerCurrentlyRunningOffline)
-    : engineHost(engineHost), layeredScreen(layeredScreen),
-      getScreens(getScreens), sequencer(sequencer), clock(clock),
-      isBouncing(isBouncing), getSampleRate(getSampleRate),
+    : performanceManager(performanceManager), engineHost(engineHost),
+      layeredScreen(layeredScreen), getScreens(getScreens),
+      sequencer(sequencer), clock(clock), isBouncing(isBouncing),
+      getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       playMetronome(playMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
@@ -409,6 +410,7 @@ void SequencerPlaybackEngine::processNoteRepeat() const
 
     if (shouldRepeatNote)
     {
+        performanceManager->enqueue(performance::ActivateQuantizedLock{});
         noteRepeatProcessor->process(
             engineHost, sequencer->getTransport()->getTickPosition(),
             repeatIntervalTicks, getEventFrameOffset(),
@@ -541,7 +543,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
             }
             else if (sequencer->getTransport()->shouldWaitForMidiClockLock())
             {
-                MLOG("Waiting for MIDI clock lock");
                 continue;
             }
         }
