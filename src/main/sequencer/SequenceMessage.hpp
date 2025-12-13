@@ -12,8 +12,10 @@
 
 namespace mpc::sequencer
 {
-    using SequenceTrackEventsSnapshot = std::unordered_map<uint8_t, std::vector<EventData>>;
-    using SequenceTrackStatesSnapshot = std::array<TrackState, Mpc2000XlSpecs::TRACK_COUNT>;
+    using SequenceTrackEventsSnapshot =
+        std::unordered_map<uint8_t, std::vector<EventData>>;
+    using SequenceTrackStatesSnapshot =
+        std::array<TrackState, Mpc2000XlSpecs::TRACK_COUNT>;
 
     struct SetTimeSignature
     {

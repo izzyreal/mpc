@@ -114,10 +114,12 @@ void Mpc::init()
 
     sampler = std::make_shared<Sampler>(
         *this,
-        GetProgramFn([manager = performanceManager.get()](const ProgramIndex programIndex)
-        {
-            return manager->getSnapshot().getProg(programIndex);
-        }),
+        GetProgramFn(
+            [manager =
+                 performanceManager.get()](const ProgramIndex programIndex)
+            {
+                return manager->getSnapshot().getProg(programIndex);
+            }),
         [&](performance::PerformanceMessage &&m)
         {
             performanceManager->enqueue(std::move(m));
@@ -324,8 +326,7 @@ bool Mpc::isPluginModeEnabled() const
     return pluginModeEnabled;
 }
 
-std::weak_ptr<performance::PerformanceManager>
-Mpc::getPerformanceManager()
+std::weak_ptr<performance::PerformanceManager> Mpc::getPerformanceManager()
 {
     return performanceManager;
 }

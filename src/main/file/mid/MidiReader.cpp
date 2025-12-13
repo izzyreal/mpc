@@ -275,10 +275,8 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     else
                     {
                         openNotes.push_back(OpenNote{
-                            noteOn->getNoteValue(),
-                            noteOn->getTick(),
-                            noteOn->getVelocity(),
-                            noteVariationData.first,
+                            noteOn->getNoteValue(), noteOn->getTick(),
+                            noteOn->getVelocity(), noteVariationData.first,
                             noteVariationData.second});
                     }
                 }
@@ -297,12 +295,10 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
                 else if (noteOn)
                 {
-                    openNotes.push_back(OpenNote{
-                        noteOn->getNoteValue(),
-                        noteOn->getTick(),
-                        noteOn->getVelocity(),
-                        noteVariationData.first,
-                        noteVariationData.second});
+                    openNotes.push_back(
+                        OpenNote{noteOn->getNoteValue(), noteOn->getTick(),
+                                 noteOn->getVelocity(), noteVariationData.first,
+                                 noteVariationData.second});
                 }
             }
         }
@@ -320,8 +316,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 int offVal;
                 int offTick;
 
-                if (auto nOn =
-                        std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
+                if (auto nOn = std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
                 {
                     // isMpc2000XlMidiFile == true. MPC2000XL MIDI files use
                     // MIDI Note On events to indicate the end of a note.
@@ -332,8 +327,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 {
                     // Ordinary MIDI file. The end of a note is indicated by a
                     // note off event.
-                    auto nOff =
-                        std::dynamic_pointer_cast<NoteOff>(noteOffs[k]);
+                    auto nOff = std::dynamic_pointer_cast<NoteOff>(noteOffs[k]);
                     offVal = nOff->getNoteValue();
                     offTick = nOff->getTick();
                 }
@@ -405,7 +399,9 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     std::vector<char> bytes(sysEx->getData().size() + 1);
                     bytes[0] = 0xF0;
                     for (int j = 0; j < sysEx->getData().size(); j++)
+                    {
                         bytes[j + 1] = sysEx->getData()[j];
+                    }
 
                     EventData e;
                     e.type = EventType::SystemExclusive;
@@ -424,8 +420,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.tick = noteAfterTouch->getTick();
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
                 e.amount = noteAfterTouch->getAmount();
-                (*updateSequenceEvents.trackSnapshots)[trackIndex]
-                    .push_back(e);
+                (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
@@ -435,8 +430,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
-                (*updateSequenceEvents.trackSnapshots)[trackIndex]
-                    .push_back(e);
+                (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
@@ -446,8 +440,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ProgramChange;
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
-                (*updateSequenceEvents.trackSnapshots)[trackIndex]
-                    .push_back(e);
+                (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
@@ -463,8 +456,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ControlChange;
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
-                (*updateSequenceEvents.trackSnapshots)[trackIndex]
-                    .push_back(e);
+                (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
@@ -473,8 +465,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 EventData e;
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
-                (*updateSequenceEvents.trackSnapshots)[trackIndex]
-                    .push_back(e);
+                (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
             }
         }
     }

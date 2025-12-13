@@ -12,8 +12,7 @@ namespace mpc::performance
     class PerformanceStateView
     {
     public:
-        explicit PerformanceStateView(
-            const PerformanceState *) noexcept;
+        explicit PerformanceStateView(const PerformanceState *) noexcept;
 
         VelocityOrPressure
             getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;

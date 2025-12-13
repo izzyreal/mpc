@@ -12,7 +12,8 @@ namespace mpc::command
     class TriggerLocalNoteOnCommand final : public Command
     {
     public:
-        explicit TriggerLocalNoteOnCommand(const context::TriggerLocalNoteOnContext &);
+        explicit TriggerLocalNoteOnCommand(
+            const context::TriggerLocalNoteOnContext &);
         void execute() override;
 
     private:

@@ -16,7 +16,7 @@ namespace mpc::concurrency
         void drain()
         {
             alignas(utils::Task) unsigned char buf[sizeof(utils::Task)];
-            auto* task = reinterpret_cast<utils::Task*>(buf);
+            auto *task = reinterpret_cast<utils::Task *>(buf);
 
             while (queue.dequeue(*task))
             {

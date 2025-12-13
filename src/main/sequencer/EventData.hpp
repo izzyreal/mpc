@@ -152,8 +152,7 @@ namespace mpc::sequencer
         double getTempo(const double baseTempo) const
         {
             assert(type == EventType::TempoChange);
-            return std::clamp(baseTempo * amount * 0.001, MinTempo,
-                              MaxTempo);
+            return std::clamp(baseTempo * amount * 0.001, MinTempo, MaxTempo);
         }
     };
 } // namespace mpc::sequencer

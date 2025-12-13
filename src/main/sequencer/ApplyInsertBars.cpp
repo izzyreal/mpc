@@ -17,10 +17,14 @@ void SequenceStateHandler::applyInsertBars(const InsertBars &m,
 
     auto barCountToUse = m.barCount;
     if (oldLastBarIndex + barCountToUse > Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
+    {
         barCountToUse = Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - oldLastBarIndex;
+    }
 
     if (barCountToUse == 0)
+    {
         return;
+    }
 
     const auto newLastBarIndex = oldLastBarIndex + barCountToUse;
 
@@ -39,30 +43,33 @@ void SequenceStateHandler::applyInsertBars(const InsertBars &m,
         const int end = insertPos + shiftCount + (activeCount - insertPos);
         const int realEnd = std::min<int>(end, Mpc2000XlSpecs::MAX_BAR_COUNT);
 
-        std::rotate(ts.begin() + insertPos,
-                    ts.begin() + activeCount,
+        std::rotate(ts.begin() + insertPos, ts.begin() + activeCount,
                     ts.begin() + realEnd);
 
-        std::rotate(bl.begin() + insertPos,
-                    bl.begin() + activeCount,
+        std::rotate(bl.begin() + insertPos, bl.begin() + activeCount,
                     bl.begin() + realEnd);
     }
 
     for (int i = 0; i < shiftCount; ++i)
     {
-        ts[insertPos + i] = TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
+        ts[insertPos + i] =
+            TimeSignature{TimeSigNumerator(4), TimeSigDenominator(4)};
         bl[insertPos + i] = ts[insertPos + i].getBarLength();
     }
 
     int barStart = 0;
     for (int i = 0; i < m.afterBar; ++i)
+    {
         barStart += seqView.getBarLength(i);
+    }
 
     if (!isAppending)
     {
         int newBarStart = 0;
         for (int i = 0; i < m.afterBar + barCountToUse; ++i)
+        {
             newBarStart += seqView.getBarLength(i);
+        }
 
         for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
         {

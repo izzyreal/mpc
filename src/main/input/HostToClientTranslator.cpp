@@ -343,7 +343,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
     }
 
     if (clientHardwareEvent.type == ClientHardwareEvent::Type::MpcButtonPress ||
-        clientHardwareEvent.type == ClientHardwareEvent::Type::MpcButtonRelease ||
+        clientHardwareEvent.type ==
+            ClientHardwareEvent::Type::MpcButtonRelease ||
         clientHardwareEvent.type ==
             ClientHardwareEvent::Type::ButtonDoublePress)
     {

@@ -7,8 +7,7 @@
 
 using namespace mpc::sequencer;
 
-SequencerStateView::SequencerStateView(
-    const SequencerState *const s) noexcept
+SequencerStateView::SequencerStateView(const SequencerState *const s) noexcept
     : state(s)
 {
 }
@@ -23,8 +22,7 @@ TrackStateView
 SequencerStateView::getTrackState(const SequenceIndex sequenceIndex,
                                   const TrackIndex trackIndex) const
 {
-    return TrackStateView(
-        state->sequences[sequenceIndex].tracks[trackIndex]);
+    return TrackStateView(state->sequences[sequenceIndex].tracks[trackIndex]);
 }
 
 mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept

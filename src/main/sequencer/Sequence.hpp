@@ -56,32 +56,33 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(const utils::PostToUiThreadFn &,
-                 std::shared_ptr<SequencerStateManager> manager,
-                 GetSequenceSnapshotFn &getSnapshot,
-                 const std::function<void(SequenceMessage &&)> &dispatch,
-                 const std::function<std::string()> &getDefaultSequenceName,
-                 const std::function<std::string(int)> &getDefaultTrackName,
-                 const std::function<int64_t()> &getTickPosition,
-                 const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens,
-                 const std::function<bool()> &isRecordingModeMulti,
-                 const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
-                 const std::function<int()> &getAutoPunchMode,
-                 const std::function<std::shared_ptr<Bus>(BusType)> &getBus,
-                 const std::function<bool()> &isEraseButtonPressed,
-                 const std::function<bool(ProgramPadIndex, ProgramIndex)>
-                     &isProgramPadPressed,
-                 const std::shared_ptr<sampler::Sampler> &sampler,
-                 const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
-                 const std::function<bool()> &isSixteenLevelsEnabled,
-                 const std::function<int()> &getActiveTrackIndex,
-                 const std::function<bool()> &isRecording,
-                 const std::function<bool()> &isOverdubbing,
-                 const std::function<bool()> &isPunchEnabled,
-                 const std::function<int64_t()> &getPunchInTime,
-                 const std::function<int64_t()> &getPunchOutTime,
-                 const std::function<bool()> &isSoloEnabled,
-                 const std::function<int()> &getCurrentBarIndex);
+        Sequence(
+            const utils::PostToUiThreadFn &,
+            std::shared_ptr<SequencerStateManager> manager,
+            GetSequenceSnapshotFn &getSnapshot,
+            const std::function<void(SequenceMessage &&)> &dispatch,
+            const std::function<std::string()> &getDefaultSequenceName,
+            const std::function<std::string(int)> &getDefaultTrackName,
+            const std::function<int64_t()> &getTickPosition,
+            const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens,
+            const std::function<bool()> &isRecordingModeMulti,
+            const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
+            const std::function<int()> &getAutoPunchMode,
+            const std::function<std::shared_ptr<Bus>(BusType)> &getBus,
+            const std::function<bool()> &isEraseButtonPressed,
+            const std::function<bool(ProgramPadIndex, ProgramIndex)>
+                &isProgramPadPressed,
+            const std::shared_ptr<sampler::Sampler> &sampler,
+            const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
+            const std::function<bool()> &isSixteenLevelsEnabled,
+            const std::function<int()> &getActiveTrackIndex,
+            const std::function<bool()> &isRecording,
+            const std::function<bool()> &isOverdubbing,
+            const std::function<bool()> &isPunchEnabled,
+            const std::function<int64_t()> &getPunchInTime,
+            const std::function<int64_t()> &getPunchOutTime,
+            const std::function<bool()> &isSoloEnabled,
+            const std::function<int()> &getCurrentBarIndex);
 
         ~Sequence();
 

@@ -21,13 +21,15 @@ namespace mpc::concurrency
             BoundedMpmcQueue<utils::SimpleAction, MessageQueueCapacity>;
 
     protected:
-        explicit AtomicStateExchange(std::function<void(State&)> reserveFn)
+        explicit AtomicStateExchange(std::function<void(State &)> reserveFn)
         {
             actions.reserve(10);
             reserveFn(activeState);
 
-            for (auto& s : pool)
+            for (auto &s : pool)
+            {
                 reserveFn(s);
+            }
 
             currentSnapshot.store(&pool[0], std::memory_order_relaxed);
             writeBuffer = &pool[1];
@@ -36,8 +38,7 @@ namespace mpc::concurrency
     public:
         virtual ~AtomicStateExchange() {}
 
-        template <class M>
-        void enqueue(M&& msg) noexcept
+        template <class M> void enqueue(M &&msg) noexcept
         {
             queue.enqueue(Message(std::forward<M>(msg)));
         }
@@ -50,7 +51,7 @@ namespace mpc::concurrency
         void drainQueue() noexcept
         {
             alignas(Message) unsigned char msgBuf[sizeof(Message)];
-            auto* msg = reinterpret_cast<Message*>(msgBuf);
+            auto *msg = reinterpret_cast<Message *>(msgBuf);
 
             bool shouldPublish = false;
 
@@ -62,16 +63,20 @@ namespace mpc::concurrency
             }
 
             if (shouldPublish)
+            {
                 publishState();
+            }
 
-            for (auto& a : actions)
+            for (auto &a : actions)
+            {
                 a();
+            }
 
             actions.clear();
 
-            alignas(utils::SimpleAction)
-            unsigned char cbBuf[sizeof(utils::SimpleAction)];
-            auto* cb = reinterpret_cast<utils::SimpleAction*>(cbBuf);
+            alignas(utils::SimpleAction) unsigned char
+                cbBuf[sizeof(utils::SimpleAction)];
+            auto *cb = reinterpret_cast<utils::SimpleAction *>(cbBuf);
 
             while (callbackQueue.dequeue(*cb))
             {
@@ -82,23 +87,25 @@ namespace mpc::concurrency
 
         View getSnapshot() const noexcept
         {
-            State* s = currentSnapshot.load(std::memory_order_acquire);
+            State *s = currentSnapshot.load(std::memory_order_acquire);
             return View{s};
         }
 
-        void applyMessageImmediate(Message&& msg) noexcept
+        void applyMessageImmediate(Message &&msg) noexcept
         {
             applyMessage(msg);
             publishState();
 
-            for (auto& a : actions)
+            for (auto &a : actions)
+            {
                 a();
+            }
 
             actions.clear();
 
-            alignas(utils::SimpleAction)
-            unsigned char cbBuf[sizeof(utils::SimpleAction)];
-            auto* cb = reinterpret_cast<utils::SimpleAction*>(cbBuf);
+            alignas(utils::SimpleAction) unsigned char
+                cbBuf[sizeof(utils::SimpleAction)];
+            auto *cb = reinterpret_cast<utils::SimpleAction *>(cbBuf);
 
             while (callbackQueue.dequeue(*cb))
             {
@@ -108,12 +115,12 @@ namespace mpc::concurrency
         }
 
     protected:
-        virtual void applyMessage(const Message& msg) noexcept = 0;
+        virtual void applyMessage(const Message &msg) noexcept = 0;
 
         State activeState;
         std::array<State, PoolSize> pool;
-        std::atomic<State*> currentSnapshot{nullptr};
-        State* writeBuffer;
+        std::atomic<State *> currentSnapshot{nullptr};
+        State *writeBuffer;
         size_t writeIndex = 1;
 
         std::vector<utils::SimpleAction> actions;
@@ -121,9 +128,9 @@ namespace mpc::concurrency
         void publishState() noexcept
         {
             const size_t nextIndex = (writeIndex + 1) % PoolSize;
-            State* dst = &pool[nextIndex];
+            State *dst = &pool[nextIndex];
 
-            State* oldSnap = currentSnapshot.load(std::memory_order_acquire);
+            State *oldSnap = currentSnapshot.load(std::memory_order_acquire);
 
             if (oldSnap == dst)
             {

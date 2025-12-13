@@ -5,7 +5,7 @@
 using namespace mpc::sequencer;
 
 void TrackStateHandler::applyRemoveEvents(const RemoveEvents &m,
-                                         SequencerState &state) const
+                                          SequencerState &state) const
 {
     auto &track = state.sequences[m.sequence].tracks[m.track];
 

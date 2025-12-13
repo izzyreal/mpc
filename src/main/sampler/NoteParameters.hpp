@@ -17,7 +17,8 @@ namespace mpc::engine
 
 namespace mpc::sampler
 {
-    using GetNoteParametersFn = utils::SmallFn<16, performance::NoteParameters()>;
+    using GetNoteParametersFn =
+        utils::SmallFn<16, performance::NoteParameters()>;
 
     class Sampler;
 

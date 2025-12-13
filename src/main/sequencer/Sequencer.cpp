@@ -1028,7 +1028,8 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
                 ->setEnabled(true);
         });
 
-    copySequence(getSelectedSequenceIndex(), UndoSequenceIndex, std::move(onComplete));
+    copySequence(getSelectedSequenceIndex(), UndoSequenceIndex,
+                 std::move(onComplete));
 }
 
 void Sequencer::resetUndo() const

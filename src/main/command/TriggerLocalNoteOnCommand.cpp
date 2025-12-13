@@ -68,8 +68,7 @@ void TriggerLocalNoteOnCommand::execute()
         if (ctx.program)
         {
             const bool isSliderNote =
-                ctx.program &&
-                ctx.program->getSlider()->getNote() == ctx.note;
+                ctx.program && ctx.program->getSlider()->getNote() == ctx.note;
 
             const auto programSlider = ctx.program->getSlider();
 
@@ -109,8 +108,8 @@ void TriggerLocalNoteOnCommand::execute()
     if (ctx.isSamplerScreen)
     {
         ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent,
-                                                   ctx.track->getDeviceIndex(),
-                                                   ctx.drumScreenSelectedDrum);
+                                                  ctx.track->getDeviceIndex(),
+                                                  ctx.drumScreenSelectedDrum);
     }
     else
     {
@@ -144,15 +143,13 @@ void TriggerLocalNoteOnCommand::execute()
         transport->playMetronomeOnly();
 
         recordNoteOnEvent = ctx.track->recordNoteEventNonLive(
-            ctx.positionTicks, ctx.note, velo,
-            ctx.metronomeOnlyPositionTicks);
+            ctx.positionTicks, ctx.note, velo, ctx.metronomeOnlyPositionTicks);
     }
     else if (ctx.isRecMainWithoutPlaying)
     {
         transport->playMetronomeOnly();
         recordNoteOnEvent = ctx.track->recordNoteEventNonLive(
-            ctx.positionTicks, ctx.note, velo,
-            ctx.metronomeOnlyPositionTicks);
+            ctx.positionTicks, ctx.note, velo, ctx.metronomeOnlyPositionTicks);
 
         const auto timingCorrectScreen = ctx.timingCorrectScreen;
 

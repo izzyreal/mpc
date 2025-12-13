@@ -92,9 +92,8 @@ namespace mpc::sequencer
         TrackIndex getIndex() const;
         void setOn(bool b, bool updateUsedness = true) const;
 
-        void
-        acquireAndInsertEvent(const EventData &,
-                              utils::SimpleAction &&onComplete = {}) const;
+        void acquireAndInsertEvent(const EventData &,
+                                   utils::SimpleAction &&onComplete = {}) const;
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0) const;
@@ -183,8 +182,7 @@ namespace mpc::sequencer
 
         void updateEventTick(EventData *, int newTick) const;
 
-        void
-        insertAcquiredEvent(EventData *event,
-                            utils::SimpleAction &&onComplete = {}) const;
+        void insertAcquiredEvent(EventData *event,
+                                 utils::SimpleAction &&onComplete = {}) const;
     };
 } // namespace mpc::sequencer

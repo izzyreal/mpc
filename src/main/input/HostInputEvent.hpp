@@ -43,11 +43,11 @@ namespace mpc::input
 
         enum class Movement
         {
-            NoMovement,     // No movement data (e.g. BEGIN/END/REPEAT events).
-            Absolute, // Absolute motion in normalized coordinates (e.g. mouse
-                      // drag along a slider).
-            Relative  // Relative motion in continuous deltas (e.g. mouse wheel
-                      // or encoder turn).
+            NoMovement, // No movement data (e.g. BEGIN/END/REPEAT events).
+            Absolute,   // Absolute motion in normalized coordinates (e.g. mouse
+                        // drag along a slider).
+            Relative // Relative motion in continuous deltas (e.g. mouse wheel
+                     // or encoder turn).
         };
 
         enum class InputDeviceType

@@ -17,8 +17,8 @@ namespace mpc::sequencer
     class SequencerStateManager;
     std::shared_ptr<EventRef>
     mapEventDataToEvent(EventData *const ptr, const EventData &snapshot,
-                         const std::function<void(TrackMessage &&)> &dispatch,
-                         Sequence *parent)
+                        const std::function<void(TrackMessage &&)> &dispatch,
+                        Sequence *parent)
     {
         if (snapshot.type == EventType::NoteOn)
         {

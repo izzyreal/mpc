@@ -204,7 +204,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             std::swap(seqs[activeState.selectedSequenceIndex],
                       seqs[UndoSequenceIndex]);
 
-            activeState.undoSequenceAvailable = !activeState.undoSequenceAvailable;
+            activeState.undoSequenceAvailable =
+                !activeState.undoSequenceAvailable;
 
             seqLock1.release();
             seqLock2.release();
@@ -292,18 +293,19 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track,
     }
 }
 
-EventData* SequencerStateManager::findRecordingNoteOnEvent(
-    const SequenceIndex sequenceIndex,
-    const TrackIndex trackIndex,
+EventData *SequencerStateManager::findRecordingNoteOnEvent(
+    const SequenceIndex sequenceIndex, const TrackIndex trackIndex,
     const NoteNumber noteNumber)
 {
-    EventData* found = nullptr;
+    EventData *found = nullptr;
 
-    const size_t liveNoteOnCount = liveNoteOnEventRecordingQueue.dequeue_bulk(tempLiveNoteOnRecordingEvents);
+    const size_t liveNoteOnCount = liveNoteOnEventRecordingQueue.dequeue_bulk(
+        tempLiveNoteOnRecordingEvents);
 
     for (size_t i = 0; i < liveNoteOnCount; ++i)
     {
-        if (const auto e = tempLiveNoteOnRecordingEvents[i]; e->noteNumber == noteNumber)
+        if (const auto e = tempLiveNoteOnRecordingEvents[i];
+            e->noteNumber == noteNumber)
         {
             found = e;
             break;
@@ -312,7 +314,7 @@ EventData* SequencerStateManager::findRecordingNoteOnEvent(
 
     for (size_t i = 0; i < liveNoteOnCount; ++i)
     {
-        EventData* e = tempLiveNoteOnRecordingEvents[i];
+        EventData *e = tempLiveNoteOnRecordingEvents[i];
         liveNoteOnEventRecordingQueue.enqueue(e);
     }
 

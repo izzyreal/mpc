@@ -28,16 +28,17 @@ namespace mpc::performance
 
         void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex);
 
-        void registerPhysicalPadPress(
-            PerformanceEventSource, lcdgui::ScreenId, sequencer::BusType,
-            PhysicalPadIndex, Velocity, TrackIndex, controller::Bank,
-            std::optional<ProgramIndex>, std::optional<NoteNumber>);
+        void registerPhysicalPadPress(PerformanceEventSource, lcdgui::ScreenId,
+                                      sequencer::BusType, PhysicalPadIndex,
+                                      Velocity, TrackIndex, controller::Bank,
+                                      std::optional<ProgramIndex>,
+                                      std::optional<NoteNumber>);
 
-        void registerPhysicalPadAftertouch(
-            PhysicalPadIndex, Pressure, PerformanceEventSource);
+        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure,
+                                           PerformanceEventSource);
 
-        void registerPhysicalPadRelease(
-            PhysicalPadIndex, PerformanceEventSource);
+        void registerPhysicalPadRelease(PhysicalPadIndex,
+                                        PerformanceEventSource);
 
         void registerProgramPadPress(
             PerformanceEventSource, std::optional<MidiChannel> midiInputChannel,
@@ -48,18 +49,18 @@ namespace mpc::performance
                                           ProgramPadIndex, ProgramIndex,
                                           Pressure);
 
-        void registerProgramPadRelease(
-            PerformanceEventSource, ProgramPadIndex, ProgramIndex);
+        void registerProgramPadRelease(PerformanceEventSource, ProgramPadIndex,
+                                       ProgramIndex);
 
-        NoteOnEvent
-        registerNoteOn(PerformanceEventSource,
-                       std::optional<MidiChannel> midiInputChannel,
-                       lcdgui::ScreenId, TrackIndex, sequencer::BusType,
-                       NoteNumber, Velocity, std::optional<ProgramIndex>);
+        NoteOnEvent registerNoteOn(PerformanceEventSource,
+                                   std::optional<MidiChannel> midiInputChannel,
+                                   lcdgui::ScreenId, TrackIndex,
+                                   sequencer::BusType, NoteNumber, Velocity,
+                                   std::optional<ProgramIndex>);
 
-        void registerNoteAftertouch(
-            PerformanceEventSource, NoteNumber, Pressure,
-            std::optional<MidiChannel> midiInputChannel);
+        void
+        registerNoteAftertouch(PerformanceEventSource, NoteNumber, Pressure,
+                               std::optional<MidiChannel> midiInputChannel);
 
         void registerNoteOff(PerformanceEventSource, NoteNumber,
                              std::optional<MidiChannel> midiInputChannel);

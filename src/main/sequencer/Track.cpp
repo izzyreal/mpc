@@ -87,9 +87,11 @@ void Track::setUsedIfCurrentlyUnused(
 
     if (getIndex() != TempoChangeTrackIndex)
     {
-        postToUiThread(utils::Task([this]{
-            setName(getDefaultTrackName(getIndex()));
-        }));
+        postToUiThread(utils::Task(
+            [this]
+            {
+                setName(getDefaultTrackName(getIndex()));
+            }));
     }
 
     dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
@@ -344,9 +346,8 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     for (const auto &eventHandle : getSnapshot(getIndex()).getNoteEvents())
     {
         const auto eventSnapshot = *eventHandle;
-        result.emplace_back(
-            std::dynamic_pointer_cast<NoteOnEvent>(mapEventDataToEvent(
-                eventHandle, eventSnapshot, dispatch, parent)));
+        result.emplace_back(std::dynamic_pointer_cast<NoteOnEvent>(
+            mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent)));
     }
 
     lock.release();

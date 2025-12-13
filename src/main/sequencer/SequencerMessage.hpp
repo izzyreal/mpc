@@ -73,7 +73,9 @@ namespace mpc::sequencer
         SequenceIndex destIndex;
     };
 
-    struct UndoSequence{};
+    struct UndoSequence
+    {
+    };
 
     struct SetUndoSequenceAvailable
     {

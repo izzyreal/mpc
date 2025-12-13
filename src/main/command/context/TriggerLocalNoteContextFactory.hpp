@@ -46,8 +46,7 @@ namespace mpc::command::context
     class TriggerLocalNoteContextFactory
     {
     public:
-        static TriggerLocalNoteOnContext
-        buildTriggerLocalNoteOnContext(
+        static TriggerLocalNoteOnContext buildTriggerLocalNoteOnContext(
             performance::PerformanceEventSource,
             const performance::NoteOnEvent &, NoteNumber note,
             Velocity velocity, sequencer::Track *,
@@ -63,21 +62,15 @@ namespace mpc::command::context
             const std::shared_ptr<hardware::Hardware> &,
             Tick metronomeOnlyPositionTicks, Tick positionTicks);
 
-        static TriggerLocalNoteOffContext
-        buildTriggerLocalNoteOffContext(
+        static TriggerLocalNoteOffContext buildTriggerLocalNoteOffContext(
             performance::PerformanceEventSource source, NoteNumber noteNumber,
             sequencer::EventData *recordedNoteOnEvent, sequencer::Track *,
-            sequencer::BusType,
-            const lcdgui::ScreenComponent *,
-            bool isSamplerScreen,
-            ProgramPadIndex programPadIndex,
-            sampler::Program *,
-            sequencer::Sequencer *,
+            sequencer::BusType, const lcdgui::ScreenComponent *,
+            bool isSamplerScreen, ProgramPadIndex programPadIndex,
+            sampler::Program *, sequencer::Sequencer *,
             performance::PerformanceManager *,
             const controller::ClientEventController *,
-            audiomidi::EventHandler *,
-            lcdgui::Screens *,
-            hardware::Hardware *,
+            audiomidi::EventHandler *, lcdgui::Screens *, hardware::Hardware *,
             Tick metronomeOnlyPositionTicks, Tick positionTicks);
     };
 } // namespace mpc::command::context

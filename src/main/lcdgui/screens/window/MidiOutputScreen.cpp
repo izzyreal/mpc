@@ -24,7 +24,7 @@ void MidiOutputScreen::open()
             {ScreenId::NameScreen, ScreenId::MidiOutputMonitorScreen}))
     {
         const auto track = sequencer.lock()->getSelectedTrack();
-        deviceIndex = std::clamp(track->getDeviceIndex() - 1, 0 , 31);
+        deviceIndex = std::clamp(track->getDeviceIndex() - 1, 0, 31);
     }
 
     displaySoftThru();
@@ -37,8 +37,7 @@ void MidiOutputScreen::openNameScreen()
 
     if (focusedFieldName == "firstletter")
     {
-        const auto enterAction =
-            [this](const std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             sequencer.lock()->getSelectedSequence()->setDeviceName(
                 deviceIndex, nameScreenName);
@@ -47,8 +46,8 @@ void MidiOutputScreen::openNameScreen()
 
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         const auto seq = sequencer.lock()->getSelectedSequence();
-        nameScreen->initialize(seq->getDeviceName(deviceIndex), 8,
-                               enterAction, "midi-output");
+        nameScreen->initialize(seq->getDeviceName(deviceIndex), 8, enterAction,
+                               "midi-output");
         openScreenById(ScreenId::NameScreen);
     }
 }
@@ -116,7 +115,8 @@ void MidiOutputScreen::displayDeviceName() const
     if (deviceIndex >= 16)
     {
         devNumber =
-            StrUtil::padLeft(std::to_string(deviceIndex - 16 + 1), " ", 2) + "B";
+            StrUtil::padLeft(std::to_string(deviceIndex - 16 + 1), " ", 2) +
+            "B";
     }
     else
     {

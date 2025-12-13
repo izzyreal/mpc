@@ -43,8 +43,7 @@ using namespace mpc::sequencer;
 using namespace mpc::engine;
 
 Sampler::Sampler(
-    Mpc &mpc,
-    GetProgramFn &&getSnapshot,
+    Mpc &mpc, GetProgramFn &&getSnapshot,
     const std::function<void(performance::PerformanceMessage &&)> &dispatch)
     : mpc(mpc), getSnapshot(std::move(getSnapshot)), dispatch(dispatch)
 {
@@ -1050,9 +1049,9 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        src->cloneNoteParameters(
-            DrumNoteNumber(i + MinDrumNoteNumber), dest.get(),
-            DrumNoteNumber(i + MinDrumNoteNumber));
+        src->cloneNoteParameters(DrumNoteNumber(i + MinDrumNoteNumber),
+                                 dest.get(),
+                                 DrumNoteNumber(i + MinDrumNoteNumber));
 
         const auto mc1 = dest->getIndivFxMixerChannel(i);
         const auto mc2 = src->getIndivFxMixerChannel(i);

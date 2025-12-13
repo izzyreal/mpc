@@ -126,9 +126,11 @@ void AllSequence::applyToInMemorySequence(
 
     const auto sequenceIndex = inMemorySequence->getSequenceIndex();
 
-    UpdateSequenceTracks updateSequenceTracks {sequenceIndex};
-    manager->trackStatesSnapshots[sequenceIndex] = SequenceTrackStatesSnapshot();
-    updateSequenceTracks.trackStates = &manager->trackStatesSnapshots[sequenceIndex];
+    UpdateSequenceTracks updateSequenceTracks{sequenceIndex};
+    manager->trackStatesSnapshots[sequenceIndex] =
+        SequenceTrackStatesSnapshot();
+    updateSequenceTracks.trackStates =
+        &manager->trackStatesSnapshots[sequenceIndex];
 
     auto &trackStates = *updateSequenceTracks.trackStates;
 
@@ -142,7 +144,8 @@ void AllSequence::applyToInMemorySequence(
         trackStates[i].programChange = tracks->getPgm(i);
         trackStates[i].on = tracks->isOn(i);
         trackStates[i].velocityRatio = tracks->getVelo(i);
-        trackStates[i].transmitProgramChangesEnabled = tracks->isTransmitProgramChangesEnabled(i);
+        trackStates[i].transmitProgramChangesEnabled =
+            tracks->isTransmitProgramChangesEnabled(i);
         trackStates[i].used = tracks->isUsed(i);
     }
 
@@ -151,7 +154,8 @@ void AllSequence::applyToInMemorySequence(
     UpdateSequenceEvents updateSequenceEvents{
         inMemorySequence->getSequenceIndex()};
 
-    updateSequenceEvents.trackSnapshots = &manager->trackEventsSnapshots[sequenceIndex];
+    updateSequenceEvents.trackSnapshots =
+        &manager->trackEventsSnapshots[sequenceIndex];
 
     updateSequenceEvents.trackSnapshots->clear();
 

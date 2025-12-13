@@ -52,7 +52,7 @@ namespace mpc::sequencer
 
         std::vector<EventData> getTempoChangeEvents() const;
 
-        EventData* getTempoChangeEventForPositionTicks(Tick) const;
+        EventData *getTempoChangeEventForPositionTicks(Tick) const;
 
     private:
         const SequenceState &state;

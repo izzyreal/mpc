@@ -178,8 +178,8 @@ void UserScreen::displayVelo() const
 
 void UserScreen::displayDeviceName() const
 {
-    const auto deviceName = "Device" +
-                          StrUtil::padLeft(std::to_string(device), "0", 2);
+    const auto deviceName =
+        "Device" + StrUtil::padLeft(std::to_string(device), "0", 2);
 
     if (busType == BusType::MIDI)
     {
@@ -189,8 +189,7 @@ void UserScreen::displayDeviceName() const
         }
         else
         {
-            findLabel("devicename")
-                ->setText(deviceName);
+            findLabel("devicename")->setText(deviceName);
         }
     }
     else

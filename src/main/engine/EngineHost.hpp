@@ -75,8 +75,8 @@ namespace mpc::engine
         void prepareProcessBlock(int nFrames);
 
         utils::PostToAudioThreadFn postToAudioThread;
-        void postSamplePreciseTaskToAudioThread(
-            concurrency::SamplePreciseTask &);
+        void
+        postSamplePreciseTaskToAudioThread(concurrency::SamplePreciseTask &);
 
         void flushNoteOffs();
 

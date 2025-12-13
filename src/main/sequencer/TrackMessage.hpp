@@ -112,8 +112,8 @@ namespace mpc::sequencer
 
     using TrackMessage = std::variant<
         InsertAcquiredEvent, RemoveEvents, RemoveEvent, UpdateEventTick,
-        RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive,
-        SetTrackUsed, SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
+        RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, SetTrackUsed,
+        SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
         SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex,
         SetTrackTransmitProgramChangesEnabled, SetTrackName>;
 } // namespace mpc::sequencer

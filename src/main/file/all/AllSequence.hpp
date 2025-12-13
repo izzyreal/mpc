@@ -120,8 +120,9 @@ namespace mpc::file::all
     public:
         std::vector<char> &getBytes();
 
-        void applyToInMemorySequence(const std::shared_ptr<sequencer::Sequence> &inMemorySequence,
-                           sequencer::SequencerStateManager *) const;
+        void applyToInMemorySequence(
+            const std::shared_ptr<sequencer::Sequence> &inMemorySequence,
+            sequencer::SequencerStateManager *) const;
 
         explicit AllSequence(const std::vector<char> &bytes);
         AllSequence(sequencer::Sequence *seq, int number);

@@ -13,14 +13,11 @@ namespace mpc::sequencer
     class SequencerStateView
     {
     public:
-        explicit SequencerStateView(
-            const SequencerState *) noexcept;
+        explicit SequencerStateView(const SequencerState *) noexcept;
 
-        SequenceStateView
-            getSequenceState(SequenceIndex) const;
+        SequenceStateView getSequenceState(SequenceIndex) const;
 
-        TrackStateView getTrackState(SequenceIndex,
-                                                      TrackIndex) const;
+        TrackStateView getTrackState(SequenceIndex, TrackIndex) const;
 
         SequenceIndex getSelectedSequenceIndex() const noexcept;
         SongIndex getSelectedSongIndex() const noexcept;

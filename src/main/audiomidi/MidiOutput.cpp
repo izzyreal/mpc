@@ -2,9 +2,7 @@
 
 using namespace mpc::audiomidi;
 
-MidiOutput::MidiOutput()
-{
-}
+MidiOutput::MidiOutput() {}
 
 void MidiOutput::panic() const {}
 

@@ -97,9 +97,9 @@ ClientEventController::getClientMidiEventController()
 
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
-    return SeqUtil::isRecMainWithoutPlaying(
-        mpc.getSequencer(), layeredScreen->getCurrentScreenId(),
-        clientHardwareEventController);
+    return SeqUtil::isRecMainWithoutPlaying(mpc.getSequencer(),
+                                            layeredScreen->getCurrentScreenId(),
+                                            clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const

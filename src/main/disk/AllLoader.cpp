@@ -96,7 +96,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
         }
 
         auto mpcSeq = mpcSequencer->getSequence(index++);
-        as->applyToInMemorySequence(mpcSeq, mpcSequencer->getStateManager().get());
+        as->applyToInMemorySequence(mpcSeq,
+                                    mpcSequencer->getStateManager().get());
     }
 
     auto allParserSequencer = allParser.getSequencer();

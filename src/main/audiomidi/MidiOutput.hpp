@@ -16,7 +16,8 @@ namespace mpc::audiomidi
     private:
         static constexpr size_t QueueCapacity = 128;
         using MidiEvent = client::event::ClientMidiEvent;
-        using MidiEventQueue = concurrency::BoundedMpmcQueue<MidiEvent, QueueCapacity>;
+        using MidiEventQueue =
+            concurrency::BoundedMpmcQueue<MidiEvent, QueueCapacity>;
 
         MidiEventQueue queue;
 

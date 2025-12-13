@@ -42,8 +42,8 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx.sequencerIsRecordingOrOverdubbing)
         {
-            ctx.sequencerStateManager->finalizeNoteEventLive(
-                ctx.recordOnEvent, ctx.positionTicks);
+            ctx.sequencerStateManager->finalizeNoteEventLive(ctx.recordOnEvent,
+                                                             ctx.positionTicks);
         }
 
         if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
@@ -63,7 +63,7 @@ void TriggerLocalNoteOffCommand::execute()
             }
 
             ctx.track->finalizeNoteEventNonLive(ctx.recordOnEvent,
-                                                 Duration(newDuration));
+                                                Duration(newDuration));
 
             if (((ctx.isStepRecording && ctx.isAutoStepIncrementEnabled) ||
                  ctx.isRecMainWithoutPlaying) &&

@@ -486,7 +486,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
             sequencer->setSelectedSongStepIndex(wrappedPosition.stepIndex);
             sequencer->getTransport()->setPosition(wrappedPosition.position);
             sequencer->getStateManager()->enqueue(
-                    SetPlayedSongStepRepetitionCount{wrappedPosition.playedRepetitionCount});
+                SetPlayedSongStepRepetitionCount{
+                    wrappedPosition.playedRepetitionCount});
         }
         else
         {

@@ -25,9 +25,7 @@ namespace mpc::sampler
     {
     public:
         explicit Sampler(
-            Mpc &,
-            GetProgramFn
-                &&getSnapshot,
+            Mpc &, GetProgramFn &&getSnapshot,
             const std::function<void(performance::PerformanceMessage &&)>
                 &dispatch);
 

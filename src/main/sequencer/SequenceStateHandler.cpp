@@ -334,8 +334,9 @@ void SequenceStateHandler::applyMessage(
             for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
             {
                 applyDeleteTrack(DeleteTrack{m.sequenceIndex, TrackIndex(i),
-                                         m.deviceIndex, m.programChange,
-                                         m.busType, m.velocityRatio}, state);
+                                             m.deviceIndex, m.programChange,
+                                             m.busType, m.velocityRatio},
+                                 state);
             }
 
             lock.release();
@@ -364,7 +365,8 @@ void SequenceStateHandler::applyMessage(
 
             for (int i = 0; i < Mpc2000XlSpecs::TRACK_COUNT; ++i)
             {
-                state.sequences[m.sequenceIndex].tracks[i] = (*m.trackStates)[i];
+                state.sequences[m.sequenceIndex].tracks[i] =
+                    (*m.trackStates)[i];
             }
 
             lock.release();

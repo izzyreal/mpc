@@ -57,7 +57,7 @@ void PasteEventScreen::function(const int i)
                 });
         }
 
-        sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(eventState,
-                                                                    std::move(onComplete));
+        sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(
+            eventState, std::move(onComplete));
     }
 }
