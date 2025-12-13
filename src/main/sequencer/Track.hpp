@@ -151,6 +151,8 @@ namespace mpc::sequencer
         void setTransmitProgramChangesEnabled(bool,
                                               bool updateUsedness = true) const;
 
+        int64_t getVersion() const;
+
     private:
         const utils::PostToUiThreadFn &postToUiThread;
         const std::function<std::string(int)> getDefaultTrackName;

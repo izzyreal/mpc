@@ -239,6 +239,9 @@ void SequenceStateHandler::applyMessage(
             const auto source = m.source;
             const auto dest = m.destination;
 
+            size_t begin = std::min(source, dest);
+            size_t end   = std::max(source, dest);
+
             if (source < dest)
             {
                 std::rotate(tracks.begin() + source,
@@ -250,6 +253,9 @@ void SequenceStateHandler::applyMessage(
                 std::rotate(tracks.begin() + dest, tracks.begin() + source,
                             tracks.begin() + source + 1);
             }
+
+            for (size_t i = begin; i <= end; i++)
+                tracks[i].version++;
 
             lock.release();
         },

@@ -19,6 +19,8 @@ namespace mpc::sequencer
         bool used;
         bool transmitProgramChangesEnabled = true;
 
+        int64_t version;
+
         TrackState()
         {
             name.reserve(Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
@@ -29,6 +31,7 @@ namespace mpc::sequencer
         {
             eventsHead = nullptr;
             playEventIndex = EventIndex(0);
+            version = 0;
             name = "(Unused)";
             used = false;
             on = true;

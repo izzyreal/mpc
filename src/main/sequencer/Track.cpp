@@ -122,6 +122,11 @@ void Track::setTransmitProgramChangesEnabled(const bool b,
     }
 }
 
+int64_t Track::getVersion() const
+{
+    return getSnapshot(getIndex()).getVersion();
+}
+
 void Track::setTrackIndex(const TrackIndex i)
 {
     if (trackIndex == i)

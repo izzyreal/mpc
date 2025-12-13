@@ -25,17 +25,27 @@ TrMoveScreen::TrMoveScreen(Mpc &mpc, const int layerIndex)
                             displayTrFields();
                             displayTrLabels();
                         }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedTrack()->getVersion();
+                        },
+                        [&](auto)
+                        {
+                            displayTrFields();
+                            displayTrLabels();
+                        }});
 }
 
 void TrMoveScreen::open()
 {
-    findBackground()->SetDirty();
     findLabel("selecttrack")->setText("Select track");
     findLabel("tomove")->setText("to move.");
 
     displaySq();
     displayTrFields();
     displayTrLabels();
+    selectedTrackIndex = NoTrackIndex;
+    ls.lock()->setFunctionKeysArrangement(1);
 }
 
 void TrMoveScreen::turnWheel(const int i)
@@ -284,11 +294,7 @@ void TrMoveScreen::displaySq() const
 
 bool TrMoveScreen::isSelected() const
 {
-    if (selectedTrackIndex != -1)
-    {
-        return true;
-    }
-    return false;
+    return selectedTrackIndex != NoTrackIndex;
 }
 
 void TrMoveScreen::goUp()
@@ -321,7 +327,6 @@ void TrMoveScreen::select()
     displayTrLabels();
     displayTrFields();
     ls.lock()->setFunctionKeysArrangement(2);
-    SetDirty();
 }
 
 void TrMoveScreen::cancel()
@@ -330,16 +335,14 @@ void TrMoveScreen::cancel()
     displayTrLabels();
     displayTrFields();
     ls.lock()->setFunctionKeysArrangement(1);
-    SetDirty();
 }
 
 void TrMoveScreen::insert(sequencer::Sequence *s)
 {
     sequencer.lock()->copySelectedSequenceToUndoSequence();
     s->moveTrack(selectedTrackIndex, currentTrackIndex);
-    selectedTrackIndex = -1;
+    selectedTrackIndex = NoTrackIndex;
     displayTrLabels();
     displayTrFields();
     ls.lock()->setFunctionKeysArrangement(1);
-    SetDirty();
 }

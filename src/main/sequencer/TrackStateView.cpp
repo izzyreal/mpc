@@ -220,3 +220,8 @@ std::string_view TrackStateView::getName() const
 {
     return state.name;
 }
+
+int64_t TrackStateView::getVersion() const
+{
+    return state.version;
+}

@@ -56,6 +56,8 @@ namespace mpc::sequencer
 
         std::string_view getName() const;
 
+        int64_t getVersion() const;
+
     private:
         const TrackState &state;
     };
