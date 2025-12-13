@@ -280,7 +280,6 @@ void LayeredScreen::closeCurrentScreen()
             setLastFocus(currentScreen->getName(), focusedFieldName);
         }
 
-        currentScreen->close();
         getFocusedLayer()->removeChild(currentScreen);
     }
 
@@ -297,6 +296,10 @@ void LayeredScreen::closeCurrentScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
+    const auto oldScreenComponent = history.empty()
+                                        ? std::shared_ptr<ScreenComponent>()
+                                        : getCurrentScreen();
+
     const auto controller =
         mpc.clientEventController->clientHardwareEventController;
 
@@ -370,7 +373,6 @@ void LayeredScreen::openScreenInternal(
             const auto focusedFieldName = focusedField->getName();
             setLastFocus(history.back()->getName(), focusedFieldName);
         }
-        history.back()->close();
     }
 
     history.push_back(newScreen);
@@ -398,6 +400,11 @@ void LayeredScreen::openScreenInternal(
 
     previousScreenId.store(currentScreenId.load());
     currentScreenId.store(getScreenId(newScreen));
+
+    if (oldScreenComponent)
+    {
+        oldScreenComponent->close();
+    }
 
     newScreen->open();
 

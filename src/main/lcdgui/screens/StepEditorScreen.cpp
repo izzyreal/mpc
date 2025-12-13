@@ -224,9 +224,7 @@ void StepEditorScreen::close()
 
     storeColumnForEventAtActiveRow();
 
-    if (const auto nextScreen = ls.lock()->getCurrentScreenName();
-        nextScreen != "step-timing-correct" && nextScreen != "insert-event" &&
-        nextScreen != "paste-event" && nextScreen != "edit-multiple")
+    if (!ls.lock()->isCurrentScreenOrChildOf(ScreenId::StepEditorScreen))
     {
         track->removeDoubles();
         sequencer.lock()->resetUndo();

@@ -17,8 +17,8 @@ void TrackStateHandler::applyRemoveDoubles(const RemoveDoubles &m,
 
     auto &track = state.sequences[m.sequence].tracks[m.track];
 
-    std::vector<NoteNumber> notesAtTick;
-    Tick lastTick = -100;
+    std::bitset<127> notesAtTick;
+    Tick lastTick = NoTick;
 
     EventData *cur = track.eventsHead;
 
@@ -30,24 +30,11 @@ void TrackStateHandler::applyRemoveDoubles(const RemoveDoubles &m,
         {
             if (cur->tick != lastTick)
             {
-                notesAtTick.clear();
-            }
-
-            bool exists = false;
-            for (auto n : notesAtTick)
-            {
-                if (n == cur->noteNumber)
-                {
-                    exists = true;
-                }
-            }
-
-            if (!exists)
-            {
-                notesAtTick.push_back(cur->noteNumber);
+                notesAtTick.reset();
                 lastTick = cur->tick;
             }
-            else
+
+            if (notesAtTick.test(cur->noteNumber))
             {
                 if (cur->prev)
                 {
@@ -64,8 +51,11 @@ void TrackStateHandler::applyRemoveDoubles(const RemoveDoubles &m,
 
                 cur->prev = nullptr;
                 cur->next = nullptr;
-
                 manager->returnEventToPool(cur);
+            }
+            else
+            {
+                notesAtTick.set(cur->noteNumber);
             }
         }
 
