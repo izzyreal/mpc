@@ -11,6 +11,28 @@ using namespace mpc::lcdgui::screens;
 LoopSongScreen::LoopSongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop-song", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()
+                                ->getSelectedSong()
+                                ->getFirstLoopStepIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayFirstStep();
+                            displayNumberOfSteps();
+                        }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()
+                                ->getSelectedSong()
+                                ->getLastLoopStepIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayLastStep();
+                            displayNumberOfSteps();
+                        }});
 }
 
 void LoopSongScreen::open()
@@ -29,16 +51,10 @@ void LoopSongScreen::turnWheel(const int i)
     if (focusedFieldName == "first-step")
     {
         song->setFirstLoopStepIndex(song->getFirstLoopStepIndex() + i);
-        displayFirstStep();
-        displayLastStep();
-        displayNumberOfSteps();
     }
     else if (focusedFieldName == "last-step")
     {
         song->setLastLoopStepIndex(song->getLastLoopStepIndex() + i);
-        displayLastStep();
-        displayFirstStep();
-        displayNumberOfSteps();
     }
     else if (focusedFieldName == "number-of-steps")
     {
@@ -50,9 +66,6 @@ void LoopSongScreen::turnWheel(const int i)
         }
 
         song->setLastLoopStepIndex(candidate);
-
-        displayLastStep();
-        displayNumberOfSteps();
     }
 }
 
