@@ -87,7 +87,9 @@ void Track::setUsedIfCurrentlyUnused(
 
     if (getIndex() != TempoChangeTrackIndex)
     {
-        setName(getDefaultTrackName(getIndex()));
+        postToUiThread(utils::Task([this]{
+            setName(getDefaultTrackName(getIndex()));
+        }));
     }
 
     dispatch(SetTrackUsed{getSequenceIndex(), getIndex(), true});
