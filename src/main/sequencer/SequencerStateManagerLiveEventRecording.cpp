@@ -111,31 +111,13 @@ void SequencerStateManager::processLiveNoteEventRecordingQueues(
     const Tick currentPositionTicks,
     const SequenceStateView& seq)
 {
-    int noteOnCount = 0;
-    for (; noteOnCount < LIVE_NOTE_EVENT_RECORDING_CAPACITY; ++noteOnCount)
+    const size_t noteOnCount = liveNoteOnEventRecordingQueue.dequeue_bulk(tempLiveNoteOnRecordingEvents);
+    const size_t noteOffCount = liveNoteOffEventRecordingQueue.dequeue_bulk(tempLiveNoteOffRecordingEvents);
+
+    if (noteOnCount == 0 && noteOffCount == 0)
     {
-        EventData* ptr;
-        if (!liveNoteOnEventRecordingQueue.dequeue(ptr))
-            break;
-
-        tempLiveNoteOnRecordingEvents[noteOnCount] = ptr;
-    }
-
-    int noteOffCount = 0;
-    for (; noteOffCount < LIVE_NOTE_EVENT_RECORDING_CAPACITY; ++noteOffCount)
-    {
-        alignas(EventData) unsigned char buf[sizeof(EventData)];
-        const auto ev = reinterpret_cast<EventData*>(buf);
-
-        if (!liveNoteOffEventRecordingQueue.dequeue(*ev))
-            break;
-
-        tempLiveNoteOffRecordingEvents[noteOffCount] = *ev;
-        ev->~EventData();
-    }
-
-    if (!noteOnCount && !noteOffCount)
         return;
+    }
 
     const Tick pos = currentPositionTicks;
     const Tick correctedPos = getCorrectedTickPos(currentPositionTicks, seq);

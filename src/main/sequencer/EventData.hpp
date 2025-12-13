@@ -134,6 +134,10 @@ namespace mpc::sequencer
                 printf(" velocity: %i\n", velocity.get());
                 printf(" duration: %i\n", duration.get());
             }
+            if (type == EventType::NoteOff)
+            {
+                printf("     note: %i\n", noteNumber.get());
+            }
             printf("================\n");
         }
 
