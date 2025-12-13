@@ -254,7 +254,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
             });
 
         const auto gapBetweenTwoAdjacentNoteEvents =
-            ((sampleRate * 0.001) * 2.0);
+            ((sampleRate * 0.001) * 1.0);
 
         task.nFrames = durationFrames - gapBetweenTwoAdjacentNoteEvents;
 
