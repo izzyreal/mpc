@@ -78,7 +78,7 @@ bool PerformanceStateView::isProgramPadPressed(const ProgramPadIndex idx) const
 std::optional<ProgramPadPressEvent>
 PerformanceStateView::getMostRecentProgramPadPress(
     const ProgramPadIndex idx,
-    const std::vector<PerformanceEventSource> &sourcesToExclude) const
+    const std::initializer_list<PerformanceEventSource> &sourcesToExclude) const
 {
     std::optional<ProgramPadPressEvent> latest = std::nullopt;
 

@@ -22,7 +22,7 @@ namespace mpc::performance
 
         std::optional<ProgramPadPressEvent> getMostRecentProgramPadPress(
             ProgramPadIndex,
-            const std::vector<PerformanceEventSource> &sourcesToExclude) const;
+            const std::initializer_list<PerformanceEventSource> &sourcesToExclude) const;
 
         int getTotalNoteOnCount() const;
 
