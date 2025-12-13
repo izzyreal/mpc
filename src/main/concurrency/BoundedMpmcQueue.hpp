@@ -8,8 +8,7 @@
 
 namespace mpc::concurrency
 {
-    template <typename T, size_t Capacity>
-    class BoundedMpmcQueue
+    template <typename T, size_t Capacity> class BoundedMpmcQueue
     {
     public:
         BoundedMpmcQueue()
@@ -19,7 +18,9 @@ namespace mpc::concurrency
             assert(Capacity >= 2 && ((Capacity & (Capacity - 1)) == 0));
 
             for (size_t i = 0; i < Capacity; i++)
+            {
                 buffer_[i].sequence_.store(i, std::memory_order_relaxed);
+            }
 
             enqueue_pos_.store(0, std::memory_order_relaxed);
             dequeue_pos_.store(0, std::memory_order_relaxed);
@@ -30,65 +31,129 @@ namespace mpc::concurrency
             delete[] buffer_;
         }
 
-        bool enqueue(const T& v) { return enqueue_impl(v); }
-        bool enqueue(T&& v)      { return enqueue_impl(std::move(v)); }
-
-        template <class U>
-        bool enqueue_impl(U&& v)
+        bool enqueue(const T &v)
         {
-            cell_t* cell;
+            return enqueue_impl(v);
+        }
+        bool enqueue(T &&v)
+        {
+            return enqueue_impl(std::move(v));
+        }
+
+        template <class U> bool enqueue_impl(U &&v)
+        {
+            cell_t *cell;
             size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
 
-            for (;;) {
+            for (;;)
+            {
                 cell = &buffer_[pos & buffer_mask_];
 
                 size_t seq = cell->sequence_.load(std::memory_order_acquire);
                 intptr_t dif = (intptr_t)seq - (intptr_t)pos;
 
-                if (dif == 0) {
+                if (dif == 0)
+                {
                     if (enqueue_pos_.compare_exchange_weak(
                             pos, pos + 1, std::memory_order_relaxed))
+                    {
                         break;
+                    }
                 }
-                else if (dif < 0) {
+                else if (dif < 0)
+                {
                     return false;
                 }
-                else {
+                else
+                {
                     pos = enqueue_pos_.load(std::memory_order_relaxed);
                 }
             }
 
-            new (cell->ptr()) T(std::forward<U>(v));   // construct only
+            new (cell->ptr()) T(std::forward<U>(v)); // construct only
             cell->sequence_.store(pos + 1, std::memory_order_release);
             return true;
         }
 
-        bool dequeue(T& out)
+        bool dequeue(T &out)
         {
-            cell_t* cell;
+            cell_t *cell;
             size_t pos = dequeue_pos_.load(std::memory_order_relaxed);
 
-            for (;;) {
+            for (;;)
+            {
                 cell = &buffer_[pos & buffer_mask_];
                 size_t seq = cell->sequence_.load(std::memory_order_acquire);
                 intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
 
-                if (dif == 0) {
+                if (dif == 0)
+                {
                     if (dequeue_pos_.compare_exchange_weak(
                             pos, pos + 1, std::memory_order_relaxed))
+                    {
                         break;
+                    }
                 }
-                else if (dif < 0) return false;
-                else              pos = dequeue_pos_.load(std::memory_order_relaxed);
+                else if (dif < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    pos = dequeue_pos_.load(std::memory_order_relaxed);
+                }
             }
 
-            T* p = cell->ptr();
-            new (&out) T(std::move(*p));  // construct out in-place
-            p->~T();                      // destroy queue copy
+            T *p = cell->ptr();
+            new (&out) T(std::move(*p)); // construct out in-place
+            p->~T();                     // destroy queue copy
 
             cell->sequence_.store(pos + buffer_mask_ + 1,
                                   std::memory_order_release);
             return true;
+        }
+
+        size_t dequeue_bulk(std::vector<T> &out)
+        {
+            size_t n = out.size();
+            size_t count = 0;
+            for (; count < n; ++count)
+            {
+                T *dst = &out[count];
+                cell_t *cell;
+                size_t pos = dequeue_pos_.load(std::memory_order_relaxed);
+
+                for (;;)
+                {
+                    cell = &buffer_[pos & buffer_mask_];
+                    size_t seq =
+                        cell->sequence_.load(std::memory_order_acquire);
+                    intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
+                    if (dif == 0)
+                    {
+                        if (dequeue_pos_.compare_exchange_weak(
+                                pos, pos + 1, std::memory_order_relaxed))
+                        {
+                            break;
+                        }
+                    }
+                    else if (dif < 0)
+                    {
+                        return count;
+                    }
+                    else
+                    {
+                        pos = dequeue_pos_.load(std::memory_order_relaxed);
+                    }
+                }
+
+                T *p = cell->ptr();
+                new (dst) T(std::move(*p));
+                p->~T();
+                cell->sequence_.store(pos + buffer_mask_ + 1,
+                                      std::memory_order_release);
+            }
+            return count;
         }
 
     private:
@@ -97,16 +162,22 @@ namespace mpc::concurrency
             std::atomic<size_t> sequence_;
             typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
 
-            T* ptr()       { return reinterpret_cast<T*>(&storage); }
-            T* ptr() const { return reinterpret_cast<T*>(const_cast<void*>(
-                                  static_cast<const void*>(&storage))); }
+            T *ptr()
+            {
+                return reinterpret_cast<T *>(&storage);
+            }
+            T *ptr() const
+            {
+                return reinterpret_cast<T *>(
+                    const_cast<void *>(static_cast<const void *>(&storage)));
+            }
         };
 
         static constexpr size_t cacheline_size = 64;
         using pad = char[cacheline_size];
 
         pad pad0_;
-        cell_t* const buffer_;
+        cell_t *const buffer_;
         const size_t buffer_mask_;
         pad pad1_;
         std::atomic<size_t> enqueue_pos_;
@@ -114,7 +185,7 @@ namespace mpc::concurrency
         std::atomic<size_t> dequeue_pos_;
         pad pad3_;
 
-        BoundedMpmcQueue(const BoundedMpmcQueue&) = delete;
-        void operator=(const BoundedMpmcQueue&)   = delete;
+        BoundedMpmcQueue(const BoundedMpmcQueue &) = delete;
+        void operator=(const BoundedMpmcQueue &) = delete;
     };
-}
+} // namespace mpc::concurrency

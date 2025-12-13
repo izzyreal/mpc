@@ -299,33 +299,21 @@ EventData* SequencerStateManager::findRecordingNoteOnEvent(
 {
     EventData* found = nullptr;
 
-    size_t count = 0;
+    const size_t liveNoteOnCount = liveNoteOnEventRecordingQueue.dequeue_bulk(tempLiveNoteOnRecordingEvents);
 
-    for (size_t i = 0; i < tempLiveNoteOnRecordingEvents.size(); ++i)
+    for (size_t i = 0; i < liveNoteOnCount; ++i)
     {
-        EventData* e;
-
-        if (!liveNoteOnEventRecordingQueue.dequeue(e))
-        {
-            break;
-        }
-
-        tempLiveNoteOnRecordingEvents[i] = e;
-        count++;
-
-        if (e->noteNumber == noteNumber)
+        if (const auto e = tempLiveNoteOnRecordingEvents[i]; e->noteNumber == noteNumber)
         {
             found = e;
             break;
         }
     }
 
-    for (size_t i = 0; i < count; ++i)
+    for (size_t i = 0; i < liveNoteOnCount; ++i)
     {
         EventData* e = tempLiveNoteOnRecordingEvents[i];
-
-        if (e != found)
-            liveNoteOnEventRecordingQueue.enqueue(e);
+        liveNoteOnEventRecordingQueue.enqueue(e);
     }
 
     tempLiveNoteOnRecordingEvents.clear();
