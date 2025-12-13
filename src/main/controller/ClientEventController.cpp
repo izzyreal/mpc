@@ -137,6 +137,12 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
     hardware->getLed(BANK_B_LED)->setEnabled(activeBank == Bank::B);
     hardware->getLed(BANK_C_LED)->setEnabled(activeBank == Bank::C);
     hardware->getLed(BANK_D_LED)->setEnabled(activeBank == Bank::D);
+
+    layeredScreen->postToUiThread(utils::Task(
+        [this]
+        {
+            setActiveBankUiCallback(activeBank);
+        }));
 }
 
 Bank ClientEventController::getActiveBank() const

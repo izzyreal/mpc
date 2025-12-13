@@ -110,7 +110,14 @@ void Mpc::init()
 
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
 
-    performanceManager = std::make_shared<performance::PerformanceManager>();
+    hardware = std::make_shared<Hardware>();
+
+    midiOutput = std::make_shared<audiomidi::MidiOutput>();
+
+    layeredScreen = std::make_shared<LayeredScreen>(*this);
+
+    performanceManager = std::make_shared<performance::PerformanceManager>(
+        layeredScreen->postToUiThread);
 
     sampler = std::make_shared<Sampler>(
         *this,
@@ -125,12 +132,6 @@ void Mpc::init()
             performanceManager->enqueue(std::move(m));
         });
     MLOG("Sampler created");
-
-    hardware = std::make_shared<Hardware>();
-
-    midiOutput = std::make_shared<audiomidi::MidiOutput>();
-
-    layeredScreen = std::make_shared<LayeredScreen>(*this);
 
     screens = std::make_shared<Screens>(*this);
 

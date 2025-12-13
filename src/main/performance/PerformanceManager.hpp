@@ -9,6 +9,8 @@
 #include "performance/PerformanceStateView.hpp"
 #include "sequencer/BusType.hpp"
 
+#include "utils/SmallFn.hpp"
+
 #include <optional>
 
 namespace mpc::sampler
@@ -18,12 +20,17 @@ namespace mpc::sampler
 
 namespace mpc::performance
 {
+    enum class ProgramPadEventType { Press, Release, Aftertouch };
+    using ProgramPadEventUiCallback =
+        utils::SmallFn<8, void(ProgramPadIndex, VelocityOrPressure,
+                               PerformanceEventSource, ProgramPadEventType)>;
+
     class PerformanceManager final
         : public concurrency::AtomicStateExchange<
               PerformanceState, PerformanceStateView, PerformanceMessage>
     {
     public:
-        PerformanceManager();
+        explicit PerformanceManager(const utils::PostToUiThreadFn &);
         ~PerformanceManager() override;
 
         void registerUpdateDrumProgram(DrumBusIndex, ProgramIndex);
@@ -67,11 +74,15 @@ namespace mpc::performance
 
         void clear();
 
+        ProgramPadEventUiCallback programPadEventUiCallback = {};
+
     protected:
         void applyMessage(const PerformanceMessage &) noexcept override;
 
     private:
         static constexpr size_t CAPACITY = 8192;
+
+        const utils::PostToUiThreadFn &postToUiThread;
 
         static void reserveState(PerformanceState &);
     };

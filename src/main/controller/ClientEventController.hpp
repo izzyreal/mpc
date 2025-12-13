@@ -92,6 +92,8 @@ namespace mpc::controller
         const SetSelectedNoteFn setSelectedNote;
         const SetSelectedPadFn setSelectedPad;
 
+        SetActiveBankUiCallback setActiveBankUiCallback = {};
+
     private:
         Mpc &mpc;
         input::HostToClientTranslator hostToClientTranslator;
