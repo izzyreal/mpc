@@ -6,6 +6,11 @@
 
 using namespace mpc::engine::audio::server;
 
+RealTimeAudioServer::RealTimeAudioServer()
+{
+    previousMpcMonoInputChannelIndices.reserve(2);
+}
+
 void RealTimeAudioServer::start()
 {
     if (running.load())
@@ -58,11 +63,24 @@ void RealTimeAudioServer::work(
     const int nFrames, const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
-    const std::vector<int8_t> &hostOutputChannelIndices) const
+    const std::vector<int8_t> &hostOutputChannelIndices)
 {
     if (!running.load())
     {
         return;
+    }
+
+    if (previousMpcMonoInputChannelIndices != mpcMonoInputChannelIndices)
+    {
+        for (const auto &input : activeInputs)
+        {
+            for (int frame = 0; frame < nFrames * 2; ++frame)
+            {
+                input->localBuffer[frame] = 0.f;
+            }
+        }
+
+        previousMpcMonoInputChannelIndices = mpcMonoInputChannelIndices;
     }
 
     for (int i = 0; i < mpcMonoInputChannelIndices.size(); i++)
