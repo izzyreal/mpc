@@ -175,7 +175,7 @@ void AllSequence::applyToInMemorySequence(
 
     for (int i = 0; i < 32; i++)
     {
-        inMemorySequence->setDeviceName(i, devNames[i]);
+        inMemorySequence->setDeviceName(i, devNames[i + 1]);
     }
 
     inMemorySequence->setFirstLoopBarIndex(BarIndex(loopFirst));
@@ -265,12 +265,18 @@ AllSequence::AllSequence(Sequence *seq, int number)
 
     for (int i = 0; i < 33; i++)
     {
-        auto offset = DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        const auto deviceNameOffset =
+            DEVICE_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
 
-        for (int j = 0; j < AllParser::DEV_NAME_LENGTH; j++)
+        const auto deviceName =
+            i == 0 ? "        "
+                   : StrUtil::padRight(seq->getDeviceName(i - 1), " ",
+                                       AllParser::DEV_NAME_LENGTH);
+
+        for (int charOffset = 0; charOffset < AllParser::DEV_NAME_LENGTH;
+             charOffset++)
         {
-            saveBytes[offset + j] = StrUtil::padRight(
-                seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
+            saveBytes[deviceNameOffset + charOffset] = deviceName[charOffset];
         }
     }
     Tracks allFileSeqTracks(seq);
