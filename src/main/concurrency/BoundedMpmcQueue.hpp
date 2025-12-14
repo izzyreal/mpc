@@ -5,6 +5,7 @@
 #include <cassert>
 #include <utility>
 #include <type_traits>
+#include <vector>
 
 namespace mpc::concurrency
 {

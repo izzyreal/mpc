@@ -2,6 +2,8 @@
 
 #include "sequencer/SequencerStateManager.hpp"
 
+#include <bitset>
+
 using namespace mpc::sequencer;
 
 void TrackStateHandler::applyRemoveDoubles(const RemoveDoubles &m,
