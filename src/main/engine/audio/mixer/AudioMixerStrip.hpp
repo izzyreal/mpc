@@ -14,7 +14,7 @@ namespace mpc::engine::audio::mixer
         AudioMixer *mixer{nullptr};
 
     private:
-        std::shared_ptr<core::AudioBuffer> buffer;
+        std::weak_ptr<core::AudioBuffer> buffer;
         std::shared_ptr<AudioProcess> input;
         std::shared_ptr<AudioProcess> directOutput;
         bool isChannel{false};

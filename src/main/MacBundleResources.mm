@@ -53,10 +53,14 @@ std::string getLv2ResourcePath(const std::string& resourceName)
     }
 
     char* path_copy = realpath(info.dli_fname, NULL);
-    if (!path_copy) return NULL;
+    if (!path_copy)
+    {
+        return "";
+    }
 
     if (std::string(path_copy).find(".lv2") == std::string::npos)
     {
+        free(path_copy);
         return "";
     }
 
@@ -69,6 +73,7 @@ std::string getLv2ResourcePath(const std::string& resourceName)
     free(path_copy);
 
     const auto result = std::string(resources_path) + "/" + resourceName;
+    free(resources_path);
     return result;
 }
 

@@ -15,7 +15,7 @@ AudioMixerBus::AudioMixerBus(const AudioMixer *mixer,
 
 std::shared_ptr<AudioBuffer> AudioMixerBus::getBuffer() const
 {
-    return buffer;
+    return buffer.lock();
 }
 
 string AudioMixerBus::getName()
@@ -25,7 +25,7 @@ string AudioMixerBus::getName()
 
 void AudioMixerBus::silence() const
 {
-    buffer->makeSilence();
+    buffer.lock()->makeSilence();
 }
 
 void AudioMixerBus::write(int nFrames) const
@@ -37,6 +37,6 @@ void AudioMixerBus::write(int nFrames) const
 
     if (output)
     {
-        output->processAudio(buffer.get(), nFrames);
+        output->processAudio(buffer.lock().get(), nFrames);
     }
 }

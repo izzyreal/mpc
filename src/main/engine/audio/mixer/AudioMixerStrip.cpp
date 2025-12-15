@@ -65,7 +65,7 @@ void AudioMixerStrip::silence()
 {
     if (nmixed > 0)
     {
-        buffer->makeSilence();
+        buffer.lock()->makeSilence();
         nmixed = 0;
     }
 }
@@ -91,11 +91,14 @@ const int AudioMixerStrip::silenceCount;
 bool AudioMixerStrip::processBuffer(int nFrames)
 {
     auto ret = AUDIO_OK;
+
+    auto lockedBuffer = buffer.lock();
+
     if (isChannel)
     {
         if (input)
         {
-            ret = input->processAudio(buffer.get(), nFrames);
+            ret = input->processAudio(lockedBuffer.get(), nFrames);
 
             if (ret == AUDIO_DISCONNECT)
             {
@@ -112,13 +115,13 @@ bool AudioMixerStrip::processBuffer(int nFrames)
         }
     }
 
-    processAudio(buffer.get(), nFrames);
+    processAudio(lockedBuffer.get(), nFrames);
 
     if (isChannel)
     {
         if (ret == AUDIO_SILENCE)
         {
-            if (buffer->square() > 0.00000001f)
+            if (lockedBuffer->square() > 0.00000001f)
             {
                 silenceCountdown = silenceCount;
             }
@@ -134,7 +137,7 @@ bool AudioMixerStrip::processBuffer(int nFrames)
     }
     if (directOutput)
     {
-        directOutput->processAudio(buffer.get(), nFrames);
+        directOutput->processAudio(lockedBuffer.get(), nFrames);
     }
     return true;
 }
@@ -162,18 +165,19 @@ AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
 
 int AudioMixerStrip::mix(AudioBuffer *bufferToMix, const vector<float> &gain)
 {
-    auto doMix = buffer.get() != bufferToMix;
+    auto lockedBuffer = buffer.lock();
+    auto doMix = lockedBuffer.get() != bufferToMix;
     auto snc = bufferToMix->getChannelCount();
-    auto dnc = buffer->getChannelCount();
+    auto dnc = lockedBuffer->getChannelCount();
 
-    auto ns = buffer->getSampleCount();
+    auto ns = lockedBuffer->getSampleCount();
     float g;
     auto k = static_cast<float>(snc) / dnc;
     for (auto i = 0; i < dnc; i++)
     {
         g = gain[i] * k;
         auto &in = bufferToMix->getChannel(i % snc);
-        auto &out = buffer->getChannel(i);
+        auto &out = lockedBuffer->getChannel(i);
         if (doMix)
         {
             for (auto s = 0; s < ns; s++)
@@ -206,5 +210,5 @@ int AudioMixerStrip::mix(AudioBuffer *bufferToMix, const vector<float> &gain)
 void AudioMixerStrip::close()
 {
     AudioProcessChain::close();
-    mixer->removeBuffer(buffer);
+    mixer->removeBuffer(buffer.lock());
 }

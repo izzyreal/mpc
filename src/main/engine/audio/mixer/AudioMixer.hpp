@@ -29,7 +29,7 @@ namespace mpc::engine::audio::mixer
         std::vector<std::shared_ptr<AudioMixerStrip>> auxStrips;
         std::shared_ptr<AudioMixerStrip> mainStrip;
         std::shared_ptr<server::AudioServer> server;
-        std::shared_ptr<core::AudioBuffer> sharedAudioBuffer;
+        std::weak_ptr<core::AudioBuffer> sharedAudioBuffer;
 
     public:
         std::shared_ptr<MixerControls> getMixerControls();

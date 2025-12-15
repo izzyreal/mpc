@@ -28,7 +28,7 @@ std::shared_ptr<MixerControls> AudioMixer::getMixerControls()
 
 std::shared_ptr<AudioBuffer> AudioMixer::getSharedBuffer() const
 {
-    return sharedAudioBuffer;
+    return sharedAudioBuffer.lock();
 }
 
 std::shared_ptr<AudioBuffer>
@@ -222,7 +222,7 @@ void AudioMixer::close()
 
     busses.clear();
     auxBusses.clear();
-    server->removeAudioBuffer(sharedAudioBuffer);
+    server->removeAudioBuffer(sharedAudioBuffer.lock());
     server.reset();
     controls.reset();
 }

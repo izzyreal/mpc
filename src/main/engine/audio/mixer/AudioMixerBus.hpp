@@ -11,7 +11,7 @@ namespace mpc::engine::audio::mixer
     class AudioMixerBus
     {
 
-        std::shared_ptr<core::AudioBuffer> buffer;
+        std::weak_ptr<core::AudioBuffer> buffer;
         std::shared_ptr<core::AudioProcess> output;
         std::string name;
 
