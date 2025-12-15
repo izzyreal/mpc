@@ -7,9 +7,8 @@ namespace mpc::sequencer
 {
     struct TransportState
     {
-        PositionQuarterNotes positionQuarterNotes = NoPositionQuarterNotes;
-        PositionQuarterNotes playStartPositionQuarterNotes =
-            NoPositionQuarterNotes;
+        PositionQuarterNotes positionQuarterNotes{0};
+        PositionQuarterNotes playStartPositionQuarterNotes{0};
         Tick metronomeOnlyPositionTicks = 0;
         bool sequencerRunning = false;
         bool recordingEnabled = false;
