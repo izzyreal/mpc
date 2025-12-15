@@ -1,5 +1,8 @@
 #include "OthersScreen.hpp"
 
+#include "Mpc.hpp"
+#include "controller/ClientEventController.hpp"
+
 using namespace mpc::lcdgui::screens;
 
 OthersScreen::OthersScreen(Mpc &mpc, const int layerIndex)
@@ -10,6 +13,7 @@ OthersScreen::OthersScreen(Mpc &mpc, const int layerIndex)
 void OthersScreen::open()
 {
     displayTapAveraging();
+    displayContrast();
 }
 
 void OthersScreen::displayTapAveraging() const
@@ -17,13 +21,14 @@ void OthersScreen::displayTapAveraging() const
     findField("tapaveraging")->setText(std::to_string(tapAveraging));
 }
 
-void OthersScreen::setTapAveraging(int i)
+void OthersScreen::displayContrast() const
 {
-    if (i < 2 || i > 4)
-    {
-        return;
-    }
-    tapAveraging = i;
+    findField("contrast")->setText(std::to_string(contrast));
+}
+
+void OthersScreen::setTapAveraging(const int i)
+{
+    tapAveraging = std::clamp(i, 2, 4);
     displayTapAveraging();
 }
 
@@ -32,13 +37,10 @@ int OthersScreen::getTapAveraging() const
     return tapAveraging;
 }
 
-void OthersScreen::setContrast(int i)
+void OthersScreen::setContrast(const int i)
 {
-    if (i < 0 || i > 50)
-    {
-        return;
-    }
-    contrast = i;
+    contrast = std::clamp(i, 0, 50);
+    displayContrast();
     notifyObservers(std::string("contrast"));
 }
 
@@ -47,7 +49,7 @@ int OthersScreen::getContrast() const
     return contrast;
 }
 
-void OthersScreen::function(int i)
+void OthersScreen::function(const int i)
 {
     switch (i)
     {
@@ -57,20 +59,19 @@ void OthersScreen::function(int i)
         case 2:
             openScreenById(ScreenId::VerScreen);
             break;
+        default:;
     }
 }
 
-void OthersScreen::turnWheel(int i)
+void OthersScreen::turnWheel(const int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (false /*mpc.getControls()->isAltPressed()*/)
+    if (focusedFieldName == "contrast")
     {
-        auto increment = i > 0 ? 1 : -1;
-        setContrast(contrast + increment);
+        setContrast(contrast + i);
     }
-    if (focusedFieldName == "tapaveraging")
+    else if (focusedFieldName == "tapaveraging")
     {
         setTapAveraging(tapAveraging + i);
     }

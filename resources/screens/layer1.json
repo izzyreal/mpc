@@ -317,11 +317,11 @@
 },
 "others":
 {
- "labels" : [ "Tap averaging:" ],
- "x" : [ 16 ],
- "y" : [ 3 ],
- "parameters" : [ "tapaveraging" ],
- "tfsize" : [ 6 ],
+ "labels" : [ "Tap averaging:", "Contrast:" ],
+ "x" : [ 16, 16 ],
+ "y" : [ 6, 24 ],
+ "parameters" : [ "tapaveraging", "contrast" ],
+ "tfsize" : [ 6, 12 ],
  "fblabels" : [ "OTHERS", "INIT", "VER.", null, null, null ],
  "fbtypes" : [ 2, 0, 0, null, null, null ]
 },
