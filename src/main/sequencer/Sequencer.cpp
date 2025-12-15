@@ -645,11 +645,11 @@ std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
-    for (const auto &s : sequences)
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
     {
-        if (s->isUsed())
+        if (sequences[i]->isUsed())
         {
-            usedSeqs.push_back(s);
+            usedSeqs.push_back(sequences[i]);
         }
     }
 
@@ -660,7 +660,7 @@ std::vector<int> Sequencer::getUsedSequenceIndexes() const
 {
     std::vector<int> usedSeqs;
 
-    for (int i = 0; i < 99; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
     {
         if (const auto s = sequences[i]; s->isUsed())
         {
