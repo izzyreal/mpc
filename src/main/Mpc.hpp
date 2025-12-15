@@ -83,7 +83,6 @@ namespace mpc
         bool pluginModeEnabled = false;
 
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<engine::EngineHost> engineHost;
@@ -93,6 +92,7 @@ namespace mpc
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<sequencer::Clock> clock;
         std::shared_ptr<performance::PerformanceManager> performanceManager;
+        std::shared_ptr<sequencer::Sequencer> sequencer;
 
     public:
         std::shared_ptr<lcdgui::Screens> screens;

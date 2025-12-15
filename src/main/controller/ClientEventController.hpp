@@ -99,9 +99,10 @@ namespace mpc::controller
         input::HostToClientTranslator hostToClientTranslator;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
         std::shared_ptr<input::KeyboardBindings> keyboardBindings;
-        std::shared_ptr<lcdgui::Screens> screens;
-        std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
-        std::shared_ptr<hardware::Hardware> hardware;
+
+        std::weak_ptr<lcdgui::Screens> screens;
+        std::weak_ptr<lcdgui::LayeredScreen> layeredScreen;
+        std::weak_ptr<hardware::Hardware> hardware;
 
         bool afterEnabled = false;
         bool fullLevelEnabled = false;

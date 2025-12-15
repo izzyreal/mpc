@@ -102,7 +102,7 @@ namespace mpc::sequencer
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;
         const std::function<void()> startBouncing;
-        const std::shared_ptr<hardware::Hardware> hardware;
+        const std::weak_ptr<hardware::Hardware> hardware;
         const std::function<bool()> isBouncing;
         const std::function<void()> stopBouncing;
         const std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;

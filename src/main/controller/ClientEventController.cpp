@@ -53,11 +53,11 @@ void ClientEventController::init()
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.getPerformanceManager(), shared_from_this(),
-        clientHardwareEventController, screens->get<ScreenId::MidiSwScreen>(),
+        clientHardwareEventController, screens.lock()->get<ScreenId::MidiSwScreen>(),
         mpc.getSequencer(), mpc.getSampler(),
-        screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
-        screens->get<ScreenId::MultiRecordingSetupScreen>(), layeredScreen,
-        hardware, screens, mpc.getEngineHost()->getPreviewSoundPlayer().get());
+        screens.lock()->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
+        screens.lock()->get<ScreenId::MultiRecordingSetupScreen>(), layeredScreen.lock(),
+        hardware.lock(), screens.lock(), mpc.getEngineHost()->getPreviewSoundPlayer().get());
 }
 
 void ClientEventController::dispatchHostInput(
@@ -98,7 +98,7 @@ ClientEventController::getClientMidiEventController()
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(mpc.getSequencer(),
-                                            layeredScreen->getCurrentScreenId(),
+                                            layeredScreen.lock()->getCurrentScreenId(),
                                             clientHardwareEventController);
 }
 
@@ -108,7 +108,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
     {
         return RecordingMode::Overdub;
     }
-    if (SeqUtil::isStepRecording(layeredScreen->getCurrentScreenName(),
+    if (SeqUtil::isStepRecording(layeredScreen.lock()->getCurrentScreenName(),
                                  mpc.getSequencer().get()))
     {
         return RecordingMode::Step;
@@ -124,7 +124,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
 
 std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()
 {
-    return layeredScreen;
+    return layeredScreen.lock();
 }
 
 void ClientEventController::setActiveBank(const Bank activeBankToUse)
@@ -133,12 +133,12 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
 
     notifyObservers(std::string("bank"));
 
-    hardware->getLed(BANK_A_LED)->setEnabled(activeBank == Bank::A);
-    hardware->getLed(BANK_B_LED)->setEnabled(activeBank == Bank::B);
-    hardware->getLed(BANK_C_LED)->setEnabled(activeBank == Bank::C);
-    hardware->getLed(BANK_D_LED)->setEnabled(activeBank == Bank::D);
+    hardware.lock()->getLed(BANK_A_LED)->setEnabled(activeBank == Bank::A);
+    hardware.lock()->getLed(BANK_B_LED)->setEnabled(activeBank == Bank::B);
+    hardware.lock()->getLed(BANK_C_LED)->setEnabled(activeBank == Bank::C);
+    hardware.lock()->getLed(BANK_D_LED)->setEnabled(activeBank == Bank::D);
 
-    layeredScreen->postToUiThread(utils::Task(
+    layeredScreen.lock()->postToUiThread(utils::Task(
         [this]
         {
             setActiveBankUiCallback(activeBank);
@@ -192,5 +192,5 @@ void ClientEventController::setSixteenLevelsEnabled(const bool b)
 
 bool ClientEventController::isEraseButtonPressed() const
 {
-    return hardware->getButton(ERASE)->isPressed();
+    return hardware.lock()->getButton(ERASE)->isPressed();
 }

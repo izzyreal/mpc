@@ -525,7 +525,7 @@ void Sequencer::undoSeq() const
     getStateManager()->enqueueCallback(utils::SimpleAction(
         [this]
         {
-            hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+            hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(
                     getStateManager()->getSnapshot().isUndoSequenceAvailable());
         }));
@@ -1024,7 +1024,7 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
         {
             getStateManager()->applyMessageImmediate(
                 SetUndoSequenceAvailable{true});
-            hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+            hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
         });
 
@@ -1035,7 +1035,7 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
 void Sequencer::resetUndo() const
 {
     getStateManager()->enqueue(SetUndoSequenceAvailable{false});
-    hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
+    hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
 SongIndex Sequencer::getSelectedSongIndex() const

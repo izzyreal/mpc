@@ -67,7 +67,7 @@ ClientMidiEventController::ClientMidiEventController(
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
-    if (clientEventController->getLayeredScreen()->isCurrentScreen(
+    if (clientEventController.lock()->getLayeredScreen()->isCurrentScreen(
             {ScreenId::MidiInputMonitorScreen}))
     {
         const auto notificationMessage =
@@ -77,7 +77,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 
     if (!sequencer.lock()->isRecordingModeMulti())
     {
-        const int receiveCh = midiInputScreen->getReceiveCh();
+        const int receiveCh = midiInputScreen.lock()->getReceiveCh();
 
         if (receiveCh != -1 && e.getChannel() != receiveCh)
         {
@@ -183,8 +183,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     ProgramPadIndex programPadIndex;
 
-    auto screen = layeredScreen->getCurrentScreen();
-    const auto screenId = layeredScreen->getCurrentScreenId();
+    auto screen = layeredScreen.lock()->getCurrentScreen();
+    const auto screenId = layeredScreen.lock()->getCurrentScreenId();
 
     auto programIndex = screen->getProgramIndex();
 
@@ -217,13 +217,13 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
     const bool isNoteRepeatMode =
         screenId == ScreenId::SequencerScreen &&
-        clientHardwareEventController->isNoteRepeatLockedOrPressed() &&
+        clientHardwareEventController.lock()->isNoteRepeatLockedOrPressed() &&
         transport.isSequencerRunning() &&
-        screens->get<ScreenId::TimingCorrectScreen>()
+        screens.lock()->get<ScreenId::TimingCorrectScreen>()
                 ->getNoteValueLengthInTicks() > 1;
 
     const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
-                                 clientEventController->isEraseButtonPressed();
+                                 clientEventController.lock()->isEraseButtonPressed();
 
     if (!isNoteRepeatMode && !isLiveEraseMode)
     {
@@ -242,7 +242,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                         noteOnEvent.noteNumber, noteOnEvent.velocity,
                         track.get(), screen->getBus(), screen, programPadIndex,
                         program, sequencer, performanceManager.lock(),
-                        clientEventController, eventHandler, screens, hardware,
+                        clientEventController.lock(), eventHandler.lock(), screens.lock(), hardware.lock(),
                         metronomeOnlyPositionTicks, positionTicks);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();
@@ -292,13 +292,13 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     const bool isNoteRepeatMode =
     registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
-    clientHardwareEventController->isNoteRepeatLockedOrPressed() &&
+    clientHardwareEventController.lock()->isNoteRepeatLockedOrPressed() &&
     transport.isSequencerRunning() &&
-    screens->get<ScreenId::TimingCorrectScreen>()
+    screens.lock()->get<ScreenId::TimingCorrectScreen>()
             ->getNoteValueLengthInTicks() > 1;
 
     const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
-                                 clientEventController->isEraseButtonPressed();
+                                 clientEventController.lock()->isEraseButtonPressed();
 
     if (isNoteRepeatMode)
     {
@@ -317,7 +317,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
             if (programIndex != NoProgramIndex)
             {
-                program = sampler->getProgram(programIndex);
+                program = sampler.lock()->getProgram(programIndex);
                 assert(isDrumNote(noteEventInfo.noteNumber));
             }
 
@@ -334,7 +334,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                 }
             }
 
-            const auto screen = screens->getScreenById(noteEventInfo.screenId);
+            const auto screen = screens.lock()->getScreenById(noteEventInfo.screenId);
             const auto seq = lockedSequencer->getSelectedSequence();
             const auto track = seq->getTrack(trackIndex).get();
 
@@ -353,8 +353,8 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     screen.get(), isSamplerScreen, programPadIndex,
                     program.get(), sequencer.lock().get(),
                     performanceManager.lock().get(),
-                    clientEventController.get(), eventHandler.get(),
-                    screens.get(), hardware.get(), metronomeOnlyPositionTicks,
+                    clientEventController.lock().get(), eventHandler.lock().get(),
+                    screens.lock().get(), hardware.lock().get(), metronomeOnlyPositionTicks,
                     positionTicks);
 
             command::TriggerLocalNoteOffCommand(ctx).execute();
@@ -394,7 +394,7 @@ void ClientMidiEventController::handleChannelAftertouch(
     const auto track = getTrackForEvent(e);
     const auto bus = sequencer.lock()->getBus(track->getBusType());
 
-    for (auto &p : sampler->getPrograms())
+    for (auto &p : sampler.lock()->getPrograms())
     {
         if (const auto program = p.lock(); program)
         {
@@ -468,14 +468,14 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
         event.componentId = SLIDER;
         event.type = ClientHardwareEvent::Type::SliderMove;
         event.value = 1.f - e.getControllerValue() / 127.f;
-        clientEventController->handleClientEvent(ClientEvent{event});
+        clientEventController.lock()->handleClientEvent(ClientEvent{event});
     }
 }
 
 void ClientMidiEventController::handleProgramChange(
     const ClientMidiEvent &e) const
 {
-    if (midiInputScreen->getProgChangeSeq())
+    if (midiInputScreen.lock()->getProgChangeSeq())
     {
         if (e.getProgramNumber() >= 0 &&
             e.getProgramNumber() <= Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)
@@ -489,7 +489,7 @@ void ClientMidiEventController::handleProgramChange(
                         ->getSequence(e.getProgramNumber())
                         ->isUsed())
                 {
-                    if (clientEventController->getLayeredScreen()
+                    if (clientEventController.lock()->getLayeredScreen()
                             ->isCurrentScreen({ScreenId::NextSeqScreen,
                                                ScreenId::NextSeqPadScreen,
                                                ScreenId::SequencerScreen}))
@@ -509,7 +509,7 @@ void ClientMidiEventController::handleProgramChange(
     {
         if (const auto drumBus = getDrumBusForEvent(e); drumBus)
         {
-            if (sampler->getProgram(e.getProgramNumber())->isUsed())
+            if (sampler.lock()->getProgram(e.getProgramNumber())->isUsed())
             {
                 drumBus->setProgramIndex(ProgramIndex(e.getProgramNumber()));
             }
@@ -624,7 +624,7 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
 {
     if (sequencer.lock()->isRecordingModeMulti())
     {
-        if (const auto mrsLines = multiRecordingSetupScreen->getMrsLines();
+        if (const auto mrsLines = multiRecordingSetupScreen.lock()->getMrsLines();
             e.getChannel() < static_cast<int>(mrsLines.size()))
         {
             return mrsLines[e.getChannel()]->getTrack();
@@ -663,7 +663,7 @@ ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
 {
     if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
-        return sampler->getProgram(
+        return sampler.lock()->getProgram(
             sequencer.lock()->getDrumBus(*drumBusType)->getProgramIndex());
     }
 
@@ -698,7 +698,7 @@ std::optional<BusType> ClientMidiEventController::getDrumBusTypeForEvent(
 bool ClientMidiEventController::shouldProcessEvent(
     const ClientMidiEvent &e) const
 {
-    if (!midiInputScreen->isMidiFilterEnabled())
+    if (!midiInputScreen.lock()->isMidiFilterEnabled())
     {
         return true;
     }
@@ -707,19 +707,19 @@ bool ClientMidiEventController::shouldProcessEvent(
     {
         case MessageType::NOTE_ON:
         case MessageType::NOTE_OFF:
-            return midiInputScreen->isNotePassEnabled();
+            return midiInputScreen.lock()->isNotePassEnabled();
         case MessageType::PITCH_WHEEL:
-            return midiInputScreen->isPitchBendPassEnabled();
+            return midiInputScreen.lock()->isPitchBendPassEnabled();
         case MessageType::PROGRAM_CHANGE:
-            return midiInputScreen->isPgmChangePassEnabled();
+            return midiInputScreen.lock()->isPgmChangePassEnabled();
         case MessageType::CHANNEL_PRESSURE:
-            return midiInputScreen->isChPressurePassEnabled();
+            return midiInputScreen.lock()->isChPressurePassEnabled();
         case MessageType::AFTERTOUCH:
-            return midiInputScreen->isPolyPressurePassEnabled();
+            return midiInputScreen.lock()->isPolyPressurePassEnabled();
         case MessageType::CONTROLLER:
         {
             const int ccNumber = e.getControllerNumber();
-            const auto &ccPassEnabled = midiInputScreen->getCcPassEnabled();
+            const auto &ccPassEnabled = midiInputScreen.lock()->getCcPassEnabled();
             if (ccNumber < 0 ||
                 ccNumber >= static_cast<int>(ccPassEnabled.size()))
             {

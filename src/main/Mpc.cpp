@@ -302,6 +302,7 @@ Mpc::~Mpc()
     nvram::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
+    engineHost->destroyServices();
 }
 
 void Mpc::panic() const
