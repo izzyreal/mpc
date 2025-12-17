@@ -110,14 +110,16 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                             lengthInFrames, splitStereoIntoLeftAndRightChannel,
                             rate, recordingName);
 
-                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
+                    mpc.getEngineHost()->onBounceStart = utils::SimpleAction(
+                        [transport = sequencer.lock()->getTransport().get()]
+                        {
+                            constexpr bool fromStart = true;
+                            transport->play(fromStart);
+                        });
+
+                    if (!mpc.getEngineHost()->startBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
-                    }
-                    else
-                    {
-                        constexpr bool fromStart = true;
-                        sequencer.lock()->getTransport()->play(fromStart);
                     }
 
                     break;
@@ -145,13 +147,16 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         Sequencer::ticksToQuarterNotes(
                             sequence->getLoopStartTick()));
 
-                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
+                    mpc.getEngineHost()->onBounceStart = utils::SimpleAction(
+                        [transport = sequencer.lock()->getTransport().get()]
+                        {
+                            constexpr bool fromStart = false;
+                            transport->play(fromStart);
+                        });
+
+                    if (!mpc.getEngineHost()->startBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
-                    }
-                    else
-                    {
-                        sequencer.lock()->getTransport()->play();
                     }
 
                     break;
@@ -178,13 +183,16 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     sequencer.lock()->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(time0));
 
-                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
+                    mpc.getEngineHost()->onBounceStart = utils::SimpleAction(
+                        [transport = sequencer.lock()->getTransport().get()]
+                        {
+                            constexpr bool fromStart = false;
+                            transport->play(fromStart);
+                        });
+
+                    if (!mpc.getEngineHost()->startBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
-                    }
-                    else
-                    {
-                        sequencer.lock()->getTransport()->play();
                     }
 
                     break;
@@ -217,14 +225,16 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         mpcSong->setLoopEnabled(false);
                     }
 
-                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
+                    mpc.getEngineHost()->onBounceStart = utils::SimpleAction(
+                        [transport = sequencer.lock()->getTransport().get()]
+                        {
+                            constexpr bool fromStart = true;
+                            transport->play(fromStart);
+                        });
+
+                    if (!mpc.getEngineHost()->startBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
-                    }
-                    else
-                    {
-                        constexpr bool fromStart = true;
-                        sequencer.lock()->getTransport()->play(fromStart);
                     }
 
                     break;
@@ -241,23 +251,13 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
 
 void VmpcDirectToDiskRecorderScreen::setSampleRate(const int rate)
 {
-    if (rate < 0 || rate > 2)
-    {
-        return;
-    }
-
-    sampleRate = rate;
+    sampleRate = std::clamp(rate, 0, 2);
     displayRate();
 }
 
 void VmpcDirectToDiskRecorderScreen::setRecord(const int i)
 {
-    if (i < 0 || i > 4)
-    {
-        return;
-    }
-
-    record = i;
+    record = std::clamp(i, 0, 4);
 
     displayRecord();
     displaySq();
@@ -268,12 +268,7 @@ void VmpcDirectToDiskRecorderScreen::setRecord(const int i)
 
 void VmpcDirectToDiskRecorderScreen::setSq(const SequenceIndex i)
 {
-    if (i < MinSequenceIndex || i > MaxSequenceIndex)
-    {
-        return;
-    }
-
-    sq = i;
+    sq = std::clamp(i, MinSequenceIndex, MaxSequenceIndex);
 
     setTime0(0);
 
@@ -291,12 +286,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(const SequenceIndex i)
 
 void VmpcDirectToDiskRecorderScreen::setSong(const int i)
 {
-    if (i < 0 || i > 19)
-    {
-        return;
-    }
-
-    song = i;
+    song = std::clamp(i, 0, 19);
     displaySong();
 }
 

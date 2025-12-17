@@ -164,14 +164,6 @@ void Mpc::init()
         hardware,
         [&]
         {
-            return engineHost->isBouncePrepared();
-        },
-        [&]
-        {
-            engineHost->startBouncing();
-        },
-        [&]
-        {
             engineHost->stopBouncing();
         },
         [&]

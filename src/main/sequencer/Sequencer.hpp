@@ -76,8 +76,6 @@ namespace mpc::sequencer
                   std::vector<std::shared_ptr<engine::Voice>> *,
                   const std::function<bool()> &isAudioServerRunning,
                   const std::shared_ptr<hardware::Hardware> &,
-                  const std::function<bool()> &isBouncePrepared,
-                  const std::function<void()> &startBouncing,
                   const std::function<void()> &stopBouncing,
                   const std::function<bool()> &isBouncing,
                   const std::function<bool()> &isEraseButtonPressed,
@@ -100,8 +98,6 @@ namespace mpc::sequencer
         std::shared_ptr<DrumBus> getDrumBus(BusType) const;
         std::shared_ptr<DrumBus> getDrumBus(DrumBusIndex) const;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
-        const std::function<bool()> isBouncePrepared;
-        const std::function<void()> startBouncing;
         const std::weak_ptr<hardware::Hardware> hardware;
         const std::function<bool()> isBouncing;
         const std::function<void()> stopBouncing;

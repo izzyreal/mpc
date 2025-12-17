@@ -115,6 +115,8 @@ namespace mpc::sequencer
 
         void setPositionTicksToReturnToWhenReleasingRec(Tick) const;
 
+        bool isPlayPossible(bool fromStart) const;
+
     private:
         Sequencer &sequencer;
 
@@ -122,7 +124,5 @@ namespace mpc::sequencer
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;
-
-        bool isPlayPossible(bool fromStart) const;
     };
 } // namespace mpc::sequencer

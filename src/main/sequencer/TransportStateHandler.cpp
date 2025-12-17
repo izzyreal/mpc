@@ -216,11 +216,6 @@ void TransportStateHandler::applyPlaySequence(
 
     sequencer->clock->reset();
 
-    if (sequencer->isBouncePrepared())
-    {
-        sequencer->startBouncing();
-    }
-
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
     manager->applyMessage(SyncTrackEventIndices{
         manager->getSnapshot().getSelectedSequenceIndex()});
@@ -242,11 +237,6 @@ void TransportStateHandler::applyPlaySong(TransportState &state) const noexcept
         sequencer->getScreens()->get<lcdgui::ScreenId::CountMetronomeScreen>();
 
     sequencer->clock->reset();
-
-    if (sequencer->isBouncePrepared())
-    {
-        sequencer->startBouncing();
-    }
 
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
     manager->applyMessage(SyncTrackEventIndices{

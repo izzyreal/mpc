@@ -34,16 +34,10 @@ void VmpcRecordJamScreen::function(const int i)
             const auto settings = std::make_unique<DirectToDiskSettings>(
                 lengthInFrames, false, rate, recordingName);
 
-            if (engineHost->prepareBouncing(settings.get()))
+            if (!engineHost->startBouncing(settings.get()))
             {
                 openScreenById(ScreenId::SequencerScreen);
-                engineHost->startBouncing();
             }
-            else
-            {
-                openScreenById(ScreenId::VmpcFileInUseScreen);
-            }
-
             break;
         }
         default:;

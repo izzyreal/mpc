@@ -129,6 +129,26 @@ bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
     return true;
 }
 
+void DiskRecorder::unprepare()
+{
+    preparedToWrite.store(false);
+
+    if (writeThread.joinable())
+    {
+        writeThread.join();
+    }
+
+    for (auto &fileStream : fileStreams)
+    {
+        wav_close(fileStream, lengthInFrames,
+          outputFileFormat->getChannels());
+    }
+
+    isOnlySilence = true;
+
+    removeFilesIfEmpty();
+}
+
 int DiskRecorder::processAudio(AudioBuffer *buf, const int nFrames)
 {
     const auto ret = AudioProcessAdapter::processAudio(buf, nFrames);

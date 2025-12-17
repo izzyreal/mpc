@@ -78,6 +78,7 @@ namespace mpc::audiomidi
         bool stopEarly();
         bool prepare(int lengthInFrames, int sampleRate, bool isStereo,
                      fs::path destinationDirectory);
+        void unprepare();
 
         int processAudio(engine::audio::core::AudioBuffer *,
                          int nFrames) override;

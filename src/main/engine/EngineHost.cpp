@@ -73,7 +73,7 @@ void EngineHost::start()
 {
     realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
     nonRealTimeAudioServer =
-        std::make_shared<NonRealTimeAudioServer>(realTimeAudioServer);
+        std::make_shared<NonRealTimeAudioServer>(this, realTimeAudioServer);
     soundRecorder = std::make_shared<SoundRecorder>(mpc);
     soundPlayer = std::make_shared<SoundPlayer>();
 
@@ -384,7 +384,7 @@ void EngineHost::closeIO() const
     }
 }
 
-bool EngineHost::prepareBouncing(const DirectToDiskSettings *settings)
+bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
 {
     const auto destinationDirectory =
         mpc.paths->recordingsPath() / settings->recordingName;
@@ -398,23 +398,19 @@ bool EngineHost::prepareBouncing(const DirectToDiskSettings *settings)
                 !settings->splitStereoIntoLeftAndRightChannel,
                 destinationDirectory))
         {
+            for (int j = 0; j < i; ++j)
+            {
+                diskRecorders[j]->unprepare();
+            }
+
+            onBounceStart = {};
             return false;
         }
     }
 
-    bouncePrepared = true;
-    return true;
-}
-
-void EngineHost::startBouncing()
-{
-    if (!bouncePrepared)
-    {
-        return;
-    }
-
-    bouncePrepared = false;
     bouncing.store(true);
+
+    return true;
 }
 
 void EngineHost::stopBouncing()
@@ -485,11 +481,6 @@ void EngineHost::stopSoundRecorder(const bool cancel)
     recordingSound.store(false);
 }
 
-bool EngineHost::isBouncePrepared() const
-{
-    return bouncePrepared;
-}
-
 void EngineHost::finishPreviewSoundPlayerVoice() const
 {
     postToAudioThread(utils::Task(
@@ -554,6 +545,8 @@ void EngineHost::changeBounceStateIfRequired()
         {
             diskRecorder->start();
         }
+
+        onBounceStart();
     }
     else if (!isBouncing() && wasBouncing)
     {
@@ -566,6 +559,8 @@ void EngineHost::changeBounceStateIfRequired()
                 getAudioServer()->setRealTime(true);
             }
         }
+
+        onBounceStart = {};
     }
 }
 

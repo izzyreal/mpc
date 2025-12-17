@@ -10,11 +10,16 @@
 #include <vector>
 #include <atomic>
 
+namespace mpc::engine
+{
+    class EngineHost;
+}
+
 namespace mpc::engine::audio::server
 {
-    class NonRealTimeAudioServer : public AudioServer, public AudioClient
+    class NonRealTimeAudioServer final : public AudioServer, public AudioClient
     {
-
+        EngineHost *engineHost;
         std::atomic<bool> realTime{true};
         std::atomic<bool> isRunningNonRealTime{false};
         std::shared_ptr<AudioServer> server;
@@ -72,7 +77,8 @@ namespace mpc::engine::audio::server
                   const std::vector<int8_t> &mpcMonoOutputChannelIndices,
                   const std::vector<int8_t> &hostInputChannelIndices,
                   const std::vector<int8_t> &hostOutputChannelIndices) const;
-        NonRealTimeAudioServer(std::shared_ptr<AudioServer> serverToUse);
+        explicit NonRealTimeAudioServer(
+            EngineHost *, std::shared_ptr<AudioServer> serverToUse);
         ~NonRealTimeAudioServer() override;
     };
 

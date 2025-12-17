@@ -1,5 +1,6 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
+#include "engine/EngineHost.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 #include "engine/audio/server/AudioClient.hpp"
 #include "engine/audio/server/AudioServer.hpp"
@@ -11,9 +12,9 @@ using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::core;
 
 NonRealTimeAudioServer::NonRealTimeAudioServer(
-    std::shared_ptr<AudioServer> serverToUse)
+    EngineHost *engineHost, std::shared_ptr<AudioServer> serverToUse)
+    : engineHost(engineHost), server(std::move(serverToUse))
 {
-    server = std::move(serverToUse);
 }
 
 void NonRealTimeAudioServer::setSampleRate(const int rate)
@@ -152,7 +153,9 @@ void NonRealTimeAudioServer::runNonRealTime()
 
     while (isRunningNonRealTime.load())
     {
-        work(server->getBufferSize());
+        const auto bufferSize = server->getBufferSize();
+        engineHost->prepareProcessBlock(bufferSize);
+        work(bufferSize);
     }
 }
 

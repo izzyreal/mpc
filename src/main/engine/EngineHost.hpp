@@ -2,6 +2,7 @@
 
 #include "concurrency/SamplePreciseTaskQueue.hpp"
 #include "concurrency/TaskQueue.hpp"
+#include "utils/SimpleAction.hpp"
 
 #include <memory>
 #include <atomic>
@@ -100,8 +101,10 @@ namespace mpc::engine
 
         void connectVoices();
         void destroyServices() const;
-        bool prepareBouncing(const audiomidi::DirectToDiskSettings *settings);
-        bool isBouncePrepared() const;
+
+        // Should never be called form the audio thread!
+        // Typically the main thread will call this.
+        bool startBouncing(const audiomidi::DirectToDiskSettings *settings);
 
         void finishPreviewSoundPlayerVoice() const;
 
@@ -116,7 +119,6 @@ namespace mpc::engine
     public:
         bool isBouncing() const;
         bool isRecordingSound() const;
-        void startBouncing();
         void stopBouncing();
         void stopBouncingEarly();
         void startRecordingSound();
@@ -131,8 +133,9 @@ namespace mpc::engine
         // Should be called from the audio thread only!
         void switchMidiControlMappingIfRequired() const;
 
+        utils::SimpleAction onBounceStart = {};
+
     private:
-        bool bouncePrepared = false;
         bool wasRecordingSound = false;
         bool wasBouncing = false;
 
