@@ -116,6 +116,7 @@ void SampleScreen::function(const int i)
 
             holdPeakL.store(0.f, std::memory_order_relaxed);
             holdPeakR.store(0.f, std::memory_order_relaxed);
+            updateVU();
             break;
         case 4:
             if (mpc.getEngineHost()->isRecordingSound())

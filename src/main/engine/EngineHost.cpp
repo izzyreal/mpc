@@ -110,9 +110,8 @@ void EngineHost::start()
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
 
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
-        mpc.getEventHandler().get(),
-        mpc.getSequencer(), mpc.getSampler(), mixer,
-        mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
+        mpc.getEventHandler().get(), mpc.getSequencer(), mpc.getSampler(),
+        mixer, mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         mpc.getPerformanceManager(), mpc.getHardware()->getSlider(), &voices,
         mixerConnections,
@@ -192,13 +191,13 @@ void EngineHost::prepareProcessBlock(const int nFrames)
     mpc.getPerformanceManager().lock()->drainQueue();
 }
 
-void EngineHost::setMonitorLevel(const int level) const
+void EngineHost::setMonitorLevel(const int8_t level) const
 {
     const auto sc = mixer->getMixerControls()->getStripControls("66");
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
-        ->setValue(static_cast<float>(level));
+        ->setValue(level);
 }
 
 void EngineHost::muteMonitor(const bool mute) const
@@ -274,22 +273,15 @@ int EngineHost::getMainLevel() const
     return static_cast<int>(val);
 }
 
-void EngineHost::setRecordLevel(const int i) const
+void EngineHost::setRecordLevel(const int8_t i) const
 {
     soundRecorder->setInputGain(i);
     setMonitorLevel(i);
 }
 
-int EngineHost::getRecordLevel() const
+int8_t EngineHost::getRecordLevel() const
 {
     return soundRecorder->getInputGain();
-    /*
-    // This is how we can get monitor output level
-    auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-    auto mmc =
-    std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock()); return
-    static_cast<int>(std::dynamic_pointer_cast<FaderControl>(mmc->find("Level").lock())->getValue());
-    */
 }
 
 void EngineHost::setAssignableMixOutLevels() const

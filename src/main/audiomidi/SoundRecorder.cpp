@@ -27,17 +27,15 @@ SoundRecorder::SoundRecorder(Mpc &mpc)
 {
 }
 
-unsigned int SoundRecorder::getInputGain() const
+int8_t SoundRecorder::getInputGain() const
 {
-    return inputGain;
+    return inputGain.load(std::memory_order_relaxed);
 }
 
-void SoundRecorder::setInputGain(const unsigned int gain)
+void SoundRecorder::setInputGain(const int8_t i)
 {
-    if (gain <= 100)
-    {
-        inputGain = gain;
-    }
+    inputGain.store(std::clamp(i, int8_t{0}, int8_t{100}),
+                    std::memory_order_relaxed);
 }
 
 void SoundRecorder::setArmed(const bool b)

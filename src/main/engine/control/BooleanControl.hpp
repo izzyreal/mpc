@@ -2,11 +2,13 @@
 
 #include "engine/control/Control.hpp"
 
+#include <atomic>
+
 namespace mpc::engine::control
 {
-    class BooleanControl : public Control
+    class BooleanControl final : public Control
     {
-        bool value{false};
+        std::atomic<bool> value{false};
 
     public:
         void setValue(bool value);

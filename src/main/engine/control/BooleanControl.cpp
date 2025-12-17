@@ -3,20 +3,21 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-BooleanControl::BooleanControl(int id, const string &name) : Control(id, name)
+BooleanControl::BooleanControl(const int id, const string &name)
+    : Control(id, name)
 {
 }
 
-void BooleanControl::setValue(bool value)
+void BooleanControl::setValue(const bool valueToUse)
 {
-    if (value != this->value)
+    if (valueToUse != this->value)
     {
-        this->value = value;
+        this->value.store(valueToUse, std::memory_order_relaxed);
         notifyParent(this);
     }
 }
 
 bool BooleanControl::getValue() const
 {
-    return value;
+    return value.load(std::memory_order_relaxed);
 }

@@ -93,8 +93,8 @@ namespace mpc::engine
         void setMainLevel(int i) const;
         int getMainLevel() const;
         void setMixerMasterLevel(int8_t dbValue) const;
-        void setRecordLevel(int i) const;
-        int getRecordLevel() const;
+        void setRecordLevel(int8_t) const;
+        int8_t getRecordLevel() const;
         void muteMonitor(bool mute) const;
         void initializeDiskRecorders();
         void closeIO() const;
@@ -161,6 +161,6 @@ namespace mpc::engine
         void setupMixer();
         void setAssignableMixOutLevels() const;
         void createSynth();
-        void setMonitorLevel(int level) const;
+        void setMonitorLevel(int8_t) const;
     };
 } // namespace mpc::engine

@@ -2,11 +2,12 @@
 #include "engine/audio/core/AudioProcess.hpp"
 
 #include "sampler/Sound.hpp"
-#include "MonoResampler.hpp"
+#include "audiomidi/MonoResampler.hpp"
 
 #include <memory>
 #include <atomic>
 #include <vector>
+#include <cstdint>
 
 using namespace mpc::sampler;
 using namespace mpc::engine::audio::core;
@@ -64,7 +65,7 @@ namespace mpc::audiomidi
 
         int engineSampleRate = 44100;
 
-        unsigned int inputGain = 0;
+        std::atomic<int8_t> inputGain{0};
         std::atomic<bool> sampleScreenActive{false};
         std::atomic<bool> armed{false};
 
@@ -80,8 +81,8 @@ namespace mpc::audiomidi
         void cancel();
         int processAudio(AudioBuffer *buf, int nFrames) override;
         bool isRecording() const;
-        unsigned int getInputGain() const;
-        void setInputGain(unsigned int);
+        int8_t getInputGain() const;
+        void setInputGain(int8_t);
         void setArmed(bool b);
         bool isArmed() const;
 

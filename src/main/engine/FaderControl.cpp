@@ -18,7 +18,7 @@ std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW()
     return res;
 }
 
-void FaderControl::setValue(float value)
+void FaderControl::setValue(const float value)
 {
     gain.store(value * 0.01f, std::memory_order_relaxed);
     LawControl::setValue(value);

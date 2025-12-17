@@ -412,7 +412,7 @@ int Voice::processAudio(AudioBuffer *buffer, const int nFrames)
     auto &left = buffer->getChannel(0);
     auto &right = buffer->getChannel(1);
 
-    const auto masterLevelToUse = masterLevel.load();
+    const auto masterLevelToUse = masterLevel.load(std::memory_order_relaxed);
 
     const auto masterLevelFactor =
         masterLevelToUse > -128
@@ -473,7 +473,7 @@ void Voice::startDecay(const int offset)
 
 void Voice::setMasterLevel(const int8_t masterLevelToUse)
 {
-    masterLevel.store(masterLevelToUse);
+    masterLevel.store(masterLevelToUse, std::memory_order_relaxed);
 }
 
 int Voice::getNote() const
