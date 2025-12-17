@@ -75,12 +75,13 @@ void MixControls::derive(Control *c)
             mute = muteControl->getValue();
             break;
         case MixControlIds::GAIN:
-            gain = gainControl->getGain();
+            gain.store(gainControl->getGain(), std::memory_order_relaxed);
             break;
         case MixControlIds::LCR:
             left = lcrControl->getLeft();
             right = lcrControl->getRight();
             break;
+        default:;
     }
 }
 
@@ -101,13 +102,14 @@ bool MixControls::isEnabled() const
 
 float MixControls::getGain() const
 {
-    return gain;
+    return gain.load(std::memory_order_relaxed);
 }
 
 void MixControls::getChannelGains(vector<float> *dest) const
 {
-    (*dest)[1] = gain * right;
-    (*dest)[0] = gain * left;
+    const auto currentGain = getGain();
+    (*dest)[1] = currentGain * right;
+    (*dest)[0] = currentGain * left;
 }
 
 float MixControls::getSmoothingFactor() const

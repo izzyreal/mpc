@@ -14,6 +14,7 @@ namespace mpc::engine::control
         std::string name;
 
     public:
+        virtual ~Control() = default;
         int getId() const;
 
         CompoundControl *getParent() const;

@@ -20,11 +20,11 @@ std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW()
 
 void FaderControl::setValue(float value)
 {
-    gain = value * 0.01f;
+    gain.store(value * 0.01f, std::memory_order_relaxed);
     LawControl::setValue(value);
 }
 
 float FaderControl::getGain() const
 {
-    return gain;
+    return gain.load(std::memory_order_relaxed);
 }

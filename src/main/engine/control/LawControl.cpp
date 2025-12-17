@@ -24,8 +24,8 @@ string LawControl::getValueString()
     return string(res1 + res2);
 }
 
-void LawControl::setValue(float value)
+void LawControl::setValue(const float valueToUse)
 {
-    this->value = value;
+    value.store(valueToUse, std::memory_order_relaxed);
     notifyParent(this);
 }

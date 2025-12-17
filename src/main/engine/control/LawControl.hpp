@@ -10,9 +10,8 @@ namespace mpc::engine::control
 
     class LawControl : public Control
     {
-
         std::shared_ptr<ControlLaw> law;
-        float value{0};
+        std::atomic<float> value{0};
 
     public:
         virtual float getValue();

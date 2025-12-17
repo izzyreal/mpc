@@ -6,14 +6,14 @@
 #include "engine/audio/mixer/MixerControls.hpp"
 #include "engine/control/EnumControl.hpp"
 
+#include <atomic>
+
 namespace mpc::engine::audio::mixer
 {
-
     class LCRControl;
 
     class MixControls : public core::AudioControls
     {
-
         static float HALF_ROOT_TWO_;
 
         std::shared_ptr<control::BooleanControl> soloControl;
@@ -32,7 +32,8 @@ namespace mpc::engine::audio::mixer
         bool master{false};
         int channelCount{0};
         bool mute{false};
-        float gain{0}, left{0}, right{0};
+        std::atomic<float> gain{0};
+        float left{0}, right{0};
 
     public:
         void derive(Control *c) override;
