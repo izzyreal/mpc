@@ -740,20 +740,26 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     const auto minimumRequiredNewSequenceLength = destStart + segLength;
     const auto ticksToAdd =
         minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    const auto barsToAdd =
+
+    auto barCountToAdd =
         static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
+
     const auto initialLastBarIndex = toSequence->getLastBarIndex();
-    for (int i = 0; i < barsToAdd; i++)
+
+    if (barCountToAdd + initialLastBarIndex >
+        Mpc2000XlSpecs::MAX_LAST_BAR_INDEX)
     {
-        const auto afterBar = initialLastBarIndex + i + 1;
+        barCountToAdd =
+            Mpc2000XlSpecs::MAX_LAST_BAR_INDEX - initialLastBarIndex;
+    }
 
-        if (afterBar >= 998)
-        {
-            break;
-        }
+    toSequence->insertBars(barCountToAdd, BarIndex(initialLastBarIndex + 1));
 
-        toSequence->insertBars(1, BarIndex(afterBar));
-        toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
+    for (int i = 0; i < barCountToAdd; i++)
+    {
+        const auto newBarIndex = initialLastBarIndex + i + 1;
+        toSequence->setTimeSignature(newBarIndex, destNumerator,
+                                     destDenominator);
     }
 
     const auto destTrack = toSequence->getTrack(toTrackIndex);
@@ -801,7 +807,7 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         }
 
         const auto newToSequenceLastTick =
-            oldToSequenceLastTick + barsToAdd * destBarLength;
+            oldToSequenceLastTick + barCountToAdd * destBarLength;
 
         if (e->getTick() >= sourceStart)
         {
