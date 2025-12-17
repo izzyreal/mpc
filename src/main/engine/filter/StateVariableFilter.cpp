@@ -13,28 +13,26 @@ StateVariableFilter::StateVariableFilter(FilterControls *variables)
     vars = variables;
 }
 
-float StateVariableFilter::update()
+float StateVariableFilter::filter(const float sample, const float cutoff,
+                                  const float resonance) const
 {
-    res = vars->getResonance();
-    element->mix = 0;
-    element->bp = false;
-    return vars->getCutoff();
-}
-
-float StateVariableFilter::filter(float sample, float f) const
-{
-    float min = 0.24f < f * 0.25f ? 0.24f : f * 0.25f;
-    auto f1 = 2.0f * sin(static_cast<float>(math::pi * min));
+    float min = 0.24f < cutoff * 0.25f ? 0.24f : cutoff * 0.25f;
+    const auto f1 = 2.0f * sin(static_cast<float>(math::pi * min));
     float v1 = 1.9f;
     float v2 = 2.0f / f1 - f1 * 0.5f;
     min = v1 < v2 ? v1 : v2;
-    v1 = res;
+    v1 = resonance;
     v2 = min;
     min = v1 < v2 ? v1 : v2;
     return element->filter(sample, f1, min);
 }
 
-void StateVariableFilter::setSampleRate(int rate)
+void StateVariableFilter::resetElementState() const
+{
+    element->resetState();
+}
+
+void StateVariableFilter::setSampleRate(const int rate)
 {
     fs = rate;
 }

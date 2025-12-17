@@ -102,11 +102,11 @@ Voice::~Voice()
 
 void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
                  const int noteNumber,
-                 performance::NoteParameters noteParameters, const int varType,
-                 const int varValue, const int drumIndex, const int frameOffset,
-                 const bool enableEnvs, const int startTick,
-                 const float engineSampleRate, const uint64_t noteEventId,
-                 ProgramIndex programIndex)
+                 const performance::NoteParameters &noteParameters,
+                 const int varType, const int varValue, const int drumIndex,
+                 const int frameOffset, const bool enableEnvs,
+                 const int startTick, const float engineSampleRate,
+                 const uint64_t noteEventId, const ProgramIndex programIndex)
 {
     VoiceState *state = getInactiveState();
 
@@ -204,11 +204,13 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
             state->filtParam = state->varValue;
         }
 
-        state->initialFilterValue =
+        state->filterCutoff =
             state->filtParam +
             veloFactor * noteParameters.velocityToFilterFrequency;
-        state->initialFilterValue =
-            static_cast<float>(17.0 + state->initialFilterValue * 0.75);
+        state->filterCutoff =
+            static_cast<float>(17.0 + state->filterCutoff * 0.75);
+        svfLeft->resetElementState();
+        svfRight->resetElementState();
         filterEnv->reset();
         fattack->setValue(
             static_cast<float>(noteParameters.filterAttack * 0.002) *
@@ -219,8 +221,7 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
             C::MAX_DECAY_LENGTH_SAMPLES);
         reso->setValue(
             static_cast<float>(0.0625 + noteParameters.filterResonance / 26.0));
-        svfLeft->update();
-        svfRight->update();
+        state->filterResonance = svfControls->getResonance();
     }
 
     state->decayCounter = 0;
@@ -310,11 +311,13 @@ const std::vector<float> &Voice::getFrame()
         state->enableEnvs ? staticEnv->getEnvelope(state->staticDecay) : 1.0f;
     state->envAmplitude *= state->staticEnvAmp;
 
+    readFrame();
+
     float filterFreq = 0;
 
     if (!isBasicVoice)
     {
-        filterFreq = VoiceUtil::midiFreq(state->initialFilterValue * 1.44f) *
+        filterFreq = VoiceUtil::midiFreq(state->filterCutoff * 1.44f) *
                      state->inverseNyquist;
         const auto filterEnvFactor = static_cast<float>(
             filterEnv->getEnvelope(false) *
@@ -323,15 +326,14 @@ const std::vector<float> &Voice::getFrame()
             VoiceUtil::midiFreq(144) * state->inverseNyquist * filterEnvFactor;
     }
 
-    readFrame();
-
     if (state->isMono)
     {
         frame[0] *= state->envAmplitude * state->amplitude;
 
         if (!isBasicVoice)
         {
-            frame[0] = svfLeft->filter(frame[0], filterFreq);
+            frame[0] =
+                svfLeft->filter(frame[0], filterFreq, state->filterResonance);
         }
 
         frame[1] = frame[0];
@@ -343,8 +345,10 @@ const std::vector<float> &Voice::getFrame()
 
         if (!isBasicVoice)
         {
-            frame[0] = svfLeft->filter(frame[0], filterFreq);
-            frame[1] = svfRight->filter(frame[1], filterFreq);
+            frame[0] =
+                svfLeft->filter(frame[0], filterFreq, state->filterResonance);
+            frame[1] =
+                svfRight->filter(frame[1], filterFreq, state->filterResonance);
         }
     }
 

@@ -2,18 +2,16 @@
 
 namespace mpc::engine::filter
 {
-
     class StateVariableFilterElement
     {
-
-        float prev{0.f};
-        float low{0.f}, high{0.f}, band{0.f}, notch{0.f};
+        float prev, low, high, band, notch;
 
     public:
-        bool bp{false};
-        float mix{0.f};
+        StateVariableFilterElement();
 
         float filter(float in, float freq, float damp);
+
+        void resetState();
     };
 
 } // namespace mpc::engine::filter

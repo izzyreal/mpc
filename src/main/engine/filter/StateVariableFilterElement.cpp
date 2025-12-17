@@ -2,17 +2,34 @@
 
 using namespace mpc::engine::filter;
 
-float StateVariableFilterElement::filter(float in, float freq, float damp)
+StateVariableFilterElement::StateVariableFilterElement()
 {
-    auto i1 = (prev + in) * 0.5f;
+    resetState();
+}
+
+float StateVariableFilterElement::filter(const float in, const float freq,
+                                         const float damp)
+{
+    const auto i1 = (prev + in) * 0.5f;
+
     prev = in;
-    notch = i1 - damp * band;
-    low = low + freq * band;
-    high = notch - low;
-    band = freq * high + band;
-    notch = in - damp * band;
-    low = low + freq * band;
-    high = notch - low;
-    band = freq * high + band;
-    return bp ? band : (1.0f - mix) * low + mix * high;
+
+    low += freq * band;
+    high = i1 - damp * band - low;
+    band += freq * high;
+
+    low += freq * band;
+    high = in - damp * band - low;
+    band += freq * high;
+
+    return low;
+}
+
+void StateVariableFilterElement::resetState()
+{
+    prev = 0.f;
+    low = 0.f;
+    high = 0.f;
+    band = 0.f;
+    notch = 0.f;
 }

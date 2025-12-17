@@ -10,7 +10,7 @@ namespace mpc::engine::filter
     class StateVariableFilter
     {
     public:
-        StateVariableFilter(FilterControls *variables);
+        explicit StateVariableFilter(FilterControls *variables);
 
         ~StateVariableFilter();
 
@@ -23,8 +23,7 @@ namespace mpc::engine::filter
         void setSampleRate(int rate);
 
     public:
-        float update();
-
-        float filter(float sample, float f) const;
+        float filter(float sample, float cutoff, float resonance) const;
+        void resetElementState() const;
     };
 } // namespace mpc::engine::filter

@@ -33,6 +33,7 @@ void FilterControls::derive(Control *c)
         case RESONANCE:
             resonance = deriveResonance();
             break;
+        default:;
     }
 }
 

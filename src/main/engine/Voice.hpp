@@ -51,7 +51,8 @@ namespace mpc::engine
         int tune = 0;
         double increment = 0;
         double position = 0;
-        float initialFilterValue = 0;
+        float filterCutoff = 0;
+        float filterResonance = 0;
         bool staticDecay = false;
         int noteNumber = -1;
         int velocity = 0;
@@ -155,7 +156,7 @@ namespace mpc::engine
 
         // Called from main thread
         void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
-                  int noteNumber, performance::NoteParameters, int varType,
+                  int noteNumber, const performance::NoteParameters &, int varType,
                   int varValue, int drumIndex, int frameOffset, bool enableEnvs,
                   int startTick, float engineSampleRate, uint64_t noteEventId,
                   ProgramIndex programIndex);
