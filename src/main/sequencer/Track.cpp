@@ -104,11 +104,7 @@ void Track::setUsedIfCurrentlyUnused(
 
 bool Track::isTransmitProgramChangesEnabled() const
 {
-    // return getSnapshot(getIndex()).isTransmitProgramChangesEnabled();
-
-    // const auto snapshot = getSnapshot(TrackIndex(0));
-
-    return true;
+    return getSnapshot(getIndex()).isTransmitProgramChangesEnabled();
 }
 
 void Track::setTransmitProgramChangesEnabled(const bool b,
