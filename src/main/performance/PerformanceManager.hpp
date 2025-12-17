@@ -80,6 +80,9 @@ namespace mpc::performance
 
         ProgramPadEventUiCallback programPadEventUiCallback = {};
 
+        SoundTable pgmFileSoundTable;
+        SoundTable convertedSoundTable;
+
     protected:
         void applyMessage(const PerformanceMessage &) noexcept override;
 

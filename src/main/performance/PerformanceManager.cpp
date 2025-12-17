@@ -219,38 +219,36 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         [&](const AddProgramSound &m)
         {
             const auto p = m.programIndex;
-            const auto n = m.drumNoteNumber;
-            auto &srcNoteParams =
-                activeState.programs[p]
-                    .noteParameters[n.get() - MinDrumNoteNumber.get()];
-            const auto localSoundIndex = srcNoteParams.soundIndex;
 
-            std::string localSoundName;
-
-            for (auto &localEntry : m.localTable)
+            for (auto &noteParams : activeState.programs[p].noteParameters)
             {
-                if (localEntry.first == localSoundIndex)
-                {
-                    localSoundName = localEntry.second;
-                    break;
-                }
-            }
+                const auto localSoundIndex = noteParams.soundIndex;
 
-            srcNoteParams.soundIndex = -1;
+                std::string localSoundName;
 
-            if (!localSoundName.empty())
-            {
-                for (auto &convertedEntry : m.convertedTable)
+                for (const auto &localEntry : *m.pgmFileSoundTable)
                 {
-                    if (convertedEntry.second == localSoundName)
+                    if (localEntry.first == localSoundIndex)
                     {
-                        srcNoteParams.soundIndex = convertedEntry.first;
+                        localSoundName = localEntry.second;
                         break;
                     }
                 }
-            }
 
-            publishState();
+                noteParams.soundIndex = -1;
+
+                if (!localSoundName.empty())
+                {
+                    for (auto &convertedEntry : *m.samplerSoundTable)
+                    {
+                        if (convertedEntry.second == localSoundName)
+                        {
+                            noteParams.soundIndex = convertedEntry.first;
+                            break;
+                        }
+                    }
+                }
+            }
         },
         [&](const UpdateStereoMixer &m)
         {

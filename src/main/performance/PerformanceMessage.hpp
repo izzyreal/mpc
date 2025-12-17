@@ -4,6 +4,9 @@
 #include "performance/Drum.hpp"
 
 #include <variant>
+#include <vector>
+#include <utility>
+#include <string>
 
 namespace mpc::sampler
 {
@@ -12,6 +15,8 @@ namespace mpc::sampler
 
 namespace mpc::performance
 {
+    using SoundTable = std::vector<std::pair<int, std::string>>;
+
     struct DeleteSoundAndReindex
     {
         int deletedIndex;
@@ -20,9 +25,8 @@ namespace mpc::performance
     struct AddProgramSound
     {
         ProgramIndex programIndex;
-        DrumNoteNumber drumNoteNumber;
-        std::vector<std::pair<int, std::string>> localTable;
-        std::vector<std::pair<int, std::string>> convertedTable;
+        SoundTable *pgmFileSoundTable;
+        SoundTable *samplerSoundTable;
     };
 
     struct UpdateDrumProgram

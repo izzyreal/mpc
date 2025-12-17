@@ -86,25 +86,30 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
         .map(
             [pgmSoundNames, &mpc, programIndex](std::shared_ptr<Program> p)
             {
-                std::vector<std::pair<int, std::string>> localTable;
+                auto manager = mpc.getPerformanceManager().lock();
+
+                performance::SoundTable *pgmFileSoundTable =
+                    &manager->pgmFileSoundTable;
+
+                pgmFileSoundTable->clear();
 
                 for (int i = 0; i < pgmSoundNames.size(); i++)
                 {
                     auto soundFileName = StrUtil::trim(pgmSoundNames[i]);
-                    localTable.push_back({i, soundFileName});
+                    pgmFileSoundTable->push_back({i, soundFileName});
                 }
 
-                std::vector<std::pair<int, std::string>> globalTable;
+                performance::SoundTable samplerSoundTable;
 
                 for (int i = 0; i < mpc.getSampler()->getSoundCount(); i++)
                 {
-                    globalTable.push_back(
+                    samplerSoundTable.push_back(
                         {i, mpc.getSampler()->getSoundName(i)});
                 }
 
                 std::vector<int> unavailableLocalSoundIndices;
 
-                for (auto &localEntry : localTable)
+                for (auto &localEntry : *pgmFileSoundTable)
                 {
                     std::string foundExtension;
                     auto soundFile = findSoundFileByFilenameWithoutExtension(
@@ -142,22 +147,24 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                     }
                 }
 
-                std::vector<std::pair<int, std::string>> convertedTable =
-                    localTable;
+                performance::SoundTable *convertedTable =
+                    &manager->convertedSoundTable;
 
-                for (auto &convertedEntry : convertedTable)
+                *convertedTable = *pgmFileSoundTable;
+
+                for (auto &convertedEntry : *convertedTable)
                 {
-                    const auto localSoundName = convertedEntry.second;
+                    const auto pgmFileSoundName = convertedEntry.second;
                     bool wasFoundInGlobalTable = false;
 
-                    for (auto &globalEntry : globalTable)
+                    for (auto &samplerEntry : samplerSoundTable)
                     {
-                        // In all cases where the sampler already has a sound by
-                        // some name, we will want the loaded program to refer
-                        // to this sound's index.
-                        if (localSoundName == globalEntry.second)
+                        // In all cases where the sampler already has a sound
+                        // with a program file's sound name, we want the loaded
+                        // program to refer to the sound that already existed.
+                        if (pgmFileSoundName == samplerEntry.second)
                         {
-                            convertedEntry.first = globalEntry.first;
+                            convertedEntry.first = samplerEntry.first;
                             wasFoundInGlobalTable = true;
                             break;
                         }
@@ -172,7 +179,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                              sampleIndex++)
                         {
                             if (mpc.getSampler()->getSoundName(sampleIndex) ==
-                                localSoundName)
+                                pgmFileSoundName)
                             {
                                 convertedEntry.first = sampleIndex;
                                 break;
@@ -181,15 +188,12 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                     }
                 }
 
-                for (int drumNote = MinDrumNoteNumber;
-                     drumNote <= MaxDrumNoteNumber; ++drumNote)
-                {
-                    performance::AddProgramSound payload{
-                        ProgramIndex(programIndex), DrumNoteNumber(drumNote),
-                        localTable, convertedTable};
-                    mpc.getPerformanceManager().lock()->enqueue(
-                        performance::PerformanceMessage{std::move(payload)});
-                }
+                performance::AddProgramSound payload{ProgramIndex(programIndex),
+                                                     pgmFileSoundTable,
+                                                     convertedTable};
+
+                manager->enqueue(
+                    performance::PerformanceMessage{std::move(payload)});
 
                 const auto ls = mpc.getLayeredScreen();
                 ls->postToUiThread(utils::Task(
