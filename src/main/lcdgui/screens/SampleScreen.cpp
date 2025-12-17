@@ -35,14 +35,16 @@ SampleScreen::SampleScreen(Mpc &mpc, const int layerIndex)
                  b->setBackgroundName("sample");
              }
          }});
-    addReactiveBinding({[&]() -> std::pair<float, float>
-                        {
-                            return {currentBufferPeakL, currentBufferPeakR};
-                        },
-                        [&](auto)
-                        {
-                            updateVU();
-                        }});
+    addReactiveBinding(
+        {[&]() -> std::pair<float, float>
+         {
+             return {currentBufferPeakL.load(std::memory_order_relaxed),
+                     currentBufferPeakR.load(std::memory_order_relaxed)};
+         },
+         [&](auto)
+         {
+             updateVU();
+         }});
 }
 
 void SampleScreen::open()
@@ -112,8 +114,8 @@ void SampleScreen::function(const int i)
                 return;
             }
 
-            peak.first = 0.f;
-            peak.second = 0.f;
+            holdPeakL.store(0.f, std::memory_order_relaxed);
+            holdPeakR.store(0.f, std::memory_order_relaxed);
             break;
         case 4:
             if (mpc.getEngineHost()->isRecordingSound())
@@ -276,11 +278,15 @@ void SampleScreen::updateVU()
     std::string lString;
     std::string rString;
 
-    int peaklValue = static_cast<int>(floor(log10(peak.first) * 20));
-    int peakrValue = static_cast<int>(floor(log10(peak.second) * 20));
+    int peaklValue = static_cast<int>(
+        floor(log10(holdPeakL.load(std::memory_order_relaxed)) * 20));
+    int peakrValue = static_cast<int>(
+        floor(log10(holdPeakR.load(std::memory_order_relaxed)) * 20));
 
-    int levell = static_cast<int>(floor(log10(currentBufferPeakL) * 20));
-    int levelr = static_cast<int>(floor(log10(currentBufferPeakR) * 20));
+    int levell = static_cast<int>(
+        floor(log10(currentBufferPeakL.load(std::memory_order_relaxed)) * 20));
+    int levelr = static_cast<int>(
+        floor(log10(currentBufferPeakR.load(std::memory_order_relaxed)) * 20));
 
     for (int i = 0; i < 34; i++)
     {
@@ -376,8 +382,18 @@ int SampleScreen::getMonitor() const
 void SampleScreen::setCurrentBufferPeak(
     const std::pair<float, float> &peakToUse)
 {
-    currentBufferPeakL.store(peakToUse.first);
-    currentBufferPeakR.store(peakToUse.second);
-    peak.first = std::max(currentBufferPeakL.load(), peak.first);
-    peak.second = std::max(currentBufferPeakR.load(), peak.second);
+    currentBufferPeakL.store(peakToUse.first, std::memory_order_relaxed);
+    currentBufferPeakR.store(peakToUse.second, std::memory_order_relaxed);
+
+    float oldL = holdPeakL.load(std::memory_order_relaxed);
+    while (peakToUse.first > oldL &&
+           !holdPeakL.compare_exchange_weak(oldL, peakToUse.first,
+                                            std::memory_order_relaxed))
+        ;
+
+    float oldR = holdPeakR.load(std::memory_order_relaxed);
+    while (peakToUse.second > oldR &&
+           !holdPeakR.compare_exchange_weak(oldR, peakToUse.second,
+                                            std::memory_order_relaxed))
+        ;
 }

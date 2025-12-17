@@ -41,7 +41,8 @@ namespace mpc::lcdgui::screens
         int time = 100;
         int monitor = 0;
         int preRec = 100;
-        std::pair<float, float> peak;
+        std::atomic<float> holdPeakL;
+        std::atomic<float> holdPeakR;
         std::atomic<float> currentBufferPeakL;
         std::atomic<float> currentBufferPeakR;
 
