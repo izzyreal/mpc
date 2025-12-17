@@ -193,12 +193,9 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             activeState.programs[m.programIndex].midiProgramChange =
                 m.midiProgramChange;
         },
-        [&](const UpdateNoteParametersBulk &m)
+        [&](const UpdateAllNoteParametersBulk &m)
         {
-            const int noteParametersIdx =
-                m.drumNoteNumber.get() - MinDrumNoteNumber.get();
-            activeState.programs[m.programIndex]
-                .noteParameters[noteParametersIdx] = m.noteParameters;
+            activeState.programs[m.programIndex].noteParameters = m.snapshot;
         },
         [&](const DeleteSoundAndReindex &m)
         {

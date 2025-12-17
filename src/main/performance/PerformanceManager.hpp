@@ -32,7 +32,7 @@ namespace mpc::performance
 
     class PerformanceManager final
         : public concurrency::AtomicStateExchange<
-              PerformanceState, PerformanceStateView, PerformanceMessage>
+              PerformanceState, PerformanceStateView, PerformanceMessage, 3, 8192>
     {
     public:
         explicit PerformanceManager(const utils::PostToUiThreadFn &);

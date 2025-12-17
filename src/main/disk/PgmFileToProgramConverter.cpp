@@ -1,5 +1,6 @@
 #include "disk/PgmFileToProgramConverter.hpp"
 
+#include "Mpc.hpp"
 #include "file/pgmreader/PRMixer.hpp"
 #include "file/pgmreader/PRPads.hpp"
 #include "file/pgmreader/PgmAllNoteParameters.hpp"
@@ -18,9 +19,11 @@
 #include "StrUtil.hpp"
 
 #include <stdexcept>
+#include <array>
 
 #include "engine/IndivFxMixer.hpp"
 #include "engine/StereoMixer.hpp"
+#include "performance/PerformanceManager.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::sampler;
@@ -47,10 +50,14 @@ void PgmFileToProgramConverter::setSlider(
 }
 
 void PgmFileToProgramConverter::setNoteParameters(
-    const ProgramFileReader &reader, const std::shared_ptr<Program> &program)
+    mpc::Mpc &mpc, const ProgramFileReader &reader,
+    const std::shared_ptr<Program> &program)
 {
     const auto pgmNoteParameters = reader.getAllNoteParameters();
     const auto pgmPads = reader.getPads();
+
+    std::array<performance::NoteParameters, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+        allPerfNoteParams;
 
     for (int programPadIndex = 0;
          programPadIndex < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; ++programPadIndex)
@@ -59,60 +66,62 @@ void PgmFileToProgramConverter::setNoteParameters(
         const auto note = padNote == -1 ? NoDrumNoteAssigned : padNote;
         program->getPad(programPadIndex)->setNote(DrumNoteNumber(note));
 
-        const NoteParameters *programNoteParameters =
-            program->getNoteParameters(programPadIndex + MinDrumNoteNumber);
-        programNoteParameters->setAttack(
-            pgmNoteParameters->getAttack(programPadIndex));
-        programNoteParameters->setDecay(
-            pgmNoteParameters->getDecay(programPadIndex));
-        programNoteParameters->setDecayMode(
-            pgmNoteParameters->getDecayMode(programPadIndex));
-        programNoteParameters->setFilterAttack(
-            pgmNoteParameters->getVelEnvToFiltAtt(programPadIndex));
-        programNoteParameters->setFilterDecay(
-            pgmNoteParameters->getVelEnvToFiltDec(programPadIndex));
-        programNoteParameters->setFilterEnvelopeAmount(
-            pgmNoteParameters->getVelEnvToFiltAmt(programPadIndex));
-        programNoteParameters->setFilterFrequency(
-            pgmNoteParameters->getCutoff(programPadIndex));
-        programNoteParameters->setFilterResonance(
-            pgmNoteParameters->getResonance(programPadIndex));
-        programNoteParameters->setMuteAssignA(
-            DrumNoteNumber(pgmNoteParameters->getMuteAssign1(programPadIndex)));
-        programNoteParameters->setMuteAssignB(
-            DrumNoteNumber(pgmNoteParameters->getMuteAssign2(programPadIndex)));
-        programNoteParameters->setOptionalNoteA(DrumNoteNumber(
-            pgmNoteParameters->getAlsoPlayUse1(programPadIndex)));
-        programNoteParameters->setOptionalNoteB(DrumNoteNumber(
-            pgmNoteParameters->getAlsoPlayUse2(programPadIndex)));
+        auto &perfNoteParams = allPerfNoteParams[programPadIndex];
+
+        perfNoteParams.attack = pgmNoteParameters->getAttack(programPadIndex);
+        perfNoteParams.decay = pgmNoteParameters->getDecay(programPadIndex);
+        perfNoteParams.decayMode =
+            pgmNoteParameters->getDecayMode(programPadIndex);
+        perfNoteParams.filterAttack =
+            pgmNoteParameters->getVelEnvToFiltAtt(programPadIndex);
+        perfNoteParams.filterDecay =
+            pgmNoteParameters->getVelEnvToFiltDec(programPadIndex);
+        perfNoteParams.filterEnvelopeAmount =
+            pgmNoteParameters->getVelEnvToFiltAmt(programPadIndex);
+        perfNoteParams.filterFrequency =
+            pgmNoteParameters->getCutoff(programPadIndex);
+        perfNoteParams.filterResonance =
+            pgmNoteParameters->getResonance(programPadIndex);
+        perfNoteParams.muteAssignA =
+            DrumNoteNumber(pgmNoteParameters->getMuteAssign1(programPadIndex));
+        perfNoteParams.muteAssignB =
+            DrumNoteNumber(pgmNoteParameters->getMuteAssign2(programPadIndex));
+        perfNoteParams.optionalNoteA =
+            DrumNoteNumber(pgmNoteParameters->getAlsoPlayUse1(programPadIndex));
+        perfNoteParams.optionalNoteB =
+            DrumNoteNumber(pgmNoteParameters->getAlsoPlayUse2(programPadIndex));
 
         const auto sampleSelect =
             pgmNoteParameters->getSampleSelect(programPadIndex);
-        programNoteParameters->setSoundIndex(
-            sampleSelect == 255 ? -1 : sampleSelect);
-        programNoteParameters->setSliderParameterNumber(
-            pgmNoteParameters->getSliderParameter(programPadIndex));
-        programNoteParameters->setSoundGenMode(
-            pgmNoteParameters->getSoundGenerationMode(programPadIndex));
-        programNoteParameters->setTune(
-            pgmNoteParameters->getTune(programPadIndex));
-        programNoteParameters->setVeloRangeLower(
-            pgmNoteParameters->getVelocityRangeLower(programPadIndex));
-        programNoteParameters->setVeloRangeUpper(
-            pgmNoteParameters->getVelocityRangeUpper(programPadIndex));
-        programNoteParameters->setVelocityToAttack(
-            pgmNoteParameters->getVelocityToAttack(programPadIndex));
-        programNoteParameters->setVelocityToFilterFrequency(
-            pgmNoteParameters->getVelocityToCutoff(programPadIndex));
-        programNoteParameters->setVeloToLevel(
-            pgmNoteParameters->getVelocityToLevel(programPadIndex));
-        programNoteParameters->setVelocityToPitch(
-            pgmNoteParameters->getVelocityToPitch(programPadIndex));
-        programNoteParameters->setVelocityToStart(
-            pgmNoteParameters->getVelocityToStart(programPadIndex));
-        programNoteParameters->setVoiceOverlapMode(
-            pgmNoteParameters->getVoiceOverlapMode(programPadIndex));
+
+        perfNoteParams.soundIndex = sampleSelect == 255 ? -1 : sampleSelect;
+
+        perfNoteParams.sliderParameterNumber =
+            pgmNoteParameters->getSliderParameter(programPadIndex);
+        perfNoteParams.soundGenerationMode =
+            pgmNoteParameters->getSoundGenerationMode(programPadIndex);
+        perfNoteParams.tune = pgmNoteParameters->getTune(programPadIndex);
+        perfNoteParams.velocityRangeLower =
+            pgmNoteParameters->getVelocityRangeLower(programPadIndex);
+        perfNoteParams.velocityRangeUpper =
+            pgmNoteParameters->getVelocityRangeUpper(programPadIndex);
+        perfNoteParams.velocityToAttack =
+            pgmNoteParameters->getVelocityToAttack(programPadIndex);
+        perfNoteParams.velocityToFilterFrequency =
+            pgmNoteParameters->getVelocityToCutoff(programPadIndex);
+        perfNoteParams.velocityToLevel =
+            pgmNoteParameters->getVelocityToLevel(programPadIndex);
+        perfNoteParams.velocityToPitch =
+            pgmNoteParameters->getVelocityToPitch(programPadIndex);
+        perfNoteParams.velocityToStart =
+            pgmNoteParameters->getVelocityToStart(programPadIndex);
+        perfNoteParams.voiceOverlapMode =
+            pgmNoteParameters->getVoiceOverlapMode(programPadIndex);
     }
+
+    performance::UpdateAllNoteParametersBulk msg{program->getProgramIndex(),
+                                                 allPerfNoteParams};
+    mpc.getPerformanceManager().lock()->enqueue(msg);
 }
 
 void PgmFileToProgramConverter::setMixer(
@@ -138,8 +147,8 @@ void PgmFileToProgramConverter::setMixer(
 }
 
 program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
-    const std::shared_ptr<MpcFile> &f, std::shared_ptr<Program> program,
-    std::vector<std::string> &soundNames)
+    mpc::Mpc &mpc, const std::shared_ptr<MpcFile> &f,
+    std::shared_ptr<Program> program, std::vector<std::string> &soundNames)
 {
     if (!f->exists())
     {
@@ -172,7 +181,7 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
         program->setName(f->getNameWithoutExtension());
     }
 
-    setNoteParameters(reader, program);
+    setNoteParameters(mpc, reader, program);
     setMixer(reader, program);
     setSlider(reader, program);
 

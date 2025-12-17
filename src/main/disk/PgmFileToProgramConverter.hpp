@@ -5,6 +5,11 @@
 #include <string>
 #include "mpc_types.hpp"
 
+namespace mpc
+{
+    class Mpc;
+}
+
 namespace mpc::sampler
 {
     class Sampler;
@@ -27,7 +32,7 @@ namespace mpc::disk
     {
     public:
         static program_or_error
-        loadFromFileAndConvert(const std::shared_ptr<MpcFile> &,
+        loadFromFileAndConvert(mpc::Mpc &, const std::shared_ptr<MpcFile> &,
                                std::shared_ptr<sampler::Program>,
                                std::vector<std::string> &soundNames);
 
@@ -35,7 +40,7 @@ namespace mpc::disk
         static void setSlider(const file::pgmreader::ProgramFileReader &,
                               const std::shared_ptr<sampler::Program> &);
         static void
-        setNoteParameters(const file::pgmreader::ProgramFileReader &,
+        setNoteParameters(mpc::Mpc &, const file::pgmreader::ProgramFileReader &,
                           const std::shared_ptr<sampler::Program> &);
         static void setMixer(const file::pgmreader::ProgramFileReader &,
                              const std::shared_ptr<sampler::Program> &);

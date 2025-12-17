@@ -81,7 +81,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
 
     std::vector<std::string> pgmSoundNames;
 
-    return PgmFileToProgramConverter::loadFromFileAndConvert(file, program,
+    return PgmFileToProgramConverter::loadFromFileAndConvert(mpc, file, program,
                                                              pgmSoundNames)
         .map(
             [pgmSoundNames, &mpc, programIndex](std::shared_ptr<Program> p)

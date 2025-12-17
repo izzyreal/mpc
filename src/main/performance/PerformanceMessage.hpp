@@ -62,13 +62,11 @@ namespace mpc::performance
         UpdateNoteParametersBySnapshot() = default;
     };
 
-    struct UpdateNoteParametersBulk
+    struct UpdateAllNoteParametersBulk
     {
         ProgramIndex programIndex{};
-        DrumNoteNumber drumNoteNumber{};
-        NoteParameters noteParameters{};
-
-        UpdateNoteParametersBulk() = default;
+        std::array<NoteParameters, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> snapshot;
+        UpdateAllNoteParametersBulk() = default;
     };
 
     struct UpdateProgramBulk
@@ -135,7 +133,6 @@ namespace mpc::performance
         Drum drum{};
     };
 
-
     struct ActivateQuantizedLock
     {
     };
@@ -146,8 +143,8 @@ namespace mpc::performance
         ProgramPadAftertouchEvent, ProgramPadReleaseEvent, NoteOnEvent,
         NoteAftertouchEvent, NoteOffEvent, UpdateDrumProgram,
         UpdateNoteParameters, UpdateIndivFxMixer, UpdateStereoMixer,
-        DeleteSoundAndReindex, AddProgramSound, UpdateNoteParametersBulk,
-        UpdateProgramBulk, UpdateProgramMidiProgramChange, SetProgramUsed,
-        RepairProgramReferences, UpdateDrumBulk,
-        UpdateNoteParametersBySnapshot, ActivateQuantizedLock>;
+        DeleteSoundAndReindex, AddProgramSound, UpdateProgramBulk,
+        UpdateProgramMidiProgramChange, SetProgramUsed, RepairProgramReferences,
+        UpdateDrumBulk, UpdateNoteParametersBySnapshot, ActivateQuantizedLock,
+        UpdateAllNoteParametersBulk>;
 } // namespace mpc::performance
