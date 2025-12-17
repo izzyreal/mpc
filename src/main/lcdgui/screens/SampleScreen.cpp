@@ -179,7 +179,7 @@ void SampleScreen::turnWheel(const int i)
         }
         else if (focusedFieldName == "threshold")
         {
-            setThreshold(threshold + i);
+            setThreshold(threshold.load(std::memory_order_relaxed) + i);
         }
         else if (focusedFieldName == "mode")
         {
@@ -210,7 +210,7 @@ void SampleScreen::setInput(const int i)
 
 void SampleScreen::setThreshold(const int i)
 {
-    threshold = std::clamp(i, -64, 0);
+    threshold.store(std::clamp(i, -64, 0), std::memory_order_relaxed);
     displayThreshold();
 }
 
@@ -245,8 +245,9 @@ void SampleScreen::displayInput() const
 
 void SampleScreen::displayThreshold() const
 {
+    const auto currentThreshold = threshold.load(std::memory_order_relaxed);
     const auto thresholdText =
-        threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
+        currentThreshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(currentThreshold);
     findField("threshold")->setTextPadded(thresholdText);
 }
 
@@ -288,6 +289,8 @@ void SampleScreen::updateVU()
     int levelr = static_cast<int>(
         floor(log10(currentBufferPeakR.load(std::memory_order_relaxed)) * 20));
 
+    const auto currentThreshold = threshold.load(std::memory_order_relaxed);
+
     for (int i = 0; i < 34; i++)
     {
         std::string l = " ";
@@ -295,8 +298,8 @@ void SampleScreen::updateVU()
         bool normall = vuPosToDb[i] <= levell;
         bool normalr = vuPosToDb[i] <= levelr;
 
-        bool thresholdHit = threshold >= vuPosToDb[i] &&
-                            (i == 33 || threshold < vuPosToDb[i + 1]);
+        bool thresholdHit = currentThreshold >= vuPosToDb[i] &&
+                            (i == 33 || currentThreshold < vuPosToDb[i + 1]);
 
         bool peakl = peaklValue >= vuPosToDb[i] &&
                      (i == 33 || peaklValue < vuPosToDb[i + 1]);

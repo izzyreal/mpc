@@ -36,7 +36,7 @@ namespace mpc::lcdgui::screens
             {24, -9},  {25, -8},  {26, -7},  {27, -6},  {28, -5},  {29, -4},
             {30, -3},  {31, -2},  {32, -1},  {33, 0}};
         int input = 0;
-        int threshold = -20;
+        std::atomic<int> threshold{-20};
         int mode = 2;
         int time = 100;
         int monitor = 0;

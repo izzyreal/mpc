@@ -29,12 +29,10 @@ namespace mpc::audiomidi
     class SoundRecorder final : public AudioProcess
     {
         Mpc &mpc;
-        std::atomic<bool> processing{
-            false}; // true while audio thread is inside processAudio
 
         // Recording state
         std::atomic<bool> recording{false}; // set/reset on audio thread
-        bool cancelled = false;
+        std::atomic<bool> cancelled{false};
         int lengthInFramesAtEngineSampleRate = 0;
         int recordedFrameCountAtEngineSampleRate = 0;
 
@@ -59,7 +57,7 @@ namespace mpc::audiomidi
 
         std::vector<float> ringLeft;
         std::vector<float> ringRight;
-        std::atomic<size_t> writeIndex{0};
+        size_t writeIndex = 0;
         size_t readIndex = 0;
 
         size_t preRecFramesAtEngineSampleRate = 0;
@@ -68,8 +66,7 @@ namespace mpc::audiomidi
 
         unsigned int inputGain = 0;
         std::atomic<bool> sampleScreenActive{false};
-        bool lastSampleScreenActive = false;
-        bool armed = false;
+        std::atomic<bool> armed{false};
 
     public:
         explicit SoundRecorder(Mpc &mpc);

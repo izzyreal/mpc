@@ -42,20 +42,22 @@ void SoundRecorder::setInputGain(const unsigned int gain)
 
 void SoundRecorder::setArmed(const bool b)
 {
-    armed = b;
+    armed.store(b, std::memory_order_relaxed);
 }
+
 bool SoundRecorder::isArmed() const
 {
-    return armed;
+    return armed.load(std::memory_order_relaxed);
 }
+
 bool SoundRecorder::isRecording() const
 {
-    return recording.load();
+    return recording.load(std::memory_order_relaxed);
 }
 
 void SoundRecorder::setSampleScreenActive(const bool active)
 {
-    sampleScreenActive.store(active);
+    sampleScreenActive.store(active, std::memory_order_relaxed);
 }
 
 void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
@@ -63,7 +65,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
                             const int engineSampleRateToUse)
 {
     // Must not be preparing while audio thread is actively recording
-    if (recording.load())
+    if (recording.load(std::memory_order_acquire))
     {
         return;
     }
@@ -86,14 +88,14 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
     lengthInFramesAtEngineSampleRate +=
         static_cast<int>(preRecFramesAtEngineSampleRate);
 
-    cancelled = false;
+    cancelled.store(false, std::memory_order_relaxed);
     mode = sampleScreen->getMode();
     if (mode != 2)
     {
         sound->setMono(true);
     }
 
-    writeIndex.store(0, std::memory_order_relaxed);
+    writeIndex = 0;
     readIndex = 0;
 
     resamplers[0].reset();
@@ -104,14 +106,14 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
 
 void SoundRecorder::start()
 {
-    if (recording.load())
+    if (recording.load(std::memory_order_relaxed))
     {
         return;
     }
 
-    armed = false;
+    armed.store(false, std::memory_order_release);
 
-    const size_t w = writeIndex.load(std::memory_order_acquire);
+    const size_t w = writeIndex;
     const size_t bufSize = ringLeft.size();
 
     const size_t preRec = std::min(preRecFramesAtEngineSampleRate, bufSize - 1);
@@ -119,37 +121,29 @@ void SoundRecorder::start()
     readIndex = start;
 
     recordedFrameCountAtEngineSampleRate = 0;
-    recording.store(true, std::memory_order_release);
+    recording.store(true, std::memory_order_relaxed);
 }
 
 void SoundRecorder::cancel()
 {
-    cancelled = true;
+    cancelled.store(true, std::memory_order_relaxed);
 }
 
 int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
 {
-    processing.store(true, std::memory_order_release);
     const auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
 
-    if (!sampleScreenActive.load())
+    if (!sampleScreenActive.load(std::memory_order_relaxed))
     {
-        if (lastSampleScreenActive)
-        {
-            lastSampleScreenActive = false;
-        }
-        processing.store(false, std::memory_order_release);
         return AUDIO_OK;
     }
 
-    lastSampleScreenActive = true;
     mode = sampleScreen->getMode();
 
     const float gain = inputGain * 0.01f;
     float peakL = 0.f, peakR = 0.f;
     const size_t bufSize = ringLeft.size();
 
-    // Write incoming frames into the ring buffer (always)
     for (int i = 0; i < nFrames; ++i)
     {
         const float l =
@@ -159,12 +153,11 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
         leftChannelCopy[i] = l;
         rightChannelCopy[i] = r;
 
-        // atomic writeIndex write
-        const size_t w = writeIndex.load(std::memory_order_relaxed);
+        const size_t w = writeIndex;
         ringLeft[w] = l;
         ringRight[w] = r;
         const size_t wnext = (w + 1) % bufSize;
-        writeIndex.store(wnext, std::memory_order_release);
+        writeIndex = wnext;
 
         peakL = std::max(peakL, l);
         peakR = std::max(peakR, r);
@@ -173,17 +166,18 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
     sampleScreen->setCurrentBufferPeak({peakL, peakR});
 
     // armed trigger check
-    if (armed && (log10(peakL) * 20 > sampleScreen->threshold ||
-                  log10(peakR) * 20 > sampleScreen->threshold))
+    const auto threshold =
+        sampleScreen->threshold.load(std::memory_order_relaxed);
+    if (armed.load(std::memory_order_relaxed) &&
+        (log10(peakL) * 20 > threshold || log10(peakR) * 20 > threshold))
     {
-        armed = false;
+        armed.store(false, std::memory_order_relaxed);
         mpc.getEngineHost()->startRecordingSound();
     }
 
     // If not recording, nothing to consume this frame (we keep always-writing)
-    if (!recording.load(std::memory_order_acquire))
+    if (!recording.load(std::memory_order_relaxed))
     {
-        processing.store(false, std::memory_order_release);
         return AUDIO_OK;
     }
 
@@ -241,9 +235,8 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
     if (recordedFrameCountAtEngineSampleRate >=
         lengthInFramesAtEngineSampleRate)
     {
-        recording.store(false, std::memory_order_release);
+        recording.store(false, std::memory_order_relaxed);
     }
-    processing.store(false, std::memory_order_release);
     return AUDIO_OK;
 }
 
@@ -252,19 +245,12 @@ void SoundRecorder::stop()
     // request stop (works if caller called from UI thread)
     recording.store(false, std::memory_order_release);
 
-    // Wait for audio-thread to finish its current processing/append.
-    // Spin-wait briefly — this should be short (one audio callback).
-    while (processing.load(std::memory_order_acquire))
-    {
-        std::this_thread::yield();
-    }
-
     // Called on UI thread after audio-thread set recording=false.
     // If cancelled, delete sound and return.
-    if (cancelled)
+    if (cancelled.load(std::memory_order_relaxed))
     {
         mpc.getSampler()->deleteSound(sound);
-        cancelled = false;
+        cancelled.store(false, std::memory_order_relaxed);
         return;
     }
 

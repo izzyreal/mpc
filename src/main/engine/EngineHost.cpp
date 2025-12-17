@@ -468,7 +468,7 @@ void EngineHost::stopBouncingEarly()
 
 void EngineHost::startRecordingSound()
 {
-    recordingSound.store(true);
+    recordingSound.store(true, std::memory_order_relaxed);
 }
 
 void EngineHost::stopSoundRecorder(const bool cancel)
@@ -497,7 +497,7 @@ bool EngineHost::isBouncing() const
 
 bool EngineHost::isRecordingSound() const
 {
-    return recordingSound.load();
+    return recordingSound.load(std::memory_order_relaxed);
 }
 
 // Should be called from the audio thread only!
