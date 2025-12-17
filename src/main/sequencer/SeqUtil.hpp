@@ -32,11 +32,10 @@ namespace mpc::sequencer
     class SeqUtil
     {
     public:
-        static int getTickFromBar(int i, const Sequence *s, int position);
-        static int getBarFromTick(const Sequence *, int position);
+        static int getTickFromBar(int i, const Sequence *s);
+        static int getBar(const Sequence *, int position);
         static int getBeat(const Sequence *, int position);
         static int getClock(const Sequence *, int position);
-        static int getBar(const Sequence *, int position);
         static int setBar(int i, const Sequence *, int position);
         static int setBeat(int i, const Sequence *, int position);
         static int setClock(int i, const Sequence *, int position);

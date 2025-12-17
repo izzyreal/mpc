@@ -24,9 +24,9 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
 
     if (focusedFieldName == "time0")
     {
-        setTime0(SeqUtil::getTickFromBar(
-            SeqUtil::getBarFromTick(sequenceToUse, time0) + notch,
-            sequenceToUse, time0));
+        setTime1(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time0) +
+                                     notch,
+                                 sequenceToUse, time0));
         return true;
     }
     if (focusedFieldName == "time1")
@@ -45,16 +45,17 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
     }
     if (focusedFieldName == "time3")
     {
-        setTime1(SeqUtil::getTickFromBar(
-            SeqUtil::getBarFromTick(sequenceToUse, time1) + notch,
-            sequenceToUse, time1));
+        setTime1(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time1) +
+                                     notch,
+                                 sequenceToUse, time1));
         return true;
     }
     if (focusedFieldName == "time4")
     {
-        setTime1(
-            SeqUtil::setBeat(SeqUtil::getBeat(sequenceToUse, time1) + notch,
-                             sequenceToUse, time1));
+        const auto currentBeat = SeqUtil::getBeat(sequenceToUse, time1);
+        const auto newBeat = currentBeat + notch;
+        const auto newPos = SeqUtil::setBeat(newBeat, sequenceToUse, time1);
+        setTime1(newPos);
         return true;
     }
     if (focusedFieldName == "time5")

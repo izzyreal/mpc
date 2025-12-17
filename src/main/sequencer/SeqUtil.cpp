@@ -13,35 +13,38 @@
 
 using namespace mpc::sequencer;
 
-int SeqUtil::getTickFromBar(const int i, const Sequence *s, int position)
+int SeqUtil::getTickFromBar(const int i, const Sequence *s)
 {
     if (i < 0)
     {
         return 0;
     }
 
-    const auto difference = i - getBarFromTick(s, position);
-    const auto den = s->getTimeSignatureFromTickPos(position).denominator;
-
-    if (const auto denTicks = static_cast<int>(
-            Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
-        position + difference * denTicks * 4 > s->getLastTick())
+    if (i >= s->getBarCount())
     {
-        position = s->getLastTick();
-    }
-    else
-    {
-        position = position + difference * denTicks * 4;
+        return s->getLastTick();
     }
 
-    return position;
+    int result = 0;
+
+    for (int j = 0; j < i; ++j)
+    {
+        result += s->getBarLength(j);
+    }
+
+    return result;
 }
 
-int SeqUtil::getBarFromTick(const Sequence *s, const int position)
+int SeqUtil::getBar(const Sequence *s, const int position)
 {
     if (position == 0)
     {
         return 0;
+    }
+
+    if (position == s->getLastTick())
+    {
+        return s->getBarCount();
     }
 
     const auto [num, den] = s->getTimeSignatureFromTickPos(position);
@@ -49,7 +52,7 @@ int SeqUtil::getBarFromTick(const Sequence *s, const int position)
         Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
     const auto bar = static_cast<int>(floor(position / (denTicks * num)));
 
-    return bar;
+    return std::clamp(bar, 0, s->getLastBarIndex());
 }
 
 double SeqUtil::secondsPerTick(const double tempo)
@@ -156,29 +159,18 @@ int SeqUtil::songFrameLength(const Song *song, Sequencer *sequencer,
     return static_cast<int>(result);
 }
 
-int SeqUtil::setBar(int i, const Sequence *sequence, int position)
+int SeqUtil::setBar(int i, const Sequence *sequence, const int position)
 {
     if (i < 0)
     {
         i = 0;
     }
-
-    const auto difference = i - getBar(sequence, position);
-    const auto den =
-        sequence->getTimeSignatureFromTickPos(position).denominator;
-
-    if (const auto denTicks = static_cast<int>(
-            Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
-        position + difference * denTicks * 4 > sequence->getLastTick())
-    {
-        position = sequence->getLastTick();
-    }
-    else
-    {
-        position = position + difference * denTicks * 4;
-    }
-
-    return position;
+    const auto currentBeat = getBeat(sequence, position);
+    const auto currentClock = getClock(sequence, position);
+    auto newPos = getTickFromBar(i, sequence);
+    newPos = setBeat(currentBeat, sequence, newPos);
+    newPos = setClock(currentClock, sequence, newPos);
+    return newPos;
 }
 
 int SeqUtil::setBeat(int i, const Sequence *s, int position)
@@ -240,23 +232,9 @@ int SeqUtil::setClock(int i, const Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::getBar(const Sequence *s, const int position)
-{
-    if (position == 0)
-    {
-        return 0;
-    }
-
-    const auto [num, den] = s->getTimeSignatureFromTickPos(position);
-    const auto denTicks = static_cast<int>(
-        Mpc2000XlSpecs::SEQUENCER_RESOLUTION_PPQ * (4.0 / den));
-    const auto bar = static_cast<int>(floor(position / (denTicks * num)));
-    return bar;
-}
-
 int SeqUtil::getBeat(const Sequence *s, const int position)
 {
-    if (position == 0)
+    if (position == 0 || position == s->getLastTick())
     {
         return 0;
     }

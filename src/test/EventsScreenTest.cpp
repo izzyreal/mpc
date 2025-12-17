@@ -254,7 +254,7 @@ TEST_CASE("COPY4", "[events-screen]")
     int toTrack = 0;
     bool merge = true;
     int copies = 1;
-    int note0 = 34;
+    int note0 = AllDrumNotes;
     int note1 = 0;
 
     eventsScreen->performCopy(start, end, SequenceIndex(toSeq), destStart,
