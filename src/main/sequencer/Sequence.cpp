@@ -92,6 +92,8 @@ Sequence::Sequence(
             defaultDeviceNames[i] = name;
         }
     }
+
+    deviceNames = defaultDeviceNames;
 }
 
 Sequence::~Sequence() {}
