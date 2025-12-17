@@ -255,7 +255,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     REQUIRE(seq1->getInitialTempo() == 119);
 
-    sequencer->copySequence(sequencer->getSequence(0), mpc::SequenceIndex(1));
+    sequencer->copySequence(mpc::SequenceIndex(0), mpc::SequenceIndex(1));
 
     auto seq2 = sequencer->getSequence(1);
 

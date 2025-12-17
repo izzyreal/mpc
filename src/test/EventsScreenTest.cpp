@@ -265,11 +265,11 @@ TEST_CASE("COPY4", "[events-screen]")
     auto seqSnapshot = stateManager->getSnapshot().getSequenceState(
         stateManager->getSnapshot().getSelectedSequenceIndex());
 
-    REQUIRE(seqSnapshot->getLastTick() == 384 + 288 + 288 + 288);
-    REQUIRE(seqSnapshot->getBarLength(0) == 384);
-    REQUIRE(seqSnapshot->getBarLength(1) == 288);
-    REQUIRE(seqSnapshot->getBarLength(2) == 288);
-    REQUIRE(seqSnapshot->getBarLength(3) == 288);
+    REQUIRE(seqSnapshot.getLastTick() == 384 + 288 + 288 + 288);
+    REQUIRE(seqSnapshot.getBarLength(0) == 384);
+    REQUIRE(seqSnapshot.getBarLength(1) == 288);
+    REQUIRE(seqSnapshot.getBarLength(2) == 288);
+    REQUIRE(seqSnapshot.getBarLength(3) == 288);
 }
 
 TEST_CASE("COPY5", "[events-screen]")
