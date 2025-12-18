@@ -31,8 +31,7 @@ namespace mpc::audiomidi
     {
         Mpc &mpc;
 
-        // Recording state
-        std::atomic<bool> recording{false}; // set/reset on audio thread
+        std::atomic<bool> recording{false};
         std::atomic<bool> cancelled{false};
         int lengthInFramesAtEngineSampleRate = 0;
         int recordedFrameCountAtEngineSampleRate = 0;
@@ -42,13 +41,10 @@ namespace mpc::audiomidi
 
         std::shared_ptr<Sound> sound;
 
-        // internal ring buffer size (frames)
         const size_t INTERNAL_BUF_SIZE = 100000;
 
-        // resamplers / helpers
         std::vector<MonoResampler> resamplers = std::vector<MonoResampler>(2);
 
-        // scratch arrays sized to BUFFER callback max
         std::vector<float> leftChannelCopy;
         std::vector<float> rightChannelCopy;
         std::vector<float> unresampledLeft;
@@ -75,9 +71,8 @@ namespace mpc::audiomidi
         void setSampleScreenActive(bool active);
         void prepare(const std::shared_ptr<Sound> &, int newLengthInFrames,
                      int engineSampleRate);
-        void start(); // must be called on audio thread (sets readIndex using
-                      // writeIndex)
-        void stop();  // called on UI thread to stop recording early
+        void start();
+        void stop();
         void cancel();
         int processAudio(AudioBuffer *buf, int nFrames) override;
         bool isRecording() const;

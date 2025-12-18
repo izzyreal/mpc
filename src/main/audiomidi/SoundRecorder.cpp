@@ -62,7 +62,6 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
                             const int newLengthInFrames,
                             const int engineSampleRateToUse)
 {
-    // Must not be preparing while audio thread is actively recording
     if (recording.load(std::memory_order_acquire))
     {
         return;
@@ -72,25 +71,34 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
     assert(sound->getSampleData()->empty());
 
     engineSampleRate = engineSampleRateToUse;
-    const double rateRatio = static_cast<double>(engineSampleRate) / 44100.0;
-    lengthInFramesAtEngineSampleRate =
-        static_cast<int>(std::lround(newLengthInFrames * rateRatio));
 
     const auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
-
-    // compute preRec in engine-rate frames and add it to total length
     const int preRecMs = sampleScreen->preRec;
+
+    const int preRecFramesAt44k =
+        static_cast<int>(std::lround(44.1 * preRecMs));
+
+    const int totalFramesAt44k =
+        newLengthInFrames + preRecFramesAt44k;
+
+    lengthInFramesAtEngineSampleRate = totalFramesAt44k;
+
     preRecFramesAtEngineSampleRate =
         static_cast<size_t>(std::lround(engineSampleRate * 0.001 * preRecMs));
 
-    lengthInFramesAtEngineSampleRate +=
-        static_cast<int>(preRecFramesAtEngineSampleRate);
-
     cancelled.store(false, std::memory_order_relaxed);
+
     mode = sampleScreen->getMode();
-    if (mode != 2)
+
+    if (mode == 2)
+    {
+        sound->setMono(false);
+        sound->getMutableSampleData()->reserve(totalFramesAt44k * 2);
+    }
+    else
     {
         sound->setMono(true);
+        sound->getMutableSampleData()->reserve(totalFramesAt44k);
     }
 
     writeIndex = 0;
@@ -154,8 +162,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
         const size_t w = writeIndex;
         ringLeft[w] = l;
         ringRight[w] = r;
-        const size_t wnext = (w + 1) % bufSize;
-        writeIndex = wnext;
+        writeIndex = (w + 1) % bufSize;
 
         peakL = std::max(peakL, l);
         peakR = std::max(peakR, r);
@@ -163,35 +170,38 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
 
     sampleScreen->setCurrentBufferPeak({peakL, peakR});
 
-    // armed trigger check
-    const auto threshold =
+    const int threshold =
         sampleScreen->threshold.load(std::memory_order_relaxed);
+
     if (armed.load(std::memory_order_relaxed) &&
-        (log10(peakL) * 20 > threshold || log10(peakR) * 20 > threshold))
+        (log10(peakL) * 20 > static_cast<float>(threshold) ||
+         log10(peakR) * 20 > static_cast<float>(threshold)))
     {
         armed.store(false, std::memory_order_relaxed);
         mpc.getEngineHost()->startRecordingSound();
     }
 
-    // If not recording, nothing to consume this frame (we keep always-writing)
     if (!recording.load(std::memory_order_relaxed))
     {
         return AUDIO_OK;
     }
 
-    // When recording, read up to nFrames from ring at readIndex (audio-thread
-    // owned)
     int consumed = 0;
     for (int i = 0; i < nFrames; ++i)
     {
-        // Safety: ensure we don't read past writer in a pathological
-        // buffer-overrun case. But since audio thread is both writer and
-        // reader, and buffer is sized sufficiently, this loop will normally
-        // always read `nFrames`.
         unresampledLeft[i] = ringLeft[readIndex];
         unresampledRight[i] = ringRight[readIndex];
         readIndex = (readIndex + 1) % bufSize;
         consumed++;
+    }
+
+    const int remaining =
+        lengthInFramesAtEngineSampleRate - recordedFrameCountAtEngineSampleRate;
+
+    if (remaining <= 0)
+    {
+        recording.store(false, std::memory_order_relaxed);
+        return AUDIO_OK;
     }
 
     if (engineSampleRate != 44100)
@@ -199,52 +209,73 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
         if (mode == 0 || mode == 1)
         {
             const auto &input = mode == 0 ? unresampledLeft : unresampledRight;
-            const auto generatedFrameCount = resamplers[0].resample(
-                input, resampledLeft, engineSampleRate, consumed);
-            sound->appendFrames(resampledLeft, generatedFrameCount);
+
+            const int gen = resamplers[0].resample(input, resampledLeft,
+                                                   engineSampleRate, consumed);
+
+            const int toAppend = std::min(gen, remaining);
+            if (toAppend > 0)
+            {
+                sound->appendFrames(resampledLeft, toAppend);
+                recordedFrameCountAtEngineSampleRate += toAppend;
+            }
+            if (toAppend < gen)
+            {
+                recording.store(false, std::memory_order_relaxed);
+            }
         }
         else
         {
-            const auto genL = resamplers[0].resample(
+            const int genL = resamplers[0].resample(
                 unresampledLeft, resampledLeft, engineSampleRate, consumed);
-            const auto genR = resamplers[1].resample(
+            const int genR = resamplers[1].resample(
                 unresampledRight, resampledRight, engineSampleRate, consumed);
             assert(genL == genR);
-            sound->appendFrames(resampledLeft, resampledRight, genL);
+            const int toAppend = std::min(genL, remaining);
+            if (toAppend > 0)
+            {
+                sound->appendFrames(resampledLeft, resampledRight, toAppend);
+                recordedFrameCountAtEngineSampleRate += toAppend;
+            }
+            if (toAppend < genL)
+            {
+                recording.store(false, std::memory_order_relaxed);
+            }
         }
     }
     else
     {
-        if (mode == 0)
+        const int toAppend = std::min(consumed, remaining);
+        if (toAppend > 0)
         {
-            sound->appendFrames(unresampledLeft, consumed);
+            if (mode == 0)
+            {
+                sound->appendFrames(unresampledLeft, toAppend);
+            }
+            else if (mode == 1)
+            {
+                sound->appendFrames(unresampledRight, toAppend);
+            }
+            else
+            {
+                sound->appendFrames(unresampledLeft, unresampledRight,
+                                    toAppend);
+            }
+            recordedFrameCountAtEngineSampleRate += toAppend;
         }
-        else if (mode == 1)
+        if (toAppend < consumed)
         {
-            sound->appendFrames(unresampledRight, consumed);
-        }
-        else
-        {
-            sound->appendFrames(unresampledLeft, unresampledRight, consumed);
+            recording.store(false, std::memory_order_relaxed);
         }
     }
 
-    recordedFrameCountAtEngineSampleRate += consumed;
-    if (recordedFrameCountAtEngineSampleRate >=
-        lengthInFramesAtEngineSampleRate)
-    {
-        recording.store(false, std::memory_order_relaxed);
-    }
     return AUDIO_OK;
 }
 
 void SoundRecorder::stop()
 {
-    // request stop (works if caller called from UI thread)
     recording.store(false, std::memory_order_release);
 
-    // Called on UI thread after audio-thread set recording=false.
-    // If cancelled, delete sound and return.
     if (cancelled.load(std::memory_order_relaxed))
     {
         mpc.getSampler()->deleteSound(sound);
@@ -256,38 +287,46 @@ void SoundRecorder::stop()
     {
         if (mode == 0 || mode == 1)
         {
-            if (const auto remaining =
-                    resamplers[0].wrapUpAndGetRemainder(resampledLeft);
-                remaining > 0)
+            const int remaining = lengthInFramesAtEngineSampleRate -
+                                  recordedFrameCountAtEngineSampleRate;
+
+            if (remaining > 0)
             {
-                sound->appendFrames(resampledLeft, remaining);
+                const auto gen =
+                    resamplers[0].wrapUpAndGetRemainder(resampledLeft);
+
+                if (const auto toAppend =
+                        std::min(static_cast<int>(gen), remaining);
+                    toAppend > 0)
+                {
+                    sound->appendFrames(resampledLeft, toAppend);
+                }
             }
         }
         else if (mode == 2)
         {
-            const auto remainingL =
-                resamplers[0].wrapUpAndGetRemainder(resampledLeft);
-            const auto remainingR =
-                resamplers[1].wrapUpAndGetRemainder(resampledRight);
-            assert(remainingL == remainingR);
-            if (remainingL > 0)
+            const auto remaining = lengthInFramesAtEngineSampleRate -
+                                   recordedFrameCountAtEngineSampleRate;
+
+            if (remaining > 0)
             {
-                sound->appendFrames(resampledLeft, resampledRight, remainingL);
+                const auto genL =
+                    resamplers[0].wrapUpAndGetRemainder(resampledLeft);
+
+                const auto genR =
+                    resamplers[1].wrapUpAndGetRemainder(resampledRight);
+
+                assert(genL == genR);
+
+                if (const auto toAppend =
+                        std::min(static_cast<int>(genL), remaining);
+                    toAppend > 0)
+                {
+                    sound->appendFrames(resampledLeft, resampledRight,
+                                        toAppend);
+                }
             }
         }
-    }
-
-    // By design the audio thread already appended samples into `sound`.
-    // Here we only do post-processing: trim overflow and set start/loop/end.
-    const double invRatio = 44100.0 / static_cast<double>(engineSampleRate);
-    const int lengthInFramesAt44Khz = static_cast<int>(
-        std::lround(lengthInFramesAtEngineSampleRate * invRatio));
-
-    if (const int overflowAt44Khz =
-            sound->getFrameCount() - lengthInFramesAt44Khz;
-        overflowAt44Khz > 0)
-    {
-        sound->removeFramesFromEnd(overflowAt44Khz);
     }
 
     const auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
@@ -297,5 +336,12 @@ void SoundRecorder::stop()
     sound->setLoopTo(sound->getFrameCount());
     sound->setEnd(sound->getFrameCount());
 
-    mpc.getLayeredScreen()->openScreenById(ScreenId::KeepOrRetryScreen);
+    auto ls = mpc.getLayeredScreen();
+    ls->postToUiThread(utils::Task(
+        [ls, this]
+        {
+            sound->getMutableSampleData()->shrink_to_fit();
+            sound.reset();
+            ls->openScreenById(ScreenId::KeepOrRetryScreen);
+        }));
 }
