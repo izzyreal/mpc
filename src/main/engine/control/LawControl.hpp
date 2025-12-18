@@ -4,6 +4,7 @@
 #include "engine/control/ControlLaw.hpp"
 
 #include <memory>
+#include <atomic>
 
 namespace mpc::engine::control
 {
