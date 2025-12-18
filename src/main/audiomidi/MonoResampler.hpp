@@ -7,7 +7,6 @@
 
 namespace mpc::audiomidi
 {
-
     class MonoResampler
     {
     public:
