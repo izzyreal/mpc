@@ -52,7 +52,8 @@ std::string getLv2ResourcePath(const std::string& resourceName)
         return {};
     }
 
-    char* path_copy = realpath(info.dli_fname, NULL);
+    char* path_copy = realpath(info.dli_fname, nullptr);
+
     if (!path_copy)
     {
         return "";
@@ -79,7 +80,7 @@ std::string getLv2ResourcePath(const std::string& resourceName)
 
 std::string MacBundleResources::getResourcePath(const std::string& resourceName)
 {
-    const auto lv2ResourcePath = getLv2ResourcePath(resourceName);
+    auto lv2ResourcePath = getLv2ResourcePath(resourceName);
 
     if (!lv2ResourcePath.empty())
     {

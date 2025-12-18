@@ -196,6 +196,11 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     };
 
     const auto eventData = getCurrentTempoChangeEventData();
+    
+    if (!eventData)
+    {
+        return {};
+    }
 
     return std::dynamic_pointer_cast<TempoChangeEvent>(mapEventDataToEvent(
         eventData, *eventData, dispatch, getSelectedSequence().get()));
