@@ -160,8 +160,8 @@ int DiskRecorder::processAudio(AudioBuffer *buf, const int nFrames)
             isOnlySilence = buf->isSilent();
         }
 
-        const auto sourceBufferLeft = buf->getChannel(0);
-        const auto sourceBufferRight = buf->getChannel(1);
+        const auto &sourceBufferLeft = buf->getChannel(0);
+        const auto &sourceBufferRight = buf->getChannel(1);
 
         for (int f = 0; f < nFrames; f++)
         {

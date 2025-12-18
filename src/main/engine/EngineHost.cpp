@@ -529,7 +529,11 @@ void EngineHost::changeBounceStateIfRequired()
         {
             if (getAudioServer()->isRealTime())
             {
-                getAudioServer()->setRealTime(false);
+                mpc.getLayeredScreen()->postToUiThread(utils::Task(
+                    [server = getAudioServer()]
+                    {
+                        server->setRealTime(false);
+                    }));
             }
         }
 
@@ -548,7 +552,11 @@ void EngineHost::changeBounceStateIfRequired()
         {
             if (!getAudioServer()->isRealTime())
             {
-                getAudioServer()->setRealTime(true);
+                mpc.getLayeredScreen()->postToUiThread(utils::Task(
+                    [server = getAudioServer()]
+                    {
+                        server->setRealTime(true);
+                    }));
             }
         }
 
