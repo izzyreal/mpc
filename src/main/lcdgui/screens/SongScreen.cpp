@@ -116,8 +116,8 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
          [&](auto isPlaying)
          {
              displaySteps();
-             findField("sequence1")->setBlinking(isPlaying, 10);
-             findField("reps1")->setBlinking(isPlaying, 10);
+             findField("sequence1")->setBlinking(isPlaying, 8);
+             findField("reps1")->setBlinking(isPlaying, 8);
          }});
 
     addReactiveBinding({[&]

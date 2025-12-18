@@ -29,7 +29,7 @@ namespace mpc::lcdgui
 
         void setLeftMargin(int margin);
         void enableTwoDots();
-        void setBlinking(bool b, int intervalMultiplier = 24);
+        void setBlinking(bool b, int intervalMultiplier = 16);
         void setInverted(bool b);
         void setDoubleInverted(bool b);
         void setAlignment(Alignment newAlignment, int endX = -1);
