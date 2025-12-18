@@ -62,7 +62,6 @@ namespace mpc::controller
         using Sequencer = sequencer::Sequencer;
         using Sampler = sampler::Sampler;
         using EventHandler = audiomidi::EventHandler;
-        using MultiRecordingSetupScreen = MultiRecordingSetupScreen;
 
         using Track = sequencer::Track;
         using Program = sampler::Program;
