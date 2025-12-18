@@ -330,7 +330,7 @@ std::vector<float> &FloatSampleBuffer::getChannel(int channel)
                             " was provided, only up to index " +
                             std::to_string(channels.size() - 1) + " available.";
         printf("ERROR: %s\n", error.c_str());
-        throw new std::invalid_argument(error);
+        throw std::invalid_argument(error);
     }
 
     return channels[channel];
