@@ -115,9 +115,6 @@ void Sampler::setSoundIndex(const int i)
 {
     soundIndex =
         std::clamp(i, 0, std::max(0, static_cast<int>(sounds.size() - 1)));
-
-    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    zoneScreen->initZones();
 }
 
 short Sampler::getSoundIndex() const

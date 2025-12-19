@@ -1,9 +1,10 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
+#include "SaveTarget.hpp"
 
 #include "controller/ClientEventController.hpp"
-#include "lcdgui/screens/window/NameScreen.hpp"
+
 #include "mpc_fs.hpp"
 
 #include "disk/AbstractDisk.hpp"
@@ -17,7 +18,6 @@
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
-#include "DirectorySaveTarget.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -28,7 +28,6 @@
 
 #include <chrono>
 #include <memory>
-#include <thread>
 
 using namespace mpc;
 using namespace mpc::file::all;
@@ -71,7 +70,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless]
+    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless, this]
     {
         auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;
@@ -94,6 +93,11 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
         for (const auto &f : availableFiles)
         {
+            if (shouldStopRestore.load(std::memory_order_relaxed))
+            {
+                break;
+            }
+
             if (auto size = saveTarget->fileSize(f); size == 0)
             {
                 continue;
@@ -310,12 +314,18 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    std::thread(
-        [restoreAction]
-        {
-            restoreAction();
-        })
-        .detach();
+    if (mpc.isPluginModeEnabled())
+    {
+        restoreAction();
+    }
+    else
+    {
+        restoreThread = std::thread(
+            [restoreAction]
+            {
+                restoreAction();
+            });
+    }
 }
 
 void AutoSave::storeAutoSavedState(
@@ -381,4 +391,17 @@ void AutoSave::storeAutoSavedState(
     };
 
     storeAction();
+}
+
+void AutoSave::interruptRestorationIfStillOngoing()
+{
+    shouldStopRestore.store(false, std::memory_order_relaxed);
+}
+
+AutoSave::~AutoSave()
+{
+    if (restoreThread.joinable())
+    {
+        restoreThread.join();
+    }
 }

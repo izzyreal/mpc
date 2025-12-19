@@ -6,6 +6,7 @@
 
 #include "disk/DiskController.hpp"
 
+#include "AutoSave.hpp"
 #include "Paths.hpp"
 
 #include <vector>
@@ -93,6 +94,7 @@ namespace mpc
         std::shared_ptr<sequencer::Clock> clock;
         std::shared_ptr<performance::PerformanceManager> performanceManager;
         std::shared_ptr<sequencer::Sequencer> sequencer;
+        std::unique_ptr<AutoSave> autoSave;
 
     public:
         std::shared_ptr<lcdgui::Screens> screens;
@@ -128,6 +130,8 @@ namespace mpc
 
         std::shared_ptr<disk::AbstractDisk> getDisk() const;
         std::vector<std::shared_ptr<disk::AbstractDisk>> getDisks() const;
+
+        AutoSave *getAutoSave();
 
         Mpc();
         ~Mpc();

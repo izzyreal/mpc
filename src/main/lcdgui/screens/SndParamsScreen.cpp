@@ -3,6 +3,7 @@
 #include "Mpc.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
+#include "lcdgui/screens/ZoneScreen.hpp"
 
 #include "Util.hpp"
 
@@ -21,14 +22,17 @@ SndParamsScreen::SndParamsScreen(Mpc &mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
-    const auto sound = sampler.lock()->getSound() ? true : false;
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    zoneScreen->initZones();
 
-    findField("snd")->setFocusable(sound);
-    findField("playx")->setFocusable(sound);
-    findField("level")->setFocusable(sound);
-    findField("tune")->setFocusable(sound);
-    findField("beat")->setFocusable(sound);
-    findField("dummy")->setFocusable(!sound);
+    const bool soundIsLoaded = sampler.lock()->getSound() != nullptr;
+
+    findField("snd")->setFocusable(soundIsLoaded);
+    findField("playx")->setFocusable(soundIsLoaded);
+    findField("level")->setFocusable(soundIsLoaded);
+    findField("tune")->setFocusable(soundIsLoaded);
+    findField("beat")->setFocusable(soundIsLoaded);
+    findField("dummy")->setFocusable(!soundIsLoaded);
 
     displaySnd();
     displayPlayX();
@@ -37,7 +41,7 @@ void SndParamsScreen::open()
     displayBeat();
     displaySampleAndNewTempo();
 
-    ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void SndParamsScreen::openWindow()

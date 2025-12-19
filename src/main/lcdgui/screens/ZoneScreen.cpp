@@ -29,18 +29,18 @@ ZoneScreen::ZoneScreen(Mpc &mpc, const int layerIndex)
 
 void ZoneScreen::open()
 {
-    const bool sound = sampler.lock()->getSound() ? true : false;
+    const bool soundIsLoaded = sampler.lock()->getSound() != nullptr;
 
     initZones();
 
-    findField("snd")->setFocusable(sound);
-    findField("playx")->setFocusable(sound);
-    findField("st")->setFocusable(sound);
+    findField("snd")->setFocusable(soundIsLoaded);
+    findField("playx")->setFocusable(soundIsLoaded);
+    findField("st")->setFocusable(soundIsLoaded);
     findField("st")->enableTwoDots();
-    findField("end")->setFocusable(sound);
+    findField("end")->setFocusable(soundIsLoaded);
     findField("end")->enableTwoDots();
-    findField("zone")->setFocusable(sound);
-    findField("dummy")->setFocusable(!sound);
+    findField("zone")->setFocusable(soundIsLoaded);
+    findField("dummy")->setFocusable(!soundIsLoaded);
 
     displayWave();
     displaySnd();
@@ -49,7 +49,7 @@ void ZoneScreen::open()
     displayEnd();
     displayZone();
 
-    ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void ZoneScreen::openWindow()

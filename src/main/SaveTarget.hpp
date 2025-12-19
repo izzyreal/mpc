@@ -6,7 +6,6 @@
 
 namespace mpc
 {
-
     class SaveTarget
     {
     public:

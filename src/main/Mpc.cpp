@@ -212,6 +212,8 @@ void Mpc::init()
 
     startMidiDeviceDetector();
     getEngineHost()->getAudioServer()->start();
+
+    autoSave = std::make_unique<AutoSave>();
 }
 
 std::shared_ptr<Hardware> Mpc::getHardware()
@@ -291,10 +293,11 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
+    if (autoSave) autoSave->interruptRestorationIfStillOngoing();
     nvram::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
-    engineHost->destroyServices();
+    if (engineHost) engineHost->destroyServices();
 }
 
 void Mpc::panic() const
@@ -333,4 +336,9 @@ void Mpc::startMidiDeviceDetector()
 std::shared_ptr<input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
+}
+
+AutoSave *Mpc::getAutoSave()
+{
+    return autoSave.get();
 }

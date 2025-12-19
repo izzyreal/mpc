@@ -6,6 +6,7 @@
 
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
+#include "lcdgui/screens/ZoneScreen.hpp"
 
 #include <climits>
 
@@ -25,18 +26,21 @@ LoopScreen::LoopScreen(Mpc &mpc, const int layerIndex)
 
 void LoopScreen::open()
 {
-    findField("loop")->setAlignment(Alignment::Centered);
-    const bool sound = sampler.lock()->getSound() ? true : false;
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    zoneScreen->initZones();
 
-    findField("snd")->setFocusable(sound);
-    findField("playx")->setFocusable(sound);
-    findField("to")->setFocusable(sound);
+    findField("loop")->setAlignment(Alignment::Centered);
+    const bool soundIsLoaded = sampler.lock()->getSound() != nullptr;
+
+    findField("snd")->setFocusable(soundIsLoaded);
+    findField("playx")->setFocusable(soundIsLoaded);
+    findField("to")->setFocusable(soundIsLoaded);
     findField("to")->enableTwoDots();
-    findField("endlength")->setFocusable(sound);
-    findField("endlengthvalue")->setFocusable(sound);
+    findField("endlength")->setFocusable(soundIsLoaded);
+    findField("endlengthvalue")->setFocusable(soundIsLoaded);
     findField("endlengthvalue")->enableTwoDots();
-    findField("loop")->setFocusable(sound);
-    findField("dummy")->setFocusable(!sound);
+    findField("loop")->setFocusable(soundIsLoaded);
+    findField("dummy")->setFocusable(!soundIsLoaded);
 
     displaySnd();
     displayPlayX();
@@ -46,7 +50,7 @@ void LoopScreen::open()
     displayTo();
     displayWave();
 
-    ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void LoopScreen::openWindow()
