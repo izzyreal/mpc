@@ -235,20 +235,19 @@ void ClientHardwareEventController::handlePadPress(
 
     std::optional<NoteNumber> note = std::nullopt;
 
-    if (program)
-    {
-        assert(programIndex);
-        constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+    assert(program && program->isUsed());
+    assert(programIndex);
 
-        mpc.getPerformanceManager().lock()->registerProgramPadPress(
-            PerformanceEventSource::VirtualMpcHardware, noMidiChannel, screenId,
-            track->getIndex(), screen->getBus()->busType,
-            ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
-            *programIndex, PhysicalPadIndex(physicalPadIndex));
+    constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        note = NoteNumber(
-            program->getNoteFromPad(ProgramPadIndex(programPadIndex)));
-    }
+    mpc.getPerformanceManager().lock()->registerProgramPadPress(
+        PerformanceEventSource::VirtualMpcHardware, noMidiChannel, screenId,
+        track->getIndex(), screen->getBus()->busType,
+        ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
+        *programIndex, PhysicalPadIndex(physicalPadIndex));
+
+    note =
+        NoteNumber(program->getNoteFromPad(ProgramPadIndex(programPadIndex)));
 
     const bool isF4Pressed = mpc.getHardware()->getButton(F4)->isPressed();
     const bool isF6Pressed = mpc.getHardware()->getButton(F6)->isPressed();
@@ -510,12 +509,11 @@ void ClientHardwareEventController::handlePadRelease(
                 performanceManager->enqueueCallback(std::move(noteOffAction));
             }
 
-            if (p.programIndex != NoProgramIndex)
-            {
-                performanceManager->registerProgramPadRelease(
-                    PerformanceEventSource::VirtualMpcHardware, programPadIndex,
-                    p.programIndex);
-            }
+            assert(p.programIndex != NoProgramIndex);
+
+            performanceManager->registerProgramPadRelease(
+                PerformanceEventSource::VirtualMpcHardware, programPadIndex,
+                p.programIndex);
         });
 
     performanceManager->enqueueCallback(std::move(action));
@@ -556,14 +554,13 @@ void ClientHardwareEventController::handlePadAftertouch(
             [performanceManager = mpc.getPerformanceManager(), pressureToUse,
              padPress = *padPressEvent]
             {
-                if (padPress.programIndex != NoProgramIndex)
-                {
-                    performanceManager.lock()->registerProgramPadAftertouch(
-                        PerformanceEventSource::VirtualMpcHardware,
-                        physicalPadAndBankToProgramPadIndex(padPress.padIndex,
-                                                            padPress.bank),
-                        padPress.programIndex, Pressure(pressureToUse));
-                }
+                assert(padPress.programIndex != NoProgramIndex);
+
+                performanceManager.lock()->registerProgramPadAftertouch(
+                    PerformanceEventSource::VirtualMpcHardware,
+                    physicalPadAndBankToProgramPadIndex(padPress.padIndex,
+                                                        padPress.bank),
+                    padPress.programIndex, Pressure(pressureToUse));
 
                 if (padPress.noteNumber != NoNoteNumber)
                 {
