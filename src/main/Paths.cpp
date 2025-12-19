@@ -45,7 +45,6 @@ fs::path Paths::configPath() const
 
 Paths::Documents *Paths::getDocuments() const
 {
-    printf("==== ACCESSING ~/DOCUMENTS =========\n");
     return documents.get();
 }
 
