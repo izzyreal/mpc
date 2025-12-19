@@ -15,7 +15,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
 {
     assert(fs::is_directory(p));
 
-    auto tempRoot = mpc.paths->tempPath();
+    auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
     if (fs::exists(tempRoot))
     {

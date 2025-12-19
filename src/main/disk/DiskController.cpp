@@ -30,7 +30,7 @@ void DiskController::initDisks()
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
     defaultVolume.localDirectoryPath =
-        mpc.paths->defaultLocalVolumePath().string();
+        mpc.paths->getDocuments()->defaultLocalVolumePath().string();
     defaultVolume.volumeSize =
         fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();

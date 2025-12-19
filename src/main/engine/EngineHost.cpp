@@ -379,7 +379,7 @@ void EngineHost::closeIO() const
 bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
 {
     const auto destinationDirectory =
-        mpc.paths->recordingsPath() / settings->recordingName;
+        mpc.paths->getDocuments()->recordingsPath() / settings->recordingName;
 
     fs::create_directory(destinationDirectory);
 

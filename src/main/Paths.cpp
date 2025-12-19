@@ -12,7 +12,16 @@ std::string getIosSharedDocumentsFolder();
 
 using namespace mpc;
 
-fs::path Paths::appDocumentsPath()
+Paths::Documents::Documents(const Paths *paths) : paths(paths) {}
+
+fs::path Paths::Documents::appDocumentsPath() const
+{
+    return paths->appDocumentsPath();
+}
+
+Paths::Paths() : documents(std::make_unique<Documents>(this)) {}
+
+fs::path Paths::appDocumentsPath() const
 {
 #if TARGET_OS_IOS
     static auto path = fs::path(getIosSharedDocumentsFolder());
@@ -22,61 +31,67 @@ fs::path Paths::appDocumentsPath()
     return path;
 }
 
-fs::path Paths::appConfigHome()
+fs::path Paths::appConfigHome() const
 {
     static auto path = fs::path(sago::getConfigHome()) / "VMPC2000XL";
     return path;
 }
 
-fs::path Paths::configPath()
+fs::path Paths::configPath() const
 {
     static auto path = appConfigHome() / "config";
     return path;
 }
 
-fs::path Paths::storesPath()
+Paths::Documents *Paths::getDocuments() const
+{
+    printf("==== ACCESSING ~/DOCUMENTS =========\n");
+    return documents.get();
+}
+
+fs::path Paths::Documents::storesPath() const
 {
     static auto storesPath = appDocumentsPath() / "Volumes";
     return storesPath;
 }
 
-fs::path Paths::defaultLocalVolumePath()
+fs::path Paths::Documents::defaultLocalVolumePath() const
 {
     static auto storesPath = appDocumentsPath() / "Volumes" / "MPC2000XL";
     return storesPath;
 }
 
-fs::path Paths::logFilePath()
+fs::path Paths::Documents::logFilePath() const
 {
     static auto logFilePath = appDocumentsPath() / "vmpc.log";
     return logFilePath;
 }
 
-fs::path Paths::recordingsPath()
+fs::path Paths::Documents::recordingsPath() const
 {
     static auto recPath = appDocumentsPath() / "Recordings";
     return recPath;
 }
 
-fs::path Paths::midiControlPresetsPath()
+fs::path Paths::Documents::midiControlPresetsPath() const
 {
     static auto path = appDocumentsPath() / "MidiControlPresets";
     return path;
 }
 
-fs::path Paths::autoSavePath()
+fs::path Paths::Documents::autoSavePath() const
 {
     static auto path = appDocumentsPath() / "AutoSave";
     return path;
 }
 
-fs::path Paths::demoDataPath()
+fs::path Paths::Documents::demoDataPath() const
 {
     static auto demoDataPath = defaultLocalVolumePath() / "DEMOS";
     return demoDataPath;
 }
 
-fs::path Paths::tempPath()
+fs::path Paths::Documents::tempPath() const
 {
     static auto tempPath = appDocumentsPath() / "Temp";
     return tempPath;
