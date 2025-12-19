@@ -300,7 +300,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const bool isLiveEraseMode = transport.isRecordingOrOverdubbing() &&
                                  clientEventController.lock()->isEraseButtonPressed();
 
-    if (isNoteRepeatMode)
+    if (isNoteRepeatMode || isLiveEraseMode)
     {
         return;
     }
