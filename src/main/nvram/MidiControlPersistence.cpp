@@ -211,7 +211,7 @@ void MidiControlPersistence::loadFileByNameIntoPreset(
     Mpc &mpc, const std::string &name,
     const std::shared_ptr<MidiControlPreset> &preset)
 {
-    auto presetsPath = mpc.paths->midiControlPresetsPath();
+    auto presetsPath = mpc.paths->getDocuments()->midiControlPresetsPath();
 
     assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
 
@@ -235,7 +235,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(Mpc &mpc)
 {
     mpc.midiControlPresets.clear();
 
-    auto presetsPath = mpc.paths->midiControlPresetsPath();
+    auto presetsPath = mpc.paths->getDocuments()->midiControlPresetsPath();
     assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
 
     for (auto &e : fs::directory_iterator(presetsPath))
@@ -255,7 +255,8 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(Mpc &mpc)
 
 bool MidiControlPersistence::doesPresetWithNameExist(Mpc &mpc, std::string name)
 {
-    auto path_it = fs::directory_iterator(mpc.paths->midiControlPresetsPath());
+    auto path_it = fs::directory_iterator(
+        mpc.paths->getDocuments()->midiControlPresetsPath());
 
     return std::any_of(fs::begin(path_it), fs::end(path_it),
                        [name](const fs::directory_entry &e)

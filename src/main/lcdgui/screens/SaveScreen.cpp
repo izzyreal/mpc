@@ -406,7 +406,7 @@ void SaveScreen::displayFree() const
 
     try
     {
-        availableSpaceInBytes = fs::space(mpc.paths->storesPath()).available;
+        availableSpaceInBytes = fs::space(mpc.paths->getDocuments()->storesPath()).available;
     }
     catch (fs::filesystem_error &)
     {

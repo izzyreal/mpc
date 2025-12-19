@@ -74,28 +74,28 @@ void MidiDeviceDetector::start(Mpc &mpc)
 
                         if (name.find("MPD16") != std::string::npos)
                         {
-                            path = mpc.paths->midiControlPresetsPath() /
+                            path = mpc.paths->getDocuments()->midiControlPresetsPath() /
                                    "MPD16.vmp";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD16");
                         }
                         else if (name.find("MPD218") != std::string::npos)
                         {
-                            path = mpc.paths->midiControlPresetsPath() /
+                            path = mpc.paths->getDocuments()->midiControlPresetsPath() /
                                    "MPD218.vmp";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD218");
                         }
                         else if (name.find("iRig PADS") != std::string::npos)
                         {
-                            path = mpc.paths->midiControlPresetsPath() /
+                            path = mpc.paths->getDocuments()->midiControlPresetsPath() /
                                    "iRig_PADS.vmp";
                             knownControllerDetectedScreen->setControllerName(
                                 "iRig_PADS");
                         }
                         else if (name.find("MPC Studio") != std::string::npos)
                         {
-                            path = mpc.paths->midiControlPresetsPath() /
+                            path = mpc.paths->getDocuments()->midiControlPresetsPath() /
                                    "MPC_Studio.vmp";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPC_Studio");

@@ -50,9 +50,9 @@ Mpc::Mpc()
 void Mpc::init()
 {
     const std::vector requiredPaths{
-        paths->appDocumentsPath(), paths->configPath(),
-        paths->storesPath(),       paths->defaultLocalVolumePath(),
-        paths->recordingsPath(),   paths->autoSavePath()};
+        paths->getDocuments()->appDocumentsPath(), paths->configPath(),
+        paths->getDocuments()->storesPath(),       paths->getDocuments()->defaultLocalVolumePath(),
+        paths->getDocuments()->recordingsPath(),   paths->getDocuments()->autoSavePath()};
 
     for (auto &p : requiredPaths)
     {
@@ -62,14 +62,14 @@ void Mpc::init()
         }
     }
 
-    fs::create_directories(paths->demoDataPath() / "TEST1");
-    fs::create_directories(paths->demoDataPath() / "TEST2");
-    fs::create_directories(paths->demoDataPath() / "TRAIN1");
-    fs::create_directories(paths->demoDataPath() / "RESIST");
+    fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST1");
+    fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST2");
+    fs::create_directories(paths->getDocuments()->demoDataPath() / "TRAIN1");
+    fs::create_directories(paths->getDocuments()->demoDataPath() / "RESIST");
 
     for (const auto &demo_file : demo_files)
     {
-        const auto dst = paths->demoDataPath() / demo_file;
+        const auto dst = paths->getDocuments()->demoDataPath() / demo_file;
         const bool should_update =
             !fs::exists(dst) ||
             std::find(always_update_demo_files.begin(),
@@ -84,7 +84,7 @@ void Mpc::init()
         }
     }
 
-    fs::create_directories(paths->midiControlPresetsPath());
+    fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
 
     const std::vector<std::string> factory_midi_control_presets{
         "MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp"};
@@ -94,15 +94,15 @@ void Mpc::init()
         const auto data =
             MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
-        if (!fs::exists(paths->midiControlPresetsPath() / preset) ||
-            fs::file_size(paths->midiControlPresetsPath() / preset) !=
+        if (!fs::exists(paths->getDocuments()->midiControlPresetsPath() / preset) ||
+            fs::file_size(paths->getDocuments()->midiControlPresetsPath() / preset) !=
                 data.size())
         {
-            set_file_data(paths->midiControlPresetsPath() / preset, data);
+            set_file_data(paths->getDocuments()->midiControlPresetsPath() / preset, data);
         }
     }
 
-    Logger::l.setPath(paths->logFilePath().string());
+    Logger::l.setPath(paths->getDocuments()->logFilePath().string());
 
     padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
