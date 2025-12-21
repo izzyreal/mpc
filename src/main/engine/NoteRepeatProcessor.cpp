@@ -113,7 +113,6 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
             Util::SliderNoteVariationContext sliderNoteVariationContext{
                 hardwareSlider->getValueAs<int>(),
-                programSlider->getNote(),
                 programSlider->getParameter(),
                 programSlider->getTuneLowRange(),
                 programSlider->getTuneHighRange(),

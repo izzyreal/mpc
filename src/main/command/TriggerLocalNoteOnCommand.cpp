@@ -63,7 +63,6 @@ void TriggerLocalNoteOnCommand::execute()
 
             const Util::SliderNoteVariationContext sliderNoteVariationContext{
                 ctx.hardwareSliderValue,
-                programSlider->getNote(),
                 programSlider->getParameter(),
                 programSlider->getTuneLowRange(),
                 programSlider->getTuneHighRange(),

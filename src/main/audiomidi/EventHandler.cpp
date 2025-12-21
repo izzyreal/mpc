@@ -90,7 +90,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
         const Util::SliderNoteVariationContext sliderNoteVariationContext{
             mpc.getHardware()->getSlider()->getValueAs<int>(),
-            programSlider->getNote(),
             programSlider->getParameter(),
             programSlider->getTuneLowRange(),
             programSlider->getTuneHighRange(),

@@ -41,7 +41,6 @@ namespace mpc
         struct SliderNoteVariationContext
         {
             const int sliderValue;
-            const int programNote;
             const NoteVariationType sliderParameter;
             const int tuneLowRange;
             const int tuneHighRange;
