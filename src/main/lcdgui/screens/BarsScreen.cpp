@@ -64,7 +64,7 @@ void BarsScreen::open()
 
 void BarsScreen::close()
 {
-    Util::initSequence(mpc);
+    Util::ensureSelectedSequenceInitialized(mpc);
 }
 
 void BarsScreen::function(const int j)
@@ -194,7 +194,7 @@ void BarsScreen::turnWheel(const int increment)
                 sequencer.lock()->getSequence(eventsScreen->toSq);
             !toSequence->isUsed())
         {
-            Util::initSequence(eventsScreen->toSq, mpc);
+            Util::ensureSequenceInitialized(eventsScreen->toSq, mpc);
         }
 
         setCopies(eventsScreen->copies + increment);

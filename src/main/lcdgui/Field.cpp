@@ -136,7 +136,7 @@ void Field::takeFocus()
     {
         if (name.find("now") != std::string::npos || name == "tempo")
         {
-            Util::initSequence(mpc);
+            Util::ensureSelectedSequenceInitialized(mpc);
         }
     }
 

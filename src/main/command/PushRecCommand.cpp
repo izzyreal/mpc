@@ -5,6 +5,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "Util.hpp"
 
 using namespace mpc::command;
 using namespace mpc::lcdgui;
@@ -33,6 +34,7 @@ void PushRecCommand::execute()
     if (!screengroups::isPlayAndRecordScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
+        mpc::Util::ensureSelectedSequenceInitialized(mpc);
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
 

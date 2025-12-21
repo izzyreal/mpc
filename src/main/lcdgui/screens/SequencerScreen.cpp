@@ -728,7 +728,7 @@ void SequencerScreen::function(const int i)
                 return;
             }
 
-            Util::initSequence(mpc);
+            Util::ensureSelectedSequenceInitialized(mpc);
 
             openScreenById(ScreenId::StepEditorScreen);
             break;
@@ -934,7 +934,7 @@ void SequencerScreen::openWindow()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "sq")
     {
-        Util::initSequence(mpc);
+        Util::ensureSelectedSequenceInitialized(mpc);
         mpc.getEngineHost()->postToAudioThread(utils::Task(
             [this]
             {
@@ -1218,12 +1218,12 @@ void SequencerScreen::stop()
 
 void SequencerScreen::rec()
 {
-    Util::initSequence(mpc);
+    Util::ensureSelectedSequenceInitialized(mpc);
     ScreenComponent::rec();
 }
 
 void SequencerScreen::overDub()
 {
-    Util::initSequence(mpc);
+    Util::ensureSelectedSequenceInitialized(mpc);
     ScreenComponent::overDub();
 }

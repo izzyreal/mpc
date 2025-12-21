@@ -163,11 +163,6 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
     return ScreenId::Count;
 }
 
-void LayeredScreen::setPopupScreenText(const std::string &text) const
-{
-    mpc.screens->get<ScreenId::PopupScreen>()->setText(text);
-}
-
 void LayeredScreen::showPopup(const std::string &msg)
 {
     const PopupScreen::PopupConfig cfg{msg};
@@ -305,7 +300,10 @@ void LayeredScreen::openScreenInternal(
 
     if (controller->isRecPressed() || controller->isOverdubPressed())
     {
-        return;
+        if (getScreenId(newScreen) != ScreenId::SequencerScreen)
+        {
+            return;
+        }
     }
 
     if (controller->isRecLocked())
@@ -414,7 +412,7 @@ void LayeredScreen::openScreenInternal(
 
     if (std::dynamic_pointer_cast<NextSeqScreen>(newScreen))
     {
-        Util::initSequence(mpc);
+        Util::ensureSelectedSequenceInitialized(mpc);
     }
 
     mpc.getHardware()

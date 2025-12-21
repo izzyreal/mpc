@@ -68,8 +68,17 @@ namespace mpc
         static std::vector<std::string> &noteNames();
         static std::string tempoString(double tempo);
         static int getTextWidthInPixels(const std::string &text);
-        static void initSequence(Mpc &mpc);
-        static void initSequence(int sequenceIndex, Mpc &mpc);
+
+        // Delegates to ensureSequenceInitialized with the selected sequence
+        // index. See ensureSequenceInitialized for further information.
+        static void ensureSelectedSequenceInitialized(mpc::Mpc &mpc);
+
+        // If the selected sequence is currently used, this is a no-op.
+        // If it's not used, the selected sequence will be initialized per the
+        // USER screen defaults and set to used, after which the sequence is
+        // ready for playback and recording.
+        static void ensureSequenceInitialized(int sequenceIndex, Mpc &mpc);
+
         static void set16LevelsValues(const SixteenLevelsContext &,
                                       sequencer::EventData &);
 

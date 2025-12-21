@@ -96,7 +96,6 @@ namespace mpc::lcdgui
         void closeRecentScreensUntilReachingLayer(int layerIndex);
 
     private:
-        void setPopupScreenText(const std::string &) const;
         std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(const std::shared_ptr<ScreenComponent> &);

@@ -195,12 +195,13 @@ int Util::getTextWidthInPixels(const std::string &text)
     return count * 6 - halfSpaceCount * 3;
 }
 
-void Util::initSequence(mpc::Mpc &mpc)
+void Util::ensureSelectedSequenceInitialized(mpc::Mpc &mpc)
 {
-    initSequence(mpc.getSequencer()->getSelectedSequenceIndex(), mpc);
+    ensureSequenceInitialized(mpc.getSequencer()->getSelectedSequenceIndex(),
+                              mpc);
 }
 
-void Util::initSequence(const int sequenceIndex, mpc::Mpc &mpc)
+void Util::ensureSequenceInitialized(int sequenceIndex, Mpc &mpc)
 {
     const auto sequencer = mpc.getSequencer();
     const auto sequence = sequencer->getSequence(sequenceIndex);

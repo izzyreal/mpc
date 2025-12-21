@@ -40,7 +40,7 @@ void PushTrackMuteCommand::execute()
                                   ScreenId::SequencerScreen}) &&
              !mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
     {
-        Util::initSequence(mpc);
+        Util::ensureSelectedSequenceInitialized(mpc);
         mpc.getLayeredScreen()->openScreenById(ScreenId::TrMuteScreen);
         mpc.getHardware()
             ->getLed(hardware::ComponentId::TRACK_MUTE_LED)

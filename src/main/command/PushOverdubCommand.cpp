@@ -32,6 +32,7 @@ void PushOverdubCommand::execute()
         !screengroups::isPlayAndRecordScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
+
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
 }
