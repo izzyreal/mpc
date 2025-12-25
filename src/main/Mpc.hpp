@@ -87,7 +87,6 @@ namespace mpc
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<engine::EngineHost> engineHost;
-        std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
@@ -101,6 +100,11 @@ namespace mpc
         std::shared_ptr<Paths> paths;
         std::vector<std::shared_ptr<nvram::MidiControlPreset>>
             midiControlPresets;
+
+    private:
+        std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
+   
+    public:
         void init();
         void startMidiDeviceDetector();
         void panic() const;
