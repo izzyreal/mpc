@@ -93,8 +93,8 @@ void KeyboardBindings::initializeDefaults()
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_Q] = {getLabel(Id::PREV_STEP_OR_EVENT)};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_W] = {getLabel(Id::NEXT_STEP_OR_EVENT)};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_E] = {getLabel(Id::GO_TO)};
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_R] = {getLabel(Id::PREV_BAR_START)};
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_T] = {getLabel(Id::NEXT_BAR_END)};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_R] = {getLabel(Id::PREV_BAR_OR_START)};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_T] = {getLabel(Id::NEXT_BAR_OR_END)};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_Y] = {
         getLabel(Id::TAP_TEMPO_OR_NOTE_REPEAT)};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_LeftBracket] = {getLabel(Id::NEXT_SEQ)};
