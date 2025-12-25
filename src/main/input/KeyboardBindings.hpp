@@ -33,9 +33,13 @@ namespace mpc::input
 
     struct KeyboardBinding
     {
-        hardware::ComponentId componentId;
+        std::string componentLabel;
         Direction direction = Direction::NoDirection;
+
+        hardware::ComponentId getComponentId() const;
     };
+
+    using KeyboardBindingsData = std::map<VmpcKeyCode, KeyboardBinding>;
 
     class KeyboardBindings
     {
@@ -46,10 +50,16 @@ namespace mpc::input
         lookupComponent(hardware::ComponentId id) const;
         std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
 
+        void setBinding(hardware::ComponentId, Direction, VmpcKeyCode);
+        void setBinding(std::string componentLabel, Direction, VmpcKeyCode);
+        void setBindingsData(KeyboardBindingsData &);
+
         void initializeDefaults();
 
+        KeyboardBindingsData getKeyboardBindingsData() const;
+
     private:
-        std::map<VmpcKeyCode, KeyboardBinding> bindings;
+        KeyboardBindingsData bindings;
     };
 
 } // namespace mpc::input
