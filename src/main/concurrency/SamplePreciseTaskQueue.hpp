@@ -60,7 +60,7 @@ namespace mpc::concurrency
             }
         }
 
-        void processTasks (const int nFrames)
+        void processTasks(const int nFrames)
         {
             SamplePreciseTask temp[Capacity];
             size_t reinsertIndex = 0;
@@ -72,8 +72,8 @@ namespace mpc::concurrency
 
                 if (remaining < nFrames) // fires in this buffer
                 {
-                    auto p = std::max<int64_t>(0,
-                                std::min<int64_t>(remaining, nFrames - 1));
+                    auto p = std::max<int64_t>(
+                        0, std::min<int64_t>(remaining, nFrames - 1));
                     task.f((int)p);
                     task.~SamplePreciseTask();
                 }
@@ -86,7 +86,9 @@ namespace mpc::concurrency
             }
 
             for (size_t i = 0; i < reinsertIndex; ++i)
+            {
                 queue.enqueue(std::move(temp[i]));
+            }
         }
 
     private:

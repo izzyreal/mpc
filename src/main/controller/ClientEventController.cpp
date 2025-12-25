@@ -53,11 +53,13 @@ void ClientEventController::init()
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.getPerformanceManager(), shared_from_this(),
-        clientHardwareEventController, screens.lock()->get<ScreenId::MidiSwScreen>(),
-        mpc.getSequencer(), mpc.getSampler(),
-        screens.lock()->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
-        screens.lock()->get<ScreenId::MultiRecordingSetupScreen>(), layeredScreen.lock(),
-        hardware.lock(), screens.lock(), mpc.getEngineHost()->getPreviewSoundPlayer().get());
+        clientHardwareEventController,
+        screens.lock()->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(),
+        mpc.getSampler(), screens.lock()->get<ScreenId::MidiInputScreen>(),
+        mpc.getEventHandler(),
+        screens.lock()->get<ScreenId::MultiRecordingSetupScreen>(),
+        layeredScreen.lock(), hardware.lock(), screens.lock(),
+        mpc.getEngineHost()->getPreviewSoundPlayer().get());
 }
 
 void ClientEventController::dispatchHostInput(
@@ -97,9 +99,9 @@ ClientEventController::getClientMidiEventController()
 
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
-    return SeqUtil::isRecMainWithoutPlaying(mpc.getSequencer(),
-                                            layeredScreen.lock()->getCurrentScreenId(),
-                                            clientHardwareEventController);
+    return SeqUtil::isRecMainWithoutPlaying(
+        mpc.getSequencer(), layeredScreen.lock()->getCurrentScreenId(),
+        clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const

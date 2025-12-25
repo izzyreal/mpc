@@ -12,5 +12,8 @@ namespace mpc::lcdgui::screens::window
 
         void open() override;
         void function(int i) override;
+
+    private:
+        void displaySequenceName();
     };
 } // namespace mpc::lcdgui::screens::window

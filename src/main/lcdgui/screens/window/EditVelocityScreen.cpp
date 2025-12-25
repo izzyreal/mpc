@@ -120,13 +120,13 @@ void EditVelocityScreen::turnWheel(const int i)
 void EditVelocityScreen::displayTime()
 {
     const auto sequence = sequencer.lock()->getSelectedSequence().get();
-    findField("time0")->setTextPadded(
-        SeqUtil::getBar(sequence, time0) + 1, "0");
+    findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1,
+                                      "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
                                       "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-    findField("time3")->setTextPadded(
-        SeqUtil::getBar(sequence, time1) + 1, "0");
+    findField("time3")->setTextPadded(SeqUtil::getBar(sequence, time1) + 1,
+                                      "0");
     findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1,
                                       "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");

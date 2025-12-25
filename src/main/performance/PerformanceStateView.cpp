@@ -178,7 +178,8 @@ PerformanceStateView::findProgramPadPress(const PerformanceEventSource source,
 {
     for (auto &p : state->programPadEvents)
     {
-        if (p.source == source && p.padIndex == programPadIndex && p.programIndex == programIndex)
+        if (p.source == source && p.padIndex == programPadIndex &&
+            p.programIndex == programIndex)
         {
             return p;
         }

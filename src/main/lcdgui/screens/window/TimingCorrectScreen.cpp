@@ -198,12 +198,10 @@ void TimingCorrectScreen::displayAmount() const
 void TimingCorrectScreen::displayTime()
 {
     const auto s = sequencer.lock()->getSelectedSequence().get();
-    findField("time0")->setTextPadded(SeqUtil::getBar(s, time0) + 1,
-                                      "0");
+    findField("time0")->setTextPadded(SeqUtil::getBar(s, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(s, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBar(s, time1) + 1,
-                                      "0");
+    findField("time3")->setTextPadded(SeqUtil::getBar(s, time1) + 1, "0");
     findField("time4")->setTextPadded(SeqUtil::getBeat(s, time1) + 1, "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(s, time1), "0");
 }

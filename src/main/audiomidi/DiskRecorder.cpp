@@ -140,8 +140,7 @@ void DiskRecorder::unprepare()
 
     for (auto &fileStream : fileStreams)
     {
-        wav_close(fileStream, lengthInFrames,
-          outputFileFormat->getChannels());
+        wav_close(fileStream, lengthInFrames, outputFileFormat->getChannels());
     }
 
     isOnlySilence = true;

@@ -74,8 +74,7 @@ Sequencer::Sequencer(
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled)
-    : getScreens(getScreens),
-      hardware(hardware), isBouncing(isBouncing),
+    : getScreens(getScreens), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), clock(clock),
       flushMidiNoteOffs(flushMidiNoteOffs),
       postToAudioThread(postToAudioThread), voices(voices),
@@ -196,7 +195,7 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     };
 
     const auto eventData = getCurrentTempoChangeEventData();
-    
+
     if (!eventData)
     {
         return {};
@@ -528,7 +527,8 @@ void Sequencer::undoSeq() const
     getStateManager()->enqueueCallback(utils::SimpleAction(
         [this]
         {
-            hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+            hardware.lock()
+                ->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(
                     getStateManager()->getSnapshot().isUndoSequenceAvailable());
         }));
@@ -1027,7 +1027,8 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
         {
             getStateManager()->applyMessageImmediate(
                 SetUndoSequenceAvailable{true});
-            hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+            hardware.lock()
+                ->getLed(hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
         });
 
@@ -1038,7 +1039,9 @@ void Sequencer::copySelectedSequenceToUndoSequence() const
 void Sequencer::resetUndo() const
 {
     getStateManager()->enqueue(SetUndoSequenceAvailable{false});
-    hardware.lock()->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
+    hardware.lock()
+        ->getLed(hardware::ComponentId::UNDO_SEQ_LED)
+        ->setEnabled(false);
 }
 
 SongIndex Sequencer::getSelectedSongIndex() const

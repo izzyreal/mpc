@@ -40,7 +40,8 @@ namespace mpc::disk
         static void setSlider(const file::pgmreader::ProgramFileReader &,
                               const std::shared_ptr<sampler::Program> &);
         static void
-        setNoteParameters(mpc::Mpc &, const file::pgmreader::ProgramFileReader &,
+        setNoteParameters(mpc::Mpc &,
+                          const file::pgmreader::ProgramFileReader &,
                           const std::shared_ptr<sampler::Program> &);
         static void setMixer(const file::pgmreader::ProgramFileReader &,
                              const std::shared_ptr<sampler::Program> &);

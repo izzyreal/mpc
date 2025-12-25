@@ -78,8 +78,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
     const int preRecFramesAt44k =
         static_cast<int>(std::lround(44.1 * preRecMs));
 
-    const int totalFramesAt44k =
-        newLengthInFrames + preRecFramesAt44k;
+    const int totalFramesAt44k = newLengthInFrames + preRecFramesAt44k;
 
     lengthInFramesAtEngineSampleRate = totalFramesAt44k;
 

@@ -438,7 +438,8 @@ void AbstractDisk::writeMidiControlPreset(
         }
 
         const auto presetPath =
-            mpc.paths->getDocuments()->midiControlPresetsPath() / (preset->name + ".vmp");
+            mpc.paths->getDocuments()->midiControlPresetsPath() /
+            (preset->name + ".vmp");
 
         set_file_data(presetPath, data);
 

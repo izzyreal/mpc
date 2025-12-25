@@ -31,8 +31,9 @@ namespace mpc::performance
                                PerformanceEventSource, ProgramPadEventType)>;
 
     class PerformanceManager final
-        : public concurrency::AtomicStateExchange<
-              PerformanceState, PerformanceStateView, PerformanceMessage, 3, 8192>
+        : public concurrency::AtomicStateExchange<PerformanceState,
+                                                  PerformanceStateView,
+                                                  PerformanceMessage, 3, 8192>
     {
     public:
         explicit PerformanceManager(const utils::PostToUiThreadFn &);

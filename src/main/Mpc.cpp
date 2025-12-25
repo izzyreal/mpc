@@ -50,9 +50,12 @@ Mpc::Mpc()
 void Mpc::init()
 {
     const std::vector requiredPaths{
-        paths->getDocuments()->appDocumentsPath(), paths->configPath(),
-        paths->getDocuments()->storesPath(),       paths->getDocuments()->defaultLocalVolumePath(),
-        paths->getDocuments()->recordingsPath(),   paths->getDocuments()->autoSavePath()};
+        paths->getDocuments()->appDocumentsPath(),
+        paths->configPath(),
+        paths->getDocuments()->storesPath(),
+        paths->getDocuments()->defaultLocalVolumePath(),
+        paths->getDocuments()->recordingsPath(),
+        paths->getDocuments()->autoSavePath()};
 
     for (auto &p : requiredPaths)
     {
@@ -94,11 +97,13 @@ void Mpc::init()
         const auto data =
             MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
-        if (!fs::exists(paths->getDocuments()->midiControlPresetsPath() / preset) ||
-            fs::file_size(paths->getDocuments()->midiControlPresetsPath() / preset) !=
-                data.size())
+        if (!fs::exists(paths->getDocuments()->midiControlPresetsPath() /
+                        preset) ||
+            fs::file_size(paths->getDocuments()->midiControlPresetsPath() /
+                          preset) != data.size())
         {
-            set_file_data(paths->getDocuments()->midiControlPresetsPath() / preset, data);
+            set_file_data(
+                paths->getDocuments()->midiControlPresetsPath() / preset, data);
         }
     }
 
@@ -293,11 +298,17 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
-    if (autoSave) autoSave->interruptRestorationIfStillOngoing();
+    if (autoSave)
+    {
+        autoSave->interruptRestorationIfStillOngoing();
+    }
     nvram::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
-    if (engineHost) engineHost->destroyServices();
+    if (engineHost)
+    {
+        engineHost->destroyServices();
+    }
 }
 
 void Mpc::panic() const

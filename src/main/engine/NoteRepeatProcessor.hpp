@@ -52,8 +52,7 @@ namespace mpc::engine
     {
     public:
         NoteRepeatProcessor(
-            audiomidi::EventHandler *,
-            std::weak_ptr<sequencer::Sequencer>,
+            audiomidi::EventHandler *, std::weak_ptr<sequencer::Sequencer>,
             std::shared_ptr<sampler::Sampler>,
             std::shared_ptr<audio::mixer::AudioMixer>,
             std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>,

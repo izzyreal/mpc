@@ -156,10 +156,10 @@ namespace mpc::engine
 
         // Called from main thread
         void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
-                  int noteNumber, const performance::NoteParameters &, int varType,
-                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
-                  int startTick, float engineSampleRate, uint64_t noteEventId,
-                  ProgramIndex programIndex);
+                  int noteNumber, const performance::NoteParameters &,
+                  int varType, int varValue, int drumIndex, int frameOffset,
+                  bool enableEnvs, int startTick, float engineSampleRate,
+                  uint64_t noteEventId, ProgramIndex programIndex);
 
         uint64_t getNoteEventId();
 

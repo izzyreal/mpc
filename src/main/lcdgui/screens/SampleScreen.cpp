@@ -247,8 +247,9 @@ void SampleScreen::displayInput() const
 void SampleScreen::displayThreshold() const
 {
     const auto currentThreshold = threshold.load(std::memory_order_relaxed);
-    const auto thresholdText =
-        currentThreshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(currentThreshold);
+    const auto thresholdText = currentThreshold == -64
+                                   ? u8"-\u00D9\u00DA"
+                                   : std::to_string(currentThreshold);
     findField("threshold")->setTextPadded(thresholdText);
 }
 

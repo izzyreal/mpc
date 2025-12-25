@@ -39,8 +39,7 @@ namespace mpc::engine
     {
     public:
         explicit SequencerPlaybackEngine(
-            performance::PerformanceManager *,
-            EngineHost *,
+            performance::PerformanceManager *, EngineHost *,
             std::function<std::shared_ptr<audiomidi::MidiOutput>()>
                 getMidiOutput,
             sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,

@@ -24,8 +24,7 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
 
     if (focusedFieldName == "time0")
     {
-        setTime0(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time0) +
-                                     notch,
+        setTime0(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time0) + notch,
                                  sequenceToUse, time0));
         return true;
     }
@@ -45,8 +44,7 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
     }
     if (focusedFieldName == "time3")
     {
-        setTime1(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time1) +
-                                     notch,
+        setTime1(SeqUtil::setBar(SeqUtil::getBar(sequenceToUse, time1) + notch,
                                  sequenceToUse, time1));
         return true;
     }

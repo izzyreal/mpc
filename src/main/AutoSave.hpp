@@ -16,16 +16,14 @@ namespace mpc
         ~AutoSave();
 
         void restoreAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>,
-                                          bool headless);
+                                   bool headless);
 
-        void storeAutoSavedState(Mpc &,
-                                        const std::shared_ptr<SaveTarget> &);
+        void storeAutoSavedState(Mpc &, const std::shared_ptr<SaveTarget> &);
 
         void interruptRestorationIfStillOngoing();
 
     private:
         std::thread restoreThread;
-        std::atomic<bool> shouldStopRestore { false };
-
+        std::atomic<bool> shouldStopRestore{false};
     };
 } // namespace mpc

@@ -11,26 +11,20 @@ using namespace mpc::lcdgui::screens::window;
 SequenceScreen::SequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sequence", layerIndex)
 {
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getSelectedSequence()->getName();
+         },
+         [&](auto)
+         {
+             displaySequenceName();
+         }});
 }
 
 void SequenceScreen::open()
 {
-    const auto sequenceNameRestLabel = findLabel("sequencenamerest");
-    const auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
-
-    const auto sequenceNameFirstLetterField =
-        findField("sequencenamefirstletter");
-    const auto defaultSequenceNameFirstLetterField =
-        findField("defaultnamefirstletter");
-
-    const auto seq = sequencer.lock()->getSelectedSequence();
-
-    sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
-    defaultSequenceNameFirstLetterField->setText(
-        sequencer.lock()->getDefaultSequenceName().substr(0, 1));
-    sequenceNameRestLabel->setText(seq->getName().substr(1));
-    defaultSequenceNameRestLabel->setText(
-        sequencer.lock()->getDefaultSequenceName().substr(1));
+    displaySequenceName();
 }
 
 void SequenceScreen::function(const int i)
@@ -79,4 +73,24 @@ void SequenceScreen::openNameScreen()
     const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequence");
     openScreenById(ScreenId::NameScreen);
+}
+
+void SequenceScreen::displaySequenceName()
+{
+    const auto sequenceNameRestLabel = findLabel("sequencenamerest");
+    const auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
+
+    const auto sequenceNameFirstLetterField =
+        findField("sequencenamefirstletter");
+    const auto defaultSequenceNameFirstLetterField =
+        findField("defaultnamefirstletter");
+
+    const auto seq = sequencer.lock()->getSelectedSequence();
+
+    sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
+    defaultSequenceNameFirstLetterField->setText(
+        sequencer.lock()->getDefaultSequenceName().substr(0, 1));
+    sequenceNameRestLabel->setText(seq->getName().substr(1));
+    defaultSequenceNameRestLabel->setText(
+        sequencer.lock()->getDefaultSequenceName().substr(1));
 }

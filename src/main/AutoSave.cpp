@@ -70,7 +70,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless, this]
+    const auto restoreAction =
+        [&mpc, availableFiles, saveTarget, headless, this]
     {
         auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;
@@ -241,8 +242,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                        });
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
-        auto relativePath =
-            fs::relative(currentDir, mpc.paths->getDocuments()->defaultLocalVolumePath());
+        auto relativePath = fs::relative(
+            currentDir, mpc.paths->getDocuments()->defaultLocalVolumePath());
         for (auto &seg : relativePath)
         {
             mpc.getDisk()->moveForward(seg.string());

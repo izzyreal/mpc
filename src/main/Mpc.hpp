@@ -103,7 +103,7 @@ namespace mpc
 
     private:
         std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
-   
+
     public:
         void init();
         void startMidiDeviceDetector();

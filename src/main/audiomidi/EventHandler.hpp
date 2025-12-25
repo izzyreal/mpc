@@ -46,10 +46,10 @@ namespace mpc::audiomidi
                                                 std::optional<DrumBusIndex>);
 
         void handleNoteEventMidiOut(const sequencer::EventData &,
-                            int trackDevice,
-                            std::optional<int> trackVelocityRatio,
-                            std::optional<int> transposeAmount,
-                            int sampleNumber);
+                                    int trackDevice,
+                                    std::optional<int> trackVelocityRatio,
+                                    std::optional<int> transposeAmount,
+                                    int sampleNumber);
 
     private:
         void handleFinalizedDrumNoteOnEvent(

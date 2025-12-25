@@ -23,6 +23,7 @@
 #include "lcdgui/screens/StepEditorScreen.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "lcdgui/screens/window/KeepOrRetryScreen.hpp"
 #include "lcdgui/screens/window/LoadASoundScreen.hpp"
@@ -102,7 +103,11 @@ ClientHardwareEventController::getMostRecentPhysicalPadPressVelocity() const
 void ClientHardwareEventController::handleClientHardwareEvent(
     const ClientHardwareEvent &event)
 {
-    if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
+    const auto vmpcSettingsScreen =
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+
+    if (event.source == ClientHardwareEvent::Source::HostInputKeyboard &&
+        vmpcSettingsScreen->isNameTypingWithKeyboardEnabled())
     {
         if (const auto nameScreen =
                 std::dynamic_pointer_cast<NameScreen>(mpc.getScreen());
