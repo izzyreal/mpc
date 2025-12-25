@@ -8,9 +8,9 @@ namespace mpc
     {
 
     protected:
-        fs::path appConfigHome() override;
+        fs::path appConfigHome() const override;
 
     public:
-        fs::path appDocumentsPath() override;
+        fs::path appDocumentsPath() const override;
     };
 } // namespace mpc

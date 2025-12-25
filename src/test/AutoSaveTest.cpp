@@ -17,10 +17,10 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
     {
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
-        const auto autosaveDir = mpc.paths->autoSavePath();
+        const auto autosaveDir = mpc.paths->getDocuments()->autoSavePath();
         auto saveTarget = std::make_shared<DirectorySaveTarget>(autosaveDir);
-        AutoSave::restoreAutoSavedState(mpc, saveTarget, isHeadless);
-        AutoSave::storeAutoSavedState(mpc, saveTarget);
+        mpc.getAutoSave()->restoreAutoSavedState(mpc, saveTarget, isHeadless);
+        mpc.getAutoSave()->storeAutoSavedState(mpc, saveTarget);
     }
 
     {
@@ -31,9 +31,9 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
             mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 
         vmpcAutoSaveScreen->setAutoLoadOnStart(2);
-        const auto autosaveDir = mpc.paths->autoSavePath();
+        const auto autosaveDir = mpc.paths->getDocuments()->autoSavePath();
         auto saveTarget = std::make_shared<DirectorySaveTarget>(autosaveDir);
-        REQUIRE_NOTHROW(
-            mpc::AutoSave::restoreAutoSavedState(mpc, saveTarget, isHeadless));
+        REQUIRE_NOTHROW(mpc.getAutoSave()->restoreAutoSavedState(
+            mpc, saveTarget, isHeadless));
     }
 }
