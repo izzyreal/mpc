@@ -58,8 +58,8 @@ ClientHardwareEventController::ClientHardwareEventController(Mpc &mpcToUse)
 {
     buttonConsumptionTracker.addConsumptionRule(GO_TO, PREV_STEP_OR_EVENT);
     buttonConsumptionTracker.addConsumptionRule(GO_TO, NEXT_STEP_OR_EVENT);
-    buttonConsumptionTracker.addConsumptionRule(GO_TO, PREV_BAR_START);
-    buttonConsumptionTracker.addConsumptionRule(GO_TO, NEXT_BAR_END);
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, PREV_BAR_OR_START);
+    buttonConsumptionTracker.addConsumptionRule(GO_TO, NEXT_BAR_OR_END);
 }
 
 bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
@@ -730,11 +730,11 @@ void ClientHardwareEventController::handleButtonPress(
         {
             withLocate->nextStepEvent();
         }
-        else if (id == PREV_BAR_START)
+        else if (id == PREV_BAR_OR_START)
         {
             withLocate->prevBarStart();
         }
-        else if (id == NEXT_BAR_END)
+        else if (id == NEXT_BAR_OR_END)
         {
             withLocate->nextBarEnd();
         }

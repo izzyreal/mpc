@@ -23,5 +23,6 @@ void VmpcResetKeyboardScreen::function(const int i)
                 ->initializeDefaults();
             openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
+        default:;
     }
 }

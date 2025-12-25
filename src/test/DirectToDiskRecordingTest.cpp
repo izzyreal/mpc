@@ -93,7 +93,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
                           {}, {0, 1});
     }
 
-    auto recordingsPath = mpc.paths->recordingsPath();
+    auto recordingsPath = mpc.paths->getDocuments()->recordingsPath();
 
     for (const auto &entry : fs::directory_iterator(recordingsPath))
     {
@@ -220,7 +220,7 @@ TEST_CASE(
                               {0, 1}, {}, {0, 1});
         }
 
-        auto recordingsPath = mpc.paths->recordingsPath();
+        auto recordingsPath = mpc.paths->getDocuments()->recordingsPath();
 
         for (const auto &entry : fs::directory_iterator(recordingsPath))
         {

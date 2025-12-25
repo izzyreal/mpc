@@ -1,6 +1,7 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 #include "input/KeyCodeHelper.hpp"
+#include "input/KeyboardBindings.hpp"
 
 namespace mpc
 {
@@ -22,10 +23,10 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
         void turnWheel(int increment) override;
 
-        bool isLearning();
-        void setLearnCandidate(int rawKeyCode);
+        bool isLearning() const;
+        void setLearnCandidate(int platformKeyCode);
 
-        bool hasMappingChanged();
+        bool hasMappingChanged() const;
 
     private:
         int row = 0;
@@ -34,6 +35,9 @@ namespace mpc::lcdgui::screens
             input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
 
         bool learning = false;
+
+        std::unique_ptr<input::KeyboardBindings> bindings;
+
         void setLearning(bool b);
         void updateRows();
         void displayUpAndDown();

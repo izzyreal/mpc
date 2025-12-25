@@ -71,7 +71,7 @@ namespace mpc::controller
         std::shared_ptr<ClientHardwareEventController>
             clientHardwareEventController;
 
-        std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
+        std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen() const;
 
         sequencer::RecordingMode determineRecordingMode() const;
 
@@ -111,5 +111,7 @@ namespace mpc::controller
         Bank activeBank = Bank::A;
         ProgramPadIndex selectedPad{MinProgramPadIndex};
         DrumNoteNumber selectedNote{60};
+
+        void restoreKeyboardBindings() const;
     };
 } // namespace mpc::controller

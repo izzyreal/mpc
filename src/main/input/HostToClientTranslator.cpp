@@ -206,13 +206,13 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
         case HostInputEvent::Source::KEYBOARD:
         {
-            const auto &[keyDown, rawKeyCode, shiftDown, ctrlDown, altDown] =
+            const auto &[keyDown, platformKeyCode, shiftDown, ctrlDown, altDown] =
                 std::get<KeyEvent>(hostInputEvent.payload);
             const auto vmpcKeyCode =
-                KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
-            const auto binding = keyboardBindings->lookup(vmpcKeyCode);
+                KeyCodeHelper::getVmpcFromPlatformKeyCode(platformKeyCode);
+            const auto binding = keyboardBindings->lookupFirstKeyCodeBinding(vmpcKeyCode);
 
-            if (!binding || binding->componentId != DATA_WHEEL)
+            if (binding == nullptr || binding->getComponentId() != DATA_WHEEL)
             {
                 if (const auto typableChar =
                         KeyCodeHelper::getCharForTypableVmpcKeyCode(
@@ -247,7 +247,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                 return std::nullopt;
             }
 
-            const auto id = binding->componentId;
+            const auto id = binding->getComponentId();
 
             if (id == NONE)
             {

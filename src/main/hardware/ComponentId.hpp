@@ -8,7 +8,7 @@ namespace mpc::hardware
 
     enum ComponentId
     {
-        NONE,
+        NONE = 0,
         PAD_1_OR_AB,
         PAD_2_OR_CD,
         PAD_3_OR_EF,
@@ -39,8 +39,8 @@ namespace mpc::hardware
         PREV_STEP_OR_EVENT,
         NEXT_STEP_OR_EVENT,
         GO_TO,
-        PREV_BAR_START,
-        NEXT_BAR_END,
+        PREV_BAR_OR_START,
+        NEXT_BAR_OR_END,
         TAP_TEMPO_OR_NOTE_REPEAT,
         NEXT_SEQ,
         TRACK_MUTE,
@@ -90,7 +90,9 @@ namespace mpc::hardware
         UNDO_SEQ_LED,
         REC_LED,
         OVERDUB_LED,
-        PLAY_LED
+        PLAY_LED,
+
+        COMPONENT_ID_COUNT
     };
 
     static const std::unordered_map<ComponentId, std::string>
@@ -126,8 +128,8 @@ namespace mpc::hardware
             {PREV_STEP_OR_EVENT, "prev-step-or-event"},
             {NEXT_STEP_OR_EVENT, "next-step-or-event"},
             {GO_TO, "go-to"},
-            {PREV_BAR_START, "prev-bar-or-start"},
-            {NEXT_BAR_END, "next-bar-or-end"},
+            {PREV_BAR_OR_START, "prev-bar-or-start"},
+            {NEXT_BAR_OR_END, "next-bar-or-end"},
             {TAP_TEMPO_OR_NOTE_REPEAT, "tap-or-note-repeat"},
             {NEXT_SEQ, "next-seq"},
             {TRACK_MUTE, "track-mute"},

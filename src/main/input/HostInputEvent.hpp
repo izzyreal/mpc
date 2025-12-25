@@ -22,7 +22,7 @@ namespace mpc::input
     struct KeyEvent
     {
         bool keyDown;
-        int rawKeyCode;
+        int platformKeyCode;
         bool shiftDown;
         bool ctrlDown;
         bool altDown;

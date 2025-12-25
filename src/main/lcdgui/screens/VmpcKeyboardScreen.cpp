@@ -1,6 +1,8 @@
 #include "VmpcKeyboardScreen.hpp"
 
 #include "Mpc.hpp"
+#include "StrUtil.hpp"
+#include "controller/ClientEventController.hpp"
 
 #include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 
@@ -8,6 +10,7 @@
 #include "lcdgui/Label.hpp"
 
 #include "input/KeyCodeHelper.hpp"
+#include "input/KeyboardBindingsWriter.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -15,7 +18,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::input;
 
-VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, int layerIndex)
+VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
 {
     for (int i = 0; i < 5; i++)
@@ -27,31 +30,48 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, int layerIndex)
     }
 }
 
-void VmpcKeyboardScreen::turnWheel(int increment)
+void VmpcKeyboardScreen::turnWheel(const int increment)
 {
-    /*
-    auto kbMapping =
-    mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    auto label = kbMapping->getLabelKeyMap()[row + rowOffset].first;
-    auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);
-    auto newKeyCode = i > 0 ? KbMapping::getNextKeyCode(oldKeyCode) :
-    KbMapping::getPreviousKeyCode(oldKeyCode);
+    const auto binding = bindings->getByIndex(row + rowOffset);
+    const auto oldKeyCode = static_cast<int>(binding->keyCode);
+    const auto newKeyCode =
+        std::clamp(oldKeyCode + increment, -1,
+                   static_cast<int>(VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE) - 1);
 
-    kbMapping->setKeyCodeForLabel(newKeyCode, label);
+    binding->keyCode = static_cast<VmpcKeyCode>(newKeyCode);
     updateRows();
-    */
 }
 
 void VmpcKeyboardScreen::open()
 {
-    /*
-    auto kbMapping =
-    mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-    screen->saveAndLeave = [kbMapping =
-    kbMapping](){kbMapping->exportMapping();}; screen->discardAndLeave =
-    [kbMapping = kbMapping](){kbMapping->importMapping();}; screen->stayScreen =
-    "vmpc-keyboard";
+    if (!ls.lock()->isPreviousScreen({ScreenId::PopupScreen,
+                                      ScreenId::VmpcDiscardMappingChangesScreen,
+                                      ScreenId::VmpcResetKeyboardScreen}))
+    {
+        bindings = std::make_unique<KeyboardBindings>(
+            mpc.clientEventController->getKeyboardBindings()
+                ->getKeyboardBindingsData());
+    }
+
+    const auto screen =
+        mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
+
+    screen->saveAndLeave = [this, path = mpc.paths->keyboardBindingsPath()]
+    {
+        const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
+        set_file_data(path, jsonData.dump());
+        mpc.clientEventController->getKeyboardBindings()->setBindingsData(
+            bindings->getKeyboardBindingsData());
+    };
+
+    screen->discardAndLeave = [this]
+    {
+        bindings->setBindingsData(
+            mpc.clientEventController->getKeyboardBindings()
+                ->getKeyboardBindingsData());
+    };
+
+    screen->stayScreen = "vmpc-keyboard";
 
     findChild<Label>("up")->setText("\u00C7");
     findChild<Label>("down")->setText("\u00C6");
@@ -59,7 +79,6 @@ void VmpcKeyboardScreen::open()
     setLearning(false);
     setLearnCandidate(-1);
     updateRows();
-    */
 }
 
 void VmpcKeyboardScreen::up()
@@ -91,14 +110,12 @@ void VmpcKeyboardScreen::down()
     {
         return;
     }
-    /*
 
-    const auto kbMapping =
-    mpc.clientEventController->clientHardwareEventController->getKbMapping();
+    const auto bindingCount = bindings->getBindingCount();
 
     if (row == 4)
     {
-        if (rowOffset + 5 >= kbMapping->getLabelKeyMap().size())
+        if (rowOffset + 5 >= bindingCount)
         {
             return;
         }
@@ -110,10 +127,9 @@ void VmpcKeyboardScreen::down()
 
     row++;
     updateRows();
-    */
 }
 
-void VmpcKeyboardScreen::setLearning(bool b)
+void VmpcKeyboardScreen::setLearning(const bool b)
 {
     learning = b;
     findChild<TextComp>("fk2")->setBlinking(learning);
@@ -121,34 +137,15 @@ void VmpcKeyboardScreen::setLearning(bool b)
     ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
-bool VmpcKeyboardScreen::hasMappingChanged()
+bool VmpcKeyboardScreen::hasMappingChanged() const
 {
-    // auto persisted = KbMapping(mpc.paths->configPath());
-    // auto inMem =
-    // mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    /*
-        for (auto& mapping : inMem->getLabelKeyMap())
-        {
-            if (inMem->getKeyCodeFromLabel(mapping.first) !=
-       persisted.getKeyCodeFromLabel(mapping.first))
-            {
-                return true;
-            }
-        }
+    const auto inMemoryBindings =
+        mpc.clientEventController->getKeyboardBindings();
 
-        for (auto& mapping : persisted.getLabelKeyMap())
-        {
-            if (inMem->getKeyCodeFromLabel(mapping.first) !=
-       persisted.getKeyCodeFromLabel(mapping.first))
-            {
-                return true;
-            }
-        }
-    */
-    return false;
+    return !inMemoryBindings->isSameAs(bindings->getKeyboardBindingsData());
 }
 
-void VmpcKeyboardScreen::function(int i)
+void VmpcKeyboardScreen::function(const int i)
 {
     switch (i)
     {
@@ -194,15 +191,12 @@ void VmpcKeyboardScreen::function(int i)
         case 3:
             if (learning)
             {
-                // const auto kbMapping =
-                // mpc.clientEventController->clientHardwareEventController->getKbMapping();
-                // const auto mapping = kbMapping->getLabelKeyMap()[row +
-                // rowOffset]; const auto oldKeyCode = mapping.second;
+                const auto binding = bindings->getByIndex(row + rowOffset);
 
-                // if (learnCandidate != oldKeyCode)
+                if (const auto oldKeyCode = binding->keyCode;
+                    learnCandidate != oldKeyCode)
                 {
-                    // kbMapping->setKeyCodeForLabel(learnCandidate,
-                    // mapping.first);
+                    binding->keyCode = learnCandidate;
                 }
             }
 
@@ -220,6 +214,7 @@ void VmpcKeyboardScreen::function(int i)
             openScreenById(ScreenId::VmpcResetKeyboardScreen);
             break;
         case 5:
+        {
             if (learning)
             {
                 return;
@@ -229,7 +224,13 @@ void VmpcKeyboardScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                // mpc.clientEventController->clientHardwareEventController->getKbMapping()->exportMapping();
+                const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
+                set_file_data(mpc.paths->keyboardBindingsPath(),
+                              jsonData.dump());
+
+                mpc.clientEventController->getKeyboardBindings()
+                    ->setBindingsData(bindings->getKeyboardBindingsData());
+
                 popupMsg = "Keyboard mapping saved";
             }
             else
@@ -240,65 +241,87 @@ void VmpcKeyboardScreen::function(int i)
             ls.lock()->showPopupForMs(popupMsg, 1000);
 
             break;
+        }
+        default:;
     }
 }
 
-void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
+void VmpcKeyboardScreen::setLearnCandidate(const int platformKeyCode)
 {
-    learnCandidate = KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
+    learnCandidate = KeyCodeHelper::getVmpcFromPlatformKeyCode(platformKeyCode);
     updateRows();
 }
 
-bool VmpcKeyboardScreen::isLearning()
+bool VmpcKeyboardScreen::isLearning() const
 {
     return learning;
 }
 
 void VmpcKeyboardScreen::updateRows()
 {
-    // auto kbMapping =
-    // mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    // auto& labelKeyMap = kbMapping->getLabelKeyMap();
-    constexpr int MAX_LABEL_LENGTH = 15;
-    /*
-        for (int i = 0; i < 5; i++)
+    const auto &bindingsData = bindings->getKeyboardBindingsData();
+
+    for (int i = 0; i < 5; i++)
+    {
+        constexpr int MAX_LABEL_LENGTH = 15;
+        const auto rowLabel = findChild<Label>("row" + std::to_string(i));
+        const auto rowField = findChild<Field>("row" + std::to_string(i));
+
+        const auto binding = bindingsData[i + rowOffset];
+
+        auto labelName = binding.componentLabel;
+
+        for (auto &c : labelName)
         {
-            auto l = findChild<Label>("row" + std::to_string(i));
-            auto f = findChild<Field>("row" + std::to_string(i));
-
-            auto mapping = labelKeyMap[i + rowOffset];
-            auto labelText = StrUtil::padRight(mapping.first, " ",
-       MAX_LABEL_LENGTH) + ":";
-
-            for (auto& c : labelText)
+            if (c == '_' || c == '-')
             {
-                if (c == '_' || c == '-') c = ' ';
-            }
-
-            l->setText(labelText);
-            const auto keyCodeDisplayName =
-       KeyCodeHelper::getAsciiCompatibleDisplayName(mapping.second);
-            f->setText(keyCodeDisplayName);
-            f->setInverted(row == i);
-
-            if (learning && i == row)
-            {
-                f->setText(KeyCodeHelper::getAsciiCompatibleDisplayName(learnCandidate));
-                f->setBlinking(true);
-            }
-            else
-            {
-                f->setBlinking(false);
+                c = ' ';
             }
         }
-     */
+
+        if (const auto pos = labelName.find(" or"); pos != std::string::npos)
+        {
+            labelName.erase(pos);
+        }
+
+        if (binding.direction == Direction::Negative)
+        {
+            labelName += " down";
+        }
+        else if (binding.direction == Direction::Positive)
+        {
+            labelName += " up";
+        }
+
+        labelName = labelName.substr(0, MAX_LABEL_LENGTH);
+
+        auto labelText =
+            StrUtil::padRight(labelName, " ", MAX_LABEL_LENGTH) + ":";
+
+        rowLabel->setText(labelText);
+        const auto keyCodeDisplayName =
+            KeyCodeHelper::getAsciiCompatibleDisplayName(binding.keyCode);
+        rowField->setText(keyCodeDisplayName);
+        rowField->setInverted(row == i);
+
+        if (learning && i == row)
+        {
+            rowField->setText(
+                KeyCodeHelper::getAsciiCompatibleDisplayName(learnCandidate));
+            rowField->setBlinking(true);
+        }
+        else
+        {
+            rowField->setBlinking(false);
+        }
+    }
+
     displayUpAndDown();
 }
 
 void VmpcKeyboardScreen::displayUpAndDown()
 {
-    // auto labelKeyMapSize =
-    // mpc.clientEventController->clientHardwareEventController->getKbMapping()->getLabelKeyMap().size();
+    const auto bindingCount = bindings->getBindingCount();
     findChild<Label>("up")->Hide(rowOffset == 0);
-    // findChild<Label>("down")->Hide(rowOffset + 5 >= labelKeyMapSize);
+    findChild<Label>("down")->Hide(rowOffset + 5 >= bindingCount);
 }

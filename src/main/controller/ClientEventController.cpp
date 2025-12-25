@@ -10,8 +10,11 @@
 
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 
 #include "hardware/ComponentId.hpp"
+#include "input/KeyboardBindingsReader.hpp"
+#include "input/legacy/LegacyKeyboardBindingsConvertor.hpp"
 
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -39,8 +42,7 @@ ClientEventController::ClientEventController(Mpc &mpcToUse)
                                        MaxProgramPadIndex);
               notifyObservers(std::string("pad"));
           }),
-      mpc(mpcToUse),
-      keyboardBindings(std::make_shared<input::KeyboardBindings>()),
+      mpc(mpcToUse), keyboardBindings(std::make_shared<KeyboardBindings>()),
       screens(mpc.screens), layeredScreen(mpc.getLayeredScreen()),
       hardware(mpc.getHardware())
 {
@@ -60,17 +62,33 @@ void ClientEventController::init()
         screens.lock()->get<ScreenId::MultiRecordingSetupScreen>(),
         layeredScreen.lock(), hardware.lock(), screens.lock(),
         mpc.getEngineHost()->getPreviewSoundPlayer().get());
+
+    restoreKeyboardBindings();
 }
 
-void ClientEventController::dispatchHostInput(
-    const input::HostInputEvent &hostEvent)
+void ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
 {
+    if (hostEvent.getSource() == HostInputEvent::Source::KEYBOARD &&
+        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::VmpcKeyboardScreen}))
+    {
+        if (const auto vmpcKeyboardScreen =
+                mpc.screens->get<ScreenId::VmpcKeyboardScreen>();
+            vmpcKeyboardScreen->isLearning())
+        {
+            if (const auto keyEvent = std::get<KeyEvent>(hostEvent.payload);
+                keyEvent.keyDown)
+            {
+                vmpcKeyboardScreen->setLearnCandidate(keyEvent.platformKeyCode);
+                return;
+            }
+        }
+    }
+
     const auto clientEvent =
         hostToClientTranslator.translate(hostEvent, keyboardBindings);
 
     if (!clientEvent.has_value())
     {
-        // printf("empty clientEvent\n");
         return;
     }
 
@@ -124,7 +142,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
     return RecordingMode::NoRecordingMode;
 }
 
-std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()
+std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen() const
 {
     return layeredScreen.lock();
 }
@@ -195,4 +213,34 @@ void ClientEventController::setSixteenLevelsEnabled(const bool b)
 bool ClientEventController::isEraseButtonPressed() const
 {
     return hardware.lock()->getButton(ERASE)->isPressed();
+}
+
+void ClientEventController::restoreKeyboardBindings() const
+{
+    if (const auto persistedBindingsExist =
+            fs::exists(mpc.paths->keyboardBindingsPath());
+        !persistedBindingsExist &&
+        fs::exists(mpc.paths->legacyKeyboardBindingsPath()))
+    {
+        const auto legacyData =
+            get_file_data(mpc.paths->legacyKeyboardBindingsPath());
+
+        const KeyboardBindingsData persistedLegacyData = legacy::
+            LegacyKeyboardBindingsConvertor::parseLegacyKeyboardBindings(
+                std::string(legacyData.begin(), legacyData.end()));
+
+        keyboardBindings->setBindingsData(persistedLegacyData);
+    }
+    else if (persistedBindingsExist)
+    {
+        const auto persistedData =
+            get_file_data(mpc.paths->keyboardBindingsPath());
+        const auto persistedBindings =
+            KeyboardBindingsReader::fromJson(json::parse(persistedData));
+        keyboardBindings->setBindingsData(persistedBindings);
+    }
+
+    keyboardBindings->deduplicateBindings();
+    keyboardBindings->ensureCorrectAmountOfBindingsPerComponentId();
+    keyboardBindings->validateBindings();
 }

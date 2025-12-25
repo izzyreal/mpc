@@ -590,8 +590,7 @@ const std::map<const VmpcKeyCode, const char>
                                        {VmpcKeyCode::VMPC_KEY_Space, ' '},
                                        {VmpcKeyCode::VMPC_KEY_ANSI_Minus, '-'}};
 
-const VmpcKeyCode
-KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKeyCode)
+VmpcKeyCode KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKeyCode)
 {
     if (platformToVmpcKeyCodes.count(platformKeyCode) == 0)
     {
@@ -601,7 +600,7 @@ KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKeyCode)
     return platformToVmpcKeyCodes.at(platformKeyCode);
 }
 
-const std::optional<char>
+std::optional<char>
 KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
 {
     if (typableVmpcKeyCodes.count(vmpcKeyCode) == 0)
@@ -612,8 +611,7 @@ KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
     return typableVmpcKeyCodes.at(vmpcKeyCode);
 }
 
-const int
-KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
+int KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
 {
     for (auto &kv : platformToVmpcKeyCodes)
     {
@@ -626,14 +624,14 @@ KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
     return -1;
 }
 
-const std::string
+std::string
 getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpcKeyCode)
 {
     if (vmpcKeyCode >= VmpcKeyCode::VMPC_KEY_F1 &&
         vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
     {
-        const auto fNumber =
-            (int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1 + 1;
+        const auto fNumber = static_cast<int>(vmpcKeyCode) -
+                             static_cast<int>(VmpcKeyCode::VMPC_KEY_F1) + 1;
         return "F" + std::to_string(fNumber);
     }
 
@@ -733,7 +731,7 @@ getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpcKeyCode)
     return result;
 }
 
-const std::string
+std::string
 KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode)
 {
     const auto commonDescriptor =
@@ -798,7 +796,7 @@ KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode)
     return result;
 }
 
-const std::string
+std::string
 KeyCodeHelper::guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode)
 {
     const auto commonDescriptor =
@@ -858,7 +856,7 @@ KeyCodeHelper::getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode)
     return std::nullopt;
 }
 
-const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
+std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
 {
     const auto platformKeyCode = getPlatformFromVmpcKeyCode(vmpcKeyCode);
 
