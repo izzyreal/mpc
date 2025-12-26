@@ -12,15 +12,37 @@ namespace mpc::input
     public:
         static KeyboardBindingsData fromJson(const nlohmann::json &j)
         {
+            if (!j.contains("version") ||
+                j.at("version").get<int>() !=
+                    CURRENT_KEYBOARD_BINDINGS_VERSION ||
+                !j.contains("bindings"))
+            {
+                return {};
+            }
+
             KeyboardBindings kb;
 
-            for (auto &el : j.items())
+            const auto bindingsArray = j.at("bindings");
+
+            if (!bindingsArray.is_array())
             {
-                const auto k = static_cast<VmpcKeyCode>(std::stoi(el.key()));
+                return {};
+            }
+
+            for (auto &el : bindingsArray)
+            {
+                if (!el.contains("keyCode") || !el.contains("componentLabel") ||
+                    !el.contains("direction"))
+                {
+                    continue;
+                }
+
+                const auto k =
+                    static_cast<VmpcKeyCode>(el.at("keyCode").get<int>());
                 auto componentLabel =
-                    el.value().at("componentLabel").get<std::string>();
-                const auto direction = static_cast<Direction>(
-                    el.value().at("direction").get<int>());
+                    el.at("componentLabel").get<std::string>();
+                const auto direction =
+                    static_cast<Direction>(el.at("direction").get<int>());
                 kb.setBinding(componentLabel, direction, k);
             }
 

@@ -45,7 +45,13 @@ fs::path Paths::configPath() const
 
 fs::path Paths::keyboardBindingsPath() const
 {
-    auto path = appConfigHome() / "keyboard_bindings.json";
+    auto path = configPath() / "keyboard_bindings.json";
+    return path;
+}
+
+fs::path Paths::legacyKeyboardBindingsPath() const
+{
+    auto path = configPath() / "keys.txt";
     return path;
 }
 

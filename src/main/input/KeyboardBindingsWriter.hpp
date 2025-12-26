@@ -19,11 +19,15 @@ namespace mpc::input
         static nlohmann::json toJson(const KeyboardBindingsData &kb)
         {
             nlohmann::json j;
+            j["version"] = CURRENT_KEYBOARD_BINDINGS_VERSION;
+            j["bindings"] = nlohmann::json::array();
             for (auto &entry : kb)
             {
-                j[std::to_string(static_cast<int>(entry.keyCode))] = {
+                j["bindings"].push_back({
+                    {"keyCode", static_cast<int>(entry.keyCode)},
                     {"componentLabel", entry.componentLabel},
-                    {"direction", static_cast<int>(entry.direction)}};
+                    {"direction", static_cast<int>(entry.direction)}
+                });
             }
             return j;
         }

@@ -40,6 +40,8 @@ namespace mpc
 
         fs::path keyboardBindingsPath() const;
 
+        fs::path legacyKeyboardBindingsPath() const;
+
         Documents *getDocuments() const;
 
     private:

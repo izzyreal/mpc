@@ -7,8 +7,11 @@
 #include "input/KeyCodeHelper.hpp"
 #include "hardware/ComponentId.hpp"
 
+#include <nlohmann/json.hpp>
+
 namespace mpc::input
 {
+    inline constexpr long long CURRENT_KEYBOARD_BINDINGS_VERSION = 3;
 
     enum class Direction
     {
@@ -108,7 +111,6 @@ namespace mpc::input
 
     private:
         KeyboardBindingsData bindings;
-
         std::vector<VmpcKeyCode>
         lookupComponentKeyCodes(const std::string &) const;
         std::vector<KeyBinding *> lookupComponentBindings(const std::string &);

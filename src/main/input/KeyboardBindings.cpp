@@ -150,6 +150,8 @@ KeyboardBindings::lookupKeyCodeBindings(const VmpcKeyCode vmpcKeyCode)
 
 void KeyboardBindings::initializeDefaults()
 {
+    bindings.clear();
+
     using VmpcKeyCode = VmpcKeyCode;
     using Id = ComponentId;
 
