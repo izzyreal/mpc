@@ -1,6 +1,7 @@
 #include "VmpcKeyboardScreen.hpp"
 
 #include "Mpc.hpp"
+#include "controller/ClientEventController.hpp"
 
 #include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 
@@ -29,17 +30,15 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, int layerIndex)
 
 void VmpcKeyboardScreen::turnWheel(int increment)
 {
-    /*
-    auto kbMapping =
-    mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    auto label = kbMapping->getLabelKeyMap()[row + rowOffset].first;
-    auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);
-    auto newKeyCode = i > 0 ? KbMapping::getNextKeyCode(oldKeyCode) :
-    KbMapping::getPreviousKeyCode(oldKeyCode);
+    const auto bindings = mpc.clientEventController->getKeyboardBindings();
+    const auto binding = bindings->getByIndex(row + rowOffset);
+    const auto oldKeyCode = static_cast<int>(binding->keyCode);
+    const auto newKeyCode =
+        std::clamp(oldKeyCode + increment, 0,
+                   static_cast<int>(VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE));
 
-    kbMapping->setKeyCodeForLabel(newKeyCode, label);
+    binding->keyCode = static_cast<VmpcKeyCode>(newKeyCode);
     updateRows();
-    */
 }
 
 void VmpcKeyboardScreen::open()

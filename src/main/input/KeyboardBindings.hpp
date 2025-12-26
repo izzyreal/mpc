@@ -31,35 +31,81 @@ namespace mpc::input
         }
     }
 
-    struct KeyboardBinding
+    struct KeyBinding
     {
+        VmpcKeyCode keyCode;
+
         std::string componentLabel;
         Direction direction = Direction::NoDirection;
 
         hardware::ComponentId getComponentId() const;
+        int getPlatformKeyCode() const;
+
+        bool operator==(const KeyBinding &other) const
+        {
+            return other.keyCode == keyCode &&
+                   other.componentLabel == componentLabel &&
+                   other.direction == direction;
+        }
+
+        bool operator!=(const KeyBinding &other) const
+        {
+            return other.keyCode != keyCode ||
+                   other.componentLabel != componentLabel ||
+                   other.direction != direction;
+        }
+
+        KeyBinding &operator=(const KeyBinding &other)
+        {
+            keyCode = other.keyCode;
+            componentLabel = other.componentLabel;
+            direction = other.direction;
+            return *this;
+        }
     };
 
-    using KeyboardBindingsData = std::map<VmpcKeyCode, KeyboardBinding>;
+    inline bool operator<(const KeyBinding& lhs, const KeyBinding& rhs)
+    {
+        return std::tie(lhs.keyCode, lhs.componentLabel, lhs.direction) <
+               std::tie(rhs.keyCode, rhs.componentLabel, rhs.direction);
+    }
+
+    using KeyboardBindingsData = std::vector<KeyBinding>;
 
     class KeyboardBindings
     {
     public:
         KeyboardBindings();
 
-        std::vector<VmpcKeyCode>
-        lookupComponent(hardware::ComponentId id) const;
-        std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
+        explicit KeyboardBindings(const KeyboardBindingsData &);
 
-        void setBinding(hardware::ComponentId, Direction, VmpcKeyCode);
-        void setBinding(std::string componentLabel, Direction, VmpcKeyCode);
-        void setBindingsData(KeyboardBindingsData &);
+        bool hasNoDuplicateVmpcKeyCodes() const;
+
+        bool hasNoDuplicateKeyBindings() const;
+
+        bool hasNoDuplicates() const;
+
+        std::vector<VmpcKeyCode>
+            lookupComponentKeyCodes(hardware::ComponentId) const;
+
+        std::vector<KeyBinding *> lookupKeyCodeBindings(VmpcKeyCode);
+        KeyBinding *lookupFirstKeyCodeBinding(VmpcKeyCode);
+
+        void setBinding(const std::string &componentLabel, Direction,
+                        VmpcKeyCode);
 
         void initializeDefaults();
 
         KeyboardBindingsData getKeyboardBindingsData() const;
 
+        KeyBinding *getByIndex(int);
+
     private:
         KeyboardBindingsData bindings;
+
+        std::vector<VmpcKeyCode>
+        lookupComponentKeyCodes(const std::string &) const;
+        std::vector<KeyBinding *> lookupComponentBindings(const std::string &);
     };
 
 } // namespace mpc::input

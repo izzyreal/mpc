@@ -210,9 +210,9 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                 std::get<KeyEvent>(hostInputEvent.payload);
             const auto vmpcKeyCode =
                 KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
-            const auto binding = keyboardBindings->lookup(vmpcKeyCode);
+            const auto binding = keyboardBindings->lookupFirstKeyCodeBinding(vmpcKeyCode);
 
-            if (!binding || binding->getComponentId() != DATA_WHEEL)
+            if (binding == nullptr || binding->getComponentId() != DATA_WHEEL)
             {
                 if (const auto typableChar =
                         KeyCodeHelper::getCharForTypableVmpcKeyCode(

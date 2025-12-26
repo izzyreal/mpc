@@ -161,20 +161,19 @@ namespace mpc::input
     class KeyCodeHelper
     {
     public:
-        static const VmpcKeyCode
+        static VmpcKeyCode
         getVmpcFromPlatformKeyCode(const int platformKeyCode);
 
-        static const std::optional<char>
+        static std::optional<char>
         getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
-        static const std::string
+        static std::string
         guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
 
-        static const std::string
+        static std::string
         getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
 
-        static const int
-        getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
+        static int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
         static std::optional<char>
         getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode);
@@ -186,6 +185,6 @@ namespace mpc::input
         static const std::map<const VmpcKeyCode, const char>
             typableVmpcKeyCodes;
 
-        static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
+        static std::string getKeyCodeString(const VmpcKeyCode keyCode);
     };
 } // namespace mpc::input

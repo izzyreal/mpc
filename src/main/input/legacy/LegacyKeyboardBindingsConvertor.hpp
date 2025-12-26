@@ -5,7 +5,6 @@
 #include "StrUtil.hpp"
 
 #include <nlohmann/json.hpp>
-#include <limits>
 
 using json = nlohmann::json;
 
@@ -48,14 +47,14 @@ namespace mpc::input::legacy
                     vmpcKeyCodeStr.push_back(data[pos++]);
                 }
 
-                vmpcKeyCodeStr = mpc::StrUtil::trim(vmpcKeyCodeStr);
+                vmpcKeyCodeStr = StrUtil::trim(vmpcKeyCodeStr);
 
-                VmpcKeyCode vmpcKeyCode = VmpcKeyCode::VMPC_KEY_UNKNOWN;
+                auto vmpcKeyCode = VmpcKeyCode::VMPC_KEY_UNKNOWN;
 
                 try
                 {
-                    int vmpcKeyCodeInt = stoi(vmpcKeyCodeStr);
-                    if (vmpcKeyCodeInt >= 0 &&
+                    if (int vmpcKeyCodeInt = stoi(vmpcKeyCodeStr);
+                        vmpcKeyCodeInt >= 0 &&
                         vmpcKeyCodeInt <
                             static_cast<int>(
                                 VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE))
@@ -74,12 +73,12 @@ namespace mpc::input::legacy
                     continue;
                 }
 
-                Direction direction = Direction::NoDirection;
-
                 if (labelName.find("extra") != std::string::npos)
                 {
                     labelName = labelName.substr(0, 1);
                 }
+
+                Direction direction = Direction::NoDirection;
 
                 if (labelName == "datawheel-down")
                 {
@@ -147,18 +146,18 @@ namespace mpc::input::legacy
                 }
                 else if (labelName == "tap")
                 {
-                    labelName =
-                        hardware::componentIdToLabel.at(Id::TAP_TEMPO_OR_NOTE_REPEAT);
+                    labelName = hardware::componentIdToLabel.at(
+                        Id::TAP_TEMPO_OR_NOTE_REPEAT);
                 }
                 else if (labelName == "full-level")
                 {
-                    labelName =
-                        hardware::componentIdToLabel.at(Id::FULL_LEVEL_OR_CASE_SWITCH);
+                    labelName = hardware::componentIdToLabel.at(
+                        Id::FULL_LEVEL_OR_CASE_SWITCH);
                 }
                 else if (labelName == "sixteen-levels")
                 {
-                    labelName =
-                        hardware::componentIdToLabel.at(Id::SIXTEEN_LEVELS_OR_SPACE);
+                    labelName = hardware::componentIdToLabel.at(
+                        Id::SIXTEEN_LEVELS_OR_SPACE);
                 }
                 else if (labelName == "0")
                 {
@@ -230,20 +229,7 @@ namespace mpc::input::legacy
                     continue;
                 }
 
-//                printf("Found valid label %s\n", labelName.c_str());
-
-                const bool isValidKeyCode =
-                    vmpcKeyCode != VmpcKeyCode::VMPC_KEY_UNKNOWN;
-
-                if (!isValidKeyCode)
-                {
-                    pos++;
-                    continue;
-                }
-
-                kbBindingsData[vmpcKeyCode] = {labelName, direction};
-                printf("Added binding for %s with key code %i\n",
-                       labelName.c_str(), vmpcKeyCode);
+                kbBindingsData.push_back({vmpcKeyCode, labelName, direction});
                 pos++;
             }
 
