@@ -275,11 +275,20 @@ namespace mpc::input::legacy
 
                 try
                 {
-                    if (const int platformKeyCodeInt = stoi(platformKeyCodeStr);
-                        platformKeyCodeInt >= 0 &&
-                        platformKeyCodeInt <
-                            static_cast<int>(
-                                VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE))
+                    const int platformKeyCodeInt = stoi(platformKeyCodeStr);
+
+#if __APPLE__
+                    // Remnants of https://github.com/izzyreal/moduru/blob/c5a8008d63a396361e051c5ed738146ae1528f20/src/main/thirdp/wrpkey/key/detail.keys.OSX.hxx#L137
+                    if (platformKeyCodeInt == -16)
+                    {
+                        vmpcKeyCode = VmpcKeyCode::VMPC_KEY_Insert;
+                    }
+                    else if (platformKeyCodeInt == -17)
+                    {
+                        vmpcKeyCode = VmpcKeyCode::VMPC_KEY_Delete;
+                    }
+                    else
+#endif
                     {
                         vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(
                             platformKeyCodeInt);

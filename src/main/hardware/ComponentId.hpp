@@ -8,7 +8,7 @@ namespace mpc::hardware
 
     enum ComponentId
     {
-        NONE,
+        NONE = 0,
         PAD_1_OR_AB,
         PAD_2_OR_CD,
         PAD_3_OR_EF,
@@ -90,7 +90,9 @@ namespace mpc::hardware
         UNDO_SEQ_LED,
         REC_LED,
         OVERDUB_LED,
-        PLAY_LED
+        PLAY_LED,
+
+        COMPONENT_ID_COUNT
     };
 
     static const std::unordered_map<ComponentId, std::string>

@@ -20,7 +20,7 @@ namespace mpc::input
                 return {};
             }
 
-            KeyboardBindings kb;
+            KeyboardBindingsData bindingsData;
 
             const auto bindingsArray = j.at("bindings");
 
@@ -37,16 +37,20 @@ namespace mpc::input
                     continue;
                 }
 
-                const auto k =
+                const auto keyCode =
                     static_cast<VmpcKeyCode>(el.at("keyCode").get<int>());
-                auto componentLabel =
+
+                const auto componentLabel =
                     el.at("componentLabel").get<std::string>();
+
                 const auto direction =
                     static_cast<Direction>(el.at("direction").get<int>());
-                kb.setBinding(componentLabel, direction, k);
+
+                bindingsData.push_back(
+                    KeyBinding{keyCode, componentLabel, direction});
             }
 
-            return kb.getKeyboardBindingsData();
+            return bindingsData;
         }
     };
 } // namespace mpc::input

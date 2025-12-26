@@ -42,8 +42,7 @@ ClientEventController::ClientEventController(Mpc &mpcToUse)
                                        MaxProgramPadIndex);
               notifyObservers(std::string("pad"));
           }),
-      mpc(mpcToUse),
-      keyboardBindings(std::make_shared<KeyboardBindings>()),
+      mpc(mpcToUse), keyboardBindings(std::make_shared<KeyboardBindings>()),
       screens(mpc.screens), layeredScreen(mpc.getLayeredScreen()),
       hardware(mpc.getHardware())
 {
@@ -67,24 +66,21 @@ void ClientEventController::init()
     restoreKeyboardBindings();
 }
 
-void ClientEventController::dispatchHostInput(
-    const HostInputEvent &hostEvent)
+void ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
 {
     if (hostEvent.getSource() == HostInputEvent::Source::KEYBOARD &&
-        mpc.getLayeredScreen()->isCurrentScreenOrChildOf(
-            ScreenId::VmpcKeyboardScreen))
+        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::VmpcKeyboardScreen}))
     {
         if (const auto vmpcKeyboardScreen =
                 mpc.screens->get<ScreenId::VmpcKeyboardScreen>();
             vmpcKeyboardScreen->isLearning())
         {
-            if (const auto keyEvent =
-                    std::get<KeyEvent>(hostEvent.payload);
+            if (const auto keyEvent = std::get<KeyEvent>(hostEvent.payload);
                 keyEvent.keyDown)
             {
                 vmpcKeyboardScreen->setLearnCandidate(keyEvent.platformKeyCode);
+                return;
             }
-            return;
         }
     }
 
@@ -222,9 +218,9 @@ bool ClientEventController::isEraseButtonPressed() const
 void ClientEventController::restoreKeyboardBindings() const
 {
     if (const auto persistedBindingsExist =
-        fs::exists(mpc.paths->keyboardBindingsPath());
-    !persistedBindingsExist &&
-    fs::exists(mpc.paths->legacyKeyboardBindingsPath()))
+            fs::exists(mpc.paths->keyboardBindingsPath());
+        !persistedBindingsExist &&
+        fs::exists(mpc.paths->legacyKeyboardBindingsPath()))
     {
         const auto legacyData =
             get_file_data(mpc.paths->legacyKeyboardBindingsPath());
@@ -233,22 +229,18 @@ void ClientEventController::restoreKeyboardBindings() const
             LegacyKeyboardBindingsConvertor::parseLegacyKeyboardBindings(
                 std::string(legacyData.begin(), legacyData.end()));
 
-        for (auto &entry : persistedLegacyData)
-        {
-            keyboardBindings->setBinding(entry.componentLabel, entry.direction,
-                                         entry.keyCode);
-        }
+        keyboardBindings->setBindingsData(persistedLegacyData);
     }
     else if (persistedBindingsExist)
     {
         const auto persistedData =
             get_file_data(mpc.paths->keyboardBindingsPath());
         const auto persistedBindings =
-            KeyboardBindingsReader::fromJson(persistedData);
-        for (auto &entry : persistedBindings)
-        {
-            keyboardBindings->setBinding(entry.componentLabel, entry.direction,
-                                         entry.keyCode);
-        }
+            KeyboardBindingsReader::fromJson(json::parse(persistedData));
+        keyboardBindings->setBindingsData(persistedBindings);
     }
+
+    keyboardBindings->deduplicateBindings();
+    keyboardBindings->ensureCorrectAmountOfBindingsPerComponentId();
+    keyboardBindings->validateBindings();
 }

@@ -1,4 +1,4 @@
-left 124
+left 123
 right 124
 up 126
 down 125

@@ -16,6 +16,37 @@ ComponentId KeyBinding::getComponentId() const
     return componentLabelToId.at(componentLabel);
 }
 
+int getRequiredBindingCountForComponentId(const ComponentId id)
+{
+    if (id >= FULL_LEVEL_OR_CASE_SWITCH_LED && id <= PLAY_LED)
+    {
+        return 0;
+    }
+
+    if (id == SLIDER || id == REC_GAIN_POT || id == MAIN_VOLUME_POT)
+    {
+        return 0;
+    }
+
+    if (id == DATA_WHEEL)
+    {
+        return 2;
+    }
+
+    if (id == SHIFT)
+    {
+        return 3;
+    }
+
+    if (id >= static_cast<int>(NUM_0_OR_VMPC) &&
+        id <= static_cast<int>(NUM_9_OR_MIDI_SYNC))
+    {
+        return 2;
+    }
+
+    return 1;
+}
+
 int KeyBinding::getPlatformKeyCode() const
 {
     return KeyCodeHelper::getPlatformFromVmpcKeyCode(keyCode);
@@ -24,6 +55,112 @@ int KeyBinding::getPlatformKeyCode() const
 KeyboardBindings::KeyboardBindings()
 {
     initializeDefaults();
+}
+
+void KeyboardBindings::ensureCorrectAmountOfBindingsPerComponentId()
+{
+    for (int i = NONE + 1; i < static_cast<int>(COMPONENT_ID_COUNT); ++i)
+    {
+        const auto id = static_cast<ComponentId>(i);
+        const auto label = componentIdToLabel.at(id);
+        const auto required = getRequiredBindingCountForComponentId(id);
+
+        int count = 0;
+        for (auto it = bindings.begin(); it != bindings.end();)
+        {
+            if (it->componentLabel == label)
+            {
+                if (count < required)
+                {
+                    ++count;
+                    ++it;
+                }
+                else
+                {
+                    it = bindings.erase(it);
+                }
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        while (count < required)
+        {
+            KeyBinding kb;
+            kb.keyCode = VmpcKeyCode::VMPC_KEY_UNKNOWN;
+            kb.componentLabel = label;
+            kb.direction = Direction::NoDirection;
+            bindings.push_back(kb);
+            ++count;
+        }
+
+        if (id == DATA_WHEEL)
+        {
+            bool hasNeg = false;
+            bool hasPos = false;
+
+            for (auto &b : bindings)
+            {
+                if (b.componentLabel == label)
+                {
+                    if (b.direction == Direction::Negative)
+                    {
+                        hasNeg = true;
+                    }
+                    if (b.direction == Direction::Positive)
+                    {
+                        hasPos = true;
+                    }
+                }
+            }
+
+            if (!hasNeg)
+            {
+                for (auto &b : bindings)
+                {
+                    if (b.componentLabel == label &&
+                        b.direction == Direction::NoDirection)
+                    {
+                        b.direction = Direction::Negative;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasPos)
+            {
+                for (auto &b : bindings)
+                {
+                    if (b.componentLabel == label &&
+                        b.direction == Direction::NoDirection)
+                    {
+                        b.direction = Direction::Positive;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void KeyboardBindings::deduplicateBindings()
+{
+    for (auto it = bindings.begin(); it != bindings.end(); ++it)
+    {
+        for (auto jt = it + 1; jt != bindings.end();)
+        {
+            if (*jt == *it && jt->keyCode != VmpcKeyCode::VMPC_KEY_UNKNOWN)
+            {
+                jt = bindings.erase(jt);
+            }
+            else
+            {
+                ++jt;
+            }
+        }
+    }
 }
 
 KeyboardBindings::KeyboardBindings(const KeyboardBindingsData &bindingsData)
@@ -41,7 +178,8 @@ bool KeyboardBindings::hasNoDuplicateVmpcKeyCodes() const
     std::set<VmpcKeyCode> seen;
     for (const auto &binding : bindings)
     {
-        if (!seen.insert(binding.keyCode).second)
+        if (!seen.insert(binding.keyCode).second &&
+            binding.keyCode != VmpcKeyCode::VMPC_KEY_UNKNOWN)
         {
             return false;
         }
@@ -55,7 +193,8 @@ bool KeyboardBindings::hasNoDuplicateKeyBindings() const
 
     for (auto binding : bindings)
     {
-        if (!seen.insert(binding).second)
+        if (!seen.insert(binding).second &&
+            binding.keyCode != VmpcKeyCode::VMPC_KEY_UNKNOWN)
         {
             return false;
         }
@@ -290,6 +429,8 @@ void KeyboardBindings::initializeDefaults()
                         getLabel(PAD_15_OR_HYPHEN_EXCLAMATION_MARK)});
     bindings.push_back(
         {VmpcKeyCode::VMPC_KEY_ANSI_K, getLabel(PAD_16_OR_PARENTHESES)});
+
+    validateBindings();
 }
 
 const KeyboardBindingsData &KeyboardBindings::getKeyboardBindingsData() const
@@ -317,24 +458,21 @@ int KeyboardBindings::getBindingCount() const
     return bindings.size();
 }
 
-void KeyboardBindings::setBinding(const std::string &componentLabel,
-                                  const Direction direction,
-                                  const VmpcKeyCode keyCode)
+void KeyboardBindings::validateBindings()
 {
-    assert(componentLabelToId.count(componentLabel) > 0);
+    assert(bindings.size() == 76);
 
-    const auto componentId = componentLabelToId.at(componentLabel);
-
-    const auto componentBindings = lookupComponentBindings(componentLabel);
-
-    assert((componentBindings.size() == 1 && componentId != DATA_WHEEL) ||
-           (componentBindings.size() == 2 && componentId == DATA_WHEEL));
-
-    for (auto &binding : componentBindings)
+    for (int i = NONE + 1; i < static_cast<int>(COMPONENT_ID_COUNT); ++i)
     {
-        if (binding->direction == direction)
-        {
-            binding->keyCode = keyCode;
-        }
+        const auto id = static_cast<ComponentId>(i);
+        const auto label = componentIdToLabel.at(id);
+        assert(lookupComponentBindings(label).size() ==
+               getRequiredBindingCountForComponentId(id));
     }
+}
+
+void KeyboardBindings::updateBindingKeyCode(const int bindingIndex,
+                                            const VmpcKeyCode keyCode)
+{
+    bindings[bindingIndex].keyCode = keyCode;
 }

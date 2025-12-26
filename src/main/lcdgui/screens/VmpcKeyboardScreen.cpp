@@ -271,6 +271,14 @@ void VmpcKeyboardScreen::updateRows()
 
         auto labelName = binding.componentLabel;
 
+        for (auto &c : labelName)
+        {
+            if (c == '_' || c == '-')
+            {
+                c = ' ';
+            }
+        }
+
         if (const auto pos = labelName.find(" or"); pos != std::string::npos)
         {
             labelName.erase(pos);
@@ -289,14 +297,6 @@ void VmpcKeyboardScreen::updateRows()
 
         auto labelText =
             StrUtil::padRight(labelName, " ", MAX_LABEL_LENGTH) + ":";
-
-        for (auto &c : labelText)
-        {
-            if (c == '_' || c == '-')
-            {
-                c = ' ';
-            }
-        }
 
         rowLabel->setText(labelText);
         const auto keyCodeDisplayName =

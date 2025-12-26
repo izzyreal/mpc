@@ -67,7 +67,7 @@ namespace mpc::input
         }
     };
 
-    inline bool operator<(const KeyBinding& lhs, const KeyBinding& rhs)
+    inline bool operator<(const KeyBinding &lhs, const KeyBinding &rhs)
     {
         return std::tie(lhs.keyCode, lhs.componentLabel, lhs.direction) <
                std::tie(rhs.keyCode, rhs.componentLabel, rhs.direction);
@@ -82,7 +82,10 @@ namespace mpc::input
 
         explicit KeyboardBindings(const KeyboardBindingsData &);
 
-        bool isSameAs(const KeyboardBindingsData& other) const;
+        void ensureCorrectAmountOfBindingsPerComponentId();
+        void deduplicateBindings();
+
+        bool isSameAs(const KeyboardBindingsData &other) const;
 
         bool hasNoDuplicateVmpcKeyCodes() const;
 
@@ -96,8 +99,7 @@ namespace mpc::input
         std::vector<KeyBinding *> lookupKeyCodeBindings(VmpcKeyCode);
         KeyBinding *lookupFirstKeyCodeBinding(VmpcKeyCode);
 
-        void setBinding(const std::string &componentLabel, Direction,
-                        VmpcKeyCode);
+        void updateBindingKeyCode(int bindingIndex, VmpcKeyCode);
 
         void initializeDefaults();
 
@@ -108,6 +110,8 @@ namespace mpc::input
         void setBindingsData(const KeyboardBindingsData &);
 
         int getBindingCount() const;
+
+        void validateBindings();
 
     private:
         KeyboardBindingsData bindings;
