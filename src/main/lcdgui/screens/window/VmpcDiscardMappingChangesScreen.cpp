@@ -13,7 +13,8 @@ void VmpcDiscardMappingChangesScreen::close()
 {
     nextScreen = "sequencer";
 }
-void VmpcDiscardMappingChangesScreen::setNextScreen(std::string nextScreenToUse)
+void VmpcDiscardMappingChangesScreen::setNextScreen(
+    const std::string &nextScreenToUse)
 {
     nextScreen = nextScreenToUse;
 }
@@ -38,5 +39,6 @@ void VmpcDiscardMappingChangesScreen::function(const int i)
             saveAndLeave();
             ls.lock()->openScreen(nextScreen);
             break;
+        default:;
     }
 }

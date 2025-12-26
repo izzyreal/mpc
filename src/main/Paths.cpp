@@ -24,22 +24,28 @@ Paths::Paths() : documents(std::make_unique<Documents>(this)) {}
 fs::path Paths::appDocumentsPath() const
 {
 #if TARGET_OS_IOS
-    static auto path = fs::path(getIosSharedDocumentsFolder());
+    auto path = fs::path(getIosSharedDocumentsFolder());
 #else
-    static auto path = fs::path(sago::getDocumentsFolder()) / "VMPC2000XL";
+    auto path = fs::path(sago::getDocumentsFolder()) / "VMPC2000XL";
 #endif
     return path;
 }
 
 fs::path Paths::appConfigHome() const
 {
-    static auto path = fs::path(sago::getConfigHome()) / "VMPC2000XL";
+    auto path = fs::path(sago::getConfigHome()) / "VMPC2000XL";
     return path;
 }
 
 fs::path Paths::configPath() const
 {
-    static auto path = appConfigHome() / "config";
+    auto path = appConfigHome() / "config";
+    return path;
+}
+
+fs::path Paths::keyboardBindingsPath() const
+{
+    auto path = appConfigHome() / "keyboard_bindings.json";
     return path;
 }
 
@@ -50,48 +56,48 @@ Paths::Documents *Paths::getDocuments() const
 
 fs::path Paths::Documents::storesPath() const
 {
-    static auto storesPath = appDocumentsPath() / "Volumes";
+    auto storesPath = appDocumentsPath() / "Volumes";
     return storesPath;
 }
 
 fs::path Paths::Documents::defaultLocalVolumePath() const
 {
-    static auto storesPath = appDocumentsPath() / "Volumes" / "MPC2000XL";
+    auto storesPath = appDocumentsPath() / "Volumes" / "MPC2000XL";
     return storesPath;
 }
 
 fs::path Paths::Documents::logFilePath() const
 {
-    static auto logFilePath = appDocumentsPath() / "vmpc.log";
+    auto logFilePath = appDocumentsPath() / "vmpc.log";
     return logFilePath;
 }
 
 fs::path Paths::Documents::recordingsPath() const
 {
-    static auto recPath = appDocumentsPath() / "Recordings";
+    auto recPath = appDocumentsPath() / "Recordings";
     return recPath;
 }
 
 fs::path Paths::Documents::midiControlPresetsPath() const
 {
-    static auto path = appDocumentsPath() / "MidiControlPresets";
+    auto path = appDocumentsPath() / "MidiControlPresets";
     return path;
 }
 
 fs::path Paths::Documents::autoSavePath() const
 {
-    static auto path = appDocumentsPath() / "AutoSave";
+    auto path = appDocumentsPath() / "AutoSave";
     return path;
 }
 
 fs::path Paths::Documents::demoDataPath() const
 {
-    static auto demoDataPath = defaultLocalVolumePath() / "DEMOS";
+    auto demoDataPath = defaultLocalVolumePath() / "DEMOS";
     return demoDataPath;
 }
 
 fs::path Paths::Documents::tempPath() const
 {
-    static auto tempPath = appDocumentsPath() / "Temp";
+    auto tempPath = appDocumentsPath() / "Temp";
     return tempPath;
 }

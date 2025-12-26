@@ -27,8 +27,13 @@ KeyboardBindings::KeyboardBindings()
 }
 
 KeyboardBindings::KeyboardBindings(const KeyboardBindingsData &bindingsData)
+    : bindings(bindingsData)
 {
-    bindings = bindingsData;
+}
+
+bool KeyboardBindings::isSameAs(const KeyboardBindingsData &other) const
+{
+    return bindings == other;
 }
 
 bool KeyboardBindings::hasNoDuplicateVmpcKeyCodes() const
@@ -285,7 +290,7 @@ void KeyboardBindings::initializeDefaults()
         {VmpcKeyCode::VMPC_KEY_ANSI_K, getLabel(PAD_16_OR_PARENTHESES)});
 }
 
-KeyboardBindingsData KeyboardBindings::getKeyboardBindingsData() const
+const KeyboardBindingsData &KeyboardBindings::getKeyboardBindingsData() const
 {
     return bindings;
 }
@@ -298,6 +303,16 @@ KeyBinding *KeyboardBindings::getByIndex(const int idx)
     }
 
     return &bindings[idx];
+}
+
+void KeyboardBindings::setBindingsData(const KeyboardBindingsData &bindingsData)
+{
+    bindings = bindingsData;
+}
+
+int KeyboardBindings::getBindingCount() const
+{
+    return bindings.size();
 }
 
 void KeyboardBindings::setBinding(const std::string &componentLabel,

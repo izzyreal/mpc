@@ -8,20 +8,24 @@ using namespace mpc::input;
 
 namespace mpc::input
 {
-class KeyboardBindingsWriter
-{
-public:
-    static nlohmann::json toJson(const KeyboardBindings& kb)
+    class KeyboardBindingsWriter
     {
-        nlohmann::json j;
-        for (auto& [k,v] : kb.getKeyboardBindingsData())
+    public:
+        static nlohmann::json toJson(const KeyboardBindings &kb)
         {
-            j[std::to_string((int)k)] = {
-                {"componentLabel", v.componentLabel},
-                {"direction", (int)v.direction}
-            };
+            return toJson(kb.getKeyboardBindingsData());
         }
-        return j;
-    }
-};
-}
+
+        static nlohmann::json toJson(const KeyboardBindingsData &kb)
+        {
+            nlohmann::json j;
+            for (auto &entry : kb)
+            {
+                j[std::to_string(static_cast<int>(entry.keyCode))] = {
+                    {"componentLabel", entry.componentLabel},
+                    {"direction", static_cast<int>(entry.direction)}};
+            }
+            return j;
+        }
+    };
+} // namespace mpc::input

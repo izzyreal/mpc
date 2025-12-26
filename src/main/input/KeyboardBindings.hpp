@@ -79,6 +79,8 @@ namespace mpc::input
 
         explicit KeyboardBindings(const KeyboardBindingsData &);
 
+        bool isSameAs(const KeyboardBindingsData& other) const;
+
         bool hasNoDuplicateVmpcKeyCodes() const;
 
         bool hasNoDuplicateKeyBindings() const;
@@ -96,9 +98,13 @@ namespace mpc::input
 
         void initializeDefaults();
 
-        KeyboardBindingsData getKeyboardBindingsData() const;
+        const KeyboardBindingsData &getKeyboardBindingsData() const;
 
         KeyBinding *getByIndex(int);
+
+        void setBindingsData(const KeyboardBindingsData &);
+
+        int getBindingCount() const;
 
     private:
         KeyboardBindingsData bindings;

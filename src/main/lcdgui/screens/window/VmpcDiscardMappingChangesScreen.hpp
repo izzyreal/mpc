@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void close() override;
 
-        void setNextScreen(std::string nextScreen);
+        void setNextScreen(const std::string &nextScreen);
 
         std::function<void()> discardAndLeave = [] {};
         std::function<void()> saveAndLeave = [] {};

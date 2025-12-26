@@ -10,6 +10,7 @@
 
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 
 #include "hardware/ComponentId.hpp"
 
@@ -65,12 +66,29 @@ void ClientEventController::init()
 void ClientEventController::dispatchHostInput(
     const input::HostInputEvent &hostEvent)
 {
+    if (hostEvent.getSource() == input::HostInputEvent::Source::KEYBOARD &&
+        mpc.getLayeredScreen()->isCurrentScreenOrChildOf(
+            ScreenId::VmpcKeyboardScreen))
+    {
+        if (const auto vmpcKeyboardScreen =
+                mpc.screens->get<ScreenId::VmpcKeyboardScreen>();
+            vmpcKeyboardScreen->isLearning())
+        {
+            if (const auto keyEvent =
+                    std::get<input::KeyEvent>(hostEvent.payload);
+                keyEvent.keyDown)
+            {
+                vmpcKeyboardScreen->setLearnCandidate(keyEvent.platformKeyCode);
+            }
+            return;
+        }
+    }
+
     const auto clientEvent =
         hostToClientTranslator.translate(hostEvent, keyboardBindings);
 
     if (!clientEvent.has_value())
     {
-        // printf("empty clientEvent\n");
         return;
     }
 
