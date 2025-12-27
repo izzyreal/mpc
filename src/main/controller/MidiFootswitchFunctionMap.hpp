@@ -7,12 +7,10 @@
 
 #include "hardware/ComponentId.hpp"
 #include "controller/ClientMidiFootswitchAssignmentController.hpp"
-#include "midi/input/MidiControlTarget.hpp" // For SequencerTarget::Command
+#include "midi/input/MidiControlTarget.hpp"
 
 namespace mpc::controller
 {
-
-    // Forward maps (existing)
     extern const std::unordered_map<MidiFootswitchFunction,
                                     hardware::ComponentId>
         footswitchToComponentId;
@@ -25,10 +23,8 @@ namespace mpc::controller
     extern const std::unordered_map<MidiFootswitchFunction, std::string>
         functionNameFromEnum;
 
-    // === REVERSE LOOKUP HELPERS (inline, header-only) ===
-
     inline std::optional<MidiFootswitchFunction>
-    componentIdToFootswitch(hardware::ComponentId cid)
+    componentIdToFootswitch(const hardware::ComponentId cid)
     {
         for (const auto &[fn, id] : footswitchToComponentId)
         {
@@ -41,7 +37,7 @@ namespace mpc::controller
     }
 
     inline std::optional<MidiFootswitchFunction> sequencerCmdToFootswitch(
-        midi::input::MidiControlTarget::SequencerTarget::Command cmd)
+        const midi::input::MidiControlTarget::SequencerTarget::Command cmd)
     {
         for (const auto &[fn, c] : footswitchToSequencerCmd)
         {
@@ -54,9 +50,9 @@ namespace mpc::controller
     }
 
     inline std::optional<hardware::ComponentId>
-    footswitchToComponentIdOpt(MidiFootswitchFunction fn)
+    footswitchToComponentIdOpt(const MidiFootswitchFunction fn)
     {
-        auto it = footswitchToComponentId.find(fn);
+        const auto it = footswitchToComponentId.find(fn);
         return it != footswitchToComponentId.end()
                    ? std::make_optional(it->second)
                    : std::nullopt;
@@ -64,9 +60,9 @@ namespace mpc::controller
 
     inline std::optional<
         midi::input::MidiControlTarget::SequencerTarget::Command>
-    footswitchToSequencerCmdOpt(MidiFootswitchFunction fn)
+    footswitchToSequencerCmdOpt(const MidiFootswitchFunction fn)
     {
-        auto it = footswitchToSequencerCmd.find(fn);
+        const auto it = footswitchToSequencerCmd.find(fn);
         return it != footswitchToSequencerCmd.end()
                    ? std::make_optional(it->second)
                    : std::nullopt;
