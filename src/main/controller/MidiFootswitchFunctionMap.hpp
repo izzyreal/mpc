@@ -68,7 +68,6 @@ namespace mpc::controller
                    : std::nullopt;
     }
 
-    // === ORDERED LIST OF ALL FUNCTIONS (for turnWheel) ===
     inline const std::vector<MidiFootswitchFunction> &
     getAllFootswitchFunctions()
     {
