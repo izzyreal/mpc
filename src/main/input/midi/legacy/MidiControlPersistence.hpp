@@ -50,4 +50,4 @@ namespace mpc::input::midi::legacy
         static void restoreLastState(Mpc &mpc);
         static void saveCurrentState(Mpc &mpc);
     };
-} // namespace mpc::nvram
+} // namespace mpc::input::midi::legacy

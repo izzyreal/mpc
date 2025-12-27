@@ -52,8 +52,8 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             // NEVER
             if (preset != presets.end())
             {
-                (*preset)->autoloadMode =
-                    input::midi::legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
+                (*preset)->autoloadMode = input::midi::legacy::
+                    MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
             }
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
@@ -62,10 +62,11 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             if (preset != presets.end())
             {
                 if ((*preset)->autoloadMode !=
-                    input::midi::legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+                    input::midi::legacy::MidiControlPreset::AutoLoadMode::
+                        AutoLoadModeYes)
                 {
-                    (*preset)->autoloadMode =
-                        input::midi::legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
+                    (*preset)->autoloadMode = input::midi::legacy::
+                        MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
                     mpc.getDisk()->writeMidiControlPreset(*preset);
                     input::midi::legacy::MidiControlPersistence::
                         loadAllPresetsFromDiskIntoMemory(mpc);
@@ -90,14 +91,14 @@ void VmpcKnownControllerDetectedScreen::open()
     {
         if (controllerName.find(p->name) != std::string::npos)
         {
-            if (p->autoloadMode ==
-                input::midi::legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
+            if (p->autoloadMode == input::midi::legacy::MidiControlPreset::
+                                       AutoLoadMode::AutoLoadModeNo)
             {
                 mpc.getLayeredScreen()->closeCurrentScreen();
                 return;
             }
-            if (p->autoloadMode ==
-                input::midi::legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+            if (p->autoloadMode == input::midi::legacy::MidiControlPreset::
+                                       AutoLoadMode::AutoLoadModeYes)
             {
                 const auto vmpcMidiScreen =
                     mpc.screens->get<ScreenId::VmpcMidiScreen>();

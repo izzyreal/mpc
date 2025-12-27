@@ -381,4 +381,4 @@ namespace mpc::input::keyboard
         }
 #endif
     };
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

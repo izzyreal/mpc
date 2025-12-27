@@ -11,8 +11,7 @@ namespace mpc::input::keyboard
     class KeyCodeHelper
     {
     public:
-        static VmpcKeyCode
-        getVmpcFromPlatformKeyCode(int platformKeyCode);
+        static VmpcKeyCode getVmpcFromPlatformKeyCode(int platformKeyCode);
 
         static std::optional<char>
         getCharForTypableVmpcKeyCode(VmpcKeyCode vmpcKeyCode);
@@ -37,4 +36,4 @@ namespace mpc::input::keyboard
 
         static std::string getKeyCodeString(VmpcKeyCode keyCode);
     };
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

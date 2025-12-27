@@ -247,4 +247,4 @@ namespace mpc::input::keyboard
             UIKeyboardHIDUsageKeyboardLANG5,
     };
 
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

@@ -113,7 +113,8 @@ void Mpc::init()
 
     diskController = std::make_unique<disk::DiskController>(*this);
 
-    input::midi::legacy::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
+    input::midi::legacy::MidiControlPersistence::
+        loadAllPresetsFromDiskIntoMemory(*this);
 
     hardware = std::make_shared<Hardware>();
 

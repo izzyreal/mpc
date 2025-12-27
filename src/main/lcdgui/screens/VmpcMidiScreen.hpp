@@ -23,8 +23,10 @@ namespace mpc::lcdgui::screens
         bool isLearning();
         void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
                                int8_t value);
-        void updateOrAddActivePresetCommand(input::midi::legacy::MidiControlCommand &c);
-        std::shared_ptr<input::midi::legacy::MidiControlPreset> getActivePreset();
+        void updateOrAddActivePresetCommand(
+            input::midi::legacy::MidiControlCommand &c);
+        std::shared_ptr<input::midi::legacy::MidiControlPreset>
+        getActivePreset();
         bool hasMappingChanged();
 
         std::atomic_bool shouldSwitch{false};
@@ -40,8 +42,9 @@ namespace mpc::lcdgui::screens
         input::midi::legacy::MidiControlCommand learnCandidate;
 
         bool learning = false;
-        std::shared_ptr<input::midi::legacy::MidiControlPreset> uneditedActivePresetCopy =
-            std::make_shared<input::midi::legacy::MidiControlPreset>();
+        std::shared_ptr<input::midi::legacy::MidiControlPreset>
+            uneditedActivePresetCopy =
+                std::make_shared<input::midi::legacy::MidiControlPreset>();
 
         void setLearning(bool b);
         void acceptLearnCandidate();

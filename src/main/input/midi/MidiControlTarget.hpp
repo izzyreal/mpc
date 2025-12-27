@@ -29,4 +29,4 @@ namespace mpc::input::midi
         std::string label;
         std::variant<HardwareTarget, SequencerTarget> payload;
     };
-} // namespace mpc::midi::input
+} // namespace mpc::input::midi

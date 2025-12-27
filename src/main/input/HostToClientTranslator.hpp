@@ -20,7 +20,8 @@ namespace mpc::input
         HostToClientTranslator();
 
         std::optional<client::event::ClientEvent>
-        translate(const HostInputEvent &, std::shared_ptr<keyboard::KeyboardBindings>);
+        translate(const HostInputEvent &,
+                  std::shared_ptr<keyboard::KeyboardBindings>);
 
     private:
         GestureSourceTracker gestureSourceTracker;

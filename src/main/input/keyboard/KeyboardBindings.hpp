@@ -59,4 +59,4 @@ namespace mpc::input::keyboard
         std::vector<KeyBinding *> lookupComponentBindings(const std::string &);
     };
 
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

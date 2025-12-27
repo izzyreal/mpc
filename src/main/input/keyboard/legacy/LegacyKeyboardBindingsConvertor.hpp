@@ -279,7 +279,8 @@ namespace mpc::input::keyboard::legacy
                     const int platformKeyCodeInt = stoi(platformKeyCodeStr);
 
 #if __APPLE__
-                    // Remnants of https://github.com/izzyreal/moduru/blob/c5a8008d63a396361e051c5ed738146ae1528f20/src/main/thirdp/wrpkey/key/detail.keys.OSX.hxx#L137
+                    // Remnants of
+                    // https://github.com/izzyreal/moduru/blob/c5a8008d63a396361e051c5ed738146ae1528f20/src/main/thirdp/wrpkey/key/detail.keys.OSX.hxx#L137
                     if (platformKeyCodeInt == -16)
                     {
                         vmpcKeyCode = VmpcKeyCode::VMPC_KEY_Insert;
@@ -326,4 +327,4 @@ namespace mpc::input::keyboard::legacy
             return kbBindingsData;
         }
     };
-} // namespace mpc::input::legacy
+} // namespace mpc::input::keyboard::legacy

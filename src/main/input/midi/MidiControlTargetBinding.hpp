@@ -40,4 +40,4 @@ namespace mpc::input::midi
     using MidiControlTargetBinding =
         std::variant<HardwareBinding, SequencerBinding>;
 
-} // namespace mpc::midi::input
+} // namespace mpc::input::midi

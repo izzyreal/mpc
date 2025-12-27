@@ -21,11 +21,10 @@ namespace mpc::input::keyboard
             j["bindings"] = nlohmann::json::array();
             for (auto &entry : kb)
             {
-                j["bindings"].push_back({
-                    {"keyCode", static_cast<int>(entry.keyCode)},
-                    {"componentLabel", entry.componentLabel},
-                    {"direction", static_cast<int>(entry.direction)}
-                });
+                j["bindings"].push_back(
+                    {{"keyCode", static_cast<int>(entry.keyCode)},
+                     {"componentLabel", entry.componentLabel},
+                     {"direction", static_cast<int>(entry.direction)}});
             }
             return j;
         }

@@ -73,4 +73,4 @@ namespace mpc::input::midi::legacy
 
         void setMpcHardwareLabel(const std::string &mpcHardwareLabel);
     };
-} // namespace mpc::nvram
+} // namespace mpc::input::midi::legacy
