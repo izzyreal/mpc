@@ -26,7 +26,7 @@ void MidiSwScreen::displaySwitchLabels()
     for (int i = 0; i < 4; i++)
     {
         const auto label = findChild<TextComp>("switch" + std::to_string(i));
-        label->setText("Switch " + std::to_string(i + 1 + xOffset));
+        label->setText("Switch " + std::to_string(i + 1));
     }
 }
 
@@ -40,12 +40,11 @@ void MidiSwScreen::displayCtrlsAndFunctions()
 
     for (int i = 0; i < 4; i++)
     {
-        const int idx = i + xOffset;
         const auto ctrlField = findChild<Field>("ctrl" + std::to_string(i));
         const auto functionField =
             findChild<Field>("function" + std::to_string(i));
 
-        if (idx >= static_cast<int>(bindings.size()))
+        if (i >= static_cast<int>(bindings.size()))
         {
             ctrlField->setText("OFF");
             functionField->setText("-");
@@ -77,7 +76,7 @@ void MidiSwScreen::displayCtrlsAndFunctions()
                     }
                 }
             },
-            bindings[idx]);
+            bindings[i]);
 
         ctrlField->setText(ctrlText);
         functionField->setText(fnText.empty() ? "-" : fnText);
@@ -89,21 +88,13 @@ void MidiSwScreen::turnWheel(int delta)
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     const int xPos =
         std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
-    const int selectedSwitch = xOffset + xPos;
     const bool editingCtrl = focusedFieldName.rfind("ctrl", 0) == 0;
 
     const auto footswitchController =
         mpc.clientEventController->getClientMidiEventController()
             ->getFootswitchAssignmentController();
 
-    if (selectedSwitch < 0 ||
-        selectedSwitch >=
-            static_cast<int>(footswitchController->bindings.size()))
-    {
-        return;
-    }
-
-    auto &binding = footswitchController->bindings[selectedSwitch];
+    auto &binding = footswitchController->bindings[xPos];
 
     if (editingCtrl)
     {
@@ -116,10 +107,8 @@ void MidiSwScreen::turnWheel(int delta)
     }
     else
     {
-        // Use centralized ordered list
         const auto &allFns = getAllFootswitchFunctions();
 
-        // Find current function index
         int currentIdx = 0;
         std::visit(
             [&](auto &b)
@@ -143,16 +132,14 @@ void MidiSwScreen::turnWheel(int delta)
             },
             binding);
 
-        // Compute new function
         const int newIdx = std::clamp(currentIdx + delta, 0,
                                       static_cast<int>(allFns.size()) - 1);
         const MidiFootswitchFunction newFn = allFns[newIdx];
 
-        // Replace binding with new function
         std::visit(
-            [&](auto &b)
+            [&](const auto &b)
             {
-                auto base = b; // copy shared fields
+                auto base = b;
 
                 if (const auto cid = footswitchToComponentIdOpt(newFn))
                 {
@@ -175,53 +162,10 @@ void MidiSwScreen::turnWheel(int delta)
     displayCtrlsAndFunctions();
 }
 
-void MidiSwScreen::function(int i)
+void MidiSwScreen::function(const int i)
 {
     if (i == 0)
     {
         openScreenById(ScreenId::SyncScreen);
     }
-}
-
-void MidiSwScreen::left()
-{
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const int xPos =
-        std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
-
-    if (xPos == 0 && xOffset > 0)
-    {
-        setXOffset(xOffset - 1);
-        return;
-    }
-
-    ScreenComponent::left();
-}
-
-void MidiSwScreen::right()
-{
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const int xPos =
-        std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
-
-    if (xPos == 3 &&
-        xOffset < ClientMidiFootswitchAssignmentController::SWITCH_COUNT - 4)
-    {
-        setXOffset(xOffset + 1);
-        return;
-    }
-
-    ScreenComponent::right();
-}
-
-void MidiSwScreen::setXOffset(int i)
-{
-    if (i < 0 || i > ClientMidiFootswitchAssignmentController::SWITCH_COUNT - 4)
-    {
-        return;
-    }
-
-    xOffset = i;
-    displaySwitchLabels();
-    displayCtrlsAndFunctions();
 }

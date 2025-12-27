@@ -62,7 +62,7 @@ namespace mpc::controller
     class ClientMidiFootswitchAssignmentController
     {
     public:
-        static constexpr int SWITCH_COUNT = 40;
+        static constexpr int SWITCH_COUNT = 4;
 
         ClientMidiFootswitchAssignmentController(
             const std::shared_ptr<ClientHardwareEventController> &,
