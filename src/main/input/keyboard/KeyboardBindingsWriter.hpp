@@ -1,12 +1,10 @@
 #pragma once
 
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
 
 #include <nlohmann/json.hpp>
 
-using namespace mpc::input;
-
-namespace mpc::input
+namespace mpc::input::keyboard
 {
     class KeyboardBindingsWriter
     {
@@ -32,4 +30,4 @@ namespace mpc::input
             return j;
         }
     };
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

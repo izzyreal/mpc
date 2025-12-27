@@ -1,5 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
-#include "input/legacy/LegacyKeyboardBindingsConvertor.hpp"
+#include "input/keyboard/legacy/LegacyKeyboardBindingsConvertor.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -29,10 +29,10 @@ TEST_CASE("Legacy preset V1 conversion works",
 
     REQUIRE(bindingsData.size() == 76);
 
-    using VmpcKeyCode = mpc::input::VmpcKeyCode;
+    using VmpcKeyCode = mpc::input::keyboard::VmpcKeyCode;
     using Id = mpc::hardware::ComponentId;
 
-    mpc::input::KeyboardBindings bindings(bindingsData);
+    mpc::input::keyboard::KeyboardBindings bindings(bindingsData);
 
     REQUIRE(bindings.lookupFirstKeyCodeBinding(VmpcKeyCode::VMPC_KEY_LeftArrow)->getComponentId() ==
             Id::CURSOR_LEFT_OR_DIGIT);

@@ -5,7 +5,7 @@
 #if __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
-#include "UIKeyConstants.hpp"
+#include "input/keyboard/UIKeyConstants.hpp"
 #elif TARGET_OS_OSX
 #include <Carbon/Carbon.h>
 #endif
@@ -16,7 +16,7 @@
 #include <X11/Xutil.h>
 #endif
 
-namespace mpc::input
+namespace mpc::input::keyboard
 {
 
     class KeyboardLayout

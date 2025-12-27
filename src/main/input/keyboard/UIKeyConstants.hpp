@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mpc::input
+namespace mpc::input::keyboard
 {
 
     enum UIKeyConstants

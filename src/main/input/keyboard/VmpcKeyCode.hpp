@@ -1,10 +1,6 @@
 #pragma once
 
-#include <string>
-#include <map>
-#include <optional>
-
-namespace mpc::input
+namespace mpc::input::keyboard
 {
     /**
      * This class enumerates all keys that can be mapped to actions.
@@ -157,34 +153,4 @@ namespace mpc::input
 
         VMPC_KEY_ENUMERATOR_SIZE
     };
-
-    class KeyCodeHelper
-    {
-    public:
-        static VmpcKeyCode
-        getVmpcFromPlatformKeyCode(const int platformKeyCode);
-
-        static std::optional<char>
-        getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
-
-        static std::string
-        guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
-
-        static std::string
-        getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
-
-        static int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
-
-        static std::optional<char>
-        getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode);
-
-    private:
-        static const std::map<const int, const VmpcKeyCode>
-            platformToVmpcKeyCodes;
-
-        static const std::map<const VmpcKeyCode, const char>
-            typableVmpcKeyCodes;
-
-        static std::string getKeyCodeString(const VmpcKeyCode keyCode);
-    };
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

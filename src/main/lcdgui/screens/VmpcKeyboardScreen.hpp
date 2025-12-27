@@ -1,7 +1,7 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
-#include "input/KeyCodeHelper.hpp"
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
+#include "input/keyboard/VmpcKeyCode.hpp"
 
 namespace mpc
 {
@@ -31,12 +31,12 @@ namespace mpc::lcdgui::screens
     private:
         int row = 0;
         int rowOffset = 0;
-        input::VmpcKeyCode learnCandidate =
-            input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
+        input::keyboard::VmpcKeyCode learnCandidate =
+            input::keyboard::VmpcKeyCode::VMPC_KEY_UNKNOWN;
 
         bool learning = false;
 
-        std::unique_ptr<input::KeyboardBindings> bindings;
+        std::unique_ptr<input::keyboard::KeyboardBindings> bindings;
 
         void setLearning(bool b);
         void updateRows();

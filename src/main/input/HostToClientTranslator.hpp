@@ -7,18 +7,20 @@
 
 #include <memory>
 
+namespace mpc::input::keyboard
+{
+    class KeyboardBindings;
+}
+
 namespace mpc::input
 {
-
-    class KeyboardBindings;
-
     class HostToClientTranslator
     {
     public:
         HostToClientTranslator();
 
         std::optional<client::event::ClientEvent>
-        translate(const HostInputEvent &, std::shared_ptr<KeyboardBindings>);
+        translate(const HostInputEvent &, std::shared_ptr<keyboard::KeyboardBindings>);
 
     private:
         GestureSourceTracker gestureSourceTracker;

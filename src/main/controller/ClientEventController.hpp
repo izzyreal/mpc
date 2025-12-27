@@ -3,7 +3,7 @@
 #include "client/event/ClientEvent.hpp"
 
 #include "input/HostToClientTranslator.hpp"
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
 
 #include "sequencer/RecordingMode.hpp"
 
@@ -60,7 +60,7 @@ namespace mpc::controller
 
         void handleClientEvent(const client::event::ClientEvent &) const;
 
-        std::shared_ptr<input::KeyboardBindings> getKeyboardBindings()
+        std::shared_ptr<input::keyboard::KeyboardBindings> getKeyboardBindings()
         {
             return keyboardBindings;
         }
@@ -98,7 +98,7 @@ namespace mpc::controller
         Mpc &mpc;
         input::HostToClientTranslator hostToClientTranslator;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
-        std::shared_ptr<input::KeyboardBindings> keyboardBindings;
+        std::shared_ptr<input::keyboard::KeyboardBindings> keyboardBindings;
 
         std::weak_ptr<lcdgui::Screens> screens;
         std::weak_ptr<lcdgui::LayeredScreen> layeredScreen;

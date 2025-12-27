@@ -1,6 +1,7 @@
 #pragma once
 
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
+#include "input/keyboard/KeyCodeHelper.hpp"
 
 #include "StrUtil.hpp"
 
@@ -8,7 +9,7 @@
 
 using json = nlohmann::json;
 
-namespace mpc::input::legacy
+namespace mpc::input::keyboard::legacy
 {
     class LegacyKeyboardBindingsConvertor
     {

@@ -1,15 +1,16 @@
 #include "input/HostToClientTranslator.hpp"
 #include "hardware/ComponentId.hpp"
 #include "client/event/ClientEvent.hpp"
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
 
-#include "input/KeyCodeHelper.hpp"
+#include "input/keyboard/KeyCodeHelper.hpp"
 
 #include "hardware/Component.hpp"
 
 #include <stdexcept>
 
 using namespace mpc::input;
+using namespace mpc::input::keyboard;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
 

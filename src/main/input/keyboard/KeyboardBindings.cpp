@@ -1,20 +1,10 @@
-#include "input/KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
 
 #include <cassert>
 #include <set>
 
-using namespace mpc::input;
+using namespace mpc::input::keyboard;
 using namespace mpc::hardware;
-
-ComponentId KeyBinding::getComponentId() const
-{
-    if (componentLabelToId.count(componentLabel) == 0)
-    {
-        return NONE;
-    }
-
-    return componentLabelToId.at(componentLabel);
-}
 
 int getRequiredBindingCountForComponentId(const ComponentId id)
 {
@@ -45,11 +35,6 @@ int getRequiredBindingCountForComponentId(const ComponentId id)
     }
 
     return 1;
-}
-
-int KeyBinding::getPlatformKeyCode() const
-{
-    return KeyCodeHelper::getPlatformFromVmpcKeyCode(keyCode);
 }
 
 KeyboardBindings::KeyboardBindings()

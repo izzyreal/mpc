@@ -1,12 +1,11 @@
 #pragma once
-#include <nlohmann/json.hpp>
 
-#include "KeyboardBindings.hpp"
+#include "input/keyboard/KeyboardBindings.hpp"
 #include "Logger.hpp"
 
-using namespace mpc::input;
+#include <nlohmann/json.hpp>
 
-namespace mpc::input
+namespace mpc::input::keyboard
 {
     class KeyboardBindingsReader
     {
@@ -80,4 +79,4 @@ namespace mpc::input
             return bindingsData;
         }
     };
-} // namespace mpc::input
+} // namespace mpc::input::keyboard

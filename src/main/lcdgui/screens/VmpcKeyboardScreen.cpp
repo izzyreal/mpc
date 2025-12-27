@@ -9,14 +9,16 @@
 #include "lcdgui/Parameter.hpp"
 #include "lcdgui/Label.hpp"
 
-#include "input/KeyCodeHelper.hpp"
-#include "input/KeyboardBindingsWriter.hpp"
+#include "input/Direction.hpp"
+#include "input/keyboard/KeyCodeHelper.hpp"
+#include "input/keyboard/KeyboardBindingsWriter.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::input;
+using namespace mpc::input::keyboard;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)

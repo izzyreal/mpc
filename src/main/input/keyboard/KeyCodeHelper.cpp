@@ -1,11 +1,11 @@
-#include "KeyCodeHelper.hpp"
+#include "input/keyboard/KeyCodeHelper.hpp"
 
-#include "KeyboardLayout.hpp"
+#include "input/keyboard/KeyboardLayout.hpp"
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
-#include "input/UIKeyConstants.hpp"
+#include "input/keyboard/UIKeyConstants.hpp"
 #else
 #include <Carbon/Carbon.h>
 #endif
@@ -16,7 +16,7 @@
 #include <X11/keysym.h>
 #endif
 
-using namespace mpc::input;
+using namespace mpc::input::keyboard;
 
 const std::map<const int, const VmpcKeyCode>
     KeyCodeHelper::platformToVmpcKeyCodes{

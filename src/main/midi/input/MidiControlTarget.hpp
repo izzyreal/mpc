@@ -5,7 +5,6 @@
 
 namespace mpc::midi::input
 {
-
     struct MidiControlTarget
     {
         struct HardwareTarget
@@ -27,8 +26,7 @@ namespace mpc::midi::input
             } command;
         };
 
-        std::string label; // human-readable
+        std::string label;
         std::variant<HardwareTarget, SequencerTarget> payload;
     };
-
 } // namespace mpc::midi::input

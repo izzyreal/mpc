@@ -13,8 +13,8 @@
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 
 #include "hardware/ComponentId.hpp"
-#include "input/KeyboardBindingsReader.hpp"
-#include "input/legacy/LegacyKeyboardBindingsConvertor.hpp"
+#include "input/keyboard/KeyboardBindingsReader.hpp"
+#include "input/keyboard/legacy/LegacyKeyboardBindingsConvertor.hpp"
 
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -26,6 +26,8 @@ using namespace mpc::client::event;
 using namespace mpc::sequencer;
 using namespace mpc::hardware;
 using namespace mpc::lcdgui;
+using namespace mpc::input::keyboard;
+using namespace mpc::input;
 
 ClientEventController::ClientEventController(Mpc &mpcToUse)
     : setSelectedNote(

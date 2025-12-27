@@ -1,5 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
-#include "input/legacy/LegacyKeyboardBindingsConvertor.hpp"
+#include "input/keyboard/legacy/LegacyKeyboardBindingsConvertor.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -29,9 +29,9 @@ TEST_CASE("Legacy preset versionless conversion works",
 
     REQUIRE(convertedBindingsData.size() == 66);
 
-    mpc::input::KeyboardBindings bindings(convertedBindingsData);
+    mpc::input::keyboard::KeyboardBindings bindings(convertedBindingsData);
 
-    using VmpcKeyCode = mpc::input::VmpcKeyCode;
+    using VmpcKeyCode = mpc::input::keyboard::VmpcKeyCode;
     using Id = mpc::hardware::ComponentId;
 
     REQUIRE(bindings.lookupFirstKeyCodeBinding(VmpcKeyCode::VMPC_KEY_LeftArrow)->getComponentId() ==
