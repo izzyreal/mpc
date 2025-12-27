@@ -24,7 +24,7 @@ TEST_CASE("Legacy preset versionless conversion works",
 {
     auto data = load_resource("test/LegacyKeyboardBindingsVersionless/keys.txt");
 
-    auto convertedBindingsData = mpc::input::legacy::LegacyKeyboardBindingsConvertor::
+    auto convertedBindingsData = mpc::input::keyboard::legacy::LegacyKeyboardBindingsConvertor::
         parseLegacyKeyboardBindings(data);
 
     REQUIRE(convertedBindingsData.size() == 66);

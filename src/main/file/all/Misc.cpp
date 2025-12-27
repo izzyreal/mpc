@@ -99,7 +99,7 @@ Misc::Misc(Mpc &mpc)
                 cc = b.number;
 
                 if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
-                                             midi::input::HardwareBinding>)
+                                             input::midi::HardwareBinding>)
                 {
                     if (auto fn = controller::componentIdToFootswitch(
                             b.target.componentId))
@@ -109,7 +109,7 @@ Misc::Misc(Mpc &mpc)
                 }
                 else if constexpr (std::is_same_v<
                                        std::decay_t<decltype(b)>,
-                                       midi::input::SequencerBinding>)
+                                       input::midi::SequencerBinding>)
                 {
                     if (auto fn = controller::sequencerCmdToFootswitch(
                             b.target.command))

@@ -7,7 +7,7 @@
 
 #include "hardware/ComponentId.hpp"
 #include "controller/ClientMidiFootswitchAssignmentController.hpp"
-#include "midi/input/MidiControlTarget.hpp"
+#include "input/midi/MidiControlTarget.hpp"
 
 namespace mpc::controller
 {
@@ -17,7 +17,7 @@ namespace mpc::controller
 
     extern const std::unordered_map<
         MidiFootswitchFunction,
-        midi::input::MidiControlTarget::SequencerTarget::Command>
+        input::midi::MidiControlTarget::SequencerTarget::Command>
         footswitchToSequencerCmd;
 
     extern const std::unordered_map<MidiFootswitchFunction, std::string>
@@ -37,7 +37,7 @@ namespace mpc::controller
     }
 
     inline std::optional<MidiFootswitchFunction> sequencerCmdToFootswitch(
-        const midi::input::MidiControlTarget::SequencerTarget::Command cmd)
+        const input::midi::MidiControlTarget::SequencerTarget::Command cmd)
     {
         for (const auto &[fn, c] : footswitchToSequencerCmd)
         {
@@ -59,7 +59,7 @@ namespace mpc::controller
     }
 
     inline std::optional<
-        midi::input::MidiControlTarget::SequencerTarget::Command>
+        input::midi::MidiControlTarget::SequencerTarget::Command>
     footswitchToSequencerCmdOpt(const MidiFootswitchFunction fn)
     {
         const auto it = footswitchToSequencerCmd.find(fn);

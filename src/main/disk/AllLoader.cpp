@@ -194,8 +194,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
     auto footswitchController =
         mpc.clientEventController->getClientMidiEventController()
             ->getFootswitchAssignmentController();
-    using Cmd = midi::input::MidiControlTarget::SequencerTarget::Command;
-    using MT = midi::input::MidiBindingBase::MessageType;
+
+    using MT = input::midi::MidiBindingBase::MessageType;
 
     int bindingCounter = 0;
     for (auto [cc, functionIndex] : misc->getSwitches())
@@ -207,8 +207,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             hw != controller::footswitchToComponentId.end())
         {
             footswitchController->bindings[bindingCounter++] =
-                midi::input::HardwareBinding{{-1, cc, std::nullopt,
-                                              midi::input::Interaction::Press,
+                input::midi::HardwareBinding{{-1, cc, std::nullopt,
+                                              input::midi::Interaction::Press,
                                               MT::CC},
                                              {hw->second}};
         }
@@ -216,8 +216,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
                  sq != controller::footswitchToSequencerCmd.end())
         {
             footswitchController->bindings[bindingCounter++] =
-                midi::input::SequencerBinding{{-1, cc, std::nullopt,
-                                               midi::input::Interaction::Press,
+                input::midi::SequencerBinding{{-1, cc, std::nullopt,
+                                               input::midi::Interaction::Press,
                                                MT::CC},
                                               {sq->second}};
         }

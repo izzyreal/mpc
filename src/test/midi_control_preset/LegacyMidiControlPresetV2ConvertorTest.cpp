@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
-#include "controls/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
-#include "controls/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -44,12 +44,12 @@ TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema",
 
     // Convert to JSON using the parser
     json convertedPreset =
-        mpc::controls::midi::legacy::parseLegacyMidiControlPresetV2(data);
+        mpc::input::midi::legacy::parseLegacyMidiControlPresetV2(data);
 
     json schemaJson = json::parse(
         load_resource("test/MidiControlPreset/"
                       "vmpc2000xl_midi_control_preset.schema.v3.json"));
-    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
     auto validator = make_validator();
@@ -93,12 +93,12 @@ TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema",
 
     // Convert to JSON using the parser
     json convertedPreset =
-        mpc::controls::midi::legacy::parseLegacyMidiControlPresetV2(data);
+        mpc::input::midi::legacy::parseLegacyMidiControlPresetV2(data);
 
     json schemaJson = json::parse(
         load_resource("test/MidiControlPreset/"
                       "vmpc2000xl_midi_control_preset.schema.v3.json"));
-    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
     auto validator = make_validator();

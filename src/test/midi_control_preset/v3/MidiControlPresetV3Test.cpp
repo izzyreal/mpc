@@ -1,5 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
-#include "controls/midi/MidiControlPresetV3.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
 #include <nlohmann/json.hpp>
 #include <cmrc/cmrc.hpp>
 #include <set>
@@ -7,7 +7,7 @@
 
 CMRC_DECLARE(mpctest);
 
-using namespace mpc::controls::midi;
+using namespace mpc::input::midi;
 using nlohmann::json;
 
 // --- Utility: load embedded resource file ---

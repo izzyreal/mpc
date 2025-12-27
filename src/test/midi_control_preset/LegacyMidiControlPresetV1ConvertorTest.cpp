@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
-#include "controls/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
-#include "controls/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -45,11 +45,11 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema",
 
     // Convert to JSON using the parser
     json convertedPreset =
-        mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
     json schemaJson = json::parse(
         load_resource("test/MidiControlPreset/"
                       "vmpc2000xl_midi_control_preset.schema.v3.json"));
-    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
     auto validator = make_validator();
@@ -96,7 +96,7 @@ TEST_CASE(
 
     // Convert to JSON using the parser
     json convertedPreset =
-        mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
 
     // Expected extra labels
     std::set<std::string> expectedLabels = {
@@ -156,7 +156,7 @@ TEST_CASE(
     json schemaJson = json::parse(
         load_resource("test/MidiControlPreset/"
                       "vmpc2000xl_midi_control_preset.schema.v3.json"));
-    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Verify that values survived under new label names
     for (int i = 0; i < 10; ++i)
@@ -203,7 +203,7 @@ TEST_CASE(
 
     // Convert to JSON using the parser
     json convertedPreset =
-        mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
     json schemaJson = json::parse(
         load_resource("test/MidiControlPreset/"
                       "vmpc2000xl_midi_control_preset.schema.v3.json"));
@@ -500,7 +500,7 @@ TEST_CASE(
 
     // Apply patching
 
-    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
     // Verify valid bindings retain their values
     for (const auto &[label, expected] : expectedBindings)
     {

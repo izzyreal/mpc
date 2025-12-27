@@ -1,9 +1,9 @@
 #pragma once
 #include <optional>
 #include <variant>
-#include "midi/input/MidiControlTarget.hpp"
+#include "input/midi/MidiControlTarget.hpp"
 
-namespace mpc::midi::input
+namespace mpc::input::midi
 {
 
     enum class Interaction

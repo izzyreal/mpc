@@ -2,7 +2,7 @@
 
 #include "client/event/ClientMidiEvent.hpp"
 #include "hardware/ComponentId.hpp"
-#include "midi/input/MidiControlTargetBinding.hpp"
+#include "input/midi/MidiControlTargetBinding.hpp"
 
 #include <memory>
 #include <vector>
@@ -71,7 +71,7 @@ namespace mpc::controller
 
         void handleEvent(const client::event::ClientMidiEvent &);
 
-        std::vector<midi::input::MidiControlTargetBinding> bindings;
+        std::vector<input::midi::MidiControlTargetBinding> bindings;
 
         void initializeDefaultBindings();
 
@@ -82,7 +82,7 @@ namespace mpc::controller
         std::weak_ptr<sequencer::Sequencer> sequencer;
 
         void dispatchSequencerCommand(
-            midi::input::MidiControlTarget::SequencerTarget::Command);
+            input::midi::MidiControlTarget::SequencerTarget::Command);
 
         void triggerDualButtonCombo(hardware::ComponentId,
                                     hardware::ComponentId);

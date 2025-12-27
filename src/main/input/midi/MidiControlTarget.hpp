@@ -3,7 +3,7 @@
 #include <variant>
 #include "hardware/Component.hpp"
 
-namespace mpc::midi::input
+namespace mpc::input::midi
 {
     struct MidiControlTarget
     {

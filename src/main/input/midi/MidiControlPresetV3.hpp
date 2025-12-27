@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 #include "IntTypes.hpp"
 
-namespace mpc::controls::midi
+namespace mpc::input::midi
 {
     inline constexpr long long CURRENT_PRESET_VERSION = 3;
 
@@ -357,4 +357,4 @@ namespace mpc::controls::midi
         p.setBindings(j.at("bindings").get<std::vector<Binding>>());
     }
 
-} // namespace mpc::controls::midi
+} // namespace mpc::input::midi

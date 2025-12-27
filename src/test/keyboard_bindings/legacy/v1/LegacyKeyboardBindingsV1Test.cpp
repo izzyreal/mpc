@@ -24,7 +24,7 @@ TEST_CASE("Legacy preset V1 conversion works",
 {
     auto data = load_resource("test/LegacyKeyboardBindingsV1/keys.txt");
 
-    auto bindingsData = mpc::input::legacy::LegacyKeyboardBindingsConvertor::
+    auto bindingsData = mpc::input::keyboard::legacy::LegacyKeyboardBindingsConvertor::
         parseLegacyKeyboardBindings(data);
 
     REQUIRE(bindingsData.size() == 76);

@@ -1,10 +1,12 @@
+#pragma once
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 using json = nlohmann::json;
 
-namespace mpc::controls::midi::legacy
+namespace mpc::input::midi::legacy
 {
     // Parses legacy MIDI preset binary data into JSON
     static json parseLegacyMidiControlPresetV1(const std::string &data)
@@ -119,4 +121,4 @@ namespace mpc::controls::midi::legacy
 
         return result;
     }
-} // namespace mpc::controls::midi::legacy
+} // namespace mpc::input::midi::legacy

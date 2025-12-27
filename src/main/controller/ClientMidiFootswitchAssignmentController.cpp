@@ -12,7 +12,7 @@
 using namespace mpc::controller;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
-using namespace mpc::midi::input;
+using namespace mpc::input::midi;
 
 ClientMidiFootswitchAssignmentController::
     ClientMidiFootswitchAssignmentController(

@@ -10,7 +10,7 @@
 using nlohmann::json;
 using nlohmann::json_schema::json_validator;
 
-namespace mpc::controls::midi::legacy
+namespace mpc::input::midi::legacy
 {
     // Helper: validate a single property against its schema definition
     inline bool isValidProperty(const json &value, const json &propSchema)
@@ -268,4 +268,4 @@ namespace mpc::controls::midi::legacy
         }
     }
 
-} // namespace mpc::controls::midi::legacy
+} // namespace mpc::input::midi::legacy

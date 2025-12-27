@@ -75,19 +75,19 @@ namespace mpc::controller
 
     const std::unordered_map<
         MidiFootswitchFunction,
-        midi::input::MidiControlTarget::SequencerTarget::Command>
+        input::midi::MidiControlTarget::SequencerTarget::Command>
         footswitchToSequencerCmd{
             {MidiFootswitchFunction::REC_PLAY,
-             midi::input::MidiControlTarget::SequencerTarget::Command::
+             input::midi::MidiControlTarget::SequencerTarget::Command::
                  REC_PLUS_PLAY},
             {MidiFootswitchFunction::ODUB_PLAY,
-             midi::input::MidiControlTarget::SequencerTarget::Command::
+             input::midi::MidiControlTarget::SequencerTarget::Command::
                  ODUB_PLUS_PLAY},
             {MidiFootswitchFunction::REC_PUNCH,
-             midi::input::MidiControlTarget::SequencerTarget::Command::
+             input::midi::MidiControlTarget::SequencerTarget::Command::
                  REC_PUNCH},
             {MidiFootswitchFunction::ODUB_PUNCH,
-             midi::input::MidiControlTarget::SequencerTarget::Command::
+             input::midi::MidiControlTarget::SequencerTarget::Command::
                  ODUB_PUNCH},
         };
 
