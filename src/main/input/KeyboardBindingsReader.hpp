@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 
 #include "KeyboardBindings.hpp"
+#include "Logger.hpp"
 
 using namespace mpc::input;
 
@@ -12,11 +13,34 @@ namespace mpc::input
     public:
         static KeyboardBindingsData fromJson(const nlohmann::json &j)
         {
-            if (!j.contains("version") ||
-                j.at("version").get<int>() !=
-                    CURRENT_KEYBOARD_BINDINGS_VERSION ||
-                !j.contains("bindings"))
+            if (!j.contains("version"))
             {
+                MLOG(
+                    "KeyboardBindingsReader: Missing 'version' field in JSON.");
+            }
+
+            if (!j.at("version").is_number_integer())
+            {
+                MLOG(
+                    "KeyboardBindingsReader: 'version' field in JSON is not an "
+                    "integer number.");
+            }
+
+            const auto versionInJson = j.at("version").get<int>();
+
+            if (versionInJson != CURRENT_KEYBOARD_BINDINGS_VERSION)
+            {
+                MLOG("KeyboardBindingsReader: Expected 'version' " +
+                     std::to_string(CURRENT_KEYBOARD_BINDINGS_VERSION) +
+                     " in JSON, but instead we got " +
+                     std::to_string(versionInJson));
+            }
+
+            if (!j.contains("bindings"))
+            {
+                MLOG(
+                    "KeyboardBindingsReader: Missing 'bindings' field in "
+                    "JSON.");
                 return {};
             }
 
@@ -26,6 +50,9 @@ namespace mpc::input
 
             if (!bindingsArray.is_array())
             {
+                MLOG(
+                    "KeyboardBindingsReader: 'bindings' field in JSON is not "
+                    "an array.");
                 return {};
             }
 
