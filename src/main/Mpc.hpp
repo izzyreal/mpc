@@ -69,13 +69,10 @@ namespace mpc::sampler
     class Sampler;
 }
 
-namespace mpc::nvram
+namespace mpc::input::midi::legacy
 {
     struct MidiControlPreset;
-    // Presets available in the default preset path,
-    // loaded into memory, and maintained as presets are changed, added or
-    // deleted.
-} // namespace mpc::nvram
+}
 
 namespace mpc
 {
@@ -98,7 +95,7 @@ namespace mpc
     public:
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<Paths> paths;
-        std::vector<std::shared_ptr<nvram::MidiControlPreset>>
+        std::vector<std::shared_ptr<input::midi::legacy::MidiControlPreset>>
             midiControlPresets;
 
     private:

@@ -3,7 +3,7 @@
 #include "Mpc.hpp"
 #include "lcdgui/Parameter.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
-#include "nvram/MidiControlPersistence.hpp"
+#include "input/midi/legacy/MidiControlPersistence.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "NameScreen.hpp"
 #include "lcdgui/Label.hpp"
@@ -13,7 +13,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace mpc::nvram;
+using namespace mpc::input::midi::legacy;
 
 VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi-presets", layerIndex)
@@ -154,9 +154,8 @@ void VmpcMidiPresetsScreen::function(const int i)
         {
             const int presetIndex = row + rowOffset - 1;
 
-            std::function<void(std::string &)> enterAction;
-
-            enterAction = [this](std::string &nameScreenName)
+            const std::function enterAction =
+                [this](std::string &nameScreenName)
             {
                 checkFileExistsAndSavePresetAndShowPopup(nameScreenName);
             };
@@ -202,6 +201,7 @@ void VmpcMidiPresetsScreen::function(const int i)
                 700);
             break;
         }
+        default:;
     }
 }
 

@@ -1,7 +1,7 @@
 #include "MidiControlCommand.hpp"
 #include <stdexcept>
 
-using namespace mpc::nvram;
+using namespace mpc::input::midi::legacy;
 
 MidiControlCommand::MidiControlCommand(
     const std::string &mpcHardwareLabelToUse,

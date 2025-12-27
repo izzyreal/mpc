@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mpc_fs.hpp"
-#include "MidiControlCommand.hpp"
+#include "input/midi/legacy/MidiControlCommand.hpp"
 
 #include <string>
 #include <vector>
@@ -12,7 +12,7 @@ namespace mpc
     class Mpc;
 }
 
-namespace mpc::nvram
+namespace mpc::input::midi::legacy
 {
     struct MidiControlPreset
     {

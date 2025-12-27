@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
         void function(int) override;
         void open() override;
 
-        void setControllerName(std::string);
+        void setControllerName(const std::string &);
 
     private:
         void displayMessage() const;

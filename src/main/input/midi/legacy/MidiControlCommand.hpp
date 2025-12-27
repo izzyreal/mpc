@@ -1,11 +1,12 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
-namespace mpc::nvram
+namespace mpc::input::midi::legacy
 {
     class MidiControlCommand
     {
-
     public:
         enum MidiMessageType
         {
@@ -31,13 +32,12 @@ namespace mpc::nvram
 
         MidiControlCommand() = default;
 
-        MidiControlCommand(const std::string &mpcHardwareLabel,
-                           const MidiMessageType, const int8_t midiChannelIndex,
-                           const int8_t number);
+        MidiControlCommand(const std::string &mpcHardwareLabel, MidiMessageType,
+                           int8_t midiChannelIndex, int8_t number);
 
-        MidiControlCommand(const std::string &mpcHardwareLabel,
-                           const MidiMessageType, const int8_t midiChannelIndex,
-                           const int8_t number, const int8_t value);
+        MidiControlCommand(const std::string &mpcHardwareLabel, MidiMessageType,
+                           int8_t midiChannelIndex, int8_t number,
+                           int8_t value);
 
         MidiControlCommand(const MidiControlCommand &c);
 
@@ -63,13 +63,13 @@ namespace mpc::nvram
 
         int8_t getValue() const;
 
-        void setMidiMessageType(const MidiMessageType);
+        void setMidiMessageType(MidiMessageType);
 
-        void setMidiChannelIndex(const int8_t midiChannelIndex);
+        void setMidiChannelIndex(int8_t midiChannelIndex);
 
-        void setNumber(const int8_t number);
+        void setNumber(int8_t number);
 
-        void setValue(const int8_t value);
+        void setValue(int8_t value);
 
         void setMpcHardwareLabel(const std::string &mpcHardwareLabel);
     };

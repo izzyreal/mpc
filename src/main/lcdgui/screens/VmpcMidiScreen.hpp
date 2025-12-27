@@ -1,6 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
-#include "nvram/MidiControlPersistence.hpp"
+#include "input/midi/legacy/MidiControlPersistence.hpp"
 
 #include <atomic>
 
@@ -23,25 +23,25 @@ namespace mpc::lcdgui::screens
         bool isLearning();
         void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
                                int8_t value);
-        void updateOrAddActivePresetCommand(nvram::MidiControlCommand &c);
-        std::shared_ptr<nvram::MidiControlPreset> getActivePreset();
+        void updateOrAddActivePresetCommand(input::midi::legacy::MidiControlCommand &c);
+        std::shared_ptr<input::midi::legacy::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
 
         std::atomic_bool shouldSwitch{false};
-        std::shared_ptr<nvram::MidiControlPreset> switchToPreset =
-            std::make_shared<nvram::MidiControlPreset>();
-        std::shared_ptr<nvram::MidiControlPreset> activePreset =
-            std::make_shared<nvram::MidiControlPreset>();
+        std::shared_ptr<input::midi::legacy::MidiControlPreset> switchToPreset =
+            std::make_shared<input::midi::legacy::MidiControlPreset>();
+        std::shared_ptr<input::midi::legacy::MidiControlPreset> activePreset =
+            std::make_shared<input::midi::legacy::MidiControlPreset>();
 
     private:
         int row = 0;
         int rowOffset = 0;
         int column = 0;
-        nvram::MidiControlCommand learnCandidate;
+        input::midi::legacy::MidiControlCommand learnCandidate;
 
         bool learning = false;
-        std::shared_ptr<nvram::MidiControlPreset> uneditedActivePresetCopy =
-            std::make_shared<nvram::MidiControlPreset>();
+        std::shared_ptr<input::midi::legacy::MidiControlPreset> uneditedActivePresetCopy =
+            std::make_shared<input::midi::legacy::MidiControlPreset>();
 
         void setLearning(bool b);
         void acceptLearnCandidate();

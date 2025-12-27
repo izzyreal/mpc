@@ -1,7 +1,7 @@
 #pragma once
-#include <disk/SoundSaver.hpp>
-#include <disk/AllLoader.hpp>
-#include "nvram/MidiControlPersistence.hpp"
+
+#include "disk/SoundSaver.hpp"
+#include "disk/AllLoader.hpp"
 
 #include <vector>
 #include <string>
@@ -13,6 +13,11 @@
 namespace mpc
 {
     class Mpc;
+}
+
+namespace mpc::input::midi::legacy
+{
+    class MidiControlPreset;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -89,11 +94,11 @@ namespace mpc::disk
         void writeAps(const std::string &fileName);
         void writeAll(const std::string &fileName);
         void writeMidiControlPreset(
-            std::shared_ptr<nvram::MidiControlPreset> preset);
+            std::shared_ptr<input::midi::legacy::MidiControlPreset> preset);
 
         void readMidiControlPreset(
             const fs::path &p,
-            const std::shared_ptr<nvram::MidiControlPreset> &);
+            const std::shared_ptr<input::midi::legacy::MidiControlPreset> &);
 
         bool checkExists(const std::string &fileName);
         virtual bool deleteRecursive(std::weak_ptr<MpcFile>);

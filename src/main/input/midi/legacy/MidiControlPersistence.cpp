@@ -1,6 +1,5 @@
-#include "MidiControlPersistence.hpp"
+#include "input/midi/legacy/MidiControlPersistence.hpp"
 
-#include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
@@ -11,7 +10,7 @@
 
 #include "Logger.hpp"
 
-using namespace mpc::nvram;
+using namespace mpc::input::midi::legacy;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 

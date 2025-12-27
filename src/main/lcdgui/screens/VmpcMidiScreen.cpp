@@ -10,7 +10,7 @@
 
 #include "StrUtil.hpp"
 
-using namespace mpc::nvram;
+using namespace mpc::input::midi::legacy;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;

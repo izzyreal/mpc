@@ -27,14 +27,16 @@
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
-#include "StrUtil.hpp"
-#include <stdexcept>
+#include "input/midi/legacy/MidiControlPersistence.hpp"
 
+#include "StrUtil.hpp"
 #include "Logger.hpp"
+
+#include <stdexcept>
 
 using namespace mpc::disk;
 
-using namespace mpc::nvram;
+using namespace mpc::input::midi::legacy;
 
 using namespace mpc::file;
 using namespace mpc::file::wav;
