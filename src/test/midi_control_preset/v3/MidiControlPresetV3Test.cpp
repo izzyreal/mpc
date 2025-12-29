@@ -10,7 +10,6 @@ CMRC_DECLARE(mpctest);
 using namespace mpc::input::midi;
 using nlohmann::json;
 
-// --- Utility: load embedded resource file ---
 inline std::string load_resource(const std::string &path)
 {
     auto fs = cmrc::mpctest::get_filesystem();
@@ -18,8 +17,7 @@ inline std::string load_resource(const std::string &path)
     return std::string(file.begin(), file.end());
 }
 
-// --- Utility: extract required labels directly from the schema ---
-inline std::set<std::string> load_required_labels()
+inline std::set<std::string> load_available_targets()
 {
     json schema = json::parse(
         load_resource("test/MidiControlPreset/"
@@ -27,27 +25,22 @@ inline std::set<std::string> load_required_labels()
 
     if (!schema.contains("$defs") || !schema["$defs"].contains("binding") ||
         !schema["$defs"]["binding"].contains("properties") ||
-        !schema["$defs"]["binding"]["properties"].contains("labelName") ||
-        !schema["$defs"]["binding"]["properties"]["labelName"].contains("enum"))
+        !schema["$defs"]["binding"]["properties"].contains("target") ||
+        !schema["$defs"]["binding"]["properties"]["target"].contains("enum"))
     {
         throw std::runtime_error(
-            "Schema missing labelName enum at expected path");
+            "Schema missing target enum at expected path");
     }
 
     const auto &enumArray =
-        schema["$defs"]["binding"]["properties"]["labelName"]["enum"];
-    std::set<std::string> labels;
+        schema["$defs"]["binding"]["properties"]["target"]["enum"];
+    std::set<std::string> targets;
     for (const auto &v : enumArray)
     {
-        labels.insert(v.get<std::string>());
+        targets.insert(v.get<std::string>());
     }
 
-    if (labels.size() != 81)
-    {
-        throw std::runtime_error("Expected 81 labels in schema labelName enum");
-    }
-
-    return labels;
+    return targets;
 }
 
 // --- TESTS ---
@@ -70,22 +63,14 @@ TEST_CASE("MidiControlPresetV3 rejects invalid autoLoad values",
     REQUIRE_NOTHROW(preset.setAutoLoad("Ask"));
 }
 
-TEST_CASE("MidiControlPresetV3 rejects wrong binding count",
-          "[MidiControlPresetV3]")
-{
-    MidiControlPresetV3 preset;
-    std::vector<Binding> b(80);
-    REQUIRE_THROWS_AS(preset.setBindings(b), std::invalid_argument);
-}
-
-TEST_CASE("MidiControlPresetV3 rejects wrong binding labels",
+TEST_CASE("MidiControlPresetV3 rejects wrong binding targets",
           "[MidiControlPresetV3]")
 {
     MidiControlPresetV3 preset;
     std::vector<Binding> b(81);
     for (int i = 0; i < 81; ++i)
     {
-        b[i].setLabelName("pad-" + std::to_string(i)); // invalid labels
+        b[i].setTarget("pad-" + std::to_string(i));
         b[i].setMessageType("Note");
         b[i].setMidiNumber(60);
         b[i].setMidiChannelIndex(0);
@@ -94,18 +79,18 @@ TEST_CASE("MidiControlPresetV3 rejects wrong binding labels",
     REQUIRE_THROWS_AS(preset.setBindings(b), std::invalid_argument);
 }
 
-TEST_CASE("MidiControlPresetV3 accepts correct binding label set",
+TEST_CASE("MidiControlPresetV3 accepts correct binding target set",
           "[MidiControlPresetV3]")
 {
     MidiControlPresetV3 preset;
-    auto labels = load_required_labels();
+    auto targets = load_available_targets();
     std::vector<Binding> b;
-    b.reserve(labels.size());
+    b.reserve(targets.size());
 
-    for (auto &lbl : labels)
+    for (auto &target : targets)
     {
         Binding bind;
-        bind.setLabelName(lbl);
+        bind.setTarget(target);
         bind.setMessageType("CC");
         bind.setMidiNumber(1);
         bind.setMidiValue(10);
@@ -123,13 +108,13 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     preset.setName("RoundTrip");
     preset.setAutoLoad("Ask");
 
-    auto labels = load_required_labels();
+    auto targets = load_available_targets();
     std::vector<Binding> b;
-    b.reserve(labels.size());
-    for (auto &lbl : labels)
+    b.reserve(targets.size());
+    for (auto &lbl : targets)
     {
         Binding bind;
-        bind.setLabelName(lbl);
+        bind.setTarget(lbl);
         bind.setMessageType("CC");
         bind.setMidiNumber(10);
         bind.setMidiValue(127);
@@ -145,7 +130,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(restored.getVersion() == CURRENT_PRESET_VERSION);
     REQUIRE(restored.getName() == "RoundTrip");
     REQUIRE(restored.getAutoLoad() == "Ask");
-    REQUIRE(restored.getBindings().size() == 81);
+    REQUIRE(restored.getBindings().size() == 67);
 }
 
 TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
@@ -162,14 +147,13 @@ TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
 TEST_CASE("Binding::from_json enforces midiValue rules",
           "[MidiControlPresetV3]")
 {
-    using json = json;
-    json validCC = {{"labelName", "left"},   {"messageType", "CC"},
+    json validCC = {{"target", "left"},   {"messageType", "CC"},
                     {"midiNumber", 10},      {"midiValue", 20},
                     {"midiChannelIndex", 0}, {"enabled", true}};
     json invalidCC = validCC;
     invalidCC.erase("midiValue");
 
-    json validNote = {{"labelName", "right"},
+    json validNote = {{"target", "right"},
                       {"messageType", "Note"},
                       {"midiNumber", 10},
                       {"midiChannelIndex", 0},
@@ -191,12 +175,12 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
     preset.setAutoLoad("Yes");
     preset.setMidiControllerDeviceName("MPK Mini Plus");
 
-    auto labels = load_required_labels();
+    auto targets = load_available_targets();
     std::vector<Binding> b;
-    for (auto &lbl : labels)
+    for (auto &lbl : targets)
     {
         Binding bind;
-        bind.setLabelName(lbl);
+        bind.setTarget(lbl);
         bind.setMessageType("Note");
         bind.setMidiNumber(10);
         bind.setMidiChannelIndex(0);
@@ -213,13 +197,10 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
 TEST_CASE("MidiControlPresetV3 rejects unknown JSON keys",
           "[MidiControlPresetV3]")
 {
-    using json = json;
-
-    // Minimal valid bindings for the test
     std::vector<json> bindings(81);
     for (int i = 0; i < 81; ++i)
     {
-        bindings[i] = {{"labelName", "left"}, // the label doesn't matter here
+        bindings[i] = {{"target", "left"},
                        {"messageType", "CC"}, {"midiNumber", 0},
                        {"midiValue", 0},      {"midiChannelIndex", 0},
                        {"enabled", false}};
@@ -230,7 +211,7 @@ TEST_CASE("MidiControlPresetV3 rejects unknown JSON keys",
         {"name", "Preset1"},
         {"autoLoad", "No"},
         {"bindings", bindings},
-        {"unknownField", "oops"} // <-- should trigger error
+        {"unknownField", "oops"}
     };
 
     REQUIRE_THROWS_AS(j.get<MidiControlPresetV3>(), std::invalid_argument);

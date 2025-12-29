@@ -15,7 +15,7 @@ namespace mpc::input::midi
 
     struct Binding
     {
-        std::string labelName;
+        std::string target;
         std::string messageType;
         MidiNumber midiNumber{0};
         MidiValue midiValue{0};
@@ -24,15 +24,14 @@ namespace mpc::input::midi
 
         Binding() = default;
 
-        // --- Setters with validation ---
-        void setLabelName(const std::string &n)
+        void setTarget(const std::string &n)
         {
-            static const std::regex pattern("^[a-z0-9_\\-#]+$");
-            if (n.empty() || n.size() > 15 || !std::regex_match(n, pattern))
+            static const std::regex pattern("^[a-z0-9_\\-#:]+$");
+            if (n.empty() || n.size() > 64 || !std::regex_match(n, pattern))
             {
-                throw std::invalid_argument("Invalid labelName");
+                throw std::invalid_argument("Invalid target");
             }
-            labelName = n;
+            target = n;
         }
 
         void setMessageType(const std::string &t)
@@ -62,10 +61,9 @@ namespace mpc::input::midi
             enabled = e;
         }
 
-        // --- Getters ---
-        const std::string &getLabelName() const
+        const std::string &getTarget() const
         {
-            return labelName;
+            return target;
         }
         const std::string &getMessageType() const
         {
@@ -89,10 +87,9 @@ namespace mpc::input::midi
         }
     };
 
-    // --- JSON conversions for Binding ---
     inline void to_json(json &j, const Binding &b)
     {
-        j = json{{"labelName", b.getLabelName()},
+        j = json{{"target", b.getTarget()},
                  {"messageType", b.getMessageType()},
                  {"midiNumber", b.getMidiNumber()},
                  {"midiChannelIndex", b.getMidiChannelIndex()},
@@ -105,11 +102,11 @@ namespace mpc::input::midi
 
     inline void from_json(const json &j, Binding &b)
     {
-        std::string label, type;
-        j.at("labelName").get_to(label);
+        std::string target, type;
+        j.at("target").get_to(target);
         j.at("messageType").get_to(type);
 
-        b.setLabelName(label);
+        b.setTarget(target);
         b.setMessageType(type);
         b.setMidiNumber(j.at("midiNumber").get<int>());
         b.setMidiChannelIndex(j.at("midiChannelIndex").get<int>());
@@ -142,7 +139,6 @@ namespace mpc::input::midi
         std::string autoLoad{"No"};
         std::vector<Binding> bindings;
 
-        // --- Setters with schema validation ---
         void setVersion(long long v)
         {
             version = ConstrainedInt<long long, 0, 4503599627370496LL>{v};
@@ -182,113 +178,93 @@ namespace mpc::input::midi
 
         void setBindings(const std::vector<Binding> &b)
         {
-            if (b.size() != 81)
-            {
-                throw std::invalid_argument(
-                    "bindings must contain exactly 81 entries");
-            }
+            static const std::set<std::string> availableTargets = {
+                "hardware:cursor-left-or-digit",
+                "hardware:cursor-right-or-digit",
+                "hardware:cursor-up",
+                "hardware:cursor-down",
+                "hardware:rec",
+                "hardware:overdub",
+                "hardware:stop",
+                "hardware:play",
+                "hardware:play-start",
+                "hardware:main-screen",
+                "hardware:prev-step-or-event",
+                "hardware:next-step-or-event",
+                "hardware:go-to",
+                "hardware:prev-bar-or-start",
+                "hardware:next-bar-or-end",
+                "hardware:tap-or-note-repeat",
+                "hardware:next-seq",
+                "hardware:track-mute",
+                "hardware:open-window",
+                "hardware:full-level-or-case-switch",
+                "hardware:sixteen-levels-or-space",
+                "hardware:f1",
+                "hardware:f2",
+                "hardware:f3",
+                "hardware:f4",
+                "hardware:f5",
+                "hardware:f6",
+                "hardware:shift",
+                "hardware:enter-or-save",
+                "hardware:undo-seq",
+                "hardware:erase",
+                "hardware:after-or-assign",
+                "hardware:bank-a",
+                "hardware:bank-b",
+                "hardware:bank-c",
+                "hardware:bank-d",
+                "hardware:0-or-vmpc",
+                "hardware:1-or-song",
+                "hardware:2-or-misc",
+                "hardware:3-or-load",
+                "hardware:4-or-sample",
+                "hardware:5-or-trim",
+                "hardware:6-or-program",
+                "hardware:7-or-mixer",
+                "hardware:8-or-other",
+                "hardware:9-or-midi-sync",
+                "hardware:pad-1-or-ab",
+                "hardware:pad-2-or-cd",
+                "hardware:pad-3-or-ef",
+                "hardware:pad-4-or-gh",
+                "hardware:pad-5-or-ij",
+                "hardware:pad-6-or-kl",
+                "hardware:pad-7-or-mn",
+                "hardware:pad-8-or-op",
+                "hardware:pad-9-or-qr",
+                "hardware:pad-10-or-st",
+                "hardware:pad-11-or-uv",
+                "hardware:pad-12-or-wx",
+                "hardware:pad-13-or-yz",
+                "hardware:pad-14-or-ampersand-octothorpe",
+                "hardware:pad-15-or-hyphen-eclamation-mark",
+                "hardware:pad-16-or-parentheses",
+                "hardware:datawheel:negative",
+                "hardware:datawheel:positive",
+                "hardware:slider",
+                "hardware:rec-gain",
+                "hardware:main-volume"
+            };
 
-            static const std::set<std::string> requiredLabels = {
-                "left",
-                "right",
-                "up",
-                "down",
-                "rec",
-                "overdub",
-                "stop",
-                "play",
-                "play-start",
-                "main-screen",
-                "prev-step-event",
-                "next-step-event",
-                "go-to",
-                "prev-bar-start",
-                "next-bar-end",
-                "tap",
-                "next-seq",
-                "track-mute",
-                "open-window",
-                "full-level",
-                "sixteen-levels",
-                "f1",
-                "f2",
-                "f3",
-                "f4",
-                "f5",
-                "f6",
-                "shift",
-                "shift_#1",
-                "shift_#2",
-                "shift_#3",
-                "enter",
-                "undo-seq",
-                "erase",
-                "after",
-                "bank-a",
-                "bank-b",
-                "bank-c",
-                "bank-d",
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "0_extra",
-                "1_extra",
-                "2_extra",
-                "3_extra",
-                "4_extra",
-                "5_extra",
-                "6_extra",
-                "7_extra",
-                "8_extra",
-                "9_extra",
-                "pad-1",
-                "pad-2",
-                "pad-3",
-                "pad-4",
-                "pad-5",
-                "pad-6",
-                "pad-7",
-                "pad-8",
-                "pad-9",
-                "pad-10",
-                "pad-11",
-                "pad-12",
-                "pad-13",
-                "pad-14",
-                "pad-15",
-                "pad-16",
-                "datawheel",
-                "datawheel-up",
-                "datawheel-down",
-                "slider",
-                "rec-gain",
-                "main-volume"};
-
-            std::set<std::string> labels;
+            std::set<std::string> targets;
 
             for (const auto &bind : b)
             {
-                labels.insert(bind.labelName);
-            }
+                if (std::find(availableTargets.begin(), availableTargets.end(),
+                              bind.target) == availableTargets.end())
+                {
+                    throw std::invalid_argument("binding has unknown target '" +
+                                                bind.target + "'");
+                }
 
-            if (labels != requiredLabels)
-            {
-                throw std::invalid_argument(
-                    "bindings must include exactly one of each required "
-                    "labelName");
+                targets.insert(bind.target);
             }
 
             bindings = b;
         }
 
-        // --- Getters ---
         long long getVersion() const
         {
             return version;
@@ -311,7 +287,6 @@ namespace mpc::input::midi
         }
     };
 
-    // --- JSON conversions for MidiControlPreset ---
     inline void to_json(json &j, const MidiControlPresetV3 &p)
     {
         j = json{{"version", p.getVersion()},
@@ -323,7 +298,6 @@ namespace mpc::input::midi
 
     inline void from_json(const json &j, MidiControlPresetV3 &p)
     {
-        // Enforce no additional properties
         static const std::set<std::string> allowedKeys = {
             "version", "name", "midiControllerDeviceName", "autoLoad",
             "bindings"};
