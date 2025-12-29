@@ -1,6 +1,10 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
+#include "input/midi/AutoLoadMode.hpp"
+
+#include "mpc_fs.hpp"
+
 #include <vector>
 #include <string>
 #include <functional>
@@ -9,7 +13,6 @@ namespace mpc::lcdgui::screens::window
 {
     class VmpcMidiPresetsScreen final : public ScreenComponent
     {
-
     public:
         VmpcMidiPresetsScreen(Mpc &presetName, int layerIndex);
 
@@ -22,6 +25,15 @@ namespace mpc::lcdgui::screens::window
         void right() override;
 
     private:
+        struct PresetMeta
+        {
+            fs::path path;
+            std::string name;
+            input::midi::AutoLoadMode autoLoadMode;
+        };
+
+        std::vector<PresetMeta> presetMetas;
+
         std::function<void(std::string &)>
             checkFileExistsAndSavePresetAndShowPopup;
         int row = 0;
@@ -31,7 +43,5 @@ namespace mpc::lcdgui::screens::window
 
         void displayUpAndDown();
         void displayRows();
-
-        std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};
     };
 } // namespace mpc::lcdgui::screens::window

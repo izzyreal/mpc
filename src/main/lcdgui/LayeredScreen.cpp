@@ -288,6 +288,19 @@ void LayeredScreen::closeCurrentScreen()
     }
 }
 
+void LayeredScreen::openPreviousScreen()
+{
+    const auto previousScreen = previousScreenId.load();
+
+    if (previousScreen == currentScreenId.load() ||
+        previousScreen == ScreenId::NoScreenId)
+    {
+        return;
+    }
+
+    openScreenById(previousScreen);
+}
+
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {

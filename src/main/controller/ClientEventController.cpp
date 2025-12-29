@@ -8,6 +8,8 @@
 
 #include "hardware/Hardware.hpp"
 
+#include "lcdgui/screens/MidiSwScreen.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
@@ -58,7 +60,8 @@ void ClientEventController::init()
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.getPerformanceManager(), shared_from_this(),
         clientHardwareEventController,
-        screens.lock()->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(),
+        screens.lock()->get<ScreenId::MidiSwScreen>(),
+        screens.lock()->get<ScreenId::VmpcMidiScreen>(), mpc.getSequencer(),
         mpc.getSampler(), screens.lock()->get<ScreenId::MidiInputScreen>(),
         mpc.getEventHandler(),
         screens.lock()->get<ScreenId::MultiRecordingSetupScreen>(),

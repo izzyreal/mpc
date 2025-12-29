@@ -49,12 +49,6 @@ fs::path Paths::keyboardBindingsPath() const
     return path;
 }
 
-fs::path Paths::legacyKeyboardBindingsPath() const
-{
-    auto path = configPath() / "keys.txt";
-    return path;
-}
-
 Paths::Documents *Paths::getDocuments() const
 {
     return documents.get();
@@ -90,6 +84,12 @@ fs::path Paths::Documents::midiControlPresetsPath() const
     return path;
 }
 
+fs::path Paths::Documents::activeMidiControlPresetPath() const
+{
+    auto path = midiControlPresetsPath() / "active_midi_control_preset.json";
+    return path;
+}
+
 fs::path Paths::Documents::autoSavePath() const
 {
     auto path = appDocumentsPath() / "AutoSave";
@@ -106,4 +106,18 @@ fs::path Paths::Documents::tempPath() const
 {
     auto tempPath = appDocumentsPath() / "Temp";
     return tempPath;
+}
+
+// LEGACY
+
+fs::path Paths::legacyKeyboardBindingsPath() const
+{
+    auto path = configPath() / "keys.txt";
+    return path;
+}
+
+fs::path Paths::legacyActiveMidiControlPresetPath() const
+{
+    auto path = configPath() / "midicontrolmapping.vmp";
+    return path;
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ClientMidiFootswitchAssignmentController.hpp"
-#include "ClientMidiInputSynchronizationController.hpp"
-#include "lcdgui/screens/MidiSwScreen.hpp"
+#include "controller/ClientMidiFootswitchAssignmentController.hpp"
+#include "controller/ClientMidiInputSynchronizationController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
 
 #include "Observer.hpp"
 #include "sequencer/BusType.hpp"
@@ -15,23 +15,32 @@ namespace mpc::performance
 namespace mpc::sequencer
 {
     class Sequencer;
+    class Track;
+    class DrumBus;
 } // namespace mpc::sequencer
 
 namespace mpc::engine
 {
     class PreviewSoundPlayer;
-} // namespace mpc::engine
+}
 
 namespace mpc::sampler
 {
     class Sampler;
-}
+    class Program;
+} // namespace mpc::sampler
 
 namespace mpc::lcdgui
 {
     class Screens;
     class LayeredScreen;
 } // namespace mpc::lcdgui
+
+namespace mpc::lcdgui::screens
+{
+    class MidiSwScreen;
+    class VmpcMidiScreen;
+} // namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens::window
 {
@@ -71,11 +80,13 @@ namespace mpc::controller
             const std::weak_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<ClientEventController> &,
             std::shared_ptr<ClientHardwareEventController>,
-            std::shared_ptr<MidiSwScreen>, std::weak_ptr<Sequencer>,
-            const std::shared_ptr<Sampler> &,
-            const std::shared_ptr<MidiInputScreen> &,
+            std::shared_ptr<lcdgui::screens::MidiSwScreen>,
+            std::shared_ptr<lcdgui::screens::VmpcMidiScreen>,
+            std::weak_ptr<Sequencer>, const std::shared_ptr<sampler::Sampler> &,
+            const std::shared_ptr<lcdgui::screens::window::MidiInputScreen> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
-            const std::shared_ptr<MultiRecordingSetupScreen> &,
+            const std::shared_ptr<
+                lcdgui::screens::window::MultiRecordingSetupScreen> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             const std::shared_ptr<hardware::Hardware> &,
             const std::shared_ptr<lcdgui::Screens> &,
@@ -84,6 +95,8 @@ namespace mpc::controller
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
         getFootswitchAssignmentController();
 
+        std::shared_ptr<ClientExtendedMidiController> getExtendedController();
+
         void handleClientMidiEvent(const ClientMidiEvent &);
 
     private:
@@ -91,6 +104,9 @@ namespace mpc::controller
 
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
             footswitchController;
+
+        std::shared_ptr<ClientExtendedMidiController> extendedController;
+
         ClientMidiInputSynchronizationController syncController;
 
         std::weak_ptr<ClientHardwareEventController>
@@ -112,11 +128,13 @@ namespace mpc::controller
         bool isPolyMode() const noexcept;
 
         std::weak_ptr<performance::PerformanceManager> performanceManager;
-        std::weak_ptr<MidiInputScreen> midiInputScreen;
+        std::weak_ptr<lcdgui::screens::window::MidiInputScreen> midiInputScreen;
+        std::weak_ptr<lcdgui::screens::VmpcMidiScreen> vmpcMidiScreen;
         std::weak_ptr<EventHandler> eventHandler;
         std::weak_ptr<Sequencer> sequencer;
         std::weak_ptr<Sampler> sampler;
-        std::weak_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen;
+        std::weak_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>
+            multiRecordingSetupScreen;
         std::weak_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::weak_ptr<hardware::Hardware> hardware;
         std::weak_ptr<lcdgui::Screens> screens;

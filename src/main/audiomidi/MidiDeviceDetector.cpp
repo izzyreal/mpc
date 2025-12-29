@@ -6,7 +6,6 @@
 #include "disk/AbstractDisk.hpp"
 
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
-#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <RtMidi.h>
 
@@ -76,7 +75,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPD16.vmp";
+                                   "MPD16.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD16");
                         }
@@ -84,7 +83,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPD218.vmp";
+                                   "MPD218.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD218");
                         }
@@ -92,7 +91,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "iRig_PADS.vmp";
+                                   "iRig_PADS.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "iRig_PADS");
                         }
@@ -100,19 +99,13 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPC_Studio.vmp";
+                                   "MPC_Studio.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPC_Studio");
                         }
 
                         if (!path.empty() && fs::exists(path))
                         {
-                            const auto vmpcMidiScreen =
-                                mpc.screens->get<ScreenId::VmpcMidiScreen>();
-
-                            mpc.getDisk()->readMidiControlPreset(
-                                path, vmpcMidiScreen->switchToPreset);
-
                             auto layeredScreen = mpc.getLayeredScreen();
                             layeredScreen->postToUiThread(utils::Task(
                                 [layeredScreen]

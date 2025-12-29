@@ -14,9 +14,9 @@ namespace mpc::math
     constexpr double pi = 3.14159265358979323846;
 }
 
-namespace mpc::input::midi::legacy
+namespace mpc::input::midi
 {
-    struct MidiControlPreset;
+    struct MidiControlPresetV3;
 }
 
 namespace mpc::sampler
@@ -61,7 +61,7 @@ using sequence_meta_infos_or_error =
                  mpc::disk::mpc_io_error_msg>;
 
 using preset_or_error =
-    tl::expected<std::shared_ptr<mpc::input::midi::legacy::MidiControlPreset>,
+    tl::expected<std::shared_ptr<mpc::input::midi::MidiControlPresetV3>,
                  mpc::disk::mpc_io_error_msg>;
 
 using wav_or_error = tl::expected<std::shared_ptr<mpc::file::wav::WavFile>,

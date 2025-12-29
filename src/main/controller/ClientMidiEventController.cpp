@@ -10,6 +10,7 @@
 #include "performance/EventTypes.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
@@ -44,6 +45,7 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
+    std::shared_ptr<VmpcMidiScreen> vmpcMidiScreen,
     std::weak_ptr<Sequencer> sequencer, const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<MidiInputScreen> &midiInputScreen,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
@@ -55,7 +57,8 @@ ClientMidiEventController::ClientMidiEventController(
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
       performanceManager(performanceManager), midiInputScreen(midiInputScreen),
-      eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
+      vmpcMidiScreen(vmpcMidiScreen), eventHandler(eventHandler),
+      sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       layeredScreen(layeredScreen), hardware(hardware), screens(screens),
       previewSoundPlayer(previewSoundPlayer)
@@ -63,6 +66,9 @@ ClientMidiEventController::ClientMidiEventController(
     footswitchController =
         std::make_shared<ClientMidiFootswitchAssignmentController>(
             clientHardwareEventController, midiSwScreen, sequencer);
+
+    extendedController = std::make_shared<ClientExtendedMidiController>(
+        clientHardwareEventController, sequencer);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
@@ -73,6 +79,21 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());
         notifyObservers(notificationMessage);
+    }
+
+    switch (e.getMessageType())
+    {
+        // Intentional fall-throughs ahead...
+        case MessageType::CONTROLLER:
+        case MessageType::NOTE_ON:
+            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
+                                                     e.getNoteNumber());
+        case MessageType::AFTERTOUCH:
+        case MessageType::NOTE_OFF:
+            extendedController->handleEvent(e);
+            break;
+        default:
+            break;
     }
 
     if (!sequencer.lock()->isRecordingModeMulti())
@@ -93,10 +114,18 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     switch (e.getMessageType())
     {
         case MessageType::NOTE_ON:
-            handleNoteOn(e);
+            if (!extendedController->getActivePreset()->hasBindingForNote(
+                    e.getNoteNumber()))
+            {
+                handleNoteOn(e);
+            }
             break;
         case MessageType::NOTE_OFF:
-            handleNoteOff(e);
+            if (!extendedController->getActivePreset()->hasBindingForNote(
+                    e.getNoteNumber()))
+            {
+                handleNoteOff(e);
+            }
             break;
         case MessageType::AFTERTOUCH:
             handleKeyAftertouch(e);
@@ -143,6 +172,12 @@ std::shared_ptr<ClientMidiFootswitchAssignmentController>
 ClientMidiEventController::getFootswitchAssignmentController()
 {
     return footswitchController;
+}
+
+std::shared_ptr<ClientExtendedMidiController>
+ClientMidiEventController::getExtendedController()
+{
+    return extendedController;
 }
 
 bool ClientMidiEventController::isOmniOn() const noexcept
@@ -268,15 +303,6 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
-    const auto registeredNoteOnEvent =
-        performanceManager.lock()->getSnapshot().findNoteOnEvent(
-            PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-            MidiChannel(midiChannel));
-
-    performanceManager.lock()->registerNoteOff(
-        PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-        std::optional<MidiChannel>(midiChannel));
-
     const auto lockedSequencer = sequencer.lock();
 
     const auto transport = lockedSequencer->getStateManager()
@@ -286,74 +312,88 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const auto metronomeOnlyPositionTicks =
         transport.getMetronomeOnlyPositionTicks();
 
-    if (!registeredNoteOnEvent)
-    {
-        // TODO Should we do anything special for orphaned note offs?
-        return;
-    }
-
-    const bool isNoteRepeatMode =
-        registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
-        clientHardwareEventController.lock()->isNoteRepeatLockedOrPressed() &&
-        transport.isSequencerRunning() &&
-        screens.lock()
-                ->get<ScreenId::TimingCorrectScreen>()
-                ->getNoteValueLengthInTicks() > 1;
-
-    const bool isLiveEraseMode =
-        transport.isRecordingOrOverdubbing() &&
-        clientEventController.lock()->isEraseButtonPressed();
-
-    if (isNoteRepeatMode || isLiveEraseMode)
-    {
-        return;
-    }
+    const bool isSequencerRunning = transport.isSequencerRunning();
+    const bool isRecordingOrOverdubbing = transport.isRecordingOrOverdubbing();
 
     utils::SimpleAction action(
-        [this, noteEventInfo = *registeredNoteOnEvent, positionTicks,
-         metronomeOnlyPositionTicks, lockedSequencer]
+        [this, positionTicks, metronomeOnlyPositionTicks, lockedSequencer,
+         noteNumber, midiChannel, isSequencerRunning, isRecordingOrOverdubbing]
         {
+            const auto manager = performanceManager.lock();
+            const auto registeredNoteOnEvent =
+                manager->getSnapshot().findNoteOnEvent(
+                    PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
+                    MidiChannel(midiChannel));
+
+            manager->registerNoteOff(PerformanceEventSource::MidiInput,
+                                     NoteNumber(noteNumber),
+                                     std::optional<MidiChannel>(midiChannel));
+
+            if (!registeredNoteOnEvent)
+            {
+                // TODO Should we do anything special for orphaned note offs?
+                return;
+            }
+
             ProgramPadIndex programPadIndex = NoProgramPadIndex;
             std::shared_ptr<Program> program;
 
-            const auto programIndex = noteEventInfo.programIndex;
-            const auto trackIndex = noteEventInfo.trackIndex;
+            const auto programIndex = registeredNoteOnEvent->programIndex;
+            const auto trackIndex = registeredNoteOnEvent->trackIndex;
 
             assert(programIndex != NoProgramIndex);
 
             program = sampler.lock()->getProgram(programIndex);
 
-            if (isDrumNote(noteEventInfo.noteNumber))
+            if (isDrumNote(registeredNoteOnEvent->noteNumber))
             {
 
                 programPadIndex = program->getPadIndexFromNote(
-                    DrumNoteNumber(noteEventInfo.noteNumber));
+                    DrumNoteNumber(registeredNoteOnEvent->noteNumber));
 
                 performanceManager.lock()->registerProgramPadRelease(
                     PerformanceEventSource::MidiInput,
                     ProgramPadIndex(programPadIndex), programIndex);
             }
 
+            const bool isNoteRepeatMode =
+                registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
+                clientHardwareEventController.lock()
+                    ->isNoteRepeatLockedOrPressed() &&
+                isSequencerRunning &&
+                screens.lock()
+                        ->get<ScreenId::TimingCorrectScreen>()
+                        ->getNoteValueLengthInTicks() > 1;
+
+            const bool isLiveEraseMode =
+                isRecordingOrOverdubbing &&
+                clientEventController.lock()->isEraseButtonPressed();
+
+            if (isNoteRepeatMode || isLiveEraseMode)
+            {
+                return;
+            }
+
             const auto screen =
-                screens.lock()->getScreenById(noteEventInfo.screenId);
+                screens.lock()->getScreenById(registeredNoteOnEvent->screenId);
             const auto seq = lockedSequencer->getSelectedSequence();
             const auto track = seq->getTrack(trackIndex).get();
 
             const auto recordingNoteOnEvent =
                 lockedSequencer->getStateManager()->findRecordingNoteOnEvent(
                     seq->getSequenceIndex(), trackIndex,
-                    noteEventInfo.noteNumber);
+                    registeredNoteOnEvent->noteNumber);
 
             const bool isSamplerScreen =
-                screengroups::isSamplerScreen(noteEventInfo.screenId);
+                screengroups::isSamplerScreen(registeredNoteOnEvent->screenId);
 
             const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                    PerformanceEventSource::MidiInput, noteEventInfo.noteNumber,
-                    recordingNoteOnEvent, track, noteEventInfo.busType,
-                    screen.get(), isSamplerScreen, programPadIndex,
-                    program.get(), sequencer.lock().get(),
-                    performanceManager.lock().get(),
+                    PerformanceEventSource::MidiInput,
+                    registeredNoteOnEvent->noteNumber, recordingNoteOnEvent,
+                    track, registeredNoteOnEvent->busType, screen.get(),
+                    isSamplerScreen, programPadIndex, program.get(),
+                    sequencer.lock().get(), performanceManager.lock().get(),
                     clientEventController.lock().get(),
                     eventHandler.lock().get(), screens.lock().get(),
                     hardware.lock().get(), metronomeOnlyPositionTicks,
