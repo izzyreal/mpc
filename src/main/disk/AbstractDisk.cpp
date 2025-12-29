@@ -24,10 +24,10 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
-#include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
-#include "input/midi/legacy/MidiControlPersistence.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
+#include "input/midi/MidiControlPresetUtil.hpp"
 
 #include "StrUtil.hpp"
 #include "Logger.hpp"
@@ -36,7 +36,7 @@
 
 using namespace mpc::disk;
 
-using namespace mpc::input::midi::legacy;
+using namespace mpc::input::midi;
 
 using namespace mpc::file;
 using namespace mpc::file::wav;
@@ -407,43 +407,14 @@ void AbstractDisk::writeAll(const std::string &fileName)
 }
 
 void AbstractDisk::writeMidiControlPreset(
-    std::shared_ptr<MidiControlPreset> preset)
+    std::shared_ptr<MidiControlPresetV3> preset, const fs::path &p)
 {
-    const std::function<preset_or_error()> ioFunc = [preset, this]
+    const std::function<preset_or_error()> ioFunc = [preset, p]
     {
-        std::vector<char> data;
+        json fileData;
+        to_json(fileData, *preset);
 
-        constexpr uint8_t fileFormatVersion = 2;
-
-        data.push_back(fileFormatVersion);
-
-        data.push_back(preset->autoloadMode);
-
-        for (char i : preset->name)
-        {
-            data.push_back(i);
-        }
-
-        for (int i = preset->name.length(); i < 16; i++)
-        {
-            data.push_back(' ');
-        }
-
-        for (auto &r : preset->rows)
-        {
-            const auto rowData = r.toBytes();
-
-            for (auto &b : rowData)
-            {
-                data.push_back(b);
-            }
-        }
-
-        const auto presetPath =
-            mpc.paths->getDocuments()->midiControlPresetsPath() /
-            (preset->name + ".vmp");
-
-        set_file_data(presetPath, data);
+        set_file_data(p, fileData.dump(4));
 
         return preset;
     };
@@ -451,148 +422,65 @@ void AbstractDisk::writeMidiControlPreset(
     performIoOrOpenErrorPopupNonReturning(ioFunc);
 }
 
-void readMidiControlPresetV1(const std::vector<char> &data,
-                             const std::shared_ptr<MidiControlPreset> &preset)
-{
-    preset->rows.clear();
-    preset->name = "";
-
-    preset->autoloadMode = data[0];
-
-    std::string presetName;
-
-    for (int i = 0; i < 16; i++)
-    {
-        if (data[i + 1] == ' ')
-        {
-            continue;
-        }
-        presetName.push_back(data[i + 1]);
-    }
-
-    preset->name = presetName;
-
-    int pointer = 17;
-
-    while (pointer < data.size())
-    {
-        std::string name;
-        char c;
-
-        while ((c = data[pointer++]) != ' ' && pointer < data.size())
-        {
-            name.push_back(c);
-        }
-
-        static constexpr char extraTag[] = "(extra)";
-
-        if (constexpr size_t extraLen = sizeof(extraTag) - 1;
-            pointer + extraLen <= data.size() &&
-            std::equal(extraTag, extraTag + extraLen, data.begin() + pointer))
-        {
-            name.push_back(' ');
-            name.append(extraTag);
-            pointer += extraLen + 1;
-        }
-
-        const bool isNote = data[pointer++] == 1;
-        const char channel = data[pointer++];
-        const char number = data[pointer++];
-
-        if (isNote)
-        {
-            const auto cmd = MidiControlCommand(
-                name, MidiControlCommand::MidiMessageType::NOTE, channel,
-                number);
-            preset->rows.emplace_back(cmd);
-            continue;
-        }
-
-        const auto cmd = MidiControlCommand(
-            name, MidiControlCommand::MidiMessageType::CC, channel, number, -1);
-        preset->rows.emplace_back(cmd);
-    }
-}
-
-void readMidiControlPresetV2(const std::vector<char> &data,
-                             const std::shared_ptr<MidiControlPreset> &preset)
-{
-    if (data[0] != 2)
-    {
-        throw std::runtime_error(
-            "File data is not actually a version 2 MIDI control preset");
-    }
-
-    preset->rows.clear();
-    preset->name = "";
-
-    preset->autoloadMode = data[1];
-
-    std::string presetName;
-
-    for (int i = 0; i < 16; i++)
-    {
-        if (data[i + 2] == ' ')
-        {
-            continue;
-        }
-        presetName.push_back(data[i + 2]);
-    }
-
-    preset->name = presetName;
-
-    size_t pointer = 18;
-
-    while (pointer < data.size())
-    {
-        size_t currentChunkSize = 0;
-
-        while (pointer < data.size())
-        {
-            currentChunkSize++;
-
-            if (data[pointer++] == ' ')
-            {
-                break;
-            }
-        }
-
-        pointer += 4;
-        currentChunkSize += 4;
-
-        const auto chunk =
-            std::vector(data.begin() + (pointer - currentChunkSize),
-                        data.begin() + pointer);
-        preset->rows.emplace_back(MidiControlCommand::fromBytes(chunk));
-    }
-}
-
 void AbstractDisk::readMidiControlPreset(
-    const fs::path &p, const std::shared_ptr<MidiControlPreset> &preset)
+    const fs::path &p, const std::shared_ptr<MidiControlPresetV3> &preset)
 {
     MLOG("Trying to read MIDI control preset at path " + p.string());
 
     const std::function ioFunc = [p, preset]() -> preset_or_error
     {
-        const auto data = get_file_data(p);
+        auto pathToUse = p;
 
-        if (data.size() < 681)
+        if (!fs::exists(p))
         {
-            return tl::make_unexpected(mpc_io_error_msg{
-                "MIDI control preset file is smaller than 681 bytes: " +
-                p.string()});
+            if (p.extension().string().find("json") != std::string::npos)
+            {
+                pathToUse.replace_extension("vmp");
+            }
+            else if (p.extension().string().find("vmp") != std::string::npos)
+            {
+                pathToUse.replace_extension("json");
+            }
         }
 
-        if (data.size() == 681 || data.size() == 847)
+        if (!fs::exists(pathToUse))
         {
-            readMidiControlPresetV1(data, preset);
-        }
-        else
-        {
-            readMidiControlPresetV2(data, preset);
+            return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
         }
 
-        return preset;
+        const auto fileData = get_file_data(pathToUse);
+
+        json fileAsJson;
+
+        bool success = false;
+
+        if (pathToUse.extension().string().find("json") != std::string::npos)
+        {
+            fileAsJson = json::parse(fileData);
+            success = true;
+        }
+
+        if (success)
+        {
+            try
+            {
+                from_json(fileAsJson, *preset);
+            }
+            catch (const std::exception &e)
+            {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Unable to parse JSON to preset: " +
+                                     std::string(e.what())});
+            }
+
+            MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);
+            MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(
+                preset);
+            return preset;
+        }
+
+        return tl::make_unexpected(
+            mpc_io_error_msg{"Unable to read MIDI control preset"});
     };
 
     performIoOrOpenErrorPopupNonReturning(ioFunc);
@@ -756,7 +644,12 @@ AbstractDisk::performIoOrOpenErrorPopup(
 {
     auto showPopup = [this](const std::string &msg)
     {
-        mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(msg, 1000, 0);
+        auto ls = mpc.getLayeredScreen();
+        ls->postToUiThread(utils::Task(
+            [ls, msg]
+            {
+                ls->showPopupAndThenReturnToLayer(msg, 1000, 0);
+            }));
     };
 
     try

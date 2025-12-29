@@ -82,16 +82,16 @@ namespace mpc::controller
         std::weak_ptr<sequencer::Sequencer> sequencer;
 
         void dispatchSequencerCommand(
-            input::midi::MidiControlTarget::SequencerTarget::Command);
+            input::midi::MidiControlTarget::SequencerTarget::Command) const;
 
         void triggerDualButtonCombo(hardware::ComponentId,
-                                    hardware::ComponentId);
-        void handleRecPunch();
-        void handleOdubPunch();
-        void pressButton(hardware::ComponentId) const;
-        void releaseButton(hardware::ComponentId) const;
-        void handleStopToPlay();
-        void handleRecordingToPlay();
+                                    hardware::ComponentId) const;
+        void handleRecPunch() const;
+        void handleOdubPunch() const;
+        void pressButtonOrPad(hardware::ComponentId) const;
+        void releaseButtonOrPad(hardware::ComponentId) const;
+        void handleStopToPlay() const;
+        void handleRecordingToPlay() const;
     };
 
 } // namespace mpc::controller

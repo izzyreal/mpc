@@ -1,5 +1,9 @@
 #pragma once
 
+#include "LegacyMidiControlPresetUtil.hpp"
+#include "StrUtil.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
@@ -8,7 +12,6 @@ using json = nlohmann::json;
 
 namespace mpc::input::midi::legacy
 {
-    // Parses legacy MIDI preset V2 binary data into JSON
     static json parseLegacyMidiControlPresetV2(const std::string &data)
     {
         json result;
@@ -18,50 +21,56 @@ namespace mpc::input::midi::legacy
             throw std::runtime_error("Data too short for legacy V2 header");
         }
 
-        // First byte is version, must be 2
-        unsigned char versionByte = static_cast<unsigned char>(data[0]);
-        if (versionByte != 2)
+        if (unsigned char versionByte = static_cast<unsigned char>(data[0]);
+            versionByte != 2)
         {
             throw std::runtime_error("Not a legacy V2 preset");
         }
-        result["midiControllerDeviceName"] = ""; // unknown in legacy format
-        result["version"] = 0;                   // default
 
-        // Next byte is autoLoad
-        unsigned char autoLoadByte = static_cast<unsigned char>(data[1]);
-        std::string autoLoadStr;
-        switch (autoLoadByte)
+        result[versionKey] = CURRENT_PRESET_VERSION;
+
+        unsigned char autoLoadModeByte = static_cast<unsigned char>(data[1]);
+        std::string autoLoadModeStr;
+        switch (autoLoadModeByte)
         {
             case 0:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
             case 1:
-                autoLoadStr = "Ask";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeAsk);
                 break;
             case 2:
-                autoLoadStr = "Yes";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeYes);
                 break;
             default:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
         }
-        result["autoLoad"] = autoLoadStr;
+        result[autoLoadModeKey] = autoLoadModeStr;
 
-        // Preset name is next 16 bytes
         std::string name = data.substr(2, 16);
-        name.erase(name.find_last_not_of(' ') + 1); // trim trailing spaces
-        result["name"] = name;
+        name.erase(name.find_last_not_of(' ') + 1);
 
-        printf("preset name: %s\n", name.c_str());
+        result[nameKey] = StrUtil::replaceAll(name, '_', " ");
+        result[midiControllerDeviceNameKey] =
+            StrUtil::replaceAll(name, '_', " ");
 
-        result["midiControllerDeviceName"] = ""; // unknown in legacy format
+        struct LegacyDatawheelBinding
+        {
+            std::string label;
+            json binding;
+        };
 
-        // Parse bindings
+        std::vector<LegacyDatawheelBinding> datawheelBindings;
+        bool hasDatawheel = false;
+        bool datawheelUpEnabled = false;
+        bool datawheelDownEnabled = false;
+        bool datawheelEnabled = false;
+
         std::vector<json> bindings;
         size_t pos = 18;
         while (pos < data.size())
         {
-            // Read space-terminated label name
             size_t end = data.find(' ', pos);
             if (end == std::string::npos)
             {
@@ -70,10 +79,9 @@ namespace mpc::input::midi::legacy
                     std::to_string(pos));
             }
             std::string label = data.substr(pos, end - pos);
-
             pos = end + 1;
 
-            if (pos + 3 > data.size())
+            if (pos + 4 > data.size())
             {
                 throw std::runtime_error("Unexpected end of data in binding");
             }
@@ -82,34 +90,123 @@ namespace mpc::input::midi::legacy
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
             unsigned char ccValueByte = static_cast<unsigned char>(data[pos++]);
+            (void)ccValueByte; // consumed but intentionally ignored
+
+            const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
             json binding;
-            binding["labelName"] = label;
-            binding["messageType"] = typeByte == 0 ? "CC" : "Note";
+            binding[targetKey] = bestGuessTarget;
+            binding[messageTypeKey] = typeByte == 0 ? controllerStr : noteStr;
 
-            int midiChannel = static_cast<signed char>(channelByte); // -1..15
-            binding["midiChannelIndex"] = midiChannel;
+            int midiChannel = static_cast<signed char>(channelByte);
+            binding[midiChannelIndexKey] = midiChannel;
 
-            int midiValue = static_cast<signed char>(ccValueByte); // -1..127
-            binding["midiValue"] = midiValue;
+            if (midiChannel > 15)
+            {
+                // The file is bound to be corrupted from here on.
+                break;
+            }
 
             int midiNumber = static_cast<signed char>(numberByte);
 
-            if (midiNumber == -1)
+            binding[midiNumberKey] = midiNumber;
+
+            // Do NOT set midiValue here; we'll assign a fixed 64 later
+            // for targets that require it in the new schema.
+
+            if (label.find("extra") != std::string::npos && midiNumber == -1)
             {
-                binding["enabled"] = false;
-                binding["midiNumber"] = 0;
+                continue;
             }
-            else
+
+            if (label.find("shift_#") != std::string::npos && midiNumber == -1)
             {
-                binding["enabled"] = true;
-                binding["midiNumber"] = midiNumber;
+                continue;
+            }
+
+            if (label.substr(0, 9) == "datawheel")
+            {
+                datawheelBindings.emplace_back(
+                    LegacyDatawheelBinding{label, binding});
+                if (label == "datawheel")
+                {
+                    hasDatawheel = true;
+                    datawheelEnabled = midiNumber != -1;
+                }
+                else if (label == "datawheel-up")
+                {
+                    datawheelUpEnabled = midiNumber != -1;
+                }
+                else if (label == "datawheel-down")
+                {
+                    datawheelDownEnabled = midiNumber != -1;
+                }
+                continue;
             }
 
             bindings.push_back(binding);
         }
 
-        result["bindings"] = bindings;
+        if (hasDatawheel && !datawheelEnabled && datawheelUpEnabled &&
+            datawheelDownEnabled)
+        {
+            for (auto &b : datawheelBindings)
+            {
+                if (b.label == "datawheel-down" || b.label == "datawheel-up")
+                {
+                    bindings.push_back(b.binding);
+                }
+            }
+        }
+        else if (datawheelEnabled)
+        {
+            for (auto &b : datawheelBindings)
+            {
+                if (b.label == "datawheel")
+                {
+                    b.binding[targetKey] = "hardware:data-wheel";
+                    b.binding[encoderModeKey] = encoderModeToString(
+                        BindingEncoderMode::RelativeStateful);
+                    bindings.push_back(b.binding);
+                }
+            }
+        }
+
+        // Post-pass: enforce new midiValue rules exactly like V1:
+        // - if controller + button-like/sequencer → midiValue = 64
+        // - else → no midiValue
+        for (auto &binding : bindings)
+        {
+            const std::string target = binding.at(targetKey).get<std::string>();
+            const std::string messageType =
+                binding.at(messageTypeKey).get<std::string>();
+
+            const bool isController = messageType == controllerStr;
+
+            const bool isHardware = target.rfind("hardware:", 0) == 0;
+
+            const bool isPad = target.rfind("hardware:pad-", 0) == 0;
+
+            const bool isPot = target == "hardware:slider" ||
+                               target == "hardware:rec-gain-pot" ||
+                               target == "hardware:main-volume-pot";
+
+            const bool isDataWheelPlain = target == "hardware:data-wheel";
+
+            const bool isButtonLike =
+                isHardware && !isPad && !isPot && !isDataWheelPlain;
+
+            if (isController && isButtonLike)
+            {
+                binding[midiValueKey] = 64;
+            }
+            else
+            {
+                binding.erase(midiValueKey);
+            }
+        }
+
+        result[bindingsKey] = bindings;
         return result;
     }
 } // namespace mpc::input::midi::legacy

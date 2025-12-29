@@ -1,11 +1,14 @@
 #pragma once
+
+#include "IntTypes.hpp"
+#include "input/Direction.hpp"
+#include "input/midi/AutoLoadMode.hpp"
+
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <vector>
-#include <regex>
-#include <stdexcept>
-#include <set>
-#include <nlohmann/json.hpp>
-#include "IntTypes.hpp"
+#include <optional>
 
 namespace mpc::input::midi
 {
@@ -13,125 +16,224 @@ namespace mpc::input::midi
 
     using json = nlohmann::json;
 
+    static const std::string autoLoadModeKey = "autoLoadMode";
+    static const std::string messageTypeKey = "messageType";
+    static const std::string midiValueKey = "midiValue";
+    static const std::string midiNumberKey = "midiNumber";
+    static const std::string midiChannelIndexKey = "midiChannelIndex";
+    static const std::string encoderModeKey = "encoderMode";
+    static const std::string bindingsKey = "bindings";
+    static const std::string nameKey = "name";
+    static const std::string versionKey = "version";
+    static const std::string targetKey = "target";
+    static const std::string midiControllerDeviceNameKey =
+        "midiControllerDeviceName";
+
+    static const std::string hardwareStr = "hardware:";
+    static const std::string negativeStr = ":negative";
+    static const std::string positiveStr = ":positive";
+    static const std::string controllerStr = "controller";
+    static const std::string controllerDisplayStr = "CC";
+    static const std::string noteStr = "note";
+    static const std::string noteDisplayStr = "Note";
+    static const std::string relativeStatefulStr = "relative_stateful";
+    static const std::string relativeStatelessStr = "relative_stateless";
+    static const std::string autoLoadModeYesStr = "Yes";
+    static const std::string autoLoadModeNoStr = "No";
+    static const std::string autoLoadModeAskStr = "Ask";
+
+    enum class BindingMessageType
+    {
+        Controller,
+        Note
+    };
+
+    enum class BindingEncoderMode
+    {
+        RelativeStateless,
+        RelativeStateful
+    };
+
+    inline std::string messageTypeToString(const BindingMessageType t)
+    {
+        if (t == BindingMessageType::Controller)
+        {
+            return controllerStr;
+        }
+        return noteStr;
+    }
+
+    inline std::string messageTypeToDisplayString(const BindingMessageType t)
+    {
+        if (t == BindingMessageType::Controller)
+        {
+            return controllerDisplayStr;
+        }
+        return noteDisplayStr;
+    }
+
+    inline BindingMessageType stringToMessageType(const std::string &s)
+    {
+        if (s == controllerStr)
+        {
+            return BindingMessageType::Controller;
+        }
+
+        if (s == noteStr)
+        {
+            return BindingMessageType::Note;
+        }
+
+        throw std::invalid_argument(
+            "Message type string has to be 'controller' or 'note', but it was "
+            "'" +
+            s + "'");
+    }
+
+    inline std::string encoderModeToString(const BindingEncoderMode m)
+    {
+        switch (m)
+        {
+            case BindingEncoderMode::RelativeStateful:
+                return relativeStatefulStr;
+            case BindingEncoderMode::RelativeStateless:
+                return relativeStatelessStr;
+        }
+
+        throw std::invalid_argument("Invalid encoderMode");
+    }
+
+    inline std::string encoderModeToDisplayString(const BindingEncoderMode m)
+    {
+        switch (m)
+        {
+            case BindingEncoderMode::RelativeStateful:
+                return "RSF";
+            case BindingEncoderMode::RelativeStateless:
+                return "RSL";
+        }
+
+        throw std::invalid_argument("Invalid encoderMode");
+    }
+
+    inline BindingEncoderMode stringToEncoderMode(const std::string &s)
+    {
+        if (s == relativeStatefulStr)
+        {
+            return BindingEncoderMode::RelativeStateful;
+        }
+        if (s == relativeStatelessStr)
+        {
+            return BindingEncoderMode::RelativeStateless;
+        }
+        throw std::invalid_argument("Invalid encoderMode string: " + s);
+    }
+
+    inline std::string autoLoadModeToString(const AutoLoadMode m)
+    {
+        if (m == AutoLoadModeAsk)
+        {
+            return autoLoadModeAskStr;
+        }
+        if (m == AutoLoadModeYes)
+        {
+            return autoLoadModeYesStr;
+        }
+        if (m == AutoLoadModeNo)
+        {
+            return autoLoadModeNoStr;
+        }
+        throw std::invalid_argument("Invalid autoLoadMode");
+    }
+
+    inline AutoLoadMode stringToAutoLoadMode(const std::string &s)
+    {
+        if (s == autoLoadModeAskStr)
+        {
+            return AutoLoadModeAsk;
+        }
+        if (s == autoLoadModeYesStr)
+        {
+            return AutoLoadModeYes;
+        }
+        if (s == autoLoadModeNoStr)
+        {
+            return AutoLoadModeNo;
+        }
+        throw std::invalid_argument("Invalid autoLoadMode string: " + s);
+    }
+
     struct Binding
     {
-        std::string labelName;
-        std::string messageType;
+        std::string target;
+        BindingMessageType messageType{BindingMessageType::Controller};
+        BindingEncoderMode encoderMode{BindingEncoderMode::RelativeStateless};
         MidiNumber midiNumber{0};
         MidiValue midiValue{0};
         MidiChannel midiChannelIndex{0};
-        bool enabled{false};
+
+        bool operator==(Binding &other)
+        {
+            return target == other.target && messageType == other.messageType &&
+                   midiNumber == other.midiNumber &&
+                   midiValue == other.midiValue &&
+                   midiChannelIndex == other.midiChannelIndex &&
+                   encoderMode == other.encoderMode;
+        }
+
+        bool operator!=(Binding &other)
+        {
+            return !(*this == other);
+        }
 
         Binding() = default;
 
-        // --- Setters with validation ---
-        void setLabelName(const std::string &n)
-        {
-            static const std::regex pattern("^[a-z0-9_\\-#]+$");
-            if (n.empty() || n.size() > 15 || !std::regex_match(n, pattern))
-            {
-                throw std::invalid_argument("Invalid labelName");
-            }
-            labelName = n;
-        }
+        void setTarget(const std::string &n);
 
-        void setMessageType(const std::string &t)
-        {
-            if (t != "CC" && t != "Note")
-            {
-                throw std::invalid_argument(
-                    "messageType must be 'CC' or 'Note'");
-            }
-            messageType = t;
-        }
+        std::string getTargetDisplayName() const;
 
-        void setMidiNumber(int n)
-        {
-            midiNumber = MidiNumber(n);
-        }
-        void setMidiValue(int v)
-        {
-            midiValue = MidiValue(v);
-        }
-        void setMidiChannelIndex(int ch)
-        {
-            midiChannelIndex = MidiChannel(ch);
-        }
-        void setEnabled(bool e)
-        {
-            enabled = e;
-        }
+        void setMessageType(BindingMessageType);
 
-        // --- Getters ---
-        const std::string &getLabelName() const
-        {
-            return labelName;
-        }
-        const std::string &getMessageType() const
-        {
-            return messageType;
-        }
-        int getMidiNumber() const
-        {
-            return midiNumber;
-        }
-        int getMidiValue() const
-        {
-            return midiValue;
-        }
-        int getMidiChannelIndex() const
-        {
-            return midiChannelIndex;
-        }
-        bool isEnabled() const
-        {
-            return enabled;
-        }
+        void setMidiNumber(int n);
+
+        void setMidiValue(int v);
+
+        void setMidiChannelIndex(int ch);
+
+        void setEncoderMode(BindingEncoderMode);
+
+        const std::string &getTarget() const;
+
+        std::optional<std::string> getHardwareTarget() const;
+
+        Direction getHardwareDirection() const;
+
+        const BindingMessageType &getMessageType() const;
+
+        int getMidiNumber() const;
+
+        int getMidiValue() const;
+
+        int getMidiChannelIndex() const;
+
+        bool isEnabled() const;
+
+        BindingEncoderMode getEncoderMode() const;
+
+        bool isController() const;
+
+        bool isNote() const;
+
+        bool isButtonLike() const;
+
+        bool isPad() const;
+
+        bool isNonButtonLikeDataWheel() const;
     };
 
-    // --- JSON conversions for Binding ---
-    inline void to_json(json &j, const Binding &b)
-    {
-        j = json{{"labelName", b.getLabelName()},
-                 {"messageType", b.getMessageType()},
-                 {"midiNumber", b.getMidiNumber()},
-                 {"midiChannelIndex", b.getMidiChannelIndex()},
-                 {"enabled", b.isEnabled()}};
-        if (b.getMessageType() == "CC")
-        {
-            j["midiValue"] = b.getMidiValue();
-        }
-    }
+    void to_json(json &j, const Binding &b);
 
-    inline void from_json(const json &j, Binding &b)
-    {
-        std::string label, type;
-        j.at("labelName").get_to(label);
-        j.at("messageType").get_to(type);
-
-        b.setLabelName(label);
-        b.setMessageType(type);
-        b.setMidiNumber(j.at("midiNumber").get<int>());
-        b.setMidiChannelIndex(j.at("midiChannelIndex").get<int>());
-        b.setEnabled(j.at("enabled").get<bool>());
-
-        if (type == "CC")
-        {
-            if (!j.contains("midiValue"))
-            {
-                throw std::invalid_argument("CC binding requires midiValue");
-            }
-            b.setMidiValue(j.at("midiValue").get<int>());
-        }
-        else
-        {
-            if (j.contains("midiValue"))
-            {
-                throw std::invalid_argument(
-                    "Note binding must not include midiValue");
-            }
-        }
-    }
+    void from_json(const json &j, Binding &b);
 
     struct MidiControlPresetV3
     {
@@ -139,222 +241,36 @@ namespace mpc::input::midi
             CURRENT_PRESET_VERSION};
         std::string name;
         std::string midiControllerDeviceName;
-        std::string autoLoad{"No"};
+        AutoLoadMode autoLoadMode{AutoLoadModeAsk};
         std::vector<Binding> bindings;
 
-        // --- Setters with schema validation ---
-        void setVersion(long long v)
-        {
-            version = ConstrainedInt<long long, 0, 4503599627370496LL>{v};
-        }
+        void setVersion(long long v);
 
-        void setName(const std::string &n)
-        {
-            static const std::regex pattern(
-                "^[A-Za-z0-9 !#\\$%&'\\(\\)\\-@_{}]+$");
-            if (n.empty() || n.size() > 16 || !std::regex_match(n, pattern))
-            {
-                throw std::invalid_argument("Invalid name (must match schema)");
-            }
-            name = n;
-        }
+        void setName(const std::string &n);
 
-        void setMidiControllerDeviceName(const std::string &n)
-        {
-            static const std::regex pattern(
-                "^[a-zA-Z0-9 _\\-\\.\\(\\)\\/\\,;]*$");
-            if (n.size() > 255 || !std::regex_match(n, pattern))
-            {
-                throw std::invalid_argument("Invalid midiControllerDeviceName");
-            }
-            midiControllerDeviceName = n;
-        }
+        void setMidiControllerDeviceName(const std::string &n);
 
-        void setAutoLoad(const std::string &a)
-        {
-            if (a != "No" && a != "Ask" && a != "Yes")
-            {
-                throw std::invalid_argument(
-                    "autoLoad must be one of: No, Ask, Yes");
-            }
-            autoLoad = a;
-        }
+        void setAutoLoadMode(AutoLoadMode);
 
-        void setBindings(const std::vector<Binding> &b)
-        {
-            if (b.size() != 81)
-            {
-                throw std::invalid_argument(
-                    "bindings must contain exactly 81 entries");
-            }
+        void setBindings(const std::vector<Binding> &b);
 
-            static const std::set<std::string> requiredLabels = {
-                "left",
-                "right",
-                "up",
-                "down",
-                "rec",
-                "overdub",
-                "stop",
-                "play",
-                "play-start",
-                "main-screen",
-                "prev-step-event",
-                "next-step-event",
-                "go-to",
-                "prev-bar-start",
-                "next-bar-end",
-                "tap",
-                "next-seq",
-                "track-mute",
-                "open-window",
-                "full-level",
-                "sixteen-levels",
-                "f1",
-                "f2",
-                "f3",
-                "f4",
-                "f5",
-                "f6",
-                "shift",
-                "shift_#1",
-                "shift_#2",
-                "shift_#3",
-                "enter",
-                "undo-seq",
-                "erase",
-                "after",
-                "bank-a",
-                "bank-b",
-                "bank-c",
-                "bank-d",
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "0_extra",
-                "1_extra",
-                "2_extra",
-                "3_extra",
-                "4_extra",
-                "5_extra",
-                "6_extra",
-                "7_extra",
-                "8_extra",
-                "9_extra",
-                "pad-1",
-                "pad-2",
-                "pad-3",
-                "pad-4",
-                "pad-5",
-                "pad-6",
-                "pad-7",
-                "pad-8",
-                "pad-9",
-                "pad-10",
-                "pad-11",
-                "pad-12",
-                "pad-13",
-                "pad-14",
-                "pad-15",
-                "pad-16",
-                "datawheel",
-                "datawheel-up",
-                "datawheel-down",
-                "slider",
-                "rec-gain",
-                "main-volume"};
+        long long getVersion() const;
 
-            std::set<std::string> labels;
+        const std::string &getName() const;
 
-            for (const auto &bind : b)
-            {
-                labels.insert(bind.labelName);
-            }
+        const std::string &getMidiControllerDeviceName() const;
 
-            if (labels != requiredLabels)
-            {
-                throw std::invalid_argument(
-                    "bindings must include exactly one of each required "
-                    "labelName");
-            }
+        AutoLoadMode getAutoLoadMode() const;
 
-            bindings = b;
-        }
+        const std::vector<Binding> &getBindings() const;
 
-        // --- Getters ---
-        long long getVersion() const
-        {
-            return version;
-        }
-        const std::string &getName() const
-        {
-            return name;
-        }
-        const std::string &getMidiControllerDeviceName() const
-        {
-            return midiControllerDeviceName;
-        }
-        const std::string &getAutoLoad() const
-        {
-            return autoLoad;
-        }
-        const std::vector<Binding> &getBindings() const
-        {
-            return bindings;
-        }
+        Binding &getBindingByIndex(int);
+
+        bool hasBindingForNote(int) const;
     };
 
-    // --- JSON conversions for MidiControlPreset ---
-    inline void to_json(json &j, const MidiControlPresetV3 &p)
-    {
-        j = json{{"version", p.getVersion()},
-                 {"name", p.getName()},
-                 {"midiControllerDeviceName", p.getMidiControllerDeviceName()},
-                 {"autoLoad", p.getAutoLoad()},
-                 {"bindings", p.getBindings()}};
-    }
+    void to_json(json &j, const MidiControlPresetV3 &p);
 
-    inline void from_json(const json &j, MidiControlPresetV3 &p)
-    {
-        // Enforce no additional properties
-        static const std::set<std::string> allowedKeys = {
-            "version", "name", "midiControllerDeviceName", "autoLoad",
-            "bindings"};
-
-        for (auto &[key, _] : j.items())
-        {
-            if (allowedKeys.count(key) == 0)
-            {
-                throw std::invalid_argument(
-                    "Unknown key in MidiControlPresetV3 JSON: " + key);
-            }
-        }
-
-        auto v = j.at("version").get<long long>();
-        if (v > CURRENT_PRESET_VERSION)
-        {
-            throw std::runtime_error(
-                "Preset version is newer than this application supports.");
-        }
-
-        p.setVersion(v);
-        p.setName(j.at("name").get<std::string>());
-
-        if (j.contains("midiControllerDeviceName"))
-        {
-            p.setMidiControllerDeviceName(
-                j.at("midiControllerDeviceName").get<std::string>());
-        }
-
-        p.setAutoLoad(j.at("autoLoad").get<std::string>());
-        p.setBindings(j.at("bindings").get<std::vector<Binding>>());
-    }
+    void from_json(const json &j, MidiControlPresetV3 &p);
 
 } // namespace mpc::input::midi

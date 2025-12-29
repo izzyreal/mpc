@@ -8,15 +8,19 @@
 #include "lcdgui/Label.hpp"
 #include "lcdgui/Field.hpp"
 
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientMidiEventController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
+
 #include "StrUtil.hpp"
 
-using namespace mpc::input::midi::legacy;
+using namespace mpc::input::midi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
+VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi", layerIndex)
 {
     for (int i = 0; i < 5; i++)
@@ -27,96 +31,111 @@ VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
         addChild(typeParam);
 
         auto numberParam = std::make_shared<Parameter>(
-            mpc, "#:", "number" + std::to_string(i), 125, 3 + i * 9, 3 * 6);
+            mpc, "#", "number" + std::to_string(i), 125, 3 + i * 9, 3 * 6);
         addChild(numberParam);
 
         auto valueParam = std::make_shared<Parameter>(
-            mpc, "v:", "value" + std::to_string(i), 164, 3 + i * 9, 3 * 6);
+            mpc, "v:", "value" + std::to_string(i), 152, 3 + i * 9, 3 * 6);
         addChild(valueParam);
 
+        auto encoderModeParam = std::make_shared<Parameter>(
+            mpc, "e:", "encoder-mode" + std::to_string(i), 152, 3 + i * 9,
+            3 * 6);
+        addChild(encoderModeParam);
+
         auto channelParam = std::make_shared<Parameter>(
-            mpc, "ch:", "channel" + std::to_string(i), 202, 3 + i * 9, 3 * 6);
+            mpc, "c:", "channel" + std::to_string(i), 190, 3 + i * 9, 3 * 6);
         addChild(channelParam);
     }
 }
 
-void VmpcMidiScreen::turnWheel(int i)
+void VmpcMidiScreen::turnWheel(const int i)
 {
-
-    MidiControlCommand &cmd = activePreset->rows[row + rowOffset];
+    Binding &binding = getActivePreset()->getBindingByIndex(row + rowOffset);
 
     if (column == 0)
     {
-        cmd.setMidiMessageType(i > 0 ? MidiControlCommand::MidiMessageType::NOTE
-                                     : MidiControlCommand::MidiMessageType::CC);
+        binding.setMessageType(i > 0 ? BindingMessageType::Note
+                                     : BindingMessageType::Controller);
     }
     else if (column == 1)
     {
-        cmd.setNumber(std::clamp(cmd.getNumber() + i, -1, 127));
+        binding.setMidiNumber(std::clamp(binding.getMidiNumber() + i, -1, 127));
     }
     else if (column == 2)
     {
-        cmd.setValue(std::clamp(cmd.getValue() + i, -1, 127));
+        if (binding.isController() && binding.isButtonLike())
+        {
+            binding.setMidiValue(
+                std::clamp(binding.getMidiValue() + i, -1, 127));
+        }
+        else if (binding.isNonButtonLikeDataWheel())
+        {
+            binding.setEncoderMode(i > 0
+                                       ? BindingEncoderMode::RelativeStateful
+                                       : BindingEncoderMode::RelativeStateless);
+        }
     }
     else if (column == 3)
     {
-        cmd.setMidiChannelIndex(
-            std::clamp(cmd.getMidiChannelIndex() + i, -1, 15));
+        binding.setMidiChannelIndex(
+            std::clamp(binding.getMidiChannelIndex() + i, -1, 15));
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::open()
 {
-    /*
-    auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
+    const auto screen =
+        mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
 
-    screen->discardAndLeave = [this]()
+    screen->discardAndLeave = [this]
     {
-        activePreset = std::make_shared<MidiControlPreset>();
+        const auto controller =
+            mpc.clientEventController->getClientMidiEventController()
+                ->getExtendedController();
 
-        for (auto &presetRow : uneditedActivePresetCopy->rows)
-        {
-            activePreset->rows.emplace_back(presetRow);
-        }
+        const auto activePreset = controller->getActivePreset();
 
-        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+        activePreset->setBindings(uneditedActivePresetCopy->getBindings());
+
+        uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
     };
 
-    screen->saveAndLeave = [this]()
+    screen->saveAndLeave = [this]
     {
-        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+        uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
     };
 
     screen->stayScreen = "vmpc-midi";
 
-    if
-    (ls.lock()->isPreviousScreenNot({ScreenId::VmpcDiscardMappingChangesScreen}))
+    if (ls.lock()->isPreviousScreenNot(
+            {ScreenId::VmpcDiscardMappingChangesScreen}))
     {
-        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+        uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
 
-        for (auto &presetRow : activePreset->rows)
-        {
-            uneditedActivePresetCopy->rows.emplace_back(presetRow);
-        }
+        const auto controller =
+            mpc.clientEventController->getClientMidiEventController()
+                ->getExtendedController();
+
+        const auto activePreset = controller->getActivePreset();
+
+        uneditedActivePresetCopy->setBindings(activePreset->getBindings());
     }
 
     findChild<Label>("up")->setText("\u00C7");
     findChild<Label>("down")->setText("\u00C6");
 
     setLearning(false);
-    learnCandidate.reset();
-    updateRows();
-    */
+    displayRows();
 }
 
 void VmpcMidiScreen::up()
 {
-    if (learning)
+    if (isLearning())
     {
         acceptLearnCandidate();
-        learnCandidate.reset();
     }
 
     if (row == 0)
@@ -128,23 +147,36 @@ void VmpcMidiScreen::up()
 
         rowOffset--;
 
-        if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+        if (isLearning())
         {
-            column--;
+            setLearnCandidateToSelectedBinding();
         }
 
-        updateRows();
+        displayRows();
+
+        if (!isColumn2VisibleAtCurrentRow() && column == 2)
+        {
+            column--;
+            displayRows();
+        }
+
         return;
     }
 
     row--;
 
-    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+    if (isLearning())
     {
-        column--;
+        setLearnCandidateToSelectedBinding();
     }
 
-    updateRows();
+    displayRows();
+
+    if (!isColumn2VisibleAtCurrentRow() && column == 2)
+    {
+        column--;
+        displayRows();
+    }
 }
 
 void VmpcMidiScreen::openWindow()
@@ -152,60 +184,75 @@ void VmpcMidiScreen::openWindow()
     openScreenById(ScreenId::VmpcMidiPresetsScreen);
 }
 
-void VmpcMidiScreen::acceptLearnCandidate()
+void VmpcMidiScreen::acceptLearnCandidate() const
 {
-    if (learnCandidate.isEmpty())
+    if (!learnCandidate)
     {
         return;
     }
 
-    activePreset->rows[row + rowOffset].setMidiMessageType(
-        learnCandidate.getMidiMessageType());
-    activePreset->rows[row + rowOffset].setNumber(learnCandidate.getNumber());
+    auto &binding = getActivePreset()->getBindingByIndex(row + rowOffset);
 
-    if (learnCandidate.isCC())
+    binding.setMessageType(learnCandidate->getMessageType());
+
+    binding.setMidiNumber(learnCandidate->getMidiNumber());
+
+    if (learnCandidate->isController())
     {
-        activePreset->rows[row + rowOffset].setValue(learnCandidate.getValue());
+        binding.setMidiValue(learnCandidate->getMidiValue());
     }
 
-    activePreset->rows[row + rowOffset].setMidiChannelIndex(
-        learnCandidate.getMidiChannelIndex());
+    binding.setMidiChannelIndex(learnCandidate->getMidiChannelIndex());
 }
 
 void VmpcMidiScreen::down()
 {
-    if (learning)
+    if (isLearning())
     {
         acceptLearnCandidate();
-        learnCandidate.reset();
     }
+
+    const auto preset = getActivePreset();
 
     if (row == 4)
     {
-        if (rowOffset + 5 >= activePreset->rows.size())
+        if (rowOffset + 5 >= preset->getBindings().size())
         {
             return;
         }
 
         rowOffset++;
 
-        if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+        if (isLearning())
         {
-            column--;
+            setLearnCandidateToSelectedBinding();
         }
 
-        updateRows();
+        displayRows();
+
+        if (!isColumn2VisibleAtCurrentRow() && column == 2)
+        {
+            column--;
+            displayRows();
+        }
+
         return;
     }
 
     row++;
 
-    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+    if (isLearning())
     {
-        column--;
+        setLearnCandidateToSelectedBinding();
     }
 
-    updateRows();
+    displayRows();
+
+    if (!isColumn2VisibleAtCurrentRow() && column == 2)
+    {
+        column--;
+        displayRows();
+    }
 }
 
 void VmpcMidiScreen::left()
@@ -217,12 +264,13 @@ void VmpcMidiScreen::left()
 
     column--;
 
-    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+    if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
+        column == 2)
     {
         column--;
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::right()
@@ -234,32 +282,56 @@ void VmpcMidiScreen::right()
 
     column++;
 
-    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
+    if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
+        column == 2)
     {
         column++;
     }
 
-    updateRows();
+    displayRows();
 }
 
-void VmpcMidiScreen::setLearning(bool b)
+void VmpcMidiScreen::setLearnCandidateToSelectedBinding()
+{
+    learnCandidate = getActivePreset()->getBindingByIndex(row + rowOffset);
+}
+
+bool VmpcMidiScreen::isColumn2VisibleAtCurrentRow()
+{
+    return !findChild<Field>("value" + std::to_string(row))->IsHidden() ||
+           !findChild<Field>("encoder-mode" + std::to_string(row))->IsHidden();
+}
+
+void VmpcMidiScreen::setLearning(const bool b)
 {
     learning = b;
+
+    if (!learning)
+    {
+        learnCandidate.reset();
+    }
+    else
+    {
+        setLearnCandidateToSelectedBinding();
+    }
+
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
     ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
-bool VmpcMidiScreen::hasMappingChanged()
+bool VmpcMidiScreen::hasMappingChanged() const
 {
-    if (activePreset->rows.size() != uneditedActivePresetCopy->rows.size())
+    if (getActivePreset()->getBindings().size() !=
+        uneditedActivePresetCopy->getBindings().size())
     {
         return true;
     }
 
-    for (int i = 0; i < activePreset->rows.size(); i++)
+    for (int i = 0; i < getActivePreset()->getBindings().size(); i++)
     {
-        if (!activePreset->rows[i].equals(uneditedActivePresetCopy->rows[i]))
+        if (getActivePreset()->getBindingByIndex(i) !=
+            uneditedActivePresetCopy->getBindingByIndex(i))
         {
             return true;
         }
@@ -268,7 +340,7 @@ bool VmpcMidiScreen::hasMappingChanged()
     return false;
 }
 
-void VmpcMidiScreen::function(int i)
+void VmpcMidiScreen::function(const int i)
 {
     switch (i)
     {
@@ -312,8 +384,7 @@ void VmpcMidiScreen::function(int i)
             if (learning)
             {
                 setLearning(false);
-                learnCandidate.reset();
-                updateRows();
+                displayRows();
                 return;
             }
 
@@ -336,9 +407,7 @@ void VmpcMidiScreen::function(int i)
             }
 
             setLearning(!learning);
-            learnCandidate.reset();
-
-            updateRows();
+            displayRows();
             break;
         case 5:
         {
@@ -351,7 +420,15 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                MidiControlPersistence::saveCurrentState(mpc);
+                const auto path =
+                    mpc.paths->getDocuments()->activeMidiControlPresetPath();
+
+                json presetJson;
+
+                to_json(presetJson, *getActivePreset());
+
+                set_file_data(path, presetJson.dump(4));
+
                 popupMsg = "MIDI mapping saved";
             }
             else
@@ -362,47 +439,33 @@ void VmpcMidiScreen::function(int i)
             ls.lock()->showPopupForMs(popupMsg, 1000);
             break;
         }
+        default:;
     }
 }
 
 void VmpcMidiScreen::setLearnCandidate(const bool isNote,
                                        const int8_t channelIndex,
-                                       const int8_t number, const int8_t value)
+                                       const int8_t number)
 {
-    learnCandidate.setMidiMessageType(
-        isNote ? MidiControlCommand::MidiMessageType::NOTE
-               : MidiControlCommand::MidiMessageType::CC);
-    learnCandidate.setMidiChannelIndex(channelIndex);
-    learnCandidate.setNumber(number);
-
-    if (!isNote)
+    if (!isLearning())
     {
-        learnCandidate.setValue(value);
+        return;
     }
 
-    updateRows();
+    learnCandidate->setMessageType(isNote ? BindingMessageType::Note
+                                          : BindingMessageType::Controller);
+    learnCandidate->setMidiChannelIndex(channelIndex);
+    learnCandidate->setMidiNumber(number);
+
+    displayRows();
 }
 
-void VmpcMidiScreen::updateOrAddActivePresetCommand(MidiControlCommand &c)
-{
-    for (auto &labelCommand : activePreset->rows)
-    {
-        if (c.getMpcHardwareLabel() == labelCommand.getMpcHardwareLabel())
-        {
-            labelCommand = c;
-            return;
-        }
-    }
-
-    activePreset->rows.emplace_back(c);
-}
-
-bool VmpcMidiScreen::isLearning()
+bool VmpcMidiScreen::isLearning() const
 {
     return learning;
 }
 
-void VmpcMidiScreen::updateRows()
+void VmpcMidiScreen::displayRows()
 {
     for (int i = 0; i < 5; i++)
     {
@@ -411,19 +474,18 @@ void VmpcMidiScreen::updateRows()
 
         constexpr int length = 15;
 
-        const auto labelText =
-            StrUtil::padRight(
-                activePreset->rows[i + rowOffset].getMpcHardwareLabel(), " ",
-                length) +
+        auto &binding =
+            learning && row == i && learnCandidate.has_value()
+                ? learnCandidate.value()
+                : getActivePreset()->getBindingByIndex(i + rowOffset);
+
+        const auto targetText =
+            StrUtil::padRight(binding.getTargetDisplayName(), " ", length) +
             ":";
 
-        typeLabel->setText(labelText);
-        MidiControlCommand &cmd =
-            learning && row == i && !learnCandidate.isEmpty()
-                ? learnCandidate
-                : activePreset->rows[i + rowOffset];
+        typeLabel->setText(targetText);
 
-        std::string type = cmd.isNote() ? "Note" : "CC";
+        std::string type = messageTypeToDisplayString(binding.getMessageType());
 
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
@@ -431,60 +493,80 @@ void VmpcMidiScreen::updateRows()
         const auto channelField =
             findChild<Field>("channel" + std::to_string(i));
 
-        if (cmd.getMidiChannelIndex() == -1)
+        if (binding.getMidiChannelIndex() == -1)
         {
             channelField->setText("all");
         }
         else
         {
             channelField->setText(
-                std::to_string(cmd.getMidiChannelIndex() + 1));
+                std::to_string(binding.getMidiChannelIndex() + 1));
         }
 
         channelField->setInverted(row == i && column == 3);
 
         const auto numberField = findChild<Field>("number" + std::to_string(i));
 
-        if (cmd.getNumber() == -1)
+        if (binding.isEnabled())
         {
-            numberField->setText("OFF");
+            numberField->setTextPadded(binding.getMidiNumber());
         }
         else
         {
-            numberField->setTextPadded(cmd.getNumber());
+            numberField->setText("OFF");
         }
 
         numberField->setInverted(row == i && column == 1);
 
         const auto valueLabel = findChild<Label>("value" + std::to_string(i));
         const auto valueField = findChild<Field>("value" + std::to_string(i));
+        const auto encoderModeLabel =
+            findChild<Label>("encoder-mode" + std::to_string(i));
+        const auto encoderModeField =
+            findChild<Field>("encoder-mode" + std::to_string(i));
 
-        if (cmd.isNote())
+        if (binding.isController() && binding.isButtonLike())
         {
-            valueLabel->Hide(true);
-            valueField->Hide(true);
-        }
-        else
-        {
-            if (cmd.getValue() == -1)
+            if (binding.getMidiValue() == -1)
             {
                 valueField->setText("all");
             }
             else
             {
-                valueField->setTextPadded(cmd.getValue());
+                valueField->setTextPadded(binding.getMidiValue());
             }
 
             valueLabel->Hide(false);
             valueField->Hide(false);
+            encoderModeLabel->Hide(true);
+            encoderModeField->Hide(true);
+            valueField->setInverted(row == i && column == 2);
+            valueField->setBlinking(learning && i == row);
         }
+        else
+        {
+            valueLabel->Hide(true);
+            valueField->Hide(true);
 
-        valueField->setInverted(row == i && column == 2);
+            if (binding.isNonButtonLikeDataWheel())
+            {
+                encoderModeField->setText(
+                    encoderModeToDisplayString(binding.getEncoderMode()));
+                encoderModeLabel->Hide(false);
+                encoderModeField->Hide(false);
+                encoderModeField->setInverted(row == i && column == 2);
+                encoderModeField->setBlinking(learning && i == row);
+            }
+            else
+            {
+                encoderModeLabel->Hide(true);
+                encoderModeField->Hide(true);
+            }
+        }
 
         typeField->setBlinking(learning && i == row);
         channelField->setBlinking(learning && i == row);
         numberField->setBlinking(learning && i == row);
-        valueField->setBlinking(learning && i == row);
     }
 
     displayUpAndDown();
@@ -493,10 +575,13 @@ void VmpcMidiScreen::updateRows()
 void VmpcMidiScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
-    findChild<Label>("down")->Hide(rowOffset + 5 >= activePreset->rows.size());
+    findChild<Label>("down")->Hide(rowOffset + 5 >=
+                                   getActivePreset()->getBindings().size());
 }
 
-std::shared_ptr<MidiControlPreset> VmpcMidiScreen::getActivePreset()
+std::shared_ptr<MidiControlPresetV3> VmpcMidiScreen::getActivePreset() const
 {
-    return activePreset;
+    return mpc.clientEventController->getClientMidiEventController()
+        ->getExtendedController()
+        ->getActivePreset();
 }

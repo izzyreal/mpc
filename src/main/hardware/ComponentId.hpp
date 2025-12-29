@@ -5,7 +5,6 @@
 
 namespace mpc::hardware
 {
-
     enum ComponentId
     {
         NONE = 0,
@@ -95,6 +94,16 @@ namespace mpc::hardware
         COMPONENT_ID_COUNT
     };
 
+    static bool isPadId(const ComponentId id)
+    {
+        return id >= PAD_1_OR_AB && id <= PAD_16_OR_PARENTHESES;
+    }
+
+    static bool isButtonId(const ComponentId id)
+    {
+        return id >= CURSOR_LEFT_OR_DIGIT && id <= NUM_9_OR_MIDI_SYNC;
+    }
+
     static const std::unordered_map<ComponentId, std::string>
         componentIdToLabel{
             {PAD_1_OR_AB, "pad-1-or-ab"},
@@ -112,7 +121,7 @@ namespace mpc::hardware
             {PAD_13_OR_YZ, "pad-13-or-yz"},
             {PAD_14_OR_AMPERSAND_OCTOTHORPE, "pad-14-or-ampersand-octothorpe"},
             {PAD_15_OR_HYPHEN_EXCLAMATION_MARK,
-             "pad-15-or-hyphen-eclamation-mark"},
+             "pad-15-or-hyphen-exclamation-mark"},
             {PAD_16_OR_PARENTHESES, "pad-16-or-parentheses"},
 
             {CURSOR_LEFT_OR_DIGIT, "cursor-left-or-digit"},
@@ -161,6 +170,7 @@ namespace mpc::hardware
             {NUM_7_OR_MIXER, "7-or-mixer"},
             {NUM_8_OR_OTHER, "8-or-other"},
             {NUM_9_OR_MIDI_SYNC, "9-or-midi-sync"},
+
             {DATA_WHEEL, "data-wheel"},
             {SLIDER, "slider"},
             {REC_GAIN_POT, "rec-gain-pot"},

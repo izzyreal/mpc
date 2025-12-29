@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://izmar.nl/vmpc2000xl_midi_control_preset.schema.v3.json",
+  "title": "MIDI Control Preset",
+  "type": "object",
+  "required": [
+    "version",
+    "name",
+    "autoLoadMode",
+    "bindings"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4503599627370496,
+      "default": 0,
+      "description": "Integer between 0 and 2^52 inclusive."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16,
+      "pattern": "^[A-Za-z0-9 !#\\$%&'\\(\\)\\-@_{}]+$",
+      "description": "Preset name: 1 to 16 characters using allowed characters [A-Za-z0-9 !#$%&'()-@_{}]. Required in every preset."
+    },
+    "midiControllerDeviceName": {
+      "type": "string",
+      "maxLength": 255,
+      "pattern": "^[a-zA-Z0-9 _\\-\\.\\(\\)\\/\\,;]*$",
+      "description": "Optional name of the MIDI controller device. Can be empty or up to 255 characters using allowed characters [a-zA-Z0-9 _-./(),;]."
+    },
+    "autoLoadMode": {
+      "type": "string",
+      "enum": [
+        "No",
+        "Ask",
+        "Yes"
+      ],
+      "default": "No",
+      "description": "Controls automatic loading of the preset. 'No': never auto-load. 'Yes': auto-load if a MIDI controller with `midiControllerDeviceName` is connected. 'Ask': prompt the user to load if the controller is connected."
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 65536,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/binding"
+      },
+      "description": "Array of MIDI control bindings."
+    }
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "required": [
+        "target",
+        "messageType",
+        "midiNumber",
+        "midiChannelIndex"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-z0-9_\\-#:]+$",
+          "enum": [
+            "hardware:pad-1-or-ab",
+            "hardware:pad-2-or-cd",
+            "hardware:pad-3-or-ef",
+            "hardware:pad-4-or-gh",
+            "hardware:pad-5-or-ij",
+            "hardware:pad-6-or-kl",
+            "hardware:pad-7-or-mn",
+            "hardware:pad-8-or-op",
+            "hardware:pad-9-or-qr",
+            "hardware:pad-10-or-st",
+            "hardware:pad-11-or-uv",
+            "hardware:pad-12-or-wx",
+            "hardware:pad-13-or-yz",
+            "hardware:pad-14-or-ampersand-octothorpe",
+            "hardware:pad-15-or-hyphen-exclamation-mark",
+            "hardware:pad-16-or-parentheses",
+            "hardware:data-wheel:negative",
+            "hardware:data-wheel:positive",
+            "hardware:data-wheel",
+            "hardware:slider",
+            "hardware:rec-gain-pot",
+            "hardware:main-volume-pot",
+            "hardware:rec",
+            "hardware:overdub",
+            "hardware:stop",
+            "hardware:play",
+            "hardware:play-start",
+            "hardware:cursor-left-or-digit",
+            "hardware:cursor-right-or-digit",
+            "hardware:cursor-up",
+            "hardware:cursor-down",
+            "hardware:main-screen",
+            "hardware:prev-step-or-event",
+            "hardware:next-step-or-event",
+            "hardware:go-to",
+            "hardware:prev-bar-or-start",
+            "hardware:next-bar-or-end",
+            "hardware:tap-or-note-repeat",
+            "hardware:next-seq",
+            "hardware:track-mute",
+            "hardware:open-window",
+            "hardware:full-level-or-case-switch",
+            "hardware:sixteen-levels-or-space",
+            "hardware:f1",
+            "hardware:f2",
+            "hardware:f3",
+            "hardware:f4",
+            "hardware:f5",
+            "hardware:f6",
+            "hardware:shift",
+            "hardware:enter-or-save",
+            "hardware:undo-seq",
+            "hardware:erase",
+            "hardware:after-or-assign",
+            "hardware:bank-a",
+            "hardware:bank-b",
+            "hardware:bank-c",
+            "hardware:bank-d",
+            "hardware:0-or-vmpc",
+            "hardware:1-or-song",
+            "hardware:2-or-misc",
+            "hardware:3-or-load",
+            "hardware:4-or-sample",
+            "hardware:5-or-trim",
+            "hardware:6-or-program",
+            "hardware:7-or-mixer",
+            "hardware:8-or-other",
+            "hardware:9-or-midi-sync"
+          ]
+        },
+        "messageType": {
+          "type": "string",
+          "enum": [
+            "controller",
+            "note"
+          ]
+        },
+        "midiNumber": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 127
+        },
+        "midiValue": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 127,
+          "description": "Threshold for button targets."
+        },
+        "midiChannelIndex": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 15,
+          "description": "Zero-based indexing (0–15), or -1 for 'all'."
+        },
+        "encoderMode": {
+          "type": "string",
+          "enum": [
+            "relative_stateless",
+            "relative_stateful"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "messageType": {
+                "const": "controller"
+              }
+            },
+            "required": [
+              "messageType"
+            ]
+          },
+          "then": {
+            "if": {
+              "properties": {
+                "target": {
+                  "enum": [
+                    "hardware:cursor-left-or-digit",
+                    "hardware:cursor-right-or-digit",
+                    "hardware:cursor-up",
+                    "hardware:cursor-down",
+                    "hardware:rec",
+                    "hardware:overdub",
+                    "hardware:stop",
+                    "hardware:play",
+                    "hardware:play-start",
+                    "hardware:main-screen",
+                    "hardware:prev-step-or-event",
+                    "hardware:next-step-or-event",
+                    "hardware:go-to",
+                    "hardware:prev-bar-or-start",
+                    "hardware:next-bar-or-end",
+                    "hardware:tap-or-note-repeat",
+                    "hardware:next-seq",
+                    "hardware:track-mute",
+                    "hardware:open-window",
+                    "hardware:full-level-or-case-switch",
+                    "hardware:sixteen-levels-or-space",
+                    "hardware:f1",
+                    "hardware:f2",
+                    "hardware:f3",
+                    "hardware:f4",
+                    "hardware:f5",
+                    "hardware:f6",
+                    "hardware:shift",
+                    "hardware:enter-or-save",
+                    "hardware:undo-seq",
+                    "hardware:erase",
+                    "hardware:after-or-assign",
+                    "hardware:bank-a",
+                    "hardware:bank-b",
+                    "hardware:bank-c",
+                    "hardware:bank-d",
+                    "hardware:0-or-vmpc",
+                    "hardware:1-or-song",
+                    "hardware:2-or-misc",
+                    "hardware:3-or-load",
+                    "hardware:4-or-sample",
+                    "hardware:5-or-trim",
+                    "hardware:6-or-program",
+                    "hardware:7-or-mixer",
+                    "hardware:8-or-other",
+                    "hardware:9-or-midi-sync",
+                    "hardware:data-wheel:negative",
+                    "hardware:data-wheel:positive"
+                  ]
+                }
+              },
+              "required": [
+                "target"
+              ]
+            },
+            "then": {
+              "required": [
+                "midiValue"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "midiValue"
+                ]
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "midiValue"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target": {
+                "const": "hardware:data-wheel"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          },
+          "then": {
+            "required": [
+              "encoderMode"
+            ],
+            "not": {
+              "required": [
+                "midiValue"
+              ]
+            }
+          },
+          "else": {
+            "properties": {
+              "encoderMode": false
+            }
+          }
+        }
+      ],
+      "default": {
+        "messageType": "controller",
+        "midiNumber": -1,
+        "midiValue": 64,
+        "midiChannelIndex": -1,
+        "encoderMode": "relative_stateless"
+      }
+    }
+  }
+}

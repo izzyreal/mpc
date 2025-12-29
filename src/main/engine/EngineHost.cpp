@@ -14,6 +14,8 @@
 #include "audiomidi/SoundRecorder.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
+#include "controller/ClientMidiEventController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
 
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "engine/Voice.hpp"
@@ -571,7 +573,9 @@ void EngineHost::switchMidiControlMappingIfRequired() const
             mpc.screens->get<ScreenId::VmpcMidiScreen>();
         vmpcMidiScreen->shouldSwitch.load())
     {
-        vmpcMidiScreen->activePreset = vmpcMidiScreen->switchToPreset;
+        mpc.clientEventController->getClientMidiEventController()
+            ->getExtendedController()
+            ->setActivePreset(vmpcMidiScreen->switchToPreset);
 
         vmpcMidiScreen->shouldSwitch.store(false);
 

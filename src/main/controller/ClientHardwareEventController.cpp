@@ -238,8 +238,6 @@ void ClientHardwareEventController::handlePadPress(
     const auto programPadIndex =
         physicalPadIndex + static_cast<int>(activeBank) * 16;
 
-    std::optional<NoteNumber> note = std::nullopt;
-
     assert(program && program->isUsed());
     assert(programIndex);
 
@@ -251,7 +249,7 @@ void ClientHardwareEventController::handlePadPress(
         ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
         *programIndex, PhysicalPadIndex(physicalPadIndex));
 
-    note =
+    auto note =
         NoteNumber(program->getNoteFromPad(ProgramPadIndex(programPadIndex)));
 
     const bool isF4Pressed = mpc.getHardware()->getButton(F4)->isPressed();
@@ -277,30 +275,25 @@ void ClientHardwareEventController::handlePadPress(
 
     std::optional<NoteOnEvent> registryNoteOnEvent = std::nullopt;
 
-    if (note)
-    {
-        NoteInputScreenUpdateContext noteInputScreenUpdateContext{
-            mpc.clientEventController->isSixteenLevelsEnabled(),
-            screengroups::isCentralNoteAndPadUpdateScreen(screen), screen,
-            [clientEventController =
-                 mpc.clientEventController](const DrumNoteNumber n)
-            {
-                clientEventController->setSelectedNote(n);
-            },
-            screen->isFocusedFieldName("fromnote")};
-
-        NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, *note)
-            .execute();
-
-        if (*note >= 0)
+    NoteInputScreenUpdateContext noteInputScreenUpdateContext{
+        mpc.clientEventController->isSixteenLevelsEnabled(),
+        screengroups::isCentralNoteAndPadUpdateScreen(screen), screen,
+        [clientEventController =
+             mpc.clientEventController](const DrumNoteNumber n)
         {
-            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
-            registryNoteOnEvent =
-                mpc.getPerformanceManager().lock()->registerNoteOn(
-                    PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
-                    screenId, track->getIndex(), screen->getBus()->busType,
-                    *note, Velocity(clampedVelocity), programIndex);
-        }
+            clientEventController->setSelectedNote(n);
+        },
+        screen->isFocusedFieldName("fromnote")};
+
+    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, note).execute();
+
+    if (note != NoDrumNoteAssigned)
+    {
+        registryNoteOnEvent =
+            mpc.getPerformanceManager().lock()->registerNoteOn(
+                PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
+                screenId, track->getIndex(), screen->getBus()->busType, note,
+                Velocity(clampedVelocity), programIndex);
     }
 
     std::optional<utils::SimpleAction> action = std::nullopt;
@@ -433,6 +426,9 @@ void ClientHardwareEventController::handlePadRelease(
             {
                 return;
             }
+
+            mpc.getPerformanceManager().lock()->registerPhysicalPadRelease(
+                PhysicalPadIndex(physicalPadIndex));
 
             auto p = *physicalPadPressEvent;
             const auto sampler = mpc.getSampler();
@@ -668,7 +664,15 @@ void ClientHardwareEventController::handlePot(
 
     const auto engineHost = mpc.getEngineHost();
 
-    pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
+    if (event.deltaValue)
+    {
+        pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
+    }
+    else
+    {
+        assert(event.value);
+        pot->setValue(*event.value);
+    }
 
     if (event.componentId == REC_GAIN_POT)
     {

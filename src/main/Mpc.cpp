@@ -10,7 +10,7 @@
 
 #include "Paths.hpp"
 #include "nvram/NvRam.hpp"
-#include "input/midi/legacy/MidiControlPersistence.hpp"
+#include "input/midi/legacy/LegacyOnDiskPresetConvertor.hpp"
 
 #include "disk/AbstractDisk.hpp"
 
@@ -29,11 +29,16 @@
 
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
 #include "controller/ClientEventController.hpp"
-
-#include <string>
+#include "controller/ClientMidiEventController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
 
 #include "Logger.hpp"
+
+#include <nlohmann/json.hpp>
+
+#include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -90,7 +95,7 @@ void Mpc::init()
     fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
 
     const std::vector<std::string> factory_midi_control_presets{
-        "MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp"};
+        "MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp", "MPC_Studio.vmp"};
 
     for (auto &preset : factory_midi_control_presets)
     {
@@ -107,14 +112,18 @@ void Mpc::init()
         }
     }
 
+    input::midi::legacy::convertOnDiskLegacyPresets(
+        paths->getDocuments()->midiControlPresetsPath());
+
+    input::midi::legacy::convertOnDiskLegacyPreset(
+        paths->legacyActiveMidiControlPresetPath(),
+        paths->getDocuments()->activeMidiControlPresetPath());
+
     Logger::l.setPath(paths->getDocuments()->logFilePath().string());
 
     padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
     diskController = std::make_unique<disk::DiskController>(*this);
-
-    input::midi::legacy::MidiControlPersistence::
-        loadAllPresetsFromDiskIntoMemory(*this);
 
     hardware = std::make_shared<Hardware>();
 
@@ -208,7 +217,16 @@ void Mpc::init()
 
     nvram::NvRam::loadUserScreenValues(*this);
 
-    input::midi::legacy::MidiControlPersistence::restoreLastState(*this);
+    if (const auto p = paths->getDocuments()->activeMidiControlPresetPath();
+        fs::exists(p))
+    {
+        const auto data = get_file_data(p);
+        const auto dataJson = json::parse(data);
+        input::midi::from_json(
+            dataJson, *clientEventController->getClientMidiEventController()
+                           ->getExtendedController()
+                           ->getActivePreset());
+    }
 
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
@@ -303,7 +321,7 @@ Mpc::~Mpc()
     {
         autoSave->interruptRestorationIfStillOngoing();
     }
-    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
+
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
     if (engineHost)
@@ -350,7 +368,7 @@ std::shared_ptr<input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
     return padAndButtonKeyboard;
 }
 
-AutoSave *Mpc::getAutoSave()
+AutoSave *Mpc::getAutoSave() const
 {
     return autoSave.get();
 }

@@ -34,6 +34,16 @@ std::string StrUtil::replaceAll(const std::string &str, char c,
     return res;
 }
 
+void StrUtil::replace(std::string &str, const std::string &substr,
+                      const std::string &replacement)
+{
+    for (size_t pos = 0; (pos = str.find(substr, pos)) != std::string::npos;
+         pos += replacement.size())
+    {
+        str.replace(pos, substr.size(), replacement);
+    }
+}
+
 bool StrUtil::eqIgnoreCase(const std::string &s1, const std::string &s2)
 {
     if (s1.length() != s2.length())

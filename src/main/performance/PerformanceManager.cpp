@@ -380,21 +380,28 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         },
         [&](const ProgramPadAftertouchEvent &m)
         {
+            bool shouldUpdateUi = false;
+
             for (auto &e : activeState.programPadEvents)
             {
                 if (e.padIndex == m.padIndex && e.source == m.source)
                 {
                     e.pressure = m.pressure;
+                    shouldUpdateUi = true;
                 }
             }
 
-            postToUiThread(utils::Task(
-                [this, padIndex = m.padIndex, pressure = m.pressure,
-                 source = m.source]
-                {
-                    programPadEventUiCallback(padIndex, pressure, source,
-                                              ProgramPadEventType::Aftertouch);
-                }));
+            if (shouldUpdateUi)
+            {
+                postToUiThread(utils::Task(
+                    [this, padIndex = m.padIndex, pressure = m.pressure,
+                     source = m.source]
+                    {
+                        programPadEventUiCallback(
+                            padIndex, pressure, source,
+                            ProgramPadEventType::Aftertouch);
+                    }));
+            }
         },
         [&](const ProgramPadReleaseEvent &m)
         {

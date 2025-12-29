@@ -25,6 +25,7 @@ namespace mpc
             fs::path logFilePath() const;
             fs::path recordingsPath() const;
             fs::path midiControlPresetsPath() const;
+            fs::path activeMidiControlPresetPath() const;
             fs::path autoSavePath() const;
 
             fs::path demoDataPath() const;
@@ -41,6 +42,8 @@ namespace mpc
         fs::path keyboardBindingsPath() const;
 
         fs::path legacyKeyboardBindingsPath() const;
+
+        fs::path legacyActiveMidiControlPresetPath() const;
 
         Documents *getDocuments() const;
 

@@ -12,7 +12,6 @@ using nlohmann::json_schema::json_validator;
 
 namespace mpc::input::midi::legacy
 {
-    // Helper: validate a single property against its schema definition
     inline bool isValidProperty(const json &value, const json &propSchema)
     {
         if (value.is_null())
@@ -20,7 +19,6 @@ namespace mpc::input::midi::legacy
             return false;
         }
 
-        // Type check
         if (propSchema.contains("type"))
         {
             std::string type = propSchema["type"].get<std::string>();
@@ -38,7 +36,6 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        // Enum check
         if (propSchema.contains("enum") && value.is_string())
         {
             bool ok = false;
@@ -56,7 +53,6 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        // Numeric min/max check
         if (value.is_number_integer())
         {
             int v = value.get<int>();
@@ -72,7 +68,6 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        // String length/pattern check
         if (value.is_string())
         {
             const std::string s = value.get<std::string>();
@@ -102,13 +97,12 @@ namespace mpc::input::midi::legacy
     inline void patchLegacyPreset(json &preset, const json &schemaJson)
     {
         const json &bindingDef = schemaJson["$defs"]["binding"];
-        std::unordered_set<std::string> allowedLabels;
-        for (const auto &lbl : bindingDef["properties"]["labelName"]["enum"])
+        std::unordered_set<std::string> allowedTargets;
+        for (const auto &target : bindingDef["properties"][targetKey]["enum"])
         {
-            allowedLabels.insert(lbl.get<std::string>());
+            allowedTargets.insert(target.get<std::string>());
         }
 
-        // Default binding (may not include labelName)
         json defaultBinding = bindingDef["default"];
         for (const auto &req : bindingDef["required"])
         {
@@ -118,69 +112,59 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        // Regexes for normalization
-        std::regex extraRegex(R"(^([0-9]).*extra.*$)");
-        std::regex legacyExtraRegex(R"(^([1-9])\s*\(extra\)$)");
-
-        // 1) Sanitize & normalize labelName: build a new bindings array that
-        // only
-        //    contains bindings with a usable string labelName.
         json sanitized = json::array();
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            if (!binding.contains("labelName") ||
-                !binding["labelName"].is_string())
+            if (!binding.contains(targetKey) || !binding[targetKey].is_string())
             {
-                // skip completely corrupted/non-string labelName entries
                 continue;
             }
-            std::string label = binding["labelName"].get<std::string>();
 
-            std::smatch m;
-            if (std::regex_match(label, m, legacyExtraRegex))
-            {
-                label = m[1].str() + "_extra";
-            }
-            else if (std::regex_match(label, m, extraRegex))
-            {
-                label = m[1].str() + "_extra";
-            }
-
-            binding["labelName"] = label;
+            binding[targetKey] = binding[targetKey].get<std::string>();
             sanitized.push_back(binding);
         }
-        preset["bindings"] = sanitized;
 
-        // 2) Index existing (sanitized) bindings by labelName
+        preset[bindingsKey] = sanitized;
+
         std::unordered_map<std::string, json *> bindingMap;
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            bindingMap[binding["labelName"].get<std::string>()] = &binding;
+            bindingMap[binding[targetKey].get<std::string>()] = &binding;
         }
 
-        // 3) Add missing bindings (use default binding as base and set
-        // labelName explicitly)
-        for (const auto &lbl : allowedLabels)
+        // Add missing targets with default binding
+        for (const auto &lbl : allowedTargets)
         {
             if (bindingMap.find(lbl) == bindingMap.end())
             {
                 json newBinding = defaultBinding;
-                newBinding["labelName"] = lbl;
-                preset["bindings"].push_back(newBinding);
+                newBinding[targetKey] = lbl;
+
+                if (lbl != "hardware:data-wheel")
+                {
+                    newBinding.erase(encoderModeKey);
+                }
+
+                preset[bindingsKey].push_back(newBinding);
             }
         }
 
-        // 4) Repair properties for each binding -- but DO NOT attempt to repair
-        // labelName here.
         const json &props = bindingDef["properties"];
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
+            const std::string target =
+                binding.contains(targetKey) && binding[targetKey].is_string()
+                    ? binding[targetKey].get<std::string>()
+                    : std::string{};
+
+            // Fill/repair all properties except target, encoderMode, midiValue
             for (auto it = props.begin(); it != props.end(); ++it)
             {
                 const std::string propName = it.key();
-                if (propName == "labelName")
+                if (propName == targetKey || propName == encoderModeKey ||
+                    propName == midiValueKey)
                 {
-                    continue; // handled already
+                    continue;
                 }
 
                 const json &propSchema = it.value();
@@ -188,7 +172,6 @@ namespace mpc::input::midi::legacy
                 if (!binding.contains(propName) ||
                     !isValidProperty(binding[propName], propSchema))
                 {
-                    // Prefer a non-null default from defaultBinding
                     if (defaultBinding.contains(propName) &&
                         !defaultBinding[propName].is_null())
                     {
@@ -200,7 +183,6 @@ namespace mpc::input::midi::legacy
                     }
                     else
                     {
-                        // Safe typed fallback instead of null
                         if (propSchema.contains("type"))
                         {
                             std::string t =
@@ -230,42 +212,109 @@ namespace mpc::input::midi::legacy
                 }
             }
 
-            // conditional schema rule: Note must not have midiValue
-            if (binding.contains("messageType") &&
-                binding["messageType"] == "Note")
+            // encoderMode: only allowed for hardware:data-wheel
+            if (target == "hardware:data-wheel")
             {
-                binding.erase("midiValue");
+                const json &encSchema = props.at(encoderModeKey);
+                if (!binding.contains(encoderModeKey) ||
+                    !isValidProperty(binding[encoderModeKey], encSchema))
+                {
+                    if (defaultBinding.contains(encoderModeKey) &&
+                        !defaultBinding[encoderModeKey].is_null())
+                    {
+                        binding[encoderModeKey] =
+                            defaultBinding[encoderModeKey];
+                    }
+                }
+            }
+            else
+            {
+                binding.erase(encoderModeKey);
+            }
+
+            // midiValue: follow schema semantics
+            if (!binding.contains(messageTypeKey) ||
+                !binding[messageTypeKey].is_string())
+            {
+                binding.erase(midiValueKey);
+            }
+            else
+            {
+                const std::string mt =
+                    binding[messageTypeKey].get<std::string>();
+                const bool isController = (mt == "controller");
+
+                if (!isController)
+                {
+                    // Note bindings must not have midiValue
+                    binding.erase(midiValueKey);
+                }
+                else
+                {
+                    const bool isPad = target.rfind("hardware:pad-", 0) == 0;
+
+                    const bool isPot = target == "hardware:slider" ||
+                                       target == "hardware:rec-gain-pot" ||
+                                       target == "hardware:main-volume-pot";
+
+                    const bool isPlainDataWheel =
+                        target == "hardware:data-wheel";
+
+                    const bool isHardware = target.rfind("hardware:", 0) == 0;
+
+                    const bool isButtonLike =
+                        (isHardware && !isPad && !isPot && !isPlainDataWheel);
+
+                    if (isButtonLike)
+                    {
+                        // Require midiValue; if missing, use default
+                        if (!binding.contains(midiValueKey) ||
+                            !binding[midiValueKey].is_number_integer())
+                        {
+                            if (defaultBinding.contains(midiValueKey))
+                            {
+                                binding[midiValueKey] =
+                                    defaultBinding[midiValueKey];
+                            }
+                            else
+                            {
+                                binding[midiValueKey] = 64;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Pads, pots, plain data-wheel: must not have midiValue
+                        binding.erase(midiValueKey);
+                    }
+                }
             }
         }
 
-        // 5) Filter down to allowed labels and deduplicate (safe now: labelName
-        // is string)
+        // Filter duplicates and unknown targets
         json filtered = json::array();
         std::unordered_set<std::string> seen;
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            if (!binding.contains("labelName") ||
-                !binding["labelName"].is_string())
+            if (!binding.contains(targetKey) || !binding[targetKey].is_string())
             {
                 continue;
             }
-            std::string lbl = binding["labelName"].get<std::string>();
-            if (allowedLabels.count(lbl) && !seen.count(lbl))
+            std::string target = binding[targetKey].get<std::string>();
+            if (allowedTargets.count(target) && !seen.count(target))
             {
                 filtered.push_back(binding);
-                seen.insert(lbl);
+                seen.insert(target);
             }
         }
-        preset["bindings"] = filtered;
+        preset[bindingsKey] = filtered;
 
-        // 6) Patch preset name / midi controller device name
-        if (preset.contains("name") && preset["name"].is_string())
+        if (preset.contains(nameKey) && preset[nameKey].is_string())
         {
-            std::string patchedName = preset["name"].get<std::string>();
+            std::string patchedName = preset[nameKey].get<std::string>();
             std::replace(patchedName.begin(), patchedName.end(), '_', ' ');
-            preset["name"] = patchedName;
-            preset["midiControllerDeviceName"] = patchedName;
+            preset[nameKey] = patchedName;
+            preset[midiControllerDeviceNameKey] = patchedName;
         }
     }
-
 } // namespace mpc::input::midi::legacy
