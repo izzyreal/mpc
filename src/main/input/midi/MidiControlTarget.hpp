@@ -1,7 +1,8 @@
 #pragma once
-#include <string>
-#include <variant>
+
 #include "hardware/Component.hpp"
+
+#include <variant>
 
 namespace mpc::input::midi
 {
@@ -26,7 +27,6 @@ namespace mpc::input::midi
             } command;
         };
 
-        std::string label;
         std::variant<HardwareTarget, SequencerTarget> payload;
     };
 } // namespace mpc::input::midi

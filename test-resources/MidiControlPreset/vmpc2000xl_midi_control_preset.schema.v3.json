@@ -131,11 +131,19 @@
             "hardware:pad-14-or-ampersand-octothorpe",
             "hardware:pad-15-or-hyphen-eclamation-mark",
             "hardware:pad-16-or-parentheses",
-            "hardware:datawheel:negative",
-            "hardware:datawheel:positive",
+            "hardware:data-wheel:negative",
+            "hardware:data-wheel:positive",
             "hardware:slider",
             "hardware:rec-gain",
-            "hardware:main-volume"
+            "hardware:main-volume",
+
+            "sequencer:play",
+            "sequencer:rec",
+            "sequencer:stop",
+            "sequencer:rec-plus-play",
+            "sequencer:odub-plus-play",
+            "sequencer:rec-punch",
+            "sequencer:odub-punch"
           ]
         },
         "messageType": {

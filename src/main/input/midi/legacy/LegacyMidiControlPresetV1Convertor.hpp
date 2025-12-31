@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LegacyMidiControlPresetUtil.hpp"
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
@@ -8,7 +10,6 @@ using json = nlohmann::json;
 
 namespace mpc::input::midi::legacy
 {
-    // Parses legacy MIDI preset binary data into JSON
     static json parseLegacyMidiControlPresetV1(const std::string &data)
     {
         json result;
@@ -18,7 +19,6 @@ namespace mpc::input::midi::legacy
             throw std::runtime_error("Data too short for legacy V1 header");
         }
 
-        // autoLoad is first byte
         unsigned char autoLoadByte = static_cast<unsigned char>(data[0]);
         std::string autoLoadStr;
         switch (autoLoadByte)
@@ -38,22 +38,18 @@ namespace mpc::input::midi::legacy
         }
         result["autoLoad"] = autoLoadStr;
 
-        // preset name is next 16 bytes
         std::string name = data.substr(1, 16);
-        // trim trailing spaces
+
         name.erase(name.find_last_not_of(' ') + 1);
         result["name"] = name;
 
-        result["midiControllerDeviceName"] = ""; // unknown in legacy format
-        result["version"] = 0;                   // default
+        result["midiControllerDeviceName"] = "";
+        result["version"] = 0;
 
-        // parse bindings
         std::vector<json> bindings;
         size_t pos = 17;
         while (pos < data.size())
         {
-
-            // Check for extra labels first
             std::string label;
             bool isExtraLabel = false;
             if (pos + 10 <= data.size())
@@ -69,7 +65,6 @@ namespace mpc::input::midi::legacy
                 }
             }
 
-            // If not an extra label, use original space-terminated label logic
             if (!isExtraLabel)
             {
                 size_t end = data.find(' ', pos);
@@ -91,30 +86,40 @@ namespace mpc::input::midi::legacy
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
 
+            const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
+
             json binding;
-            binding["labelName"] = label;
+            binding["target"] = bestGuessTarget;
             binding["messageType"] = typeByte == 0 ? "CC" : "Note";
 
-            int midiChannel = static_cast<signed char>(channelByte); // -1..15
+            int midiChannel = static_cast<signed char>(channelByte);
             binding["midiChannelIndex"] = midiChannel;
 
             int midiNumber = static_cast<signed char>(numberByte);
             if (midiNumber == -1)
             {
                 binding["enabled"] = false;
-                binding["midiNumber"] = 0; // placeholder
-                binding["midiValue"] = 0;  // placeholder
+                binding["midiNumber"] = 0;
+                binding["midiValue"] = 0;
             }
             else
             {
                 binding["enabled"] = true;
                 binding["midiNumber"] = midiNumber;
-                // legacy format doesn't have CC value, behaviour was assumed to
-                // like "all", so we set it to -1
                 binding["midiValue"] = -1;
             }
 
-            bindings.push_back(binding);
+            if (bestGuessTarget == "hardware:datawheel")
+            {
+                binding["target"] = "hardware:data-wheel:negative";
+                bindings.push_back(binding);
+                binding["target"] = "hardware:data-wheel:positive";
+                bindings.push_back(binding);
+            }
+            else
+            {
+                bindings.push_back(binding);
+            }
         }
 
         result["bindings"] = bindings;

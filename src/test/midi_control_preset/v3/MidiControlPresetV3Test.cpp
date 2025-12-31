@@ -130,7 +130,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(restored.getVersion() == CURRENT_PRESET_VERSION);
     REQUIRE(restored.getName() == "RoundTrip");
     REQUIRE(restored.getAutoLoad() == "Ask");
-    REQUIRE(restored.getBindings().size() == 67);
+    REQUIRE(restored.getBindings().size() == 74);
 }
 
 TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
