@@ -54,8 +54,8 @@ namespace mpc::input::midi::legacy
             bool isExtraLabel = false;
             if (pos + 10 <= data.size())
             {
-                std::string potentialExtra = data.substr(pos, 9);
-                if (potentialExtra.size() == 9 && potentialExtra[0] >= '0' &&
+                if (std::string potentialExtra = data.substr(pos, 9);
+                    potentialExtra.size() == 9 && potentialExtra[0] >= '0' &&
                     potentialExtra[0] <= '9' &&
                     potentialExtra.substr(1, 8) == " (extra)")
                 {
@@ -95,8 +95,8 @@ namespace mpc::input::midi::legacy
             int midiChannel = static_cast<signed char>(channelByte);
             binding["midiChannelIndex"] = midiChannel;
 
-            int midiNumber = static_cast<signed char>(numberByte);
-            if (midiNumber == -1)
+            if (int midiNumber = static_cast<signed char>(numberByte);
+                midiNumber == -1)
             {
                 binding["enabled"] = false;
                 binding["midiNumber"] = 0;

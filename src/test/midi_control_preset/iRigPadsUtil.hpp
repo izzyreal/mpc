@@ -96,8 +96,8 @@ inline void checkIRigPadsPreset(const json &preset)
 
     for (const auto &binding : preset["bindings"])
     {
-        std::string target = binding["target"].get<std::string>();
-        if (!expected.count(target))
+        if (auto target = binding["target"].get<std::string>();
+            !expected.count(target))
         {
             if (binding["enabled"].get<bool>())
             {
