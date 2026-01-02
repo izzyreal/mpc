@@ -4,6 +4,9 @@
 
 #include <nlohmann/json.hpp>
 
+#include <unordered_map>
+#include <unordered_set>
+
 using mpc::hardware::componentIdToLabel;
 using nlohmann::json;
 
@@ -142,11 +145,23 @@ inline void checkIRigPadsPreset(const json &preset)
         getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC)};
 
     std::vector<std::pair<std::string, json>> actual;
+    std::unordered_map<std::string, int> seen;
 
     for (const auto &binding : preset["bindings"])
     {
-        actual.emplace_back(binding["target"].get<std::string>(), binding);
+        const std::string target = binding["target"].get<std::string>();
+        int &count = seen[target];
+        count++;
+        if (count > 1)
+        {
+            throw std::runtime_error(
+                "Duplicate binding for target '" + target +
+                "': occurrence " + std::to_string(count));
+        }
+        actual.emplace_back(target, binding);
     }
+
+    std::unordered_set<std::string> matched;
 
     for (const auto &kv : expected)
     {
@@ -157,65 +172,46 @@ inline void checkIRigPadsPreset(const json &preset)
         for (auto &p : actual)
         {
             if (p.first != target)
-            {
                 continue;
-            }
+
             const json &b = p.second;
             if (b["enabled"].get<bool>() != spec.enabled)
-            {
                 continue;
-            }
             if (b["messageType"] != spec.type)
-            {
                 continue;
-            }
             if (b["midiNumber"].get<int>() != spec.number)
-            {
                 continue;
-            }
             if (b["midiChannelIndex"].get<int>() != spec.channel)
-            {
                 continue;
-            }
+
             if (spec.type == CcStr)
             {
                 if (!b.contains("midiValue"))
-                {
                     continue;
-                }
-                int actualVal = b["midiValue"].get<int>();
-                if (spec.value == -1 && actualVal != -1)
-                {
+                if (spec.value == -1 && b["midiValue"].get<int>() != -1)
                     continue;
-                }
             }
-            else
+            else if (b.contains("midiValue"))
             {
-                if (b.contains("midiValue"))
-                {
-                    continue;
-                }
+                continue;
             }
+
             found = true;
+            matched.insert(target);
             break;
         }
 
         if (!found)
         {
-            throw std::runtime_error("No matching binding for: " + target);
+            throw std::runtime_error("Missing binding: " + target);
         }
     }
 
-    for (const auto &binding : preset["bindings"])
+    for (const auto &[target, binding] : actual)
     {
-        if (auto target = binding["target"].get<std::string>();
-            !expected.count(target))
+        if (!expected.count(target))
         {
-            if (binding["enabled"].get<bool>())
-            {
-                throw std::runtime_error("Unexpected binding enabled: " +
-                                         target);
-            }
+            throw std::runtime_error("Unexpected binding: " + target);
         }
     }
 }

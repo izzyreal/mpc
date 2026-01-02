@@ -14,6 +14,20 @@ namespace mpc::input::midi::legacy
 {
     static json parseLegacyMidiControlPresetV1(const std::string &data)
     {
+        struct LegacyDatawheelBinding
+        {
+            std::string label;
+            json binding;
+        };
+
+        std::vector<LegacyDatawheelBinding> datawheelBindings;
+        bool hasDatawheelUp = false;
+        bool hasDatawheelDown = false;
+        bool hasDatawheel = false;
+        bool datawheelUpEnabled = false;
+        bool datawheelDownEnabled = false;
+        bool datawheelEnabled = false;
+
         json result;
 
         if (data.size() < 17)
@@ -44,10 +58,12 @@ namespace mpc::input::midi::legacy
 
         name.erase(name.find_last_not_of(' ') + 1);
         result["name"] = mpc::StrUtil::replaceAll(name, '_', " ");
-        result["midiControllerDeviceName"] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result["midiControllerDeviceName"] =
+            mpc::StrUtil::replaceAll(name, '_', " ");
         result["version"] = 0;
 
         std::vector<json> bindings;
+
         size_t pos = 17;
         while (pos < data.size())
         {
@@ -87,11 +103,11 @@ namespace mpc::input::midi::legacy
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
 
-//            printf("=================\n");
-//            printf("label: %s\n", label.c_str());
-//            printf("type: %i\n", typeByte);
-//            printf("channel: %i\n", channelByte);
-//            printf("number: %i\n", numberByte);
+            //            printf("=================\n");
+            //            printf("label: %s\n", label.c_str());
+            //            printf("type: %i\n", typeByte);
+            //            printf("channel: %i\n", channelByte);
+            //            printf("number: %i\n", numberByte);
 
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
@@ -103,7 +119,6 @@ namespace mpc::input::midi::legacy
             binding["midiChannelIndex"] = midiChannel;
 
             int midiNumber = static_cast<signed char>(numberByte);
-
             if (midiNumber == -1)
             {
                 binding["midiNumber"] = 0;
@@ -120,16 +135,53 @@ namespace mpc::input::midi::legacy
                 binding["midiValue"] = -1;
             }
 
-            if (bestGuessTarget == "hardware:datawheel")
+            if (label.substr(0, 9) == "datawheel")
             {
-                binding["target"] = "hardware:data-wheel:negative";
-                bindings.push_back(binding);
-                binding["target"] = "hardware:data-wheel:positive";
-                bindings.push_back(binding);
+                datawheelBindings.emplace_back(
+                    LegacyDatawheelBinding{label, binding});
+                if (label == "datawheel")
+                {
+                    hasDatawheel = true;
+                    datawheelEnabled = midiNumber != -1;
+                }
+                else if (label == "datawheel-up")
+                {
+                    hasDatawheelUp = true;
+                    datawheelUpEnabled = midiNumber != -1;
+                }
+                else if (label == "datawheel-down")
+                {
+                    hasDatawheelDown = true;
+                    datawheelDownEnabled = midiNumber != -1;
+                }
+                continue;
             }
-            else
+
+            bindings.push_back(binding);
+        }
+
+        if (hasDatawheel && !datawheelEnabled && datawheelUpEnabled &&
+            datawheelDownEnabled)
+        {
+            for (auto &b : datawheelBindings)
             {
-                bindings.push_back(binding);
+                if (b.label == "datawheel-down" || b.label == "datawheel-up")
+                {
+                    bindings.push_back(b.binding);
+                }
+            }
+        }
+        else if (datawheelEnabled)
+        {
+            for (auto &b : datawheelBindings)
+            {
+                if (b.label == "datawheel")
+                {
+                    b.binding["target"] = "hardware:data-wheel:negative";
+                    bindings.push_back(b.binding);
+                    b.binding["target"] = "hardware:data-wheel:positive";
+                    bindings.push_back(b.binding);
+                }
             }
         }
 
