@@ -20,14 +20,17 @@ inline std::string load_resource(const std::string &path)
     return std::string(file.begin(), file.end());
 }
 
-inline json_validator make_validator()
+inline json load_schema()
 {
-    auto schemaData = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/vmpc2000xl_midi_control_preset.schema.v3.json");
-    const json schemaJson = json::parse(schemaData);
-
-    json_validator validator;
-    validator.set_root_schema(schemaJson);
-
-    return validator;
+    auto schemaData = mpc::MpcResourceUtil::get_resource_data(
+        "midicontrolpresets/vmpc2000xl_midi_control_preset.schema.v3.json");
+    return json::parse(schemaData);
 }
 
+inline json_validator make_validator()
+{
+    const json schemaJson = load_schema();
+    json_validator validator;
+    validator.set_root_schema(schemaJson);
+    return validator;
+}

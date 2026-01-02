@@ -1,5 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 
 #include "TestUtil.hpp"
 #include <nlohmann/json.hpp>
@@ -22,6 +23,8 @@ TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema",
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV2(data);
+
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
 
     try
     {
@@ -55,6 +58,8 @@ TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema",
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV2(data);
+
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
 
     try
     {

@@ -1,5 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 
 #include "TestUtil.hpp"
 #include <nlohmann/json.hpp>
@@ -19,6 +20,8 @@ TEST_CASE("Legacy preset V1 conversion iRig PADS",
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
+
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
 
     try
     {
@@ -53,6 +56,8 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly",
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
+
+    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
 
     try
     {

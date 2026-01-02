@@ -53,6 +53,13 @@ inline void checkIRigPadsPreset(const json &preset)
                                            AllChannels, AllCcValues, false}};
     };
 
+    auto getDisabledSeqBinding =
+        [&](const std::string seqTarget) -> std::pair<std::string, BindingSpec>
+    {
+        return {"sequencer:" + seqTarget, BindingSpec{CcStr, DefaultMidiNumber,
+                                           AllChannels, AllCcValues, false}};
+    };
+
     const std::unordered_map<std::string, BindingSpec> expected = {
         {getTarget(Id::PAD_1_OR_AB),
          {NoteStr, 35, std::nullopt, AllChannels, true}},
@@ -142,7 +149,15 @@ inline void checkIRigPadsPreset(const json &preset)
         getDisabledBinding(Id::NUM_6_OR_PROGRAM),
         getDisabledBinding(Id::NUM_7_OR_MIXER),
         getDisabledBinding(Id::NUM_8_OR_OTHER),
-        getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC)};
+        getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC),
+        getDisabledSeqBinding("play"),
+        getDisabledSeqBinding("rec"),
+        getDisabledSeqBinding("stop"),
+        getDisabledSeqBinding("rec-plus-play"),
+        getDisabledSeqBinding("odub-plus-play"),
+        getDisabledSeqBinding("rec-punch"),
+        getDisabledSeqBinding("odub-punch"),
+    };
 
     std::vector<std::pair<std::string, json>> actual;
     std::unordered_map<std::string, int> seen;

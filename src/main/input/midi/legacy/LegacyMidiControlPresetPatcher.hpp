@@ -112,9 +112,6 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        std::regex extraRegex(R"(^([0-9]).*extra.*$)");
-        std::regex legacyExtraRegex(R"(^([1-9])\s*\(extra\)$)");
-
         json sanitized = json::array();
         for (auto &binding : preset["bindings"])
         {
@@ -123,21 +120,11 @@ namespace mpc::input::midi::legacy
             {
                 continue;
             }
-            std::string target = binding["target"].get<std::string>();
 
-            std::smatch m;
-            if (std::regex_match(target, m, legacyExtraRegex))
-            {
-                target = m[1].str() + "_extra";
-            }
-            else if (std::regex_match(target, m, extraRegex))
-            {
-                target = m[1].str() + "_extra";
-            }
-
-            binding["target"] = target;
+            binding["target"] = binding["target"].get<std::string>();
             sanitized.push_back(binding);
         }
+
         preset["bindings"] = sanitized;
 
         std::unordered_map<std::string, json *> bindingMap;
