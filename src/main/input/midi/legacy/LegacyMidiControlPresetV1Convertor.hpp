@@ -21,8 +21,6 @@ namespace mpc::input::midi::legacy
         };
 
         std::vector<LegacyDatawheelBinding> datawheelBindings;
-        bool hasDatawheelUp = false;
-        bool hasDatawheelDown = false;
         bool hasDatawheel = false;
         bool datawheelUpEnabled = false;
         bool datawheelDownEnabled = false;
@@ -163,12 +161,10 @@ namespace mpc::input::midi::legacy
                 }
                 else if (label == "datawheel-up")
                 {
-                    hasDatawheelUp = true;
                     datawheelUpEnabled = midiNumber != -1;
                 }
                 else if (label == "datawheel-down")
                 {
-                    hasDatawheelDown = true;
                     datawheelDownEnabled = midiNumber != -1;
                 }
                 continue;

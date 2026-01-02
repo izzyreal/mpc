@@ -50,6 +50,7 @@ namespace mpc::input::midi::legacy
         if (label.substr(0, 1) == "7") return "hardware:7-or-mixer";
         if (label.substr(0, 1) == "8") return "hardware:8-or-other";
         if (label.substr(0, 1) == "9") return "hardware:9-or-midi-sync";
+        if (label.substr(0, 5) == "shift") return "hardware:shift";
 
         return "hardware:" + label;
     }
