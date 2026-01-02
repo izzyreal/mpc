@@ -116,6 +116,13 @@ namespace mpc::input::midi::legacy
             binding["messageType"] = typeByte == 0 ? "CC" : "Note";
 
             int midiChannel = static_cast<signed char>(channelByte);
+
+            if (midiChannel > 15)
+            {
+                // The file is bound to be corrupted from here on.
+                break;
+            }
+
             binding["midiChannelIndex"] = midiChannel;
 
             int midiNumber = static_cast<signed char>(numberByte);
@@ -133,6 +140,16 @@ namespace mpc::input::midi::legacy
             if (typeByte == 0)
             {
                 binding["midiValue"] = -1;
+            }
+
+            if (label.find("extra") != std::string::npos && midiNumber == -1)
+            {
+                continue;
+            }
+
+            if (label.find("shift_#") != std::string::npos && midiNumber == -1)
+            {
+                continue;
             }
 
             if (label.substr(0, 9) == "datawheel")
