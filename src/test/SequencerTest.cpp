@@ -308,7 +308,7 @@ TEST_CASE("Undo", "[sequencer]")
     server->start();
 
     sequencer->getTransport()->recFromStart();
-    stateManager->drainQueue();
+    mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
 
     const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
 
