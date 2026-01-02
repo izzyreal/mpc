@@ -1,13 +1,13 @@
 #include "catch2/catch_test_macros.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
+#include "input/midi/MidiControlPresetUtil.hpp"
+#include "midi_control_preset/TestUtil.hpp"
 
-#include "TestUtil.hpp"
 #include <nlohmann/json.hpp>
 
 #include <string>
 #include <iostream>
-#include <set>
 
 #include "iRigPadsUtil.hpp"
 

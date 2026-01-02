@@ -1,4 +1,7 @@
 #pragma once
+
+#include "input/midi/MidiControlPresetUtil.hpp"
+
 #include <string>
 #include <vector>
 #include <regex>
@@ -178,84 +181,7 @@ namespace mpc::input::midi
 
         void setBindings(const std::vector<Binding> &b)
         {
-            static const std::set<std::string> availableTargets = {
-                "hardware:cursor-left-or-digit",
-                "hardware:cursor-right-or-digit",
-                "hardware:cursor-up",
-                "hardware:cursor-down",
-                "hardware:rec",
-                "hardware:overdub",
-                "hardware:stop",
-                "hardware:play",
-                "hardware:play-start",
-                "hardware:main-screen",
-                "hardware:prev-step-or-event",
-                "hardware:next-step-or-event",
-                "hardware:go-to",
-                "hardware:prev-bar-or-start",
-                "hardware:next-bar-or-end",
-                "hardware:tap-or-note-repeat",
-                "hardware:next-seq",
-                "hardware:track-mute",
-                "hardware:open-window",
-                "hardware:full-level-or-case-switch",
-                "hardware:sixteen-levels-or-space",
-                "hardware:f1",
-                "hardware:f2",
-                "hardware:f3",
-                "hardware:f4",
-                "hardware:f5",
-                "hardware:f6",
-                "hardware:shift",
-                "hardware:enter-or-save",
-                "hardware:undo-seq",
-                "hardware:erase",
-                "hardware:after-or-assign",
-                "hardware:bank-a",
-                "hardware:bank-b",
-                "hardware:bank-c",
-                "hardware:bank-d",
-                "hardware:0-or-vmpc",
-                "hardware:1-or-song",
-                "hardware:2-or-misc",
-                "hardware:3-or-load",
-                "hardware:4-or-sample",
-                "hardware:5-or-trim",
-                "hardware:6-or-program",
-                "hardware:7-or-mixer",
-                "hardware:8-or-other",
-                "hardware:9-or-midi-sync",
-                "hardware:pad-1-or-ab",
-                "hardware:pad-2-or-cd",
-                "hardware:pad-3-or-ef",
-                "hardware:pad-4-or-gh",
-                "hardware:pad-5-or-ij",
-                "hardware:pad-6-or-kl",
-                "hardware:pad-7-or-mn",
-                "hardware:pad-8-or-op",
-                "hardware:pad-9-or-qr",
-                "hardware:pad-10-or-st",
-                "hardware:pad-11-or-uv",
-                "hardware:pad-12-or-wx",
-                "hardware:pad-13-or-yz",
-                "hardware:pad-14-or-ampersand-octothorpe",
-                "hardware:pad-15-or-hyphen-eclamation-mark",
-                "hardware:pad-16-or-parentheses",
-                "hardware:data-wheel:negative",
-                "hardware:data-wheel:positive",
-                "hardware:slider",
-                "hardware:rec-gain",
-                "hardware:main-volume",
-
-                "sequencer:play",
-                "sequencer:rec",
-                "sequencer:stop",
-                "sequencer:rec-plus-play",
-                "sequencer:odub-plus-play",
-                "sequencer:rec-punch",
-                "sequencer:odub-punch"
-            };
-
+            auto availableTargets = load_available_targets();
             std::set<std::string> targets;
 
             for (const auto &bind : b)

@@ -1,6 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
+#include "input/midi/MidiControlPresetUtil.hpp"
 
 #include "TestUtil.hpp"
 #include <nlohmann/json.hpp>

@@ -1,5 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
+
 #include "input/midi/MidiControlPresetV3.hpp"
+#include "input/midi/MidiControlPresetUtil.hpp"
+
 #include <nlohmann/json.hpp>
 #include <cmrc/cmrc.hpp>
 #include <set>
@@ -9,41 +12,6 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc::input::midi;
 using nlohmann::json;
-
-inline std::string load_resource(const std::string &path)
-{
-    auto fs = cmrc::mpctest::get_filesystem();
-    auto file = fs.open(path);
-    return std::string(file.begin(), file.end());
-}
-
-inline std::set<std::string> load_available_targets()
-{
-    json schema = json::parse(
-        load_resource("test/MidiControlPreset/"
-                      "vmpc2000xl_midi_control_preset.schema.v3.json"));
-
-    if (!schema.contains("$defs") || !schema["$defs"].contains("binding") ||
-        !schema["$defs"]["binding"].contains("properties") ||
-        !schema["$defs"]["binding"]["properties"].contains("target") ||
-        !schema["$defs"]["binding"]["properties"]["target"].contains("enum"))
-    {
-        throw std::runtime_error(
-            "Schema missing target enum at expected path");
-    }
-
-    const auto &enumArray =
-        schema["$defs"]["binding"]["properties"]["target"]["enum"];
-    std::set<std::string> targets;
-    for (const auto &v : enumArray)
-    {
-        targets.insert(v.get<std::string>());
-    }
-
-    return targets;
-}
-
-// --- TESTS ---
 
 TEST_CASE("MidiControlPresetV3 rejects invalid preset names",
           "[MidiControlPresetV3]")
