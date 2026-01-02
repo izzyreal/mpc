@@ -38,6 +38,8 @@ namespace mpc::input::midi::legacy
         if (label == "sixteen-levels") return "hardware:sixteen-levels-or-space";
         if (label == "enter") return "hardware:enter-or-save";
         if (label == "after") return "hardware:after-or-assign";
+        if (label == "rec-gain") return "hardware:rec-gain-pot";
+        if (label == "main-volume") return "hardware:main-volume-pot";
         if (label.substr(0, 1) == "0") return "hardware:0-or-vmpc";
         if (label.substr(0, 1) == "1") return "hardware:1-or-song";
         if (label.substr(0, 1) == "2") return "hardware:2-or-misc";

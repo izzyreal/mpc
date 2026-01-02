@@ -2,9 +2,7 @@
 #include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
 
 #include "TestUtil.hpp"
-#include "input/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 #include <nlohmann/json.hpp>
-#include <nlohmann/json-schema.hpp>
 
 #include <string>
 #include <iostream>
@@ -13,19 +11,14 @@
 #include "iRigPadsUtil.hpp"
 
 using nlohmann::json;
-using nlohmann::json_schema::json_validator;
 
-TEST_CASE("Legacy preset V1 conversion validates against new schema",
-          "[legacy-midi-control-preset-v1-conversion]")
+TEST_CASE("Legacy preset V1 conversion iRig PADS",
+          "[legacy-midi-control-preset-v1-convertor]")
 {
     auto data = load_resource("test/LegacyMidiControlPresetV1/iRig_PADS.vmp");
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
-    json schemaJson = json::parse(
-        load_resource("test/MidiControlPreset/"
-                      "vmpc2000xl_midi_control_preset.schema.v3.json"));
-    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     auto validator = make_validator();
 
@@ -38,7 +31,7 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema",
     {
         std::cerr << "Schema validation failed:\n" << e.what() << "\n";
 
-        // std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+//         std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
 
         FAIL("Converted preset did not pass schema validation.");
     }
@@ -52,6 +45,7 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema",
     catch (const std::exception &e)
     {
         std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+                 std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
         FAIL("Converted preset did not pass consistency check.");
     }
 }
@@ -105,9 +99,6 @@ TEST_CASE(
 
     json convertedPreset =
         mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
-    json schemaJson = json::parse(
-        load_resource("test/MidiControlPreset/"
-                      "vmpc2000xl_midi_control_preset.schema.v3.json"));
 
     std::vector<std::pair<std::string, json>> expectedBindings = {
         {"hardware:pad-1-or-ab",

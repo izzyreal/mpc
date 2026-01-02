@@ -134,8 +134,8 @@
             "hardware:data-wheel:negative",
             "hardware:data-wheel:positive",
             "hardware:slider",
-            "hardware:rec-gain",
-            "hardware:main-volume",
+            "hardware:rec-gain-pot",
+            "hardware:main-volume-pot",
 
             "sequencer:play",
             "sequencer:rec",

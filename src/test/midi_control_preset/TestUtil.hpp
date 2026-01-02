@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MpcResourceUtil.hpp"
+
 #include <string>
 
 #include <cmrc/cmrc.hpp>
@@ -20,9 +22,8 @@ inline std::string load_resource(const std::string &path)
 
 inline json_validator make_validator()
 {
-    const json schemaJson = json::parse(
-        load_resource("test/MidiControlPreset/"
-                      "vmpc2000xl_midi_control_preset.schema.v3.json"));
+    auto schemaData = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/vmpc2000xl_midi_control_preset.schema.v3.json");
+    const json schemaJson = json::parse(schemaData);
 
     json_validator validator;
     validator.set_root_schema(schemaJson);

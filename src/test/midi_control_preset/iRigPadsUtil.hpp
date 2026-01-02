@@ -11,7 +11,9 @@ inline void checkIRigPadsPreset(const json &preset)
 {
     if (preset["name"] != "iRig PADS")
     {
-        throw std::runtime_error("Preset name is not 'iRig PADS'");
+        throw std::runtime_error("Preset name is '" +
+                                 preset["name"].get<std::string>() +
+                                 "' and not 'iRig PADS'");
     }
     if (preset["midiControllerDeviceName"] != "iRig PADS")
     {
@@ -41,9 +43,11 @@ inline void checkIRigPadsPreset(const json &preset)
         return "hardware:" + componentIdToLabel.at(id);
     };
 
-    auto getDisabledBinding = [&](const Id id) -> std::pair<std::string, BindingSpec>
+    auto getDisabledBinding =
+        [&](const Id id) -> std::pair<std::string, BindingSpec>
     {
-        return {getTarget(id), BindingSpec{CcStr, DefaultMidiNumber, AllChannels, AllCcValues, false}};
+        return {getTarget(id), BindingSpec{CcStr, DefaultMidiNumber,
+                                           AllChannels, AllCcValues, false}};
     };
 
     const std::unordered_map<std::string, BindingSpec> expected = {
@@ -88,6 +92,10 @@ inline void checkIRigPadsPreset(const json &preset)
          {CcStr, 11, AllCcValues, AllChannels, true}},
         {getTarget(Id::MAIN_VOLUME_POT),
          {CcStr, 10, AllCcValues, AllChannels, true}},
+        {getTarget(Id::FULL_LEVEL_OR_CASE_SWITCH),
+         {CcStr, 20, AllCcValues, AllChannels, true}},
+        {getTarget(Id::SIXTEEN_LEVELS_OR_SPACE),
+         {CcStr, 21, AllCcValues, AllChannels, true}},
         getDisabledBinding(Id::CURSOR_LEFT_OR_DIGIT),
         getDisabledBinding(Id::CURSOR_RIGHT_OR_DIGIT),
         getDisabledBinding(Id::CURSOR_UP),
@@ -107,8 +115,6 @@ inline void checkIRigPadsPreset(const json &preset)
         getDisabledBinding(Id::NEXT_SEQ),
         getDisabledBinding(Id::TRACK_MUTE),
         getDisabledBinding(Id::OPEN_WINDOW),
-        getDisabledBinding(Id::FULL_LEVEL_OR_CASE_SWITCH),
-        getDisabledBinding(Id::SIXTEEN_LEVELS_OR_SPACE),
         getDisabledBinding(Id::F1),
         getDisabledBinding(Id::F2),
         getDisabledBinding(Id::F3),
@@ -133,8 +139,7 @@ inline void checkIRigPadsPreset(const json &preset)
         getDisabledBinding(Id::NUM_6_OR_PROGRAM),
         getDisabledBinding(Id::NUM_7_OR_MIXER),
         getDisabledBinding(Id::NUM_8_OR_OTHER),
-        getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC)
-    };
+        getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC)};
 
     std::vector<std::pair<std::string, json>> actual;
 

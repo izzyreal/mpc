@@ -2,6 +2,8 @@
 
 #include "LegacyMidiControlPresetUtil.hpp"
 
+#include "StrUtil.hpp"
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
@@ -41,9 +43,8 @@ namespace mpc::input::midi::legacy
         std::string name = data.substr(1, 16);
 
         name.erase(name.find_last_not_of(' ') + 1);
-        result["name"] = name;
-
-        result["midiControllerDeviceName"] = "";
+        result["name"] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result["midiControllerDeviceName"] = mpc::StrUtil::replaceAll(name, '_', " ");
         result["version"] = 0;
 
         std::vector<json> bindings;
@@ -86,11 +87,11 @@ namespace mpc::input::midi::legacy
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
 
-            printf("=================\n");
-            printf("label: %s\n", label.c_str());
-            printf("type: %i\n", typeByte);
-            printf("channel: %i\n", channelByte);
-            printf("number: %i\n", numberByte);
+//            printf("=================\n");
+//            printf("label: %s\n", label.c_str());
+//            printf("type: %i\n", typeByte);
+//            printf("channel: %i\n", channelByte);
+//            printf("number: %i\n", numberByte);
 
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
@@ -101,17 +102,21 @@ namespace mpc::input::midi::legacy
             int midiChannel = static_cast<signed char>(channelByte);
             binding["midiChannelIndex"] = midiChannel;
 
-            if (int midiNumber = static_cast<signed char>(numberByte);
-                midiNumber == -1)
+            int midiNumber = static_cast<signed char>(numberByte);
+
+            if (midiNumber == -1)
             {
-                binding["enabled"] = false;
                 binding["midiNumber"] = 0;
-                binding["midiValue"] = 0;
+                binding["enabled"] = false;
             }
             else
             {
-                binding["enabled"] = true;
                 binding["midiNumber"] = midiNumber;
+                binding["enabled"] = true;
+            }
+
+            if (typeByte == 0)
+            {
                 binding["midiValue"] = -1;
             }
 
