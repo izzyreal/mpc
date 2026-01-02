@@ -1,7 +1,10 @@
 #pragma once
 
+#include "hardware/ComponentId.hpp"
+
 #include <nlohmann/json.hpp>
 
+using mpc::hardware::componentIdToLabel;
 using nlohmann::json;
 
 inline void checkIRigPadsPreset(const json &preset)
@@ -15,42 +18,122 @@ inline void checkIRigPadsPreset(const json &preset)
         throw std::runtime_error("Device name is not 'iRig PADS'");
     }
 
+    static constexpr int AllChannels = -1;
+    static constexpr int AllCcValues = -1;
+    static constexpr int DefaultMidiNumber = 0;
+
     struct BindingSpec
     {
         std::string type;
         int number;
-        int value;
+        std::optional<int> value;
         int channel;
-        bool enabled = true;
+        bool enabled;
+    };
+
+    static const auto NoteStr = std::string("Note");
+    static const auto CcStr = std::string("CC");
+
+    using Id = mpc::hardware::ComponentId;
+
+    auto getTarget = [&](const Id id) -> std::string
+    {
+        return "hardware:" + componentIdToLabel.at(id);
+    };
+
+    auto getDisabledBinding = [&](const Id id) -> std::pair<std::string, BindingSpec>
+    {
+        return {getTarget(id), BindingSpec{CcStr, DefaultMidiNumber, AllChannels, AllCcValues, false}};
     };
 
     const std::unordered_map<std::string, BindingSpec> expected = {
-        {"hardware:pad-1-or-ab", {"Note", 35, 0, -1}},
-        {"hardware:pad-2-or-cd", {"Note", 36, 0, -1}},
-        {"hardware:pad-3-or-ef", {"Note", 38, 0, -1}},
-        {"hardware:pad-4-or-gh", {"Note", 40, 0, -1}},
-        {"hardware:pad-5-or-ij", {"Note", 37, 0, -1}},
-        {"hardware:pad-6-or-kl", {"Note", 39, 0, -1}},
-        {"hardware:pad-7-or-mn", {"Note", 42, 0, -1}},
-        {"hardware:pad-8-or-op", {"Note", 44, 0, -1}},
-        {"hardware:pad-9-or-qr", {"Note", 50, 0, -1}},
-        {"hardware:pad-10-or-st", {"Note", 45, 0, -1}},
-        {"hardware:pad-11-or-uv", {"Note", 41, 0, -1}},
-        {"hardware:pad-12-or-wx", {"Note", 46, 0, -1}},
-        {"hardware:pad-13-or-yz", {"Note", 51, 0, -1}},
-        {"hardware:pad-14-or-ampersand-octothorpe", {"Note", 53, 0, -1}},
-        {"hardware:pad-15-or-hyphen-eclamation-mark",
-         {"Note", 49, 0, -1}},
-        {"hardware:pad-16-or-parentheses", {"Note", 52, 0, -1}},
-        {"hardware:data-wheel:negative", {"CC", 7, -1, -1}},
-        {"hardware:data-wheel:positive", {"CC", 7, -1, -1}},
-        {"hardware:data-wheel:negative", {"CC", 7, -1, -1, false}},
-        {"hardware:data-wheel:positive", {"CC", 7, -1, -1, false}},
-        {"hardware:slider", {"CC", 1, -1, -1}},
-        {"hardware:rec-gain", {"CC", 11, -1, -1}},
-        {"hardware:main-volume", {"CC", 10, -1, -1}},
-        {"hardware:full-level-or-case-switch", {"CC", 20, -1, -1}},
-        {"hardware:sixteen-levels-or-space", {"CC", 21, -1, -1}},
+        {getTarget(Id::PAD_1_OR_AB),
+         {NoteStr, 35, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_2_OR_CD),
+         {NoteStr, 36, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_3_OR_EF),
+         {NoteStr, 38, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_4_OR_GH),
+         {NoteStr, 40, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_5_OR_IJ),
+         {NoteStr, 37, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_6_OR_KL),
+         {NoteStr, 39, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_7_OR_MN),
+         {NoteStr, 42, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_8_OR_OP),
+         {NoteStr, 44, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_9_OR_QR),
+         {NoteStr, 50, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_10_OR_ST),
+         {NoteStr, 45, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_11_OR_UV),
+         {NoteStr, 41, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_12_OR_WX),
+         {NoteStr, 46, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_13_OR_YZ),
+         {NoteStr, 51, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_14_OR_AMPERSAND_OCTOTHORPE),
+         {NoteStr, 53, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_15_OR_HYPHEN_EXCLAMATION_MARK),
+         {NoteStr, 49, std::nullopt, AllChannels, true}},
+        {getTarget(Id::PAD_16_OR_PARENTHESES),
+         {NoteStr, 52, std::nullopt, AllChannels, true}},
+        {getTarget(Id::DATA_WHEEL) + ":negative",
+         {CcStr, 7, AllCcValues, AllChannels, true}},
+        {getTarget(Id::DATA_WHEEL) + ":positive",
+         {CcStr, 7, AllCcValues, AllChannels, true}},
+        {getTarget(Id::SLIDER), {CcStr, 1, AllCcValues, AllChannels, true}},
+        {getTarget(Id::REC_GAIN_POT),
+         {CcStr, 11, AllCcValues, AllChannels, true}},
+        {getTarget(Id::MAIN_VOLUME_POT),
+         {CcStr, 10, AllCcValues, AllChannels, true}},
+        getDisabledBinding(Id::CURSOR_LEFT_OR_DIGIT),
+        getDisabledBinding(Id::CURSOR_RIGHT_OR_DIGIT),
+        getDisabledBinding(Id::CURSOR_UP),
+        getDisabledBinding(Id::CURSOR_DOWN),
+        getDisabledBinding(Id::REC),
+        getDisabledBinding(Id::OVERDUB),
+        getDisabledBinding(Id::STOP),
+        getDisabledBinding(Id::PLAY),
+        getDisabledBinding(Id::PLAY_START),
+        getDisabledBinding(Id::MAIN_SCREEN),
+        getDisabledBinding(Id::PREV_STEP_OR_EVENT),
+        getDisabledBinding(Id::NEXT_STEP_OR_EVENT),
+        getDisabledBinding(Id::GO_TO),
+        getDisabledBinding(Id::PREV_BAR_OR_START),
+        getDisabledBinding(Id::NEXT_BAR_OR_END),
+        getDisabledBinding(Id::TAP_TEMPO_OR_NOTE_REPEAT),
+        getDisabledBinding(Id::NEXT_SEQ),
+        getDisabledBinding(Id::TRACK_MUTE),
+        getDisabledBinding(Id::OPEN_WINDOW),
+        getDisabledBinding(Id::FULL_LEVEL_OR_CASE_SWITCH),
+        getDisabledBinding(Id::SIXTEEN_LEVELS_OR_SPACE),
+        getDisabledBinding(Id::F1),
+        getDisabledBinding(Id::F2),
+        getDisabledBinding(Id::F3),
+        getDisabledBinding(Id::F4),
+        getDisabledBinding(Id::F5),
+        getDisabledBinding(Id::F6),
+        getDisabledBinding(Id::SHIFT),
+        getDisabledBinding(Id::ENTER_OR_SAVE),
+        getDisabledBinding(Id::UNDO_SEQ),
+        getDisabledBinding(Id::ERASE),
+        getDisabledBinding(Id::AFTER_OR_ASSIGN),
+        getDisabledBinding(Id::BANK_A),
+        getDisabledBinding(Id::BANK_B),
+        getDisabledBinding(Id::BANK_C),
+        getDisabledBinding(Id::BANK_D),
+        getDisabledBinding(Id::NUM_0_OR_VMPC),
+        getDisabledBinding(Id::NUM_1_OR_SONG),
+        getDisabledBinding(Id::NUM_2_OR_MISC),
+        getDisabledBinding(Id::NUM_3_OR_LOAD),
+        getDisabledBinding(Id::NUM_4_OR_SAMPLE),
+        getDisabledBinding(Id::NUM_5_OR_TRIM),
+        getDisabledBinding(Id::NUM_6_OR_PROGRAM),
+        getDisabledBinding(Id::NUM_7_OR_MIXER),
+        getDisabledBinding(Id::NUM_8_OR_OTHER),
+        getDisabledBinding(Id::NUM_9_OR_MIDI_SYNC)
     };
 
     std::vector<std::pair<std::string, json>> actual;
@@ -68,21 +151,45 @@ inline void checkIRigPadsPreset(const json &preset)
 
         for (auto &p : actual)
         {
-            if (p.first != target) continue;
-            const json &b = p.second;
-            if (b["enabled"].get<bool>() != spec.enabled) continue;
-            if (b["messageType"] != spec.type) continue;
-            if (b["midiNumber"].get<int>() != spec.number) continue;
-            if (b["midiChannelIndex"].get<int>() != spec.channel) continue;
-            if (spec.type == "CC")
+            if (p.first != target)
             {
-                if (!b.contains("midiValue")) continue;
+                continue;
+            }
+            const json &b = p.second;
+            if (b["enabled"].get<bool>() != spec.enabled)
+            {
+                continue;
+            }
+            if (b["messageType"] != spec.type)
+            {
+                continue;
+            }
+            if (b["midiNumber"].get<int>() != spec.number)
+            {
+                continue;
+            }
+            if (b["midiChannelIndex"].get<int>() != spec.channel)
+            {
+                continue;
+            }
+            if (spec.type == CcStr)
+            {
+                if (!b.contains("midiValue"))
+                {
+                    continue;
+                }
                 int actualVal = b["midiValue"].get<int>();
-                if (spec.value == -1 && actualVal != -1) continue;
+                if (spec.value == -1 && actualVal != -1)
+                {
+                    continue;
+                }
             }
             else
             {
-                if (b.contains("midiValue")) continue;
+                if (b.contains("midiValue"))
+                {
+                    continue;
+                }
             }
             found = true;
             break;

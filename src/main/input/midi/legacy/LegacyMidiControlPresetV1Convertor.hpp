@@ -86,6 +86,12 @@ namespace mpc::input::midi::legacy
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
 
+            printf("=================\n");
+            printf("label: %s\n", label.c_str());
+            printf("type: %i\n", typeByte);
+            printf("channel: %i\n", channelByte);
+            printf("number: %i\n", numberByte);
+
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
             json binding;
