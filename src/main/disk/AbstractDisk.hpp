@@ -17,7 +17,7 @@ namespace mpc
 
 namespace mpc::input::midi::legacy
 {
-    class MidiControlPreset;
+    struct MidiControlPreset;
 }
 
 namespace mpc::lcdgui::screens::window

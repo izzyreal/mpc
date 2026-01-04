@@ -1,7 +1,9 @@
 #pragma once
 
-#include "ClientMidiFootswitchAssignmentController.hpp"
-#include "ClientMidiInputSynchronizationController.hpp"
+#include "controller/ClientMidiFootswitchAssignmentController.hpp"
+#include "controller/ClientMidiInputSynchronizationController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
+
 #include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "Observer.hpp"
@@ -91,6 +93,10 @@ namespace mpc::controller
 
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
             footswitchController;
+
+        std::shared_ptr<ClientExtendedMidiController>
+            extendedController;
+
         ClientMidiInputSynchronizationController syncController;
 
         std::weak_ptr<ClientHardwareEventController>
