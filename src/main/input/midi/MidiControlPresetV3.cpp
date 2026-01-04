@@ -162,7 +162,7 @@ void MidiControlPresetV3::setAutoLoad(const std::string &a)
 
 void MidiControlPresetV3::setBindings(const std::vector<Binding> &b)
 {
-    auto availableTargets = load_available_targets();
+    auto availableTargets = MidiControlPresetUtil::load_available_targets();
     std::set<std::string> targets;
 
     for (const auto &bind : b)

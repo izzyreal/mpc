@@ -12,6 +12,7 @@
 #include "iRigPadsUtil.hpp"
 
 using nlohmann::json;
+using namespace mpc::input::midi;
 
 TEST_CASE("Legacy preset V1 conversion iRig PADS",
           "[legacy-midi-control-preset-v1-convertor]")
@@ -19,13 +20,13 @@ TEST_CASE("Legacy preset V1 conversion iRig PADS",
     auto data = load_resource("test/LegacyMidiControlPresetV1/iRig_PADS.vmp");
 
     json convertedPreset =
-        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        legacy::parseLegacyMidiControlPresetV1(data);
 
-    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
+    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
 
     try
     {
-        make_validator().validate(convertedPreset);
+        MidiControlPresetUtil::make_validator().validate(convertedPreset);
         SUCCEED("Converted preset passed schema validation.");
     }
     catch (const std::exception &e)
@@ -55,13 +56,13 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly",
         "test/LegacyMidiControlPresetV1/erroneous_extra_first_run.vmp");
 
     json convertedPreset =
-        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        legacy::parseLegacyMidiControlPresetV1(data);
 
-    mpc::input::midi::legacy::patchLegacyPreset(convertedPreset, load_schema());
+    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
 
     try
     {
-        make_validator().validate(convertedPreset);
+        MidiControlPresetUtil::make_validator().validate(convertedPreset);
         SUCCEED("Converted preset passed schema validation.");
     }
     catch (const std::exception &e)
@@ -79,11 +80,11 @@ TEST_CASE(
         "test/LegacyMidiControlPresetV1/erroneous_extra_second_run.vmp");
 
     json convertedPreset =
-        mpc::input::midi::legacy::parseLegacyMidiControlPresetV1(data);
+        legacy::parseLegacyMidiControlPresetV1(data);
 
     try
     {
-        make_validator().validate(convertedPreset);
+        MidiControlPresetUtil::make_validator().validate(convertedPreset);
         SUCCEED("Converted preset passed schema validation.");
     }
     catch (const std::exception &e)

@@ -51,7 +51,7 @@ TEST_CASE("MidiControlPresetV3 accepts correct binding target set",
           "[MidiControlPresetV3]")
 {
     MidiControlPresetV3 preset;
-    auto targets = load_available_targets();
+    auto targets = MidiControlPresetUtil::load_available_targets();
     std::vector<Binding> b;
     b.reserve(targets.size());
 
@@ -76,7 +76,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     preset.setName("RoundTrip");
     preset.setAutoLoad("Ask");
 
-    auto targets = load_available_targets();
+    auto targets = MidiControlPresetUtil::load_available_targets();
     std::vector<Binding> b;
     b.reserve(targets.size());
     for (auto &lbl : targets)
@@ -143,7 +143,7 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
     preset.setAutoLoad("Yes");
     preset.setMidiControllerDeviceName("MPK Mini Plus");
 
-    auto targets = load_available_targets();
+    auto targets = MidiControlPresetUtil::load_available_targets();
     std::vector<Binding> b;
     for (auto &lbl : targets)
     {

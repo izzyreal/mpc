@@ -2,6 +2,8 @@
 
 #include "input/midi/MidiControlPresetV3.hpp"
 
+#include <memory>
+
 namespace mpc::controller
 {
     class ClientExtendedMidiController
@@ -10,6 +12,6 @@ namespace mpc::controller
         ClientExtendedMidiController();
 
     private:
-        std::unique_ptr<input::midi::MidiControlPresetV3> activePreset;
+        std::shared_ptr<input::midi::MidiControlPresetV3> activePreset;
     };
 }
