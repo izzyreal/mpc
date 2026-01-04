@@ -24,15 +24,12 @@ json_validator MidiControlPresetUtil::make_validator()
 std::set<std::string> MidiControlPresetUtil::load_available_targets()
 {
     auto schema = load_schema();
-    if (!schema.contains("$defs") ||
-        !schema["$defs"].contains("binding") ||
+    if (!schema.contains("$defs") || !schema["$defs"].contains("binding") ||
         !schema["$defs"]["binding"].contains("properties") ||
         !schema["$defs"]["binding"]["properties"].contains("target") ||
-        !schema["$defs"]["binding"]["properties"]["target"].contains(
-            "enum"))
+        !schema["$defs"]["binding"]["properties"]["target"].contains("enum"))
     {
-        throw std::runtime_error(
-            "Schema missing target enum at expected path");
+        throw std::runtime_error("Schema missing target enum at expected path");
     }
 
     const auto &enumArray =
@@ -49,5 +46,4 @@ std::set<std::string> MidiControlPresetUtil::load_available_targets()
 void MidiControlPresetUtil::resetMidiControlPreset(
     std::shared_ptr<mpc::input::midi::MidiControlPresetV3>)
 {
-
 }

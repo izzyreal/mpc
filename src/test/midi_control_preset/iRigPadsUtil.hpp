@@ -56,8 +56,9 @@ inline void checkIRigPadsPreset(const json &preset)
     auto getDisabledSeqBinding =
         [&](const std::string seqTarget) -> std::pair<std::string, BindingSpec>
     {
-        return {"sequencer:" + seqTarget, BindingSpec{CcStr, DefaultMidiNumber,
-                                           AllChannels, AllCcValues, false}};
+        return {"sequencer:" + seqTarget,
+                BindingSpec{CcStr, DefaultMidiNumber, AllChannels, AllCcValues,
+                            false}};
     };
 
     const std::unordered_map<std::string, BindingSpec> expected = {
@@ -169,9 +170,8 @@ inline void checkIRigPadsPreset(const json &preset)
         count++;
         if (count > 1)
         {
-            throw std::runtime_error(
-                "Duplicate binding for target '" + target +
-                "': occurrence " + std::to_string(count));
+            throw std::runtime_error("Duplicate binding for target '" + target +
+                                     "': occurrence " + std::to_string(count));
         }
         actual.emplace_back(target, binding);
     }
@@ -187,24 +187,38 @@ inline void checkIRigPadsPreset(const json &preset)
         for (auto &p : actual)
         {
             if (p.first != target)
+            {
                 continue;
+            }
 
             const json &b = p.second;
             if (b["enabled"].get<bool>() != spec.enabled)
+            {
                 continue;
+            }
             if (b["messageType"] != spec.type)
+            {
                 continue;
+            }
             if (b["midiNumber"].get<int>() != spec.number)
+            {
                 continue;
+            }
             if (b["midiChannelIndex"].get<int>() != spec.channel)
+            {
                 continue;
+            }
 
             if (spec.type == CcStr)
             {
                 if (!b.contains("midiValue"))
+                {
                     continue;
+                }
                 if (spec.value == -1 && b["midiValue"].get<int>() != -1)
+                {
                     continue;
+                }
             }
             else if (b.contains("midiValue"))
             {

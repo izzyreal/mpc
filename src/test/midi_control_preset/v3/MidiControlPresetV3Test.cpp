@@ -115,7 +115,7 @@ TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
 TEST_CASE("Binding::from_json enforces midiValue rules",
           "[MidiControlPresetV3]")
 {
-    json validCC = {{"target", "left"},   {"messageType", "CC"},
+    json validCC = {{"target", "left"},      {"messageType", "CC"},
                     {"midiNumber", 10},      {"midiValue", 20},
                     {"midiChannelIndex", 0}, {"enabled", true}};
     json invalidCC = validCC;
@@ -168,19 +168,16 @@ TEST_CASE("MidiControlPresetV3 rejects unknown JSON keys",
     std::vector<json> bindings(81);
     for (int i = 0; i < 81; ++i)
     {
-        bindings[i] = {{"target", "left"},
-                       {"messageType", "CC"}, {"midiNumber", 0},
-                       {"midiValue", 0},      {"midiChannelIndex", 0},
-                       {"enabled", false}};
+        bindings[i] = {{"target", "left"},      {"messageType", "CC"},
+                       {"midiNumber", 0},       {"midiValue", 0},
+                       {"midiChannelIndex", 0}, {"enabled", false}};
     }
 
-    json j = {
-        {"version", 3},
-        {"name", "Preset1"},
-        {"autoLoad", "No"},
-        {"bindings", bindings},
-        {"unknownField", "oops"}
-    };
+    json j = {{"version", 3},
+              {"name", "Preset1"},
+              {"autoLoad", "No"},
+              {"bindings", bindings},
+              {"unknownField", "oops"}};
 
     REQUIRE_THROWS_AS(j.get<MidiControlPresetV3>(), std::invalid_argument);
 }

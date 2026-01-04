@@ -115,8 +115,7 @@ namespace mpc::input::midi::legacy
         json sanitized = json::array();
         for (auto &binding : preset["bindings"])
         {
-            if (!binding.contains("target") ||
-                !binding["target"].is_string())
+            if (!binding.contains("target") || !binding["target"].is_string())
             {
                 continue;
             }
@@ -210,8 +209,7 @@ namespace mpc::input::midi::legacy
         std::unordered_set<std::string> seen;
         for (auto &binding : preset["bindings"])
         {
-            if (!binding.contains("target") ||
-                !binding["target"].is_string())
+            if (!binding.contains("target") || !binding["target"].is_string())
             {
                 continue;
             }

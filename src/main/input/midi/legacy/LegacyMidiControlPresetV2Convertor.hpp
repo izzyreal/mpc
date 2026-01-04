@@ -125,12 +125,12 @@ namespace mpc::input::midi::legacy
                 binding["midiNumber"] = midiNumber;
             }
 
-//            printf("=================\n");
-//            printf("label: %s\n", label.c_str());
-//            printf("type: %i\n", typeByte);
-//            printf("channel: %i\n", channelByte);
-//            printf("number: %i\n", numberByte);
-//            printf("cc value: %i\n", ccValueByte);
+            //            printf("=================\n");
+            //            printf("label: %s\n", label.c_str());
+            //            printf("type: %i\n", typeByte);
+            //            printf("channel: %i\n", channelByte);
+            //            printf("number: %i\n", numberByte);
+            //            printf("cc value: %i\n", ccValueByte);
 
             if (label.find("extra") != std::string::npos && midiNumber == -1)
             {

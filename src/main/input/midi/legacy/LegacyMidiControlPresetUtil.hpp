@@ -22,35 +22,119 @@ namespace mpc::input::midi::legacy
                            hardware::PAD_1_OR_AB + (padNumber - 1)));
         }
 
-        if (label == "datawheel-up") return "hardware:data-wheel:positive";
-        if (label == "datawheel-down") return "hardware:data-wheel:negative";
+        if (label == "datawheel-up")
+        {
+            return "hardware:data-wheel:positive";
+        }
+        if (label == "datawheel-down")
+        {
+            return "hardware:data-wheel:negative";
+        }
 
-        if (label == "up") return "hardware:cursor-up";
-        if (label == "down") return "hardware:cursor-down";
-        if (label == "left") return "hardware:cursor-left-or-digit";
-        if (label == "right") return "hardware:cursor-right-or-digit";
-        if (label == "prev-step-event") return "hardware:prev-step-or-event";
-        if (label == "next-step-event") return "hardware:next-step-or-event";
-        if (label == "prev-bar-start") return "hardware:prev-bar-or-start";
-        if (label == "next-bar-end") return "hardware:next-bar-or-end";
-        if (label == "tap") return "hardware:tap-or-note-repeat";
-        if (label == "full-level") return "hardware:full-level-or-case-switch";
-        if (label == "sixteen-levels") return "hardware:sixteen-levels-or-space";
-        if (label == "enter") return "hardware:enter-or-save";
-        if (label == "after") return "hardware:after-or-assign";
-        if (label == "rec-gain") return "hardware:rec-gain-pot";
-        if (label == "main-volume") return "hardware:main-volume-pot";
-        if (label.substr(0, 1) == "0") return "hardware:0-or-vmpc";
-        if (label.substr(0, 1) == "1") return "hardware:1-or-song";
-        if (label.substr(0, 1) == "2") return "hardware:2-or-misc";
-        if (label.substr(0, 1) == "3") return "hardware:3-or-load";
-        if (label.substr(0, 1) == "4") return "hardware:4-or-sample";
-        if (label.substr(0, 1) == "5") return "hardware:5-or-trim";
-        if (label.substr(0, 1) == "6") return "hardware:6-or-program";
-        if (label.substr(0, 1) == "7") return "hardware:7-or-mixer";
-        if (label.substr(0, 1) == "8") return "hardware:8-or-other";
-        if (label.substr(0, 1) == "9") return "hardware:9-or-midi-sync";
-        if (label.substr(0, 5) == "shift") return "hardware:shift";
+        if (label == "up")
+        {
+            return "hardware:cursor-up";
+        }
+        if (label == "down")
+        {
+            return "hardware:cursor-down";
+        }
+        if (label == "left")
+        {
+            return "hardware:cursor-left-or-digit";
+        }
+        if (label == "right")
+        {
+            return "hardware:cursor-right-or-digit";
+        }
+        if (label == "prev-step-event")
+        {
+            return "hardware:prev-step-or-event";
+        }
+        if (label == "next-step-event")
+        {
+            return "hardware:next-step-or-event";
+        }
+        if (label == "prev-bar-start")
+        {
+            return "hardware:prev-bar-or-start";
+        }
+        if (label == "next-bar-end")
+        {
+            return "hardware:next-bar-or-end";
+        }
+        if (label == "tap")
+        {
+            return "hardware:tap-or-note-repeat";
+        }
+        if (label == "full-level")
+        {
+            return "hardware:full-level-or-case-switch";
+        }
+        if (label == "sixteen-levels")
+        {
+            return "hardware:sixteen-levels-or-space";
+        }
+        if (label == "enter")
+        {
+            return "hardware:enter-or-save";
+        }
+        if (label == "after")
+        {
+            return "hardware:after-or-assign";
+        }
+        if (label == "rec-gain")
+        {
+            return "hardware:rec-gain-pot";
+        }
+        if (label == "main-volume")
+        {
+            return "hardware:main-volume-pot";
+        }
+        if (label.substr(0, 1) == "0")
+        {
+            return "hardware:0-or-vmpc";
+        }
+        if (label.substr(0, 1) == "1")
+        {
+            return "hardware:1-or-song";
+        }
+        if (label.substr(0, 1) == "2")
+        {
+            return "hardware:2-or-misc";
+        }
+        if (label.substr(0, 1) == "3")
+        {
+            return "hardware:3-or-load";
+        }
+        if (label.substr(0, 1) == "4")
+        {
+            return "hardware:4-or-sample";
+        }
+        if (label.substr(0, 1) == "5")
+        {
+            return "hardware:5-or-trim";
+        }
+        if (label.substr(0, 1) == "6")
+        {
+            return "hardware:6-or-program";
+        }
+        if (label.substr(0, 1) == "7")
+        {
+            return "hardware:7-or-mixer";
+        }
+        if (label.substr(0, 1) == "8")
+        {
+            return "hardware:8-or-other";
+        }
+        if (label.substr(0, 1) == "9")
+        {
+            return "hardware:9-or-midi-sync";
+        }
+        if (label.substr(0, 5) == "shift")
+        {
+            return "hardware:shift";
+        }
 
         return "hardware:" + label;
     }

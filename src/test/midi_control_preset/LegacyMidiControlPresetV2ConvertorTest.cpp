@@ -23,14 +23,14 @@ TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema",
 {
     auto data = load_resource("test/LegacyMidiControlPresetV2/iRig_PADS.vmp");
 
-    json convertedPreset =
-        legacy::parseLegacyMidiControlPresetV2(data);
+    json convertedPreset = legacy::parseLegacyMidiControlPresetV2(data);
 
-    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
+    legacy::patchLegacyPreset(convertedPreset,
+                              MidiControlPresetUtil::load_schema());
 
     try
     {
-        (void) MidiControlPresetUtil::make_validator().validate(convertedPreset);
+        (void)MidiControlPresetUtil::make_validator().validate(convertedPreset);
         SUCCEED("Converted preset passed schema validation.");
     }
     catch (const std::exception &e)
@@ -58,14 +58,14 @@ TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema",
 {
     auto data = load_resource("test/LegacyMidiControlPresetV2/MPK25.vmp");
 
-    json convertedPreset =
-        legacy::parseLegacyMidiControlPresetV2(data);
+    json convertedPreset = legacy::parseLegacyMidiControlPresetV2(data);
 
-    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
+    legacy::patchLegacyPreset(convertedPreset,
+                              MidiControlPresetUtil::load_schema());
 
     try
     {
-        (void) MidiControlPresetUtil::make_validator().validate(convertedPreset);
+        (void)MidiControlPresetUtil::make_validator().validate(convertedPreset);
         SUCCEED("Converted preset passed schema validation.");
     }
     catch (const std::exception &e)

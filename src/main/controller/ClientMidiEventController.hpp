@@ -94,8 +94,7 @@ namespace mpc::controller
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
             footswitchController;
 
-        std::shared_ptr<ClientExtendedMidiController>
-            extendedController;
+        std::shared_ptr<ClientExtendedMidiController> extendedController;
 
         ClientMidiInputSynchronizationController syncController;
 

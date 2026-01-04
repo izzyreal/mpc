@@ -19,10 +19,10 @@ TEST_CASE("Legacy preset V1 conversion iRig PADS",
 {
     auto data = load_resource("test/LegacyMidiControlPresetV1/iRig_PADS.vmp");
 
-    json convertedPreset =
-        legacy::parseLegacyMidiControlPresetV1(data);
+    json convertedPreset = legacy::parseLegacyMidiControlPresetV1(data);
 
-    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
+    legacy::patchLegacyPreset(convertedPreset,
+                              MidiControlPresetUtil::load_schema());
 
     try
     {
@@ -44,7 +44,7 @@ TEST_CASE("Legacy preset V1 conversion iRig PADS",
     catch (const std::exception &e)
     {
         std::cerr << "Consistency check failed:\n" << e.what() << "\n";
-                 std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
         FAIL("Converted preset did not pass consistency check.");
     }
 }
@@ -55,10 +55,10 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly",
     const auto data = load_resource(
         "test/LegacyMidiControlPresetV1/erroneous_extra_first_run.vmp");
 
-    json convertedPreset =
-        legacy::parseLegacyMidiControlPresetV1(data);
+    json convertedPreset = legacy::parseLegacyMidiControlPresetV1(data);
 
-    legacy::patchLegacyPreset(convertedPreset, MidiControlPresetUtil::load_schema());
+    legacy::patchLegacyPreset(convertedPreset,
+                              MidiControlPresetUtil::load_schema());
 
     try
     {
@@ -79,8 +79,7 @@ TEST_CASE(
     auto data = load_resource(
         "test/LegacyMidiControlPresetV1/erroneous_extra_second_run.vmp");
 
-    json convertedPreset =
-        legacy::parseLegacyMidiControlPresetV1(data);
+    json convertedPreset = legacy::parseLegacyMidiControlPresetV1(data);
 
     try
     {

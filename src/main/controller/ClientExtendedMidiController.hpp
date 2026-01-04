@@ -14,4 +14,4 @@ namespace mpc::controller
     private:
         std::shared_ptr<input::midi::MidiControlPresetV3> activePreset;
     };
-}
+} // namespace mpc::controller

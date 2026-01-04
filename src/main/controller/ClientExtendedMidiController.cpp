@@ -2,6 +2,4 @@
 
 using namespace mpc::controller;
 
-ClientExtendedMidiController::ClientExtendedMidiController()
-{
-}
+ClientExtendedMidiController::ClientExtendedMidiController() {}
