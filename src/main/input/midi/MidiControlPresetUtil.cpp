@@ -44,6 +44,95 @@ std::set<std::string> MidiControlPresetUtil::load_available_targets()
 }
 
 void MidiControlPresetUtil::resetMidiControlPreset(
-    std::shared_ptr<mpc::input::midi::MidiControlPresetV3>)
+    std::shared_ptr<mpc::input::midi::MidiControlPresetV3> p)
 {
+    const json schema = load_schema();
+    const auto targets = load_available_targets();
+
+    if (!schema.contains("properties"))
+    {
+        throw std::runtime_error("Schema missing root properties");
+    }
+
+    if (!schema.contains("$defs") || !schema["$defs"].contains("binding"))
+    {
+        throw std::runtime_error("Schema missing binding definition");
+    }
+
+    p->setVersion(CURRENT_PRESET_VERSION);
+
+    const json &rootProps = schema["properties"];
+
+    const json &bindingProps =
+        schema["$defs"]["binding"]["properties"];
+
+    if (rootProps.contains("name") &&
+        rootProps["name"].contains("default"))
+    {
+        p->setName(rootProps["name"]["default"].get<std::string>());
+    }
+
+    if (rootProps.contains("midiControllerDeviceName") &&
+        rootProps["midiControllerDeviceName"].contains("default"))
+    {
+        p->setMidiControllerDeviceName(
+            rootProps["midiControllerDeviceName"]["default"]
+                .get<std::string>());
+    }
+
+    if (rootProps.contains("autoLoad") &&
+        rootProps["autoLoad"].contains("default"))
+    {
+        p->setAutoLoad(
+            rootProps["autoLoad"]["default"].get<std::string>());
+    }
+
+    std::vector<Binding> bindings;
+    bindings.reserve(targets.size());
+
+    for (const auto &target : targets)
+    {
+        Binding b;
+        b.setTarget(target);
+
+        if (bindingProps.contains("messageType") &&
+            bindingProps["messageType"].contains("default"))
+        {
+            b.setMessageType(
+                bindingProps["messageType"]["default"]
+                    .get<std::string>());
+        }
+
+        if (bindingProps.contains("midiNumber") &&
+            bindingProps["midiNumber"].contains("default"))
+        {
+            b.setMidiNumber(
+                bindingProps["midiNumber"]["default"].get<int>());
+        }
+
+        if (bindingProps.contains("midiValue") &&
+            bindingProps["midiValue"].contains("default"))
+        {
+            b.setMidiValue(
+                bindingProps["midiValue"]["default"].get<int>());
+        }
+
+        if (bindingProps.contains("midiChannelIndex") &&
+            bindingProps["midiChannelIndex"].contains("default"))
+        {
+            b.setMidiChannelIndex(
+                bindingProps["midiChannelIndex"]["default"].get<int>());
+        }
+
+        if (bindingProps.contains("enabled") &&
+            bindingProps["enabled"].contains("default"))
+        {
+            b.setEnabled(
+                bindingProps["enabled"]["default"].get<bool>());
+        }
+
+        bindings.push_back(b);
+    }
+
+    p->setBindings(bindings);
 }

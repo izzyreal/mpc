@@ -4,6 +4,11 @@
 
 #include <memory>
 
+namespace mpc::input::midi
+{
+    struct MidiControlPresetV3;
+}
+
 namespace mpc::controller
 {
     class ClientExtendedMidiController

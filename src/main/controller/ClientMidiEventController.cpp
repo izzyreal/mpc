@@ -63,6 +63,8 @@ ClientMidiEventController::ClientMidiEventController(
     footswitchController =
         std::make_shared<ClientMidiFootswitchAssignmentController>(
             clientHardwareEventController, midiSwScreen, sequencer);
+
+    extendedController = std::make_shared<ClientExtendedMidiController>();
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
