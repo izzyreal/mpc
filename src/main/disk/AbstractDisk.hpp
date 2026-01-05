@@ -15,9 +15,9 @@ namespace mpc
     class Mpc;
 }
 
-namespace mpc::input::midi::legacy
+namespace mpc::input::midi
 {
-    struct MidiControlPreset;
+    struct MidiControlPresetV3;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -94,11 +94,11 @@ namespace mpc::disk
         void writeAps(const std::string &fileName);
         void writeAll(const std::string &fileName);
         void writeMidiControlPreset(
-            std::shared_ptr<input::midi::legacy::MidiControlPreset> preset);
+            std::shared_ptr<input::midi::MidiControlPresetV3>);
 
         void readMidiControlPreset(
             const fs::path &p,
-            const std::shared_ptr<input::midi::legacy::MidiControlPreset> &);
+            const std::shared_ptr<input::midi::MidiControlPresetV3> &);
 
         bool checkExists(const std::string &fileName);
         virtual bool deleteRecursive(std::weak_ptr<MpcFile>);

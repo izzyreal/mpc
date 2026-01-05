@@ -35,7 +35,16 @@ void Binding::setMessageType(const std::string &t)
 
 void Binding::setMidiNumber(int n)
 {
-    midiNumber = MidiNumber(n);
+    if (n < 0)
+    {
+        midiNumber = MidiNumber(0);
+        enabled = false;
+    }
+    else
+    {
+        midiNumber = MidiNumber(n);
+        enabled = true;
+    }
 }
 
 void Binding::setMidiValue(int v)
@@ -81,6 +90,16 @@ int Binding::getMidiChannelIndex() const
 bool Binding::isEnabled() const
 {
     return enabled;
+}
+
+bool Binding::isCc() const
+{
+    return getMessageType() == "CC";
+}
+
+bool Binding::isNote() const
+{
+    return getMessageType() == "Note";
 }
 
 void mpc::input::midi::to_json(json &j, const Binding &b)
@@ -203,6 +222,11 @@ const std::string &MidiControlPresetV3::getAutoLoad() const
 const std::vector<Binding> &MidiControlPresetV3::getBindings() const
 {
     return bindings;
+}
+
+Binding &MidiControlPresetV3::getBindingByIndex(const int idx)
+{
+    return bindings[idx];
 }
 
 void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)

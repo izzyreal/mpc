@@ -22,6 +22,20 @@ namespace mpc::input::midi
         MidiChannel midiChannelIndex{0};
         bool enabled{false};
 
+        bool operator==(Binding &other)
+        {
+            return target == other.target && messageType == other.messageType &&
+                   midiNumber == other.midiNumber &&
+                   midiValue == other.midiValue &&
+                   midiChannelIndex == other.midiChannelIndex &&
+                   enabled == other.enabled;
+        }
+
+        bool operator!=(Binding &other)
+        {
+            return !(*this == other);
+        }
+
         Binding() = default;
 
         void setTarget(const std::string &n);
@@ -47,6 +61,10 @@ namespace mpc::input::midi
         int getMidiChannelIndex() const;
 
         bool isEnabled() const;
+
+        bool isCc() const;
+
+        bool isNote() const;
     };
 
     void to_json(json &j, const Binding &b);
@@ -81,6 +99,8 @@ namespace mpc::input::midi
         const std::string &getAutoLoad() const;
 
         const std::vector<Binding> &getBindings() const;
+
+        Binding &getBindingByIndex(int);
     };
 
     void to_json(json &j, const MidiControlPresetV3 &p);

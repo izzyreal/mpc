@@ -86,6 +86,9 @@ namespace mpc::controller
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
         getFootswitchAssignmentController();
 
+        std::shared_ptr<ClientExtendedMidiController>
+        getExtendedController();
+
         void handleClientMidiEvent(const ClientMidiEvent &);
 
     private:

@@ -113,8 +113,8 @@ void Mpc::init()
 
     diskController = std::make_unique<disk::DiskController>(*this);
 
-    input::midi::legacy::MidiControlPersistence::
-        loadAllPresetsFromDiskIntoMemory(*this);
+//    input::midi::legacy::MidiControlPersistence::
+//        loadAllPresetsFromDiskIntoMemory(*this);
 
     hardware = std::make_shared<Hardware>();
 
@@ -208,7 +208,7 @@ void Mpc::init()
 
     nvram::NvRam::loadUserScreenValues(*this);
 
-    input::midi::legacy::MidiControlPersistence::restoreLastState(*this);
+//    input::midi::legacy::MidiControlPersistence::restoreLastState(*this);
 
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
@@ -303,7 +303,7 @@ Mpc::~Mpc()
     {
         autoSave->interruptRestorationIfStillOngoing();
     }
-    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
+//    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
     if (engineHost)

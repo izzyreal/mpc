@@ -1,12 +1,17 @@
-#include "VmpcKnownControllerDetectedScreen.hpp"
+#include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
+
 #include "Mpc.hpp"
+
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "lcdgui/Label.hpp"
+
+#include "input/midi/MidiControlPresetUtil.hpp"
 
 #include "disk/AbstractDisk.hpp"
-#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::input::midi;
 
 VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
     Mpc &m, const int layer)
@@ -29,13 +34,13 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
 void VmpcKnownControllerDetectedScreen::function(const int i)
 {
     const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
-    auto &presets = mpc.midiControlPresets;
-    const auto preset = std::find_if(
-        presets.begin(), presets.end(),
-        [this](const std::shared_ptr<input::midi::legacy::MidiControlPreset> &p)
-        {
-            return controllerName.find(p->name) != std::string::npos;
-        });
+
+    std::shared_ptr<MidiControlPresetV3> preset;
+
+    mpc.getDisk()->readMidiControlPreset(
+        mpc.paths->getDocuments()->midiControlPresetsPath() /
+            (controllerName + ".json"),
+        preset);
 
     switch (i)
     {
@@ -50,28 +55,25 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             break;
         case 3:
             // NEVER
-            if (preset != presets.end())
-            {
-                (*preset)->autoloadMode = input::midi::legacy::
-                    MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
-            }
+//            if (preset != presets.end())
+//            {
+//                (*preset)->autoloadMode = AutoLoadMode::AutoLoadModeNo;
+//            }
+
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         case 4:
             // ALWAYS
-            if (preset != presets.end())
-            {
-                if ((*preset)->autoloadMode !=
-                    input::midi::legacy::MidiControlPreset::AutoLoadMode::
-                        AutoLoadModeYes)
-                {
-                    (*preset)->autoloadMode = input::midi::legacy::
-                        MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
-                    mpc.getDisk()->writeMidiControlPreset(*preset);
-                    input::midi::legacy::MidiControlPersistence::
-                        loadAllPresetsFromDiskIntoMemory(mpc);
-                }
-            }
+//            if (preset != presets.end())
+//            {
+//                if ((*preset)->autoloadMode != AutoLoadMode::AutoLoadModeYes)
+//                {
+//                    (*preset)->autoloadMode = AutoLoadMode::AutoLoadModeYes;
+//                    mpc.getDisk()->writeMidiControlPreset(*preset);
+//                    legacy::MidiControlPersistence::
+//                        loadAllPresetsFromDiskIntoMemory(mpc);
+//                }
+//            }
             vmpcMidiScreen->shouldSwitch.store(true);
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
@@ -87,28 +89,28 @@ void VmpcKnownControllerDetectedScreen::displayMessage() const
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    for (const auto &p : mpc.midiControlPresets)
-    {
-        if (controllerName.find(p->name) != std::string::npos)
-        {
-            if (p->autoloadMode == input::midi::legacy::MidiControlPreset::
-                                       AutoLoadMode::AutoLoadModeNo)
-            {
-                mpc.getLayeredScreen()->closeCurrentScreen();
-                return;
-            }
-            if (p->autoloadMode == input::midi::legacy::MidiControlPreset::
-                                       AutoLoadMode::AutoLoadModeYes)
-            {
-                const auto vmpcMidiScreen =
-                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
-                vmpcMidiScreen->shouldSwitch.store(true);
-                mpc.getLayeredScreen()->closeCurrentScreen();
-                return;
-            }
-            break;
-        }
-    }
+//    for (const auto &p : mpc.midiControlPresets)
+//    {
+//        if (controllerName.find(p->name) != std::string::npos)
+//        {
+//            if (p->autoloadMode ==
+//                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
+//            {
+//                mpc.getLayeredScreen()->closeCurrentScreen();
+//                return;
+//            }
+//            if (p->autoloadMode ==
+//                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+//            {
+//                const auto vmpcMidiScreen =
+//                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
+//                vmpcMidiScreen->shouldSwitch.store(true);
+//                mpc.getLayeredScreen()->closeCurrentScreen();
+//                return;
+//            }
+//            break;
+//        }
+//    }
 
     displayMessage();
 }

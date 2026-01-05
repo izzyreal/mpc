@@ -147,6 +147,12 @@ ClientMidiEventController::getFootswitchAssignmentController()
     return footswitchController;
 }
 
+std::shared_ptr<ClientExtendedMidiController>
+ClientMidiEventController::getExtendedController()
+{
+    return extendedController;
+}
+
 bool ClientMidiEventController::isOmniOn() const noexcept
 {
     // return mode == 1 || mode == 2;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mpc_fs.hpp"
+
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 
@@ -24,5 +26,8 @@ namespace mpc::input::midi
 
         static void resetMidiControlPreset(
             std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
+
+
+        static bool doesPresetWithNameExist(const fs::path &, std::string name);
     };
 } // namespace mpc::input::midi

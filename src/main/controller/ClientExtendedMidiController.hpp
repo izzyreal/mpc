@@ -16,6 +16,9 @@ namespace mpc::controller
     public:
         ClientExtendedMidiController();
 
+    std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
+    void setActivePreset(std::shared_ptr<input::midi::MidiControlPresetV3>);
+
     private:
         std::shared_ptr<input::midi::MidiControlPresetV3> activePreset;
     };

@@ -69,11 +69,6 @@ namespace mpc::sampler
     class Sampler;
 }
 
-namespace mpc::input::midi::legacy
-{
-    struct MidiControlPreset;
-}
-
 namespace mpc
 {
     class Mpc
@@ -95,8 +90,6 @@ namespace mpc
     public:
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<Paths> paths;
-        std::vector<std::shared_ptr<input::midi::legacy::MidiControlPreset>>
-            midiControlPresets;
 
     private:
         std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;

@@ -3,6 +3,7 @@
 #include "input/midi/MidiControlPresetV3.hpp"
 
 #include "MpcResourceUtil.hpp"
+#include "StrUtil.hpp"
 
 using namespace mpc::input::midi;
 
@@ -135,4 +136,18 @@ void MidiControlPresetUtil::resetMidiControlPreset(
     }
 
     p->setBindings(bindings);
+}
+
+
+bool MidiControlPresetUtil::doesPresetWithNameExist(const fs::path &path, std::string name)
+{
+    auto path_it = fs::directory_iterator(path);
+
+    return std::any_of(fs::begin(path_it), fs::end(path_it),
+                       [name](const fs::directory_entry &e)
+                       {
+                           return !fs::is_directory(e) &&
+                                  mpc::StrUtil::eqIgnoreCase(
+                                      e.path().stem().string(), name);
+                       });
 }
