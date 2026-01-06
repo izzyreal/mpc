@@ -22,7 +22,7 @@ json_validator MidiControlPresetUtil::make_validator()
     return validator;
 }
 
-std::set<std::string> MidiControlPresetUtil::load_available_targets()
+std::vector<std::string> MidiControlPresetUtil::load_available_targets()
 {
     auto schema = load_schema();
     if (!schema.contains("$defs") || !schema["$defs"].contains("binding") ||
@@ -35,10 +35,10 @@ std::set<std::string> MidiControlPresetUtil::load_available_targets()
 
     const auto &enumArray =
         schema["$defs"]["binding"]["properties"]["target"]["enum"];
-    std::set<std::string> targets;
+    std::vector<std::string> targets;
     for (const auto &v : enumArray)
     {
-        targets.insert(v.get<std::string>());
+        targets.push_back(v.get<std::string>());
     }
 
     return targets;
@@ -50,36 +50,11 @@ void MidiControlPresetUtil::resetMidiControlPreset(
     const json schema = load_schema();
     const auto targets = load_available_targets();
 
-    if (!schema.contains("properties"))
-    {
-        throw std::runtime_error("Schema missing root properties");
-    }
-
-    if (!schema.contains("$defs") || !schema["$defs"].contains("binding"))
-    {
-        throw std::runtime_error("Schema missing binding definition");
-    }
-
     p->setVersion(CURRENT_PRESET_VERSION);
 
-    const json &rootProps = schema["properties"];
-
-    const json &bindingProps =
-        schema["$defs"]["binding"]["properties"];
-
-    if (rootProps.contains("name") &&
-        rootProps["name"].contains("default"))
-    {
-        p->setName(rootProps["name"]["default"].get<std::string>());
-    }
-
-    if (rootProps.contains("midiControllerDeviceName") &&
-        rootProps["midiControllerDeviceName"].contains("default"))
-    {
-        p->setMidiControllerDeviceName(
-            rootProps["midiControllerDeviceName"]["default"]
-                .get<std::string>());
-    }
+    const json& rootProps = schema["properties"];
+    const json& bindingSchema = schema["$defs"]["binding"];
+    const json& bindingProps = bindingSchema["properties"];
 
     if (rootProps.contains("autoLoad") &&
         rootProps["autoLoad"].contains("default"))
@@ -91,45 +66,29 @@ void MidiControlPresetUtil::resetMidiControlPreset(
     std::vector<Binding> bindings;
     bindings.reserve(targets.size());
 
-    for (const auto &target : targets)
+    for (const auto& target : targets)
     {
         Binding b;
         b.setTarget(target);
 
-        if (bindingProps.contains("messageType") &&
-            bindingProps["messageType"].contains("default"))
+        if (bindingSchema.contains("default"))
         {
-            b.setMessageType(
-                bindingProps["messageType"]["default"]
-                    .get<std::string>());
-        }
+            const json& d = bindingSchema["default"];
 
-        if (bindingProps.contains("midiNumber") &&
-            bindingProps["midiNumber"].contains("default"))
-        {
-            b.setMidiNumber(
-                bindingProps["midiNumber"]["default"].get<int>());
-        }
+            if (d.contains("messageType"))
+                b.setMessageType(d["messageType"].get<std::string>());
 
-        if (bindingProps.contains("midiValue") &&
-            bindingProps["midiValue"].contains("default"))
-        {
-            b.setMidiValue(
-                bindingProps["midiValue"]["default"].get<int>());
-        }
+            if (d.contains("midiNumber"))
+                b.setMidiNumber(d["midiNumber"].get<int>());
 
-        if (bindingProps.contains("midiChannelIndex") &&
-            bindingProps["midiChannelIndex"].contains("default"))
-        {
-            b.setMidiChannelIndex(
-                bindingProps["midiChannelIndex"]["default"].get<int>());
-        }
+            if (d.contains("midiValue"))
+                b.setMidiValue(d["midiValue"].get<int>());
 
-        if (bindingProps.contains("enabled") &&
-            bindingProps["enabled"].contains("default"))
-        {
-            b.setEnabled(
-                bindingProps["enabled"]["default"].get<bool>());
+            if (d.contains("midiChannelIndex"))
+                b.setMidiChannelIndex(d["midiChannelIndex"].get<int>());
+
+            if (d.contains("enabled"))
+                b.setEnabled(d["enabled"].get<bool>());
         }
 
         bindings.push_back(b);
@@ -137,7 +96,6 @@ void MidiControlPresetUtil::resetMidiControlPreset(
 
     p->setBindings(bindings);
 }
-
 
 bool MidiControlPresetUtil::doesPresetWithNameExist(const fs::path &path, std::string name)
 {

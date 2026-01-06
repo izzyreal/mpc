@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 
-#include <set>
+#include <vector>
 #include <memory>
 
 using nlohmann::json;
@@ -22,11 +22,10 @@ namespace mpc::input::midi
 
         static json_validator make_validator();
 
-        static std::set<std::string> load_available_targets();
+        static std::vector<std::string> load_available_targets();
 
         static void resetMidiControlPreset(
             std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
-
 
         static bool doesPresetWithNameExist(const fs::path &, std::string name);
     };

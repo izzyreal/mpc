@@ -37,9 +37,9 @@ void Binding::setMessageType(const std::string &t)
 
 void Binding::setMidiNumber(int n)
 {
-    if (n < 0)
+    if (n < MinMidiNumber)
     {
-        midiNumber = MidiNumber(0);
+        midiNumber = NoMidiNumber;
         enabled = false;
     }
     else
@@ -134,8 +134,6 @@ std::string Binding::getTargetDisplayName() const
     }
 
     result = result.substr(0, 15);
-
-    printf("target: %s, display name: %s\n", target.c_str(), result.c_str());
 
     return result;
 }

@@ -155,7 +155,10 @@ namespace mpc
 
     /////////
 
-    using MidiNumber = ConstrainedInt<int8_t, 0, 127>;
+    using MidiNumber = ConstrainedInt<int8_t, -1, 127>;
+    constexpr MidiNumber NoMidiNumber{-1};
+    constexpr MidiNumber MinMidiNumber{0};
+    constexpr MidiNumber MaxMidiNumber{127};
 
     /////////
 
