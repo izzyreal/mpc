@@ -40,6 +40,8 @@ namespace mpc::input::midi
 
         void setTarget(const std::string &n);
 
+        std::string getTargetDisplayName() const;
+
         void setMessageType(const std::string &t);
 
         void setMidiNumber(int n);

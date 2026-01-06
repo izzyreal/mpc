@@ -2,6 +2,8 @@
 
 #include "IntTypes.hpp"
 
+#include "StrUtil.hpp"
+
 #include "input/midi/MidiControlPresetUtil.hpp"
 
 #include <nlohmann/json.hpp>
@@ -100,6 +102,42 @@ bool Binding::isCc() const
 bool Binding::isNote() const
 {
     return getMessageType() == "Note";
+}
+
+std::string Binding::getTargetDisplayName() const
+{
+    static const std::string hardwareStr = "hardware:";
+    static const std::string sequencerStr = "sequencer:";
+    static const std::string negativeStr = ":negative";
+    static const std::string positiveStr = ":positive";
+
+    std::string result = target;
+
+    StrUtil::replace(result, "-", " ");
+
+    StrUtil::replace(result, hardwareStr, "");
+    StrUtil::replace(result, sequencerStr, "seq ");
+    StrUtil::replace(result, negativeStr, " -");
+    StrUtil::replace(result, positiveStr, " +");
+
+    StrUtil::replace(result, "ampersand octothorpe", "&#");
+    StrUtil::replace(result, "hyphen exclamation mark", "-!");
+    StrUtil::replace(result, "parentheses", "()");
+    StrUtil::replace(result, " plus ", " + ");
+
+    if (result.size() > 15)
+    {
+        if (auto pos = result.find(" or"); pos != std::string::npos)
+        {
+            result.erase(pos, result.size());
+        }
+    }
+
+    result = result.substr(0, 15);
+
+    printf("target: %s, display name: %s\n", target.c_str(), result.c_str());
+
+    return result;
 }
 
 void mpc::input::midi::to_json(json &j, const Binding &b)

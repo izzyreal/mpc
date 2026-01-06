@@ -112,7 +112,7 @@ namespace mpc::hardware
             {PAD_13_OR_YZ, "pad-13-or-yz"},
             {PAD_14_OR_AMPERSAND_OCTOTHORPE, "pad-14-or-ampersand-octothorpe"},
             {PAD_15_OR_HYPHEN_EXCLAMATION_MARK,
-             "pad-15-or-hyphen-eclamation-mark"},
+             "pad-15-or-hyphen-exclamation-mark"},
             {PAD_16_OR_PARENTHESES, "pad-16-or-parentheses"},
 
             {CURSOR_LEFT_OR_DIGIT, "cursor-left-or-digit"},

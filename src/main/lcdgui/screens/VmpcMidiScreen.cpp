@@ -420,7 +420,7 @@ void VmpcMidiScreen::updateRows()
 
         const auto targetText =
             StrUtil::padRight(
-                getActivePreset()->getBindingByIndex(i + rowOffset).target, " ",
+                getActivePreset()->getBindingByIndex(i + rowOffset).getTargetDisplayName(), " ",
                 length) +
             ":";
 

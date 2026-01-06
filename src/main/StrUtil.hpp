@@ -17,6 +17,9 @@ namespace mpc
         static bool eqIgnoreCase(const std::string &s1, const std::string &s2);
         static std::string replaceAll(const std::string &str, char c,
                                       const std::string &replacement);
+        static void replace(std::string &,
+                                   const std::string &substr,
+                                   const std::string &replacement);
         static std::string TrimDecimals(const std::string &str,
                                         int decimalCount);
         static std::string TrimDecimals(double d, int decimalCount);
