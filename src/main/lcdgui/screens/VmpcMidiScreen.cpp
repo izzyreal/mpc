@@ -31,15 +31,15 @@ VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
         addChild(typeParam);
 
         auto numberParam = std::make_shared<Parameter>(
-            mpc, "#:", "number" + std::to_string(i), 125, 3 + i * 9, 3 * 6);
+            mpc, "#", "number" + std::to_string(i), 125, 3 + i * 9, 3 * 6);
         addChild(numberParam);
 
         auto valueParam = std::make_shared<Parameter>(
-            mpc, "v:", "value" + std::to_string(i), 164, 3 + i * 9, 3 * 6);
+            mpc, "v:", "value" + std::to_string(i), 152, 3 + i * 9, 3 * 6);
         addChild(valueParam);
 
         auto channelParam = std::make_shared<Parameter>(
-            mpc, "ch:", "channel" + std::to_string(i), 202, 3 + i * 9, 3 * 6);
+            mpc, "c:", "channel" + std::to_string(i), 190, 3 + i * 9, 3 * 6);
         addChild(channelParam);
     }
 }
@@ -374,7 +374,15 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                //                MidiControlPersistence::saveCurrentState(mpc);
+                const auto path =
+                    mpc.paths->getDocuments()->activeMidiControlPresetPath();
+
+                json presetJson;
+
+                to_json(presetJson, *getActivePreset());
+
+                set_file_data(path, presetJson.dump(4));
+
                 popupMsg = "MIDI mapping saved";
             }
             else
@@ -419,9 +427,10 @@ void VmpcMidiScreen::updateRows()
         constexpr int length = 15;
 
         const auto targetText =
-            StrUtil::padRight(
-                getActivePreset()->getBindingByIndex(i + rowOffset).getTargetDisplayName(), " ",
-                length) +
+            StrUtil::padRight(getActivePreset()
+                                  ->getBindingByIndex(i + rowOffset)
+                                  .getTargetDisplayName(),
+                              " ", length) +
             ":";
 
         typeLabel->setText(targetText);

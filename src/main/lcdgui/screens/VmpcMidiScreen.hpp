@@ -29,8 +29,6 @@ namespace mpc::lcdgui::screens
         void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
                                int8_t value);
 
-        void updateOrAddActivePresetBinding(input::midi::Binding &c);
-
         std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
 
         bool hasMappingChanged();

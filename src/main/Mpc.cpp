@@ -29,11 +29,16 @@
 
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
 #include "controller/ClientEventController.hpp"
-
-#include <string>
+#include "controller/ClientMidiEventController.hpp"
+#include "controller/ClientExtendedMidiController.hpp"
 
 #include "Logger.hpp"
+
+#include <nlohmann/json.hpp>
+
+#include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -113,8 +118,8 @@ void Mpc::init()
 
     diskController = std::make_unique<disk::DiskController>(*this);
 
-//    input::midi::legacy::MidiControlPersistence::
-//        loadAllPresetsFromDiskIntoMemory(*this);
+    //    input::midi::legacy::MidiControlPersistence::
+    //        loadAllPresetsFromDiskIntoMemory(*this);
 
     hardware = std::make_shared<Hardware>();
 
@@ -208,7 +213,16 @@ void Mpc::init()
 
     nvram::NvRam::loadUserScreenValues(*this);
 
-//    input::midi::legacy::MidiControlPersistence::restoreLastState(*this);
+    if (auto p = paths->getDocuments()->activeMidiControlPresetPath();
+        fs::exists(p))
+    {
+        const auto data = get_file_data(p);
+        const auto dataJson = nlohmann::json::parse(data);
+        input::midi::from_json(
+            dataJson, *clientEventController->getClientMidiEventController()
+                           ->getExtendedController()
+                           ->getActivePreset());
+    }
 
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
@@ -303,7 +317,7 @@ Mpc::~Mpc()
     {
         autoSave->interruptRestorationIfStillOngoing();
     }
-//    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
+    //    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
     if (engineHost)

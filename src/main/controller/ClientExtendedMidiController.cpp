@@ -10,6 +10,7 @@ ClientExtendedMidiController::ClientExtendedMidiController()
 {
     activePreset = std::make_shared<MidiControlPresetV3>();
     MidiControlPresetUtil::resetMidiControlPreset(activePreset);
+    activePreset->setName("active_preset");
 }
 
 std::shared_ptr<MidiControlPresetV3>

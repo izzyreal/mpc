@@ -198,7 +198,7 @@
       ],
       "default": {
         "messageType": "CC",
-        "midiNumber": 0,
+        "midiNumber": -1,
         "midiValue": -1,
         "midiChannelIndex": -1,
         "enabled": false
