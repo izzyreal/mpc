@@ -668,7 +668,15 @@ void ClientHardwareEventController::handlePot(
 
     const auto engineHost = mpc.getEngineHost();
 
-    pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
+    if (event.deltaValue)
+    {
+        pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
+    }
+    else
+    {
+        assert(event.value);
+        pot->setValue(*event.value);
+    }
 
     if (event.componentId == REC_GAIN_POT)
     {

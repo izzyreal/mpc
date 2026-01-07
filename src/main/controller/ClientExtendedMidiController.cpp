@@ -155,6 +155,11 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 {
                     moveSlider(1.f - (e.getControllerValue() / 127.f));
                 }
+                else if (componentId == REC_GAIN_POT ||
+                         componentId == MAIN_VOLUME_POT)
+                {
+                    movePot(componentId, e.getControllerValue() / 127.f);
+                }
             }
             else
             {
@@ -284,5 +289,16 @@ void ClientExtendedMidiController::releasePad(hardware::ComponentId id) const
     ev.componentId = id;
     ev.type = ClientHardwareEvent::Type::PadRelease;
     ev.index = static_cast<int>(id) - static_cast<int>(PAD_1_OR_AB);
+    clientHardwareEventController->handleClientHardwareEvent(ev);
+}
+
+void ClientExtendedMidiController::movePot(const ComponentId id,
+                                           float normalizedValue) const
+{
+    ClientHardwareEvent ev{};
+    ev.source = ClientHardwareEvent::Source::Internal;
+    ev.componentId = id;
+    ev.type = ClientHardwareEvent::Type::PotMove;
+    ev.value = normalizedValue;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }

@@ -52,5 +52,7 @@ namespace mpc::controller
         void turnWheel(int) const;
 
         void moveSlider(float normalizedY) const;
+
+        void movePot(hardware::ComponentId, float normalizedValue) const;
     };
 } // namespace mpc::controller
