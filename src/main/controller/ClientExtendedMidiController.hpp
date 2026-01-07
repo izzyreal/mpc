@@ -5,6 +5,7 @@
 #include "hardware/ComponentId.hpp"
 
 #include <memory>
+#include <map>
 
 namespace mpc::sequencer
 {
@@ -37,6 +38,8 @@ namespace mpc::controller
         std::shared_ptr<ClientHardwareEventController>
             clientHardwareEventController;
         std::weak_ptr<sequencer::Sequencer> sequencer;
+
+        std::map<MidiNumber, MidiValue> statefulDataWheels;
 
         void pressButton(hardware::ComponentId id) const;
 

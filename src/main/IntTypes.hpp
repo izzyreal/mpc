@@ -164,6 +164,7 @@ namespace mpc
 
     using MidiValue = ConstrainedInt<int8_t, -1, 127>;
     constexpr MidiValue NoMidiValue{-1};
+    constexpr MidiValue MinMidiValue{0};
     constexpr MidiValue MaxMidiValue{127};
 
     /////////

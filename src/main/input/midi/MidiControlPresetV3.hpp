@@ -116,6 +116,8 @@ namespace mpc::input::midi
         const std::vector<Binding> &getBindings() const;
 
         Binding &getBindingByIndex(int);
+
+        bool hasStatefulDataWheelBindingForController(MidiNumber) const;
     };
 
     void to_json(json &j, const MidiControlPresetV3 &p);

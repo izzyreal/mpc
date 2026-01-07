@@ -5,6 +5,7 @@
 #include "StrUtil.hpp"
 
 #include "input/midi/MidiControlPresetUtil.hpp"
+#include "hardware/ComponentId.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -308,6 +309,41 @@ const std::vector<Binding> &MidiControlPresetV3::getBindings() const
 Binding &MidiControlPresetV3::getBindingByIndex(const int idx)
 {
     return bindings[idx];
+}
+
+bool MidiControlPresetV3::hasStatefulDataWheelBindingForController(
+    const MidiNumber controllerNumber) const
+{
+    const auto dataWheelLabel =
+        hardware::componentIdToLabel.at(hardware::ComponentId::DATA_WHEEL);
+
+    std::optional<int> prevCcValue = std::nullopt;
+
+    for (auto &b : bindings)
+    {
+        if (b.getMessageType() != "CC" || b.getMidiNumber() != controllerNumber)
+        {
+            continue;
+        }
+
+        if (auto h = b.getHardwareTarget(); h && *h == dataWheelLabel)
+        {
+            if (prevCcValue && (*prevCcValue == b.getMidiValue() ||
+                                b.getMidiValue() == NoMidiValue))
+            {
+                return true;
+            }
+
+            if (b.getMidiValue() == NoMidiValue)
+            {
+                return true;
+            }
+
+            prevCcValue = b.getMidiValue();
+        }
+    }
+
+    return false;
 }
 
 void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)

@@ -56,6 +56,8 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
             continue;
         }
 
+        bool hasStatefulDataWheelBindingForController = false;
+
         if (b.getMessageType() == "CC")
         {
             if (e.getMessageType() != ClientMidiEvent::CONTROLLER ||
@@ -63,6 +65,10 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
             {
                 continue;
             }
+
+            hasStatefulDataWheelBindingForController =
+                activePreset->hasStatefulDataWheelBindingForController(
+                    MidiNumber(e.getControllerNumber()));
         }
         else if (b.getMessageType() == "Note")
         {
@@ -89,18 +95,57 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
             if (componentId == DATA_WHEEL)
             {
-                const auto direction = b.getHardwareDirection();
+                if (hasStatefulDataWheelBindingForController)
+                {
+                    if (statefulDataWheels.count(
+                            MidiNumber(e.getControllerNumber())) == 0)
+                    {
+                        statefulDataWheels[MidiNumber(
+                            e.getControllerNumber())] =
+                            MidiValue(e.getControllerValue());
+                    }
+                    else
+                    {
+                        const auto previousValue = statefulDataWheels.at(
+                            MidiNumber(e.getControllerNumber()));
 
-                if (direction == input::Direction::NoDirection)
-                {
-                }
-                else if (direction == input::Direction::Positive)
-                {
-                    turnWheel(1);
+                        if (previousValue < e.getControllerValue())
+                        {
+                            turnWheel(1);
+                        }
+                        else if (previousValue > e.getControllerValue())
+                        {
+                            turnWheel(-1);
+                        }
+                        else if (previousValue == MinMidiValue)
+                        {
+                            turnWheel(-1);
+                        }
+                        else if (previousValue == MaxMidiValue)
+                        {
+                            turnWheel(1);
+                        }
+
+                        statefulDataWheels[MidiNumber(
+                            e.getControllerNumber())] =
+                            MidiValue(e.getControllerValue());
+                    }
                 }
                 else
                 {
-                    turnWheel(-1);
+                    const auto direction = b.getHardwareDirection();
+
+                    if (direction == input::Direction::NoDirection)
+                    {
+                    }
+                    else if (direction == input::Direction::Positive)
+                    {
+                        turnWheel(1);
+                    }
+                    else
+                    {
+                        turnWheel(-1);
+                    }
                 }
             }
             else if (std::find(potComponents.begin(), potComponents.end(),
@@ -206,7 +251,7 @@ void ClientExtendedMidiController::turnWheel(int i) const
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = DATA_WHEEL;
     ev.type = ClientHardwareEvent::Type::DataWheelTurn;
-    ev.value = i;
+    ev.deltaValue = i;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
