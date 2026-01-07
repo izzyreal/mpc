@@ -64,7 +64,8 @@ ClientMidiEventController::ClientMidiEventController(
         std::make_shared<ClientMidiFootswitchAssignmentController>(
             clientHardwareEventController, midiSwScreen, sequencer);
 
-    extendedController = std::make_shared<ClientExtendedMidiController>();
+    extendedController = std::make_shared<ClientExtendedMidiController>(
+        clientHardwareEventController, sequencer);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
@@ -96,9 +97,11 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     {
         case MessageType::NOTE_ON:
             handleNoteOn(e);
+            extendedController->handleEvent(e);
             break;
         case MessageType::NOTE_OFF:
             handleNoteOff(e);
+            extendedController->handleEvent(e);
             break;
         case MessageType::AFTERTOUCH:
             handleKeyAftertouch(e);
@@ -117,6 +120,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         case MessageType::CONTROLLER:
             handleControlChange(e);
             footswitchController->handleEvent(e);
+            extendedController->handleEvent(e);
             break;
 
         case MessageType::MIDI_CLOCK:

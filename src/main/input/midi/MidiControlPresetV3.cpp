@@ -104,13 +104,58 @@ bool Binding::isNote() const
     return getMessageType() == "Note";
 }
 
+std::optional<std::string> Binding::getHardwareTarget() const
+{
+    if (target.find(hardwareStr) == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    std::string result = target;
+
+    StrUtil::replace(result, hardwareStr, "");
+    StrUtil::replace(result, negativeStr, "");
+    StrUtil::replace(result, positiveStr, "");
+
+    return result;
+}
+
+mpc::input::Direction Binding::getHardwareDirection() const
+{
+    if (target.find(hardwareStr) == std::string::npos)
+    {
+        return Direction::NoDirection;
+    }
+
+    if (target.find(negativeStr) != std::string::npos)
+    {
+        return Direction::Negative;
+    }
+
+    if (target.find(positiveStr) != std::string::npos)
+    {
+        return Direction::Positive;
+    }
+
+    return Direction::NoDirection;
+}
+
+std::optional<std::string> Binding::getSequencerTarget() const
+{
+    if (target.find(sequencerStr) == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    auto result = target;
+
+    StrUtil::replace(result, sequencerStr, "");
+
+    return result;
+}
+
 std::string Binding::getTargetDisplayName() const
 {
-    static const std::string hardwareStr = "hardware:";
-    static const std::string sequencerStr = "sequencer:";
-    static const std::string negativeStr = ":negative";
-    static const std::string positiveStr = ":positive";
-
     std::string result = target;
 
     StrUtil::replace(result, "-", " ");

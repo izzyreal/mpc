@@ -1,17 +1,24 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "input/Direction.hpp"
 
 #include <nlohmann/json.hpp>
 
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace mpc::input::midi
 {
     inline constexpr long long CURRENT_PRESET_VERSION = 3;
 
     using json = nlohmann::json;
+
+    static const std::string hardwareStr = "hardware:";
+    static const std::string sequencerStr = "sequencer:";
+    static const std::string negativeStr = ":negative";
+    static const std::string positiveStr = ":positive";
 
     struct Binding
     {
@@ -53,6 +60,12 @@ namespace mpc::input::midi
         void setEnabled(bool e);
 
         const std::string &getTarget() const;
+
+        std::optional<std::string> getHardwareTarget() const;
+
+        Direction getHardwareDirection() const;
+
+        std::optional<std::string> getSequencerTarget() const;
 
         const std::string &getMessageType() const;
 

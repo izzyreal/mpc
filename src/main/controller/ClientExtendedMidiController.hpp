@@ -1,8 +1,15 @@
 #pragma once
 
 #include "input/midi/MidiControlPresetV3.hpp"
+#include "client/event/ClientMidiEvent.hpp"
+#include "hardware/ComponentId.hpp"
 
 #include <memory>
+
+namespace mpc::sequencer
+{
+    class Sequencer;
+}
 
 namespace mpc::input::midi
 {
@@ -11,15 +18,34 @@ namespace mpc::input::midi
 
 namespace mpc::controller
 {
+    class ClientHardwareEventController;
+
     class ClientExtendedMidiController
     {
     public:
-        ClientExtendedMidiController();
+        ClientExtendedMidiController(
+            const std::shared_ptr<ClientHardwareEventController> &,
+            const std::weak_ptr<sequencer::Sequencer> &);
 
-    std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
-    void setActivePreset(std::shared_ptr<input::midi::MidiControlPresetV3>);
+        void handleEvent(const client::event::ClientMidiEvent &);
+
+        std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
+        void setActivePreset(std::shared_ptr<input::midi::MidiControlPresetV3>);
 
     private:
         std::shared_ptr<input::midi::MidiControlPresetV3> activePreset;
+        std::shared_ptr<ClientHardwareEventController>
+            clientHardwareEventController;
+        std::weak_ptr<sequencer::Sequencer> sequencer;
+
+        void pressButton(hardware::ComponentId id) const;
+
+        void releaseButton(hardware::ComponentId id) const;
+
+        void pressPad(hardware::ComponentId, float normalizedVelocity) const;
+
+        void releasePad(hardware::ComponentId) const;
+
+        void turnWheel(int) const;
     };
 } // namespace mpc::controller

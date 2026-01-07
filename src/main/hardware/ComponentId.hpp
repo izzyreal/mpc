@@ -161,6 +161,7 @@ namespace mpc::hardware
             {NUM_7_OR_MIXER, "7-or-mixer"},
             {NUM_8_OR_OTHER, "8-or-other"},
             {NUM_9_OR_MIDI_SYNC, "9-or-midi-sync"},
+
             {DATA_WHEEL, "data-wheel"},
             {SLIDER, "slider"},
             {REC_GAIN_POT, "rec-gain-pot"},
