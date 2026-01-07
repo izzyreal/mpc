@@ -24,10 +24,11 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
-#include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
 #include "input/midi/MidiControlPresetV3.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
+#include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
 
 #include "StrUtil.hpp"
 #include "Logger.hpp"
@@ -415,7 +416,8 @@ void AbstractDisk::writeMidiControlPreset(
         to_json(fileData, *preset);
 
         const auto presetPath =
-            mpc.paths->getDocuments()->midiControlPresetsPath() / (preset->name + ".json");
+            mpc.paths->getDocuments()->midiControlPresetsPath() /
+            (preset->name + ".json");
 
         set_file_data(presetPath, fileData.dump(4));
 
@@ -432,13 +434,80 @@ void AbstractDisk::readMidiControlPreset(
 
     const std::function ioFunc = [p, preset]() -> preset_or_error
     {
-        const auto fileData = get_file_data(p);
+        auto pathToUse = p;
 
-        const json fileAsJson = json::parse(fileData);
+        if (!fs::exists(p))
+        {
+            if (p.extension().string().find("json") != std::string::npos)
+            {
+                pathToUse.replace_extension("vmp");
+            }
+            else if (p.extension().string().find("vmp") != std::string::npos)
+            {
+                pathToUse.replace_extension("json");
+            }
+        }
 
-        from_json(fileAsJson, *preset);
+        if (!fs::exists(pathToUse))
+        {
+            return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
+        }
 
-        return preset;
+        const auto fileData = get_file_data(pathToUse);
+
+        json fileAsJson;
+
+        bool success = false;
+
+        if (pathToUse.extension().string().find("vmp") != std::string::npos)
+        {
+            bool shouldTryV1Parser = true;
+
+            try
+            {
+                fileAsJson = legacy::parseLegacyMidiControlPresetV2(
+                    std::string(fileData.begin(), fileData.end()));
+                shouldTryV1Parser = false;
+                success = true;
+            }
+            catch (const std::exception &)
+            {
+            }
+
+            if (shouldTryV1Parser)
+            {
+                try
+                {
+                    fileAsJson = legacy::parseLegacyMidiControlPresetV1(
+                        std::string(fileData.begin(), fileData.end()));
+                    success = true;
+                }
+                catch (const std::exception &)
+                {
+                }
+            }
+        }
+        else if (pathToUse.extension().string().find("json") !=
+                 std::string::npos)
+        {
+            fileAsJson = json::parse(fileData);
+            success = true;
+        }
+
+        if (success)
+        {
+            try
+            {
+                from_json(fileAsJson, *preset);
+                return preset;
+            }
+            catch (const std::exception)
+            {
+            }
+        }
+
+        return tl::make_unexpected(
+            mpc_io_error_msg{"Unable to read MIDI control preset"});
     };
 
     performIoOrOpenErrorPopupNonReturning(ioFunc);
@@ -602,7 +671,12 @@ AbstractDisk::performIoOrOpenErrorPopup(
 {
     auto showPopup = [this](const std::string &msg)
     {
-        mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(msg, 1000, 0);
+        auto ls = mpc.getLayeredScreen();
+        ls->postToUiThread(utils::Task(
+            [ls, msg]
+            {
+                ls->showPopupAndThenReturnToLayer(msg, 1000, 0);
+            }));
     };
 
     try

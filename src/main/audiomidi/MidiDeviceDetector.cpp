@@ -6,7 +6,6 @@
 #include "disk/AbstractDisk.hpp"
 
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
-#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <RtMidi.h>
 
@@ -107,12 +106,6 @@ void MidiDeviceDetector::start(Mpc &mpc)
 
                         if (!path.empty() && fs::exists(path))
                         {
-                            const auto vmpcMidiScreen =
-                                mpc.screens->get<ScreenId::VmpcMidiScreen>();
-
-                            mpc.getDisk()->readMidiControlPreset(
-                                path, vmpcMidiScreen->switchToPreset);
-
                             auto layeredScreen = mpc.getLayeredScreen();
                             layeredScreen->postToUiThread(utils::Task(
                                 [layeredScreen]

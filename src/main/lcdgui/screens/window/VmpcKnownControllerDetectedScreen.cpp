@@ -35,13 +35,6 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
 {
     const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
 
-    std::shared_ptr<MidiControlPresetV3> preset;
-
-    mpc.getDisk()->readMidiControlPreset(
-        mpc.paths->getDocuments()->midiControlPresetsPath() /
-            (controllerName + ".json"),
-        preset);
-
     switch (i)
     {
         case 1:
@@ -50,30 +43,44 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             break;
         case 2:
             // YES
+            mpc.getDisk()->readMidiControlPreset(
+                mpc.paths->getDocuments()->midiControlPresetsPath() /
+                    (controllerName + ".json"),
+                vmpcMidiScreen->switchToPreset);
+
             vmpcMidiScreen->shouldSwitch.store(true);
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         case 3:
             // NEVER
-//            if (preset != presets.end())
-//            {
-//                (*preset)->autoloadMode = AutoLoadMode::AutoLoadModeNo;
-//            }
+            //            if (preset != presets.end())
+            //            {
+            //                (*preset)->autoloadMode =
+            //                AutoLoadMode::AutoLoadModeNo;
+            //            }
 
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         case 4:
             // ALWAYS
-//            if (preset != presets.end())
-//            {
-//                if ((*preset)->autoloadMode != AutoLoadMode::AutoLoadModeYes)
-//                {
-//                    (*preset)->autoloadMode = AutoLoadMode::AutoLoadModeYes;
-//                    mpc.getDisk()->writeMidiControlPreset(*preset);
-//                    legacy::MidiControlPersistence::
-//                        loadAllPresetsFromDiskIntoMemory(mpc);
-//                }
-//            }
+            //            if (preset != presets.end())
+            //            {
+            //                if ((*preset)->autoloadMode !=
+            //                AutoLoadMode::AutoLoadModeYes)
+            //                {
+            //                    (*preset)->autoloadMode =
+            //                    AutoLoadMode::AutoLoadModeYes;
+            //                    mpc.getDisk()->writeMidiControlPreset(*preset);
+            //                    legacy::MidiControlPersistence::
+            //                        loadAllPresetsFromDiskIntoMemory(mpc);
+            //                }
+            //            }
+
+            mpc.getDisk()->readMidiControlPreset(
+                mpc.paths->getDocuments()->midiControlPresetsPath() /
+                    (controllerName + ".json"),
+                vmpcMidiScreen->switchToPreset);
+
             vmpcMidiScreen->shouldSwitch.store(true);
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
@@ -89,28 +96,28 @@ void VmpcKnownControllerDetectedScreen::displayMessage() const
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-//    for (const auto &p : mpc.midiControlPresets)
-//    {
-//        if (controllerName.find(p->name) != std::string::npos)
-//        {
-//            if (p->autoloadMode ==
-//                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
-//            {
-//                mpc.getLayeredScreen()->closeCurrentScreen();
-//                return;
-//            }
-//            if (p->autoloadMode ==
-//                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
-//            {
-//                const auto vmpcMidiScreen =
-//                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
-//                vmpcMidiScreen->shouldSwitch.store(true);
-//                mpc.getLayeredScreen()->closeCurrentScreen();
-//                return;
-//            }
-//            break;
-//        }
-//    }
+    //    for (const auto &p : mpc.midiControlPresets)
+    //    {
+    //        if (controllerName.find(p->name) != std::string::npos)
+    //        {
+    //            if (p->autoloadMode ==
+    //                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
+    //            {
+    //                mpc.getLayeredScreen()->closeCurrentScreen();
+    //                return;
+    //            }
+    //            if (p->autoloadMode ==
+    //                legacy::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+    //            {
+    //                const auto vmpcMidiScreen =
+    //                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
+    //                vmpcMidiScreen->shouldSwitch.store(true);
+    //                mpc.getLayeredScreen()->closeCurrentScreen();
+    //                return;
+    //            }
+    //            break;
+    //        }
+    //    }
 
     displayMessage();
 }
