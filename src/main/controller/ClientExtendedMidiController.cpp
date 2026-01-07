@@ -84,29 +84,31 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 continue;
             }
 
-            static const std::vector<Id> directionalComponents{
-                DATA_WHEEL, SLIDER, MAIN_VOLUME_POT, REC_GAIN_POT};
+            static const std::vector<Id> potComponents{SLIDER, MAIN_VOLUME_POT,
+                                                       REC_GAIN_POT};
 
-            if (std::find(directionalComponents.begin(),
-                          directionalComponents.end(),
-                          componentId) != directionalComponents.end())
+            if (componentId == DATA_WHEEL)
             {
                 const auto direction = b.getHardwareDirection();
-                assert(direction != input::Direction::NoDirection);
 
-                if (direction == input::Direction::Positive)
+                if (direction == input::Direction::NoDirection)
                 {
-                    if (componentId == DATA_WHEEL)
-                    {
-                        turnWheel(1);
-                    }
+                }
+                else if (direction == input::Direction::Positive)
+                {
+                    turnWheel(1);
                 }
                 else
                 {
-                    if (componentId == DATA_WHEEL)
-                    {
-                        turnWheel(-1);
-                    }
+                    turnWheel(-1);
+                }
+            }
+            else if (std::find(potComponents.begin(), potComponents.end(),
+                               componentId) != potComponents.end())
+            {
+                if (componentId == SLIDER)
+                {
+                    moveSlider(1.f - (e.getControllerValue() / 127.f));
                 }
             }
             else
@@ -208,15 +210,24 @@ void ClientExtendedMidiController::turnWheel(int i) const
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientExtendedMidiController::pressPad(hardware::ComponentId id, float normalizedVelocity) const
+void ClientExtendedMidiController::moveSlider(float normalizedY) const
+{
+    ClientHardwareEvent ev{};
+    ev.source = ClientHardwareEvent::Source::Internal;
+    ev.componentId = SLIDER;
+    ev.type = ClientHardwareEvent::Type::SliderMove;
+    ev.value = normalizedY;
+    clientHardwareEventController->handleClientHardwareEvent(ev);
+}
+
+void ClientExtendedMidiController::pressPad(hardware::ComponentId id,
+                                            float normalizedVelocity) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = id;
     ev.type = ClientHardwareEvent::Type::PadPress;
-    ev.index =
-        static_cast<int>(id) -
-        static_cast<int>(PAD_1_OR_AB);
+    ev.index = static_cast<int>(id) - static_cast<int>(PAD_1_OR_AB);
     ev.value = normalizedVelocity;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
@@ -227,8 +238,6 @@ void ClientExtendedMidiController::releasePad(hardware::ComponentId id) const
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = id;
     ev.type = ClientHardwareEvent::Type::PadRelease;
-    ev.index =
-        static_cast<int>(id) -
-        static_cast<int>(PAD_1_OR_AB);
+    ev.index = static_cast<int>(id) - static_cast<int>(PAD_1_OR_AB);
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
