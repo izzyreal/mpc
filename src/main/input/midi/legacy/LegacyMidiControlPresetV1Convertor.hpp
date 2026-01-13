@@ -3,6 +3,7 @@
 #include "LegacyMidiControlPresetUtil.hpp"
 
 #include "StrUtil.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
 
 #include <nlohmann/json.hpp>
 #include <string>
@@ -100,18 +101,13 @@ namespace mpc::input::midi::legacy
             unsigned char typeByte = static_cast<unsigned char>(data[pos++]);
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
             unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
-
-            //            printf("=================\n");
-            //            printf("label: %s\n", label.c_str());
-            //            printf("type: %i\n", typeByte);
-            //            printf("channel: %i\n", channelByte);
-            //            printf("number: %i\n", numberByte);
-
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
             json binding;
             binding["target"] = bestGuessTarget;
-            binding["messageType"] = typeByte == 0 ? "CC" : "Note";
+            binding["messageType"] = (typeByte == 0)
+                                         ? input::midi::controllerStr
+                                         : input::midi::noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
 
@@ -133,11 +129,6 @@ namespace mpc::input::midi::legacy
             {
                 binding["midiNumber"] = midiNumber;
                 binding["enabled"] = true;
-            }
-
-            if (typeByte == 0)
-            {
-                binding["midiValue"] = -1;
             }
 
             if (label.find("extra") != std::string::npos && midiNumber == -1)
@@ -173,6 +164,9 @@ namespace mpc::input::midi::legacy
             bindings.push_back(binding);
         }
 
+        // Reconstruct data wheel behavior into our new model:
+        // - either two directional bindings (negative/positive)
+        // - or two clones of the single "datawheel" binding as +/-.
         if (hasDatawheel && !datawheelEnabled && datawheelUpEnabled &&
             datawheelDownEnabled)
         {
@@ -194,6 +188,70 @@ namespace mpc::input::midi::legacy
                     bindings.push_back(b.binding);
                     b.binding["target"] = "hardware:data-wheel:positive";
                     bindings.push_back(b.binding);
+                }
+            }
+        }
+
+        // Now enforce the new schema rules for midiValue / encoderMode.
+        // This legacy format never emits plain "hardware:data-wheel", only
+        // the +/- variants, so we don't set encoderMode here at all.
+        for (auto &binding : bindings)
+        {
+            const std::string target = binding.at("target").get<std::string>();
+            const std::string messageType =
+                binding.at("messageType").get<std::string>();
+
+            const bool isController =
+                (messageType == input::midi::controllerStr);
+
+            const bool isSequencer =
+                target.rfind("sequencer:", 0) == 0;
+
+            const bool isHardware =
+                target.rfind("hardware:", 0) == 0;
+
+            const bool isPad =
+                target.rfind("hardware:pad-", 0) == 0;
+
+            const bool isPot =
+                target == "hardware:slider" ||
+                target == "hardware:rec-gain-pot" ||
+                target == "hardware:main-volume-pot";
+
+            const bool isDataWheelPlain =
+                target == "hardware:data-wheel";
+
+            const bool isButtonLike =
+                isSequencer ||
+                (isHardware && !isPad && !isPot && !isDataWheelPlain);
+
+            if (isController)
+            {
+                if (isButtonLike)
+                {
+                    // Button-like hardware and sequencer CC bindings
+                    // require midiValue. Use a sensible default threshold.
+                    if (!binding.contains("midiValue"))
+                    {
+                        binding["midiValue"] = 64;
+                    }
+                }
+                else
+                {
+                    // Pads, pots, plain data wheel (if it ever appeared)
+                    // must not have midiValue.
+                    if (binding.contains("midiValue"))
+                    {
+                        binding.erase("midiValue");
+                    }
+                }
+            }
+            else
+            {
+                // messageType == "note": midiValue is always forbidden.
+                if (binding.contains("midiValue"))
+                {
+                    binding.erase("midiValue");
                 }
             }
         }

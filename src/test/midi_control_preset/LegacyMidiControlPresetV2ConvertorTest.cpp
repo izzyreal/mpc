@@ -49,6 +49,7 @@ TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema",
     catch (const std::exception &e)
     {
         std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
         FAIL("Converted preset did not pass consistency check.");
     }
 }

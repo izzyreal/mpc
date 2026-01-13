@@ -132,12 +132,19 @@ namespace mpc::input::midi::legacy
             bindingMap[binding["target"].get<std::string>()] = &binding;
         }
 
+        // Add missing targets with default binding
         for (const auto &lbl : allowedTargets)
         {
             if (bindingMap.find(lbl) == bindingMap.end())
             {
                 json newBinding = defaultBinding;
                 newBinding["target"] = lbl;
+
+                if (lbl != "hardware:data-wheel")
+                {
+                    newBinding.erase("encoderMode");
+                }
+
                 preset["bindings"].push_back(newBinding);
             }
         }
@@ -145,10 +152,18 @@ namespace mpc::input::midi::legacy
         const json &props = bindingDef["properties"];
         for (auto &binding : preset["bindings"])
         {
+            const std::string target =
+                binding.contains("target") && binding["target"].is_string()
+                    ? binding["target"].get<std::string>()
+                    : std::string{};
+
+            // Fill/repair all properties except target, encoderMode, midiValue
             for (auto it = props.begin(); it != props.end(); ++it)
             {
                 const std::string propName = it.key();
-                if (propName == "target")
+                if (propName == "target" ||
+                    propName == "encoderMode" ||
+                    propName == "midiValue")
                 {
                     continue;
                 }
@@ -198,13 +213,90 @@ namespace mpc::input::midi::legacy
                 }
             }
 
-            if (binding.contains("messageType") &&
-                binding["messageType"] == "Note")
+            // encoderMode: only allowed for hardware:data-wheel
+            if (target == "hardware:data-wheel")
+            {
+                const json &encSchema = props.at("encoderMode");
+                if (!binding.contains("encoderMode") ||
+                    !isValidProperty(binding["encoderMode"], encSchema))
+                {
+                    if (defaultBinding.contains("encoderMode") &&
+                        !defaultBinding["encoderMode"].is_null())
+                    {
+                        binding["encoderMode"] = defaultBinding["encoderMode"];
+                    }
+                }
+            }
+            else
+            {
+                binding.erase("encoderMode");
+            }
+
+            // midiValue: follow schema semantics
+            if (!binding.contains("messageType") ||
+                !binding["messageType"].is_string())
             {
                 binding.erase("midiValue");
             }
+            else
+            {
+                const std::string mt = binding["messageType"].get<std::string>();
+                const bool isController = (mt == "controller");
+
+                if (!isController)
+                {
+                    // Note bindings must not have midiValue
+                    binding.erase("midiValue");
+                }
+                else
+                {
+                    const bool isSequencer =
+                        target.rfind("sequencer:", 0) == 0;
+
+                    const bool isPad =
+                        target.rfind("hardware:pad-", 0) == 0;
+
+                    const bool isPot =
+                        target == "hardware:slider" ||
+                        target == "hardware:rec-gain-pot" ||
+                        target == "hardware:main-volume-pot";
+
+                    const bool isPlainDataWheel =
+                        target == "hardware:data-wheel";
+
+                    const bool isHardware =
+                        target.rfind("hardware:", 0) == 0;
+
+                    const bool isButtonLike =
+                        isSequencer ||
+                        (isHardware && !isPad && !isPot && !isPlainDataWheel);
+
+                    if (isButtonLike)
+                    {
+                        // Require midiValue; if missing, use default
+                        if (!binding.contains("midiValue") ||
+                            !binding["midiValue"].is_number_integer())
+                        {
+                            if (defaultBinding.contains("midiValue"))
+                            {
+                                binding["midiValue"] = defaultBinding["midiValue"];
+                            }
+                            else
+                            {
+                                binding["midiValue"] = 64;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Pads, pots, plain data-wheel: must not have midiValue
+                        binding.erase("midiValue");
+                    }
+                }
+            }
         }
 
+        // Filter duplicates and unknown targets
         json filtered = json::array();
         std::unordered_set<std::string> seen;
         for (auto &binding : preset["bindings"])
@@ -230,5 +322,4 @@ namespace mpc::input::midi::legacy
             preset["midiControllerDeviceName"] = patchedName;
         }
     }
-
 } // namespace mpc::input::midi::legacy

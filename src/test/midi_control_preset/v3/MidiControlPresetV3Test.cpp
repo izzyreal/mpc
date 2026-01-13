@@ -76,21 +76,79 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     preset.setName("RoundTrip");
     preset.setAutoLoad("Ask");
 
-    auto targets = MidiControlPresetUtil::load_available_targets();
-    std::vector<Binding> b;
-    b.reserve(targets.size());
-    for (auto &lbl : targets)
+    std::vector<Binding> bindings;
+
+    // 1) Hardware button, CC with midiValue
     {
-        Binding bind;
-        bind.setTarget(lbl);
-        bind.setMessageType(BindingMessageType::Controller);
-        bind.setMidiNumber(10);
-        bind.setMidiValue(127);
-        bind.setMidiChannelIndex(0);
-        bind.setEnabled(true);
-        b.push_back(bind);
+        Binding b;
+        b.setTarget("hardware:play");
+        b.setMessageType(BindingMessageType::Controller);
+        b.setMidiNumber(10);
+        b.setMidiValue(64);
+        b.setMidiChannelIndex(0);
+        b.setEnabled(true);
+        bindings.push_back(b);
     }
-    preset.setBindings(b);
+
+    // 2) Pad, Note without midiValue
+    {
+        Binding b;
+        b.setTarget("hardware:pad-1-or-ab");
+        b.setMessageType(BindingMessageType::Note);
+        b.setMidiNumber(36);
+        b.setMidiChannelIndex(1);
+        b.setEnabled(true);
+        bindings.push_back(b);
+    }
+
+    // 3) Pot/slider, CC without midiValue
+    {
+        Binding b;
+        b.setTarget("hardware:slider");
+        b.setMessageType(BindingMessageType::Controller);
+        b.setMidiNumber(7);
+        b.setMidiChannelIndex(2);
+        b.setEnabled(true);
+        bindings.push_back(b);
+    }
+
+    // 4) Encoder-style data wheel (no midiValue, has encoderMode)
+    {
+        Binding b;
+        b.setTarget("hardware:data-wheel");
+        b.setMessageType(BindingMessageType::Controller);
+        b.setEncoderMode(BindingEncoderMode::RelativeStateless);
+        b.setMidiNumber(16);
+        b.setMidiChannelIndex(0);
+        b.setEnabled(true);
+        bindings.push_back(b);
+    }
+
+    // 5) Button-like data wheel negative (has midiValue)
+    {
+        Binding b;
+        b.setTarget("hardware:data-wheel:negative");
+        b.setMessageType(BindingMessageType::Controller);
+        b.setMidiNumber(17);
+        b.setMidiValue(64);
+        b.setMidiChannelIndex(0);
+        b.setEnabled(true);
+        bindings.push_back(b);
+    }
+
+    // 6) Sequencer CC (has midiValue)
+    {
+        Binding b;
+        b.setTarget("sequencer:play");
+        b.setMessageType(BindingMessageType::Controller);
+        b.setMidiNumber(20);
+        b.setMidiValue(64);
+        b.setMidiChannelIndex(0);
+        b.setEnabled(true);
+        bindings.push_back(b);
+    }
+
+    preset.setBindings(bindings);
 
     json j = preset;
     MidiControlPresetV3 restored = j.get<MidiControlPresetV3>();
@@ -98,7 +156,55 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(restored.getVersion() == CURRENT_PRESET_VERSION);
     REQUIRE(restored.getName() == "RoundTrip");
     REQUIRE(restored.getAutoLoad() == "Ask");
-    REQUIRE(restored.getBindings().size() == 74);
+    REQUIRE(restored.getBindings().size() == bindings.size());
+
+    const auto &rb = restored.getBindings();
+
+    // 1) Hardware button
+    REQUIRE(rb[0].getTarget() == "hardware:play");
+    REQUIRE(rb[0].isController());
+    REQUIRE(rb[0].getMidiNumber() == 10);
+    REQUIRE(rb[0].getMidiValue() == 64);
+    REQUIRE(rb[0].getMidiChannelIndex() == 0);
+    REQUIRE(rb[0].isEnabled());
+
+    // 2) Pad note, no midiValue
+    REQUIRE(rb[1].getTarget() == "hardware:pad-1-or-ab");
+    REQUIRE(rb[1].isNote());
+    REQUIRE(rb[1].getMidiNumber() == 36);
+    REQUIRE(rb[1].getMidiChannelIndex() == 1);
+    REQUIRE(rb[1].isEnabled());
+
+    // 3) Slider CC, no midiValue
+    REQUIRE(rb[2].getTarget() == "hardware:slider");
+    REQUIRE(rb[2].isController());
+    REQUIRE(rb[2].getMidiNumber() == 7);
+    REQUIRE(rb[2].getMidiChannelIndex() == 2);
+    REQUIRE(rb[2].isEnabled());
+
+    // 4) Encoder-style data wheel
+    REQUIRE(rb[3].getTarget() == "hardware:data-wheel");
+    REQUIRE(rb[3].isController());
+    REQUIRE(rb[3].getEncoderMode() == BindingEncoderMode::RelativeStateless);
+    REQUIRE(rb[3].getMidiNumber() == 16);
+    REQUIRE(rb[3].getMidiChannelIndex() == 0);
+    REQUIRE(rb[3].isEnabled());
+
+    // 5) Button-like data wheel negative
+    REQUIRE(rb[4].getTarget() == "hardware:data-wheel:negative");
+    REQUIRE(rb[4].isController());
+    REQUIRE(rb[4].getMidiNumber() == 17);
+    REQUIRE(rb[4].getMidiValue() == 64);
+    REQUIRE(rb[4].getMidiChannelIndex() == 0);
+    REQUIRE(rb[4].isEnabled());
+
+    // 6) Sequencer CC
+    REQUIRE(rb[5].getTarget() == "sequencer:play");
+    REQUIRE(rb[5].isController());
+    REQUIRE(rb[5].getMidiNumber() == 20);
+    REQUIRE(rb[5].getMidiValue() == 64);
+    REQUIRE(rb[5].getMidiChannelIndex() == 0);
+    REQUIRE(rb[5].isEnabled());
 }
 
 TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
@@ -115,14 +221,18 @@ TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
 TEST_CASE("Binding::from_json enforces midiValue rules",
           "[MidiControlPresetV3]")
 {
-    json validCC = {{"target", "left"},      {"messageType", "CC"},
-                    {"midiNumber", 10},      {"midiValue", 20},
-                    {"midiChannelIndex", 0}, {"enabled", true}};
+    json validCC = {{"target", "hardware:cursor-left-or-digit"},
+                    {"messageType", "controller"},
+                    {"midiNumber", 10},
+                    {"midiValue", 20},
+                    {"midiChannelIndex", 0},
+                    {"enabled", true}};
+
     json invalidCC = validCC;
     invalidCC.erase("midiValue");
 
     json validNote = {{"target", "right"},
-                      {"messageType", "Note"},
+                      {"messageType", "note"},
                       {"midiNumber", 10},
                       {"midiChannelIndex", 0},
                       {"enabled", true}};

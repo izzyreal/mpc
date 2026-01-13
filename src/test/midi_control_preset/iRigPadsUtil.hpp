@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hardware/ComponentId.hpp"
+#include "input/midi/MidiControlPresetV3.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -24,8 +25,8 @@ inline void checkIRigPadsPreset(const json &preset)
     }
 
     static constexpr int AllChannels = -1;
-    static constexpr int AllCcValues = -1;
     static constexpr int DefaultMidiNumber = 0;
+    static constexpr int DefaultMidiValue = 64;
 
     struct BindingSpec
     {
@@ -36,8 +37,8 @@ inline void checkIRigPadsPreset(const json &preset)
         bool enabled;
     };
 
-    static const auto NoteStr = std::string("Note");
-    static const auto CcStr = std::string("CC");
+    static const auto NoteStr = mpc::input::midi::noteStr;
+    static const auto CcStr = mpc::input::midi::controllerStr;
 
     using Id = mpc::hardware::ComponentId;
 
@@ -49,16 +50,17 @@ inline void checkIRigPadsPreset(const json &preset)
     auto getDisabledBinding =
         [&](const Id id) -> std::pair<std::string, BindingSpec>
     {
-        return {getTarget(id), BindingSpec{CcStr, DefaultMidiNumber,
-                                           AllChannels, AllCcValues, false}};
+        return {getTarget(id),
+                BindingSpec{CcStr, DefaultMidiNumber, DefaultMidiValue,
+                            AllChannels, false}};
     };
 
     auto getDisabledSeqBinding =
         [&](const std::string seqTarget) -> std::pair<std::string, BindingSpec>
     {
         return {"sequencer:" + seqTarget,
-                BindingSpec{CcStr, DefaultMidiNumber, AllChannels, AllCcValues,
-                            false}};
+                BindingSpec{CcStr, DefaultMidiNumber, DefaultMidiValue,
+                            AllChannels, false}};
     };
 
     const std::unordered_map<std::string, BindingSpec> expected = {
@@ -95,18 +97,21 @@ inline void checkIRigPadsPreset(const json &preset)
         {getTarget(Id::PAD_16_OR_PARENTHESES),
          {NoteStr, 52, std::nullopt, AllChannels, true}},
         {getTarget(Id::DATA_WHEEL) + ":negative",
-         {CcStr, 7, AllCcValues, AllChannels, true}},
+         {CcStr, 7, DefaultMidiValue, AllChannels, true}},
         {getTarget(Id::DATA_WHEEL) + ":positive",
-         {CcStr, 7, AllCcValues, AllChannels, true}},
-        {getTarget(Id::SLIDER), {CcStr, 1, AllCcValues, AllChannels, true}},
+         {CcStr, 7, DefaultMidiValue, AllChannels, true}},
+        {getTarget(Id::DATA_WHEEL),
+         {CcStr, DefaultMidiNumber, DefaultMidiValue, AllChannels, false}},
+        {getTarget(Id::SLIDER),
+         {CcStr, 1, DefaultMidiValue, AllChannels, true}},
         {getTarget(Id::REC_GAIN_POT),
-         {CcStr, 11, AllCcValues, AllChannels, true}},
+         {CcStr, 11, DefaultMidiValue, AllChannels, true}},
         {getTarget(Id::MAIN_VOLUME_POT),
-         {CcStr, 10, AllCcValues, AllChannels, true}},
+         {CcStr, 10, DefaultMidiValue, AllChannels, true}},
         {getTarget(Id::FULL_LEVEL_OR_CASE_SWITCH),
-         {CcStr, 20, AllCcValues, AllChannels, true}},
+         {CcStr, 20, DefaultMidiValue, AllChannels, true}},
         {getTarget(Id::SIXTEEN_LEVELS_OR_SPACE),
-         {CcStr, 21, AllCcValues, AllChannels, true}},
+         {CcStr, 21, DefaultMidiValue, AllChannels, true}},
         getDisabledBinding(Id::CURSOR_LEFT_OR_DIGIT),
         getDisabledBinding(Id::CURSOR_RIGHT_OR_DIGIT),
         getDisabledBinding(Id::CURSOR_UP),
@@ -180,6 +185,12 @@ inline void checkIRigPadsPreset(const json &preset)
 
     for (const auto &kv : expected)
     {
+        if (kv.first == "hardware:8-or-other")
+        {
+            const auto foo = kv.second;
+            printf("");
+        }
+
         const std::string &target = kv.first;
         const BindingSpec &spec = kv.second;
         bool found = false;
@@ -211,11 +222,8 @@ inline void checkIRigPadsPreset(const json &preset)
 
             if (spec.type == CcStr)
             {
-                if (!b.contains("midiValue"))
-                {
-                    continue;
-                }
-                if (spec.value == -1 && b["midiValue"].get<int>() != -1)
+                if (b.contains("midiValue") &&
+                    spec.value != b["midiValue"].get<int>())
                 {
                     continue;
                 }
