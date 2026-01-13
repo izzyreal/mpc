@@ -27,6 +27,7 @@
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
 #include "input/midi/MidiControlPresetV3.hpp"
+#include "input/midi/MidiControlPresetUtil.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
 #include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
 
@@ -499,11 +500,17 @@ void AbstractDisk::readMidiControlPreset(
             try
             {
                 from_json(fileAsJson, *preset);
-                return preset;
             }
             catch (const std::exception)
             {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Unable to convert JSON to preset"});
             }
+
+            MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);
+            MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(
+                preset);
+            return preset;
         }
 
         return tl::make_unexpected(

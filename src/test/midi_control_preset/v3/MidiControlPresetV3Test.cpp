@@ -39,7 +39,7 @@ TEST_CASE("MidiControlPresetV3 rejects wrong binding targets",
     for (int i = 0; i < 81; ++i)
     {
         b[i].setTarget("pad-" + std::to_string(i));
-        b[i].setMessageType("Note");
+        b[i].setMessageType(BindingMessageType::Note);
         b[i].setMidiNumber(60);
         b[i].setMidiChannelIndex(0);
         b[i].setEnabled(true);
@@ -59,7 +59,7 @@ TEST_CASE("MidiControlPresetV3 accepts correct binding target set",
     {
         Binding bind;
         bind.setTarget(target);
-        bind.setMessageType("CC");
+        bind.setMessageType(BindingMessageType::Controller);
         bind.setMidiNumber(1);
         bind.setMidiValue(10);
         bind.setMidiChannelIndex(0);
@@ -83,7 +83,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     {
         Binding bind;
         bind.setTarget(lbl);
-        bind.setMessageType("CC");
+        bind.setMessageType(BindingMessageType::Controller);
         bind.setMidiNumber(10);
         bind.setMidiValue(127);
         bind.setMidiChannelIndex(0);
@@ -149,7 +149,7 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
     {
         Binding bind;
         bind.setTarget(lbl);
-        bind.setMessageType("Note");
+        bind.setMessageType(BindingMessageType::Note);
         bind.setMidiNumber(10);
         bind.setMidiChannelIndex(0);
         bind.setEnabled(true);

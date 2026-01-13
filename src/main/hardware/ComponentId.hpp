@@ -5,7 +5,6 @@
 
 namespace mpc::hardware
 {
-
     enum ComponentId
     {
         NONE = 0,
@@ -94,6 +93,17 @@ namespace mpc::hardware
 
         COMPONENT_ID_COUNT
     };
+
+    static bool isPadId(const ComponentId id)
+    {
+        return id >= PAD_1_OR_AB && id <= PAD_16_OR_PARENTHESES;
+    }
+
+    static bool isButtonId(const ComponentId id)
+    {
+        return id >= CURSOR_LEFT_OR_DIGIT && id <= NUM_9_OR_MIDI_SYNC;
+    }
+
 
     static const std::unordered_map<ComponentId, std::string>
         componentIdToLabel{

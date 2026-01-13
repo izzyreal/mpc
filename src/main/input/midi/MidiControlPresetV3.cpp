@@ -27,12 +27,8 @@ void Binding::setTarget(const std::string &n)
     target = n;
 }
 
-void Binding::setMessageType(const std::string &t)
+void Binding::setMessageType(const BindingMessageType t)
 {
-    if (t != "CC" && t != "Note")
-    {
-        throw std::invalid_argument("messageType must be 'CC' or 'Note'");
-    }
     messageType = t;
 }
 
@@ -52,7 +48,7 @@ void Binding::setMidiNumber(int n)
 
 void Binding::setMidiValue(int v)
 {
-    midiValue = MidiValue(v);
+    midiValue = MidiValue(std::clamp(v, 1, 127));
 }
 
 void Binding::setMidiChannelIndex(int ch)
@@ -65,12 +61,17 @@ void Binding::setEnabled(bool e)
     enabled = e;
 }
 
+void Binding::setEncoderMode(const BindingEncoderMode m)
+{
+    encoderMode = m;
+}
+
 const std::string &Binding::getTarget() const
 {
     return target;
 }
 
-const std::string &Binding::getMessageType() const
+const BindingMessageType &Binding::getMessageType() const
 {
     return messageType;
 }
@@ -95,14 +96,19 @@ bool Binding::isEnabled() const
     return enabled;
 }
 
-bool Binding::isCc() const
+BindingEncoderMode Binding::getEncoderMode() const
 {
-    return getMessageType() == "CC";
+    return encoderMode;
+}
+
+bool Binding::isController() const
+{
+    return getMessageType() == BindingMessageType::Controller;
 }
 
 bool Binding::isNote() const
 {
-    return getMessageType() == "Note";
+    return getMessageType() == BindingMessageType::Note;
 }
 
 std::optional<std::string> Binding::getHardwareTarget() const
@@ -187,13 +193,47 @@ std::string Binding::getTargetDisplayName() const
 void mpc::input::midi::to_json(json &j, const Binding &b)
 {
     j = json{{"target", b.getTarget()},
-             {"messageType", b.getMessageType()},
+             {"messageType", messageTypeToString(b.getMessageType())},
              {"midiNumber", b.getMidiNumber()},
              {"midiChannelIndex", b.getMidiChannelIndex()},
              {"enabled", b.isEnabled()}};
-    if (b.getMessageType() == "CC")
+
+    if (b.getTarget() == "hardware:data-wheel")
     {
-        j["midiValue"] = b.getMidiValue();
+        j["encoderMode"] = encoderModeToString(b.getEncoderMode());
+        return;
+    }
+
+    if (b.getMessageType() == BindingMessageType::Controller)
+    {
+        bool isButtonLike = false;
+
+        const auto sequencerTargetStr = b.getSequencerTarget();
+        if (sequencerTargetStr.has_value())
+        {
+            isButtonLike = true;
+        }
+
+        const auto hardwareTargetStr = b.getHardwareTarget();
+        if (hardwareTargetStr.has_value())
+        {
+            const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
+            if (hardware::isButtonId(id))
+            {
+                isButtonLike = true;
+            }
+        }
+
+        if (b.getTarget() == "hardware:data-wheel:negative" ||
+            b.getTarget() == "hardware:data-wheel:positive")
+        {
+            isButtonLike = true;
+        }
+
+        if (isButtonLike)
+        {
+            j["midiValue"] = b.getMidiValue();
+        }
     }
 }
 
@@ -204,26 +244,118 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     j.at("messageType").get_to(type);
 
     b.setTarget(target);
-    b.setMessageType(type);
+    b.setMessageType(stringToMessageType(type));
     b.setMidiNumber(j.at("midiNumber").get<int>());
     b.setMidiChannelIndex(j.at("midiChannelIndex").get<int>());
     b.setEnabled(j.at("enabled").get<bool>());
 
-    if (type == "CC")
+    const bool isController = b.isController();
+    const bool hasMidiValue = j.contains("midiValue");
+    bool shouldContainMidiValue = false;
+
+    if (target == "hardware:data-wheel")
     {
-        if (!j.contains("midiValue"))
+        if (!j.contains("encoderMode"))
         {
-            throw std::invalid_argument("CC binding requires midiValue");
+            throw std::invalid_argument(
+                "Data wheel binding requires 'encoderMode'");
         }
-        b.setMidiValue(j.at("midiValue").get<int>());
+
+        b.setEncoderMode(
+            stringToEncoderMode(j.at("encoderMode").get<std::string>()));
+
+        if (hasMidiValue)
+        {
+            throw std::invalid_argument(
+                "Data wheel binding must not include 'midiValue'");
+        }
+    }
+    else if (const auto hardwareTargetStr = b.getHardwareTarget())
+    {
+        const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
+
+        if (j.contains("encoderMode"))
+        {
+            throw std::invalid_argument(
+                "encoderMode is only allowed for hardware:data-wheel");
+        }
+
+        const bool isButtonHardware = hardware::isButtonId(id);
+        const bool isDataWheelDir = target == "hardware:data-wheel:negative" ||
+                                    target == "hardware:data-wheel:positive";
+
+        const bool isButtonLike = isButtonHardware || isDataWheelDir;
+
+        if (isController && isButtonLike)
+        {
+            if (!hasMidiValue)
+            {
+                throw std::invalid_argument(
+                    "Button-like binding requires 'midiValue'");
+            }
+
+            const auto candidate = j.at("midiValue").get<int>();
+
+            if (candidate < 1 || candidate > 127)
+            {
+                throw std::invalid_argument(
+                    "'midiValue' must be between 1 and 127, but it is " +
+                    std::to_string(candidate));
+            }
+
+            b.setMidiValue(candidate);
+            shouldContainMidiValue = true;
+        }
+        else
+        {
+            if (hasMidiValue)
+            {
+                throw std::invalid_argument(
+                    "Binding must not include 'midiValue'");
+            }
+        }
+    }
+    else if (const auto sequencerTargetStr = b.getSequencerTarget())
+    {
+        if (j.contains("encoderMode"))
+        {
+            throw std::invalid_argument(
+                "encoderMode is only allowed for hardware:data-wheel");
+        }
+
+        if (isController)
+        {
+            if (!hasMidiValue)
+            {
+                throw std::invalid_argument(
+                    "Sequencer binding requires 'midiValue'");
+            }
+
+            b.setMidiValue(j.at("midiValue").get<int>());
+            shouldContainMidiValue = true;
+        }
+        else
+        {
+            if (hasMidiValue)
+            {
+                throw std::invalid_argument(
+                    "Non-controller sequencer binding must not include "
+                    "'midiValue'");
+            }
+        }
     }
     else
     {
-        if (j.contains("midiValue"))
+        if (j.contains("encoderMode"))
         {
             throw std::invalid_argument(
-                "Note binding must not include midiValue");
+                "encoderMode is only allowed for hardware:data-wheel");
         }
+    }
+
+    if (!shouldContainMidiValue && hasMidiValue)
+    {
+        throw std::invalid_argument("Binding must not include 'midiValue'");
     }
 }
 
@@ -309,41 +441,6 @@ const std::vector<Binding> &MidiControlPresetV3::getBindings() const
 Binding &MidiControlPresetV3::getBindingByIndex(const int idx)
 {
     return bindings[idx];
-}
-
-bool MidiControlPresetV3::hasStatefulDataWheelBindingForController(
-    const MidiNumber controllerNumber) const
-{
-    const auto dataWheelLabel =
-        hardware::componentIdToLabel.at(hardware::ComponentId::DATA_WHEEL);
-
-    std::optional<int> prevCcValue = std::nullopt;
-
-    for (auto &b : bindings)
-    {
-        if (b.getMessageType() != "CC" || b.getMidiNumber() != controllerNumber)
-        {
-            continue;
-        }
-
-        if (auto h = b.getHardwareTarget(); h && *h == dataWheelLabel)
-        {
-            if (prevCcValue && (*prevCcValue == b.getMidiValue() ||
-                                b.getMidiValue() == NoMidiValue))
-            {
-                return true;
-            }
-
-            if (b.getMidiValue() == NoMidiValue)
-            {
-                return true;
-            }
-
-            prevCcValue = b.getMidiValue();
-        }
-    }
-
-    return false;
 }
 
 void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)

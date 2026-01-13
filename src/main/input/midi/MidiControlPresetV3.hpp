@@ -19,11 +19,79 @@ namespace mpc::input::midi
     static const std::string sequencerStr = "sequencer:";
     static const std::string negativeStr = ":negative";
     static const std::string positiveStr = ":positive";
+    static const std::string controllerStr = "controller";
+    static const std::string noteStr = "note";
+
+    enum class BindingMessageType
+    {
+        Controller,
+        Note
+    };
+
+    enum class BindingEncoderMode
+    {
+        RelativeStateless,
+        RelativeStateful
+    };
+
+    inline std::string messageTypeToString(const BindingMessageType t)
+    {
+        if (t == BindingMessageType::Controller)
+        {
+            return controllerStr;
+        }
+        return noteStr;
+    }
+
+    inline BindingMessageType stringToMessageType(const std::string &s)
+    {
+        if (s == controllerStr)
+        {
+            return BindingMessageType::Controller;
+        }
+
+        if (s == noteStr)
+        {
+            return BindingMessageType::Note;
+        }
+
+        throw std::invalid_argument(
+            "Message type string has to be 'controller' or 'note', but it was "
+            "'" +
+            s + "'");
+    }
+
+    inline std::string encoderModeToString(const BindingEncoderMode m)
+    {
+        switch (m)
+        {
+            case BindingEncoderMode::RelativeStateful:
+                return "relative_stateful";
+            case BindingEncoderMode::RelativeStateless:
+                return "relative_stateless";
+        }
+
+        throw std::invalid_argument("Invalid encoderMode");
+    }
+
+    inline BindingEncoderMode stringToEncoderMode(const std::string &s)
+    {
+        if (s == "relative_stateful")
+        {
+            return BindingEncoderMode::RelativeStateful;
+        }
+        if (s == "relative_stateless")
+        {
+            return BindingEncoderMode::RelativeStateless;
+        }
+        throw std::invalid_argument("Invalid encoderMode string: " + s);
+    }
 
     struct Binding
     {
         std::string target;
-        std::string messageType;
+        BindingMessageType messageType{BindingMessageType::Controller};
+        BindingEncoderMode encoderMode{BindingEncoderMode::RelativeStateless};
         MidiNumber midiNumber{0};
         MidiValue midiValue{0};
         MidiChannel midiChannelIndex{0};
@@ -35,7 +103,7 @@ namespace mpc::input::midi
                    midiNumber == other.midiNumber &&
                    midiValue == other.midiValue &&
                    midiChannelIndex == other.midiChannelIndex &&
-                   enabled == other.enabled;
+                   enabled == other.enabled && encoderMode == other.encoderMode;
         }
 
         bool operator!=(Binding &other)
@@ -49,7 +117,7 @@ namespace mpc::input::midi
 
         std::string getTargetDisplayName() const;
 
-        void setMessageType(const std::string &t);
+        void setMessageType(const BindingMessageType);
 
         void setMidiNumber(int n);
 
@@ -59,6 +127,8 @@ namespace mpc::input::midi
 
         void setEnabled(bool e);
 
+        void setEncoderMode(const BindingEncoderMode);
+
         const std::string &getTarget() const;
 
         std::optional<std::string> getHardwareTarget() const;
@@ -67,7 +137,7 @@ namespace mpc::input::midi
 
         std::optional<std::string> getSequencerTarget() const;
 
-        const std::string &getMessageType() const;
+        const BindingMessageType &getMessageType() const;
 
         int getMidiNumber() const;
 
@@ -77,7 +147,9 @@ namespace mpc::input::midi
 
         bool isEnabled() const;
 
-        bool isCc() const;
+        BindingEncoderMode getEncoderMode() const;
+
+        bool isController() const;
 
         bool isNote() const;
     };
@@ -116,8 +188,6 @@ namespace mpc::input::midi
         const std::vector<Binding> &getBindings() const;
 
         Binding &getBindingByIndex(int);
-
-        bool hasStatefulDataWheelBindingForController(MidiNumber) const;
     };
 
     void to_json(json &j, const MidiControlPresetV3 &p);

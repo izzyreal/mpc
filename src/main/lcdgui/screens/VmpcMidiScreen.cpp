@@ -50,7 +50,8 @@ void VmpcMidiScreen::turnWheel(int i)
 
     if (column == 0)
     {
-        binding.setMessageType(i > 0 ? "Note" : "CC");
+        binding.setMessageType(i > 0 ? BindingMessageType::Note
+                                     : BindingMessageType::Controller);
     }
     else if (column == 1)
     {
@@ -171,7 +172,7 @@ void VmpcMidiScreen::acceptLearnCandidate()
 
     binding.setMidiNumber(learnCandidate->getMidiNumber());
 
-    if (learnCandidate->isCc())
+    if (learnCandidate->isController())
     {
         binding.setMidiValue(learnCandidate->getMidiValue());
     }
@@ -400,7 +401,8 @@ void VmpcMidiScreen::setLearnCandidate(const bool isNote,
                                        const int8_t channelIndex,
                                        const int8_t number, const int8_t value)
 {
-    learnCandidate->setMessageType(isNote ? "Note" : "CC");
+    learnCandidate->setMessageType(isNote ? BindingMessageType::Note
+                                          : BindingMessageType::Controller);
     learnCandidate->setMidiChannelIndex(channelIndex);
     learnCandidate->setMidiNumber(number);
 
@@ -440,7 +442,7 @@ void VmpcMidiScreen::updateRows()
                 ? learnCandidate.value()
                 : getActivePreset()->getBindingByIndex(i + rowOffset);
 
-        std::string type = binding.getMessageType();
+        std::string type = messageTypeToString(binding.getMessageType());
 
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);

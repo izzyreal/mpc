@@ -27,6 +27,12 @@ namespace mpc::input::midi
         static void resetMidiControlPreset(
             std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
 
+        static void ensurePresetHasAllAvailableTargets(
+            std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
+
+        static void ensureTargetsAreInSameOrderAsInSchema(
+            std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
+
         static bool doesPresetWithNameExist(const fs::path &, std::string name);
     };
 } // namespace mpc::input::midi

@@ -56,21 +56,15 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
             continue;
         }
 
-        bool hasStatefulDataWheelBindingForController = false;
-
-        if (b.getMessageType() == "CC")
+        if (b.isController())
         {
             if (e.getMessageType() != ClientMidiEvent::CONTROLLER ||
                 b.getMidiNumber() != e.getControllerNumber())
             {
                 continue;
             }
-
-            hasStatefulDataWheelBindingForController =
-                activePreset->hasStatefulDataWheelBindingForController(
-                    MidiNumber(e.getControllerNumber()));
         }
-        else if (b.getMessageType() == "Note")
+        else if (b.isNote())
         {
             if ((e.getMessageType() != ClientMidiEvent::NOTE_ON &&
                  e.getMessageType() != ClientMidiEvent::NOTE_OFF) ||
@@ -95,56 +89,65 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
             if (componentId == DATA_WHEEL)
             {
-                if (hasStatefulDataWheelBindingForController)
+                const auto direction = b.getHardwareDirection();
+
+                if (direction == input::Direction::Positive)
                 {
-                    if (statefulDataWheels.count(
-                            MidiNumber(e.getControllerNumber())) == 0)
-                    {
-                        statefulDataWheels[MidiNumber(
-                            e.getControllerNumber())] =
-                            MidiValue(e.getControllerValue());
-                    }
-                    else
-                    {
-                        const auto previousValue = statefulDataWheels.at(
-                            MidiNumber(e.getControllerNumber()));
-
-                        if (previousValue < e.getControllerValue())
-                        {
-                            turnWheel(1);
-                        }
-                        else if (previousValue > e.getControllerValue())
-                        {
-                            turnWheel(-1);
-                        }
-                        else if (previousValue == MinMidiValue)
-                        {
-                            turnWheel(-1);
-                        }
-                        else if (previousValue == MaxMidiValue)
-                        {
-                            turnWheel(1);
-                        }
-
-                        statefulDataWheels[MidiNumber(
-                            e.getControllerNumber())] =
-                            MidiValue(e.getControllerValue());
-                    }
+                    turnWheel(1);
                 }
-                else
+                else if (direction == input::Direction::Negative)
                 {
-                    const auto direction = b.getHardwareDirection();
+                    turnWheel(-1);
+                }
+                else /* if (direction == input::Direction::None) */
+                {
+                    if (b.encoderMode == BindingEncoderMode::RelativeStateful)
+                    {
+                        if (statefulDataWheels.count(
+                                MidiNumber(e.getControllerNumber())) == 0)
+                        {
+                            statefulDataWheels[MidiNumber(
+                                e.getControllerNumber())] =
+                                MidiValue(e.getControllerValue());
+                        }
+                        else
+                        {
+                            const auto previousValue = statefulDataWheels.at(
+                                MidiNumber(e.getControllerNumber()));
 
-                    if (direction == input::Direction::NoDirection)
-                    {
+                            if (previousValue < e.getControllerValue())
+                            {
+                                turnWheel(1);
+                            }
+                            else if (previousValue > e.getControllerValue())
+                            {
+                                turnWheel(-1);
+                            }
+                            else if (previousValue == MinMidiValue)
+                            {
+                                turnWheel(-1);
+                            }
+                            else if (previousValue == MaxMidiValue)
+                            {
+                                turnWheel(1);
+                            }
+
+                            statefulDataWheels[MidiNumber(
+                                e.getControllerNumber())] =
+                                MidiValue(e.getControllerValue());
+                        }
                     }
-                    else if (direction == input::Direction::Positive)
+                    else /*if (b.getEncoderMode() ==
+                            BindingEncoderMode::RelativeStateless)*/
                     {
-                        turnWheel(1);
-                    }
-                    else
-                    {
-                        turnWheel(-1);
+                        auto increment = e.getControllerValue();
+
+                        if (increment > 63)
+                        {
+                            increment = -(128 - increment);
+                        }
+
+                        turnWheel(increment);
                     }
                 }
             }
@@ -201,7 +204,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 }
                 else
                 {
-                    if (e.getControllerValue() >= 64)
+                    if (e.getControllerValue() >= b.getMidiValue())
                     {
                         if (isButton)
                         {
