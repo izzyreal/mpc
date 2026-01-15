@@ -126,7 +126,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
             handleControlChange(e);
             footswitchController->handleEvent(e);
             extendedController->handleEvent(e);
-            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
+            vmpcMidiScreen.lock()->setLearnCandidate(false, e.getChannel(),
                                                      e.getControllerNumber());
             break;
 
