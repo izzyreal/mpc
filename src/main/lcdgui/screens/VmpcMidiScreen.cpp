@@ -38,6 +38,11 @@ VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
             mpc, "v:", "value" + std::to_string(i), 152, 3 + i * 9, 3 * 6);
         addChild(valueParam);
 
+        auto encoderModeParam = std::make_shared<Parameter>(
+            mpc, "e:", "encoder-mode" + std::to_string(i), 152, 3 + i * 9,
+            3 * 6);
+        addChild(encoderModeParam);
+
         auto channelParam = std::make_shared<Parameter>(
             mpc, "c:", "channel" + std::to_string(i), 190, 3 + i * 9, 3 * 6);
         addChild(channelParam);
@@ -59,7 +64,17 @@ void VmpcMidiScreen::turnWheel(int i)
     }
     else if (column == 2)
     {
-        binding.setMidiValue(std::clamp(binding.getMidiValue() + i, -1, 127));
+        if (binding.isController() && binding.isButtonLike())
+        {
+            binding.setMidiValue(
+                std::clamp(binding.getMidiValue() + i, -1, 127));
+        }
+        else if (binding.isNonButtonLikeDataWheel())
+        {
+            binding.setEncoderMode(i > 0
+                                       ? BindingEncoderMode::RelativeStateful
+                                       : BindingEncoderMode::RelativeStateless);
+        }
     }
     else if (column == 3)
     {
@@ -67,7 +82,7 @@ void VmpcMidiScreen::turnWheel(int i)
             std::clamp(binding.getMidiChannelIndex() + i, -1, 15));
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::open()
@@ -113,7 +128,7 @@ void VmpcMidiScreen::open()
 
     setLearning(false);
     learnCandidate.reset();
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::up()
@@ -139,7 +154,7 @@ void VmpcMidiScreen::up()
             column--;
         }
 
-        updateRows();
+        displayRows();
         return;
     }
 
@@ -151,7 +166,7 @@ void VmpcMidiScreen::up()
         column--;
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::openWindow()
@@ -204,7 +219,7 @@ void VmpcMidiScreen::down()
             column--;
         }
 
-        updateRows();
+        displayRows();
         return;
     }
 
@@ -215,7 +230,7 @@ void VmpcMidiScreen::down()
         column--;
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::left()
@@ -233,7 +248,7 @@ void VmpcMidiScreen::left()
         column--;
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::right()
@@ -251,7 +266,7 @@ void VmpcMidiScreen::right()
         column++;
     }
 
-    updateRows();
+    displayRows();
 }
 
 void VmpcMidiScreen::setLearning(bool b)
@@ -337,7 +352,7 @@ void VmpcMidiScreen::function(int i)
             {
                 setLearning(false);
                 learnCandidate.reset();
-                updateRows();
+                displayRows();
                 return;
             }
 
@@ -362,7 +377,7 @@ void VmpcMidiScreen::function(int i)
             setLearning(!learning);
             learnCandidate.reset();
 
-            updateRows();
+            displayRows();
             break;
         case 5:
         {
@@ -411,7 +426,7 @@ void VmpcMidiScreen::setLearnCandidate(const bool isNote,
         learnCandidate->setMidiValue(value);
     }
 
-    updateRows();
+    displayRows();
 }
 
 bool VmpcMidiScreen::isLearning()
@@ -419,7 +434,7 @@ bool VmpcMidiScreen::isLearning()
     return learning;
 }
 
-void VmpcMidiScreen::updateRows()
+void VmpcMidiScreen::displayRows()
 {
     for (int i = 0; i < 5; i++)
     {
@@ -442,7 +457,7 @@ void VmpcMidiScreen::updateRows()
                 ? learnCandidate.value()
                 : getActivePreset()->getBindingByIndex(i + rowOffset);
 
-        std::string type = messageTypeToString(binding.getMessageType());
+        std::string type = messageTypeToDisplayString(binding.getMessageType());
 
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
@@ -477,13 +492,12 @@ void VmpcMidiScreen::updateRows()
 
         const auto valueLabel = findChild<Label>("value" + std::to_string(i));
         const auto valueField = findChild<Field>("value" + std::to_string(i));
+        const auto encoderModeLabel =
+            findChild<Label>("encoder-mode" + std::to_string(i));
+        const auto encoderModeField =
+            findChild<Field>("encoder-mode" + std::to_string(i));
 
-        if (binding.isNote())
-        {
-            valueLabel->Hide(true);
-            valueField->Hide(true);
-        }
-        else
+        if (binding.isController() && binding.isButtonLike())
         {
             if (binding.getMidiValue() == -1)
             {
@@ -496,14 +510,35 @@ void VmpcMidiScreen::updateRows()
 
             valueLabel->Hide(false);
             valueField->Hide(false);
+            encoderModeLabel->Hide(true);
+            encoderModeField->Hide(true);
+            valueField->setInverted(row == i && column == 2);
+            valueField->setBlinking(learning && i == row);
         }
+        else
+        {
+            valueLabel->Hide(true);
+            valueField->Hide(true);
 
-        valueField->setInverted(row == i && column == 2);
+            if (binding.isNonButtonLikeDataWheel())
+            {
+                encoderModeField->setText(
+                    encoderModeToDisplayString(binding.getEncoderMode()));
+                encoderModeLabel->Hide(false);
+                encoderModeField->Hide(false);
+                encoderModeField->setInverted(row == i && column == 2);
+                encoderModeField->setBlinking(learning && i == row);
+            }
+            else
+            {
+                encoderModeLabel->Hide(true);
+                encoderModeField->Hide(true);
+            }
+        }
 
         typeField->setBlinking(learning && i == row);
         channelField->setBlinking(learning && i == row);
         numberField->setBlinking(learning && i == row);
-        valueField->setBlinking(learning && i == row);
     }
 
     displayUpAndDown();

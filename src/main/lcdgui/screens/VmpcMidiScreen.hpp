@@ -52,7 +52,7 @@ namespace mpc::lcdgui::screens
 
         void setLearning(bool b);
         void acceptLearnCandidate();
-        void updateRows();
+        void displayRows();
         void displayUpAndDown();
     };
 } // namespace mpc::lcdgui::screens

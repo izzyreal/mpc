@@ -20,7 +20,9 @@ namespace mpc::input::midi
     static const std::string negativeStr = ":negative";
     static const std::string positiveStr = ":positive";
     static const std::string controllerStr = "controller";
+    static const std::string controllerDisplayStr = "CC";
     static const std::string noteStr = "note";
+    static const std::string noteDisplayStr = "Note";
 
     enum class BindingMessageType
     {
@@ -41,6 +43,15 @@ namespace mpc::input::midi
             return controllerStr;
         }
         return noteStr;
+    }
+
+    inline std::string messageTypeToDisplayString(const BindingMessageType t)
+    {
+        if (t == BindingMessageType::Controller)
+        {
+            return controllerDisplayStr;
+        }
+        return noteDisplayStr;
     }
 
     inline BindingMessageType stringToMessageType(const std::string &s)
@@ -69,6 +80,19 @@ namespace mpc::input::midi
                 return "relative_stateful";
             case BindingEncoderMode::RelativeStateless:
                 return "relative_stateless";
+        }
+
+        throw std::invalid_argument("Invalid encoderMode");
+    }
+
+    inline std::string encoderModeToDisplayString(const BindingEncoderMode m)
+    {
+        switch (m)
+        {
+            case BindingEncoderMode::RelativeStateful:
+                return "RSF";
+            case BindingEncoderMode::RelativeStateless:
+                return "RSL";
         }
 
         throw std::invalid_argument("Invalid encoderMode");
@@ -152,6 +176,10 @@ namespace mpc::input::midi
         bool isController() const;
 
         bool isNote() const;
+
+        bool isButtonLike() const;
+
+        bool isNonButtonLikeDataWheel() const;
     };
 
     void to_json(json &j, const Binding &b);

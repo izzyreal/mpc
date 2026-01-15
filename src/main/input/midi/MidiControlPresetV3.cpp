@@ -111,6 +111,46 @@ bool Binding::isNote() const
     return getMessageType() == BindingMessageType::Note;
 }
 
+bool Binding::isButtonLike() const
+{
+    if (getSequencerTarget())
+    {
+        return true;
+    }
+
+    const auto hardwareTargetStr = getHardwareTarget();
+
+    if (hardwareTargetStr)
+    {
+        const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
+
+        if (hardware::isButtonId(id))
+        {
+            return true;
+        }
+    }
+
+    if (getTarget() == "hardware:data-wheel:negative" ||
+        getTarget() == "hardware:data-wheel:positive")
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Binding::isNonButtonLikeDataWheel() const
+{
+    if (const auto hardwareTargetStr = getHardwareTarget())
+    {
+        return hardware::componentLabelToId.at(*hardwareTargetStr) ==
+                   hardware::ComponentId::DATA_WHEEL &&
+               getHardwareDirection() == Direction::NoDirection;
+    }
+
+    return false;
+}
+
 std::optional<std::string> Binding::getHardwareTarget() const
 {
     if (target.find(hardwareStr) == std::string::npos)
@@ -206,31 +246,7 @@ void mpc::input::midi::to_json(json &j, const Binding &b)
 
     if (b.getMessageType() == BindingMessageType::Controller)
     {
-        bool isButtonLike = false;
-
-        const auto sequencerTargetStr = b.getSequencerTarget();
-        if (sequencerTargetStr.has_value())
-        {
-            isButtonLike = true;
-        }
-
-        const auto hardwareTargetStr = b.getHardwareTarget();
-        if (hardwareTargetStr.has_value())
-        {
-            const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
-            if (hardware::isButtonId(id))
-            {
-                isButtonLike = true;
-            }
-        }
-
-        if (b.getTarget() == "hardware:data-wheel:negative" ||
-            b.getTarget() == "hardware:data-wheel:positive")
-        {
-            isButtonLike = true;
-        }
-
-        if (isButtonLike)
+        if (b.isButtonLike())
         {
             j["midiValue"] = b.getMidiValue();
         }
@@ -284,7 +300,7 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
         const bool isDataWheelDir = target == "hardware:data-wheel:negative" ||
                                     target == "hardware:data-wheel:positive";
 
-        const bool isButtonLike = isButtonHardware || isDataWheelDir;
+        const bool isButtonLike = b.isButtonLike();
 
         if (isController && isButtonLike)
         {
