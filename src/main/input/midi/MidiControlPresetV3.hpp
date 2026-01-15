@@ -2,6 +2,7 @@
 
 #include "IntTypes.hpp"
 #include "input/Direction.hpp"
+#include "input/midi/AutoLoadMode.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -15,6 +16,19 @@ namespace mpc::input::midi
 
     using json = nlohmann::json;
 
+    static const std::string autoLoadModeKey = "autoLoadMode";
+    static const std::string messageTypeKey = "messageType";
+    static const std::string midiValueKey = "midiValue";
+    static const std::string midiNumberKey = "midiNumber";
+    static const std::string midiChannelIndexKey = "midiChannelIndex";
+    static const std::string encoderModeKey = "encoderMode";
+    static const std::string bindingsKey = "bindings";
+    static const std::string nameKey = "name";
+    static const std::string versionKey = "version";
+    static const std::string targetKey = "target";
+    static const std::string midiControllerDeviceNameKey =
+        "midiControllerDeviceName";
+
     static const std::string hardwareStr = "hardware:";
     static const std::string negativeStr = ":negative";
     static const std::string positiveStr = ":positive";
@@ -22,6 +36,11 @@ namespace mpc::input::midi
     static const std::string controllerDisplayStr = "CC";
     static const std::string noteStr = "note";
     static const std::string noteDisplayStr = "Note";
+    static const std::string relativeStatefulStr = "relative_stateful";
+    static const std::string relativeStatelessStr = "relative_stateless";
+    static const std::string autoLoadModeYesStr = "Yes";
+    static const std::string autoLoadModeNoStr = "No";
+    static const std::string autoLoadModeAskStr = "Ask";
 
     enum class BindingMessageType
     {
@@ -76,9 +95,9 @@ namespace mpc::input::midi
         switch (m)
         {
             case BindingEncoderMode::RelativeStateful:
-                return "relative_stateful";
+                return relativeStatefulStr;
             case BindingEncoderMode::RelativeStateless:
-                return "relative_stateless";
+                return relativeStatelessStr;
         }
 
         throw std::invalid_argument("Invalid encoderMode");
@@ -99,15 +118,49 @@ namespace mpc::input::midi
 
     inline BindingEncoderMode stringToEncoderMode(const std::string &s)
     {
-        if (s == "relative_stateful")
+        if (s == relativeStatefulStr)
         {
             return BindingEncoderMode::RelativeStateful;
         }
-        if (s == "relative_stateless")
+        if (s == relativeStatelessStr)
         {
             return BindingEncoderMode::RelativeStateless;
         }
         throw std::invalid_argument("Invalid encoderMode string: " + s);
+    }
+
+    inline std::string autoLoadModeToString(const AutoLoadMode m)
+    {
+        if (m == AutoLoadModeAsk)
+        {
+            return autoLoadModeAskStr;
+        }
+        if (m == AutoLoadModeYes)
+        {
+            return autoLoadModeYesStr;
+        }
+        if (m == AutoLoadModeNo)
+        {
+            return autoLoadModeNoStr;
+        }
+        throw std::invalid_argument("Invalid autoLoadMode");
+    }
+
+    inline AutoLoadMode stringToAutoLoadMode(const std::string &s)
+    {
+        if (s == autoLoadModeAskStr)
+        {
+            return AutoLoadModeAsk;
+        }
+        if (s == autoLoadModeYesStr)
+        {
+            return AutoLoadModeYes;
+        }
+        if (s == autoLoadModeNoStr)
+        {
+            return AutoLoadModeNo;
+        }
+        throw std::invalid_argument("Invalid autoLoadMode string: " + s);
     }
 
     struct Binding
@@ -186,7 +239,7 @@ namespace mpc::input::midi
             CURRENT_PRESET_VERSION};
         std::string name;
         std::string midiControllerDeviceName;
-        std::string autoLoad{"No"};
+        AutoLoadMode autoLoadMode{AutoLoadModeAsk};
         std::vector<Binding> bindings;
 
         void setVersion(long long v);
@@ -195,7 +248,7 @@ namespace mpc::input::midi
 
         void setMidiControllerDeviceName(const std::string &n);
 
-        void setAutoLoad(const std::string &a);
+        void setAutoLoadMode(const AutoLoadMode);
 
         void setBindings(const std::vector<Binding> &b);
 
@@ -205,7 +258,7 @@ namespace mpc::input::midi
 
         const std::string &getMidiControllerDeviceName() const;
 
-        const std::string &getAutoLoad() const;
+        AutoLoadMode getAutoLoadMode() const;
 
         const std::vector<Binding> &getBindings() const;
 

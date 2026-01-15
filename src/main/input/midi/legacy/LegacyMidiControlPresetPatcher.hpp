@@ -98,7 +98,7 @@ namespace mpc::input::midi::legacy
     {
         const json &bindingDef = schemaJson["$defs"]["binding"];
         std::unordered_set<std::string> allowedTargets;
-        for (const auto &target : bindingDef["properties"]["target"]["enum"])
+        for (const auto &target : bindingDef["properties"][targetKey]["enum"])
         {
             allowedTargets.insert(target.get<std::string>());
         }
@@ -113,23 +113,23 @@ namespace mpc::input::midi::legacy
         }
 
         json sanitized = json::array();
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            if (!binding.contains("target") || !binding["target"].is_string())
+            if (!binding.contains(targetKey) || !binding[targetKey].is_string())
             {
                 continue;
             }
 
-            binding["target"] = binding["target"].get<std::string>();
+            binding[targetKey] = binding[targetKey].get<std::string>();
             sanitized.push_back(binding);
         }
 
-        preset["bindings"] = sanitized;
+        preset[bindingsKey] = sanitized;
 
         std::unordered_map<std::string, json *> bindingMap;
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            bindingMap[binding["target"].get<std::string>()] = &binding;
+            bindingMap[binding[targetKey].get<std::string>()] = &binding;
         }
 
         // Add missing targets with default binding
@@ -138,31 +138,31 @@ namespace mpc::input::midi::legacy
             if (bindingMap.find(lbl) == bindingMap.end())
             {
                 json newBinding = defaultBinding;
-                newBinding["target"] = lbl;
+                newBinding[targetKey] = lbl;
 
                 if (lbl != "hardware:data-wheel")
                 {
-                    newBinding.erase("encoderMode");
+                    newBinding.erase(encoderModeKey);
                 }
 
-                preset["bindings"].push_back(newBinding);
+                preset[bindingsKey].push_back(newBinding);
             }
         }
 
         const json &props = bindingDef["properties"];
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
             const std::string target =
-                binding.contains("target") && binding["target"].is_string()
-                    ? binding["target"].get<std::string>()
+                binding.contains(targetKey) && binding[targetKey].is_string()
+                    ? binding[targetKey].get<std::string>()
                     : std::string{};
 
             // Fill/repair all properties except target, encoderMode, midiValue
             for (auto it = props.begin(); it != props.end(); ++it)
             {
                 const std::string propName = it.key();
-                if (propName == "target" || propName == "encoderMode" ||
-                    propName == "midiValue")
+                if (propName == targetKey || propName == encoderModeKey ||
+                    propName == midiValueKey)
                 {
                     continue;
                 }
@@ -215,38 +215,38 @@ namespace mpc::input::midi::legacy
             // encoderMode: only allowed for hardware:data-wheel
             if (target == "hardware:data-wheel")
             {
-                const json &encSchema = props.at("encoderMode");
-                if (!binding.contains("encoderMode") ||
-                    !isValidProperty(binding["encoderMode"], encSchema))
+                const json &encSchema = props.at(encoderModeKey);
+                if (!binding.contains(encoderModeKey) ||
+                    !isValidProperty(binding[encoderModeKey], encSchema))
                 {
-                    if (defaultBinding.contains("encoderMode") &&
-                        !defaultBinding["encoderMode"].is_null())
+                    if (defaultBinding.contains(encoderModeKey) &&
+                        !defaultBinding[encoderModeKey].is_null())
                     {
-                        binding["encoderMode"] = defaultBinding["encoderMode"];
+                        binding[encoderModeKey] = defaultBinding[encoderModeKey];
                     }
                 }
             }
             else
             {
-                binding.erase("encoderMode");
+                binding.erase(encoderModeKey);
             }
 
             // midiValue: follow schema semantics
-            if (!binding.contains("messageType") ||
-                !binding["messageType"].is_string())
+            if (!binding.contains(messageTypeKey) ||
+                !binding[messageTypeKey].is_string())
             {
-                binding.erase("midiValue");
+                binding.erase(midiValueKey);
             }
             else
             {
                 const std::string mt =
-                    binding["messageType"].get<std::string>();
+                    binding[messageTypeKey].get<std::string>();
                 const bool isController = (mt == "controller");
 
                 if (!isController)
                 {
                     // Note bindings must not have midiValue
-                    binding.erase("midiValue");
+                    binding.erase(midiValueKey);
                 }
                 else
                 {
@@ -267,24 +267,24 @@ namespace mpc::input::midi::legacy
                     if (isButtonLike)
                     {
                         // Require midiValue; if missing, use default
-                        if (!binding.contains("midiValue") ||
-                            !binding["midiValue"].is_number_integer())
+                        if (!binding.contains(midiValueKey) ||
+                            !binding[midiValueKey].is_number_integer())
                         {
-                            if (defaultBinding.contains("midiValue"))
+                            if (defaultBinding.contains(midiValueKey))
                             {
-                                binding["midiValue"] =
-                                    defaultBinding["midiValue"];
+                                binding[midiValueKey] =
+                                    defaultBinding[midiValueKey];
                             }
                             else
                             {
-                                binding["midiValue"] = 64;
+                                binding[midiValueKey] = 64;
                             }
                         }
                     }
                     else
                     {
                         // Pads, pots, plain data-wheel: must not have midiValue
-                        binding.erase("midiValue");
+                        binding.erase(midiValueKey);
                     }
                 }
             }
@@ -293,27 +293,27 @@ namespace mpc::input::midi::legacy
         // Filter duplicates and unknown targets
         json filtered = json::array();
         std::unordered_set<std::string> seen;
-        for (auto &binding : preset["bindings"])
+        for (auto &binding : preset[bindingsKey])
         {
-            if (!binding.contains("target") || !binding["target"].is_string())
+            if (!binding.contains(targetKey) || !binding[targetKey].is_string())
             {
                 continue;
             }
-            std::string target = binding["target"].get<std::string>();
+            std::string target = binding[targetKey].get<std::string>();
             if (allowedTargets.count(target) && !seen.count(target))
             {
                 filtered.push_back(binding);
                 seen.insert(target);
             }
         }
-        preset["bindings"] = filtered;
+        preset[bindingsKey] = filtered;
 
-        if (preset.contains("name") && preset["name"].is_string())
+        if (preset.contains(nameKey) && preset[nameKey].is_string())
         {
-            std::string patchedName = preset["name"].get<std::string>();
+            std::string patchedName = preset[nameKey].get<std::string>();
             std::replace(patchedName.begin(), patchedName.end(), '_', ' ');
-            preset["name"] = patchedName;
-            preset["midiControllerDeviceName"] = patchedName;
+            preset[nameKey] = patchedName;
+            preset[midiControllerDeviceNameKey] = patchedName;
         }
     }
 } // namespace mpc::input::midi::legacy

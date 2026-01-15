@@ -198,14 +198,14 @@ std::string Binding::getTargetDisplayName() const
 
 void mpc::input::midi::to_json(json &j, const Binding &b)
 {
-    j = json{{"target", b.getTarget()},
-             {"messageType", messageTypeToString(b.getMessageType())},
-             {"midiNumber", b.getMidiNumber()},
-             {"midiChannelIndex", b.getMidiChannelIndex()}};
+    j = json{{targetKey, b.getTarget()},
+             {messageTypeKey, messageTypeToString(b.getMessageType())},
+             {midiNumberKey, b.getMidiNumber()},
+             {midiChannelIndexKey, b.getMidiChannelIndex()}};
 
     if (b.getTarget() == "hardware:data-wheel")
     {
-        j["encoderMode"] = encoderModeToString(b.getEncoderMode());
+        j[encoderModeKey] = encoderModeToString(b.getEncoderMode());
         return;
     }
 
@@ -213,7 +213,7 @@ void mpc::input::midi::to_json(json &j, const Binding &b)
     {
         if (b.isButtonLike())
         {
-            j["midiValue"] = b.getMidiValue();
+            j[midiValueKey] = b.getMidiValue();
         }
     }
 }
@@ -221,28 +221,28 @@ void mpc::input::midi::to_json(json &j, const Binding &b)
 void mpc::input::midi::from_json(const json &j, Binding &b)
 {
     std::string target, type;
-    j.at("target").get_to(target);
-    j.at("messageType").get_to(type);
+    j.at(targetKey).get_to(target);
+    j.at(messageTypeKey).get_to(type);
 
     b.setTarget(target);
     b.setMessageType(stringToMessageType(type));
-    b.setMidiNumber(j.at("midiNumber").get<int>());
-    b.setMidiChannelIndex(j.at("midiChannelIndex").get<int>());
+    b.setMidiNumber(j.at(midiNumberKey).get<int>());
+    b.setMidiChannelIndex(j.at(midiChannelIndexKey).get<int>());
 
     const bool isController = b.isController();
-    const bool hasMidiValue = j.contains("midiValue");
+    const bool hasMidiValue = j.contains(midiValueKey);
     bool shouldContainMidiValue = false;
 
     if (target == "hardware:data-wheel")
     {
-        if (!j.contains("encoderMode"))
+        if (!j.contains(encoderModeKey))
         {
             throw std::invalid_argument(
                 "Data wheel binding requires 'encoderMode'");
         }
 
         b.setEncoderMode(
-            stringToEncoderMode(j.at("encoderMode").get<std::string>()));
+            stringToEncoderMode(j.at(encoderModeKey).get<std::string>()));
 
         if (hasMidiValue)
         {
@@ -254,7 +254,7 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     {
         const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
 
-        if (j.contains("encoderMode"))
+        if (j.contains(encoderModeKey))
         {
             throw std::invalid_argument(
                 "encoderMode is only allowed for hardware:data-wheel");
@@ -274,7 +274,7 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
                     "Button-like binding requires 'midiValue'");
             }
 
-            const auto candidate = j.at("midiValue").get<int>();
+            const auto candidate = j.at(midiValueKey).get<int>();
 
             if (candidate < 1 || candidate > 127)
             {
@@ -297,7 +297,7 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     }
     else
     {
-        if (j.contains("encoderMode"))
+        if (j.contains(encoderModeKey))
         {
             throw std::invalid_argument(
                 "encoderMode is only allowed for hardware:data-wheel");
@@ -335,13 +335,14 @@ void MidiControlPresetV3::setMidiControllerDeviceName(const std::string &n)
     midiControllerDeviceName = n;
 }
 
-void MidiControlPresetV3::setAutoLoad(const std::string &a)
+void MidiControlPresetV3::setAutoLoadMode(const AutoLoadMode m)
 {
-    if (a != "No" && a != "Ask" && a != "Yes")
+    if (m != AutoLoadModeNo && m != AutoLoadModeAsk && m != AutoLoadModeYes)
     {
-        throw std::invalid_argument("autoLoad must be one of: No, Ask, Yes");
+        throw std::invalid_argument("Invalid AutoLoadMode");
     }
-    autoLoad = a;
+
+    autoLoadMode = m;
 }
 
 void MidiControlPresetV3::setBindings(const std::vector<Binding> &b)
@@ -379,9 +380,9 @@ const std::string &MidiControlPresetV3::getMidiControllerDeviceName() const
     return midiControllerDeviceName;
 }
 
-const std::string &MidiControlPresetV3::getAutoLoad() const
+AutoLoadMode MidiControlPresetV3::getAutoLoadMode() const
 {
-    return autoLoad;
+    return autoLoadMode;
 }
 
 const std::vector<Binding> &MidiControlPresetV3::getBindings() const
@@ -409,17 +410,18 @@ bool MidiControlPresetV3::hasBindingForNote(const int noteNumber) const
 
 void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)
 {
-    j = json{{"version", p.getVersion()},
-             {"name", p.getName()},
-             {"midiControllerDeviceName", p.getMidiControllerDeviceName()},
-             {"autoLoad", p.getAutoLoad()},
-             {"bindings", p.getBindings()}};
+    j = json{{versionKey, p.getVersion()},
+             {nameKey, p.getName()},
+             {midiControllerDeviceNameKey, p.getMidiControllerDeviceName()},
+             {autoLoadModeKey, autoLoadModeToString(p.getAutoLoadMode())},
+             {bindingsKey, p.getBindings()}};
 }
 
 void mpc::input::midi::from_json(const json &j, MidiControlPresetV3 &p)
 {
     static const std::set<std::string> allowedKeys = {
-        "version", "name", "midiControllerDeviceName", "autoLoad", "bindings"};
+        versionKey, nameKey, midiControllerDeviceNameKey, autoLoadModeKey,
+        bindingsKey};
 
     for (auto &[key, _] : j.items())
     {
@@ -430,7 +432,7 @@ void mpc::input::midi::from_json(const json &j, MidiControlPresetV3 &p)
         }
     }
 
-    auto v = j.at("version").get<long long>();
+    auto v = j.at(versionKey).get<long long>();
     if (v > CURRENT_PRESET_VERSION)
     {
         throw std::runtime_error(
@@ -438,14 +440,15 @@ void mpc::input::midi::from_json(const json &j, MidiControlPresetV3 &p)
     }
 
     p.setVersion(v);
-    p.setName(j.at("name").get<std::string>());
+    p.setName(j.at(nameKey).get<std::string>());
 
-    if (j.contains("midiControllerDeviceName"))
+    if (j.contains(midiControllerDeviceNameKey))
     {
         p.setMidiControllerDeviceName(
-            j.at("midiControllerDeviceName").get<std::string>());
+            j.at(midiControllerDeviceNameKey).get<std::string>());
     }
 
-    p.setAutoLoad(j.at("autoLoad").get<std::string>());
-    p.setBindings(j.at("bindings").get<std::vector<Binding>>());
+    p.setAutoLoadMode(
+        stringToAutoLoadMode(j.at(autoLoadModeKey).get<std::string>()));
+    p.setBindings(j.at(bindingsKey).get<std::vector<Binding>>());
 }

@@ -5,8 +5,6 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/Label.hpp"
 
-#include "input/midi/MidiControlPresetUtil.hpp"
-
 #include "disk/AbstractDisk.hpp"
 
 using namespace mpc::lcdgui;
@@ -52,15 +50,25 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         case 3:
+        {
+            auto preset = std::make_shared<MidiControlPresetV3>();
+
+            mpc.getDisk()->readMidiControlPreset(
+                mpc.paths->getDocuments()->midiControlPresetsPath() /
+                    (controllerName + ".json"),
+                preset);
+
+//            preset->setAutoLoad();
+
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        }
             // NEVER
             //            if (preset != presets.end())
             //            {
             //                (*preset)->autoloadMode =
             //                AutoLoadMode::AutoLoadModeNo;
             //            }
-
-            mpc.getLayeredScreen()->closeCurrentScreen();
-            break;
         case 4:
             // ALWAYS
             //            if (preset != presets.end())

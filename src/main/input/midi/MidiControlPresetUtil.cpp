@@ -7,6 +7,13 @@
 
 using namespace mpc::input::midi;
 
+static const std::string bindingKey = "binding";
+static const std::string defaultKey = "default";
+static const std::string propertiesKey = "properties";
+static const std::string enumKey = "enum";
+
+static const std::string defsKey = "$defs";
+
 json MidiControlPresetUtil::load_schema()
 {
     auto schemaData = mpc::MpcResourceUtil::get_resource_data(
@@ -25,16 +32,17 @@ json_validator MidiControlPresetUtil::make_validator()
 std::vector<std::string> MidiControlPresetUtil::load_available_targets()
 {
     auto schema = load_schema();
-    if (!schema.contains("$defs") || !schema["$defs"].contains("binding") ||
-        !schema["$defs"]["binding"].contains("properties") ||
-        !schema["$defs"]["binding"]["properties"].contains("target") ||
-        !schema["$defs"]["binding"]["properties"]["target"].contains("enum"))
+    if (!schema.contains(defsKey) || !schema[defsKey].contains(bindingKey) ||
+        !schema[defsKey][bindingKey].contains(propertiesKey) ||
+        !schema[defsKey][bindingKey][propertiesKey].contains(targetKey) ||
+        !schema[defsKey][bindingKey][propertiesKey][targetKey].contains(
+            enumKey))
     {
         throw std::runtime_error("Schema missing target enum at expected path");
     }
 
     const auto &enumArray =
-        schema["$defs"]["binding"]["properties"]["target"]["enum"];
+        schema[defsKey][bindingKey][propertiesKey][targetKey][enumKey];
     std::vector<std::string> targets;
     for (const auto &v : enumArray)
     {
@@ -52,13 +60,14 @@ void MidiControlPresetUtil::resetMidiControlPreset(
 
     p->setVersion(CURRENT_PRESET_VERSION);
 
-    const json &rootProps = schema["properties"];
-    const json &bindingSchema = schema["$defs"]["binding"];
+    const json &rootProps = schema[propertiesKey];
+    const json &bindingSchema = schema[defsKey][bindingKey];
 
-    if (rootProps.contains("autoLoad") &&
-        rootProps["autoLoad"].contains("default"))
+    if (rootProps.contains(autoLoadModeKey) &&
+        rootProps[autoLoadModeKey].contains(defaultKey))
     {
-        p->setAutoLoad(rootProps["autoLoad"]["default"].get<std::string>());
+        p->setAutoLoadMode(stringToAutoLoadMode(
+            rootProps[autoLoadModeKey][defaultKey].get<std::string>()));
     }
 
     std::vector<Binding> bindings;
@@ -69,29 +78,29 @@ void MidiControlPresetUtil::resetMidiControlPreset(
         Binding b;
         b.setTarget(target);
 
-        if (bindingSchema.contains("default"))
+        if (bindingSchema.contains(defaultKey))
         {
-            const json &d = bindingSchema["default"];
+            const json &d = bindingSchema[defaultKey];
 
-            if (d.contains("messageType"))
+            if (d.contains(messageTypeKey))
             {
                 b.setMessageType(
-                    stringToMessageType(d["messageType"].get<std::string>()));
+                    stringToMessageType(d[messageTypeKey].get<std::string>()));
             }
 
-            if (d.contains("midiNumber"))
+            if (d.contains(midiNumberKey))
             {
-                b.setMidiNumber(d["midiNumber"].get<int>());
+                b.setMidiNumber(d[midiNumberKey].get<int>());
             }
 
-            if (d.contains("midiValue"))
+            if (d.contains(midiValueKey))
             {
-                b.setMidiValue(d["midiValue"].get<int>());
+                b.setMidiValue(d[midiValueKey].get<int>());
             }
 
-            if (d.contains("midiChannelIndex"))
+            if (d.contains(midiChannelIndexKey))
             {
-                b.setMidiChannelIndex(d["midiChannelIndex"].get<int>());
+                b.setMidiChannelIndex(d[midiChannelIndexKey].get<int>());
             }
         }
 
@@ -120,7 +129,7 @@ void MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(
 {
     const auto targets = load_available_targets();
     const json schema = load_schema();
-    const json &bindingSchema = schema["$defs"]["binding"];
+    const json &bindingSchema = schema[defsKey][bindingKey];
 
     auto bindings = p->getBindings();
 
@@ -140,29 +149,29 @@ void MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(
         Binding b;
         b.setTarget(target);
 
-        if (bindingSchema.contains("default"))
+        if (bindingSchema.contains(defaultKey))
         {
-            const json &d = bindingSchema["default"];
+            const json &d = bindingSchema[defaultKey];
 
-            if (d.contains("messageType"))
+            if (d.contains(messageTypeKey))
             {
                 b.setMessageType(
-                    stringToMessageType(d["messageType"].get<std::string>()));
+                    stringToMessageType(d[messageTypeKey].get<std::string>()));
             }
 
-            if (d.contains("midiNumber"))
+            if (d.contains(midiNumberKey))
             {
-                b.setMidiNumber(d["midiNumber"].get<int>());
+                b.setMidiNumber(d[midiNumberKey].get<int>());
             }
 
-            if (d.contains("midiValue"))
+            if (d.contains(midiValueKey))
             {
-                b.setMidiValue(d["midiValue"].get<int>());
+                b.setMidiValue(d[midiValueKey].get<int>());
             }
 
-            if (d.contains("midiChannelIndex"))
+            if (d.contains(midiChannelIndexKey))
             {
-                b.setMidiChannelIndex(d["midiChannelIndex"].get<int>());
+                b.setMidiChannelIndex(d[midiChannelIndexKey].get<int>());
             }
         }
 

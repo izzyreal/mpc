@@ -23,12 +23,16 @@ TEST_CASE("MidiControlPresetV3 rejects invalid preset names",
     REQUIRE_NOTHROW(preset.setName("GoodName"));
 }
 
-TEST_CASE("MidiControlPresetV3 rejects invalid autoLoad values",
+TEST_CASE("MidiControlPresetV3 rejects invalid autoLoadMode values",
           "[MidiControlPresetV3]")
 {
     MidiControlPresetV3 preset;
-    REQUIRE_THROWS_AS(preset.setAutoLoad("Sometimes"), std::invalid_argument);
-    REQUIRE_NOTHROW(preset.setAutoLoad("Ask"));
+    REQUIRE_THROWS_AS(preset.setAutoLoadMode(static_cast<AutoLoadMode>(3)),
+                      std::invalid_argument);
+
+    REQUIRE_NOTHROW(preset.setAutoLoadMode(AutoLoadModeNo));
+    REQUIRE_NOTHROW(preset.setAutoLoadMode(AutoLoadModeYes));
+    REQUIRE_NOTHROW(preset.setAutoLoadMode(AutoLoadModeAsk));
 }
 
 TEST_CASE("MidiControlPresetV3 rejects wrong binding targets",
@@ -72,7 +76,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
 {
     MidiControlPresetV3 preset;
     preset.setName("RoundTrip");
-    preset.setAutoLoad("Ask");
+    preset.setAutoLoadMode(AutoLoadModeAsk);
 
     std::vector<Binding> bindings;
 
@@ -136,7 +140,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
 
     REQUIRE(restored.getVersion() == CURRENT_PRESET_VERSION);
     REQUIRE(restored.getName() == "RoundTrip");
-    REQUIRE(restored.getAutoLoad() == "Ask");
+    REQUIRE(restored.getAutoLoadMode() == AutoLoadModeAsk);
     REQUIRE(restored.getBindings().size() == bindings.size());
 
     const auto &rb = restored.getBindings();
@@ -223,7 +227,7 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
 {
     MidiControlPresetV3 preset;
     preset.setName("Named");
-    preset.setAutoLoad("Yes");
+    preset.setAutoLoadMode(AutoLoadModeYes);
     preset.setMidiControllerDeviceName("MPK Mini Plus");
 
     auto targets = MidiControlPresetUtil::load_available_targets();

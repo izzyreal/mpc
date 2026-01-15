@@ -10,7 +10,6 @@
 
 #include "Paths.hpp"
 #include "nvram/NvRam.hpp"
-#include "input/midi/legacy/MidiControlPersistence.hpp"
 #include "input/midi/legacy/LegacyOnDiskPresetConvertor.hpp"
 
 #include "disk/AbstractDisk.hpp"

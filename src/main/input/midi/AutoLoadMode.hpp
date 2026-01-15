@@ -4,8 +4,8 @@ namespace mpc::input::midi
 {
     enum AutoLoadMode
     {
-        AutoLoadModeNo,
-        AutoLoadModeAsk,
-        AutoLoadModeYes
+        AutoLoadModeNo = 0,
+        AutoLoadModeAsk = 1,
+        AutoLoadModeYes = 2
     };
 } // namespace mpc::input::midi

@@ -6,7 +6,7 @@
   "required": [
     "version",
     "name",
-    "autoLoad",
+    "autoLoadMode",
     "bindings"
   ],
   "additionalProperties": false,
@@ -31,7 +31,7 @@
       "pattern": "^[a-zA-Z0-9 _\\-\\.\\(\\)\\/\\,;]*$",
       "description": "Optional name of the MIDI controller device. Can be empty or up to 255 characters using allowed characters [a-zA-Z0-9 _-./(),;]."
     },
-    "autoLoad": {
+    "autoLoadMode": {
       "type": "string",
       "enum": [
         "No",

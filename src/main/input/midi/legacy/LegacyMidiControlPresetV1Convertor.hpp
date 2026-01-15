@@ -34,32 +34,32 @@ namespace mpc::input::midi::legacy
             throw std::runtime_error("Data too short for legacy V1 header");
         }
 
-        unsigned char autoLoadByte = static_cast<unsigned char>(data[0]);
-        std::string autoLoadStr;
-        switch (autoLoadByte)
+        unsigned char autoLoadModeByte = static_cast<unsigned char>(data[0]);
+        std::string autoLoadModeStr;
+        switch (autoLoadModeByte)
         {
             case 0:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
             case 1:
-                autoLoadStr = "Ask";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeAsk);
                 break;
             case 2:
-                autoLoadStr = "Yes";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeYes);
                 break;
             default:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
         }
-        result["autoLoad"] = autoLoadStr;
+        result[autoLoadModeKey] = autoLoadModeStr;
 
         std::string name = data.substr(1, 16);
 
         name.erase(name.find_last_not_of(' ') + 1);
-        result["name"] = mpc::StrUtil::replaceAll(name, '_', " ");
-        result["midiControllerDeviceName"] =
+        result[nameKey] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result[midiControllerDeviceNameKey] =
             mpc::StrUtil::replaceAll(name, '_', " ");
-        result["version"] = 0;
+        result[versionKey] = 0;
 
         std::vector<json> bindings;
 
@@ -104,8 +104,8 @@ namespace mpc::input::midi::legacy
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
             json binding;
-            binding["target"] = bestGuessTarget;
-            binding["messageType"] = (typeByte == 0)
+            binding[targetKey] = bestGuessTarget;
+            binding[messageTypeKey] = (typeByte == 0)
                                          ? input::midi::controllerStr
                                          : input::midi::noteStr;
 
@@ -117,19 +117,11 @@ namespace mpc::input::midi::legacy
                 break;
             }
 
-            binding["midiChannelIndex"] = midiChannel;
+            binding[midiChannelIndexKey] = midiChannel;
 
             int midiNumber = static_cast<signed char>(numberByte);
-            if (midiNumber == -1)
-            {
-                binding["midiNumber"] = 0;
-                binding["enabled"] = false;
-            }
-            else
-            {
-                binding["midiNumber"] = midiNumber;
-                binding["enabled"] = true;
-            }
+
+            binding[midiNumberKey] = midiNumber;
 
             if (label.find("extra") != std::string::npos && midiNumber == -1)
             {
@@ -184,8 +176,9 @@ namespace mpc::input::midi::legacy
             {
                 if (b.label == "datawheel")
                 {
-                    b.binding["target"] = "hardware:data-wheel";
-                    b.binding["encoderMode"] = "relative_stateful";
+                    b.binding[targetKey] = "hardware:data-wheel";
+                    b.binding[encoderModeKey] = encoderModeToString(
+                        BindingEncoderMode::RelativeStateful);
                     bindings.push_back(b.binding);
                 }
             }
@@ -196,9 +189,9 @@ namespace mpc::input::midi::legacy
         // the +/- variants, so we don't set encoderMode here at all.
         for (auto &binding : bindings)
         {
-            const std::string target = binding.at("target").get<std::string>();
+            const std::string target = binding.at(targetKey).get<std::string>();
             const std::string messageType =
-                binding.at("messageType").get<std::string>();
+                binding.at(messageTypeKey).get<std::string>();
 
             const bool isController =
                 (messageType == input::midi::controllerStr);
@@ -222,27 +215,27 @@ namespace mpc::input::midi::legacy
                 {
                     // Button-like hardware and sequencer CC bindings
                     // require midiValue. Use a sensible default threshold.
-                    if (!binding.contains("midiValue"))
+                    if (!binding.contains(midiValueKey))
                     {
-                        binding["midiValue"] = 64;
+                        binding[midiValueKey] = 64;
                     }
                 }
                 else
                 {
                     // Pads, pots, plain data wheel (if it ever appeared)
                     // must not have midiValue.
-                    if (binding.contains("midiValue"))
+                    if (binding.contains(midiValueKey))
                     {
-                        binding.erase("midiValue");
+                        binding.erase(midiValueKey);
                     }
                 }
             }
             else
             {
                 // messageType == "note": midiValue is always forbidden.
-                if (binding.contains("midiValue"))
+                if (binding.contains(midiValueKey))
                 {
-                    binding.erase("midiValue");
+                    binding.erase(midiValueKey);
                 }
             }
         }

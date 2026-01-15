@@ -27,32 +27,32 @@ namespace mpc::input::midi::legacy
             throw std::runtime_error("Not a legacy V2 preset");
         }
 
-        result["version"] = 0;
+        result[versionKey] = 0;
 
-        unsigned char autoLoadByte = static_cast<unsigned char>(data[1]);
-        std::string autoLoadStr;
-        switch (autoLoadByte)
+        unsigned char autoLoadModeByte = static_cast<unsigned char>(data[1]);
+        std::string autoLoadModeStr;
+        switch (autoLoadModeByte)
         {
             case 0:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
             case 1:
-                autoLoadStr = "Ask";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeAsk);
                 break;
             case 2:
-                autoLoadStr = "Yes";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeYes);
                 break;
             default:
-                autoLoadStr = "No";
+                autoLoadModeStr = autoLoadModeToString(AutoLoadModeNo);
                 break;
         }
-        result["autoLoad"] = autoLoadStr;
+        result[autoLoadModeKey] = autoLoadModeStr;
 
         std::string name = data.substr(2, 16);
         name.erase(name.find_last_not_of(' ') + 1);
 
-        result["name"] = mpc::StrUtil::replaceAll(name, '_', " ");
-        result["midiControllerDeviceName"] =
+        result[nameKey] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result[midiControllerDeviceNameKey] =
             mpc::StrUtil::replaceAll(name, '_', " ");
 
         struct LegacyDatawheelBinding
@@ -95,13 +95,13 @@ namespace mpc::input::midi::legacy
             const auto bestGuessTarget = mapLegacyLabelToHardwareTarget(label);
 
             json binding;
-            binding["target"] = bestGuessTarget;
-            binding["messageType"] = (typeByte == 0)
-                                         ? input::midi::controllerStr
-                                         : input::midi::noteStr;
+            binding[targetKey] = bestGuessTarget;
+            binding[messageTypeKey] = (typeByte == 0)
+                                          ? input::midi::controllerStr
+                                          : input::midi::noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
-            binding["midiChannelIndex"] = midiChannel;
+            binding[midiChannelIndexKey] = midiChannel;
 
             if (midiChannel > 15)
             {
@@ -111,16 +111,7 @@ namespace mpc::input::midi::legacy
 
             int midiNumber = static_cast<signed char>(numberByte);
 
-            if (midiNumber == -1)
-            {
-                binding["enabled"] = false;
-                binding["midiNumber"] = 0;
-            }
-            else
-            {
-                binding["enabled"] = true;
-                binding["midiNumber"] = midiNumber;
-            }
+            binding[midiNumberKey] = midiNumber;
 
             // Do NOT set midiValue here; we'll assign a fixed 64 later
             // for targets that require it in the new schema.
@@ -175,8 +166,9 @@ namespace mpc::input::midi::legacy
             {
                 if (b.label == "datawheel")
                 {
-                    b.binding["target"] = "hardware:data-wheel";
-                    b.binding["encoderMode"] = "relative_stateful";
+                    b.binding[targetKey] = "hardware:data-wheel";
+                    b.binding[encoderModeKey] = encoderModeToString(
+                        BindingEncoderMode::RelativeStateful);
                     bindings.push_back(b.binding);
                 }
             }
@@ -187,9 +179,9 @@ namespace mpc::input::midi::legacy
         // - else → no midiValue
         for (auto &binding : bindings)
         {
-            const std::string target = binding.at("target").get<std::string>();
+            const std::string target = binding.at(targetKey).get<std::string>();
             const std::string messageType =
-                binding.at("messageType").get<std::string>();
+                binding.at(messageTypeKey).get<std::string>();
 
             const bool isController =
                 (messageType == input::midi::controllerStr);
@@ -209,15 +201,15 @@ namespace mpc::input::midi::legacy
 
             if (isController && isButtonLike)
             {
-                binding["midiValue"] = 64;
+                binding[midiValueKey] = 64;
             }
             else
             {
-                binding.erase("midiValue");
+                binding.erase(midiValueKey);
             }
         }
 
-        result["bindings"] = bindings;
+        result[bindingsKey] = bindings;
         return result;
     }
 } // namespace mpc::input::midi::legacy
