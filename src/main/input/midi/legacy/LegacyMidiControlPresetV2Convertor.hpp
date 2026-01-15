@@ -86,9 +86,9 @@ namespace mpc::input::midi::legacy
                 throw std::runtime_error("Unexpected end of data in binding");
             }
 
-            unsigned char typeByte    = static_cast<unsigned char>(data[pos++]);
+            unsigned char typeByte = static_cast<unsigned char>(data[pos++]);
             unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
-            unsigned char numberByte  = static_cast<unsigned char>(data[pos++]);
+            unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
             unsigned char ccValueByte = static_cast<unsigned char>(data[pos++]);
             (void)ccValueByte; // consumed but intentionally ignored
 
@@ -96,9 +96,9 @@ namespace mpc::input::midi::legacy
 
             json binding;
             binding["target"] = bestGuessTarget;
-            binding["messageType"] =
-                (typeByte == 0) ? input::midi::controllerStr
-                                : input::midi::noteStr;
+            binding["messageType"] = (typeByte == 0)
+                                         ? input::midi::controllerStr
+                                         : input::midi::noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
             binding["midiChannelIndex"] = midiChannel;
@@ -188,33 +188,24 @@ namespace mpc::input::midi::legacy
         // - else → no midiValue
         for (auto &binding : bindings)
         {
-            const std::string target =
-                binding.at("target").get<std::string>();
+            const std::string target = binding.at("target").get<std::string>();
             const std::string messageType =
                 binding.at("messageType").get<std::string>();
 
             const bool isController =
                 (messageType == input::midi::controllerStr);
 
-            const bool isSequencer =
-                target.rfind("sequencer:", 0) == 0;
+            const bool isHardware = target.rfind("hardware:", 0) == 0;
 
-            const bool isHardware =
-                target.rfind("hardware:", 0) == 0;
+            const bool isPad = target.rfind("hardware:pad-", 0) == 0;
 
-            const bool isPad =
-                target.rfind("hardware:pad-", 0) == 0;
+            const bool isPot = target == "hardware:slider" ||
+                               target == "hardware:rec-gain-pot" ||
+                               target == "hardware:main-volume-pot";
 
-            const bool isPot =
-                target == "hardware:slider" ||
-                target == "hardware:rec-gain-pot" ||
-                target == "hardware:main-volume-pot";
-
-            const bool isDataWheelPlain =
-                target == "hardware:data-wheel";
+            const bool isDataWheelPlain = target == "hardware:data-wheel";
 
             const bool isButtonLike =
-                isSequencer ||
                 (isHardware && !isPad && !isPot && !isDataWheelPlain);
 
             if (isController && isButtonLike)

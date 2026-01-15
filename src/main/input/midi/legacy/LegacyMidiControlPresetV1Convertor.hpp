@@ -204,25 +204,17 @@ namespace mpc::input::midi::legacy
             const bool isController =
                 (messageType == input::midi::controllerStr);
 
-            const bool isSequencer =
-                target.rfind("sequencer:", 0) == 0;
+            const bool isHardware = target.rfind("hardware:", 0) == 0;
 
-            const bool isHardware =
-                target.rfind("hardware:", 0) == 0;
+            const bool isPad = target.rfind("hardware:pad-", 0) == 0;
 
-            const bool isPad =
-                target.rfind("hardware:pad-", 0) == 0;
+            const bool isPot = target == "hardware:slider" ||
+                               target == "hardware:rec-gain-pot" ||
+                               target == "hardware:main-volume-pot";
 
-            const bool isPot =
-                target == "hardware:slider" ||
-                target == "hardware:rec-gain-pot" ||
-                target == "hardware:main-volume-pot";
-
-            const bool isDataWheelPlain =
-                target == "hardware:data-wheel";
+            const bool isDataWheelPlain = target == "hardware:data-wheel";
 
             const bool isButtonLike =
-                isSequencer ||
                 (isHardware && !isPad && !isPot && !isDataWheelPlain);
 
             if (isController)

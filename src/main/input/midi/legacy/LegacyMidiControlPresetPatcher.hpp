@@ -161,8 +161,7 @@ namespace mpc::input::midi::legacy
             for (auto it = props.begin(); it != props.end(); ++it)
             {
                 const std::string propName = it.key();
-                if (propName == "target" ||
-                    propName == "encoderMode" ||
+                if (propName == "target" || propName == "encoderMode" ||
                     propName == "midiValue")
                 {
                     continue;
@@ -240,7 +239,8 @@ namespace mpc::input::midi::legacy
             }
             else
             {
-                const std::string mt = binding["messageType"].get<std::string>();
+                const std::string mt =
+                    binding["messageType"].get<std::string>();
                 const bool isController = (mt == "controller");
 
                 if (!isController)
@@ -250,25 +250,18 @@ namespace mpc::input::midi::legacy
                 }
                 else
                 {
-                    const bool isSequencer =
-                        target.rfind("sequencer:", 0) == 0;
+                    const bool isPad = target.rfind("hardware:pad-", 0) == 0;
 
-                    const bool isPad =
-                        target.rfind("hardware:pad-", 0) == 0;
-
-                    const bool isPot =
-                        target == "hardware:slider" ||
-                        target == "hardware:rec-gain-pot" ||
-                        target == "hardware:main-volume-pot";
+                    const bool isPot = target == "hardware:slider" ||
+                                       target == "hardware:rec-gain-pot" ||
+                                       target == "hardware:main-volume-pot";
 
                     const bool isPlainDataWheel =
                         target == "hardware:data-wheel";
 
-                    const bool isHardware =
-                        target.rfind("hardware:", 0) == 0;
+                    const bool isHardware = target.rfind("hardware:", 0) == 0;
 
                     const bool isButtonLike =
-                        isSequencer ||
                         (isHardware && !isPad && !isPot && !isPlainDataWheel);
 
                     if (isButtonLike)
@@ -279,7 +272,8 @@ namespace mpc::input::midi::legacy
                         {
                             if (defaultBinding.contains("midiValue"))
                             {
-                                binding["midiValue"] = defaultBinding["midiValue"];
+                                binding["midiValue"] =
+                                    defaultBinding["midiValue"];
                             }
                             else
                             {

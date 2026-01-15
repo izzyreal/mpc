@@ -16,7 +16,6 @@ namespace mpc::input::midi
     using json = nlohmann::json;
 
     static const std::string hardwareStr = "hardware:";
-    static const std::string sequencerStr = "sequencer:";
     static const std::string negativeStr = ":negative";
     static const std::string positiveStr = ":positive";
     static const std::string controllerStr = "controller";
@@ -155,8 +154,6 @@ namespace mpc::input::midi
         std::optional<std::string> getHardwareTarget() const;
 
         Direction getHardwareDirection() const;
-
-        std::optional<std::string> getSequencerTarget() const;
 
         const BindingMessageType &getMessageType() const;
 

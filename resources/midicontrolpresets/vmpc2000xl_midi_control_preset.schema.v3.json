@@ -135,14 +135,7 @@
             "hardware:data-wheel",
             "hardware:slider",
             "hardware:rec-gain-pot",
-            "hardware:main-volume-pot",
-            "sequencer:play",
-            "sequencer:rec",
-            "sequencer:stop",
-            "sequencer:rec-plus-play",
-            "sequencer:odub-plus-play",
-            "sequencer:rec-punch",
-            "sequencer:odub-punch"
+            "hardware:main-volume-pot"
           ]
         },
         "messageType": {
@@ -241,14 +234,7 @@
                     "hardware:8-or-other",
                     "hardware:9-or-midi-sync",
                     "hardware:data-wheel:negative",
-                    "hardware:data-wheel:positive",
-                    "sequencer:play",
-                    "sequencer:rec",
-                    "sequencer:stop",
-                    "sequencer:rec-plus-play",
-                    "sequencer:odub-plus-play",
-                    "sequencer:rec-punch",
-                    "sequencer:odub-punch"
+                    "hardware:data-wheel:positive"
                   ]
                 }
               },

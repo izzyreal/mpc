@@ -42,7 +42,6 @@ TEST_CASE("MidiControlPresetV3 rejects wrong binding targets",
         b[i].setMessageType(BindingMessageType::Note);
         b[i].setMidiNumber(60);
         b[i].setMidiChannelIndex(0);
-        b[i].setEnabled(true);
     }
     REQUIRE_THROWS_AS(preset.setBindings(b), std::invalid_argument);
 }
@@ -63,7 +62,6 @@ TEST_CASE("MidiControlPresetV3 accepts correct binding target set",
         bind.setMidiNumber(1);
         bind.setMidiValue(10);
         bind.setMidiChannelIndex(0);
-        bind.setEnabled(true);
         b.push_back(bind);
     }
 
@@ -86,7 +84,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         b.setMidiNumber(10);
         b.setMidiValue(64);
         b.setMidiChannelIndex(0);
-        b.setEnabled(true);
         bindings.push_back(b);
     }
 
@@ -97,7 +94,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         b.setMessageType(BindingMessageType::Note);
         b.setMidiNumber(36);
         b.setMidiChannelIndex(1);
-        b.setEnabled(true);
         bindings.push_back(b);
     }
 
@@ -108,7 +104,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         b.setMessageType(BindingMessageType::Controller);
         b.setMidiNumber(7);
         b.setMidiChannelIndex(2);
-        b.setEnabled(true);
         bindings.push_back(b);
     }
 
@@ -120,7 +115,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         b.setEncoderMode(BindingEncoderMode::RelativeStateless);
         b.setMidiNumber(16);
         b.setMidiChannelIndex(0);
-        b.setEnabled(true);
         bindings.push_back(b);
     }
 
@@ -132,19 +126,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         b.setMidiNumber(17);
         b.setMidiValue(64);
         b.setMidiChannelIndex(0);
-        b.setEnabled(true);
-        bindings.push_back(b);
-    }
-
-    // 6) Sequencer CC (has midiValue)
-    {
-        Binding b;
-        b.setTarget("sequencer:play");
-        b.setMessageType(BindingMessageType::Controller);
-        b.setMidiNumber(20);
-        b.setMidiValue(64);
-        b.setMidiChannelIndex(0);
-        b.setEnabled(true);
         bindings.push_back(b);
     }
 
@@ -197,14 +178,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(rb[4].getMidiValue() == 64);
     REQUIRE(rb[4].getMidiChannelIndex() == 0);
     REQUIRE(rb[4].isEnabled());
-
-    // 6) Sequencer CC
-    REQUIRE(rb[5].getTarget() == "sequencer:play");
-    REQUIRE(rb[5].isController());
-    REQUIRE(rb[5].getMidiNumber() == 20);
-    REQUIRE(rb[5].getMidiValue() == 64);
-    REQUIRE(rb[5].getMidiChannelIndex() == 0);
-    REQUIRE(rb[5].isEnabled());
 }
 
 TEST_CASE("MidiControlPresetV3 rejects invalid midiControllerDeviceName",
@@ -262,7 +235,6 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
         bind.setMessageType(BindingMessageType::Note);
         bind.setMidiNumber(10);
         bind.setMidiChannelIndex(0);
-        bind.setEnabled(true);
         b.push_back(bind);
     }
     preset.setBindings(b);

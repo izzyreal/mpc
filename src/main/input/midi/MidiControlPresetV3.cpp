@@ -99,11 +99,6 @@ bool Binding::isNote() const
 
 bool Binding::isButtonLike() const
 {
-    if (getSequencerTarget())
-    {
-        return true;
-    }
-
     const auto hardwareTargetStr = getHardwareTarget();
 
     if (hardwareTargetStr)
@@ -173,20 +168,6 @@ mpc::input::Direction Binding::getHardwareDirection() const
     return Direction::NoDirection;
 }
 
-std::optional<std::string> Binding::getSequencerTarget() const
-{
-    if (target.find(sequencerStr) == std::string::npos)
-    {
-        return std::nullopt;
-    }
-
-    auto result = target;
-
-    StrUtil::replace(result, sequencerStr, "");
-
-    return result;
-}
-
 std::string Binding::getTargetDisplayName() const
 {
     std::string result = target;
@@ -194,7 +175,6 @@ std::string Binding::getTargetDisplayName() const
     StrUtil::replace(result, "-", " ");
 
     StrUtil::replace(result, hardwareStr, "");
-    StrUtil::replace(result, sequencerStr, "seq ");
     StrUtil::replace(result, negativeStr, " -");
     StrUtil::replace(result, positiveStr, " +");
 
@@ -312,35 +292,6 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
             {
                 throw std::invalid_argument(
                     "Binding must not include 'midiValue'");
-            }
-        }
-    }
-    else if (const auto sequencerTargetStr = b.getSequencerTarget())
-    {
-        if (j.contains("encoderMode"))
-        {
-            throw std::invalid_argument(
-                "encoderMode is only allowed for hardware:data-wheel");
-        }
-
-        if (isController)
-        {
-            if (!hasMidiValue)
-            {
-                throw std::invalid_argument(
-                    "Sequencer binding requires 'midiValue'");
-            }
-
-            b.setMidiValue(j.at("midiValue").get<int>());
-            shouldContainMidiValue = true;
-        }
-        else
-        {
-            if (hasMidiValue)
-            {
-                throw std::invalid_argument(
-                    "Non-controller sequencer binding must not include "
-                    "'midiValue'");
             }
         }
     }

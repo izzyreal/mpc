@@ -229,9 +229,6 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 }
             }
         }
-        else if (auto sequencerTarget = b.getSequencerTarget())
-        {
-        }
     }
 }
 
