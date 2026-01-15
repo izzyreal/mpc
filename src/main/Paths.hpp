@@ -43,6 +43,8 @@ namespace mpc
 
         fs::path legacyKeyboardBindingsPath() const;
 
+        fs::path legacyActiveMidiControlPresetPath() const;
+
         Documents *getDocuments() const;
 
     private:

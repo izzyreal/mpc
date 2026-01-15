@@ -116,14 +116,15 @@ void Mpc::init()
     input::midi::legacy::convertOnDiskLegacyPresets(
         paths->getDocuments()->midiControlPresetsPath());
 
+    input::midi::legacy::convertOnDiskLegacyPreset(
+        paths->legacyActiveMidiControlPresetPath(),
+        paths->getDocuments()->activeMidiControlPresetPath());
+
     Logger::l.setPath(paths->getDocuments()->logFilePath().string());
 
     padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
     diskController = std::make_unique<disk::DiskController>(*this);
-
-    //    input::midi::legacy::MidiControlPersistence::
-    //        loadAllPresetsFromDiskIntoMemory(*this);
 
     hardware = std::make_shared<Hardware>();
 

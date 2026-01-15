@@ -9,84 +9,95 @@
 
 namespace mpc::input::midi::legacy
 {
-    inline void convertOnDiskLegacyPresets(const fs::path &p)
+    inline void
+    convertOnDiskLegacyPreset(const fs::path &p,
+                              std::optional<fs::path> newPath = std::nullopt)
     {
-        for (const auto &f : fs::directory_iterator(p))
+        if (!fs::exists(p) || !fs::is_regular_file(p) ||
+            p.extension().string().find("vmp") == std::string::npos)
         {
-            if (!fs::is_regular_file(f) ||
-                f.path().extension().string().find("vmp") == std::string::npos)
-            {
-                continue;
-            }
+            return;
+        }
 
-            const auto fileData = get_file_data(f.path());
+        const auto fileData = get_file_data(p);
 
-            json fileAsJson;
+        json fileAsJson;
 
-            bool success = false;
+        bool success = false;
 
-            bool shouldTryV1Parser = true;
+        bool shouldTryV1Parser = true;
 
+        try
+        {
+            fileAsJson = parseLegacyMidiControlPresetV2(
+                std::string(fileData.begin(), fileData.end()));
+            shouldTryV1Parser = false;
+            success = true;
+        }
+        catch (const std::exception &)
+        {
+        }
+
+        if (shouldTryV1Parser)
+        {
             try
             {
-                fileAsJson = parseLegacyMidiControlPresetV2(
+                fileAsJson = parseLegacyMidiControlPresetV1(
                     std::string(fileData.begin(), fileData.end()));
-                shouldTryV1Parser = false;
                 success = true;
             }
             catch (const std::exception &)
             {
             }
+        }
 
-            if (shouldTryV1Parser)
-            {
-                try
-                {
-                    fileAsJson = parseLegacyMidiControlPresetV1(
-                        std::string(fileData.begin(), fileData.end()));
-                    success = true;
-                }
-                catch (const std::exception &)
-                {
-                }
-            }
+        if (!success)
+        {
+            return;
+        }
 
-            if (!success)
-            {
-                continue;
-            }
+        auto preset = std::make_shared<MidiControlPresetV3>();
 
-            auto preset = std::make_shared<MidiControlPresetV3>();
+        try
+        {
+            from_json(fileAsJson, *preset);
+        }
+        catch (const std::exception)
+        {
+            return;
+        }
 
-            try
-            {
-                from_json(fileAsJson, *preset);
-            }
-            catch (const std::exception)
-            {
-                continue;
-            }
+        patchLegacyPreset(fileAsJson, MidiControlPresetUtil::load_schema());
 
-            patchLegacyPreset(fileAsJson, MidiControlPresetUtil::load_schema());
+        MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);
 
-            MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);
+        MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(preset);
 
-            MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(
-                preset);
+        to_json(fileAsJson, *preset);
 
-            to_json(fileAsJson, *preset);
+        auto jsonFilePath = p;
 
-            auto jsonFilePath = f.path();
+        jsonFilePath.replace_extension(".json");
 
-            jsonFilePath.replace_extension(".json");
+        if (newPath)
+        {
+            jsonFilePath = *newPath;
+        }
 
-            set_file_data(jsonFilePath, fileAsJson.dump(4));
+        set_file_data(jsonFilePath, fileAsJson.dump(4));
 
-            auto newFilePath = f.path();
+        auto newFilePath = p;
 
-            newFilePath += ".bk";
+        newFilePath += ".bk";
 
-            fs::rename(f.path(), newFilePath);
+        fs::rename(p, newFilePath);
+    }
+
+    inline void convertOnDiskLegacyPresets(const fs::path &p)
+    {
+        for (const auto &f : fs::directory_iterator(p))
+        {
+            convertOnDiskLegacyPreset(f.path());
         }
     }
 } // namespace mpc::input::midi::legacy
