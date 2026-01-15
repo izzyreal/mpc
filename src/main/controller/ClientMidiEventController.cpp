@@ -287,15 +287,6 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
-    const auto registeredNoteOnEvent =
-        performanceManager.lock()->getSnapshot().findNoteOnEvent(
-            PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-            MidiChannel(midiChannel));
-
-    performanceManager.lock()->registerNoteOff(
-        PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
-        std::optional<MidiChannel>(midiChannel));
-
     const auto lockedSequencer = sequencer.lock();
 
     const auto transport = lockedSequencer->getStateManager()
@@ -305,48 +296,62 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     const auto metronomeOnlyPositionTicks =
         transport.getMetronomeOnlyPositionTicks();
 
-    if (!registeredNoteOnEvent)
-    {
-        // TODO Should we do anything special for orphaned note offs?
-        return;
-    }
-
-    const bool isNoteRepeatMode =
-        registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
-        clientHardwareEventController.lock()->isNoteRepeatLockedOrPressed() &&
-        transport.isSequencerRunning() &&
-        screens.lock()
-                ->get<ScreenId::TimingCorrectScreen>()
-                ->getNoteValueLengthInTicks() > 1;
-
-    const bool isLiveEraseMode =
-        transport.isRecordingOrOverdubbing() &&
-        clientEventController.lock()->isEraseButtonPressed();
-
-    if (isNoteRepeatMode || isLiveEraseMode)
-    {
-        return;
-    }
+    const bool isSequencerRunning = transport.isSequencerRunning();
+    const bool isRecordingOrOverdubbing = transport.isRecordingOrOverdubbing();
 
     utils::SimpleAction action(
-        [this, noteEventInfo = *registeredNoteOnEvent, positionTicks,
-         metronomeOnlyPositionTicks, lockedSequencer]
+        [this, positionTicks, metronomeOnlyPositionTicks, lockedSequencer,
+         noteNumber, midiChannel, isSequencerRunning, isRecordingOrOverdubbing]
         {
+            const auto manager = performanceManager.lock();
+            const auto registeredNoteOnEvent =
+                manager->getSnapshot().findNoteOnEvent(
+                    PerformanceEventSource::MidiInput, NoteNumber(noteNumber),
+                    MidiChannel(midiChannel));
+
+            manager->registerNoteOff(PerformanceEventSource::MidiInput,
+                                     NoteNumber(noteNumber),
+                                     std::optional<MidiChannel>(midiChannel));
+
+            if (!registeredNoteOnEvent)
+            {
+                // TODO Should we do anything special for orphaned note offs?
+                return;
+            }
+
+            const bool isNoteRepeatMode =
+                registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
+                clientHardwareEventController.lock()
+                    ->isNoteRepeatLockedOrPressed() &&
+                isSequencerRunning &&
+                screens.lock()
+                        ->get<ScreenId::TimingCorrectScreen>()
+                        ->getNoteValueLengthInTicks() > 1;
+
+            const bool isLiveEraseMode =
+                isRecordingOrOverdubbing &&
+                clientEventController.lock()->isEraseButtonPressed();
+
+            if (isNoteRepeatMode || isLiveEraseMode)
+            {
+                return;
+            }
+
             ProgramPadIndex programPadIndex = NoProgramPadIndex;
             std::shared_ptr<Program> program;
 
-            const auto programIndex = noteEventInfo.programIndex;
-            const auto trackIndex = noteEventInfo.trackIndex;
+            const auto programIndex = registeredNoteOnEvent->programIndex;
+            const auto trackIndex = registeredNoteOnEvent->trackIndex;
 
             assert(programIndex != NoProgramIndex);
 
             program = sampler.lock()->getProgram(programIndex);
 
-            if (isDrumNote(noteEventInfo.noteNumber))
+            if (isDrumNote(registeredNoteOnEvent->noteNumber))
             {
 
                 programPadIndex = program->getPadIndexFromNote(
-                    DrumNoteNumber(noteEventInfo.noteNumber));
+                    DrumNoteNumber(registeredNoteOnEvent->noteNumber));
 
                 performanceManager.lock()->registerProgramPadRelease(
                     PerformanceEventSource::MidiInput,
@@ -354,25 +359,25 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             }
 
             const auto screen =
-                screens.lock()->getScreenById(noteEventInfo.screenId);
+                screens.lock()->getScreenById(registeredNoteOnEvent->screenId);
             const auto seq = lockedSequencer->getSelectedSequence();
             const auto track = seq->getTrack(trackIndex).get();
 
             const auto recordingNoteOnEvent =
                 lockedSequencer->getStateManager()->findRecordingNoteOnEvent(
                     seq->getSequenceIndex(), trackIndex,
-                    noteEventInfo.noteNumber);
+                    registeredNoteOnEvent->noteNumber);
 
             const bool isSamplerScreen =
-                screengroups::isSamplerScreen(noteEventInfo.screenId);
+                screengroups::isSamplerScreen(registeredNoteOnEvent->screenId);
 
             const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                    PerformanceEventSource::MidiInput, noteEventInfo.noteNumber,
-                    recordingNoteOnEvent, track, noteEventInfo.busType,
-                    screen.get(), isSamplerScreen, programPadIndex,
-                    program.get(), sequencer.lock().get(),
-                    performanceManager.lock().get(),
+                    PerformanceEventSource::MidiInput,
+                    registeredNoteOnEvent->noteNumber, recordingNoteOnEvent,
+                    track, registeredNoteOnEvent->busType, screen.get(),
+                    isSamplerScreen, programPadIndex, program.get(),
+                    sequencer.lock().get(), performanceManager.lock().get(),
                     clientEventController.lock().get(),
                     eventHandler.lock().get(), screens.lock().get(),
                     hardware.lock().get(), metronomeOnlyPositionTicks,
