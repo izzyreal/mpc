@@ -81,6 +81,25 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         notifyObservers(notificationMessage);
     }
 
+    switch (e.getMessageType())
+    {
+        case MessageType::NOTE_ON:
+            extendedController->handleEvent(e);
+            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
+                                                     e.getNoteNumber());
+            break;
+        case MessageType::NOTE_OFF:
+            extendedController->handleEvent(e);
+            break;
+        case MessageType::CONTROLLER:
+            extendedController->handleEvent(e);
+            vmpcMidiScreen.lock()->setLearnCandidate(false, e.getChannel(),
+                                                     e.getControllerNumber());
+            break;
+        default:
+            break;
+    }
+
     if (!sequencer.lock()->isRecordingModeMulti())
     {
         const int receiveCh = midiInputScreen.lock()->getReceiveCh();
@@ -100,13 +119,9 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     {
         case MessageType::NOTE_ON:
             handleNoteOn(e);
-            extendedController->handleEvent(e);
-            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
-                                                     e.getNoteNumber());
             break;
         case MessageType::NOTE_OFF:
             handleNoteOff(e);
-            extendedController->handleEvent(e);
             break;
         case MessageType::AFTERTOUCH:
             handleKeyAftertouch(e);
@@ -125,9 +140,6 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         case MessageType::CONTROLLER:
             handleControlChange(e);
             footswitchController->handleEvent(e);
-            extendedController->handleEvent(e);
-            vmpcMidiScreen.lock()->setLearnCandidate(false, e.getChannel(),
-                                                     e.getControllerNumber());
             break;
 
         case MessageType::MIDI_CLOCK:
