@@ -460,36 +460,7 @@ void AbstractDisk::readMidiControlPreset(
 
         bool success = false;
 
-        if (pathToUse.extension().string().find("vmp") != std::string::npos)
-        {
-            bool shouldTryV1Parser = true;
-
-            try
-            {
-                fileAsJson = legacy::parseLegacyMidiControlPresetV2(
-                    std::string(fileData.begin(), fileData.end()));
-                shouldTryV1Parser = false;
-                success = true;
-            }
-            catch (const std::exception &)
-            {
-            }
-
-            if (shouldTryV1Parser)
-            {
-                try
-                {
-                    fileAsJson = legacy::parseLegacyMidiControlPresetV1(
-                        std::string(fileData.begin(), fileData.end()));
-                    success = true;
-                }
-                catch (const std::exception &)
-                {
-                }
-            }
-        }
-        else if (pathToUse.extension().string().find("json") !=
-                 std::string::npos)
+        if (pathToUse.extension().string().find("json") != std::string::npos)
         {
             fileAsJson = json::parse(fileData);
             success = true;
@@ -501,10 +472,11 @@ void AbstractDisk::readMidiControlPreset(
             {
                 from_json(fileAsJson, *preset);
             }
-            catch (const std::exception)
+            catch (const std::exception &e)
             {
                 return tl::make_unexpected(
-                    mpc_io_error_msg{"Unable to convert JSON to preset"});
+                    mpc_io_error_msg{"Unable to parse JSON to preset: " +
+                                     std::string(e.what())});
             }
 
             MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);

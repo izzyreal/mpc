@@ -11,6 +11,7 @@
 #include "Paths.hpp"
 #include "nvram/NvRam.hpp"
 #include "input/midi/legacy/MidiControlPersistence.hpp"
+#include "input/midi/legacy/LegacyOnDiskPresetConvertor.hpp"
 
 #include "disk/AbstractDisk.hpp"
 
@@ -111,6 +112,9 @@ void Mpc::init()
                 paths->getDocuments()->midiControlPresetsPath() / preset, data);
         }
     }
+
+    input::midi::legacy::convertOnDiskLegacyPresets(
+        paths->getDocuments()->midiControlPresetsPath());
 
     Logger::l.setPath(paths->getDocuments()->logFilePath().string());
 
