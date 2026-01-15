@@ -127,16 +127,14 @@ void VmpcMidiScreen::open()
     findChild<Label>("down")->setText("\u00C6");
 
     setLearning(false);
-    learnCandidate.reset();
     displayRows();
 }
 
 void VmpcMidiScreen::up()
 {
-    if (learning)
+    if (isLearning())
     {
         acceptLearnCandidate();
-        learnCandidate.reset();
     }
 
     if (row == 0)
@@ -148,25 +146,36 @@ void VmpcMidiScreen::up()
 
         rowOffset--;
 
-        if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
-            column == 2)
+        if (isLearning())
         {
-            column--;
+            setLearnCandidateToSelectedBinding();
         }
 
         displayRows();
+
+        if (!isColumn2VisibleAtCurrentRow() && column == 2)
+        {
+            column--;
+            displayRows();
+        }
+
         return;
     }
 
     row--;
 
-    if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
-        column == 2)
+    if (isLearning())
     {
-        column--;
+        setLearnCandidateToSelectedBinding();
     }
 
     displayRows();
+
+    if (!isColumn2VisibleAtCurrentRow() && column == 2)
+    {
+        column--;
+        displayRows();
+    }
 }
 
 void VmpcMidiScreen::openWindow()
@@ -197,10 +206,9 @@ void VmpcMidiScreen::acceptLearnCandidate()
 
 void VmpcMidiScreen::down()
 {
-    if (learning)
+    if (isLearning())
     {
         acceptLearnCandidate();
-        learnCandidate.reset();
     }
 
     auto preset = getActivePreset();
@@ -214,23 +222,36 @@ void VmpcMidiScreen::down()
 
         rowOffset++;
 
-        if (preset->getBindingByIndex(row + rowOffset).isNote() && column == 2)
+        if (isLearning())
         {
-            column--;
+            setLearnCandidateToSelectedBinding();
         }
 
         displayRows();
+
+        if (!isColumn2VisibleAtCurrentRow() && column == 2)
+        {
+            column--;
+            displayRows();
+        }
+
         return;
     }
 
     row++;
 
-    if (preset->getBindingByIndex(row + rowOffset).isNote() && column == 2)
+    if (isLearning())
     {
-        column--;
+        setLearnCandidateToSelectedBinding();
     }
 
     displayRows();
+
+    if (!isColumn2VisibleAtCurrentRow() && column == 2)
+    {
+        column--;
+        displayRows();
+    }
 }
 
 void VmpcMidiScreen::left()
@@ -269,6 +290,18 @@ void VmpcMidiScreen::right()
     displayRows();
 }
 
+void VmpcMidiScreen::setLearnCandidateToSelectedBinding()
+{
+    learnCandidate = getActivePreset()->getBindingByIndex(row + rowOffset);
+}
+
+bool VmpcMidiScreen::isColumn2VisibleAtCurrentRow()
+{
+    return !findChild<Parameter>("value" + std::to_string(row))->IsHidden() ||
+           !findChild<Parameter>("encoder-mode" + std::to_string(row))
+                ->IsHidden();
+}
+
 void VmpcMidiScreen::setLearning(bool b)
 {
     learning = b;
@@ -279,7 +312,7 @@ void VmpcMidiScreen::setLearning(bool b)
     }
     else
     {
-        learnCandidate = getActivePreset()->getBindingByIndex(row + rowOffset);
+        setLearnCandidateToSelectedBinding();
     }
 
     findChild<TextComp>("fk2")->setBlinking(learning);
@@ -351,7 +384,6 @@ void VmpcMidiScreen::function(int i)
             if (learning)
             {
                 setLearning(false);
-                learnCandidate.reset();
                 displayRows();
                 return;
             }
@@ -375,8 +407,6 @@ void VmpcMidiScreen::function(int i)
             }
 
             setLearning(!learning);
-            learnCandidate.reset();
-
             displayRows();
             break;
         case 5:
@@ -414,17 +444,17 @@ void VmpcMidiScreen::function(int i)
 
 void VmpcMidiScreen::setLearnCandidate(const bool isNote,
                                        const int8_t channelIndex,
-                                       const int8_t number, const int8_t value)
+                                       const int8_t number)
 {
+    if (!isLearning())
+    {
+        return;
+    }
+
     learnCandidate->setMessageType(isNote ? BindingMessageType::Note
                                           : BindingMessageType::Controller);
     learnCandidate->setMidiChannelIndex(channelIndex);
     learnCandidate->setMidiNumber(number);
-
-    if (!isNote)
-    {
-        learnCandidate->setMidiValue(value);
-    }
 
     displayRows();
 }
@@ -443,19 +473,16 @@ void VmpcMidiScreen::displayRows()
 
         constexpr int length = 15;
 
-        const auto targetText =
-            StrUtil::padRight(getActivePreset()
-                                  ->getBindingByIndex(i + rowOffset)
-                                  .getTargetDisplayName(),
-                              " ", length) +
-            ":";
-
-        typeLabel->setText(targetText);
-
         auto &binding =
             learning && row == i && learnCandidate.has_value()
                 ? learnCandidate.value()
                 : getActivePreset()->getBindingByIndex(i + rowOffset);
+
+        const auto targetText =
+            StrUtil::padRight(binding.getTargetDisplayName(), " ", length) +
+            ":";
+
+        typeLabel->setText(targetText);
 
         std::string type = messageTypeToDisplayString(binding.getMessageType());
 

@@ -10,6 +10,7 @@
 #include "performance/EventTypes.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
 #include "lcdgui/ScreenIdGroups.hpp"
@@ -44,6 +45,7 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
+    std::shared_ptr<VmpcMidiScreen> vmpcMidiScreen,
     std::weak_ptr<Sequencer> sequencer, const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<MidiInputScreen> &midiInputScreen,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
@@ -55,7 +57,8 @@ ClientMidiEventController::ClientMidiEventController(
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
       performanceManager(performanceManager), midiInputScreen(midiInputScreen),
-      eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
+      vmpcMidiScreen(vmpcMidiScreen), eventHandler(eventHandler),
+      sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       layeredScreen(layeredScreen), hardware(hardware), screens(screens),
       previewSoundPlayer(previewSoundPlayer)
@@ -98,6 +101,8 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         case MessageType::NOTE_ON:
             handleNoteOn(e);
             extendedController->handleEvent(e);
+            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
+                                                     e.getNoteNumber());
             break;
         case MessageType::NOTE_OFF:
             handleNoteOff(e);
@@ -121,6 +126,8 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
             handleControlChange(e);
             footswitchController->handleEvent(e);
             extendedController->handleEvent(e);
+            vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
+                                                     e.getControllerNumber());
             break;
 
         case MessageType::MIDI_CLOCK:

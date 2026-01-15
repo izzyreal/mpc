@@ -26,8 +26,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
         bool isLearning();
-        void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
-                               int8_t value);
+        void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number);
 
         std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
 
@@ -50,7 +49,9 @@ namespace mpc::lcdgui::screens
             uneditedActivePresetCopy =
                 std::make_shared<input::midi::MidiControlPresetV3>();
 
+        bool isColumn2VisibleAtCurrentRow();
         void setLearning(bool b);
+        void setLearnCandidateToSelectedBinding();
         void acceptLearnCandidate();
         void displayRows();
         void displayUpAndDown();
