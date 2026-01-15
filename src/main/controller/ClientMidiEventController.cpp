@@ -331,24 +331,6 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                 return;
             }
 
-            const bool isNoteRepeatMode =
-                registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
-                clientHardwareEventController.lock()
-                    ->isNoteRepeatLockedOrPressed() &&
-                isSequencerRunning &&
-                screens.lock()
-                        ->get<ScreenId::TimingCorrectScreen>()
-                        ->getNoteValueLengthInTicks() > 1;
-
-            const bool isLiveEraseMode =
-                isRecordingOrOverdubbing &&
-                clientEventController.lock()->isEraseButtonPressed();
-
-            if (isNoteRepeatMode || isLiveEraseMode)
-            {
-                return;
-            }
-
             ProgramPadIndex programPadIndex = NoProgramPadIndex;
             std::shared_ptr<Program> program;
 
@@ -368,6 +350,24 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                 performanceManager.lock()->registerProgramPadRelease(
                     PerformanceEventSource::MidiInput,
                     ProgramPadIndex(programPadIndex), programIndex);
+            }
+
+            const bool isNoteRepeatMode =
+                registeredNoteOnEvent->screenId == ScreenId::SequencerScreen &&
+                clientHardwareEventController.lock()
+                    ->isNoteRepeatLockedOrPressed() &&
+                isSequencerRunning &&
+                screens.lock()
+                        ->get<ScreenId::TimingCorrectScreen>()
+                        ->getNoteValueLengthInTicks() > 1;
+
+            const bool isLiveEraseMode =
+                isRecordingOrOverdubbing &&
+                clientEventController.lock()->isEraseButtonPressed();
+
+            if (isNoteRepeatMode || isLiveEraseMode)
+            {
+                return;
             }
 
             const auto screen =
