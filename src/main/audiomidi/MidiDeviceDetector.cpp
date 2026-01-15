@@ -75,7 +75,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPD16.vmp";
+                                   "MPD16.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD16");
                         }
@@ -83,7 +83,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPD218.vmp";
+                                   "MPD218.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPD218");
                         }
@@ -91,7 +91,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "iRig_PADS.vmp";
+                                   "iRig_PADS.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "iRig_PADS");
                         }
@@ -99,7 +99,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             path = mpc.paths->getDocuments()
                                        ->midiControlPresetsPath() /
-                                   "MPC_Studio.vmp";
+                                   "MPC_Studio.json";
                             knownControllerDetectedScreen->setControllerName(
                                 "MPC_Studio");
                         }

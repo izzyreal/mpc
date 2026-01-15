@@ -175,9 +175,8 @@ namespace mpc::input::midi::legacy
             {
                 if (b.label == "datawheel")
                 {
-                    b.binding["target"] = "hardware:data-wheel:negative";
-                    bindings.push_back(b.binding);
-                    b.binding["target"] = "hardware:data-wheel:positive";
+                    b.binding["target"] = "hardware:data-wheel";
+                    b.binding["encoderMode"] = "relative_stateful";
                     bindings.push_back(b.binding);
                 }
             }
