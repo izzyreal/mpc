@@ -394,6 +394,19 @@ Binding &MidiControlPresetV3::getBindingByIndex(const int idx)
     return bindings[idx];
 }
 
+bool MidiControlPresetV3::hasBindingForNote(const int noteNumber) const
+{
+    for (auto &b : bindings)
+    {
+        if (b.isNote() && b.getMidiNumber() == noteNumber)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)
 {
     j = json{{"version", p.getVersion()},

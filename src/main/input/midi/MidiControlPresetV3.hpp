@@ -210,6 +210,8 @@ namespace mpc::input::midi
         const std::vector<Binding> &getBindings() const;
 
         Binding &getBindingByIndex(int);
+
+        bool hasBindingForNote(int) const;
     };
 
     void to_json(json &j, const MidiControlPresetV3 &p);

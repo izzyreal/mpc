@@ -118,10 +118,18 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     switch (e.getMessageType())
     {
         case MessageType::NOTE_ON:
-            handleNoteOn(e);
+            if (!extendedController->getActivePreset()->hasBindingForNote(
+                    e.getNoteNumber()))
+            {
+                handleNoteOn(e);
+            }
             break;
         case MessageType::NOTE_OFF:
-            handleNoteOff(e);
+            if (!extendedController->getActivePreset()->hasBindingForNote(
+                    e.getNoteNumber()))
+            {
+                handleNoteOff(e);
+            }
             break;
         case MessageType::AFTERTOUCH:
             handleKeyAftertouch(e);
