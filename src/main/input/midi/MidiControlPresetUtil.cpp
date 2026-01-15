@@ -93,11 +93,6 @@ void MidiControlPresetUtil::resetMidiControlPreset(
             {
                 b.setMidiChannelIndex(d["midiChannelIndex"].get<int>());
             }
-
-            if (d.contains("enabled"))
-            {
-                b.setEnabled(d["enabled"].get<bool>());
-            }
         }
 
         bindings.push_back(b);
@@ -168,11 +163,6 @@ void MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(
             if (d.contains("midiChannelIndex"))
             {
                 b.setMidiChannelIndex(d["midiChannelIndex"].get<int>());
-            }
-
-            if (d.contains("enabled"))
-            {
-                b.setEnabled(d["enabled"].get<bool>());
             }
         }
 

@@ -119,7 +119,6 @@ namespace mpc::input::midi
         MidiNumber midiNumber{0};
         MidiValue midiValue{0};
         MidiChannel midiChannelIndex{0};
-        bool enabled{false};
 
         bool operator==(Binding &other)
         {
@@ -127,7 +126,7 @@ namespace mpc::input::midi
                    midiNumber == other.midiNumber &&
                    midiValue == other.midiValue &&
                    midiChannelIndex == other.midiChannelIndex &&
-                   enabled == other.enabled && encoderMode == other.encoderMode;
+                   encoderMode == other.encoderMode;
         }
 
         bool operator!=(Binding &other)
@@ -148,8 +147,6 @@ namespace mpc::input::midi
         void setMidiValue(int v);
 
         void setMidiChannelIndex(int ch);
-
-        void setEnabled(bool e);
 
         void setEncoderMode(const BindingEncoderMode);
 

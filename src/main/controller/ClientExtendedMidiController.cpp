@@ -51,7 +51,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
     for (auto &b : bindings)
     {
-        if (b.getMidiNumber() == NoMidiNumber)
+        if (!b.isEnabled())
         {
             continue;
         }

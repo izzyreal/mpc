@@ -34,16 +34,7 @@ void Binding::setMessageType(const BindingMessageType t)
 
 void Binding::setMidiNumber(int n)
 {
-    if (n < MinMidiNumber)
-    {
-        midiNumber = NoMidiNumber;
-        enabled = false;
-    }
-    else
-    {
-        midiNumber = MidiNumber(n);
-        enabled = true;
-    }
+    midiNumber = MidiNumber(n);
 }
 
 void Binding::setMidiValue(int v)
@@ -54,11 +45,6 @@ void Binding::setMidiValue(int v)
 void Binding::setMidiChannelIndex(int ch)
 {
     midiChannelIndex = MidiChannel(ch);
-}
-
-void Binding::setEnabled(bool e)
-{
-    enabled = e;
 }
 
 void Binding::setEncoderMode(const BindingEncoderMode m)
@@ -93,7 +79,7 @@ int Binding::getMidiChannelIndex() const
 
 bool Binding::isEnabled() const
 {
-    return enabled;
+    return midiNumber != NoMidiNumber;
 }
 
 BindingEncoderMode Binding::getEncoderMode() const
@@ -235,8 +221,7 @@ void mpc::input::midi::to_json(json &j, const Binding &b)
     j = json{{"target", b.getTarget()},
              {"messageType", messageTypeToString(b.getMessageType())},
              {"midiNumber", b.getMidiNumber()},
-             {"midiChannelIndex", b.getMidiChannelIndex()},
-             {"enabled", b.isEnabled()}};
+             {"midiChannelIndex", b.getMidiChannelIndex()}};
 
     if (b.getTarget() == "hardware:data-wheel")
     {
@@ -263,7 +248,6 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     b.setMessageType(stringToMessageType(type));
     b.setMidiNumber(j.at("midiNumber").get<int>());
     b.setMidiChannelIndex(j.at("midiChannelIndex").get<int>());
-    b.setEnabled(j.at("enabled").get<bool>());
 
     const bool isController = b.isController();
     const bool hasMidiValue = j.contains("midiValue");
