@@ -77,11 +77,11 @@ inline void checkIRigPadsPreset(const json &preset)
         {getTarget(Id::PAD_16_OR_PARENTHESES),
          {NoteStr, 52, std::nullopt, AllChannels}},
         {getTarget(Id::DATA_WHEEL) + ":negative",
-         {CcStr, 7, DefaultMidiValue, AllChannels}},
+         {CcStr, DisabledMidiNumber, DefaultMidiValue, AllChannels}},
         {getTarget(Id::DATA_WHEEL) + ":positive",
-         {CcStr, 7, DefaultMidiValue, AllChannels}},
+         {CcStr, DisabledMidiNumber, DefaultMidiValue, AllChannels}},
         {getTarget(Id::DATA_WHEEL),
-         {CcStr, DefaultMidiNumber, DefaultMidiValue, AllChannels}},
+         {CcStr, 7, DefaultMidiValue, AllChannels}},
         {getTarget(Id::SLIDER), {CcStr, 1, DefaultMidiValue, AllChannels}},
         {getTarget(Id::REC_GAIN_POT),
          {CcStr, 11, DefaultMidiValue, AllChannels}},
@@ -156,12 +156,6 @@ inline void checkIRigPadsPreset(const json &preset)
 
     for (const auto &kv : expected)
     {
-        if (kv.first == "hardware:8-or-other")
-        {
-            const auto foo = kv.second;
-            printf("");
-        }
-
         const std::string &target = kv.first;
         const BindingSpec &spec = kv.second;
         bool found = false;
@@ -207,7 +201,10 @@ inline void checkIRigPadsPreset(const json &preset)
 
         if (!found)
         {
-            throw std::runtime_error("Missing binding: " + target);
+            throw std::runtime_error(
+                "Missing binding: " + target + " with midiValue " +
+                std::to_string(kv.second.value.value_or(-2)) +
+                " with midiNumber " + std::to_string(kv.second.number));
         }
     }
 
