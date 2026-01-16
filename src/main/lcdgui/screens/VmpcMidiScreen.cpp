@@ -20,7 +20,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
+VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi", layerIndex)
 {
     for (int i = 0; i < 5; i++)
@@ -49,7 +49,7 @@ VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
     }
 }
 
-void VmpcMidiScreen::turnWheel(int i)
+void VmpcMidiScreen::turnWheel(const int i)
 {
     Binding &binding = getActivePreset()->getBindingByIndex(row + rowOffset);
 
@@ -87,22 +87,22 @@ void VmpcMidiScreen::turnWheel(int i)
 
 void VmpcMidiScreen::open()
 {
-    auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
+    const auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
 
-    screen->discardAndLeave = [this]()
+    screen->discardAndLeave = [this]
     {
-        auto controller =
+        const auto controller =
             mpc.clientEventController->getClientMidiEventController()
                 ->getExtendedController();
 
-        auto activePreset = controller->getActivePreset();
+        const auto activePreset = controller->getActivePreset();
 
         activePreset->setBindings(uneditedActivePresetCopy->getBindings());
 
         uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
     };
 
-    screen->saveAndLeave = [this]()
+    screen->saveAndLeave = [this]
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
     };
@@ -114,11 +114,11 @@ void VmpcMidiScreen::open()
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
 
-        auto controller =
+        const auto controller =
             mpc.clientEventController->getClientMidiEventController()
                 ->getExtendedController();
 
-        auto activePreset = controller->getActivePreset();
+        const auto activePreset = controller->getActivePreset();
 
         uneditedActivePresetCopy->setBindings(activePreset->getBindings());
     }
@@ -183,7 +183,7 @@ void VmpcMidiScreen::openWindow()
     openScreenById(ScreenId::VmpcMidiPresetsScreen);
 }
 
-void VmpcMidiScreen::acceptLearnCandidate()
+void VmpcMidiScreen::acceptLearnCandidate() const
 {
     if (!learnCandidate)
     {
@@ -211,7 +211,7 @@ void VmpcMidiScreen::down()
         acceptLearnCandidate();
     }
 
-    auto preset = getActivePreset();
+    const auto preset = getActivePreset();
 
     if (row == 4)
     {
@@ -297,12 +297,12 @@ void VmpcMidiScreen::setLearnCandidateToSelectedBinding()
 
 bool VmpcMidiScreen::isColumn2VisibleAtCurrentRow()
 {
-    return !findChild<Parameter>("value" + std::to_string(row))->IsHidden() ||
-           !findChild<Parameter>("encoder-mode" + std::to_string(row))
+    return !findChild<Field>("value" + std::to_string(row))->IsHidden() ||
+           !findChild<Field>("encoder-mode" + std::to_string(row))
                 ->IsHidden();
 }
 
-void VmpcMidiScreen::setLearning(bool b)
+void VmpcMidiScreen::setLearning(const bool b)
 {
     learning = b;
 
@@ -320,7 +320,7 @@ void VmpcMidiScreen::setLearning(bool b)
     ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
-bool VmpcMidiScreen::hasMappingChanged()
+bool VmpcMidiScreen::hasMappingChanged() const
 {
     if (getActivePreset()->getBindings().size() !=
         uneditedActivePresetCopy->getBindings().size())
@@ -340,7 +340,7 @@ bool VmpcMidiScreen::hasMappingChanged()
     return false;
 }
 
-void VmpcMidiScreen::function(int i)
+void VmpcMidiScreen::function(const int i)
 {
     switch (i)
     {
@@ -439,6 +439,7 @@ void VmpcMidiScreen::function(int i)
             ls.lock()->showPopupForMs(popupMsg, 1000);
             break;
         }
+        default:;
     }
 }
 
@@ -459,7 +460,7 @@ void VmpcMidiScreen::setLearnCandidate(const bool isNote,
     displayRows();
 }
 
-bool VmpcMidiScreen::isLearning()
+bool VmpcMidiScreen::isLearning() const
 {
     return learning;
 }
@@ -578,7 +579,7 @@ void VmpcMidiScreen::displayUpAndDown()
                                    getActivePreset()->getBindings().size());
 }
 
-std::shared_ptr<MidiControlPresetV3> VmpcMidiScreen::getActivePreset()
+std::shared_ptr<MidiControlPresetV3> VmpcMidiScreen::getActivePreset() const
 {
     return mpc.clientEventController->getClientMidiEventController()
         ->getExtendedController()

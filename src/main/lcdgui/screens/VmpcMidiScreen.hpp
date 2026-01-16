@@ -25,12 +25,12 @@ namespace mpc::lcdgui::screens
         void openWindow() override;
         void turnWheel(int i) override;
 
-        bool isLearning();
+        bool isLearning() const;
         void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number);
 
-        std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
+        std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset() const;
 
-        bool hasMappingChanged();
+        bool hasMappingChanged() const;
 
         std::atomic_bool shouldSwitch{false};
 
@@ -52,7 +52,7 @@ namespace mpc::lcdgui::screens
         bool isColumn2VisibleAtCurrentRow();
         void setLearning(bool b);
         void setLearnCandidateToSelectedBinding();
-        void acceptLearnCandidate();
+        void acceptLearnCandidate() const;
         void displayRows();
         void displayUpAndDown();
     };
