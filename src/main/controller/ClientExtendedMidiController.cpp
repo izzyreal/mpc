@@ -31,7 +31,7 @@ ClientExtendedMidiController::getActivePreset()
 }
 
 void ClientExtendedMidiController::setActivePreset(
-    std::shared_ptr<MidiControlPresetV3> p)
+    const std::shared_ptr<MidiControlPresetV3> &p)
 {
     activePreset = p;
 }
@@ -40,14 +40,13 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 {
     if (e.getMessageType() != ClientMidiEvent::NOTE_ON &&
         e.getMessageType() != ClientMidiEvent::NOTE_OFF &&
+        e.getMessageType() != ClientMidiEvent::AFTERTOUCH &&
         e.getMessageType() != ClientMidiEvent::CONTROLLER)
     {
         return;
     }
 
     const auto &bindings = activePreset->getBindings();
-
-    using Id = ComponentId;
 
     for (auto &b : bindings)
     {
@@ -67,7 +66,8 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
         else if (b.isNote())
         {
             if ((e.getMessageType() != ClientMidiEvent::NOTE_ON &&
-                 e.getMessageType() != ClientMidiEvent::NOTE_OFF) ||
+                 e.getMessageType() != ClientMidiEvent::NOTE_OFF &&
+                 e.getMessageType() != ClientMidiEvent::AFTERTOUCH) ||
                 b.getMidiNumber() != e.getNoteNumber())
             {
                 continue;
@@ -76,22 +76,20 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
         if (auto hardwareTarget = b.getHardwareTarget())
         {
-            const auto componentId =
-                componentLabelToId.at(*hardwareTarget);
+            const auto componentId = componentLabelToId.at(*hardwareTarget);
 
             if (componentId == NONE)
             {
                 continue;
             }
 
-            static const std::vector<Id> potComponents{SLIDER, MAIN_VOLUME_POT,
-                                                       REC_GAIN_POT};
+            static const std::vector potComponents{SLIDER, MAIN_VOLUME_POT,
+                                                   REC_GAIN_POT};
 
             if (componentId == DATA_WHEEL)
             {
-                const auto direction = b.getHardwareDirection();
-
-                if (direction == input::Direction::Positive)
+                if (const auto direction = b.getHardwareDirection();
+                    direction == input::Direction::Positive)
                 {
                     turnWheel(1);
                 }
@@ -156,7 +154,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
             {
                 if (componentId == SLIDER)
                 {
-                    moveSlider(1.f - (e.getControllerValue() / 127.f));
+                    moveSlider(1.f - e.getControllerValue() / 127.f);
                 }
                 else if (componentId == REC_GAIN_POT ||
                          componentId == MAIN_VOLUME_POT)
@@ -169,8 +167,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 bool isButton = false;
                 bool isPad = false;
 
-                if (componentId >= PAD_1_OR_AB &&
-                    componentId <= PAD_16_OR_PARENTHESES)
+                if (isPadId(componentId))
                 {
                     isPad = true;
                 }
@@ -188,7 +185,9 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                     }
                     else if (isPad)
                     {
-                        pressPad(componentId, e.getVelocity() / 127.f);
+                        constexpr bool isAftertouch = false;
+                        pressPad(componentId, e.getVelocity() / 127.f,
+                                 isAftertouch);
                     }
                 }
                 else if (e.getMessageType() == ClientMidiEvent::NOTE_OFF)
@@ -202,6 +201,12 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                         releasePad(componentId);
                     }
                 }
+                else if (e.getMessageType() == ClientMidiEvent::AFTERTOUCH)
+                {
+                    constexpr bool isAftertouch = true;
+                    pressPad(componentId, e.getAftertouchValue() / 127.f,
+                             isAftertouch);
+                }
                 else
                 {
                     if (e.getControllerValue() >= b.getMidiValue())
@@ -212,7 +217,8 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                         }
                         else if (isPad)
                         {
-                            pressPad(componentId, 1.f);
+                            constexpr bool isAftertouch = false;
+                            pressPad(componentId, 1.f, isAftertouch);
                         }
                     }
                     else
@@ -271,19 +277,20 @@ void ClientExtendedMidiController::moveSlider(float normalizedY) const
 }
 
 void ClientExtendedMidiController::pressPad(const ComponentId id,
-                                            float normalizedVelocity) const
+                                            const float normalizedVelocity,
+                                            const bool isAftertouch) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = id;
-    ev.type = ClientHardwareEvent::Type::PadPress;
+    ev.type = isAftertouch ? ClientHardwareEvent::Type::PadAftertouch
+                           : ClientHardwareEvent::Type::PadPress;
     ev.index = static_cast<int>(id) - static_cast<int>(PAD_1_OR_AB);
     ev.value = normalizedVelocity;
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientExtendedMidiController::releasePad(
-    const ComponentId id) const
+void ClientExtendedMidiController::releasePad(const ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;

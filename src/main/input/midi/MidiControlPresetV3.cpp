@@ -117,6 +117,20 @@ bool Binding::isButtonLike() const
     return false;
 }
 
+bool Binding::isPad() const
+{
+    if (const auto hardwareTargetStr = getHardwareTarget())
+    {
+        if (const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
+            hardware::isPadId(id))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Binding::isNonButtonLikeDataWheel() const
 {
     if (const auto hardwareTargetStr = getHardwareTarget())

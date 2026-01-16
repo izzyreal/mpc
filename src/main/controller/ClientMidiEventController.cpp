@@ -83,18 +83,14 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 
     switch (e.getMessageType())
     {
+        // Intentional fall-throughs ahead...
+        case MessageType::CONTROLLER:
         case MessageType::NOTE_ON:
-            extendedController->handleEvent(e);
             vmpcMidiScreen.lock()->setLearnCandidate(true, e.getChannel(),
                                                      e.getNoteNumber());
-            break;
+        case MessageType::AFTERTOUCH:
         case MessageType::NOTE_OFF:
             extendedController->handleEvent(e);
-            break;
-        case MessageType::CONTROLLER:
-            extendedController->handleEvent(e);
-            vmpcMidiScreen.lock()->setLearnCandidate(false, e.getChannel(),
-                                                     e.getControllerNumber());
             break;
         default:
             break;

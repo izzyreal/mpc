@@ -226,6 +226,8 @@ namespace mpc::input::midi
 
         bool isButtonLike() const;
 
+        bool isPad() const;
+
         bool isNonButtonLikeDataWheel() const;
     };
 

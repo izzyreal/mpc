@@ -31,7 +31,8 @@ namespace mpc::controller
         void handleEvent(const client::event::ClientMidiEvent &);
 
         std::shared_ptr<input::midi::MidiControlPresetV3> getActivePreset();
-        void setActivePreset(std::shared_ptr<input::midi::MidiControlPresetV3>);
+        void setActivePreset(
+            const std::shared_ptr<input::midi::MidiControlPresetV3> &);
 
     private:
         std::shared_ptr<input::midi::MidiControlPresetV3> activePreset;
@@ -45,7 +46,7 @@ namespace mpc::controller
 
         void releaseButton(hardware::ComponentId id) const;
 
-        void pressPad(hardware::ComponentId, float normalizedVelocity) const;
+        void pressPad(hardware::ComponentId, float normalizedVelocity, bool isAftertouch) const;
 
         void releasePad(hardware::ComponentId) const;
 
