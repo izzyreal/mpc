@@ -192,7 +192,7 @@ namespace mpc::input::midi
 
         std::string getTargetDisplayName() const;
 
-        void setMessageType(const BindingMessageType);
+        void setMessageType(BindingMessageType);
 
         void setMidiNumber(int n);
 
@@ -200,7 +200,7 @@ namespace mpc::input::midi
 
         void setMidiChannelIndex(int ch);
 
-        void setEncoderMode(const BindingEncoderMode);
+        void setEncoderMode(BindingEncoderMode);
 
         const std::string &getTarget() const;
 
@@ -250,7 +250,7 @@ namespace mpc::input::midi
 
         void setMidiControllerDeviceName(const std::string &n);
 
-        void setAutoLoadMode(const AutoLoadMode);
+        void setAutoLoadMode(AutoLoadMode);
 
         void setBindings(const std::vector<Binding> &b);
 

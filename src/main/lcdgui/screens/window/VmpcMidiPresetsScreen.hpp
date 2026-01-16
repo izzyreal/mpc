@@ -3,6 +3,8 @@
 
 #include "input/midi/AutoLoadMode.hpp"
 
+#include "mpc_fs.hpp"
+
 #include <vector>
 #include <string>
 #include <functional>
@@ -25,8 +27,9 @@ namespace mpc::lcdgui::screens::window
     private:
         struct PresetMeta
         {
+            fs::path path;
             std::string name;
-            mpc::input::midi::AutoLoadMode autoLoadMode;
+            input::midi::AutoLoadMode autoLoadMode;
         };
 
         std::vector<PresetMeta> presetMetas;
@@ -40,7 +43,5 @@ namespace mpc::lcdgui::screens::window
 
         void displayUpAndDown();
         void displayRows();
-
-        std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};
     };
 } // namespace mpc::lcdgui::screens::window

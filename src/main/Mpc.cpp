@@ -217,11 +217,11 @@ void Mpc::init()
 
     nvram::NvRam::loadUserScreenValues(*this);
 
-    if (auto p = paths->getDocuments()->activeMidiControlPresetPath();
+    if (const auto p = paths->getDocuments()->activeMidiControlPresetPath();
         fs::exists(p))
     {
         const auto data = get_file_data(p);
-        const auto dataJson = nlohmann::json::parse(data);
+        const auto dataJson = json::parse(data);
         input::midi::from_json(
             dataJson, *clientEventController->getClientMidiEventController()
                            ->getExtendedController()
@@ -321,7 +321,7 @@ Mpc::~Mpc()
     {
         autoSave->interruptRestorationIfStillOngoing();
     }
-    //    input::midi::legacy::MidiControlPersistence::saveCurrentState(*this);
+
     nvram::NvRam::saveUserScreenValues(*this);
     nvram::NvRam::saveVmpcSettings(*this);
     if (engineHost)

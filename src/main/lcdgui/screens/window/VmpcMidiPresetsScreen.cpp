@@ -1,6 +1,9 @@
 #include "VmpcMidiPresetsScreen.hpp"
 
+#include "Logger.hpp"
 #include "Mpc.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientMidiEventController.hpp"
 
 #include "lcdgui/Parameter.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
@@ -100,6 +103,40 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
 
 void VmpcMidiPresetsScreen::open()
 {
+    presetMetas.clear();
+
+    for (const auto entry : fs::directory_iterator(
+             mpc.paths->getDocuments()->midiControlPresetsPath()))
+    {
+        const auto presetPath = entry.path();
+
+        if (presetPath.extension() != ".json" ||
+            presetPath ==
+                mpc.paths->getDocuments()->activeMidiControlPresetPath())
+        {
+            continue;
+        }
+
+        const auto preset = std::make_shared<MidiControlPresetV3>();
+
+        try
+        {
+            const auto presetFileData = get_file_data(presetPath);
+            const auto presetJson = json::parse(presetFileData);
+            from_json(presetJson, *preset);
+        }
+        catch (const std::exception &)
+        {
+            continue;
+        }
+
+        PresetMeta meta;
+        meta.path = presetPath;
+        meta.name = preset->name;
+        meta.autoLoadMode = preset->autoLoadMode;
+        presetMetas.emplace_back(meta);
+    }
+
     if (row + rowOffset >= presetMetas.size() + 1)
     {
         row = 0;
@@ -120,30 +157,48 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
 
 void VmpcMidiPresetsScreen::turnWheel(const int i)
 {
-    //    const int presetIndex = row + rowOffset - 1;
-    //
-    //    if (presetIndex < 0 || presetIndex >= presets.size())
-    //    {
-    //        return;
-    //    }
-    //
-    //    auto candidate = presetMetas[presetIndex]->autoloadMode + i;
-    //
-    //    if (candidate < 0)
-    //    {
-    //        candidate = 0;
-    //    }
-    //    else if (candidate > 2)
-    //    {
-    //        candidate = 2;
-    //    }
-    //
-    //    if (presets[presetIndex]->autoloadMode != candidate)
-    //    {
-    //        presets[presetIndex]->autoloadMode = candidate;
-    //        mpc.getDisk()->writeMidiControlPreset(presets[presetIndex]);
-    //        MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
-    //    }
+    const int presetIndex = row + rowOffset - 1;
+
+    if (presetIndex < 0 || presetIndex >= presetMetas.size() || column == 0)
+    {
+        return;
+    }
+
+    auto candidate = std::clamp(presetMetas[presetIndex].autoLoadMode + i, 0,
+                                AutoLoadModeCount - 1);
+
+    if (presetMetas[presetIndex].autoLoadMode != candidate)
+    {
+        const auto preset = std::make_shared<MidiControlPresetV3>();
+
+        try
+        {
+            const auto presetFileData =
+                get_file_data(presetMetas[presetIndex].path);
+            const auto presetJson = json::parse(presetFileData);
+            from_json(presetJson, *preset);
+        }
+        catch (const std::exception &e)
+        {
+            ls.lock()->showPopupAndAwaitInteraction(
+                "Error! See vmpc.log for info");
+
+            MLOG(
+                "Error while trying to change MIDI control preset auto-load "
+                "mode. Pass the following information to the developer: " +
+                std::string(e.what()));
+
+            return;
+        }
+
+        presetMetas[presetIndex].autoLoadMode =
+            static_cast<AutoLoadMode>(candidate);
+
+        preset->autoLoadMode = static_cast<AutoLoadMode>(candidate);
+
+        mpc.getDisk()->writeMidiControlPreset(preset,
+                                              presetMetas[presetIndex].path);
+    }
 
     displayRows();
 }
@@ -151,8 +206,6 @@ void VmpcMidiPresetsScreen::turnWheel(const int i)
 void VmpcMidiPresetsScreen::function(const int i)
 {
     ScreenComponent::function(i);
-
-    const auto &presets = presetMetas;
 
     switch (i)
     {
@@ -176,8 +229,8 @@ void VmpcMidiPresetsScreen::function(const int i)
             }
             else
             {
-                //                checkFileExistsAndSavePresetAndShowPopup(
-                //                    presets[presetIndex]->name);
+                checkFileExistsAndSavePresetAndShowPopup(
+                    presetMetas[presetIndex].name);
             }
             break;
         }
@@ -186,25 +239,28 @@ void VmpcMidiPresetsScreen::function(const int i)
             break;
         case 4:
         {
+            const auto activePreset =
+                mpc.clientEventController->getClientMidiEventController()
+                    ->getExtendedController()
+                    ->getActivePreset();
+
             const auto index = row + rowOffset - 1;
 
             if (index == -1)
             {
-                //                MidiControlPersistence::loadDefaultMapping(mpc);
+                MidiControlPresetUtil::resetMidiControlPreset(activePreset);
             }
             else
             {
-                const auto vmpcMidiScreen =
-                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
-                //                MidiControlPersistence::loadFileByNameIntoPreset(
-                //                    mpc, presets[index]->name,
-                //                    vmpcMidiScreen->getActivePreset());
+                mpc.getDisk()->readMidiControlPreset(presetMetas[index].path,
+                                                     activePreset);
             }
 
-            //            ls.lock()->showPopupAndThenOpen(
-            //                ScreenId::VmpcMidiPresetsScreen,
-            //                "Loading " + (index == -1 ? "Default" :
-            //                presets[index]->name), 700);
+            ls.lock()->showPopupAndThenOpen(
+                ScreenId::VmpcMidiPresetsScreen,
+                "Loading " +
+                    (index == -1 ? "Default" : presetMetas[index].name),
+                700);
             break;
         }
         default:;
@@ -305,7 +361,7 @@ void VmpcMidiPresetsScreen::displayRows()
         const auto autoloadText =
             presetIndex == -1
                 ? ""
-                : autoLoadModeNames[presetMetas[presetIndex].autoLoadMode];
+                : autoLoadModeToString(presetMetas[presetIndex].autoLoadMode);
         autoLoadField->setText(autoloadText);
         autoLoadField->setInverted(i == row && column == 1);
     }

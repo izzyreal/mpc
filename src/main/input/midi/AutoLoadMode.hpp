@@ -6,6 +6,7 @@ namespace mpc::input::midi
     {
         AutoLoadModeNo = 0,
         AutoLoadModeAsk = 1,
-        AutoLoadModeYes = 2
+        AutoLoadModeYes = 2,
+        AutoLoadModeCount = 3
     };
 } // namespace mpc::input::midi
