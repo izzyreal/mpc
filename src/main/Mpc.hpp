@@ -125,7 +125,7 @@ namespace mpc
         std::shared_ptr<disk::AbstractDisk> getDisk() const;
         std::vector<std::shared_ptr<disk::AbstractDisk>> getDisks() const;
 
-        AutoSave *getAutoSave();
+        AutoSave *getAutoSave() const;
 
         Mpc();
         ~Mpc();

@@ -368,7 +368,7 @@ std::shared_ptr<input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
     return padAndButtonKeyboard;
 }
 
-AutoSave *Mpc::getAutoSave()
+AutoSave *Mpc::getAutoSave() const
 {
     return autoSave.get();
 }
