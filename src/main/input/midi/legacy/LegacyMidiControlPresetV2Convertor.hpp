@@ -21,13 +21,13 @@ namespace mpc::input::midi::legacy
             throw std::runtime_error("Data too short for legacy V2 header");
         }
 
-        unsigned char versionByte = static_cast<unsigned char>(data[0]);
-        if (versionByte != 2)
+        if (unsigned char versionByte = static_cast<unsigned char>(data[0]);
+            versionByte != 2)
         {
             throw std::runtime_error("Not a legacy V2 preset");
         }
 
-        result[versionKey] = 0;
+        result[versionKey] = CURRENT_PRESET_VERSION;
 
         unsigned char autoLoadModeByte = static_cast<unsigned char>(data[1]);
         std::string autoLoadModeStr;
@@ -51,9 +51,9 @@ namespace mpc::input::midi::legacy
         std::string name = data.substr(2, 16);
         name.erase(name.find_last_not_of(' ') + 1);
 
-        result[nameKey] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result[nameKey] = StrUtil::replaceAll(name, '_', " ");
         result[midiControllerDeviceNameKey] =
-            mpc::StrUtil::replaceAll(name, '_', " ");
+            StrUtil::replaceAll(name, '_', " ");
 
         struct LegacyDatawheelBinding
         {
@@ -96,9 +96,7 @@ namespace mpc::input::midi::legacy
 
             json binding;
             binding[targetKey] = bestGuessTarget;
-            binding[messageTypeKey] = (typeByte == 0)
-                                          ? input::midi::controllerStr
-                                          : input::midi::noteStr;
+            binding[messageTypeKey] = typeByte == 0 ? controllerStr : noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
             binding[midiChannelIndexKey] = midiChannel;
@@ -183,8 +181,7 @@ namespace mpc::input::midi::legacy
             const std::string messageType =
                 binding.at(messageTypeKey).get<std::string>();
 
-            const bool isController =
-                (messageType == input::midi::controllerStr);
+            const bool isController = messageType == controllerStr;
 
             const bool isHardware = target.rfind("hardware:", 0) == 0;
 
@@ -197,7 +194,7 @@ namespace mpc::input::midi::legacy
             const bool isDataWheelPlain = target == "hardware:data-wheel";
 
             const bool isButtonLike =
-                (isHardware && !isPad && !isPot && !isDataWheelPlain);
+                isHardware && !isPad && !isPot && !isDataWheelPlain;
 
             if (isController && isButtonLike)
             {

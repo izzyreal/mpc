@@ -32,17 +32,17 @@ void Binding::setMessageType(const BindingMessageType t)
     messageType = t;
 }
 
-void Binding::setMidiNumber(int n)
+void Binding::setMidiNumber(const int n)
 {
     midiNumber = MidiNumber(n);
 }
 
-void Binding::setMidiValue(int v)
+void Binding::setMidiValue(const int v)
 {
     midiValue = MidiValue(std::clamp(v, 1, 127));
 }
 
-void Binding::setMidiChannelIndex(int ch)
+void Binding::setMidiChannelIndex(const int ch)
 {
     midiChannelIndex = MidiChannel(ch);
 }
@@ -99,13 +99,10 @@ bool Binding::isNote() const
 
 bool Binding::isButtonLike() const
 {
-    const auto hardwareTargetStr = getHardwareTarget();
-
-    if (hardwareTargetStr)
+    if (const auto hardwareTargetStr = getHardwareTarget())
     {
-        const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
-
-        if (hardware::isButtonId(id))
+        if (const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
+            hardware::isButtonId(id))
         {
             return true;
         }
@@ -185,7 +182,7 @@ std::string Binding::getTargetDisplayName() const
 
     if (result.size() > 15)
     {
-        if (auto pos = result.find(" or"); pos != std::string::npos)
+        if (const auto pos = result.find(" or"); pos != std::string::npos)
         {
             result.erase(pos, result.size());
         }
@@ -252,21 +249,14 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     }
     else if (const auto hardwareTargetStr = b.getHardwareTarget())
     {
-        const auto id = hardware::componentLabelToId.at(*hardwareTargetStr);
-
         if (j.contains(encoderModeKey))
         {
             throw std::invalid_argument(
                 "encoderMode is only allowed for hardware:data-wheel");
         }
 
-        const bool isButtonHardware = hardware::isButtonId(id);
-        const bool isDataWheelDir = target == "hardware:data-wheel:negative" ||
-                                    target == "hardware:data-wheel:positive";
-
-        const bool isButtonLike = b.isButtonLike();
-
-        if (isController && isButtonLike)
+        if (const bool isButtonLike = b.isButtonLike();
+            isController && isButtonLike)
         {
             if (!hasMidiValue)
             {
@@ -310,7 +300,7 @@ void mpc::input::midi::from_json(const json &j, Binding &b)
     }
 }
 
-void MidiControlPresetV3::setVersion(long long v)
+void MidiControlPresetV3::setVersion(const long long v)
 {
     version = ConstrainedInt<long long, 0, 4503599627370496LL>{v};
 }
@@ -419,9 +409,9 @@ void mpc::input::midi::to_json(json &j, const MidiControlPresetV3 &p)
 
 void mpc::input::midi::from_json(const json &j, MidiControlPresetV3 &p)
 {
-    static const std::set<std::string> allowedKeys = {
-        versionKey, nameKey, midiControllerDeviceNameKey, autoLoadModeKey,
-        bindingsKey};
+    static const std::set allowedKeys = {versionKey, nameKey,
+                                         midiControllerDeviceNameKey,
+                                         autoLoadModeKey, bindingsKey};
 
     for (auto &[key, _] : j.items())
     {
@@ -432,8 +422,9 @@ void mpc::input::midi::from_json(const json &j, MidiControlPresetV3 &p)
         }
     }
 
-    auto v = j.at(versionKey).get<long long>();
-    if (v > CURRENT_PRESET_VERSION)
+    const auto v = j.at(versionKey).get<long long>();
+
+    if (v != CURRENT_PRESET_VERSION)
     {
         throw std::runtime_error(
             "Preset version is newer than this application supports.");

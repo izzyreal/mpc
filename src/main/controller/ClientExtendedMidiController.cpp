@@ -47,7 +47,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
     const auto &bindings = activePreset->getBindings();
 
-    using Id = hardware::ComponentId;
+    using Id = ComponentId;
 
     for (auto &b : bindings)
     {
@@ -77,9 +77,9 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
         if (auto hardwareTarget = b.getHardwareTarget())
         {
             const auto componentId =
-                hardware::componentLabelToId.at(*hardwareTarget);
+                componentLabelToId.at(*hardwareTarget);
 
-            if (componentId == Id::NONE)
+            if (componentId == NONE)
             {
                 continue;
             }
@@ -169,12 +169,12 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 bool isButton = false;
                 bool isPad = false;
 
-                if (componentId >= Id::PAD_1_OR_AB &&
+                if (componentId >= PAD_1_OR_AB &&
                     componentId <= PAD_16_OR_PARENTHESES)
                 {
                     isPad = true;
                 }
-                else if (componentId >= Id::CURSOR_LEFT_OR_DIGIT &&
+                else if (componentId >= CURSOR_LEFT_OR_DIGIT &&
                          componentId <= NUM_9_OR_MIDI_SYNC)
                 {
                     isButton = true;
@@ -188,7 +188,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                     }
                     else if (isPad)
                     {
-                        pressPad(componentId, e.getVelocity());
+                        pressPad(componentId, e.getVelocity() / 127.f);
                     }
                 }
                 else if (e.getMessageType() == ClientMidiEvent::NOTE_OFF)
@@ -232,7 +232,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
     }
 }
 
-void ClientExtendedMidiController::pressButton(ComponentId id) const
+void ClientExtendedMidiController::pressButton(const ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
@@ -241,7 +241,7 @@ void ClientExtendedMidiController::pressButton(ComponentId id) const
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientExtendedMidiController::releaseButton(ComponentId id) const
+void ClientExtendedMidiController::releaseButton(const ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
@@ -270,7 +270,7 @@ void ClientExtendedMidiController::moveSlider(float normalizedY) const
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientExtendedMidiController::pressPad(hardware::ComponentId id,
+void ClientExtendedMidiController::pressPad(const ComponentId id,
                                             float normalizedVelocity) const
 {
     ClientHardwareEvent ev{};
@@ -282,7 +282,8 @@ void ClientExtendedMidiController::pressPad(hardware::ComponentId id,
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientExtendedMidiController::releasePad(hardware::ComponentId id) const
+void ClientExtendedMidiController::releasePad(
+    const ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;

@@ -56,10 +56,11 @@ namespace mpc::input::midi::legacy
         std::string name = data.substr(1, 16);
 
         name.erase(name.find_last_not_of(' ') + 1);
-        result[nameKey] = mpc::StrUtil::replaceAll(name, '_', " ");
+        result[nameKey] = StrUtil::replaceAll(name, '_', " ");
         result[midiControllerDeviceNameKey] =
-            mpc::StrUtil::replaceAll(name, '_', " ");
-        result[versionKey] = 0;
+            StrUtil::replaceAll(name, '_', " ");
+
+        result[versionKey] = CURRENT_PRESET_VERSION;
 
         std::vector<json> bindings;
 
@@ -105,9 +106,9 @@ namespace mpc::input::midi::legacy
 
             json binding;
             binding[targetKey] = bestGuessTarget;
-            binding[messageTypeKey] = (typeByte == 0)
-                                         ? input::midi::controllerStr
-                                         : input::midi::noteStr;
+            binding[messageTypeKey] = typeByte == 0
+                                         ? controllerStr
+                                         : noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
 
@@ -194,7 +195,7 @@ namespace mpc::input::midi::legacy
                 binding.at(messageTypeKey).get<std::string>();
 
             const bool isController =
-                (messageType == input::midi::controllerStr);
+                messageType == controllerStr;
 
             const bool isHardware = target.rfind("hardware:", 0) == 0;
 
@@ -207,7 +208,7 @@ namespace mpc::input::midi::legacy
             const bool isDataWheelPlain = target == "hardware:data-wheel";
 
             const bool isButtonLike =
-                (isHardware && !isPad && !isPot && !isDataWheelPlain);
+                isHardware && !isPad && !isPot && !isDataWheelPlain;
 
             if (isController)
             {

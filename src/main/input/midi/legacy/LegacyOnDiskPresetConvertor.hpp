@@ -9,12 +9,16 @@
 
 namespace mpc::input::midi::legacy
 {
-    inline void
-    convertOnDiskLegacyPreset(const fs::path &p,
-                              std::optional<fs::path> newPath = std::nullopt)
+    inline void convertOnDiskLegacyPreset(
+        const fs::path &p,
+        const std::optional<fs::path> &newPath = std::nullopt)
     {
+        const auto jsonFilePath =
+            newPath.value_or(fs::path(p).replace_extension(".json"));
+
         if (!fs::exists(p) || !fs::is_regular_file(p) ||
-            p.extension().string().find("vmp") == std::string::npos)
+            p.extension().string().find("vmp") == std::string::npos ||
+            fs::exists(jsonFilePath))
         {
             return;
         }
@@ -56,7 +60,7 @@ namespace mpc::input::midi::legacy
             return;
         }
 
-        auto preset = std::make_shared<MidiControlPresetV3>();
+        const auto preset = std::make_shared<MidiControlPresetV3>();
 
         try
         {
@@ -74,15 +78,6 @@ namespace mpc::input::midi::legacy
         MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(preset);
 
         to_json(fileAsJson, *preset);
-
-        auto jsonFilePath = p;
-
-        jsonFilePath.replace_extension(".json");
-
-        if (newPath)
-        {
-            jsonFilePath = *newPath;
-        }
 
         set_file_data(jsonFilePath, fileAsJson.dump(4));
 
