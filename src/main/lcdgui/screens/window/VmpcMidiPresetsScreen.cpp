@@ -47,7 +47,11 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
                 const auto preset = vmpcMidiScreen->getActivePreset();
                 preset->name = presetName;
 
-                this->mpc.getDisk()->writeMidiControlPreset(preset);
+                const auto presetPath =
+                    this->mpc.paths->getDocuments()->midiControlPresetsPath() /
+                    (preset->name + ".json");
+
+                this->mpc.getDisk()->writeMidiControlPreset(preset, presetPath);
 
                 ls.lock()->showPopupAndThenOpen(ScreenId::VmpcMidiPresetsScreen,
                                                 "Saving " + presetName, 1000);
@@ -84,7 +88,10 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
                 this->mpc.screens->get<ScreenId::VmpcMidiScreen>();
             const auto preset = vmpcMidiScreen->getActivePreset();
             preset->name = presetName;
-            this->mpc.getDisk()->writeMidiControlPreset(preset);
+            const auto presetPath =
+                this->mpc.paths->getDocuments()->midiControlPresetsPath() /
+                (preset->name + ".json");
+            this->mpc.getDisk()->writeMidiControlPreset(preset, presetPath);
             ls.lock()->showPopupAndThenOpen(ScreenId::VmpcMidiPresetsScreen,
                                             "Saving " + presetName, 1000);
         }
@@ -108,36 +115,35 @@ void VmpcMidiPresetsScreen::open()
 void VmpcMidiPresetsScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
-    findChild<Label>("down")->Hide(rowOffset + 4 >=
-                                   presetMetas.size());
+    findChild<Label>("down")->Hide(rowOffset + 4 >= presetMetas.size());
 }
 
 void VmpcMidiPresetsScreen::turnWheel(const int i)
 {
-//    const int presetIndex = row + rowOffset - 1;
-//
-//    if (presetIndex < 0 || presetIndex >= presets.size())
-//    {
-//        return;
-//    }
-//
-//    auto candidate = presetMetas[presetIndex]->autoloadMode + i;
-//
-//    if (candidate < 0)
-//    {
-//        candidate = 0;
-//    }
-//    else if (candidate > 2)
-//    {
-//        candidate = 2;
-//    }
-//
-//    if (presets[presetIndex]->autoloadMode != candidate)
-//    {
-//        presets[presetIndex]->autoloadMode = candidate;
-//        mpc.getDisk()->writeMidiControlPreset(presets[presetIndex]);
-//        MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
-//    }
+    //    const int presetIndex = row + rowOffset - 1;
+    //
+    //    if (presetIndex < 0 || presetIndex >= presets.size())
+    //    {
+    //        return;
+    //    }
+    //
+    //    auto candidate = presetMetas[presetIndex]->autoloadMode + i;
+    //
+    //    if (candidate < 0)
+    //    {
+    //        candidate = 0;
+    //    }
+    //    else if (candidate > 2)
+    //    {
+    //        candidate = 2;
+    //    }
+    //
+    //    if (presets[presetIndex]->autoloadMode != candidate)
+    //    {
+    //        presets[presetIndex]->autoloadMode = candidate;
+    //        mpc.getDisk()->writeMidiControlPreset(presets[presetIndex]);
+    //        MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
+    //    }
 
     displayRows();
 }
@@ -170,8 +176,8 @@ void VmpcMidiPresetsScreen::function(const int i)
             }
             else
             {
-//                checkFileExistsAndSavePresetAndShowPopup(
-//                    presets[presetIndex]->name);
+                //                checkFileExistsAndSavePresetAndShowPopup(
+                //                    presets[presetIndex]->name);
             }
             break;
         }
@@ -184,21 +190,21 @@ void VmpcMidiPresetsScreen::function(const int i)
 
             if (index == -1)
             {
-//                MidiControlPersistence::loadDefaultMapping(mpc);
+                //                MidiControlPersistence::loadDefaultMapping(mpc);
             }
             else
             {
                 const auto vmpcMidiScreen =
                     mpc.screens->get<ScreenId::VmpcMidiScreen>();
-//                MidiControlPersistence::loadFileByNameIntoPreset(
-//                    mpc, presets[index]->name,
-//                    vmpcMidiScreen->getActivePreset());
+                //                MidiControlPersistence::loadFileByNameIntoPreset(
+                //                    mpc, presets[index]->name,
+                //                    vmpcMidiScreen->getActivePreset());
             }
 
-//            ls.lock()->showPopupAndThenOpen(
-//                ScreenId::VmpcMidiPresetsScreen,
-//                "Loading " + (index == -1 ? "Default" : presets[index]->name),
-//                700);
+            //            ls.lock()->showPopupAndThenOpen(
+            //                ScreenId::VmpcMidiPresetsScreen,
+            //                "Loading " + (index == -1 ? "Default" :
+            //                presets[index]->name), 700);
             break;
         }
         default:;

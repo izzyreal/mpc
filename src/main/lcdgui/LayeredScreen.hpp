@@ -93,6 +93,8 @@ namespace mpc::lcdgui
 
         void closeCurrentScreen();
 
+        void openPreviousScreen();
+
         void closeRecentScreensUntilReachingLayer(int layerIndex);
 
     private:

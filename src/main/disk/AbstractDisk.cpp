@@ -28,8 +28,6 @@
 
 #include "input/midi/MidiControlPresetV3.hpp"
 #include "input/midi/MidiControlPresetUtil.hpp"
-#include "input/midi/legacy/LegacyMidiControlPresetV2Convertor.hpp"
-#include "input/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
 
 #include "StrUtil.hpp"
 #include "Logger.hpp"
@@ -409,18 +407,14 @@ void AbstractDisk::writeAll(const std::string &fileName)
 }
 
 void AbstractDisk::writeMidiControlPreset(
-    std::shared_ptr<MidiControlPresetV3> preset)
+    std::shared_ptr<MidiControlPresetV3> preset, const fs::path &p)
 {
-    const std::function<preset_or_error()> ioFunc = [preset, this]
+    const std::function<preset_or_error()> ioFunc = [preset, p]
     {
         json fileData;
         to_json(fileData, *preset);
 
-        const auto presetPath =
-            mpc.paths->getDocuments()->midiControlPresetsPath() /
-            (preset->name + ".json");
-
-        set_file_data(presetPath, fileData.dump(4));
+        set_file_data(p, fileData.dump(4));
 
         return preset;
     };

@@ -94,10 +94,10 @@ namespace mpc::disk
         void writeAps(const std::string &fileName);
         void writeAll(const std::string &fileName);
         void writeMidiControlPreset(
-            std::shared_ptr<input::midi::MidiControlPresetV3>);
+            std::shared_ptr<input::midi::MidiControlPresetV3>, const fs::path &);
 
         void readMidiControlPreset(
-            const fs::path &p,
+            const fs::path &,
             const std::shared_ptr<input::midi::MidiControlPresetV3> &);
 
         bool checkExists(const std::string &fileName);
