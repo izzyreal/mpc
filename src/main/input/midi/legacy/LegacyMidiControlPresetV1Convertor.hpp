@@ -106,9 +106,7 @@ namespace mpc::input::midi::legacy
 
             json binding;
             binding[targetKey] = bestGuessTarget;
-            binding[messageTypeKey] = typeByte == 0
-                                         ? controllerStr
-                                         : noteStr;
+            binding[messageTypeKey] = typeByte == 0 ? controllerStr : noteStr;
 
             int midiChannel = static_cast<signed char>(channelByte);
 
@@ -194,8 +192,7 @@ namespace mpc::input::midi::legacy
             const std::string messageType =
                 binding.at(messageTypeKey).get<std::string>();
 
-            const bool isController =
-                messageType == controllerStr;
+            const bool isController = messageType == controllerStr;
 
             const bool isHardware = target.rfind("hardware:", 0) == 0;
 

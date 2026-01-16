@@ -94,7 +94,8 @@ namespace mpc::disk
         void writeAps(const std::string &fileName);
         void writeAll(const std::string &fileName);
         void writeMidiControlPreset(
-            std::shared_ptr<input::midi::MidiControlPresetV3>, const fs::path &);
+            std::shared_ptr<input::midi::MidiControlPresetV3>,
+            const fs::path &);
 
         void readMidiControlPreset(
             const fs::path &,

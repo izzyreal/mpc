@@ -104,7 +104,6 @@ namespace mpc::hardware
         return id >= CURSOR_LEFT_OR_DIGIT && id <= NUM_9_OR_MIDI_SYNC;
     }
 
-
     static const std::unordered_map<ComponentId, std::string>
         componentIdToLabel{
             {PAD_1_OR_AB, "pad-1-or-ab"},

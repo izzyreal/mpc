@@ -222,7 +222,8 @@ namespace mpc::input::midi::legacy
                     if (defaultBinding.contains(encoderModeKey) &&
                         !defaultBinding[encoderModeKey].is_null())
                     {
-                        binding[encoderModeKey] = defaultBinding[encoderModeKey];
+                        binding[encoderModeKey] =
+                            defaultBinding[encoderModeKey];
                     }
                 }
             }

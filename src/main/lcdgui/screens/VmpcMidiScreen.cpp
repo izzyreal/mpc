@@ -87,7 +87,8 @@ void VmpcMidiScreen::turnWheel(const int i)
 
 void VmpcMidiScreen::open()
 {
-    const auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
+    const auto screen =
+        mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
 
     screen->discardAndLeave = [this]
     {
@@ -298,8 +299,7 @@ void VmpcMidiScreen::setLearnCandidateToSelectedBinding()
 bool VmpcMidiScreen::isColumn2VisibleAtCurrentRow()
 {
     return !findChild<Field>("value" + std::to_string(row))->IsHidden() ||
-           !findChild<Field>("encoder-mode" + std::to_string(row))
-                ->IsHidden();
+           !findChild<Field>("encoder-mode" + std::to_string(row))->IsHidden();
 }
 
 void VmpcMidiScreen::setLearning(const bool b)

@@ -46,7 +46,8 @@ namespace mpc::controller
 
         void releaseButton(hardware::ComponentId id) const;
 
-        void pressPad(hardware::ComponentId, float normalizedVelocity, bool isAftertouch) const;
+        void pressPad(hardware::ComponentId, float normalizedVelocity,
+                      bool isAftertouch) const;
 
         void releasePad(hardware::ComponentId) const;
 
