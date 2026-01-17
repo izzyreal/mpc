@@ -234,15 +234,19 @@ TEST_CASE(
         auto recordingPath = recordingsPath / "L.wav";
         REQUIRE(fs::exists(recordingPath));
 
-        auto wavInputStream =
-            std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
-        auto wavOrError =
-            mpc::file::wav::WavFile::readWavStream(wavInputStream);
-        REQUIRE(wavOrError.has_value());
-
-        auto wav = wavOrError.value();
         std::vector<float> frames(100);
-        wav->readFrames(frames, 100);
+
+        {
+            auto wavInputStream =
+                std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
+            auto wavOrError =
+                mpc::file::wav::WavFile::readWavStream(wavInputStream);
+            REQUIRE(wavOrError.has_value());
+
+            auto wav = wavOrError.value();
+            wav->readFrames(frames, 100);
+        }
+
         fs::remove_all(recordingsPath);
         REQUIRE(!fs::exists(recordingsPath));
         return frames;
