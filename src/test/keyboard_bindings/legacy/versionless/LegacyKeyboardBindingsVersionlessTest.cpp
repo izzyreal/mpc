@@ -1,3 +1,13 @@
+#ifdef __APPLE__
+#  include <TargetConditionals.h>
+#  if (defined(TARGET_OS_OSX) && TARGET_OS_OSX == 1) || \
+(defined(TARGET_OS_MAC) && TARGET_OS_MAC == 1)
+#    define MPC_TEST_PLATFORM_MAC
+#  endif
+#endif
+
+#ifdef MPC_TEST_PLATFORM_MAC
+
 #include "catch2/catch_test_macros.hpp"
 #include "input/keyboard/legacy/LegacyKeyboardBindingsConvertor.hpp"
 
@@ -191,3 +201,5 @@ TEST_CASE("Legacy preset versionless conversion works",
     REQUIRE(bindings.getBindingCount() == 76);
     REQUIRE(bindings.hasNoDuplicates());
 }
+
+#endif
