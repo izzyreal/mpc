@@ -14,8 +14,8 @@ using nlohmann::json;
 
 inline std::string load_resource(const std::string &path)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
-    auto file = fs.open(path);
+    const auto fs = cmrc::mpctest::get_filesystem();
+    const auto file = fs.open(path);
     return std::string(file.begin(), file.end());
 }
 

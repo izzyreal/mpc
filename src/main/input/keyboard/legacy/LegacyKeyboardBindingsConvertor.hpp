@@ -165,12 +165,15 @@ namespace mpc::input::keyboard::legacy
         static KeyboardBindingsData
         parseLegacyKeyboardBindings(const std::string &data)
         {
-            if (data.substr(0, v1_magic.length()) == v1_magic)
+            std::string norm = data;
+            norm.erase(std::remove(norm.begin(), norm.end(), '\r'), norm.end());
+
+            if (norm.rfind(v1_magic, 0) == 0)
             {
-                return parseLegacyKeyboardBindingsV1(data);
+                return parseLegacyKeyboardBindingsV1(norm);
             }
 
-            return parseLegacyKeyboardBindingsVersionless(data);
+            return parseLegacyKeyboardBindingsVersionless(norm);
         }
 
     private:
