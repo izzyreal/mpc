@@ -78,9 +78,9 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         {
             songStateHandler->applyMessage(activeState, actions, m);
         },
-        [&](const SwitchToNextSequence &m)
+        [&](const SwitchToNextSequenceSudden &m)
         {
-            constexpr bool setPositionTo0 = false;
+            constexpr bool setPositionTo0 = true;
             enqueue(SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
         },
         [&](const SetSelectedSequenceIndex &m)
@@ -90,6 +90,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             if (m.setPositionTo0)
             {
                 activeState.transport.positionQuarterNotes = 0;
+                applyMessageImmediate(
+                    SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
         [&](const SetSelectedSongIndex &m)

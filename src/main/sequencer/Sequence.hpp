@@ -119,8 +119,6 @@ namespace mpc::sequencer
                               int den) const;
         void setTimeSignature(int barIndex, int num, int den) const;
 
-        void syncTrackEventIndices() const;
-
         std::vector<std::shared_ptr<Track>> &getTracks();
         std::vector<std::string> &getDeviceNames();
         void setDeviceNames(const std::vector<std::string> &sa);

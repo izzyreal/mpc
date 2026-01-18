@@ -10,7 +10,7 @@
 
 namespace mpc::sequencer
 {
-    struct SwitchToNextSequence
+    struct SwitchToNextSequenceSudden
     {
         SequenceIndex sequenceIndex;
     };
@@ -92,7 +92,7 @@ namespace mpc::sequencer
 
     using SequencerMessage =
         std::variant<TransportMessage, SequenceMessage, SongMessage, CopyEvents,
-                     SwitchToNextSequence, SetSelectedSequenceIndex, CopyBars,
+                     SwitchToNextSequenceSudden, SetSelectedSequenceIndex, CopyBars,
                      SetSelectedSongIndex, SetSelectedSongStepIndex,
                      DeleteSequence, CopySequence, UndoSequence, CopyTrack,
                      SetUndoSequenceAvailable, DeleteAllSequences>;

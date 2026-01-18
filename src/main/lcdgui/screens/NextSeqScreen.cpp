@@ -167,7 +167,7 @@ void NextSeqScreen::function(const int i)
         if (i == 3 && nextSq != NoSequenceIndex)
         {
             sequencer.lock()->getStateManager()->enqueue(
-                sequencer::SwitchToNextSequence{nextSq});
+                sequencer::SwitchToNextSequenceSudden{nextSq});
         }
     }
     else if (i == 5)

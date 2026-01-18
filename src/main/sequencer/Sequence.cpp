@@ -604,8 +604,3 @@ std::shared_ptr<Track> Sequence::getTempoChangeTrack() const
 {
     return tracks[TempoChangeTrackIndex];
 }
-
-void Sequence::syncTrackEventIndices() const
-{
-    dispatch(SyncTrackEventIndices{getSequenceIndex()});
-}

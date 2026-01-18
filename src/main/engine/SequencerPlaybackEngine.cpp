@@ -503,8 +503,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         manager->drainQueue();
         seq = sequencer->getCurrentlyPlayingSequence();
-        seq->syncTrackEventIndices();
-        manager->drainQueue();
+        manager->applyMessageImmediate(
+            SyncTrackEventIndices{seq->getSequenceIndex()});
     }
 
     bool songHasStopped = false;
@@ -580,7 +580,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (sequencer->getTransport()->getTickPosition() >=
                 seq->getLastTick() - 1 &&
-            !sequencer->isSongModeEnabled() && sequencer->getNextSq() != -1)
+            !sequencer->isSongModeEnabled() &&
+            sequencer->getNextSq() != NoSequenceIndex)
         {
             seq = switchToNextSequence();
             continue;

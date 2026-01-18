@@ -97,7 +97,7 @@ void PushPadScreenUpdateCommand::execute()
             }
 
             ctx.sequencer->getStateManager()->enqueue(
-                sequencer::SwitchToNextSequence{padIndexWithBank});
+                sequencer::SwitchToNextSequenceSudden{padIndexWithBank});
             return;
         }
 
