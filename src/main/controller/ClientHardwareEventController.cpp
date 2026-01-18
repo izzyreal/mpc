@@ -444,70 +444,73 @@ void ClientHardwareEventController::handlePadRelease(
             {
                 previewSoundPlayer->finishVoiceIfSoundIsLooping();
             }
-            else if (screengroups::isPadDoesNotTriggerNoteEventScreen(
-                         p.screenId))
-            {
-                return;
-            }
 
             const auto programPadIndex =
                 physicalPadAndBankToProgramPadIndex(p.padIndex, p.bank);
 
-            const auto programPadPressEvent =
-                performanceManager->getSnapshot().findProgramPadPress(
-                    PerformanceEventSource::VirtualMpcHardware, p.padIndex,
-                    p.programIndex);
-
-            const auto quantizedLockActivated =
-                programPadPressEvent.has_value() &&
-                programPadPressEvent->quantizedLockActivated;
-
-            if (p.noteNumber != NoNoteNumber && !quantizedLockActivated &&
-                !isNoteRepeatMode && !isLiveEraseMode)
+            if (!screengroups::isPadDoesNotTriggerNoteEventScreen(p.screenId))
             {
-                const auto selectedSequence = sequencer->getSelectedSequence();
+                const auto programPadPressEvent =
+                    performanceManager->getSnapshot().findProgramPadPress(
+                        PerformanceEventSource::VirtualMpcHardware, p.padIndex,
+                        p.programIndex);
 
-                const auto recordingNoteOnEvent =
-                    sequencer->getStateManager()->findRecordingNoteOnEvent(
-                        selectedSequence->getSequenceIndex(), p.trackIndex,
-                        p.noteNumber);
+                const auto quantizedLockActivated =
+                    programPadPressEvent.has_value() &&
+                    programPadPressEvent->quantizedLockActivated;
 
-                NoteOffEvent msg{p.noteNumber, NoMidiChannel,
-                                 PerformanceEventSource::VirtualMpcHardware};
+                if (p.noteNumber != NoNoteNumber && !quantizedLockActivated &&
+                    !isNoteRepeatMode && !isLiveEraseMode)
+                {
+                    const auto selectedSequence =
+                        sequencer->getSelectedSequence();
 
-                performanceManager->applyMessageImmediate(std::move(msg));
+                    const auto recordingNoteOnEvent =
+                        sequencer->getStateManager()->findRecordingNoteOnEvent(
+                            selectedSequence->getSequenceIndex(), p.trackIndex,
+                            p.noteNumber);
 
-                const bool isSamplerScreen =
-                    screengroups::isSamplerScreen(p.screenId);
+                    NoteOffEvent msg{
+                        p.noteNumber, NoMidiChannel,
+                        PerformanceEventSource::VirtualMpcHardware};
 
-                auto screenComponent = screens->getScreenById(p.screenId).get();
+                    performanceManager->applyMessageImmediate(std::move(msg));
 
-                const auto track =
-                    selectedSequence->getTrack(p.trackIndex).get();
+                    const bool isSamplerScreen =
+                        screengroups::isSamplerScreen(p.screenId);
 
-                utils::SimpleAction noteOffAction(
-                    [this, recordingNoteOnEvent, track, p, isSamplerScreen,
-                     screenComponent, programPadIndex,
-                     program = sampler->getProgram(p.programIndex).get(),
-                     metronomeOnlyPositionTicks, positionTicks,
-                     performanceManager]
-                    {
-                        const auto ctx = TriggerLocalNoteContextFactory::
-                            buildTriggerLocalNoteOffContext(
-                                PerformanceEventSource::VirtualMpcHardware,
-                                p.noteNumber, recordingNoteOnEvent, track,
-                                p.busType, screenComponent, isSamplerScreen,
-                                programPadIndex, program,
-                                mpc.getSequencer().get(), performanceManager,
-                                mpc.clientEventController.get(),
-                                mpc.getEventHandler().get(), mpc.screens.get(),
-                                mpc.getHardware().get(),
-                                metronomeOnlyPositionTicks, positionTicks);
+                    auto screenComponent =
+                        screens->getScreenById(p.screenId).get();
 
-                        TriggerLocalNoteOffCommand(ctx).execute();
-                    });
+                    const auto track =
+                        selectedSequence->getTrack(p.trackIndex).get();
 
-                performanceManager->enqueueCallback(std::move(noteOffAction));
+                    utils::SimpleAction noteOffAction(
+                        [this, recordingNoteOnEvent, track, p, isSamplerScreen,
+                         screenComponent, programPadIndex,
+                         program = sampler->getProgram(p.programIndex).get(),
+                         metronomeOnlyPositionTicks, positionTicks,
+                         performanceManager]
+                        {
+                            const auto ctx = TriggerLocalNoteContextFactory::
+                                buildTriggerLocalNoteOffContext(
+                                    PerformanceEventSource::VirtualMpcHardware,
+                                    p.noteNumber, recordingNoteOnEvent, track,
+                                    p.busType, screenComponent, isSamplerScreen,
+                                    programPadIndex, program,
+                                    mpc.getSequencer().get(),
+                                    performanceManager,
+                                    mpc.clientEventController.get(),
+                                    mpc.getEventHandler().get(),
+                                    mpc.screens.get(), mpc.getHardware().get(),
+                                    metronomeOnlyPositionTicks, positionTicks);
+
+                            TriggerLocalNoteOffCommand(ctx).execute();
+                        });
+
+                    performanceManager->enqueueCallback(
+                        std::move(noteOffAction));
+                }
             }
 
             assert(p.programIndex != NoProgramIndex);
