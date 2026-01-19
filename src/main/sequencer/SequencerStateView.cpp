@@ -59,3 +59,8 @@ SequenceStateView SequencerStateView::getSelectedSequenceStateView() const
 {
     return SequenceStateView(state->sequences[state->selectedSequenceIndex]);
 }
+
+mpc::SequenceIndex SequencerStateView::getNextSequenceIndex() const
+{
+    return state->nextSequenceIndex;
+}

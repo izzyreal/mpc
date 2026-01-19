@@ -77,7 +77,7 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
     const auto nextSequenceIndex = sequencer->getNextSq();
     sequencer->setSelectedSequenceIndex(nextSequenceIndex, false);
     sequencer->getStateManager()->drainQueue();
-    sequencer->setNextSq(NoSequenceIndex);
+    sequencer->clearNextSq();
     sequencer->getStateManager()->drainQueue();
     setTickPositionEffectiveImmediately(0, nextSequenceIndex);
     return sequencer->getCurrentlyPlayingSequence();
@@ -203,9 +203,8 @@ void SequencerPlaybackEngine::displayPunchRects() const
 void SequencerPlaybackEngine::stopCountingInIfRequired(
     const SequenceIndex sequenceIndex) const
 {
-    const auto transport = sequencer->getTransport();
-
-    if (transport->getTickPosition() >= transport->getCountInEndPosTicks())
+    if (const auto transport = sequencer->getTransport();
+        transport->getTickPosition() >= transport->getCountInEndPosTicks())
     {
         setTickPositionEffectiveImmediately(
             transport->getCountInStartPosTicks(), sequenceIndex);
@@ -268,9 +267,8 @@ bool SequencerPlaybackEngine::processSongMode() const
             sequencer->getTransport()->resetPlayedStepRepetitions();
             sequencer->setSelectedSongStepIndex(stepIndex + 1);
 
-            const auto newStep = song->getStep(stepIndex + 1);
-
-            if (!sequencer->getSequence(newStep.sequenceIndex)->isUsed())
+            if (const auto newStep = song->getStep(stepIndex + 1);
+                !sequencer->getSequence(newStep.sequenceIndex)->isUsed())
             {
                 stopSequencer();
                 return true;
@@ -581,7 +579,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (sequencer->getTransport()->getTickPosition() >=
                 seq->getLastTick() - 1 &&
             !sequencer->isSongModeEnabled() &&
-            sequencer->getNextSq() != NoSequenceIndex)
+            sequencer->getNextSq() >= MinSequenceIndex)
         {
             seq = switchToNextSequence();
             continue;

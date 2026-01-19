@@ -98,10 +98,10 @@ void NextSeqPadScreen::function(const int i)
     if (i == 3 || i == 4)
     {
         const auto nextSq = sequencer.lock()->getNextSq();
-        sequencer.lock()->setNextSq(NoSequenceIndex);
+        sequencer.lock()->clearNextSq();
         displayNextSq();
 
-        if (i == 3 && nextSq != NoSequenceIndex)
+        if (i == 3 && nextSq >= MinSequenceIndex)
         {
             sequencer.lock()->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequenceSudden{nextSq});
@@ -117,7 +117,7 @@ void NextSeqPadScreen::displayNextSq() const
 {
     const auto nextSq = sequencer.lock()->getNextSq();
 
-    if (nextSq == NoSequenceIndex)
+    if (nextSq < MinSequenceIndex)
     {
         findLabel("nextsq")->setText(" ");
         return;

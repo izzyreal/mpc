@@ -442,9 +442,9 @@ void LayeredScreen::openScreenInternal(
         (std::dynamic_pointer_cast<SequencerScreen>(newScreen) &&
          !mpc.getSequencer()->getTransport()->isPlaying()))
     {
-        if (mpc.getSequencer()->getNextSq() != NoSequenceIndex)
+        if (mpc.getSequencer()->getNextSq() != NoNextSequenceIndex)
         {
-            mpc.getSequencer()->setNextSq(NoSequenceIndex);
+            mpc.getSequencer()->clearNextSq();
         }
     }
 }

@@ -31,7 +31,7 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
                         {
                             displayNextSq();
 
-                            if (nextSq == NoSequenceIndex)
+                            if (nextSq == NoNextSequenceIndex)
                             {
                                 selectNextSqFromScratch = true;
                             }
@@ -86,7 +86,7 @@ void NextSeqScreen::open()
     displayTiming();
     displayNextSq();
 
-    if (sequencer.lock()->getNextSq() == NoSequenceIndex)
+    if (sequencer.lock()->getNextSq() < MinSequenceIndex)
     {
         ls.lock()->setFocus("sq");
     }
@@ -105,7 +105,7 @@ void NextSeqScreen::turnWheel(const int increment)
         {
             sequencer.lock()->setNextSq(
                 sequencer.lock()->getCurrentlyPlayingSequenceIndex() +
-                increment);
+                increment, std::nullopt);
             ls.lock()->setFocus("nextsq");
         }
         else
@@ -113,18 +113,19 @@ void NextSeqScreen::turnWheel(const int increment)
             sequencer.lock()->getStateManager()->enqueue(
                 sequencer::SetSelectedSequenceIndex{
                     sequencer.lock()->getSelectedSequenceIndex() + increment});
+            selectNextSqFromScratch = true;
         }
     }
     else if (focusedFieldName == "nextsq")
     {
         auto nextSq = sequencer.lock()->getNextSq();
 
-        if (nextSq == NoSequenceIndex && increment < 0)
+        if (nextSq < MinSequenceIndex && increment < 0)
         {
             return;
         }
 
-        if (nextSq == NoSequenceIndex && selectNextSqFromScratch)
+        if (nextSq < MinSequenceIndex && selectNextSqFromScratch)
         {
             nextSq = sequencer.lock()->getSelectedSequenceIndex();
             selectNextSqFromScratch = false;
@@ -134,7 +135,7 @@ void NextSeqScreen::turnWheel(const int increment)
             nextSq = nextSq + increment;
         }
 
-        sequencer.lock()->setNextSq(nextSq);
+        sequencer.lock()->setNextSq(nextSq, selectNextSqFromScratch);
 
         displayNextSq();
     }
@@ -160,11 +161,11 @@ void NextSeqScreen::function(const int i)
     if (i == 3 || i == 4)
     {
         const auto nextSq = sequencer.lock()->getNextSq();
-        sequencer.lock()->setNextSq(NoSequenceIndex);
+        sequencer.lock()->clearNextSq();
         selectNextSqFromScratch = true;
         displayNextSq();
 
-        if (i == 3 && nextSq != NoSequenceIndex)
+        if (i == 3 && nextSq >= MinSequenceIndex)
         {
             sequencer.lock()->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequenceSudden{nextSq});
@@ -208,7 +209,7 @@ void NextSeqScreen::displayNextSq() const
     const auto nextSq = sequencer.lock()->getNextSq();
     std::string res = "";
 
-    if (nextSq != NoSequenceIndex)
+    if (nextSq >= MinSequenceIndex)
     {
         const auto seqName = sequencer.lock()->getSequence(nextSq)->getName();
         res = StrUtil::padLeft(

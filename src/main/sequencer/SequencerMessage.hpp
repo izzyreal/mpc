@@ -15,6 +15,11 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
     };
 
+    struct SetNextSequenceIndex
+    {
+        SequenceIndex sequenceIndex;
+    };
+
     struct SetSelectedSequenceIndex
     {
         SequenceIndex sequenceIndex;
@@ -92,8 +97,9 @@ namespace mpc::sequencer
 
     using SequencerMessage =
         std::variant<TransportMessage, SequenceMessage, SongMessage, CopyEvents,
-                     SwitchToNextSequenceSudden, SetSelectedSequenceIndex, CopyBars,
-                     SetSelectedSongIndex, SetSelectedSongStepIndex,
+                     SwitchToNextSequenceSudden, SetSelectedSequenceIndex,
+                     CopyBars, SetSelectedSongIndex, SetSelectedSongStepIndex,
                      DeleteSequence, CopySequence, UndoSequence, CopyTrack,
-                     SetUndoSequenceAvailable, DeleteAllSequences>;
+                     SetUndoSequenceAvailable, DeleteAllSequences,
+                     SetNextSequenceIndex>;
 } // namespace mpc::sequencer

@@ -31,6 +31,8 @@ namespace mpc::sequencer
 
         SequenceStateView getSelectedSequenceStateView() const;
 
+        SequenceIndex getNextSequenceIndex() const;
+
     private:
         const SequencerState *const state;
     };

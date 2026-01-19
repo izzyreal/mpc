@@ -395,7 +395,6 @@ void Sequencer::init()
     }
 
     lastTap = currentTimeMillis();
-    nextSq = NoSequenceIndex;
 
     selectedTrackIndex = 0;
 
@@ -895,7 +894,7 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
 
 SequenceIndex Sequencer::getNextSq() const
 {
-    return nextSq;
+    return getStateManager()->getSnapshot().getNextSequenceIndex();
 }
 
 SequenceIndex Sequencer::getFirstUsedSeqDown(const SequenceIndex from,
@@ -932,7 +931,8 @@ SequenceIndex Sequencer::getFirstUsedSeqUp(const SequenceIndex from,
     return NoSequenceIndex;
 }
 
-void Sequencer::setNextSq(SequenceIndex i)
+void Sequencer::setNextSq(SequenceIndex i,
+                          const std::optional<bool> fromScratch) const
 {
     if (i < NoSequenceIndex)
     {
@@ -943,13 +943,16 @@ void Sequencer::setNextSq(SequenceIndex i)
         i = MaxSequenceIndex;
     }
 
-    const auto startingFromScratch = nextSq == NoSequenceIndex;
+    const auto nextSq = getNextSq();
+
+    const auto startingFromScratch =
+        fromScratch.value_or(nextSq == NoNextSequenceIndex);
 
     auto up = i > nextSq;
 
     if (startingFromScratch)
     {
-        up = i > selectedTrackIndex;
+        up = i > getSelectedSequenceIndex();
     }
 
     const auto candidate =
@@ -960,18 +963,23 @@ void Sequencer::setNextSq(SequenceIndex i)
         return;
     }
 
-    nextSq = candidate;
+    getStateManager()->enqueue(SetNextSequenceIndex{candidate});
 }
 
-void Sequencer::setNextSqPad(const SequenceIndex i)
+void Sequencer::clearNextSq() const
+{
+    getStateManager()->enqueue(SetNextSequenceIndex{NoNextSequenceIndex});
+}
+
+void Sequencer::setNextSqPad(const SequenceIndex i) const
 {
     if (!sequences[i]->isUsed())
     {
-        nextSq = NoSequenceIndex;
+        clearNextSq();
         return;
     }
 
-    nextSq = i;
+    getStateManager()->enqueue(SetNextSequenceIndex{i});
 }
 
 std::shared_ptr<Song> Sequencer::getSong(const int i)

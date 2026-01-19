@@ -144,7 +144,6 @@ namespace mpc::sequencer
         std::string defaultSequenceName = "Sequence";
         std::vector<std::string> defaultTrackNames;
         int selectedTrackIndex = 0;
-        SequenceIndex nextSq{NoSequenceIndex};
 
         void makeNewSequence(SequenceIndex sequenceIndex);
 
@@ -206,8 +205,56 @@ namespace mpc::sequencer
                                           bool unused = false) const;
         SequenceIndex getFirstUsedSeqUp(SequenceIndex from,
                                         bool unused = false) const;
-        void setNextSq(SequenceIndex);
-        void setNextSqPad(SequenceIndex);
+
+        /**
+         * In the MAIN screen, the behaviour is like this:
+         *
+         * Turning the DATA wheel left selects the first used sequence below
+         * the currently selected or next sequence. Turning it right selects the
+         * first used sequence above the currently selected or next sequence.
+         * Setting a next sequence can only be done while the sequencer is
+         * playing. Once a next sequence is set, it's impossible to unset it. It
+         * can only be changed to another next sequence, which may also be the
+         * currently playing sequence. But the 'Next Sq:' widget that appears at
+         * the bottom of the screen, overlaying the 'STEP' and 'EDIT' function
+         * key labels, remains visible for as long as the sequencer has not
+         * switched to the next sequence (or the sequencer has stopped playing).
+         * In this screen, setting a next sequence from scratch means that the
+         * user goes from having no next sequence set, to some next sequence
+         * set. This type of from-scratch-ness is trivially determined by
+         * checking if the current state of 'nextSequence' equals
+         * 'NoNextSequenceIndex', which we do inside `setNextSq`. If this
+         * evaluates to true, we're making a from-scratch selection, which means
+         * that the current next sequence is the point of reference, rather than
+         * the currently selected sequence.
+         *
+         * In the NEXT SEQ screen, the 'from scratch' state is attained in a
+         * different way. If the user enters the NEXT SEQ screen, or they change
+         * the currently selected sequence while the sequencer is not playing,
+         * or the sequencer has switched to the next sequence, we enter the 'from
+         * scratch' state in this screen. A next sequence can be set via the
+         * 'Sq:' field, or via the 'Next Sq:' field. Setting it via the
+         * 'Next Sq:' field never yields a 'from scratch' state, even though the
+         * user may select no next sequence via this field by turning the DATA
+         * wheel left until the 'Next Sq:' field is empty.
+         *
+         * For this reason, the `Sequencer::setNextSq` API has an optional bool.
+         * The MAIN screen invokes it while passing `std::nullopt` for the
+         * `fromScratch` parameter, so the implementation relies on the
+         * `nextSequence == NoNextSequenceIndex` comparison mentioned above. The
+         * NEXT SEQ screen invokes it while passing a non-empty optional,
+         * containing the from-scratch state that is owned and maintained by
+         * this screen itself. Note that it only does that when the user sets
+         * the next sequence via the 'Next Sq:' field. Setting it via the 'Sq:'
+         * field in the NEXT SEQ screen is 100% the same as setting it via the
+         * 'Sq:' field in the MAIN screen, as is resetting the next sequence to
+         * `NoNextSequenceIndex` via the 'CLEAR' function.
+         */
+        void setNextSq(SequenceIndex, std::optional<bool> fromScratch) const;
+
+        void clearNextSq() const;
+
+        void setNextSqPad(SequenceIndex) const;
         std::shared_ptr<Song> getSong(int i);
         std::shared_ptr<Song> getSelectedSong() const;
         void deleteSong(int i) const;

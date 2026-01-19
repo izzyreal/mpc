@@ -78,6 +78,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         {
             songStateHandler->applyMessage(activeState, actions, m);
         },
+        [&](const SetNextSequenceIndex &m)
+        {
+            activeState.nextSequenceIndex = m.sequenceIndex;
+        },
         [&](const SwitchToNextSequenceSudden &m)
         {
             constexpr bool setPositionTo0 = true;

@@ -861,7 +861,7 @@ void SequencerScreen::turnWheel(const int i)
 
                 if (seqIndex + i >= 0)
                 {
-                    sequencer.lock()->setNextSq(seqIndex + i);
+                    sequencer.lock()->setNextSq(seqIndex + i, std::nullopt);
                 }
             }
         }
@@ -882,7 +882,8 @@ void SequencerScreen::turnWheel(const int i)
     {
         if (sequencer.lock()->getNextSq() + i >= 0)
         {
-            sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
+            sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i,
+                                        std::nullopt);
         }
     }
     else if (focusedFieldName == "bars")

@@ -250,7 +250,7 @@ void TransportStateHandler::applyStopSequence(
     state.sequencerRunning = false;
     sequencer->clock->reset();
 
-    sequencer->setNextSq(NoSequenceIndex);
+    sequencer->clearNextSq();
 
     state.recordingEnabled = false;
     state.overdubbingEnabled = false;

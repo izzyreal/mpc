@@ -543,7 +543,7 @@ void ClientMidiEventController::handleProgramChange(
                                                ScreenId::SequencerScreen}))
                     {
                         sequencer.lock()->setNextSq(
-                            SequenceIndex(e.getProgramNumber()));
+                            SequenceIndex(e.getProgramNumber()), std::nullopt);
                     }
                 }
             }

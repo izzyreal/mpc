@@ -16,6 +16,7 @@ namespace mpc::sequencer
         SequenceIndex selectedSequenceIndex{MinSequenceIndex};
         SongStepIndex selectedSongStepIndex{MinSongStepIndex};
         SongIndex selectedSongIndex{MinSongIndex};
+        SequenceIndex nextSequenceIndex{NoNextSequenceIndex};
         TransportState transport;
         bool undoSequenceAvailable{false};
     };
