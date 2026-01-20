@@ -34,7 +34,8 @@ PerformanceStateView::getPressedProgramPadAfterTouchOrVelocity(
 
     for (const auto &e : state->programPadEvents)
     {
-        if (e.source == PerformanceEventSource::NoteRepeat)
+        if (e.source == PerformanceEventSource::NoteRepeat ||
+            e.source == PerformanceEventSource::Sequence)
         {
             continue;
         }

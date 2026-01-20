@@ -7,7 +7,6 @@ namespace mpc::performance
         VirtualMpcHardware,
         Sequence,
         MidiInput,
-        StepEditor,
         NoteRepeat
     };
 
@@ -25,10 +24,6 @@ namespace mpc::performance
         if (s == PerformanceEventSource::MidiInput)
         {
             return "MidiInput";
-        }
-        if (s == PerformanceEventSource::StepEditor)
-        {
-            return "StepEditor";
         }
         if (s == PerformanceEventSource::NoteRepeat)
         {
