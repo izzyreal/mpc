@@ -17,9 +17,7 @@ void VmpcSettingsScreen::open()
     displayInitialPadMapping();
     display16LevelsEraseMode();
     displayAutoConvertWavs();
-    displayMidiControlMode();
     displayNameTypingWithKeyboard();
-    ls.lock()->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
 }
 
 void VmpcSettingsScreen::close()
@@ -45,11 +43,6 @@ void VmpcSettingsScreen::function(const int i)
             openScreenById(ScreenId::VmpcDisksScreen);
             break;
         case 4:
-            if (midiControlMode == ORIGINAL)
-            {
-                return;
-            }
-
             openScreenById(ScreenId::VmpcMidiScreen);
             break;
         case 5:
@@ -72,10 +65,8 @@ void VmpcSettingsScreen::function(const int i)
 
 void VmpcSettingsScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldName();
-
-    if (focusedFieldName == "initial-pad-mapping")
+    if (const auto focusedFieldName = getFocusedFieldName();
+        focusedFieldName == "initial-pad-mapping")
     {
         setInitialPadMapping(initialPadMapping + i);
     }
@@ -86,12 +77,6 @@ void VmpcSettingsScreen::turnWheel(const int i)
     else if (focusedFieldName == "auto-convert-wavs")
     {
         setAutoConvertWavs(autoConvertWavs + i);
-    }
-    else if (focusedFieldName == "midi-control-mode")
-    {
-        setMidiControlMode(midiControlMode + i);
-        ls.lock()->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1
-                                                                          : 0);
     }
     else if (focusedFieldName == "name-typing-with-keyboard")
     {
@@ -139,23 +124,6 @@ void VmpcSettingsScreen::displayAutoConvertWavs() const
 {
     findField("auto-convert-wavs")
         ->setText(autoConvertWavs == 1 ? "YES" : "ASK");
-}
-
-void VmpcSettingsScreen::setMidiControlMode(const int i)
-{
-    midiControlMode = std::clamp(i, 0, 1);
-    displayMidiControlMode();
-}
-
-void VmpcSettingsScreen::displayMidiControlMode() const
-{
-    findField("midi-control-mode")
-        ->setText(midiControlModeNames[midiControlMode]);
-}
-
-int VmpcSettingsScreen::getMidiControlMode() const
-{
-    return midiControlMode;
 }
 
 void VmpcSettingsScreen::displayNameTypingWithKeyboard() const

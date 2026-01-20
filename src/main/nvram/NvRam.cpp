@@ -77,7 +77,8 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(vmpcSettingsScreen->autoConvertWavs),
         0x00, // This was tap averaging, but it does not belong here
         static_cast<char>(othersScreen->getContrast()),
-        static_cast<char>(vmpcSettingsScreen->midiControlMode),
+        0x00, // This was MIDI control mode (VMPC or ORIGINAL), but this feature
+              // (configurability) was removed.
         static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled)};
 
     set_file_data(path, bytes);
@@ -156,10 +157,8 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
     {
         othersScreen->setContrast(bytes[9]);
     }
-    if (bytes.size() > 10)
-    {
-        vmpcSettingsScreen->midiControlMode = bytes[10];
-    }
+    // We used to have MIDI control mode here, but this configurability was
+    // removed, so we ignore this byte.
     if (bytes.size() > 11)
     {
         vmpcSettingsScreen->nameTypingWithKeyboardEnabled =

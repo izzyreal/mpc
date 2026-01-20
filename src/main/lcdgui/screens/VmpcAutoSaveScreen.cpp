@@ -16,16 +16,9 @@ void VmpcAutoSaveScreen::open()
 
     displayAutoSaveOnExit();
     displayAutoLoadOnStart();
-
-    const auto vmpcSettingsScreen =
-        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-    const auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
-    ls.lock()->setFunctionKeysArrangement(
-        midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
-                                                                         : 0);
 }
 
-void VmpcAutoSaveScreen::function(int i)
+void VmpcAutoSaveScreen::function(const int i)
 {
     switch (i)
     {
@@ -42,24 +35,17 @@ void VmpcAutoSaveScreen::function(int i)
         {
             const auto vmpcSettingsScreen =
                 mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-
-            if (vmpcSettingsScreen->getMidiControlMode() ==
-                VmpcSettingsScreen::MidiControlMode::ORIGINAL)
-            {
-                return;
-            }
-
             openScreenById(ScreenId::VmpcMidiScreen);
             break;
         }
+        default:;
     }
 }
 
-void VmpcAutoSaveScreen::turnWheel(int i)
+void VmpcAutoSaveScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldName();
-
-    if (focusedFieldName == "auto-save-on-exit")
+    if (const auto focusedFieldName = getFocusedFieldName();
+        focusedFieldName == "auto-save-on-exit")
     {
         setAutoSaveOnExit(autoSaveOnExit + i);
     }
@@ -69,13 +55,13 @@ void VmpcAutoSaveScreen::turnWheel(int i)
     }
 }
 
-void VmpcAutoSaveScreen::setAutoSaveOnExit(int i)
+void VmpcAutoSaveScreen::setAutoSaveOnExit(const int i)
 {
     autoSaveOnExit = std::clamp(i, 0, 1);
     displayAutoSaveOnExit();
 }
 
-void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
+void VmpcAutoSaveScreen::setAutoLoadOnStart(const int i)
 {
     autoLoadOnStart = std::clamp(i, 0, 2);
     displayAutoLoadOnStart();

@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens
 namespace mpc::lcdgui::screens::window
 {
     class MidiInputScreen;
-} // namespace mpc::lcdgui::screens::window
+}
 
 namespace mpc::lcdgui::screens
 {
@@ -36,11 +36,6 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        enum MidiControlMode
-        {
-            VMPC,
-            ORIGINAL
-        };
         void turnWheel(int i) override;
 
         VmpcSettingsScreen(Mpc &mpc, int layerIndex);
@@ -49,7 +44,6 @@ namespace mpc::lcdgui::screens
         void close() override;
         void function(int) override;
 
-        int getMidiControlMode() const;
         bool isNameTypingWithKeyboardEnabled() const;
 
     private:
@@ -58,25 +52,20 @@ namespace mpc::lcdgui::screens
                                                               "ORIGINAL"};
         const std::vector<std::string> sixteenLevelsEraseModeNames{
             "All levels", "Only pressed level"};
-        const std::vector<std::string> midiControlModeNames{
-            "VMPC, see MIDI tab", "ORIGINAL"};
 
         int initialPadMapping = 0;
         int sixteenLevelsEraseMode = 0;
         int autoConvertWavs = 1;
-        int midiControlMode = 0;
         bool nameTypingWithKeyboardEnabled = true;
 
         void setInitialPadMapping(int);
         void set16LevelsEraseMode(int);
         void setAutoConvertWavs(int);
-        void setMidiControlMode(int);
         void setNameTypingWithKeyboard(bool);
 
         void displayInitialPadMapping() const;
         void display16LevelsEraseMode() const;
         void displayAutoConvertWavs() const;
-        void displayMidiControlMode() const;
         void displayNameTypingWithKeyboard() const;
 
         friend class sampler::Pad;

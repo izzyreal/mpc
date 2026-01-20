@@ -50,7 +50,7 @@ void VmpcDisksScreen::open()
     displayFunctionKeys();
 }
 
-void VmpcDisksScreen::function(int i)
+void VmpcDisksScreen::function(const int i)
 {
     switch (i)
     {
@@ -67,13 +67,6 @@ void VmpcDisksScreen::function(int i)
         {
             const auto vmpcSettingsScreen =
                 mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-
-            if (vmpcSettingsScreen->getMidiControlMode() ==
-                VmpcSettingsScreen::MidiControlMode::ORIGINAL)
-            {
-                return;
-            }
-
             openScreenById(ScreenId::VmpcMidiScreen);
             break;
         }
@@ -106,10 +99,11 @@ void VmpcDisksScreen::function(int i)
             ls.lock()->showPopupForMs(popupMsg, 1000);
             break;
         }
+        default:;
     }
 }
 
-void VmpcDisksScreen::turnWheel(int i)
+void VmpcDisksScreen::turnWheel(const int i)
 {
     const auto &volume = mpc.getDisks()[row]->getVolume();
 
@@ -219,13 +213,7 @@ bool VmpcDisksScreen::hasConfigChanged() const
 
 void VmpcDisksScreen::displayFunctionKeys() const
 {
-    const auto vmpcSettingsScreen =
-        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-    const auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
-    auto newArrangement =
-        midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
-                                                                         : 0;
-    newArrangement += hasConfigChanged() ? 0 : 1;
+    const auto newArrangement = hasConfigChanged() ? 0 : 1;
     ls.lock()->setFunctionKeysArrangement(newArrangement);
 }
 

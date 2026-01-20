@@ -593,20 +593,18 @@
 },
 "vmpc-settings":
 {
- "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "MIDI control mode   :", "Name typing w. keybd:" ],
- "x" : [ 3, 3, 3, 3, 3 ],
- "y" : [ 3, 12, 21, 30, 39 ],
+ "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "Name typing w. keybd:" ],
+ "x" : [ 3, 3, 3, 3 ],
+ "y" : [ 3, 12, 21, 30 ],
  "parameters" : [
   "initial-pad-mapping", [ "_", "_", "_", "16-levels-erase-mode" ],
   "16-levels-erase-mode", [ "_", "_", "initial-pad-mapping", "auto-convert-wavs" ],
-  "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "midi-control-mode" ],
-  "midi-control-mode", [ "_", "_", "auto-convert-wavs", "name-typing-with-keyboard" ],
-  "name-typing-with-keyboard", [ "_", "_", "midi-control-mode", "_" ]
+  "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "name-typing-with-keyboard" ],
+  "name-typing-with-keyboard", [ "_", "_", "auto-convert-wavs", "_" ]
  ],
- "tfsize" : [ 60, 108, 18, 108, 18 ],
- "fblabels" : [[ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
-               [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
- "fbtypes" : [[ 2, 0, 0, 0, 0, null ], [ 2, 0, 0, 0, null, null ]]
+ "tfsize" : [ 60, 108, 18, 108 ],
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI" ],
+ "fbtypes" : [ 2, 0, 0, 0, 0, null ]
 },
 "vmpc-keyboard":
 {
@@ -635,9 +633,8 @@
  "infosize" : [ 168 ],
  "infox" : [ 45 ],
  "infoy" : [ 37 ],
- "fblabels" : [[ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
- "fbtypes" : [[ 0, 0, 2, 0, 0, null ], [ 0, 0, 2, 0, null, null ]]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
+ "fbtypes" : [ 0, 0, 2, 0, 0, null ]
 },
 "vmpc-disks":
 {
@@ -652,14 +649,10 @@
  "infoy" : [ 10, 38 ],
  "fblabels" : [
   [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", "SAVE" ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, "SAVE" ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ]],
 "fbtypes" : [
   [ 0, 0, 0, 2, 0, 1 ],
-  [ 0, 0, 0, 2, 0, null ],
-  [ 0, 0, 0, 2, null, 1 ],
-  [ 0, 0, 0, 2, null, null ]]
+  [ 0, 0, 0, 2, 0, null ]]
 },
 "vmpc-midi":
 {
