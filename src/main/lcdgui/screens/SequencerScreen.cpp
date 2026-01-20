@@ -272,7 +272,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                         [&](auto nextSqIndex)
                         {
                             displayNextSq();
-                            if (nextSqIndex != -1)
+                            if (nextSqIndex >= MinSequenceIndex)
                             {
                                 ls.lock()->setFocus("nextsq");
                             }
@@ -340,7 +340,7 @@ void SequencerScreen::open()
         findBackground()->setBackgroundName("sequencer");
     }
 
-    if (sequencer.lock()->getNextSq() != -1)
+    if (sequencer.lock()->getNextSq() >= MinSequenceIndex)
     {
         ls.lock()->setFocus("nextsq");
     }
@@ -1035,7 +1035,7 @@ void SequencerScreen::right()
 
 void SequencerScreen::moveCursor(const std::function<void()> &cursorCall)
 {
-    if (sequencer.lock()->getNextSq() == -1)
+    if (sequencer.lock()->getNextSq() == NoNextSequenceIndex)
     {
         cursorCall();
         return;
@@ -1169,10 +1169,10 @@ void SequencerScreen::displayPunchWhileRecording()
 
 void SequencerScreen::displayNextSq() const
 {
-    ls.lock()->setFunctionKeysArrangement(
-        sequencer.lock()->getNextSq() == -1 ? 0 : 1);
+    const auto noNextSq = sequencer.lock()->getNextSq() == NoNextSequenceIndex;
 
-    const auto noNextSq = sequencer.lock()->getNextSq() == -1;
+    ls.lock()->setFunctionKeysArrangement(noNextSq ? 0 : 1);
+
     findLabel("nextsq")->Hide(noNextSq);
     findField("nextsq")->Hide(noNextSq);
 
