@@ -172,7 +172,7 @@ namespace mpc::input::midi
         MidiValue midiValue{0};
         MidiChannel midiChannelIndex{0};
 
-        bool operator==(Binding &other)
+        bool operator==(const Binding &other) const
         {
             return target == other.target && messageType == other.messageType &&
                    midiNumber == other.midiNumber &&
@@ -181,7 +181,7 @@ namespace mpc::input::midi
                    encoderMode == other.encoderMode;
         }
 
-        bool operator!=(Binding &other)
+        bool operator!=(const Binding &other) const
         {
             return !(*this == other);
         }
