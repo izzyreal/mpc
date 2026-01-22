@@ -232,9 +232,7 @@
                     "hardware:6-or-program",
                     "hardware:7-or-mixer",
                     "hardware:8-or-other",
-                    "hardware:9-or-midi-sync",
-                    "hardware:data-wheel:negative",
-                    "hardware:data-wheel:positive"
+                    "hardware:9-or-midi-sync"
                   ]
                 }
               },

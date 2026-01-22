@@ -264,8 +264,7 @@ void VmpcMidiScreen::left()
 
     column--;
 
-    if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
-        column == 2)
+    if (column == 2 && !isColumn2VisibleAtCurrentRow())
     {
         column--;
     }
@@ -282,8 +281,7 @@ void VmpcMidiScreen::right()
 
     column++;
 
-    if (getActivePreset()->getBindingByIndex(row + rowOffset).isNote() &&
-        column == 2)
+    if (column == 2 && !isColumn2VisibleAtCurrentRow())
     {
         column++;
     }

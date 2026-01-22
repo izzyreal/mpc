@@ -194,18 +194,21 @@ namespace mpc::input::midi::legacy
 
             const bool isController = messageType == controllerStr;
 
-            const bool isHardware = target.rfind("hardware:", 0) == 0;
+            const bool isHardware =
+                target.rfind("hardware:", 0) != std::string::npos;
 
-            const bool isPad = target.rfind("hardware:pad-", 0) == 0;
+            const bool isPad =
+                target.rfind("hardware:pad-", 0) != std::string::npos;
 
             const bool isPot = target == "hardware:slider" ||
                                target == "hardware:rec-gain-pot" ||
                                target == "hardware:main-volume-pot";
 
-            const bool isDataWheelPlain = target == "hardware:data-wheel";
+            const bool isDataWheel =
+                target.rfind("hardware:data-wheel") != std::string::npos;
 
             const bool isButtonLike =
-                isHardware && !isPad && !isPot && !isDataWheelPlain;
+                isHardware && !isPad && !isPot && !isDataWheel;
 
             if (isController)
             {
@@ -238,7 +241,7 @@ namespace mpc::input::midi::legacy
             }
         }
 
-        result["bindings"] = bindings;
+        result[bindingsKey] = bindings;
 
         return result;
     }

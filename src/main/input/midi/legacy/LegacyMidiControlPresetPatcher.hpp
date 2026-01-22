@@ -21,7 +21,7 @@ namespace mpc::input::midi::legacy
 
         if (propSchema.contains("type"))
         {
-            std::string type = propSchema["type"].get<std::string>();
+            const auto type = propSchema["type"].get<std::string>();
             if (type == "string" && !value.is_string())
             {
                 return false;
@@ -242,7 +242,7 @@ namespace mpc::input::midi::legacy
             {
                 const std::string mt =
                     binding[messageTypeKey].get<std::string>();
-                const bool isController = (mt == "controller");
+                const bool isController = (mt == controllerStr);
 
                 if (!isController)
                 {
@@ -251,19 +251,21 @@ namespace mpc::input::midi::legacy
                 }
                 else
                 {
-                    const bool isPad = target.rfind("hardware:pad-", 0) == 0;
+                    const bool isPad =
+                        target.rfind("hardware:pad-", 0) != std::string::npos;
 
                     const bool isPot = target == "hardware:slider" ||
                                        target == "hardware:rec-gain-pot" ||
                                        target == "hardware:main-volume-pot";
 
-                    const bool isPlainDataWheel =
-                        target == "hardware:data-wheel";
+                    const bool isDataWheel =
+                        target.find("hardware:data-wheel") != std::string::npos;
 
-                    const bool isHardware = target.rfind("hardware:", 0) == 0;
+                    const bool isHardware =
+                        target.rfind("hardware:", 0) != std::string::npos;
 
                     const bool isButtonLike =
-                        (isHardware && !isPad && !isPot && !isPlainDataWheel);
+                        (isHardware && !isPad && !isPot && !isDataWheel);
 
                     if (isButtonLike)
                     {

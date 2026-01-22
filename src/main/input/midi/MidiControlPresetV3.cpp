@@ -108,12 +108,6 @@ bool Binding::isButtonLike() const
         }
     }
 
-    if (getTarget() == "hardware:data-wheel:negative" ||
-        getTarget() == "hardware:data-wheel:positive")
-    {
-        return true;
-    }
-
     return false;
 }
 

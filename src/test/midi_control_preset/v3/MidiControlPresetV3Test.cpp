@@ -122,13 +122,12 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
         bindings.push_back(b);
     }
 
-    // 5) Button-like data wheel negative (has midiValue)
+    // 5) Button-like data wheel negative (has no midiValue)
     {
         Binding b;
         b.setTarget("hardware:data-wheel:negative");
         b.setMessageType(BindingMessageType::Controller);
         b.setMidiNumber(17);
-        b.setMidiValue(64);
         b.setMidiChannelIndex(0);
         bindings.push_back(b);
     }
@@ -136,7 +135,7 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     preset.setBindings(bindings);
 
     json j = preset;
-    MidiControlPresetV3 restored = j.get<MidiControlPresetV3>();
+    auto restored = j.get<MidiControlPresetV3>();
 
     REQUIRE(restored.getVersion() == CURRENT_PRESET_VERSION);
     REQUIRE(restored.getName() == "RoundTrip");
@@ -179,7 +178,6 @@ TEST_CASE("MidiControlPresetV3 round-trips via JSON", "[MidiControlPresetV3]")
     REQUIRE(rb[4].getTarget() == "hardware:data-wheel:negative");
     REQUIRE(rb[4].isController());
     REQUIRE(rb[4].getMidiNumber() == 17);
-    REQUIRE(rb[4].getMidiValue() == 64);
     REQUIRE(rb[4].getMidiChannelIndex() == 0);
     REQUIRE(rb[4].isEnabled());
 }
