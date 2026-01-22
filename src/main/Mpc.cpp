@@ -95,7 +95,7 @@ void Mpc::init()
     fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
 
     const std::vector<std::string> factory_midi_control_presets{
-        "MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp", "MPC_Studio.vmp"};
+        "MPD16.json", "MPD218.json", "iRig_PADS.json", "MPC_Studio.json"};
 
     for (auto &preset : factory_midi_control_presets)
     {

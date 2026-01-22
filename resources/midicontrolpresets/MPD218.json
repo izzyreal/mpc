@@ -1,0 +1,463 @@
+{
+    "autoLoadMode": "Ask",
+    "bindings": [
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 36,
+            "target": "hardware:pad-1-or-ab"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 37,
+            "target": "hardware:pad-2-or-cd"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 38,
+            "target": "hardware:pad-3-or-ef"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 39,
+            "target": "hardware:pad-4-or-gh"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 40,
+            "target": "hardware:pad-5-or-ij"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 41,
+            "target": "hardware:pad-6-or-kl"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 42,
+            "target": "hardware:pad-7-or-mn"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 43,
+            "target": "hardware:pad-8-or-op"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 44,
+            "target": "hardware:pad-9-or-qr"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 45,
+            "target": "hardware:pad-10-or-st"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 46,
+            "target": "hardware:pad-11-or-uv"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 47,
+            "target": "hardware:pad-12-or-wx"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 48,
+            "target": "hardware:pad-13-or-yz"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 49,
+            "target": "hardware:pad-14-or-ampersand-octothorpe"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 50,
+            "target": "hardware:pad-15-or-hyphen-exclamation-mark"
+        },
+        {
+            "messageType": "note",
+            "midiChannelIndex": -1,
+            "midiNumber": 51,
+            "target": "hardware:pad-16-or-parentheses"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "target": "hardware:data-wheel:negative"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "target": "hardware:data-wheel:positive"
+        },
+        {
+            "encoderMode": "relative_stateless",
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": 3,
+            "target": "hardware:data-wheel"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": 9,
+            "target": "hardware:slider"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": 12,
+            "target": "hardware:rec-gain-pot"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": 13,
+            "target": "hardware:main-volume-pot"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:rec"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:overdub"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:stop"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:play"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:play-start"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:cursor-left-or-digit"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:cursor-right-or-digit"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:cursor-up"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:cursor-down"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:main-screen"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:prev-step-or-event"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:next-step-or-event"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:go-to"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:prev-bar-or-start"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:next-bar-or-end"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:tap-or-note-repeat"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:next-seq"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:track-mute"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:open-window"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:full-level-or-case-switch"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:sixteen-levels-or-space"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f1"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f2"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f3"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f4"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f5"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:f6"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:shift"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:enter-or-save"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:undo-seq"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:erase"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:after-or-assign"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:bank-a"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:bank-b"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:bank-c"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:bank-d"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:0-or-vmpc"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:1-or-song"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:2-or-misc"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:3-or-load"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:4-or-sample"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:5-or-trim"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:6-or-program"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:7-or-mixer"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:8-or-other"
+        },
+        {
+            "messageType": "controller",
+            "midiChannelIndex": -1,
+            "midiNumber": -1,
+            "midiValue": 64,
+            "target": "hardware:9-or-midi-sync"
+        }
+    ],
+    "midiControllerDeviceName": "MPD218",
+    "name": "MPD218",
+    "version": 3
+}
