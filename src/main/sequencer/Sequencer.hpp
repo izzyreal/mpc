@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <optional>
 #include <atomic>
 
 namespace mpc::lcdgui
