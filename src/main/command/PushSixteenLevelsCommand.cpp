@@ -4,6 +4,7 @@
 #include "controller/ClientEventController.hpp"
 
 #include "hardware/Hardware.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 
 using namespace mpc::command;
 using namespace mpc::lcdgui;
@@ -12,15 +13,23 @@ using namespace mpc::hardware;
 
 PushSixteenLevelsCommand::PushSixteenLevelsCommand(
     const std::shared_ptr<LayeredScreen> &layeredScreenToUse,
+    const std::shared_ptr<input::PadAndButtonKeyboard>
+        &padAndButtonKeyboardToUse,
     const std::shared_ptr<ClientEventController> &controllerToUse,
     const std::shared_ptr<Hardware> &hardwareToUse)
-    : layeredScreen(layeredScreenToUse), controller(controllerToUse),
-      hardware(hardwareToUse)
+    : layeredScreen(layeredScreenToUse),
+      padAndButtonKeyboard(padAndButtonKeyboardToUse),
+      controller(controllerToUse), hardware(hardwareToUse)
 {
 }
 
 void PushSixteenLevelsCommand::execute()
 {
+    if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
+    {
+        padAndButtonKeyboard->pressHardwareComponent(SIXTEEN_LEVELS_OR_SPACE);
+    }
+
     if (!layeredScreen->isCurrentScreen(
             {ScreenId::SequencerScreen, ScreenId::Assign16LevelsScreen}))
     {

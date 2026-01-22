@@ -4,6 +4,11 @@
 
 #include <memory>
 
+namespace mpc::input
+{
+    class PadAndButtonKeyboard;
+}
+
 namespace mpc::lcdgui
 {
     class LayeredScreen;
@@ -26,12 +31,14 @@ namespace mpc::command
     public:
         explicit PushSixteenLevelsCommand(
             const std::shared_ptr<lcdgui::LayeredScreen> &,
+            const std::shared_ptr<input::PadAndButtonKeyboard> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<hardware::Hardware> &);
         void execute() override;
 
     private:
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
+        std::shared_ptr<input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<controller::ClientEventController> controller;
         std::shared_ptr<hardware::Hardware> hardware;
     };

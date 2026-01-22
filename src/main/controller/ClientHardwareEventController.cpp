@@ -184,6 +184,14 @@ void ClientHardwareEventController::handlePadPress(
     if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}) &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
+        const auto vmpcSettingsScreen =
+            mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+
+        if (!vmpcSettingsScreen->isNameTypingWithKeyboardEnabled())
+        {
+            mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
+                event.componentId);
+        }
         return;
     }
 
@@ -865,8 +873,8 @@ void ClientHardwareEventController::handleButtonPress(
     }
     else if (id == SIXTEEN_LEVELS_OR_SPACE)
     {
-        PushSixteenLevelsCommand(layeredScreen, mpc.clientEventController,
-                                 mpc.getHardware())
+        PushSixteenLevelsCommand(layeredScreen, mpc.getPadAndButtonKeyboard(),
+                                 mpc.clientEventController, mpc.getHardware())
             .execute();
     }
     else if (id == F1)

@@ -31,13 +31,13 @@ namespace mpc::input
         hardware::ComponentId previousPad = hardware::ComponentId::NONE;
 
     public:
-        PadAndButtonKeyboard(Mpc &);
-        void pressHardwareComponent(const hardware::ComponentId);
+        explicit PadAndButtonKeyboard(Mpc &);
+        void pressHardwareComponent(hardware::ComponentId);
         void resetPreviousPad();
         void resetPressedZeroTimes();
         void resetUpperCase();
 
-        const bool isUpperCase() const
+        bool isUpperCase() const
         {
             return upperCase;
         }
