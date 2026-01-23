@@ -1,3 +1,20 @@
+## v0.9.0 RC17 (23-1-2026)
+* Fix random crashes when hitting pads. It seems iPadOS users were most affected by this bug, but it may well have affected users on other
+* Improved extended MIDI control, the feature that allows you to use a MIDI controller to control VMPC2000XL's virtual hardware. The GUI for extended MIDI controls has remained largely the same. Quick summary of the current implementation compared to previous versions:
+
+    - Button-like targets (i.e. all actual buttons and DATA wheel - and DATA wheel +) have a v: column. This value serves as a threshold, meaning CC events with values equal or greater than the value are interpreted as "press", and below the value as "release" (where a "release" doesn't do anything for the 2 DATA wheel targets).
+
+    - The singular data wheel target (without - or + suffix) is meant to be associated with an endless dial on one's MIDI controller. This new build of VMPC2000XL anticipates 2 common encoding schemes, which are named RSL (relative stateless) and RSF (relative stateful). The Akai MPD218 that I have emits RSL when in the MPD218 editor I set the TYPE: for a given knob to INC/DEC 2. The MIDI events for this encoding scheme correspond with CC events with values between 1 and 63 for clockwise turns, and values between 64 and 127 for counterclockwise turns. I also have an iRig PADS, which has a notched encoder that by default emits RSF. My hope is that RSL and RSF cover most people's needs. If not, please contact me and I'd be happy to dig in. I really want this feature to work perfectly.
+
+* Removed 'MIDI control mode'. That main reason this was introduced was to avoid duplicate handling of MIDI note input (once by the original MPC2000XL input handling, and once by VMPC2000XL's extended MIDI control handling). In the updated version, VMPC2000XL omits original 2000XL MIDI note input handling if you've configured a binding for that note in the VMPC MIDI tab (Shift + 0, F5).
+
+* Thread-safe code (finally!). This means less random bugs, audio glitches and total crashes.
+
+* No blocking operations on the audio thread. This means less audio glitches at lower latencies, as well as when you have a lot of plugins running simultaneously in your DAW.
+
+* New keyboard configuration and MIDI control preset file formats. Both are now in JSON, making them human-readable, and somewhat editable outside VMPC2000XL.
+
+
 ## v0.9.0 RC16 (22-9-2025)
 * Fix random crashes when hitting pads. It seems iPadOS users were most affected by this bug, but it may well have affected users on other platforms.
 * Fix sound preview when hitting pads in the TRIM/LOOP/ZONE screens. VMPC2000XL used to play whatever sound is assigned to the pad you hit, but this behaviour is incongruent with the real MPC2000XL. It should play the selected sound, regardless of which pad you hit.
