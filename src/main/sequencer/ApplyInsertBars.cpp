@@ -28,8 +28,7 @@ void SequenceStateHandler::applyInsertBars(const InsertBars &m,
 
     const auto newLastBarIndex = oldLastBarIndex + barCountToUse;
 
-    manager->applyMessage(
-        SetLastBarIndex{m.sequenceIndex, BarIndex(newLastBarIndex)});
+    state.sequences[m.sequenceIndex].lastBarIndex = newLastBarIndex;;
 
     auto &ts = seq.timeSignatures;
     auto &bl = seq.barLengths;

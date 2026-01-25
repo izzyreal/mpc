@@ -146,3 +146,78 @@ TEST_CASE("BARS2", "[bars-screen]")
         REQUIRE(noteEvent->getNote() == eventIndex + 35);
     }
 }
+
+TEST_CASE("BARS3", "[bars-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(1);
+    stateManager->drainQueue();
+    seq->setTimeSignature(0, 4, 4);
+    seq->setTimeSignature(1, 4, 4);
+    stateManager->drainQueue();
+
+    std::vector ticks{ 0, 96, 200, 383, 384, 450, 600, 767 };
+
+    for (int i = 0; i < static_cast<int>(ticks.size()); i++)
+    {
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = ticks[i];
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        seq->getTrack(0)->acquireAndInsertEvent(eventData);
+    }
+
+    stateManager->drainQueue();
+
+    auto tr = seq->getTrack(0);
+    auto originalCount = static_cast<int>(tr->getEvents().size());
+    REQUIRE(originalCount == (int) ticks.size());
+
+    std::vector<int> originalTicks;
+    std::vector<int> originalNotes;
+
+    for (int i = 0; i < originalCount; i++)
+    {
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        REQUIRE(noteEvent);
+        originalTicks.push_back(noteEvent->getTick());
+        originalNotes.push_back(noteEvent->getNote());
+    }
+
+    auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
+
+    int toSeqIndex = 0;
+    int firstBar = 0;
+    int lastBar = 1;
+    int copies = 1;
+    int afterBar = 2;
+
+    barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
+    stateManager->drainQueue();
+    stateManager->drainQueue();
+
+    REQUIRE(seq->getBarCount() == 4);
+    REQUIRE((int) tr->getEvents().size() == originalCount * 2);
+
+    int shiftTicks = 2 * 384;
+
+    for (int i = 0; i < originalCount; i++)
+    {
+        auto a = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto b = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i + originalCount));
+        REQUIRE(a);
+        REQUIRE(b);
+
+        REQUIRE(a->getTick() == originalTicks[i]);
+        REQUIRE(a->getNote() == originalNotes[i]);
+
+        REQUIRE(b->getTick() == originalTicks[i] + shiftTicks);
+        REQUIRE(b->getNote() == originalNotes[i]);
+    }
+}
