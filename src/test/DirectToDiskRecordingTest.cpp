@@ -13,6 +13,9 @@
 #include "file/wav/WavFile.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
+#include <thread>
+#include <chrono>
+
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
@@ -146,6 +149,7 @@ TEST_CASE(
     constexpr int SAMPLE_RATE = 44100;
     constexpr int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
     constexpr int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
+    constexpr int RUN_COUNT = 3;
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -234,6 +238,45 @@ TEST_CASE(
         auto recordingPath = recordingsPath / "L.wav";
         REQUIRE(fs::exists(recordingPath));
 
+        std::uintmax_t lastSize = 0;
+        int stable = 0;
+        bool haveSize = false;
+
+        for (int attempt = 0; attempt < 400 && stable < 5; ++attempt)
+        {
+            std::error_code ec;
+            auto size = fs::file_size(recordingPath, ec);
+
+            if (!ec && size > 44)
+            {
+                if (!haveSize)
+                {
+                    haveSize = true;
+                    lastSize = size;
+                    stable = 1;
+                }
+                else if (size == lastSize)
+                {
+                    ++stable;
+                }
+                else
+                {
+                    lastSize = size;
+                    stable = 1;
+                }
+            }
+            else
+            {
+                haveSize = false;
+                stable = 0;
+                lastSize = 0;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+
+        REQUIRE(stable >= 5);
+        
         std::vector<float> frames(100);
 
         {
@@ -252,15 +295,25 @@ TEST_CASE(
         return frames;
     };
 
-    auto firstFrames = runRecording();
+    std::vector<std::vector<float>> allFrames;
+    allFrames.reserve(RUN_COUNT);
 
-    auto secondFrames = runRecording();
-
-    REQUIRE(firstFrames.size() == secondFrames.size());
-
-    for (size_t i = 0; i < firstFrames.size(); ++i)
+    for (int run = 0; run < RUN_COUNT; ++run)
     {
-        REQUIRE(firstFrames[i] == secondFrames[i]);
+        allFrames.push_back(runRecording());
+    }
+
+    REQUIRE(!allFrames.empty());
+
+    const auto &reference = allFrames.front();
+
+    for (int run = 1; run < RUN_COUNT; ++run)
+    {
+        REQUIRE(reference.size() == allFrames[run].size());
+        for (size_t i = 0; i < reference.size(); ++i)
+        {
+            REQUIRE(reference[i] == allFrames[run][i]);
+        }
     }
 
     for (int i = 0; i < 10; ++i)
