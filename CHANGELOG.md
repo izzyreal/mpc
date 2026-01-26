@@ -3,6 +3,7 @@
 * Fix "copy bars" functionality in `BARS` screen.
 
 ## v0.9.0 RC17 (23-1-2026)
+* UPDATE: This release was retracted on 25-1-2026 due to a problem with state persistence in plugin that could easily lead to users losing important work they created in VMPC2000XL.
 * Fix random crashes when hitting pads. It seems iPadOS users were most affected by this bug, but it may well have affected users on other
 * Improved extended MIDI control, the feature that allows you to use a MIDI controller to control VMPC2000XL's virtual hardware. The GUI for extended MIDI controls has remained largely the same. Quick summary of the current implementation compared to previous versions:
 
