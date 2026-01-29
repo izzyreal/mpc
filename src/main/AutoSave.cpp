@@ -23,6 +23,7 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
+#include "engine/EngineHost.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Transport.hpp"
 
@@ -290,17 +291,6 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         if (mpc.getSampler()->getProgramCount() == 0)
         {
             mpc.getSampler()->addProgram(0);
-        }
-
-        for (size_t drumBusIndex = 0;
-             drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
-        {
-            if (auto d = mpc.getSequencer()->getDrumBus(
-                    sequencer::drumBusIndexToDrumBusType(drumBusIndex));
-                !mpc.getSampler()->getProgram(d->getProgramIndex())->isUsed())
-            {
-                d->setProgramIndex(ProgramIndex{0});
-            }
         }
     };
 
