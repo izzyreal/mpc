@@ -25,6 +25,7 @@
 #include "StrUtil.hpp"
 #include "engine/EngineHost.hpp"
 #include "lcdgui/ScreenGroups.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "sequencer/Transport.hpp"
 
 #include <chrono>
@@ -292,6 +293,24 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         {
             mpc.getSampler()->addProgram(0);
         }
+
+        utils::SimpleAction action([&mpc]
+        {
+            for (size_t drumBusIndex = 0;
+                 drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
+                 ++drumBusIndex) {
+                if (const auto d = mpc.getSequencer()->getDrumBus(
+                        sequencer::drumBusIndexToDrumBusType(drumBusIndex));
+                    !mpc.getSampler()
+                         ->getProgram(d->getProgramIndex())
+                         ->isUsed())
+                {
+                    d->setProgramIndex(ProgramIndex{0});
+                }
+            }
+        });
+
+        mpc.getPerformanceManager().lock()->enqueueCallback(std::move(action));
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&
