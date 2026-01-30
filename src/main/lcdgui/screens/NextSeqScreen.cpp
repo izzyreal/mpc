@@ -105,14 +105,16 @@ void NextSeqScreen::turnWheel(const int increment)
         {
             sequencer.lock()->setNextSq(
                 sequencer.lock()->getCurrentlyPlayingSequenceIndex() +
-                increment, std::nullopt);
+                    increment,
+                std::nullopt);
             ls.lock()->setFocus("nextsq");
         }
         else
         {
             sequencer.lock()->getStateManager()->enqueue(
-                sequencer::SetSelectedSequenceIndex{
-                    sequencer.lock()->getSelectedSequenceIndex() + increment});
+                sequencer::SetSelectedSequenceIndex{std::clamp(
+                    sequencer.lock()->getSelectedSequenceIndex() + increment,
+                    MinSequenceIndex, MaxSequenceIndex)});
             selectNextSqFromScratch = true;
         }
     }
