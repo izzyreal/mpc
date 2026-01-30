@@ -12,19 +12,6 @@ VelocityModulationScreen::VelocityModulationScreen(Mpc &mpc,
                                                    const int layerIndex)
     : ScreenComponent(mpc, "velocity-modulation", layerIndex)
 {
-    addReactiveBinding(
-        {[this]
-         {
-             const auto controller =
-                 this->mpc.clientEventController->clientHardwareEventController;
-             return controller->getMostRecentPhysicalPadPressTime();
-         },
-         [this](auto) mutable
-         {
-             const auto controller =
-                 this->mpc.clientEventController->clientHardwareEventController;
-             setVelo(controller->getMostRecentPhysicalPadPressVelocity());
-         }});
 }
 
 void VelocityModulationScreen::open()
@@ -54,6 +41,20 @@ void VelocityModulationScreen::open()
 
     if (isReactiveBindingsEmpty())
     {
+        addReactiveBinding(
+            {[this]
+             {
+                 const auto controller = this->mpc.clientEventController
+                                             ->clientHardwareEventController;
+                 return controller->getMostRecentPhysicalPadPressTime();
+             },
+             [this](auto) mutable
+             {
+                 const auto controller = this->mpc.clientEventController
+                                             ->clientHardwareEventController;
+                 setVelo(controller->getMostRecentPhysicalPadPressVelocity());
+             }});
+
         addReactiveBinding({[getSelectedNote]
                             {
                                 return getSelectedNote();

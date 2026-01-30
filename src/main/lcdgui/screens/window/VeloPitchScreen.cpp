@@ -13,19 +13,6 @@ using namespace mpc::lcdgui::screens::window;
 VeloPitchScreen::VeloPitchScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "velo-pitch", layerIndex)
 {
-    addReactiveBinding(
-        {[this]
-         {
-             const auto controller =
-                 this->mpc.clientEventController->clientHardwareEventController;
-             return controller->getMostRecentPhysicalPadPressTime();
-         },
-         [this](auto) mutable
-         {
-             const auto controller =
-                 this->mpc.clientEventController->clientHardwareEventController;
-             setVelo(controller->getMostRecentPhysicalPadPressVelocity());
-         }});
 }
 
 void VeloPitchScreen::open()
@@ -42,6 +29,20 @@ void VeloPitchScreen::open()
         {
             return getProgramOrThrow()->getNoteParameters(getSelectedNote());
         };
+
+        addReactiveBinding(
+            {[this]
+             {
+                 const auto controller = this->mpc.clientEventController
+                                             ->clientHardwareEventController;
+                 return controller->getMostRecentPhysicalPadPressTime();
+             },
+             [this](auto) mutable
+             {
+                 const auto controller = this->mpc.clientEventController
+                                             ->clientHardwareEventController;
+                 setVelo(controller->getMostRecentPhysicalPadPressVelocity());
+             }});
 
         addReactiveBinding({[getSelectedNote]
                             {
