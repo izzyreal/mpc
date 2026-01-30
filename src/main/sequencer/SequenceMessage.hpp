@@ -5,6 +5,8 @@
 #include "sequencer/TrackMessage.hpp"
 
 #include "utils/SmallFn.hpp"
+#include "IntTypes.hpp"
+#include "NoteRange.hpp"
 
 #include <variant>
 #include <vector>
@@ -22,6 +24,17 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
         BarIndex barIndex;
         TimeSignature timeSignature;
+    };
+
+    struct EraseEvents
+    {
+        SequenceIndex sequenceIndex;
+        TrackIndex trackIndex;
+        Tick startTick;
+        Tick endTick;
+        int erase;
+        int type;
+        NoteRange noteRange;
     };
 
     // This message only deals with non-meta track events, i.e. tracks
@@ -143,5 +156,5 @@ namespace mpc::sequencer
                      SetLastLoopBarIndex, SyncTrackEventIndices, MoveTrack,
                      DeleteTrack, DeleteAllTracks, DeleteBars,
                      UpdateSequenceEvents, UpdateSequenceTracks,
-                     SetSequenceName>;
+                     SetSequenceName, EraseEvents>;
 } // namespace mpc::sequencer

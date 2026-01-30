@@ -379,6 +379,19 @@ void SequenceStateHandler::applyMessage(
 
             lock.release();
         },
+        [&](const EraseEvents &m)
+        {
+            auto &lock = manager->sequenceLocks[m.sequenceIndex];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
+            appleEraseEvents(m, state);
+
+            lock.release();
+        },
         [&](const SetSequenceName &m)
         {
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
@@ -433,4 +446,62 @@ void SequenceStateHandler::applyDeleteTrack(const DeleteTrack &m,
     track.velocityRatio = m.velocityRatio;
     track.busType = m.busType;
     track.programChange = m.programChange;
+}
+
+void SequenceStateHandler::appleEraseEvents(const EraseEvents &m,
+                                            SequencerState &state) const
+{
+    static const std::vector eventTypes{
+        EventType::NoteOn,          EventType::PitchBend,
+        EventType::ControlChange,   EventType::ProgramChange,
+        EventType::ChannelPressure, EventType::PolyPressure,
+        EventType::SystemExclusive};
+
+    const auto firstTrackIndex =
+        m.trackIndex == AllTracks ? MinTrackIndex : m.trackIndex;
+
+    const auto lastTrackIndex =
+        m.trackIndex == AllTracks ? MaxTrackIndex : m.trackIndex;
+
+    const auto seq = state.sequences[m.sequenceIndex];
+
+    const auto selectedType = m.type;
+
+    for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex;
+         ++trackIndex)
+    {
+        const auto t = seq.tracks[trackIndex];
+
+        EventData *it = t.eventsHead;
+
+        while (it)
+        {
+            if (m.startTick > it->tick || m.endTick < it->tick)
+            {
+                it = it->next;
+                continue;
+            }
+
+            if (m.erase == 0 ||
+                (m.erase == 1 &&
+                 it->type != static_cast<EventType>(selectedType)) ||
+                m.erase == 2 &&
+                    it->type == static_cast<EventType>(selectedType))
+            {
+                if (it->type == EventType::NoteOn)
+                {
+                    if (m.noteRange.contains(it->noteNumber))
+                    {
+                        manager->applyMessageImmediate(RemoveEvent{it});
+                    }
+                }
+                else
+                {
+                    manager->applyMessageImmediate(RemoveEvent{it});
+                }
+            }
+
+            it = it->next;
+        }
+    }
 }

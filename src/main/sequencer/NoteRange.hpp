@@ -19,6 +19,30 @@ namespace mpc::sequencer
         {
         }
 
+        void setStartNoteNumber(const NoteNumber startNoteNumber)
+        {
+            start = startNoteNumber;
+        }
+
+        void setDrumNoteNumber(const DrumNoteNumber drumNoteNumber)
+        {
+            if (drumNoteNumber == AllDrumNotes)
+            {
+                start = MinDrumNoteNumber;
+                end = MaxDrumNoteNumber;
+            }
+            else
+            {
+                start = drumNoteNumber;
+                end = drumNoteNumber;
+            }
+        }
+
+        void setEndNoteNumber(const NoteNumber endNoteNumber)
+        {
+            end = endNoteNumber;
+        }
+
         bool contains(const NoteNumber n) const
         {
             return n >= start && n <= end;

@@ -31,5 +31,7 @@ namespace mpc::sequencer
                                        SequencerState &) const;
 
         void applyDeleteTrack(const DeleteTrack &, SequencerState &) const;
+
+        void appleEraseEvents(const EraseEvents &, SequencerState &) const;
     };
 } // namespace mpc::sequencer

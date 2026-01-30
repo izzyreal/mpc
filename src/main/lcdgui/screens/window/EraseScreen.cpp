@@ -1,16 +1,17 @@
 #include "EraseScreen.hpp"
 
+#include "Mpc.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -218,57 +219,34 @@ void EraseScreen::setType(const int i)
 
 void EraseScreen::doErase() const
 {
-    const auto firstTrackIndex = track < 0 ? 0 : track;
-    const auto lastTrackIndex = track < 0 ? 63 : track;
+    EraseEvents eraseEvents;
+    const auto seq = sequencer.lock();
+
+    eraseEvents.sequenceIndex = seq->getSelectedSequenceIndex();
+    eraseEvents.trackIndex = track < 0 ? AllTracks : TrackIndex(track);
+    eraseEvents.startTick = time0;
+    eraseEvents.endTick = time1;
+    eraseEvents.erase = erase;
+    eraseEvents.type = type;
+
+    NoteRange noteRange;
 
     const auto midi = track >= 0 && isMidiBusType(sequencer.lock()
-                                                      ->getSelectedSequence()
-                                                      ->getTrack(track)
-                                                      ->getBusType());
+                                                  ->getSelectedSequence()
+                                                  ->getTrack(track)
+                                                  ->getBusType());
 
-    const auto noteA = midi ? midiNote0 : drumNoteNumber;
-    const auto noteB = midi ? midiNote1 : -1;
-
-    const auto seq = sequencer.lock()->getSelectedSequence();
-
-    const auto selectedType = eventTypes[type];
-
-    for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex;
-         trackIndex++)
+    if (midi)
     {
-        const auto seqTrack = seq->getTrack(trackIndex);
-
-        for (auto eventIndex =
-                 static_cast<int>(seqTrack->getEvents().size()) - 1;
-             eventIndex >= 0; eventIndex--)
-        {
-            const auto event = seqTrack->getEvent(eventIndex);
-            const auto noteEvent =
-                std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-            if (event->getTick() >= time0 && event->getTick() < time1)
-            {
-                if (erase == 0 ||
-                    (erase == 1 && event->getTypeName() != selectedType) ||
-                    erase == 2 && event->getTypeName() != selectedType)
-                {
-                    if (noteEvent)
-                    {
-                        if (const auto noteNumber = noteEvent->getNote();
-                            (midi && noteNumber >= noteA &&
-                             noteNumber <= noteB) ||
-                            (!midi &&
-                             (noteA == AllDrumNotes || noteA == noteNumber)))
-                        {
-                            seqTrack->removeEvent(noteEvent);
-                        }
-                    }
-                    else
-                    {
-                        seqTrack->removeEvent(noteEvent);
-                    }
-                }
-            }
-        }
+        noteRange.setStartNoteNumber(midiNote0);
+        noteRange.setEndNoteNumber(midiNote1);
     }
+    else
+    {
+        noteRange.setDrumNoteNumber(drumNoteNumber);
+    }
+
+    eraseEvents.noteRange = noteRange;
+
+    seq->getStateManager()->enqueue(eraseEvents);
 }
