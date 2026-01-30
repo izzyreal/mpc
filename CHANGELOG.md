@@ -1,3 +1,9 @@
+## v0.9.0 RC19 (30-1-2026)
+* Fix DRUM program selection when restoring plugin state.
+* Fix an issue with 16 levels.
+* Remember last saved APS and ALL name in SAVE screen.
+* Fix UI updates in Velocity Modulation, Velo/Env >> Filter, and Velo >> Pitch windows.
+
 ## v0.9.0 RC18 (25-1-2026)
 * Fix state persistence in plugin.
 * Fix "copy bars" functionality in `BARS` screen.
