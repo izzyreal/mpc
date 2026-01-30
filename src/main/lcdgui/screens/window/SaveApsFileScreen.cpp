@@ -21,11 +21,6 @@ SaveApsFileScreen::SaveApsFileScreen(Mpc &mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
-    if (ls.lock()->isPreviousScreen({ScreenId::SaveScreen}))
-    {
-        fileName = "ALL_PGMS";
-    }
-
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);
     displayFile();
     displayReplaceSameSounds();
