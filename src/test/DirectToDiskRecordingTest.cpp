@@ -31,17 +31,9 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto recordingsRoot = mpc.paths->getDocuments()->recordingsPath();
-    if (fs::exists(recordingsRoot))
-    {
-        for (const auto& e : fs::directory_iterator(recordingsRoot))
-            fs::remove_all(e.path());
-    }
-    else
-    {
-        fs::create_directories(recordingsRoot);
-    }
-
-    const auto testStart = fs::file_time_type::clock::now();
+    fs::create_directories(recordingsRoot);
+    for (const auto& e : fs::directory_iterator(recordingsRoot))
+        fs::remove_all(e.path());
 
     auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
@@ -81,11 +73,11 @@ TEST_CASE("Direct to disk recording does not start with silence",
     audioServer->resizeBuffers(BUFFER_SIZE);
     audioServer->start();
 
-    const float **inputBuffer = new const float *[2];
+    const float** inputBuffer = new const float*[2];
     inputBuffer[0] = new float[BUFFER_SIZE]();
     inputBuffer[1] = new float[BUFFER_SIZE]();
 
-    float **outputBuffer = new float *[10];
+    float** outputBuffer = new float*[10];
     for (int i = 0; i < 10; ++i)
         outputBuffer[i] = new float[BUFFER_SIZE]();
 
@@ -108,49 +100,55 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc.getScreen()->function(4);
     ls->timerCallback();
 
-    fs::path recordingsPath;
-    fs::file_time_type newestTime{};
-    bool found = false;
+    fs::path recordingPath;
+    fs::file_time_type bestTime{};
+    bool have = false;
 
-    if (fs::exists(recordingsRoot))
+    for (int tries = 0; tries < 400 && !have; ++tries)
     {
-        for (const auto& entry : fs::directory_iterator(recordingsRoot))
+        for (const auto& entry : fs::recursive_directory_iterator(recordingsRoot))
         {
-            if (!fs::is_directory(entry))
+            if (!entry.is_regular_file())
+                continue;
+
+            if (entry.path().filename() != "L.wav")
                 continue;
 
             const auto t = fs::last_write_time(entry.path());
-            if (t < testStart)
-                continue;
-
-            if (!found || t > newestTime)
+            if (!have || t > bestTime)
             {
-                found = true;
-                newestTime = t;
-                recordingsPath = entry.path();
+                have = true;
+                bestTime = t;
+                recordingPath = entry.path();
             }
         }
+
+        if (!have)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    REQUIRE(found);
-
-    const auto recordingPath = recordingsPath / "L.wav";
+    REQUIRE(have);
+    REQUIRE(fs::exists(recordingPath));
 
     std::uintmax_t lastSize = 0;
-    for (int tries = 0; tries < 200; ++tries)
+    bool stable = false;
+
+    for (int tries = 0; tries < 400; ++tries)
     {
         if (fs::exists(recordingPath))
         {
             const auto sz = fs::file_size(recordingPath);
             if (sz != 0 && sz == lastSize)
+            {
+                stable = true;
                 break;
+            }
             lastSize = sz;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    REQUIRE(fs::exists(recordingPath));
-    REQUIRE(fs::file_size(recordingPath) > 0);
+    REQUIRE(stable);
 
     auto wavInputStream =
         std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
