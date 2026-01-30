@@ -3,7 +3,6 @@
 #include "performance/PerformanceEventSource.hpp"
 
 #include "IntTypes.hpp"
-#include "controller/Bank.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "sequencer/BusType.hpp"
 
@@ -24,9 +23,8 @@ namespace mpc::performance
         TrackIndex trackIndex;
         sequencer::BusType busType;
         Velocity velocity;
-        controller::Bank bank;
         ProgramIndex programIndex;
-        NoteNumber noteNumber;
+        DrumNoteNumber drumNoteNumber;
         Pressure pressure;
     };
 

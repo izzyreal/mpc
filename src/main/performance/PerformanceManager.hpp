@@ -20,15 +20,20 @@ namespace mpc::sampler
 
 namespace mpc::performance
 {
-    enum class ProgramPadEventType
+    enum class UiCallbackPadEventType
     {
         Press,
         Release,
         Aftertouch
     };
+
+    using PhysicalPadEventUiCallback =
+        utils::SmallFn<8, void(PhysicalPadIndex, VelocityOrPressure,
+                               UiCallbackPadEventType)>;
+
     using ProgramPadEventUiCallback =
         utils::SmallFn<8, void(ProgramPadIndex, VelocityOrPressure,
-                               PerformanceEventSource, ProgramPadEventType)>;
+                               UiCallbackPadEventType)>;
 
     class PerformanceManager final
         : public concurrency::AtomicStateExchange<PerformanceState,
@@ -43,9 +48,9 @@ namespace mpc::performance
 
         void registerPhysicalPadPress(PerformanceEventSource, lcdgui::ScreenId,
                                       sequencer::BusType, PhysicalPadIndex,
-                                      Velocity, TrackIndex, controller::Bank,
+                                      Velocity, TrackIndex,
                                       std::optional<ProgramIndex>,
-                                      std::optional<NoteNumber>);
+                                      std::optional<DrumNoteNumber>);
 
         void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure,
                                            PerformanceEventSource);
@@ -79,6 +84,7 @@ namespace mpc::performance
 
         void clear();
 
+        PhysicalPadEventUiCallback physicalPadEventUiCallback = {};
         ProgramPadEventUiCallback programPadEventUiCallback = {};
 
         SoundTable pgmFileSoundTable;

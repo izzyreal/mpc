@@ -195,13 +195,13 @@ int Util::getTextWidthInPixels(const std::string &text)
     return count * 6 - halfSpaceCount * 3;
 }
 
-void Util::ensureSelectedSequenceInitialized(mpc::Mpc &mpc)
+void Util::ensureSelectedSequenceInitialized(Mpc &mpc)
 {
     ensureSequenceInitialized(mpc.getSequencer()->getSelectedSequenceIndex(),
                               mpc);
 }
 
-void Util::ensureSequenceInitialized(int sequenceIndex, Mpc &mpc)
+void Util::ensureSequenceInitialized(const int sequenceIndex, Mpc &mpc)
 {
     const auto sequencer = mpc.getSequencer();
     const auto sequence = sequencer->getSequence(sequenceIndex);
@@ -221,7 +221,7 @@ void Util::ensureSequenceInitialized(int sequenceIndex, Mpc &mpc)
 }
 
 void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
-                             sequencer::EventData &event)
+                             EventData &event)
 {
     if (!ctx.isSixteenLevelsEnabled)
     {

@@ -41,8 +41,8 @@ void PerformanceManager::registerPhysicalPadPress(
     const PerformanceEventSource source, const lcdgui::ScreenId screen,
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
-    const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
-    const std::optional<NoteNumber> noteNumber)
+    const std::optional<ProgramIndex> programIndex,
+    const std::optional<DrumNoteNumber> noteNumber)
 {
     PhysicalPadPressEvent e{padIndex,
                             source,
@@ -50,9 +50,8 @@ void PerformanceManager::registerPhysicalPadPress(
                             trackIndex,
                             busType,
                             velocity,
-                            bank,
                             programIndex.value_or(NoProgramIndex),
-                            noteNumber.value_or(NoNoteNumber),
+                            noteNumber.value_or(NoDrumNoteAssigned),
                             NoPressure};
 
     enqueue(std::move(e));
@@ -341,15 +340,34 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         [&](const PhysicalPadPressEvent &m)
         {
             activeState.physicalPadEvents.push_back(m);
+            postToUiThread(utils::Task(
+                [this, padIndex = m.padIndex, velocity = m.velocity]
+                {
+                    physicalPadEventUiCallback(padIndex, velocity,
+                                               UiCallbackPadEventType::Press);
+                }));
         },
         [&](const PhysicalPadAftertouchEvent &m)
         {
+            bool shouldUpdateUi = false;
             for (auto &e : activeState.physicalPadEvents)
             {
                 if (e.padIndex == m.padIndex && e.source == m.source)
                 {
                     e.pressure = m.pressure;
+                    shouldUpdateUi = true;
                 }
+            }
+
+            if (shouldUpdateUi)
+            {
+                postToUiThread(utils::Task(
+                    [this, padIndex = m.padIndex, pressure = m.pressure]
+                    {
+                        physicalPadEventUiCallback(
+                            padIndex, pressure,
+                            UiCallbackPadEventType::Aftertouch);
+                    }));
             }
         },
         [&](const PhysicalPadReleaseEvent &m)
@@ -365,18 +383,27 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             {
                 activeState.physicalPadEvents.erase(it);
             }
+
+            postToUiThread(utils::Task(
+                [this, padIndex = m.padIndex]
+                {
+                    physicalPadEventUiCallback(padIndex, NoVelocityOrPressure,
+                                               UiCallbackPadEventType::Release);
+                }));
         },
         [&](const ProgramPadPressEvent &m)
         {
             activeState.programPadEvents.push_back(m);
 
-            postToUiThread(utils::Task(
-                [this, padIndex = m.padIndex, velocity = m.velocity,
-                 source = m.source]
-                {
-                    programPadEventUiCallback(padIndex, velocity, source,
-                                              ProgramPadEventType::Press);
-                }));
+            if (m.source != PerformanceEventSource::VirtualMpcHardware)
+            {
+                postToUiThread(utils::Task(
+                    [this, padIndex = m.padIndex, velocity = m.velocity]
+                    {
+                        programPadEventUiCallback(
+                            padIndex, velocity, UiCallbackPadEventType::Press);
+                    }));
+            }
         },
         [&](const ProgramPadAftertouchEvent &m)
         {
@@ -387,19 +414,19 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 if (e.padIndex == m.padIndex && e.source == m.source)
                 {
                     e.pressure = m.pressure;
-                    shouldUpdateUi = true;
+                    shouldUpdateUi =
+                        m.source != PerformanceEventSource::VirtualMpcHardware;
                 }
             }
 
             if (shouldUpdateUi)
             {
                 postToUiThread(utils::Task(
-                    [this, padIndex = m.padIndex, pressure = m.pressure,
-                     source = m.source]
+                    [this, padIndex = m.padIndex, pressure = m.pressure]
                     {
                         programPadEventUiCallback(
-                            padIndex, pressure, source,
-                            ProgramPadEventType::Aftertouch);
+                            padIndex, pressure,
+                            UiCallbackPadEventType::Aftertouch);
                     }));
             }
         },
@@ -419,13 +446,16 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 activeState.programPadEvents.erase(it);
             }
 
-            postToUiThread(utils::Task(
-                [this, padIndex = m.padIndex, source = m.source]
-                {
-                    programPadEventUiCallback(padIndex, NoVelocityOrPressure,
-                                              source,
-                                              ProgramPadEventType::Release);
-                }));
+            if (m.source != PerformanceEventSource::VirtualMpcHardware)
+            {
+                postToUiThread(utils::Task(
+                    [this, padIndex = m.padIndex]
+                    {
+                        programPadEventUiCallback(
+                            padIndex, NoVelocityOrPressure,
+                            UiCallbackPadEventType::Release);
+                    }));
+            }
         },
         [&](const NoteOnEvent &m)
         {
