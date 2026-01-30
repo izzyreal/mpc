@@ -30,14 +30,25 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
+    auto recordingsRoot = mpc.paths->getDocuments()->recordingsPath();
+    if (fs::exists(recordingsRoot))
+    {
+        for (const auto& e : fs::directory_iterator(recordingsRoot))
+            fs::remove_all(e.path());
+    }
+    else
+    {
+        fs::create_directories(recordingsRoot);
+    }
+
+    const auto testStart = fs::file_time_type::clock::now();
+
     auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
     sound->setMono(true);
 
     for (int i = 0; i < 1000; i++)
-    {
         sound->insertFrame({1.f}, i);
-    }
 
     sound->setStart(0);
     sound->setEnd(1000);
@@ -53,6 +64,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     seq->init(1);
     stateManager->drainQueue();
     seq->setInitialTempo(300);
+
     EventData eventData;
     eventData.type = EventType::NoteOn;
     eventData.tick = 0;
@@ -70,15 +82,12 @@ TEST_CASE("Direct to disk recording does not start with silence",
     audioServer->start();
 
     const float **inputBuffer = new const float *[2];
-    inputBuffer[0] = new float[BUFFER_SIZE];
-    inputBuffer[1] = new float[BUFFER_SIZE];
+    inputBuffer[0] = new float[BUFFER_SIZE]();
+    inputBuffer[1] = new float[BUFFER_SIZE]();
 
     float **outputBuffer = new float *[10];
-
     for (int i = 0; i < 10; ++i)
-    {
-        outputBuffer[i] = new float[BUFFER_SIZE];
-    }
+        outputBuffer[i] = new float[BUFFER_SIZE]();
 
     auto ls = mpc.getLayeredScreen();
     ls->openScreenById(ScreenId::VmpcDirectToDiskRecorderScreen);
@@ -96,20 +105,52 @@ TEST_CASE("Direct to disk recording does not start with silence",
                           {}, {0, 1});
     }
 
-    auto recordingsPath = mpc.paths->getDocuments()->recordingsPath();
+    mpc.getScreen()->function(4);
+    ls->timerCallback();
 
-    for (const auto &entry : fs::directory_iterator(recordingsPath))
+    fs::path recordingsPath;
+    fs::file_time_type newestTime{};
+    bool found = false;
+
+    if (fs::exists(recordingsRoot))
     {
-        if (fs::is_directory(entry))
+        for (const auto& entry : fs::directory_iterator(recordingsRoot))
         {
-            recordingsPath = entry.path();
-            break;
+            if (!fs::is_directory(entry))
+                continue;
+
+            const auto t = fs::last_write_time(entry.path());
+            if (t < testStart)
+                continue;
+
+            if (!found || t > newestTime)
+            {
+                found = true;
+                newestTime = t;
+                recordingsPath = entry.path();
+            }
         }
     }
 
+    REQUIRE(found);
+
     const auto recordingPath = recordingsPath / "L.wav";
 
+    std::uintmax_t lastSize = 0;
+    for (int tries = 0; tries < 200; ++tries)
+    {
+        if (fs::exists(recordingPath))
+        {
+            const auto sz = fs::file_size(recordingPath);
+            if (sz != 0 && sz == lastSize)
+                break;
+            lastSize = sz;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
     REQUIRE(fs::exists(recordingPath));
+    REQUIRE(fs::file_size(recordingPath) > 0);
 
     auto wavInputStream =
         std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
@@ -123,17 +164,13 @@ TEST_CASE("Direct to disk recording does not start with silence",
     wav->readFrames(wavFrames, 100);
 
     for (int i = 0; i < 100; i++)
-    {
         REQUIRE(wavFrames[i] > 0.f);
-    }
 
     for (int i = 0; i < 10; ++i)
     {
-        if (i < 2)
-        {
-            delete[] inputBuffer[i];
-        }
         delete[] outputBuffer[i];
+        if (i < 2)
+            delete[] inputBuffer[i];
     }
 
     delete[] inputBuffer;
