@@ -10,11 +10,6 @@
 
 #include <optional>
 
-namespace mpc::performance
-{
-    class PerformanceManager;
-}
-
 namespace mpc ::lcdgui
 {
     class LayeredScreen;
@@ -49,7 +44,6 @@ namespace mpc::command::context
     struct TriggerLocalNoteOnContext
     {
         performance::PerformanceEventSource source;
-        performance::PerformanceManager *performanceManager;
         sequencer::SequencerStateManager *sequencerStateManager;
         performance::NoteOnEvent registryNoteOnEvent;
         std::optional<ProgramPadIndex> programPadIndex;

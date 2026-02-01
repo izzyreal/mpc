@@ -55,7 +55,6 @@ namespace mpc::command::context
             ProgramPadIndex programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::weak_ptr<sequencer::Sequencer> &,
-            const std::weak_ptr<performance::PerformanceManager> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<lcdgui::Screens> &,

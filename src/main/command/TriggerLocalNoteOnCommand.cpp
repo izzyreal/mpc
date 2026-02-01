@@ -93,26 +93,24 @@ void TriggerLocalNoteOnCommand::execute()
 
     apply16LevelsAndSliderNoteVariation(noteOnEvent);
 
+    std::optional<sequencer::BusType> drumBusType = std::nullopt;
+
     if (ctx.isSamplerScreen)
     {
-        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent,
-                                                  ctx.track->getDeviceIndex(),
-                                                  ctx.drumScreenSelectedDrum);
+        drumBusType = ctx.drumScreenSelectedDrum;
     }
     else
     {
-        std::optional<sequencer::BusType> drumBusType = std::nullopt;
-
         if (const auto drumBus = dynamic_cast<sequencer::DrumBus *>(ctx.bus);
             drumBus)
         {
             drumBusType =
                 sequencer::drumBusIndexToDrumBusType(drumBus->getIndex());
         }
-
-        ctx.eventHandler->handleUnfinalizedNoteOn(
-            noteOnEvent, ctx.track->getDeviceIndex(), drumBusType);
     }
+
+    ctx.eventHandler->handleUnfinalizedNoteOn(
+        noteOnEvent, ctx.track->getDeviceIndex(), drumBusType);
 
     sequencer::EventData *recordNoteOnEvent = nullptr;
 

@@ -38,7 +38,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const ProgramPadIndex programPadIndex,
     const std::shared_ptr<sampler::Program> &program,
     const std::weak_ptr<Sequencer> &sequencer,
-    const std::weak_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
@@ -74,7 +73,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
     return TriggerLocalNoteOnContext{
         source,
-        performanceManager.lock().get(),
         lockedSequencer->getStateManager().get(),
         registryNoteOnEvent,
         programPadIndex,

@@ -278,9 +278,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                         PerformanceEventSource::MidiInput, noteOnEvent,
                         noteOnEvent.noteNumber, noteOnEvent.velocity,
                         track.get(), screen->getBus(), screen, programPadIndex,
-                        program, sequencer, performanceManager.lock(),
-                        clientEventController.lock(), eventHandler.lock(),
-                        screens.lock(), hardware.lock(),
+                        program, sequencer, clientEventController.lock(),
+                        eventHandler.lock(), screens.lock(), hardware.lock(),
                         metronomeOnlyPositionTicks, positionTicks);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();
@@ -716,7 +715,8 @@ ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
             sequencer.lock()->getDrumBus(*drumBusType)->getProgramIndex());
     }
 
-    return {};
+    return sampler.lock()->getProgram(
+        sequencer.lock()->getDrumBus(BusType::DRUM1)->getProgramIndex());
 }
 
 mpc::ProgramIndex ClientMidiEventController::getProgramIndexForEvent(

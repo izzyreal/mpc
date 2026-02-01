@@ -361,7 +361,7 @@ void ClientHardwareEventController::handlePadPress(
                             noteEventInfo, drumNoteNumber,
                             Velocity(clampedVelocity), tr, screen->getBus(),
                             screen, ProgramPadIndex(programPadIndex), program,
-                            mpc.getSequencer(), mpc.getPerformanceManager(),
+                            mpc.getSequencer(),
                             mpc.clientEventController, mpc.getEventHandler(),
                             mpc.screens, mpc.getHardware(),
                             metronomeOnlyPositionTicks, positionTicks);
