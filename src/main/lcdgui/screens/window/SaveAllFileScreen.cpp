@@ -22,9 +22,15 @@ void SaveAllFileScreen::open()
 {
     displayFile();
 }
+
 std::string SaveAllFileScreen::getFileName() const
 {
     return fileName;
+}
+
+void SaveAllFileScreen::setFileName(const std::string &fileNameToUse)
+{
+    fileName = fileNameToUse;
 }
 
 void SaveAllFileScreen::displayFile() const

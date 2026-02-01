@@ -26,9 +26,15 @@ void SaveApsFileScreen::open()
     displayReplaceSameSounds();
     displaySave();
 }
+
 std::string SaveApsFileScreen::getFileName() const
 {
     return fileName;
+}
+
+void SaveApsFileScreen::setFileName(const std::string &fileNameToUse)
+{
+    fileName = fileNameToUse;
 }
 
 void SaveApsFileScreen::turnWheel(const int i)

@@ -14,6 +14,8 @@
 #include "file/sndwriter/SndWriter.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
+#include "lcdgui/screens/window/SaveAllFileScreen.hpp"
+#include "lcdgui/screens/window/SaveApsFileScreen.hpp"
 #include "lcdgui/Screens.hpp"
 
 #include "disk/AllLoader.hpp"
@@ -53,10 +55,17 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const std::vector<fs::path> files{
-        "APS.APS",         "ALL.ALL",          "soundIndex.txt",
-        "selectedPad.txt", "selectedNote.txt", "screen.txt",
-        "focus.txt",       "sounds.txt",       "currentDir.txt"};
+    const std::vector<fs::path> files{"APS.APS",
+                                      "ALL.ALL",
+                                      "soundIndex.txt",
+                                      "selectedPad.txt",
+                                      "selectedNote.txt",
+                                      "screen.txt",
+                                      "focus.txt",
+                                      "sounds.txt",
+                                      "currentDir.txt",
+                                      "last_aps_file_name.txt",
+                                      "last_all_file_name.txt"};
 
     std::vector<fs::path> availableFiles;
     for (const auto &f : files)
@@ -142,6 +151,14 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             else if (f == "currentDir.txt")
             {
                 desc = "current directory";
+            }
+            else if (f == "last_all_file_name.txt")
+            {
+                desc = "last ALL file name";
+            }
+            else if (f == "last_aps_file_name.txt")
+            {
+                desc = "last APS file name";
             }
 
             showMsg("Loading " + desc);
@@ -255,8 +272,33 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         const auto screenName = getStringProperty("screen.txt");
         const auto focusName = getStringProperty("focus.txt");
 
-        utils::Task uiTask;
-        uiTask.set(
+        const auto lastAllFileName =
+            getStringProperty("last_all_file_name.txt");
+
+        const auto lastApsFileName =
+            getStringProperty("last_aps_file_name.txt");
+
+        utils::Task uiTask1(
+            [screens = mpc.screens, lastAllFileName, lastApsFileName]
+            {
+                if (!lastAllFileName.empty())
+                {
+                    const auto saveAllFileScreen =
+                        screens->get<ScreenId::SaveAllFileScreen>();
+
+                    saveAllFileScreen->setFileName(lastAllFileName);
+                }
+
+                if (!lastApsFileName.empty())
+                {
+                    const auto saveApsFileScreen =
+                        screens->get<ScreenId::SaveApsFileScreen>();
+
+                    saveApsFileScreen->setFileName(lastApsFileName);
+                }
+            });
+
+        utils::Task uiTask2(
             [layeredScreen, screenName, focusName,
              sequencer = mpc.getSequencer()]
             {
@@ -273,7 +315,9 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                     layeredScreen->setFocus(focusName);
                 }
             });
-        layeredScreen->postToUiThread(std::move(uiTask));
+
+        layeredScreen->postToUiThread(std::move(uiTask1));
+        layeredScreen->postToUiThread(std::move(uiTask2));
 
         for (auto &p : mpc.getSampler()->getPrograms())
         {
@@ -294,21 +338,23 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             mpc.getSampler()->addProgram(0);
         }
 
-        utils::SimpleAction action([&mpc]
-        {
-            for (size_t drumBusIndex = 0;
-                 drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
-                 ++drumBusIndex) {
-                if (const auto d = mpc.getSequencer()->getDrumBus(
-                        sequencer::drumBusIndexToDrumBusType(drumBusIndex));
-                    !mpc.getSampler()
-                         ->getProgram(d->getProgramIndex())
-                         ->isUsed())
+        utils::SimpleAction action(
+            [&mpc]
+            {
+                for (size_t drumBusIndex = 0;
+                     drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
+                     ++drumBusIndex)
                 {
-                    d->setProgramIndex(ProgramIndex{0});
+                    if (const auto d = mpc.getSequencer()->getDrumBus(
+                            sequencer::drumBusIndexToDrumBusType(drumBusIndex));
+                        !mpc.getSampler()
+                             ->getProgram(d->getProgramIndex())
+                             ->isUsed())
+                    {
+                        d->setProgramIndex(ProgramIndex{0});
+                    }
                 }
-            }
-        });
+            });
 
         mpc.getPerformanceManager().lock()->enqueueCallback(std::move(action));
     };
@@ -362,8 +408,26 @@ void AutoSave::storeAutoSavedState(
         auto selectedNote = mpc.clientEventController->getSelectedNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
+        const auto saveAllFileScreen =
+            mpc.screens->get<ScreenId::SaveAllFileScreen>();
+
+        const auto saveApsFileScreen =
+            mpc.screens->get<ScreenId::SaveApsFileScreen>();
+
+        const auto lastAllFileName = saveAllFileScreen->getFileName();
+        const auto lastApsFileName = saveApsFileScreen->getFileName();
+
         saveTarget->setFileData("screen.txt",
                                 {currentScreen.begin(), currentScreen.end()});
+
+        saveTarget->setFileData("last_all_file_name.txt",
+                                {lastAllFileName.begin(),
+                                 lastAllFileName.end()});
+
+        saveTarget->setFileData("last_aps_file_name.txt",
+                                {lastApsFileName.begin(),
+                                 lastApsFileName.end()});
+
         saveTarget->setFileData("focus.txt", {focus.begin(), focus.end()});
         saveTarget->setFileData("currentDir.txt",
                                 {currentDir.begin(), currentDir.end()});

@@ -17,6 +17,8 @@ namespace mpc::lcdgui::screens::window
 
         std::string getFileName() const;
 
+        void setFileName(const std::string &);
+
     private:
         void displayFile() const;
         std::string fileName = "ALL_SEQ_SONG1";

@@ -18,6 +18,8 @@ namespace mpc::lcdgui::screens::window
 
         std::string getFileName() const;
 
+        void setFileName(const std::string &fileNameToUse);
+
     private:
         const std::vector<std::string> apsSaveNames{"APS ONLY", "WITH SOUNDS",
                                                     "WITH .WAV"};
