@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TrackMessage.hpp"
-#include "utils/SimpleAction.hpp"
 
 namespace mpc::sequencer
 {
@@ -18,12 +17,12 @@ namespace mpc::sequencer
         ~TrackStateHandler();
 
         void applyMessage(SequencerState &, const TrackMessage &) const;
+        void applyRemoveEvents(const RemoveEvents &, SequencerState &) const;
 
     private:
         SequencerStateManager *manager;
         Sequencer *sequencer;
 
-        void applyRemoveEvents(const RemoveEvents &, SequencerState &) const;
         void applyRemoveEvent(const RemoveEvent &, SequencerState &) const;
         void applyUpdateEventTick(const UpdateEventTick &,
                                   SequencerState &) const;

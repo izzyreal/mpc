@@ -168,9 +168,36 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 
             for (int8_t idx = 0; idx < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++idx)
             {
-                CopyTrack copyTrack{m.sourceIndex, m.destIndex, TrackIndex(idx),
-                                    TrackIndex(idx)};
-                applyCopyTrack(copyTrack);
+                const auto &t1 =
+                    activeState.sequences[m.sourceIndex].tracks[idx];
+
+                auto &t2 =
+                    activeState.sequences[m.destIndex].tracks[idx];
+
+                RemoveEvents removeEvents{m.destIndex, TrackIndex(idx)};
+                trackStateHandler->applyRemoveEvents(removeEvents, activeState);
+
+                t2.used = t1.used;
+                t2.name.assign(t1.name.data(), t1.name.size());
+                t2.busType = t1.busType;
+                t2.deviceIndex = t1.deviceIndex;
+                t2.on = t1.on;
+                t2.programChange = t1.programChange;
+                t2.transmitProgramChangesEnabled = t1.transmitProgramChangesEnabled;
+                t2.velocityRatio = t1.velocityRatio;
+
+                auto it = t1.eventsHead;
+
+                while (it)
+                {
+                    EventData *e = acquireEvent();
+                    std::memcpy(e, it, sizeof(EventData));
+                    e->sequenceIndex = m.destIndex;
+                    e->prev = nullptr;
+                    e->next = nullptr;
+                    insertAcquiredEvent(t2, e);
+                    it = it->next;
+                }
             }
 
             seqLock1.release();
