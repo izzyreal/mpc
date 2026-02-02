@@ -5,6 +5,7 @@
 #include "TimeSignature.hpp"
 
 #include <vector>
+#include <array>
 #include <string_view>
 
 namespace mpc::sequencer
