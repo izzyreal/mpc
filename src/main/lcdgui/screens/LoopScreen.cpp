@@ -116,13 +116,6 @@ void LoopScreen::function(const int f)
             break;
         }
         case 5:
-            if (mpc.getHardware()
-                    ->getButton(hardware::ComponentId::F6)
-                    ->isPressed())
-            {
-                return;
-            }
-
             sampler.lock()->playX();
             break;
         default:;

@@ -115,10 +115,8 @@ void TrimScreen::function(const int f)
             break;
         }
         case 5:
-        {
             sampler.lock()->playX();
             break;
-        }
         default:;
     }
 }
