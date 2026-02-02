@@ -422,7 +422,12 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
 
     if (createDefaultProgram)
     {
-        createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
+        utils::SimpleAction callback([this]
+        {
+            createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
+        });
+
+        mpc.getPerformanceManager().lock()->enqueueCallback(std::move(callback));
     }
 }
 
