@@ -31,96 +31,96 @@ void MidiDeviceDetector::start(Mpc &mpc)
     pollThread = std::make_unique<std::thread>(
         [&mpc, this]
         {
-            std::shared_ptr<RtMidiIn> rtMidiIn;
-
-            // RtMidiIn instantiation throws an exception when building an LV2
-            // in several CI/CD build environments, so when we catch an
-            // exception, the thread's work is done.
             try
             {
-                rtMidiIn = std::make_shared<RtMidiIn>();
+                RtMidiIn rtMidiIn;
+
+                if (!lower_my_priority())
+                {
+                    MLOG("MidiDeviceDetector failed to lower its priority!");
+                }
+
+                while (running.load())
+                {
+                    std::set<std::string> allCurrentNames;
+
+                    for (int i = 0; i < rtMidiIn.getPortCount(); i++)
+                    {
+                        auto name = rtMidiIn.getPortName(i);
+                        allCurrentNames.emplace(name);
+                    }
+
+                    for (auto &name : allCurrentNames)
+                    {
+                        if (deviceNames.emplace(name).second)
+                        {
+                            MLOG("A new MIDI device was connected: " + name);
+
+                            fs::path path;
+                            const auto knownControllerDetectedScreen =
+                                mpc.screens->get<
+                                    ScreenId::
+                                        VmpcKnownControllerDetectedScreen>();
+
+                            if (name.find("MPD16") != std::string::npos)
+                            {
+                                path = mpc.paths->getDocuments()
+                                           ->midiControlPresetsPath() /
+                                       "MPD16.json";
+                                knownControllerDetectedScreen
+                                    ->setControllerName("MPD16");
+                            }
+                            else if (name.find("MPD218") != std::string::npos)
+                            {
+                                path = mpc.paths->getDocuments()
+                                           ->midiControlPresetsPath() /
+                                       "MPD218.json";
+                                knownControllerDetectedScreen
+                                    ->setControllerName("MPD218");
+                            }
+                            else if (name.find("iRig PADS") !=
+                                     std::string::npos)
+                            {
+                                path = mpc.paths->getDocuments()
+                                           ->midiControlPresetsPath() /
+                                       "iRig_PADS.json";
+                                knownControllerDetectedScreen
+                                    ->setControllerName("iRig_PADS");
+                            }
+                            else if (name.find("MPC Studio") !=
+                                     std::string::npos)
+                            {
+                                path = mpc.paths->getDocuments()
+                                           ->midiControlPresetsPath() /
+                                       "MPC_Studio.json";
+                                knownControllerDetectedScreen
+                                    ->setControllerName("MPC_Studio");
+                            }
+
+                            if (!path.empty() && fs::exists(path))
+                            {
+                                auto layeredScreen = mpc.getLayeredScreen();
+                                layeredScreen->postToUiThread(utils::Task(
+                                    [layeredScreen]
+                                    {
+                                        layeredScreen->openScreenById(
+                                            ScreenId::
+                                                VmpcKnownControllerDetectedScreen);
+                                    }));
+                            }
+                        }
+                    }
+
+                    deviceNames = allCurrentNames;
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                }
             }
             catch (const RtMidiError &)
             {
-                return;
-            }
-
-            if (!lower_my_priority())
-            {
-                MLOG("MidiDeviceDetector failed to lower its priority!");
-            }
-
-            while (running.load())
-            {
-                std::set<std::string> allCurrentNames;
-
-                for (int i = 0; i < rtMidiIn->getPortCount(); i++)
-                {
-                    auto name = rtMidiIn->getPortName(i);
-                    allCurrentNames.emplace(name);
-                }
-
-                for (auto &name : allCurrentNames)
-                {
-                    if (deviceNames.emplace(name).second)
-                    {
-                        MLOG("A new MIDI device was connected: " + name);
-
-                        fs::path path;
-                        const auto knownControllerDetectedScreen =
-                            mpc.screens->get<
-                                ScreenId::VmpcKnownControllerDetectedScreen>();
-
-                        if (name.find("MPD16") != std::string::npos)
-                        {
-                            path = mpc.paths->getDocuments()
-                                       ->midiControlPresetsPath() /
-                                   "MPD16.json";
-                            knownControllerDetectedScreen->setControllerName(
-                                "MPD16");
-                        }
-                        else if (name.find("MPD218") != std::string::npos)
-                        {
-                            path = mpc.paths->getDocuments()
-                                       ->midiControlPresetsPath() /
-                                   "MPD218.json";
-                            knownControllerDetectedScreen->setControllerName(
-                                "MPD218");
-                        }
-                        else if (name.find("iRig PADS") != std::string::npos)
-                        {
-                            path = mpc.paths->getDocuments()
-                                       ->midiControlPresetsPath() /
-                                   "iRig_PADS.json";
-                            knownControllerDetectedScreen->setControllerName(
-                                "iRig_PADS");
-                        }
-                        else if (name.find("MPC Studio") != std::string::npos)
-                        {
-                            path = mpc.paths->getDocuments()
-                                       ->midiControlPresetsPath() /
-                                   "MPC_Studio.json";
-                            knownControllerDetectedScreen->setControllerName(
-                                "MPC_Studio");
-                        }
-
-                        if (!path.empty() && fs::exists(path))
-                        {
-                            auto layeredScreen = mpc.getLayeredScreen();
-                            layeredScreen->postToUiThread(utils::Task(
-                                [layeredScreen]
-                                {
-                                    layeredScreen->openScreenById(
-                                        ScreenId::
-                                            VmpcKnownControllerDetectedScreen);
-                                }));
-                        }
-                    }
-                }
-
-                deviceNames = allCurrentNames;
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                // RtMidiIn instantiation throws an exception when building an LV2
+                // in several CI/CD build environments, so when we catch an
+                // exception, the thread's work is done.
             }
         });
 }
