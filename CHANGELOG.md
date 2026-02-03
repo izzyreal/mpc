@@ -1,3 +1,12 @@
+## v0.9.0 RC21 (1-2-2026)
+* Persist last used ALL/APS name.
+* Fix MIDI track crash upon MIDI input.
+* Fix first metronome click during REC.
+
+## v0.9.0 RC20 (31-1-2026)
+* Fix crash when setting selected sequence in Next Seq screen.
+* Fix Erase Events.
+
 ## v0.9.0 RC19 (30-1-2026)
 * Fix DRUM program selection when restoring plugin state.
 * Fix an issue with 16 levels.
