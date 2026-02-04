@@ -37,7 +37,8 @@ void TriggerLocalNoteOnCommand::execute()
     auto apply16LevelsAndSliderNoteVariation =
         [&](sequencer::EventData &noteEventToApplyTo)
     {
-        if (ctx.program && ctx.programPadIndex)
+        if (ctx.program && ctx.programPadIndex &&
+            ctx.physicalPadIndex != NoPhysicalPadIndex)
         {
             const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 
@@ -49,7 +50,7 @@ void TriggerLocalNoteOnCommand::execute()
                 assign16LevelsScreen->getOriginalKeyPad(),
                 assign16LevelsScreen->getNote(),
                 assign16LevelsScreen->getParameter(),
-                *ctx.programPadIndex % 16};
+                *ctx.physicalPadIndex % 16};
 
             Util::set16LevelsValues(sixteenLevelsContext, noteEventToApplyTo);
         }

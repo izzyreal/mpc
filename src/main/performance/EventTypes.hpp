@@ -75,11 +75,13 @@ namespace mpc::performance
     {
         NoteNumber noteNumber;
         PerformanceEventSource source;
+        PhysicalPadIndex physicalPadIndex;
         MidiChannel midiInputChannel;
         lcdgui::ScreenId screenId;
         TrackIndex trackIndex;
         sequencer::BusType busType;
         Velocity velocity;
+        TimeInMilliseconds eventTimeMs;
         ProgramIndex programIndex;
         Pressure pressure;
     };

@@ -70,6 +70,7 @@ namespace mpc::performance
                                        ProgramIndex);
 
         NoteOnEvent registerNoteOn(PerformanceEventSource,
+                                   PhysicalPadIndex,
                                    std::optional<MidiChannel> midiInputChannel,
                                    lcdgui::ScreenId, TrackIndex,
                                    sequencer::BusType, NoteNumber, Velocity,

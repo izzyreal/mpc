@@ -46,6 +46,7 @@ namespace mpc::command::context
         performance::PerformanceEventSource source;
         sequencer::SequencerStateManager *sequencerStateManager;
         performance::NoteOnEvent registryNoteOnEvent;
+        std::optional<PhysicalPadIndex> physicalPadIndex;
         std::optional<ProgramPadIndex> programPadIndex;
         Velocity velocity;
         bool isFullLevelEnabled;

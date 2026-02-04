@@ -240,7 +240,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
     }
 
     const auto noteOnEvent = performanceManager.lock()->registerNoteOn(
-        PerformanceEventSource::MidiInput,
+        PerformanceEventSource::MidiInput, NoPhysicalPadIndex,
         std::optional<MidiChannel>(e.getChannel()), screenId, track->getIndex(),
         screen->getBus()->busType, NoteNumber(e.getNoteNumber()),
         Velocity(e.getVelocity()), std::optional(programIndex));
@@ -277,9 +277,10 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                     buildTriggerLocalNoteOnContext(
                         PerformanceEventSource::MidiInput, noteOnEvent,
                         noteOnEvent.noteNumber, noteOnEvent.velocity,
-                        track.get(), screen->getBus(), screen, programPadIndex,
-                        program, sequencer, clientEventController.lock(),
-                        eventHandler.lock(), screens.lock(), hardware.lock(),
+                        track.get(), screen->getBus(), screen, NoPhysicalPadIndex,
+                        programPadIndex, program, sequencer,
+                        clientEventController.lock(), eventHandler.lock(),
+                        screens.lock(), hardware.lock(),
                         metronomeOnlyPositionTicks, positionTicks);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();

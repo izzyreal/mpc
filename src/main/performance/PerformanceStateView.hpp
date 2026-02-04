@@ -24,6 +24,10 @@ namespace mpc::performance
             ProgramPadIndex, const std::initializer_list<PerformanceEventSource>
                                  &sourcesToExclude) const;
 
+        std::optional<NoteOnEvent> getMostRecentDrumNoteOnEvent(
+            DrumNoteNumber, const std::initializer_list<PerformanceEventSource>
+                                 &sourcesToExclude) const;
+
         int getTotalNoteOnCount() const;
 
         Program getProg(ProgramIndex) const;

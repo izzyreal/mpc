@@ -190,7 +190,7 @@ TEST_CASE("Can record and playback from different threads",
                         ClientHardwareEvent::Type::PadPress,
                         0,
                         PAD_1_OR_AB,
-                        127.f,
+                        1.f,
                         std::nullopt,
                         std::nullopt};
                     mpc.clientEventController->handleClientEvent(clientEvent);
@@ -202,7 +202,7 @@ TEST_CASE("Can record and playback from different threads",
                         ClientHardwareEvent::Type::PadRelease,
                         0,
                         PAD_1_OR_AB,
-                        127.f,
+                        1.f,
                         std::nullopt,
                         std::nullopt};
                     mpc.clientEventController->handleClientEvent(clientEvent);
@@ -322,7 +322,7 @@ TEST_CASE("Undo", "[sequencer]")
                 ClientHardwareEvent::Type::PadPress,
                 0,
                 PAD_1_OR_AB,
-                127.f,
+                1.f,
                 std::nullopt,
                 std::nullopt};
             mpc.clientEventController->handleClientEvent(clientEvent);

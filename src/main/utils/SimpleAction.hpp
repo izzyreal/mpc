@@ -6,5 +6,5 @@ namespace mpc::utils
 {
     // "Simple" means "no parameters, no return type"
 
-    using SimpleAction = SmallFn<104, void()>;
+    using SimpleAction = SmallFn<120, void()>;
 } // namespace mpc::utils

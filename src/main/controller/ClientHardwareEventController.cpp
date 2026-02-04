@@ -243,12 +243,21 @@ void ClientHardwareEventController::handlePadPress(
     const auto programIndex = screen->getProgramIndex();
     const auto program = screen->getProgram();
 
-    const Bank activeBank = mpc.clientEventController->getActiveBank();
-    const auto programPadIndex =
-        physicalPadIndex + static_cast<int>(activeBank) * 16;
+    const auto assign16LevelsScreen =
+        mpc.screens->get<ScreenId::Assign16LevelsScreen>();
+
+    const bool isSixteenLevelsEnabled =
+        mpc.clientEventController->isSixteenLevelsEnabled();
 
     assert(program && program->isUsed());
     assert(programIndex);
+
+    const Bank activeBank = mpc.clientEventController->getActiveBank();
+
+    const auto programPadIndex =
+        isSixteenLevelsEnabled
+            ? program->getPadIndexFromNote(assign16LevelsScreen->getNote())
+            : physicalPadIndex + static_cast<int>(activeBank) * 16;
 
     constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
@@ -258,10 +267,7 @@ void ClientHardwareEventController::handlePadPress(
         ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
         *programIndex, PhysicalPadIndex(physicalPadIndex));
 
-    const auto assign16LevelsScreen =
-        mpc.screens->get<ScreenId::Assign16LevelsScreen>();
-
-    auto note = mpc.clientEventController->isSixteenLevelsEnabled()
+    auto note = isSixteenLevelsEnabled
                     ? assign16LevelsScreen->getNote()
                     : program->getNoteFromPad(ProgramPadIndex(programPadIndex));
 
@@ -304,8 +310,9 @@ void ClientHardwareEventController::handlePadPress(
     {
         registryNoteOnEvent =
             mpc.getPerformanceManager().lock()->registerNoteOn(
-                PerformanceEventSource::VirtualMpcHardware, noMidiChannel,
-                screenId, track->getIndex(), screen->getBus()->busType, note,
+                PerformanceEventSource::VirtualMpcHardware,
+                PhysicalPadIndex(physicalPadIndex), noMidiChannel, screenId,
+                track->getIndex(), screen->getBus()->busType, note,
                 Velocity(clampedVelocity), programIndex);
     }
 
@@ -348,8 +355,9 @@ void ClientHardwareEventController::handlePadPress(
 
             action = utils::SimpleAction(
                 [noteEventInfo = *registryNoteOnEvent, clampedVelocity,
-                 tr = track.get(), screen, program, programPadIndex, this,
-                 metronomeOnlyPositionTicks, positionTicks]
+                 tr = track.get(), screen, program, physicalPadIndex,
+                 programPadIndex, this, metronomeOnlyPositionTicks,
+                 positionTicks]
                 {
                     const DrumNoteNumber drumNoteNumber =
                         program->getNoteFromPad(
@@ -360,11 +368,12 @@ void ClientHardwareEventController::handlePadPress(
                             PerformanceEventSource::VirtualMpcHardware,
                             noteEventInfo, drumNoteNumber,
                             Velocity(clampedVelocity), tr, screen->getBus(),
-                            screen, ProgramPadIndex(programPadIndex), program,
-                            mpc.getSequencer(),
-                            mpc.clientEventController, mpc.getEventHandler(),
-                            mpc.screens, mpc.getHardware(),
-                            metronomeOnlyPositionTicks, positionTicks);
+                            screen, PhysicalPadIndex(physicalPadIndex),
+                            ProgramPadIndex(programPadIndex), program,
+                            mpc.getSequencer(), mpc.clientEventController,
+                            mpc.getEventHandler(), mpc.screens,
+                            mpc.getHardware(), metronomeOnlyPositionTicks,
+                            positionTicks);
 
                     TriggerLocalNoteOnCommand(ctx).execute();
                 });
@@ -374,8 +383,8 @@ void ClientHardwareEventController::handlePadPress(
     mpc.getPerformanceManager().lock()->registerPhysicalPadPress(
         PerformanceEventSource::VirtualMpcHardware, screenId,
         screen->getBus()->busType, PhysicalPadIndex(physicalPadIndex),
-        Velocity(clampedVelocity), track->getIndex(),
-        screen->getProgramIndex(), note);
+        Velocity(clampedVelocity), track->getIndex(), screen->getProgramIndex(),
+        note);
 
     if (action)
     {
@@ -474,9 +483,7 @@ void ClientHardwareEventController::handlePadRelease(
                     programPadPressEvent.has_value() &&
                     programPadPressEvent->quantizedLockActivated;
 
-                if (p.drumNoteNumber != NoDrumNoteAssigned &&
-                    !quantizedLockActivated && !isNoteRepeatMode &&
-                    !isLiveEraseMode)
+                if (p.drumNoteNumber != NoDrumNoteAssigned)
                 {
                     const auto selectedSequence =
                         sequencer->getSelectedSequence();
@@ -492,40 +499,44 @@ void ClientHardwareEventController::handlePadRelease(
 
                     performanceManager->applyMessageImmediate(std::move(msg));
 
-                    const bool isSamplerScreen =
-                        screengroups::isSamplerScreen(p.screenId);
+                    if (!quantizedLockActivated && !isNoteRepeatMode &&
+                    !isLiveEraseMode)
+                    {
+                        const bool isSamplerScreen =
+                            screengroups::isSamplerScreen(p.screenId);
 
-                    auto screenComponent =
-                        screens->getScreenById(p.screenId).get();
+                        auto screenComponent =
+                            screens->getScreenById(p.screenId).get();
 
-                    const auto track =
-                        selectedSequence->getTrack(p.trackIndex).get();
+                        const auto track =
+                            selectedSequence->getTrack(p.trackIndex).get();
 
-                    utils::SimpleAction noteOffAction(
-                        [this, recordingNoteOnEvent, track, p, isSamplerScreen,
-                         screenComponent, programPadIndex,
-                         program = sampler->getProgram(p.programIndex).get(),
-                         metronomeOnlyPositionTicks, positionTicks,
-                         performanceManager]
-                        {
-                            const auto ctx = TriggerLocalNoteContextFactory::
-                                buildTriggerLocalNoteOffContext(
-                                    PerformanceEventSource::VirtualMpcHardware,
-                                    p.drumNoteNumber, recordingNoteOnEvent,
-                                    track, p.busType, screenComponent,
-                                    isSamplerScreen, programPadIndex, program,
-                                    mpc.getSequencer().get(),
-                                    performanceManager,
-                                    mpc.clientEventController.get(),
-                                    mpc.getEventHandler().get(),
-                                    mpc.screens.get(), mpc.getHardware().get(),
-                                    metronomeOnlyPositionTicks, positionTicks);
+                        utils::SimpleAction noteOffAction(
+                            [this, recordingNoteOnEvent, track, p, isSamplerScreen,
+                             screenComponent, programPadIndex,
+                             program = sampler->getProgram(p.programIndex).get(),
+                             metronomeOnlyPositionTicks, positionTicks,
+                             performanceManager]
+                            {
+                                const auto ctx = TriggerLocalNoteContextFactory::
+                                    buildTriggerLocalNoteOffContext(
+                                        PerformanceEventSource::VirtualMpcHardware,
+                                        p.drumNoteNumber, recordingNoteOnEvent,
+                                        track, p.busType, screenComponent,
+                                        isSamplerScreen, programPadIndex, program,
+                                        mpc.getSequencer().get(),
+                                        performanceManager,
+                                        mpc.clientEventController.get(),
+                                        mpc.getEventHandler().get(),
+                                        mpc.screens.get(), mpc.getHardware().get(),
+                                        metronomeOnlyPositionTicks, positionTicks);
 
-                            TriggerLocalNoteOffCommand(ctx).execute();
-                        });
+                                TriggerLocalNoteOffCommand(ctx).execute();
+                            });
 
-                    performanceManager->enqueueCallback(
-                        std::move(noteOffAction));
+                        performanceManager->enqueueCallback(
+                            std::move(noteOffAction));
+                    }
                 }
             }
 
@@ -583,8 +594,7 @@ void ClientHardwareEventController::handlePadAftertouch(
                 assert(padPress.programIndex != NoProgramIndex);
 
                 performanceManager.lock()->registerProgramPadAftertouch(
-                    PerformanceEventSource::VirtualMpcHardware,
-                    programPadIndex,
+                    PerformanceEventSource::VirtualMpcHardware, programPadIndex,
                     padPress.programIndex, Pressure(pressureToUse));
 
                 if (padPress.drumNoteNumber != NoDrumNoteAssigned)

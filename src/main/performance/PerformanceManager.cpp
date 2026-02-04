@@ -112,6 +112,7 @@ void PerformanceManager::registerProgramPadRelease(
 
 NoteOnEvent PerformanceManager::registerNoteOn(
     const PerformanceEventSource source,
+    const PhysicalPadIndex physicalPadIndex,
     const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const NoteNumber noteNumber,
@@ -119,11 +120,13 @@ NoteOnEvent PerformanceManager::registerNoteOn(
 {
     NoteOnEvent e{noteNumber,
                   source,
+                  physicalPadIndex,
                   midiInputChannel.value_or(NoMidiChannel),
                   screen,
                   trackIndex,
                   busType,
                   velocity,
+                  utils::nowInMilliseconds(),
                   programIndex.value_or(NoProgramIndex),
                   NoPressure};
     const NoteOnEvent copy = e;

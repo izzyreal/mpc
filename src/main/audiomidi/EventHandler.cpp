@@ -20,7 +20,6 @@
 #include "sampler/Program.hpp"
 
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 #include "Util.hpp"
@@ -35,9 +34,6 @@
 
 #include "engine/StereoMixer.hpp"
 #include "performance/PerformanceManager.hpp"
-#include "lcdgui/ScreenNames.hpp"
-
-#include <nlohmann/detail/meta/call_std/end.hpp>
 
 using namespace mpc::audiomidi;
 using namespace mpc::sampler;
@@ -136,9 +132,12 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
 
+    constexpr std::optional<MidiChannel> noMidiInputChannel{std::nullopt};
+
     mpc.getPerformanceManager().lock()->registerNoteOn(
-        performance::PerformanceEventSource::Sequence, std::nullopt, screenId,
-        trackIndex, drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), note,
+        performance::PerformanceEventSource::Sequence, NoPhysicalPadIndex,
+        noMidiInputChannel, screenId, trackIndex,
+        drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), note,
         Velocity(velocityToUse), programIndex);
 
     if (programPadIndex != -1)

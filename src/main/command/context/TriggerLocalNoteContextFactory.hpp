@@ -48,12 +48,10 @@ namespace mpc::command::context
     public:
         static TriggerLocalNoteOnContext buildTriggerLocalNoteOnContext(
             performance::PerformanceEventSource,
-            const performance::NoteOnEvent &, NoteNumber note,
-            Velocity velocity, sequencer::Track *,
-            const std::shared_ptr<sequencer::Bus> &,
-            const std::shared_ptr<lcdgui::ScreenComponent> &,
-            ProgramPadIndex programPadIndex,
-            const std::shared_ptr<sampler::Program> &,
+            const performance::NoteOnEvent &, NoteNumber, Velocity velocity,
+            sequencer::Track *, const std::shared_ptr<sequencer::Bus> &,
+            const std::shared_ptr<lcdgui::ScreenComponent> &, PhysicalPadIndex,
+            ProgramPadIndex, const std::shared_ptr<sampler::Program> &,
             const std::weak_ptr<sequencer::Sequencer> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,

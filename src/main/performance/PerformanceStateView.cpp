@@ -113,6 +113,43 @@ PerformanceStateView::getMostRecentProgramPadPress(
     return latest;
 }
 
+std::optional<NoteOnEvent>
+PerformanceStateView::getMostRecentDrumNoteOnEvent(
+    const DrumNoteNumber drumNoteNumber,
+    const std::initializer_list<PerformanceEventSource> &sourcesToExclude) const
+{
+    std::optional<NoteOnEvent> latest = std::nullopt;
+
+    for (auto &e : state->noteEvents)
+    {
+        if (e.noteNumber != drumNoteNumber)
+        {
+            continue;
+        }
+
+        bool excluded = false;
+        for (auto &s : sourcesToExclude)
+        {
+            if (e.source == s)
+            {
+                excluded = true;
+                break;
+            }
+        }
+        if (excluded)
+        {
+            continue;
+        }
+
+        if (!latest || e.eventTimeMs > latest->eventTimeMs)
+        {
+            latest = e;
+        }
+    }
+
+    return latest;
+}
+
 int PerformanceStateView::getTotalNoteOnCount() const
 {
     return state->noteEvents.size();
