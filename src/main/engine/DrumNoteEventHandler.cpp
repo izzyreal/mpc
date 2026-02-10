@@ -147,13 +147,18 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
     for (int i = 0; i < 4; i++)
     {
-        auto auxControl = std::dynamic_pointer_cast<CompoundControl>(
+        auto mainAuxControl = std::dynamic_pointer_cast<CompoundControl>(
             mainStrip->find("AUX#" + std::to_string(i + 1)));
+        auto duplicateAuxControl = std::dynamic_pointer_cast<CompoundControl>(
+            duplicateStrip->find("AUX#" + std::to_string(i + 1)));
 
-        auto auxLevel =
-            std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
+        auto mainAuxLevel = std::dynamic_pointer_cast<FaderControl>(
+            mainAuxControl->find("Level"));
+        auto duplicateAuxLevel = std::dynamic_pointer_cast<FaderControl>(
+            duplicateAuxControl->find("Level"));
 
-        auxLevel->setValue(
+        mainAuxLevel->setValue(0);
+        duplicateAuxLevel->setValue(
             i == selectedAssignableMixOutPair
                 ? static_cast<float>(indivFxMixer.individualOutLevel)
                 : 0);
