@@ -879,16 +879,6 @@ bool LayeredScreen::setFocus(const std::string &focus)
     return getFocusedLayer()->setFocus(focus);
 }
 
-void LayeredScreen::setFunctionKeysArrangement(const int arrangementIndex)
-{
-    getFunctionKeys()->setActiveArrangement(arrangementIndex);
-}
-
-FunctionKeys *LayeredScreen::getFunctionKeys()
-{
-    return getFocusedLayer()->getFunctionKeys();
-}
-
 std::shared_ptr<Field> LayeredScreen::getFocusedField()
 {
     const auto focusedLayer = getFocusedLayer();

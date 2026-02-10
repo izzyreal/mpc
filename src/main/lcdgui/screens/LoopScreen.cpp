@@ -50,7 +50,7 @@ void LoopScreen::open()
     displayTo();
     displayWave();
 
-    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
+    setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void LoopScreen::openWindow()

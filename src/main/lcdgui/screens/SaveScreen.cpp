@@ -11,7 +11,6 @@
 #include "lcdgui/screens/window/SaveApsFileScreen.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/Volume.hpp"
-#include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
 #include "nvram/VolumesPersistence.hpp"
 
@@ -57,14 +56,12 @@ void SaveScreen::open()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
-        findChild<FunctionKeys>("function-keys")
-            ->setActiveArrangement(
-                device == mpc.getDiskController()->getActiveDiskIndex() ? 0
-                                                                        : 1);
+        setFunctionKeysArrangement(
+            device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
     }
     else
     {
-        findChild<FunctionKeys>("function-keys")->setActiveArrangement(0);
+        setFunctionKeysArrangement(0);
     }
 }
 
@@ -133,7 +130,7 @@ void SaveScreen::function(const int i)
                     }
                 }
 
-                ls.lock()->setFunctionKeysArrangement(0);
+                setFunctionKeysArrangement(0);
 
                 newDisk->initFiles();
 
@@ -284,7 +281,7 @@ void SaveScreen::turnWheel(const int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls.lock()->setFunctionKeysArrangement(
+        setFunctionKeysArrangement(
             mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
     }
 }
@@ -445,7 +442,7 @@ void SaveScreen::up()
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
 
     ScreenComponent::up();

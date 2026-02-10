@@ -73,10 +73,10 @@ void SecondSeqScreen::displayFunctionKeys() const
 {
     if (sequencer.lock()->isSecondSequenceEnabled())
     {
-        ls.lock()->setFunctionKeysArrangement(2);
+        setFunctionKeysArrangement(2);
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
 }

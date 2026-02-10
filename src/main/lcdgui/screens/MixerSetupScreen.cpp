@@ -24,7 +24,7 @@ void MixerSetupScreen::open()
     displayCopyPgmMixToDrum();
     displayRecordMixChanges();
     const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-    ls.lock()->setFunctionKeysArrangement(
+    setFunctionKeysArrangement(
         sequencer::drumBusTypeToDrumIndex(drumScreen->getDrum()));
 }
 

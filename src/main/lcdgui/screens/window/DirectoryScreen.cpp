@@ -52,11 +52,11 @@ void DirectoryScreen::setFunctionKeys()
             fs::path(getSelectedFile()->getName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
-        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+        setFunctionKeysArrangement(playable ? 1 : 0);
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
 
     findBackground()->repaintUnobtrusive(

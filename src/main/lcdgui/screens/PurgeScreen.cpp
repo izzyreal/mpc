@@ -17,7 +17,7 @@ void PurgeScreen::open()
 {
     const auto unusedSampleCount = sampler.lock()->getUnusedSampleCount();
     findLabel("value")->setTextPadded(unusedSampleCount, " ");
-    ls.lock()->setFunctionKeysArrangement(unusedSampleCount > 0 ? 1 : 0);
+    setFunctionKeysArrangement(unusedSampleCount > 0 ? 1 : 0);
 }
 
 void PurgeScreen::function(int f)

@@ -1041,7 +1041,7 @@ void StepEditorScreen::refreshSelection()
 
     if (somethingSelected)
     {
-        ls.lock()->setFunctionKeysArrangement(1);
+        setFunctionKeysArrangement(1);
     }
 }
 
@@ -1362,7 +1362,7 @@ void StepEditorScreen::setSelectionStartIndex(const int i)
     selectionStartIndex = i;
     selectionEndIndex = i;
 
-    ls.lock()->setFunctionKeysArrangement(1);
+    setFunctionKeysArrangement(1);
     refreshSelection();
 }
 
@@ -1370,7 +1370,7 @@ void StepEditorScreen::clearSelection()
 {
     selectionStartIndex = -1;
     selectionEndIndex = -1;
-    ls.lock()->setFunctionKeysArrangement(0);
+    setFunctionKeysArrangement(0);
     refreshSelection();
 }
 

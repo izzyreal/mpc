@@ -178,11 +178,11 @@ void MonoToStereoScreen::displayLSource()
     if (sampler.lock()->getSound()->isMono() &&
         sampler.lock()->getSound()->isMono())
     {
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(1);
+        setFunctionKeysArrangement(1);
         findChild<Background>("")->repaintUnobtrusive(
             findChild<FunctionKey>("fk4")->getRect());
     }
@@ -202,11 +202,11 @@ void MonoToStereoScreen::displayRSource()
 
     if (sound.first->isMono() && sampler.lock()->getSound()->isMono())
     {
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(1);
+        setFunctionKeysArrangement(1);
         findBackground()->repaintUnobtrusive(
             findChild<FunctionKey>("fk4")->getRect());
     }

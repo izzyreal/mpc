@@ -51,7 +51,7 @@ void TrimScreen::open()
     displayView();
     displayWave();
 
-    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
+    setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void TrimScreen::openWindow()

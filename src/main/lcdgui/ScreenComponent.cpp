@@ -1,6 +1,7 @@
 #include "ScreenComponent.hpp"
 
 #include "Background.hpp"
+#include "FunctionKeys.hpp"
 
 #include "Mpc.hpp"
 
@@ -39,6 +40,17 @@ ScreenComponent::ScreenComponent(Mpc &mpc, const std::string &name,
 void ScreenComponent::openScreenById(const ScreenId screenId) const
 {
     ls.lock()->openScreenById(screenId);
+}
+
+void ScreenComponent::setFunctionKeysArrangement(const int arrangementIndex) const
+{
+    auto self = const_cast<ScreenComponent *>(this);
+
+    if (const auto functionKeys = self->findChild<FunctionKeys>("function-keys");
+        functionKeys)
+    {
+        functionKeys->setActiveArrangement(arrangementIndex);
+    }
 }
 
 void ScreenComponent::setTransferMap(

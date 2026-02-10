@@ -214,7 +214,7 @@ bool VmpcDisksScreen::hasConfigChanged() const
 void VmpcDisksScreen::displayFunctionKeys() const
 {
     const auto newArrangement = hasConfigChanged() ? 0 : 1;
-    ls.lock()->setFunctionKeysArrangement(newArrangement);
+    setFunctionKeysArrangement(newArrangement);
 }
 
 void VmpcDisksScreen::displayUpAndDown()

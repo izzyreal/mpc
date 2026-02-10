@@ -176,13 +176,13 @@ void StereoToMonoScreen::displayStereoSource()
 
     if (sound->isMono())
     {
-        ls.lock()->setFunctionKeysArrangement(1);
+        setFunctionKeysArrangement(1);
         findBackground()->repaintUnobtrusive(
             findChild<FunctionKey>("fk4")->getRect());
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(0);
+        setFunctionKeysArrangement(0);
     }
 }
 

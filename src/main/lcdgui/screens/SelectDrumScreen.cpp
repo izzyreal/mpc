@@ -14,7 +14,7 @@ SelectDrumScreen::SelectDrumScreen(Mpc &mpc, const int layerIndex)
 void SelectDrumScreen::open()
 {
     const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-    ls.lock()->setFunctionKeysArrangement(
+    setFunctionKeysArrangement(
         sequencer::drumBusTypeToDrumIndex(drumScreen->getDrum()));
 }
 

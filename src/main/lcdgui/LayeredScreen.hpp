@@ -19,7 +19,6 @@ namespace mpc
 
 namespace mpc::lcdgui
 {
-    class FunctionKeys;
     class Background;
     class Field;
     class Label;
@@ -104,8 +103,6 @@ namespace mpc::lcdgui
         void returnToLastFocus(const std::shared_ptr<ScreenComponent> &screen,
                                const std::string &firstFieldOfCurrentScreen);
 
-        FunctionKeys *getFunctionKeys();
-
     public:
         static ScreenId
         getScreenId(const std::shared_ptr<ScreenComponent> &screen);
@@ -120,8 +117,6 @@ namespace mpc::lcdgui
         ScreenId getCurrentScreenId() const;
         std::string getCurrentScreenName() const;
         std::string getFirstLayerScreenName() const;
-        void setFunctionKeysArrangement(int arrangementIndex);
-
         std::vector<std::vector<bool>> *getPixels();
         bool IsDirty() const;
         void setDirty() const;

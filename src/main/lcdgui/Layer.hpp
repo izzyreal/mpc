@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.hpp"
 #include "Background.hpp"
-#include "FunctionKeys.hpp"
 
 #include <string>
 
@@ -16,7 +15,6 @@ namespace mpc::lcdgui
         explicit Layer(int index);
 
         Background *getBackground();
-        FunctionKeys *getFunctionKeys();
         bool setFocus(const std::string &textFieldName);
         std::string getFocus();
     };

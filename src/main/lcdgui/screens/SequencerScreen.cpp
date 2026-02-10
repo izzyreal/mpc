@@ -1171,7 +1171,7 @@ void SequencerScreen::displayNextSq() const
 {
     const auto noNextSq = sequencer.lock()->getNextSq() == NoNextSequenceIndex;
 
-    ls.lock()->setFunctionKeysArrangement(noNextSq ? 0 : 1);
+    setFunctionKeysArrangement(noNextSq ? 0 : 1);
 
     findLabel("nextsq")->Hide(noNextSq);
     findField("nextsq")->Hide(noNextSq);

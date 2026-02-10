@@ -57,12 +57,12 @@ void LoadScreen::open()
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
-        ls.lock()->setFunctionKeysArrangement(
+        setFunctionKeysArrangement(
             device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 2);
     }
     else
     {
-        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+        setFunctionKeysArrangement(playable ? 1 : 0);
     }
 }
 
@@ -120,7 +120,7 @@ void LoadScreen::function(const int i)
                     }
                 }
 
-                ls.lock()->setFunctionKeysArrangement(0);
+                setFunctionKeysArrangement(0);
 
                 newDisk->initFiles();
 
@@ -215,7 +215,7 @@ void LoadScreen::function(const int i)
                         fs::path(getSelectedFileName()).extension().string();
                     const auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
                                           StrUtil::eqIgnoreCase(ext, ".wav");
-                    ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+                    setFunctionKeysArrangement(playable ? 1 : 0);
                 }
             }
             else if (StrUtil::eqIgnoreCase(ext, ".snd") ||
@@ -320,7 +320,7 @@ void LoadScreen::turnWheel(const int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls.lock()->setFunctionKeysArrangement(
+        setFunctionKeysArrangement(
             mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 2);
         return;
     }
@@ -330,7 +330,7 @@ void LoadScreen::turnWheel(const int i)
     const auto playable =
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") ||
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
-    ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+    setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::displayView() const
@@ -559,7 +559,7 @@ void LoadScreen::up()
         const auto ext = fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
-        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+        setFunctionKeysArrangement(playable ? 1 : 0);
     }
 
     ScreenComponent::up();

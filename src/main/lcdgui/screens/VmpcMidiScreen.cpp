@@ -315,7 +315,7 @@ void VmpcMidiScreen::setLearning(const bool b)
 
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
-    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
+    setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
 bool VmpcMidiScreen::hasMappingChanged() const

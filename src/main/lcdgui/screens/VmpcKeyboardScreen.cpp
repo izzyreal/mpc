@@ -136,7 +136,7 @@ void VmpcKeyboardScreen::setLearning(const bool b)
     learning = b;
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
-    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
+    setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
 bool VmpcKeyboardScreen::hasMappingChanged() const

@@ -12,11 +12,6 @@ Background *Layer::getBackground()
     return findChild<Background>("").get();
 }
 
-FunctionKeys *Layer::getFunctionKeys()
-{
-    return findChild<FunctionKeys>("function-keys").get();
-}
-
 bool Layer::setFocus(const std::string &fieldName)
 {
     const auto newFocus = findField(fieldName);

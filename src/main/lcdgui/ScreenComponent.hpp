@@ -66,6 +66,7 @@ namespace mpc::lcdgui
         std::shared_ptr<Wave> findWave();
         std::shared_ptr<EnvGraph> findEnvGraph();
         void openScreenById(ScreenId) const;
+        void setFunctionKeysArrangement(int arrangementIndex) const;
 
     public:
         virtual void open() {}

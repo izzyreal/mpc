@@ -49,7 +49,7 @@ void PunchScreen::open()
     displayBackground();
     displayAutoPunch();
 
-    ls.lock()->setFunctionKeysArrangement(
+    setFunctionKeysArrangement(
         sequencer.lock()->getTransport()->isPunchEnabled());
 }
 

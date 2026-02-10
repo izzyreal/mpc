@@ -41,7 +41,7 @@ void SndParamsScreen::open()
     displayBeat();
     displaySampleAndNewTempo();
 
-    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
+    setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void SndParamsScreen::openWindow()

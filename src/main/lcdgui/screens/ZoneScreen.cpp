@@ -49,7 +49,7 @@ void ZoneScreen::open()
     displayEnd();
     displayZone();
 
-    ls.lock()->setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
+    setFunctionKeysArrangement(soundIsLoaded ? 1 : 0);
 }
 
 void ZoneScreen::openWindow()

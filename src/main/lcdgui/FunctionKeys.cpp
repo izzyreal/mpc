@@ -139,7 +139,7 @@ FunctionKeys::FunctionKeys(
 
 void FunctionKeys::setActiveArrangement(int i)
 {
-    if (i < 0 || i > texts.size())
+    if (i < 0 || i >= static_cast<int>(texts.size()))
     {
         return;
     }

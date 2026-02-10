@@ -95,6 +95,6 @@ void CopyProgramScreen::displayPgm1() const
 
 void CopyProgramScreen::displayFunctionKeys()
 {
-    ls.lock()->setFunctionKeysArrangement(pgm0 == pgm1 ? 1 : 0);
+    setFunctionKeysArrangement(pgm0 == pgm1 ? 1 : 0);
     findBackground()->SetDirty();
 }
