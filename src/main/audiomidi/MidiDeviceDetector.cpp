@@ -11,6 +11,10 @@
 
 #include "Logger.hpp"
 
+#ifdef __APPLE__
+#include <CoreMIDI/CoreMIDI.h>
+#endif
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -18,6 +22,30 @@
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+
+namespace
+{
+#ifdef __APPLE__
+    bool canCreateCoreMidiClient()
+    {
+        MIDIClientRef client = 0;
+        const auto status = MIDIClientCreate(CFSTR("vMPC MidiDeviceDetector"),
+                                             nullptr, nullptr, &client);
+
+        if (status != noErr)
+        {
+            MLOG("MidiDeviceDetector: CoreMIDI client preflight failed with "
+                 "status " +
+                 std::to_string(static_cast<int>(status)) +
+                 ", skipping MIDI device detection.");
+            return false;
+        }
+
+        MIDIClientDispose(client);
+        return true;
+    }
+#endif
+} // namespace
 
 void MidiDeviceDetector::start(Mpc &mpc)
 {
@@ -33,6 +61,14 @@ void MidiDeviceDetector::start(Mpc &mpc)
         {
             try
             {
+#ifdef __APPLE__
+                if (!canCreateCoreMidiClient())
+                {
+                    running.store(false);
+                    return;
+                }
+#endif
+
                 RtMidiIn rtMidiIn;
 
                 if (!lower_my_priority())
