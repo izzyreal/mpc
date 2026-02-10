@@ -322,8 +322,6 @@ void SequencerScreen::open()
     displayVelo();
     displayBus();
     displayDeviceNumber();
-    displayNextSq();
-
     findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
 
     if (sequencer.lock()->isSecondSequenceEnabled())
@@ -365,6 +363,8 @@ void SequencerScreen::open()
                     ->getButton(hardware::ComponentId::ERASE)
                     ->isPressed() &&
                 sequencerIsRecordingOrOverdubbing));
+
+    displayNextSq();
 }
 
 void SequencerScreen::erase()
@@ -373,6 +373,7 @@ void SequencerScreen::erase()
     findChild("footer-label")->Hide(false);
     findChild<TextComp>("footer-label")
         ->setText("(Hold pads or keys to erase)");
+    displayNextSq();
 }
 
 void SequencerScreen::tap()
@@ -384,6 +385,7 @@ void SequencerScreen::tap()
         {
             findChild("function-keys")->Hide(false);
             findChild("footer-label")->Hide(true);
+            displayNextSq();
         }
         else
         {
@@ -391,14 +393,16 @@ void SequencerScreen::tap()
             findChild("footer-label")->Hide(false);
             findChild<TextComp>("footer-label")
                 ->setText("(Hold pads or keys to repeat)");
+            displayNextSq();
         }
     }
 }
 
-void SequencerScreen::hideFooterLabelAndShowFunctionKeys()
+void SequencerScreen::hideHoldHintAndRestoreFooterWidgets()
 {
     findChild("footer-label")->Hide(true);
     findChild("function-keys")->Hide(false);
+    displayNextSq();
 }
 
 void SequencerScreen::close()
@@ -1167,14 +1171,16 @@ void SequencerScreen::displayPunchWhileRecording()
     }
 }
 
-void SequencerScreen::displayNextSq() const
+void SequencerScreen::displayNextSq()
 {
     const auto noNextSq = sequencer.lock()->getNextSq() == NoNextSequenceIndex;
+    const auto footerIsVisible = !findChild("footer-label")->IsHidden();
+    const auto hideNextSq = noNextSq || footerIsVisible;
 
     setFunctionKeysArrangement(noNextSq ? 0 : 1);
 
-    findLabel("nextsq")->Hide(noNextSq);
-    findField("nextsq")->Hide(noNextSq);
+    findLabel("nextsq")->Hide(hideNextSq);
+    findField("nextsq")->Hide(hideNextSq);
 
     if (noNextSq)
     {

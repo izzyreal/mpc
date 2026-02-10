@@ -11,5 +11,5 @@ ReleaseEraseCommand::ReleaseEraseCommand(Mpc &mpc) : mpc(mpc) {}
 void ReleaseEraseCommand::execute()
 {
     const auto sequencerScreen = mpc.screens->get<ScreenId::SequencerScreen>();
-    sequencerScreen->hideFooterLabelAndShowFunctionKeys();
+    sequencerScreen->hideHoldHintAndRestoreFooterWidgets();
 }

@@ -41,5 +41,5 @@ void PushStopCommand::execute()
     }
 
     const auto sequencerScreen = mpc.screens->get<ScreenId::SequencerScreen>();
-    sequencerScreen->hideFooterLabelAndShowFunctionKeys();
+    sequencerScreen->hideHoldHintAndRestoreFooterWidgets();
 }

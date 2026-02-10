@@ -54,7 +54,7 @@ namespace mpc::lcdgui::screens
         void displayTsig() const;
         void displayLoop() const;
         void displayPunchWhileRecording();
-        void displayNextSq() const;
+        void displayNextSq();
 
     public:
         void pressEnter() override;
@@ -77,8 +77,9 @@ namespace mpc::lcdgui::screens
 
         // During certain erase and note repeat scenarios, the function keys are
         // hidden and replaced by a bespoke label.
-        // `hideFooterLabelAndShowFunctionKeys` is invoked when the function
-        // keys should be shown again, and the the bespoke label hidden.
-        void hideFooterLabelAndShowFunctionKeys();
+        // `hideHoldHintAndRestoreFooterWidgets` is invoked when the function
+        // keys and Next Sq widgets should be shown again, and the bespoke hold
+        // hint label hidden.
+        void hideHoldHintAndRestoreFooterWidgets();
     };
 } // namespace mpc::lcdgui::screens
