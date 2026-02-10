@@ -1,3 +1,8 @@
+## v0.9.0 RC24 (11-2-2026)
+* Fix tiny cosmetic issue with slider cap (noticeable on large displays).
+* Fix occasional crash when closing step editor (reported on iOS, but may affect other platforms).
+* Fix MAIN screen appearance when combining next sequence with note repeat or erase while playing.
+
 ## v0.9.0 RC23 (10-2-2026)
 * Fix individual out for mono sounds.
 
