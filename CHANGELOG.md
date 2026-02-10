@@ -1,9 +1,12 @@
+## v0.9.0 RC23 (10-2-2026)
+* Fix individual out for mono sounds.
+
 ## v0.9.0 RC22 (4-2-2026)
 * Fix various 16 LEVELS and NOTE REPEAT issues.
 * Fix PLAYX in LOOP screen.
 * Fix CLEAR when loading PGM file.
 * [macOS] Fix crash when switching MIDI Studio configuration.
-*
+
 * ## v0.9.0 RC21 (1-2-2026)
 * Persist last used ALL/APS name.
 * Fix MIDI track crash upon MIDI input.
