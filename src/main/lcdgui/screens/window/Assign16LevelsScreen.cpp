@@ -140,7 +140,9 @@ int Assign16LevelsScreen::getParameter() const
 void Assign16LevelsScreen::displayNote() const
 {
     const auto track = mpc.getSequencer()->getSelectedTrack();
-    const auto drumBus = sequencer.lock()->getBus<DrumBus>(track->getBusType());
+    const auto drumBus = sequencer.lock()->getBus<DrumBus>(
+        track->getBusType() == BusType::MIDI ? BusType::DRUM1
+                                             : track->getBusType());
     assert(drumBus);
     const auto program = sampler.lock()->getProgram(drumBus->getProgramIndex());
     const auto padIndex = program->getPadIndexFromNote(note);
