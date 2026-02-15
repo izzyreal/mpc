@@ -199,7 +199,7 @@ void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
         flush();
         initFiles();
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-            "Saving" + fileName, 400, 0);
+            "Saving " + fileName, 400, 0);
         return f;
     };
 
