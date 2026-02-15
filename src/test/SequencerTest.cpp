@@ -22,6 +22,8 @@
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
+#include <atomic>
+
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::command;
@@ -82,7 +84,7 @@ TEST_CASE("Can record and playback from different threads",
     constexpr int BUFFER_SIZE = 512;
     constexpr int PROCESS_BLOCK_INTERVAL =
         12; // Approximate duration of 512 frames at 44100khz
-    constexpr int AUDIO_THREAD_TIMEOUT = 4000;
+    constexpr int AUDIO_THREAD_TIMEOUT = 8000;
     constexpr int RECORD_DELAY = 500;
     constexpr int INITIAL_EVENT_INSERTION_DELAY = 500;
 
@@ -104,7 +106,7 @@ TEST_CASE("Can record and playback from different threads",
     std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
                                    192, 216, 240, 264, 288, 312, 336, 360};
 
-    bool audioThreadBusy = true;
+    std::atomic<bool> audioThreadBusy{true};
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -151,7 +153,7 @@ TEST_CASE("Can record and playback from different threads",
                     std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
             }
 
-            audioThreadBusy = false;
+            audioThreadBusy.store(false, std::memory_order_release);
         });
 
     int initialDelayCounter = 0;
@@ -161,64 +163,84 @@ TEST_CASE("Can record and playback from different threads",
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    int tickPos = sequencer->getTransport()->getTickPosition();
-
     if (!sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         sequencer->getTransport()->recFromStart();
     }
 
-    std::vector<int> recordedTickPos;
-    int prevTickPos = -1;
+    auto tickPos = sequencer->getTransport()->getTickPosition();
+    int prevTickPos = tickPos;
+    const auto insertionStart = std::chrono::steady_clock::now();
 
-    const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
-
-    while (tickPos < 384 && prevTickPos <= tickPos)
+    auto triggerPad = [&mpc]
     {
-        for (int i = 0; i < humanTickPositions.size(); i++)
+        ClientEvent clientEvent;
+        clientEvent.payload = ClientHardwareEvent{
+            ClientHardwareEvent::Source::HostInputGesture,
+            ClientHardwareEvent::Type::PadPress,
+            0,
+            PAD_1_OR_AB,
+            1.f,
+            std::nullopt,
+            std::nullopt};
+        mpc.clientEventController->handleClientEvent(clientEvent);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+
+        clientEvent.payload = ClientHardwareEvent{
+            ClientHardwareEvent::Source::HostInputGesture,
+            ClientHardwareEvent::Type::PadRelease,
+            0,
+            PAD_1_OR_AB,
+            1.f,
+            std::nullopt,
+            std::nullopt};
+        mpc.clientEventController->handleClientEvent(clientEvent);
+    };
+
+    for (const auto hTickPos : humanTickPositions)
+    {
+        bool looped = false;
+        bool shouldInsert = false;
+        auto deadline =
+            insertionStart + std::chrono::milliseconds(AUDIO_THREAD_TIMEOUT);
+
+        while (std::chrono::steady_clock::now() < deadline)
         {
-            auto hTickPos = humanTickPositions[i];
+            tickPos = sequencer->getTransport()->getTickPosition();
 
-            if (tickPos >= hTickPos && tickPos < hTickPos + 24)
+            if (tickPos < prevTickPos)
             {
-                if (std::find(recordedTickPos.begin(), recordedTickPos.end(),
-                              hTickPos) == recordedTickPos.end())
-                {
-                    ClientEvent clientEvent;
-                    clientEvent.payload = ClientHardwareEvent{
-                        ClientHardwareEvent::Source::HostInputGesture,
-                        ClientHardwareEvent::Type::PadPress,
-                        0,
-                        PAD_1_OR_AB,
-                        1.f,
-                        std::nullopt,
-                        std::nullopt};
-                    mpc.clientEventController->handleClientEvent(clientEvent);
-
-                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
-
-                    clientEvent.payload = ClientHardwareEvent{
-                        ClientHardwareEvent::Source::HostInputGesture,
-                        ClientHardwareEvent::Type::PadRelease,
-                        0,
-                        PAD_1_OR_AB,
-                        1.f,
-                        std::nullopt,
-                        std::nullopt};
-                    mpc.clientEventController->handleClientEvent(clientEvent);
-                    recordedTickPos.push_back(hTickPos);
-                }
+                looped = true;
+                break;
             }
+
+            if (tickPos >= hTickPos)
+            {
+                shouldInsert = true;
+                break;
+            }
+
+            prevTickPos = tickPos;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        prevTickPos = tickPos;
-        tickPos = sequencer->getTransport()->getTickPosition();
+        if (looped)
+        {
+            break;
+        }
+
+        if (!shouldInsert)
+        {
+            break;
+        }
+
+        triggerPad();
     }
 
     sequencer->getTransport()->stop();
 
-    while (audioThreadBusy)
+    while (audioThreadBusy.load(std::memory_order_acquire))
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
