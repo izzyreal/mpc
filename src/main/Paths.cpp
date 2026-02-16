@@ -1,6 +1,7 @@
 #include "Paths.hpp"
 
 #include <platform_folders.h>
+#include <cstdlib>
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
@@ -23,6 +24,12 @@ Paths::Paths() : documents(std::make_unique<Documents>(this)) {}
 
 fs::path Paths::appDocumentsPath() const
 {
+    if (const char *documentsPath = std::getenv("VMPC2000XL_DOCUMENTS_PATH");
+        documentsPath != nullptr && *documentsPath != '\0')
+    {
+        return fs::path(documentsPath);
+    }
+
 #if TARGET_OS_IOS
     auto path = fs::path(getIosSharedDocumentsFolder());
 #else
