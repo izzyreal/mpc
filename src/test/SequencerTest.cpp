@@ -23,6 +23,8 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -82,11 +84,7 @@ TEST_CASE("Can record and playback from different threads",
 {
     constexpr int SAMPLE_RATE = 44100;
     constexpr int BUFFER_SIZE = 512;
-    constexpr int PROCESS_BLOCK_INTERVAL =
-        12; // Approximate duration of 512 frames at 44100khz
-    constexpr int AUDIO_THREAD_TIMEOUT = 8000;
-    constexpr int RECORD_DELAY = 500;
-    constexpr int INITIAL_EVENT_INSERTION_DELAY = 500;
+    constexpr int AUDIO_THREAD_MAX_CYCLES = 4000;
 
     // Quantized positions:
     // 1                   2
@@ -107,6 +105,11 @@ TEST_CASE("Can record and playback from different threads",
                                    192, 216, 240, 264, 288, 312, 336, 360};
 
     std::atomic<bool> audioThreadBusy{true};
+    std::atomic<bool> stopAudioThread{false};
+    std::mutex tickMutex;
+    std::condition_variable tickCv;
+    int publishedTickPos = 0;
+    bool tickUpdated = false;
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -131,10 +134,8 @@ TEST_CASE("Can record and playback from different threads",
         [&]
         {
             int dspCycleCounter = 0;
-
-            while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL <
-                       AUDIO_THREAD_TIMEOUT &&
-                   track->getEvents().size() < humanTickPositions.size())
+            while (dspCycleCounter++ < AUDIO_THREAD_MAX_CYCLES &&
+                   !stopAudioThread.load(std::memory_order_acquire))
             {
                 mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
                 mpc.getClock()->processBufferInternal(
@@ -142,35 +143,30 @@ TEST_CASE("Can record and playback from different threads",
                     BUFFER_SIZE, 0);
                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
 
-                if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
-                {
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-                    continue;
-                }
-
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+                std::unique_lock<std::mutex> lock(tickMutex);
+                publishedTickPos = sequencer->getTransport()->getTickPosition();
+                tickUpdated = true;
+                tickCv.notify_one();
+                tickCv.wait(lock, [&]
+                            {
+                                return !tickUpdated ||
+                                       stopAudioThread.load(
+                                           std::memory_order_acquire);
+                            });
             }
 
             audioThreadBusy.store(false, std::memory_order_release);
+            tickCv.notify_one();
         });
-
-    int initialDelayCounter = 0;
-
-    while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
 
     if (!sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         sequencer->getTransport()->recFromStart();
     }
 
-    auto tickPos = sequencer->getTransport()->getTickPosition();
-    int prevTickPos = tickPos;
-    const auto insertionStart = std::chrono::steady_clock::now();
+    size_t nextHumanTickPosIndex = 0;
+    int prevTickPos = -1;
+    bool wrapped = false;
 
     auto triggerPad = [&mpc]
     {
@@ -198,47 +194,45 @@ TEST_CASE("Can record and playback from different threads",
         mpc.clientEventController->handleClientEvent(clientEvent);
     };
 
-    for (const auto hTickPos : humanTickPositions)
+    while (nextHumanTickPosIndex < humanTickPositions.size())
     {
-        bool looped = false;
-        bool shouldInsert = false;
-        auto deadline =
-            insertionStart + std::chrono::milliseconds(AUDIO_THREAD_TIMEOUT);
+        std::unique_lock<std::mutex> lock(tickMutex);
+        tickCv.wait(lock, [&]
+                    {
+                        return tickUpdated ||
+                               !audioThreadBusy.load(std::memory_order_acquire);
+                    });
 
-        while (std::chrono::steady_clock::now() < deadline)
-        {
-            tickPos = sequencer->getTransport()->getTickPosition();
-
-            if (tickPos < prevTickPos)
-            {
-                looped = true;
-                break;
-            }
-
-            if (tickPos >= hTickPos)
-            {
-                shouldInsert = true;
-                break;
-            }
-
-            prevTickPos = tickPos;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-
-        if (looped)
+        if (!audioThreadBusy.load(std::memory_order_acquire) && !tickUpdated)
         {
             break;
         }
 
-        if (!shouldInsert)
+        const auto tickPos = publishedTickPos;
+        tickUpdated = false;
+        lock.unlock();
+        tickCv.notify_one();
+
+        if (prevTickPos >= 0 && tickPos < prevTickPos)
         {
+            wrapped = true;
             break;
         }
 
-        triggerPad();
+        while (nextHumanTickPosIndex < humanTickPositions.size() &&
+               tickPos >= humanTickPositions[nextHumanTickPosIndex])
+        {
+            triggerPad();
+            nextHumanTickPosIndex++;
+        }
+
+        prevTickPos = tickPos;
     }
 
     sequencer->getTransport()->stop();
+
+    stopAudioThread.store(true, std::memory_order_release);
+    tickCv.notify_one();
 
     while (audioThreadBusy.load(std::memory_order_acquire))
     {
@@ -248,6 +242,9 @@ TEST_CASE("Can record and playback from different threads",
     audioThread.join();
 
     sequencer->getStateManager()->drainQueue();
+
+    REQUIRE(!wrapped);
+    REQUIRE(nextHumanTickPosIndex == humanTickPositions.size());
 
     // For - 1 explanation, see humanTickPositions comment
     REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
