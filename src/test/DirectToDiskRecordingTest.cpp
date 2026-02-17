@@ -130,25 +130,47 @@ TEST_CASE("Direct to disk recording does not start with silence",
     REQUIRE(have);
     REQUIRE(fs::exists(recordingPath));
 
-    std::uintmax_t lastSize = 0;
-    bool stable = false;
+    constexpr std::uintmax_t WAV_HEADER_BYTES = 44;
+    constexpr std::uintmax_t MIN_DATA_BYTES_FOR_100_MONO_SAMPLES = 100 * 2;
 
-    for (int tries = 0; tries < 400; ++tries)
+    std::uintmax_t lastSize = 0;
+    int stable = 0;
+    bool haveSize = false;
+
+    for (int tries = 0; tries < 400 && stable < 5; ++tries)
     {
-        if (fs::exists(recordingPath))
+        std::error_code ec;
+        const auto size = fs::file_size(recordingPath, ec);
+
+        if (!ec && size >= WAV_HEADER_BYTES + MIN_DATA_BYTES_FOR_100_MONO_SAMPLES)
         {
-            const auto sz = fs::file_size(recordingPath);
-            if (sz != 0 && sz == lastSize)
+            if (!haveSize)
             {
-                stable = true;
-                break;
+                haveSize = true;
+                lastSize = size;
+                stable = 1;
             }
-            lastSize = sz;
+            else if (size == lastSize)
+            {
+                ++stable;
+            }
+            else
+            {
+                lastSize = size;
+                stable = 1;
+            }
         }
+        else
+        {
+            haveSize = false;
+            stable = 0;
+            lastSize = 0;
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    REQUIRE(stable);
+    REQUIRE(stable >= 5);
 
     auto wavInputStream =
         std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
