@@ -10,6 +10,12 @@ ReleaseEraseCommand::ReleaseEraseCommand(Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseEraseCommand::execute()
 {
+    if (!mpc.getLayeredScreen()->isCurrentScreen(
+            {ScreenId::SequencerScreen}))
+    {
+        return;
+    }
+
     const auto sequencerScreen = mpc.screens->get<ScreenId::SequencerScreen>();
     sequencerScreen->hideHoldHintAndRestoreFooterWidgets();
 }
