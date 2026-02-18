@@ -11,6 +11,9 @@
 
 #include "Logger.hpp"
 
+#include <algorithm>
+#include <vector>
+
 #ifdef __APPLE__
 #include <CoreMIDI/CoreMIDI.h>
 #endif
@@ -25,6 +28,34 @@ using namespace mpc::lcdgui::screens::window;
 
 namespace
 {
+    RtMidiIn createMidiInForDeviceDetection()
+    {
+#ifdef __linux__
+        std::vector<RtMidi::Api> compiledApis;
+        RtMidi::getCompiledApi(compiledApis);
+
+        for (const auto api : {RtMidi::LINUX_ALSA, RtMidi::UNIX_JACK})
+        {
+            if (std::find(compiledApis.begin(), compiledApis.end(), api) ==
+                compiledApis.end())
+            {
+                continue;
+            }
+
+            try
+            {
+                return RtMidiIn(api);
+            }
+            catch (const RtMidiError &)
+            {
+                // Try the next preferred API.
+            }
+        }
+#endif
+
+        return RtMidiIn(RtMidi::UNSPECIFIED);
+    }
+
 #ifdef __APPLE__
     bool canCreateCoreMidiClient()
     {
@@ -69,7 +100,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                 }
 #endif
 
-                RtMidiIn rtMidiIn;
+                auto rtMidiIn = createMidiInForDeviceDetection();
 
                 if (!lower_my_priority())
                 {
