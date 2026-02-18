@@ -6,6 +6,7 @@
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
+#include "lcdgui/Field.hpp"
 
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SequenceStateView.hpp"
@@ -416,4 +417,107 @@ TEST_CASE("COPY6", "[events-screen]")
         REQUIRE(e2->getNote() == 27 + i);
         tickPos += 24;
     }
+}
+
+TEST_CASE("COPY7 - time0 scroll in 8 bars of 2/4", "[events-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+
+    seq->init(7); // 8 bars.
+    stateManager->drainQueue();
+    seq->setTimeSignature(0, seq->getLastBarIndex(), 2, 4);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+    mpc.getScreen()->function(1); // MAIN SCREEN > EDIT
+
+    REQUIRE(layeredScreen->getCurrentScreenId() == ScreenId::EventsScreen);
+    REQUIRE(layeredScreen->setFocus("time0"));
+
+    auto controls = mpc.getScreen();
+    auto barText = [&]
+    {
+        return controls->findChild<Field>("time0")->getText();
+    };
+
+    REQUIRE(barText() == "001");
+
+    for (const auto &expectedBar :
+         std::vector<std::string>{"002", "003", "004", "005",
+                                  "006", "007", "008", "009"})
+    {
+        controls->turnWheel(1);
+        REQUIRE(barText() == expectedBar);
+    }
+
+    controls->turnWheel(-1);
+    REQUIRE(barText() == "008");
+    controls->turnWheel(-1);
+    REQUIRE(barText() == "007");
+}
+
+TEST_CASE("COPY8 - all time fields scroll by their component", "[events-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+
+    seq->init(7); // 8 bars.
+    stateManager->drainQueue();
+    seq->setTimeSignature(0, seq->getLastBarIndex(), 2, 4);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+    mpc.getScreen()->function(1); // MAIN SCREEN > EDIT
+
+    REQUIRE(layeredScreen->getCurrentScreenId() == ScreenId::EventsScreen);
+
+    auto controls = mpc.getScreen();
+    auto text = [&](const std::string &fieldName)
+    {
+        return controls->findChild<Field>(fieldName)->getText();
+    };
+
+    REQUIRE(text("time0") == "001");
+    REQUIRE(text("time1") == "01");
+    REQUIRE(text("time2") == "00");
+    REQUIRE(text("time3") == "009");
+    REQUIRE(text("time4") == "01");
+    REQUIRE(text("time5") == "00");
+
+    REQUIRE(layeredScreen->setFocus("time1"));
+    controls->turnWheel(1);
+    REQUIRE(text("time1") == "02");
+    controls->turnWheel(1); // Clamp at max beat in 2/4.
+    REQUIRE(text("time1") == "02");
+
+    REQUIRE(layeredScreen->setFocus("time2"));
+    controls->turnWheel(1);
+    REQUIRE(text("time2") == "01");
+    controls->turnWheel(-1);
+    REQUIRE(text("time2") == "00");
+
+    REQUIRE(layeredScreen->setFocus("time3"));
+    controls->turnWheel(-1);
+    REQUIRE(text("time3") == "008");
+
+    REQUIRE(layeredScreen->setFocus("time4"));
+    controls->turnWheel(1);
+    REQUIRE(text("time4") == "02");
+    controls->turnWheel(1); // Clamp at max beat in 2/4.
+    REQUIRE(text("time4") == "02");
+
+    REQUIRE(layeredScreen->setFocus("time5"));
+    controls->turnWheel(1);
+    REQUIRE(text("time5") == "01");
 }
