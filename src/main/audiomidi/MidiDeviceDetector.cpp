@@ -53,7 +53,7 @@ namespace
         }
 #endif
 
-        return RtMidiIn(RtMidi::UNSPECIFIED);
+        return RtMidiIn();
     }
 
 #ifdef __APPLE__
