@@ -16,6 +16,7 @@ ChangeTsigScreen::ChangeTsigScreen(Mpc &mpc, const int layerIndex)
 
 void ChangeTsigScreen::open()
 {
+    ls.lock()->setFocus("newtsig");
     const auto lastBarIndex =
         sequencer.lock()->getSelectedSequence()->getLastBarIndex();
 
