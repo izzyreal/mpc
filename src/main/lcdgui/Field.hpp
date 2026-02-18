@@ -25,6 +25,7 @@ namespace mpc::lcdgui
         std::string nextFocus = "_";
 
         bool focusable = true;
+        bool focusableWhenHidden = false;
         bool focus = false;
         std::string csn;
         bool split = false;
@@ -37,6 +38,8 @@ namespace mpc::lcdgui
         bool hasFocus() const;
         void setFocusable(bool b);
         bool isFocusable() const;
+        void setFocusableWhenHidden(bool b);
+        bool isFocusableWhenHidden() const;
         void loseFocus(const std::string &next);
         void takeFocus();
         void setSplit(bool b);

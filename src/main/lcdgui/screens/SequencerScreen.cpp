@@ -276,6 +276,12 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             {
                                 ls.lock()->setFocus("nextsq");
                             }
+                            else if (
+                                sequencer.lock()->getTransport()->isPlaying() &&
+                                ls.lock()->getFocusedFieldName() == "nextsq")
+                            {
+                                ls.lock()->setFocus("sq");
+                            }
                         }});
 
     addReactiveBinding(
@@ -291,6 +297,8 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
+    findField("nextsq")->setFocusableWhenHidden(true);
+
     findField("loop")->setAlignment(Alignment::Centered);
     findField("on")->setAlignment(Alignment::Centered);
     findField("bars")->setAlignment(Alignment::Centered);
@@ -403,6 +411,11 @@ void SequencerScreen::hideHoldHintAndRestoreFooterWidgets()
     findChild("footer-label")->Hide(true);
     findChild("function-keys")->Hide(false);
     displayNextSq();
+
+    if (sequencer.lock()->getNextSq() >= MinSequenceIndex)
+    {
+        ls.lock()->setFocus("nextsq");
+    }
 }
 
 void SequencerScreen::close()
@@ -1177,7 +1190,10 @@ void SequencerScreen::displayNextSq()
     const auto footerIsVisible = !findChild("footer-label")->IsHidden();
     const auto hideNextSq = noNextSq || footerIsVisible;
 
-    setFunctionKeysArrangement(noNextSq ? 0 : 1);
+    if (!footerIsVisible)
+    {
+        setFunctionKeysArrangement(noNextSq ? 0 : 1);
+    }
 
     findLabel("nextsq")->Hide(hideNextSq);
     findField("nextsq")->Hide(hideNextSq);

@@ -16,7 +16,8 @@ bool Layer::setFocus(const std::string &fieldName)
 {
     const auto newFocus = findField(fieldName);
 
-    if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
+    if (!newFocus || !newFocus->isFocusable() ||
+        (newFocus->IsHidden() && !newFocus->isFocusableWhenHidden()))
     {
         return false;
     }
@@ -29,7 +30,14 @@ bool Layer::setFocus(const std::string &fieldName)
     focus = fieldName;
 
     newFocus->takeFocus();
-    findChild<ScreenComponent>()->bringToFront(newFocus.get());
+    const auto screen = findChild<ScreenComponent>();
+    screen->bringToFront(newFocus.get());
+
+    if (const auto footerLabel = screen->findChild("footer-label");
+        footerLabel && !footerLabel->IsHidden())
+    {
+        screen->bringToFront(footerLabel.get());
+    }
     return true;
 }
 

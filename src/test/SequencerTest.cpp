@@ -5,6 +5,7 @@
 #include "client/event/ClientEvent.hpp"
 #include "client/event/ClientHardwareEvent.hpp"
 #include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "command/TriggerLocalNoteOffCommand.hpp"
@@ -77,6 +78,346 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     sequencer->goToPreviousStep();
     stateManager->drainQueue();
     REQUIRE(pos() == 0);
+}
+
+TEST_CASE("Next Sq takes focus even when note repeat hint is visible",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    auto seq0 = sequencer->getSequence(0);
+    seq0->init(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+    hwController->lockNoteRepeat();
+
+    // Re-open so SequencerScreen::open applies the hold-hint UI branch.
+    layeredScreen->openScreenById(ScreenId::StepEditorScreen);
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    const auto screen = mpc.getScreen();
+    REQUIRE_FALSE(screen->findChild("footer-label")->IsHidden());
+    REQUIRE(screen->findField("nextsq")->IsHidden());
+}
+
+TEST_CASE("Next Sq focus is preserved across note repeat press/release",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    auto seq0 = sequencer->getSequence(0);
+    seq0->init(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+    REQUIRE_FALSE(mpc.getScreen()->findField("nextsq")->IsHidden());
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+
+    const auto tapPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapPress);
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+    REQUIRE(mpc.getScreen()->findField("nextsq")->IsHidden());
+
+    const auto tapRelease = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonRelease,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        0.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapRelease);
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+    REQUIRE_FALSE(mpc.getScreen()->findField("nextsq")->IsHidden());
+}
+
+TEST_CASE("Next Sq focus is preserved when releasing TAP after locking note repeat",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    auto seq0 = sequencer->getSequence(0);
+    seq0->init(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+
+    const auto tapPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapPress);
+
+    const auto shiftPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        SHIFT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(shiftPress);
+
+    REQUIRE(hwController->isNoteRepeatLocked());
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+    REQUIRE(mpc.getScreen()->findField("nextsq")->IsHidden());
+
+    const auto tapRelease = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonRelease,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        0.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapRelease);
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+}
+
+TEST_CASE("Next Sq focus survives lock flow when set via NEXT SEQ screen",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(0);
+    sequencer->getSequence(1)->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+
+    const auto tapPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapPress);
+
+    const auto shiftPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        SHIFT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(shiftPress);
+    REQUIRE(hwController->isNoteRepeatLocked());
+
+    const auto nextSeqPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        NEXT_SEQ,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    const auto nextSeqRelease = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonRelease,
+        std::nullopt,
+        NEXT_SEQ,
+        0.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(nextSeqPress);
+    hwController->handleClientHardwareEvent(nextSeqRelease);
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "next-seq");
+    mpc.getScreen()->turnWheel(1);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+    REQUIRE(sequencer->getNextSq() == mpc::SequenceIndex(1));
+
+    hwController->handleClientHardwareEvent(nextSeqPress);
+    hwController->handleClientHardwareEvent(nextSeqRelease);
+    REQUIRE(layeredScreen->getCurrentScreenName() == "sequencer");
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    const auto tapRelease = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonRelease,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        0.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapRelease);
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+}
+
+TEST_CASE("Releasing note repeat restores Next Sq focus when next sequence exists",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(0);
+    sequencer->getSequence(1)->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+
+    const auto tapPress = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapPress);
+
+    REQUIRE(mpc.getScreen()->findField("nextsq")->IsHidden());
+    REQUIRE(layeredScreen->setFocus("sq"));
+    REQUIRE(layeredScreen->getFocusedFieldName() == "sq");
+
+    const auto tapRelease = ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonRelease,
+        std::nullopt,
+        TAP_TEMPO_OR_NOTE_REPEAT,
+        0.f,
+        std::nullopt,
+        std::nullopt};
+    hwController->handleClientHardwareEvent(tapRelease);
+
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+}
+
+TEST_CASE("Focus returns to Sq after queued next sequence is consumed",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(0);
+    sequencer->getSequence(1)->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    // Emulate playback engine behavior when sequence end is reached:
+    // switch to queued sequence, then clear next sq.
+    sequencer->setSelectedSequenceIndex(mpc::SequenceIndex(1), false);
+    stateManager->drainQueue();
+    sequencer->clearNextSq();
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(sequencer->getSelectedSequenceIndex() == mpc::SequenceIndex(1));
+    REQUIRE(sequencer->getNextSq() == mpc::NoNextSequenceIndex);
+    REQUIRE(layeredScreen->getFocusedFieldName() == "sq");
 }
 
 TEST_CASE("Can record and playback from different threads",

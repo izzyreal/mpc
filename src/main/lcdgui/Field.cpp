@@ -40,7 +40,7 @@ void Field::setNextFocus(const std::string &newNextFocus)
 
 void Field::Hide(bool b)
 {
-    if (b && focus)
+    if (b && focus && !focusableWhenHidden)
     {
         mpc.getLayeredScreen()->setFocus(nextFocus);
     }
@@ -393,6 +393,16 @@ void Field::setFocusable(bool b)
 bool Field::isFocusable() const
 {
     return focusable;
+}
+
+void Field::setFocusableWhenHidden(const bool b)
+{
+    focusableWhenHidden = b;
+}
+
+bool Field::isFocusableWhenHidden() const
+{
+    return focusableWhenHidden;
 }
 
 bool Field::hasFocus() const

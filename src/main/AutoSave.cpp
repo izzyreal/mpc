@@ -403,6 +403,9 @@ void AutoSave::storeAutoSavedState(
         std::string currentScreen = layeredScreen->getFirstLayerScreenName();
 
         auto focus = layeredScreen->getFocusedFieldName();
+
+        if (focus == "nextsq") focus = "sq";
+
         auto soundIndex = mpc.getSampler()->getSoundIndex();
         auto selectedPad = mpc.clientEventController->getSelectedPad();
         auto selectedNote = mpc.clientEventController->getSelectedNote();
