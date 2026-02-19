@@ -8,6 +8,65 @@
 
 using namespace mpc;
 
+namespace
+{
+std::string getLoadedModulePath()
+{
+    Dl_info info;
+
+    if (dladdr((void*)MacBundleResources::getResourcePath, &info) == 0 ||
+        info.dli_fname == nullptr)
+    {
+        return {};
+    }
+
+    char* path_copy = realpath(info.dli_fname, nullptr);
+
+    if (!path_copy)
+    {
+        return {};
+    }
+
+    const std::string result(path_copy);
+    free(path_copy);
+    return result;
+}
+
+bool fileExists(const std::string& path)
+{
+    if (path.empty())
+    {
+        return false;
+    }
+
+    NSString* filePath = [NSString stringWithUTF8String:path.c_str()];
+    if (filePath == nil)
+    {
+        return false;
+    }
+
+    return [[NSFileManager defaultManager] fileExistsAtPath:filePath];
+}
+
+std::string getNonLv2ResourcePathFromLoadedModule(const std::string& resourceName)
+{
+    const auto modulePath = getLoadedModulePath();
+    if (modulePath.empty())
+    {
+        return {};
+    }
+
+    const auto markerPos = modulePath.rfind("/Contents/MacOS/");
+    if (markerPos == std::string::npos)
+    {
+        return {};
+    }
+
+    const auto bundleRoot = modulePath.substr(0, markerPos);
+    return bundleRoot + "/Contents/Resources/" + resourceName;
+}
+} // namespace
+
 std::string getNonLv2ResourcePath(const std::string& resourceName)
 {
     NSString *resourceNameNSString = [NSString stringWithUTF8String:resourceName.c_str()];
@@ -24,7 +83,7 @@ std::string getNonLv2ResourcePath(const std::string& resourceName)
 
 #if TARGET_OS_OSX
         NSURL *appexURL = [appBundleURL URLByAppendingPathComponent:@"Contents/PlugIns/VMPC2000XL.appex/"];
-        
+
         if ([[NSFileManager defaultManager] fileExistsAtPath:[appexURL path]]) {
             appBundleURL = appexURL;
         }
@@ -32,50 +91,33 @@ std::string getNonLv2ResourcePath(const std::string& resourceName)
         appBundleURL = [appBundleURL URLByAppendingPathComponent:@"PlugIns/VMPC2000XL.appex/"];
 #endif
     }
-    
+
 #if TARGET_OS_OSX
     NSString* filePath = [appBundleURL.path stringByAppendingString:@"/Contents/Resources/"];
 #else
     NSString* filePath = [appBundleURL.path stringByAppendingString:@"/"];
 #endif
-    
+
     filePath = [filePath stringByAppendingString:resourceNameNSString];
     return {[filePath UTF8String]};
 }
 
 std::string getLv2ResourcePath(const std::string& resourceName)
 {
-    Dl_info info;
-
-    if (dladdr((void*)MacBundleResources::getResourcePath, &info) == 0)
+    const auto modulePath = getLoadedModulePath();
+    if (modulePath.empty() || modulePath.find(".lv2") == std::string::npos)
     {
         return {};
     }
 
-    char* path_copy = realpath(info.dli_fname, nullptr);
-
-    if (!path_copy)
+    const auto lastSlash = modulePath.rfind('/');
+    if (lastSlash == std::string::npos)
     {
-        return "";
+        return {};
     }
 
-    if (std::string(path_copy).find(".lv2") == std::string::npos)
-    {
-        free(path_copy);
-        return "";
-    }
-
-    char* last_slash = strrchr(path_copy, '/');
-    if (last_slash) *last_slash = '\0';
-
-    char* resources_path = (char*)malloc(PATH_MAX);
-
-    snprintf(resources_path, PATH_MAX, "%s/resources", path_copy);
-    free(path_copy);
-
-    const auto result = std::string(resources_path) + "/" + resourceName;
-    free(resources_path);
-    return result;
+    const auto moduleDir = modulePath.substr(0, lastSlash);
+    return moduleDir + "/resources/" + resourceName;
 }
 
 std::string MacBundleResources::getResourcePath(const std::string& resourceName)
@@ -85,6 +127,12 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
     if (!lv2ResourcePath.empty())
     {
         return lv2ResourcePath;
+    }
+
+    auto moduleDerivedPath = getNonLv2ResourcePathFromLoadedModule(resourceName);
+    if (fileExists(moduleDerivedPath))
+    {
+        return moduleDerivedPath;
     }
 
     return getNonLv2ResourcePath(resourceName);
