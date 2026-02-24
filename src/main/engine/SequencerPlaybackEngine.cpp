@@ -25,7 +25,10 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
-#include <string>
+#include <thread>
+#include <atomic>
+
+#include "concurrency/BoundedMpmcQueue.hpp"
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -178,7 +181,7 @@ namespace
 
         bool maybeBuildReport(const int sampleRate, const int nFrames,
                               const double deadlineUs,
-                              std::string &outReport) noexcept
+                              char (&outReport)[512]) noexcept
         {
             const auto now = telemetryNow();
             if (telemetryDeltaUs(lastReportCounter, now) < ReportIntervalUs)
@@ -240,9 +243,8 @@ namespace
             const double p99WorkUs = computeP99(recentWorkUs, recentCount);
             const double p99HeadroomUs = deadlineUs - p99WorkUs;
 
-            char line[512];
             std::snprintf(
-                line, sizeof(line),
+                outReport, sizeof(outReport),
                 "[AUDIO_TELEMETRY] sr=%d bs=%d deadline_us=%.2f buffers=%llu "
                 "avg_us=%.2f p99_us=%.2f max_us=%.2f avg_loop_us=%.2f "
                 "max_loop_us=%.2f avg_midi_us=%.2f max_midi_us=%.2f "
@@ -262,8 +264,6 @@ namespace
                 avgTracksVisited, avgPlayNextCalls, p99HeadroomUs,
                 static_cast<unsigned long long>(totalOverruns), overrunPercent,
                 avgTicks, maxTicksInBuffer);
-
-            outReport.assign(line);
             return true;
         }
     };
@@ -271,6 +271,71 @@ namespace
     AudioTelemetry &audioTelemetry() noexcept
     {
         static AudioTelemetry instance;
+        return instance;
+    }
+
+    struct TelemetryLine
+    {
+        char text[512];
+    };
+
+    class TelemetryLogger
+    {
+    public:
+        TelemetryLogger() : running(true), worker([this] { run(); }) {}
+
+        ~TelemetryLogger()
+        {
+            running.store(false, std::memory_order_release);
+            if (worker.joinable())
+            {
+                worker.join();
+            }
+        }
+
+        void enqueue(const char (&line)[512]) noexcept
+        {
+            TelemetryLine message{};
+            std::snprintf(message.text, sizeof(message.text), "%s", line);
+            queue.enqueue(std::move(message));
+        }
+
+    private:
+        static constexpr size_t QueueCapacity = 128;
+        mpc::concurrency::BoundedMpmcQueue<TelemetryLine, QueueCapacity> queue;
+        std::atomic<bool> running{false};
+        std::thread worker;
+
+        void run() noexcept
+        {
+            while (running.load(std::memory_order_acquire))
+            {
+                TelemetryLine line{};
+                while (queue.dequeue(line))
+                {
+                    std::fputs(line.text, stdout);
+                    std::fflush(stdout);
+                }
+
+#ifdef _WIN32
+                Sleep(2);
+#else
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
+#endif
+            }
+
+            TelemetryLine line{};
+            while (queue.dequeue(line))
+            {
+                std::fputs(line.text, stdout);
+                std::fflush(stdout);
+            }
+        }
+    };
+
+    TelemetryLogger &telemetryLogger() noexcept
+    {
+        static TelemetryLogger instance;
         return instance;
     }
 } // namespace
@@ -302,6 +367,9 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
           engineHost, getSampleRate, getMidiOutput, sequencer, getScreens,
           isBouncing))
 {
+#ifdef VMPC_AUDIO_TELEMETRY
+    telemetryLogger();
+#endif
 }
 
 unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
@@ -755,16 +823,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
             workUs, loopWorkUs, deadlineUs, processedTickCount, midiClockPhaseUs,
             triggerClickPhaseUs, playTickPhaseUs, noteRepeatPhaseUs, drainPhaseUs,
             uiPostPhaseUs, tracksVisitedCount, playNextCallsCount);
-        std::string telemetryReport;
+        char telemetryReport[512]{};
         if (audioTelemetry().maybeBuildReport(sampleRate, nFrames, deadlineUs,
                                               telemetryReport))
         {
-            layeredScreen->postToUiThread(utils::Task(
-                [report = std::move(telemetryReport)]
-                {
-                    std::fputs(report.c_str(), stdout);
-                    std::fflush(stdout);
-                }));
+            telemetryLogger().enqueue(telemetryReport);
         }
 #endif
         return;
@@ -990,16 +1053,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
         workUs, loopWorkUs, deadlineUs, processedTickCount, midiClockPhaseUs,
         triggerClickPhaseUs, playTickPhaseUs, noteRepeatPhaseUs, drainPhaseUs,
         uiPostPhaseUs, tracksVisitedCount, playNextCallsCount);
-    std::string telemetryReport;
+    char telemetryReport[512]{};
     if (audioTelemetry().maybeBuildReport(sampleRate, nFrames, deadlineUs,
                                           telemetryReport))
     {
-        layeredScreen->postToUiThread(utils::Task(
-            [report = std::move(telemetryReport)]
-            {
-                std::fputs(report.c_str(), stdout);
-                std::fflush(stdout);
-            }));
+        telemetryLogger().enqueue(telemetryReport);
     }
 #endif
 }
