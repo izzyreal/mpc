@@ -180,6 +180,10 @@ if(VMPC2000XL_WIN7)
     target_compile_definitions(mpc PRIVATE VMPC2000XL_WIN7)
 endif()
 
+if(VMPC_AUDIO_TELEMETRY)
+    target_compile_definitions(mpc PRIVATE VMPC_AUDIO_TELEMETRY)
+endif()
+
 if (IOS)
     target_compile_definitions(rtmidi PRIVATE TARGET_OS_IPHONE=1)
 endif()

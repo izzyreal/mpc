@@ -20,11 +20,188 @@
 #include "performance/PerformanceManager.hpp"
 #include "performance/PerformanceMessage.hpp"
 
+#ifdef VMPC_AUDIO_TELEMETRY
+#include <array>
+#include <algorithm>
+#include <cstdio>
+#include <cmath>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#else
+#include <chrono>
+#endif
+#endif
+
 using namespace mpc::engine;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+
+#ifdef VMPC_AUDIO_TELEMETRY
+namespace
+{
+#ifdef _WIN32
+    inline int64_t telemetryNow() noexcept
+    {
+        LARGE_INTEGER value;
+        QueryPerformanceCounter(&value);
+        return value.QuadPart;
+    }
+
+    inline double telemetryDeltaUs(const int64_t begin,
+                                   const int64_t end) noexcept
+    {
+        static const double inverseFreqUs =
+            []
+            {
+                LARGE_INTEGER freq;
+                QueryPerformanceFrequency(&freq);
+                return 1000000.0 / static_cast<double>(freq.QuadPart);
+            }();
+
+        return static_cast<double>(end - begin) * inverseFreqUs;
+    }
+#else
+    inline int64_t telemetryNow() noexcept
+    {
+        using namespace std::chrono;
+        return duration_cast<microseconds>(
+                   steady_clock::now().time_since_epoch())
+            .count();
+    }
+
+    inline double telemetryDeltaUs(const int64_t begin,
+                                   const int64_t end) noexcept
+    {
+        return static_cast<double>(end - begin);
+    }
+#endif
+
+    struct AudioTelemetry
+    {
+        static constexpr size_t SampleWindow = 256;
+        static constexpr double ReportIntervalUs = 2000000.0;
+
+        std::array<double, SampleWindow> recentWorkUs{};
+        size_t recentWriteIndex = 0;
+        size_t recentCount = 0;
+
+        uint64_t totalBuffers = 0;
+        uint64_t totalOverruns = 0;
+        uint64_t totalTicks = 0;
+        uint32_t maxTicksInBuffer = 0;
+
+        double sumWorkUs = 0.0;
+        double maxWorkUs = 0.0;
+        double sumLoopUs = 0.0;
+        double maxLoopUs = 0.0;
+
+        int64_t lastReportCounter = telemetryNow();
+
+        void pushSample(const double workUs, const double loopUs,
+                        const double deadlineUs, const uint32_t tickCount) noexcept
+        {
+            totalBuffers++;
+            totalTicks += tickCount;
+            maxTicksInBuffer = std::max(maxTicksInBuffer, tickCount);
+            sumWorkUs += workUs;
+            sumLoopUs += loopUs;
+            maxWorkUs = std::max(maxWorkUs, workUs);
+            maxLoopUs = std::max(maxLoopUs, loopUs);
+
+            if (workUs > deadlineUs)
+            {
+                totalOverruns++;
+            }
+
+            recentWorkUs[recentWriteIndex] = workUs;
+            recentWriteIndex = (recentWriteIndex + 1) % SampleWindow;
+            recentCount = std::min(recentCount + 1, SampleWindow);
+        }
+
+        static double computeP99(const std::array<double, SampleWindow> &buffer,
+                                 const size_t count) noexcept
+        {
+            if (count == 0)
+            {
+                return 0.0;
+            }
+
+            std::array<double, SampleWindow> scratch{};
+            std::copy_n(buffer.begin(), count, scratch.begin());
+            const size_t p99Index = static_cast<size_t>(
+                std::ceil(static_cast<double>(count) * 0.99)) -
+                1;
+            std::nth_element(scratch.begin(), scratch.begin() + p99Index,
+                             scratch.begin() + count);
+            return scratch[p99Index];
+        }
+
+        void maybeReport(const int sampleRate, const int nFrames,
+                         const double deadlineUs) noexcept
+        {
+            const auto now = telemetryNow();
+            if (telemetryDeltaUs(lastReportCounter, now) < ReportIntervalUs)
+            {
+                return;
+            }
+
+            lastReportCounter = now;
+
+            const double avgWorkUs =
+                totalBuffers > 0 ? (sumWorkUs / static_cast<double>(totalBuffers))
+                                 : 0.0;
+            const double avgLoopUs =
+                totalBuffers > 0 ? (sumLoopUs / static_cast<double>(totalBuffers))
+                                 : 0.0;
+            const double avgTicks =
+                totalBuffers > 0 ? (static_cast<double>(totalTicks) /
+                                    static_cast<double>(totalBuffers))
+                                 : 0.0;
+            const double overrunPercent =
+                totalBuffers > 0
+                    ? (100.0 * static_cast<double>(totalOverruns) /
+                       static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double p99WorkUs = computeP99(recentWorkUs, recentCount);
+            const double p99HeadroomUs = deadlineUs - p99WorkUs;
+
+            char line[512];
+            std::snprintf(
+                line, sizeof(line),
+                "[AUDIO_TELEMETRY] sr=%d bs=%d deadline_us=%.2f buffers=%llu "
+                "avg_us=%.2f p99_us=%.2f max_us=%.2f avg_loop_us=%.2f "
+                "max_loop_us=%.2f p99_headroom_us=%.2f overruns=%llu "
+                "(%.2f%%) avg_ticks=%.2f max_ticks=%u\n",
+                sampleRate, nFrames, deadlineUs,
+                static_cast<unsigned long long>(totalBuffers), avgWorkUs,
+                p99WorkUs, maxWorkUs, avgLoopUs, maxLoopUs, p99HeadroomUs,
+                static_cast<unsigned long long>(totalOverruns),
+                overrunPercent, avgTicks, maxTicksInBuffer);
+
+            std::fputs(line, stdout);
+            std::fflush(stdout);
+
+            if (auto *log = std::fopen("vmpc.log", "a"))
+            {
+                std::fputs(line, log);
+                std::fclose(log);
+            }
+        }
+    };
+
+    AudioTelemetry &audioTelemetry() noexcept
+    {
+        static AudioTelemetry instance;
+        return instance;
+    }
+} // namespace
+#endif
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
     performance::PerformanceManager *performanceManager, EngineHost *engineHost,
@@ -427,6 +604,12 @@ void SequencerPlaybackEngine::stopSequencer() const
 void SequencerPlaybackEngine::work(const int nFrames)
 {
     // printf("BUFFER\n");
+#ifdef VMPC_AUDIO_TELEMETRY
+    const auto telemetryStart = telemetryNow();
+    double loopWorkUs = 0.0;
+    uint32_t processedTickCount = 0;
+#endif
+
     const auto manager = sequencer->getStateManager();
     const auto realtimeStateAccess = manager->scopedRealtimeStateAccess();
     manager->drainQueue();
@@ -457,10 +640,28 @@ void SequencerPlaybackEngine::work(const int nFrames)
                 tickCursor++;
             }
         }
+#ifdef VMPC_AUDIO_TELEMETRY
+        processedTickCount = static_cast<uint32_t>(ticksForCurrentBuffer.size());
+#endif
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto loopEnd = telemetryNow();
+        loopWorkUs = telemetryDeltaUs(telemetryStart, loopEnd);
+#endif
         manager->publishActiveState();
         clock->clearTicks();
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto telemetryEnd = telemetryNow();
+        const auto workUs = telemetryDeltaUs(telemetryStart, telemetryEnd);
+        const auto deadlineUs = (sampleRate > 0)
+                                    ? (1000000.0 * static_cast<double>(nFrames) /
+                                       static_cast<double>(sampleRate))
+                                    : 0.0;
+        audioTelemetry().pushSample(workUs, loopWorkUs, deadlineUs,
+                                    processedTickCount);
+        audioTelemetry().maybeReport(sampleRate, nFrames, deadlineUs);
+#endif
         return;
     }
 
@@ -514,6 +715,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
+#ifdef VMPC_AUDIO_TELEMETRY
+    const auto loopStart = telemetryNow();
+#endif
     size_t tickCursor = 0;
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
@@ -525,6 +729,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
             tickCountAtThisFrameIndex++;
             tickCursor++;
         }
+#ifdef VMPC_AUDIO_TELEMETRY
+        processedTickCount += static_cast<uint32_t>(tickCountAtThisFrameIndex);
+#endif
 
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex, tickCountAtThisFrameIndex);
@@ -619,7 +826,23 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         manager->drainQueueWithoutPublish();
     }
+#ifdef VMPC_AUDIO_TELEMETRY
+    const auto loopEnd = telemetryNow();
+    loopWorkUs = telemetryDeltaUs(loopStart, loopEnd);
+#endif
 
     manager->publishActiveState();
     clock->clearTicks();
+
+#ifdef VMPC_AUDIO_TELEMETRY
+    const auto telemetryEnd = telemetryNow();
+    const auto workUs = telemetryDeltaUs(telemetryStart, telemetryEnd);
+    const auto deadlineUs = (sampleRate > 0)
+                                ? (1000000.0 * static_cast<double>(nFrames) /
+                                   static_cast<double>(sampleRate))
+                                : 0.0;
+    audioTelemetry().pushSample(workUs, loopWorkUs, deadlineUs,
+                                processedTickCount);
+    audioTelemetry().maybeReport(sampleRate, nFrames, deadlineUs);
+#endif
 }
