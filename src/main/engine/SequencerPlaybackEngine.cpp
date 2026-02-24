@@ -66,9 +66,9 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
         Sequencer::ticksToQuarterNotes(newTickPos));
 
     const auto manager = sequencer->getStateManager();
-    manager->drainQueue();
+    manager->drainQueueWithoutPublish();
     manager->enqueue(SyncTrackEventIndices{sequenceIndex});
-    manager->drainQueue();
+    manager->drainQueueWithoutPublish();
 }
 
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
@@ -76,9 +76,9 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
     sequencer->playTick(sequencer->getTransport()->getTickPosition());
     const auto nextSequenceIndex = sequencer->getNextSq();
     sequencer->setSelectedSequenceIndex(nextSequenceIndex, false);
-    sequencer->getStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueueWithoutPublish();
     sequencer->clearNextSq();
-    sequencer->getStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueueWithoutPublish();
     setTickPositionEffectiveImmediately(0, nextSequenceIndex);
     return sequencer->getCurrentlyPlayingSequence();
 }
@@ -209,7 +209,7 @@ void SequencerPlaybackEngine::stopCountingInIfRequired(
         setTickPositionEffectiveImmediately(
             transport->getCountInStartPosTicks(), sequenceIndex);
         transport->setCountingIn(false);
-        sequencer->getStateManager()->drainQueue();
+        sequencer->getStateManager()->drainQueueWithoutPublish();
     }
 }
 
@@ -225,7 +225,7 @@ bool SequencerPlaybackEngine::processSongMode() const
 
     sequencer->playTick(seq->getLastTick() - 1);
     sequencer->getTransport()->incrementPlayedStepRepetitions();
-    sequencer->getStateManager()->drainQueue();
+    sequencer->getStateManager()->drainQueueWithoutPublish();
     const auto song = sequencer->getSelectedSong();
     const auto stepIndex = sequencer->getSelectedSongStepIndex();
     const auto step = song->getStep(stepIndex);
@@ -241,7 +241,7 @@ bool SequencerPlaybackEngine::processSongMode() const
     {
         sequencer->getTransport()->resetPlayedStepRepetitions();
         sequencer->setSelectedSongStepIndex(song->getFirstLoopStepIndex());
-        sequencer->getStateManager()->drainQueue();
+        sequencer->getStateManager()->drainQueueWithoutPublish();
 
         if (const auto newStep = song->getStep(song->getFirstLoopStepIndex());
             !sequencer->getSequence(newStep.sequenceIndex)->isUsed())
@@ -428,6 +428,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     // printf("BUFFER\n");
     const auto manager = sequencer->getStateManager();
+    const auto realtimeStateAccess = manager->scopedRealtimeStateAccess();
     manager->drainQueue();
 
     const auto sequencerSnapshot = manager->getSnapshot();
@@ -452,10 +453,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
             {
                 triggerClickIfNeeded();
                 manager->enqueue(BumpMetronomeOnlyTickPositionOneTick{});
-                manager->drainQueue();
+                manager->drainQueueWithoutPublish();
             }
         }
 
+        manager->publishActiveState();
         clock->clearTicks();
 
         return;
@@ -499,9 +501,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
             sequencer->getTransport()->setPosition(wrappedPosition);
         }
 
-        manager->drainQueue();
+        manager->drainQueueWithoutPublish();
         seq = sequencer->getCurrentlyPlayingSequence();
-        manager->applyMessageImmediate(
+        manager->applyMessageImmediateWithoutPublish(
             SyncTrackEventIndices{seq->getSequenceIndex()});
     }
 
@@ -555,7 +557,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->getTransport()->bumpPositionByTicks(
                 tickCountAtThisFrameIndex - 1);
-            manager->drainQueue();
+            manager->drainQueueWithoutPublish();
         }
 
         tickFrameOffset = frameIndex;
@@ -571,7 +573,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (sequencer->getTransport()->isCountingIn())
         {
             sequencer->getTransport()->bumpPositionByTicks(1);
-            manager->drainQueue();
+            manager->drainQueueWithoutPublish();
             stopCountingInIfRequired(seq->getSequenceIndex());
             continue;
         }
@@ -615,8 +617,9 @@ void SequencerPlaybackEngine::work(const int nFrames)
             sequencer->getTransport()->bumpPositionByTicks(1);
         }
 
-        manager->drainQueue();
+        manager->drainQueueWithoutPublish();
     }
 
+    manager->publishActiveState();
     clock->clearTicks();
 }

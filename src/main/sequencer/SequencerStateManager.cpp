@@ -17,6 +17,9 @@
 using namespace mpc::sequencer;
 using namespace mpc::concurrency;
 
+thread_local bool SequencerStateManager::preferActiveStateForCurrentThread =
+    false;
+
 SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     : AtomicStateExchange([](SequencerState &) {}), sequencer(sequencer)
 {
@@ -37,6 +40,35 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
 }
 
 SequencerStateManager::~SequencerStateManager() {}
+
+SequencerStateManager::ScopedRealtimeStateAccess::ScopedRealtimeStateAccess()
+    noexcept
+{
+    previousValue = SequencerStateManager::preferActiveStateForCurrentThread;
+    SequencerStateManager::preferActiveStateForCurrentThread = true;
+}
+
+SequencerStateManager::ScopedRealtimeStateAccess::~ScopedRealtimeStateAccess()
+    noexcept
+{
+    SequencerStateManager::preferActiveStateForCurrentThread = previousValue;
+}
+
+SequencerStateManager::ScopedRealtimeStateAccess
+SequencerStateManager::scopedRealtimeStateAccess() const noexcept
+{
+    return ScopedRealtimeStateAccess{};
+}
+
+SequencerStateView SequencerStateManager::getSnapshot() const noexcept
+{
+    if (preferActiveStateForCurrentThread)
+    {
+        return SequencerStateView{&activeState};
+    }
+
+    return AtomicStateExchange::getSnapshot();
+}
 
 void SequencerStateManager::returnEventToPool(EventData *e) const
 {

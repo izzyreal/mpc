@@ -50,39 +50,18 @@ namespace mpc::concurrency
 
         void drainQueue() noexcept
         {
-            alignas(Message) unsigned char msgBuf[sizeof(Message)];
-            auto *msg = reinterpret_cast<Message *>(msgBuf);
-
-            bool shouldPublish = false;
-
-            while (queue.dequeue(*msg))
-            {
-                applyMessage(*msg);
-                msg->~Message();
-                shouldPublish = true;
-            }
-
+            const bool shouldPublish = drainMessages();
             if (shouldPublish)
             {
                 publishState();
             }
+            runActionsAndCallbacks();
+        }
 
-            for (auto &a : actions)
-            {
-                a();
-            }
-
-            actions.clear();
-
-            alignas(utils::SimpleAction) unsigned char
-                cbBuf[sizeof(utils::SimpleAction)];
-            auto *cb = reinterpret_cast<utils::SimpleAction *>(cbBuf);
-
-            while (callbackQueue.dequeue(*cb))
-            {
-                (*cb)();
-                cb->~SmallFn();
-            }
+        void drainQueueWithoutPublish() noexcept
+        {
+            drainMessages();
+            runActionsAndCallbacks();
         }
 
         View getSnapshot() const noexcept
@@ -95,23 +74,18 @@ namespace mpc::concurrency
         {
             applyMessage(msg);
             publishState();
+            runActionsAndCallbacks();
+        }
 
-            for (auto &a : actions)
-            {
-                a();
-            }
+        void applyMessageImmediateWithoutPublish(Message &&msg) noexcept
+        {
+            applyMessage(msg);
+            runActionsAndCallbacks();
+        }
 
-            actions.clear();
-
-            alignas(utils::SimpleAction) unsigned char
-                cbBuf[sizeof(utils::SimpleAction)];
-            auto *cb = reinterpret_cast<utils::SimpleAction *>(cbBuf);
-
-            while (callbackQueue.dequeue(*cb))
-            {
-                (*cb)();
-                cb->~SmallFn();
-            }
+        void publishActiveState() noexcept
+        {
+            publishState();
         }
 
     protected:
@@ -156,6 +130,42 @@ namespace mpc::concurrency
 
         MessageQueue queue;
         CallbackQueue callbackQueue;
+
+        bool drainMessages() noexcept
+        {
+            alignas(Message) unsigned char msgBuf[sizeof(Message)];
+            auto *msg = reinterpret_cast<Message *>(msgBuf);
+
+            bool didApplyAnyMessages = false;
+            while (queue.dequeue(*msg))
+            {
+                applyMessage(*msg);
+                msg->~Message();
+                didApplyAnyMessages = true;
+            }
+
+            return didApplyAnyMessages;
+        }
+
+        void runActionsAndCallbacks() noexcept
+        {
+            for (auto &a : actions)
+            {
+                a();
+            }
+
+            actions.clear();
+
+            alignas(utils::SimpleAction) unsigned char
+                cbBuf[sizeof(utils::SimpleAction)];
+            auto *cb = reinterpret_cast<utils::SimpleAction *>(cbBuf);
+
+            while (callbackQueue.dequeue(*cb))
+            {
+                (*cb)();
+                cb->~SmallFn();
+            }
+        }
     };
 
 } // namespace mpc::concurrency

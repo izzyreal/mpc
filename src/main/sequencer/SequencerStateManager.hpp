@@ -29,6 +29,25 @@ namespace mpc::sequencer
         explicit SequencerStateManager(Sequencer *);
         ~SequencerStateManager() override;
 
+        class ScopedRealtimeStateAccess
+        {
+        public:
+            ScopedRealtimeStateAccess() noexcept;
+            ~ScopedRealtimeStateAccess() noexcept;
+
+            ScopedRealtimeStateAccess(const ScopedRealtimeStateAccess &) =
+                delete;
+            ScopedRealtimeStateAccess &
+            operator=(const ScopedRealtimeStateAccess &) = delete;
+
+        private:
+            bool previousValue = false;
+        };
+
+        ScopedRealtimeStateAccess scopedRealtimeStateAccess() const noexcept;
+
+        SequencerStateView getSnapshot() const noexcept;
+
         using EventPool =
             concurrency::FreeList<EventData,
                                   Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
@@ -81,6 +100,8 @@ namespace mpc::sequencer
         void applyMessage(const SequencerMessage &msg) noexcept override;
 
     private:
+        static thread_local bool preferActiveStateForCurrentThread;
+
         static constexpr uint8_t LIVE_NOTE_EVENT_RECORDING_CAPACITY = 128;
 
         Sequencer *sequencer;
