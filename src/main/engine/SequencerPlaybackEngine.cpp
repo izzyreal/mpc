@@ -282,7 +282,10 @@ namespace
     class TelemetryLogger
     {
     public:
-        TelemetryLogger() : running(true), worker([this] { run(); }) {}
+        TelemetryLogger() : running(true), worker([this] { run(); })
+        {
+            enqueue("[AUDIO_TELEMETRY] logger_thread_started\n");
+        }
 
         ~TelemetryLogger()
         {
@@ -293,7 +296,7 @@ namespace
             }
         }
 
-        void enqueue(const char (&line)[512]) noexcept
+        void enqueue(const char *line) noexcept
         {
             TelemetryLine message{};
             std::snprintf(message.text, sizeof(message.text), "%s", line);
@@ -315,6 +318,14 @@ namespace
                 {
                     std::fputs(line.text, stdout);
                     std::fflush(stdout);
+#ifdef _WIN32
+                    OutputDebugStringA(line.text);
+                    if (auto *log = std::fopen("vmpc.log", "a"))
+                    {
+                        std::fputs(line.text, log);
+                        std::fclose(log);
+                    }
+#endif
                 }
 
 #ifdef _WIN32
@@ -329,6 +340,14 @@ namespace
             {
                 std::fputs(line.text, stdout);
                 std::fflush(stdout);
+#ifdef _WIN32
+                OutputDebugStringA(line.text);
+                if (auto *log = std::fopen("vmpc.log", "a"))
+                {
+                    std::fputs(line.text, log);
+                    std::fclose(log);
+                }
+#endif
             }
         }
     };
