@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
+#include <string>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -100,11 +101,30 @@ namespace
         double maxWorkUs = 0.0;
         double sumLoopUs = 0.0;
         double maxLoopUs = 0.0;
+        double sumMidiClockUs = 0.0;
+        double maxMidiClockUs = 0.0;
+        double sumTriggerClickUs = 0.0;
+        double maxTriggerClickUs = 0.0;
+        double sumPlayTickUs = 0.0;
+        double maxPlayTickUs = 0.0;
+        double sumNoteRepeatUs = 0.0;
+        double maxNoteRepeatUs = 0.0;
+        double sumDrainUs = 0.0;
+        double maxDrainUs = 0.0;
+        double sumUiPostUs = 0.0;
+        double maxUiPostUs = 0.0;
+        uint64_t totalTracksVisited = 0;
+        uint64_t totalPlayNextCalls = 0;
 
         int64_t lastReportCounter = telemetryNow();
 
         void pushSample(const double workUs, const double loopUs,
-                        const double deadlineUs, const uint32_t tickCount) noexcept
+                        const double deadlineUs, const uint32_t tickCount,
+                        const double midiClockUs, const double triggerClickUs,
+                        const double playTickUs, const double noteRepeatUs,
+                        const double drainUs, const double uiPostUs,
+                        const uint32_t tracksVisited,
+                        const uint32_t playNextCalls) noexcept
         {
             totalBuffers++;
             totalTicks += tickCount;
@@ -113,6 +133,20 @@ namespace
             sumLoopUs += loopUs;
             maxWorkUs = std::max(maxWorkUs, workUs);
             maxLoopUs = std::max(maxLoopUs, loopUs);
+            sumMidiClockUs += midiClockUs;
+            maxMidiClockUs = std::max(maxMidiClockUs, midiClockUs);
+            sumTriggerClickUs += triggerClickUs;
+            maxTriggerClickUs = std::max(maxTriggerClickUs, triggerClickUs);
+            sumPlayTickUs += playTickUs;
+            maxPlayTickUs = std::max(maxPlayTickUs, playTickUs);
+            sumNoteRepeatUs += noteRepeatUs;
+            maxNoteRepeatUs = std::max(maxNoteRepeatUs, noteRepeatUs);
+            sumDrainUs += drainUs;
+            maxDrainUs = std::max(maxDrainUs, drainUs);
+            sumUiPostUs += uiPostUs;
+            maxUiPostUs = std::max(maxUiPostUs, uiPostUs);
+            totalTracksVisited += tracksVisited;
+            totalPlayNextCalls += playNextCalls;
 
             if (workUs > deadlineUs)
             {
@@ -142,13 +176,14 @@ namespace
             return scratch[p99Index];
         }
 
-        void maybeReport(const int sampleRate, const int nFrames,
-                         const double deadlineUs) noexcept
+        bool maybeBuildReport(const int sampleRate, const int nFrames,
+                              const double deadlineUs,
+                              std::string &outReport) noexcept
         {
             const auto now = telemetryNow();
             if (telemetryDeltaUs(lastReportCounter, now) < ReportIntervalUs)
             {
-                return;
+                return false;
             }
 
             lastReportCounter = now;
@@ -163,6 +198,40 @@ namespace
                 totalBuffers > 0 ? (static_cast<double>(totalTicks) /
                                     static_cast<double>(totalBuffers))
                                  : 0.0;
+            const double avgMidiClockUs =
+                totalBuffers > 0
+                    ? (sumMidiClockUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgTriggerClickUs =
+                totalBuffers > 0
+                    ? (sumTriggerClickUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgPlayTickUs =
+                totalBuffers > 0
+                    ? (sumPlayTickUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgNoteRepeatUs =
+                totalBuffers > 0
+                    ? (sumNoteRepeatUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgDrainUs =
+                totalBuffers > 0
+                    ? (sumDrainUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgUiPostUs =
+                totalBuffers > 0
+                    ? (sumUiPostUs / static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgTracksVisited =
+                totalBuffers > 0
+                    ? (static_cast<double>(totalTracksVisited) /
+                       static_cast<double>(totalBuffers))
+                    : 0.0;
+            const double avgPlayNextCalls =
+                totalBuffers > 0
+                    ? (static_cast<double>(totalPlayNextCalls) /
+                       static_cast<double>(totalBuffers))
+                    : 0.0;
             const double overrunPercent =
                 totalBuffers > 0
                     ? (100.0 * static_cast<double>(totalOverruns) /
@@ -176,22 +245,26 @@ namespace
                 line, sizeof(line),
                 "[AUDIO_TELEMETRY] sr=%d bs=%d deadline_us=%.2f buffers=%llu "
                 "avg_us=%.2f p99_us=%.2f max_us=%.2f avg_loop_us=%.2f "
-                "max_loop_us=%.2f p99_headroom_us=%.2f overruns=%llu "
-                "(%.2f%%) avg_ticks=%.2f max_ticks=%u\n",
+                "max_loop_us=%.2f avg_midi_us=%.2f max_midi_us=%.2f "
+                "avg_click_us=%.2f max_click_us=%.2f avg_playtick_us=%.2f "
+                "max_playtick_us=%.2f avg_note_repeat_us=%.2f "
+                "max_note_repeat_us=%.2f avg_drain_us=%.2f max_drain_us=%.2f "
+                "avg_ui_post_us=%.2f max_ui_post_us=%.2f "
+                "avg_tracks_visited=%.2f avg_playnext_calls=%.2f "
+                "p99_headroom_us=%.2f overruns=%llu (%.2f%%) avg_ticks=%.2f "
+                "max_ticks=%u\n",
                 sampleRate, nFrames, deadlineUs,
                 static_cast<unsigned long long>(totalBuffers), avgWorkUs,
-                p99WorkUs, maxWorkUs, avgLoopUs, maxLoopUs, p99HeadroomUs,
-                static_cast<unsigned long long>(totalOverruns),
-                overrunPercent, avgTicks, maxTicksInBuffer);
+                p99WorkUs, maxWorkUs, avgLoopUs, maxLoopUs, avgMidiClockUs,
+                maxMidiClockUs, avgTriggerClickUs, maxTriggerClickUs,
+                avgPlayTickUs, maxPlayTickUs, avgNoteRepeatUs, maxNoteRepeatUs,
+                avgDrainUs, maxDrainUs, avgUiPostUs, maxUiPostUs,
+                avgTracksVisited, avgPlayNextCalls, p99HeadroomUs,
+                static_cast<unsigned long long>(totalOverruns), overrunPercent,
+                avgTicks, maxTicksInBuffer);
 
-            std::fputs(line, stdout);
-            std::fflush(stdout);
-
-            if (auto *log = std::fopen("vmpc.log", "a"))
-            {
-                std::fputs(line, log);
-                std::fclose(log);
-            }
+            outReport.assign(line);
+            return true;
         }
     };
 
@@ -608,6 +681,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const auto telemetryStart = telemetryNow();
     double loopWorkUs = 0.0;
     uint32_t processedTickCount = 0;
+    double midiClockPhaseUs = 0.0;
+    double triggerClickPhaseUs = 0.0;
+    double playTickPhaseUs = 0.0;
+    double noteRepeatPhaseUs = 0.0;
+    double drainPhaseUs = 0.0;
+    double uiPostPhaseUs = 0.0;
+    uint32_t tracksVisitedCount = 0;
+    uint32_t playNextCallsCount = 0;
 #endif
 
     const auto manager = sequencer->getStateManager();
@@ -634,9 +715,21 @@ void SequencerPlaybackEngine::work(const int nFrames)
             while (tickCursor < ticksForCurrentBuffer.size() &&
                    ticksForCurrentBuffer[tickCursor] == frameIndex)
             {
+#ifdef VMPC_AUDIO_TELEMETRY
+                const auto clickStart = telemetryNow();
+#endif
                 triggerClickIfNeeded();
+#ifdef VMPC_AUDIO_TELEMETRY
+                triggerClickPhaseUs += telemetryDeltaUs(clickStart, telemetryNow());
+#endif
                 manager->enqueue(BumpMetronomeOnlyTickPositionOneTick{});
+#ifdef VMPC_AUDIO_TELEMETRY
+                const auto drainStart = telemetryNow();
+#endif
                 manager->drainQueueWithoutPublish();
+#ifdef VMPC_AUDIO_TELEMETRY
+                drainPhaseUs += telemetryDeltaUs(drainStart, telemetryNow());
+#endif
                 tickCursor++;
             }
         }
@@ -658,9 +751,21 @@ void SequencerPlaybackEngine::work(const int nFrames)
                                     ? (1000000.0 * static_cast<double>(nFrames) /
                                        static_cast<double>(sampleRate))
                                     : 0.0;
-        audioTelemetry().pushSample(workUs, loopWorkUs, deadlineUs,
-                                    processedTickCount);
-        audioTelemetry().maybeReport(sampleRate, nFrames, deadlineUs);
+        audioTelemetry().pushSample(
+            workUs, loopWorkUs, deadlineUs, processedTickCount, midiClockPhaseUs,
+            triggerClickPhaseUs, playTickPhaseUs, noteRepeatPhaseUs, drainPhaseUs,
+            uiPostPhaseUs, tracksVisitedCount, playNextCallsCount);
+        std::string telemetryReport;
+        if (audioTelemetry().maybeBuildReport(sampleRate, nFrames, deadlineUs,
+                                              telemetryReport))
+        {
+            layeredScreen->postToUiThread(utils::Task(
+                [report = std::move(telemetryReport)]
+                {
+                    std::fputs(report.c_str(), stdout);
+                    std::fflush(stdout);
+                }));
+        }
 #endif
         return;
     }
@@ -733,8 +838,14 @@ void SequencerPlaybackEngine::work(const int nFrames)
         processedTickCount += static_cast<uint32_t>(tickCountAtThisFrameIndex);
 #endif
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto midiStart = telemetryNow();
+#endif
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex, tickCountAtThisFrameIndex);
+#ifdef VMPC_AUDIO_TELEMETRY
+        midiClockPhaseUs += telemetryDeltaUs(midiStart, telemetryNow());
+#endif
 
         if (!sequencerIsRunningAtStartOfBuffer)
         {
@@ -768,13 +879,25 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         tickFrameOffset = frameIndex;
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto clickStart = telemetryNow();
+#endif
         triggerClickIfNeeded();
+#ifdef VMPC_AUDIO_TELEMETRY
+        triggerClickPhaseUs += telemetryDeltaUs(clickStart, telemetryNow());
+#endif
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto uiPostStart = telemetryNow();
+#endif
         layeredScreen->postToUiThread(utils::Task(
             [this]
             {
                 displayPunchRects();
             }));
+#ifdef VMPC_AUDIO_TELEMETRY
+        uiPostPhaseUs += telemetryDeltaUs(uiPostStart, telemetryNow());
+#endif
 
         if (sequencer->getTransport()->isCountingIn())
         {
@@ -818,13 +941,35 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (!songHasStopped && !normalPlayHasStopped)
         {
+#ifdef VMPC_AUDIO_TELEMETRY
+            const auto playTickStart = telemetryNow();
+#endif
+#ifdef VMPC_AUDIO_TELEMETRY
+            sequencer->playTick(sequencer->getTransport()->getTickPosition(),
+                                &tracksVisitedCount, &playNextCallsCount);
+#else
             sequencer->playTick(sequencer->getTransport()->getTickPosition());
+#endif
+#ifdef VMPC_AUDIO_TELEMETRY
+            playTickPhaseUs += telemetryDeltaUs(playTickStart, telemetryNow());
+            const auto noteRepeatStart = telemetryNow();
+#endif
             processNoteRepeat();
+#ifdef VMPC_AUDIO_TELEMETRY
+            noteRepeatPhaseUs +=
+                telemetryDeltaUs(noteRepeatStart, telemetryNow());
+#endif
             sequencer->getTransport()->bumpPositionByTicksImmediateWithoutPublish(
                 1);
         }
 
+#ifdef VMPC_AUDIO_TELEMETRY
+        const auto drainStart = telemetryNow();
+#endif
         manager->drainQueueWithoutPublish();
+#ifdef VMPC_AUDIO_TELEMETRY
+        drainPhaseUs += telemetryDeltaUs(drainStart, telemetryNow());
+#endif
     }
 #ifdef VMPC_AUDIO_TELEMETRY
     const auto loopEnd = telemetryNow();
@@ -841,8 +986,20 @@ void SequencerPlaybackEngine::work(const int nFrames)
                                 ? (1000000.0 * static_cast<double>(nFrames) /
                                    static_cast<double>(sampleRate))
                                 : 0.0;
-    audioTelemetry().pushSample(workUs, loopWorkUs, deadlineUs,
-                                processedTickCount);
-    audioTelemetry().maybeReport(sampleRate, nFrames, deadlineUs);
+    audioTelemetry().pushSample(
+        workUs, loopWorkUs, deadlineUs, processedTickCount, midiClockPhaseUs,
+        triggerClickPhaseUs, playTickPhaseUs, noteRepeatPhaseUs, drainPhaseUs,
+        uiPostPhaseUs, tracksVisitedCount, playNextCallsCount);
+    std::string telemetryReport;
+    if (audioTelemetry().maybeBuildReport(sampleRate, nFrames, deadlineUs,
+                                          telemetryReport))
+    {
+        layeredScreen->postToUiThread(utils::Task(
+            [report = std::move(telemetryReport)]
+            {
+                std::fputs(report.c_str(), stdout);
+                std::fflush(stdout);
+            }));
+    }
 #endif
 }

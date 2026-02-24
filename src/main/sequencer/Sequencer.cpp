@@ -95,7 +95,8 @@ Sequencer::Sequencer(
 
 Sequencer::~Sequencer() {}
 
-void Sequencer::playTick(const Tick tick) const
+void Sequencer::playTick(const Tick tick, uint32_t *tracksVisited,
+                         uint32_t *playNextCalls) const
 {
     if (transport->isMetronomeOnlyEnabled())
     {
@@ -133,8 +134,17 @@ void Sequencer::playTick(const Tick tick) const
 
         for (const auto &track : seq->getTracks())
         {
+            if (tracksVisited)
+            {
+                (*tracksVisited)++;
+            }
+
             while (track->getNextTick() == tick)
             {
+                if (playNextCalls)
+                {
+                    (*playNextCalls)++;
+                }
                 track->playNext();
             }
         }

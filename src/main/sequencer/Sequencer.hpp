@@ -91,7 +91,8 @@ namespace mpc::sequencer
         static uint32_t quarterNotesToTicks(double quarterNotes);
         static double ticksToQuarterNotes(double ticks);
 
-        void playTick(Tick) const;
+        void playTick(Tick, uint32_t *tracksVisited = nullptr,
+                      uint32_t *playNextCalls = nullptr) const;
         SequenceIndex getSelectedSequenceIndex() const;
         std::shared_ptr<Track> getSelectedTrack();
         template <typename T> std::shared_ptr<T> getBus(BusType) const;
