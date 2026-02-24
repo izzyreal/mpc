@@ -62,7 +62,7 @@ unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
     const int newTickPos, const SequenceIndex sequenceIndex) const
 {
-    sequencer->getTransport()->setPosition(
+    sequencer->getTransport()->setPositionImmediateWithoutPublish(
         Sequencer::ticksToQuarterNotes(newTickPos));
 
     const auto manager = sequencer->getStateManager();
@@ -445,15 +445,16 @@ void SequencerPlaybackEngine::work(const int nFrames)
                                      sampleRate, nFrames, 0);
         const auto &ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
 
+        size_t tickCursor = 0;
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
-            if (std::find(ticksForCurrentBuffer.begin(),
-                          ticksForCurrentBuffer.end(),
-                          frameIndex) != ticksForCurrentBuffer.end())
+            while (tickCursor < ticksForCurrentBuffer.size() &&
+                   ticksForCurrentBuffer[tickCursor] == frameIndex)
             {
                 triggerClickIfNeeded();
                 manager->enqueue(BumpMetronomeOnlyTickPositionOneTick{});
                 manager->drainQueueWithoutPublish();
+                tickCursor++;
             }
         }
 
@@ -513,17 +514,16 @@ void SequencerPlaybackEngine::work(const int nFrames)
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
+    size_t tickCursor = 0;
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
         size_t tickCountAtThisFrameIndex = 0;
 
-        for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
+        while (tickCursor < clockTicks.size() &&
+               clockTicks[tickCursor] == frameIndex)
         {
-            if (const auto tickFrameIndex = clockTicks[tickIndex];
-                tickFrameIndex == frameIndex)
-            {
-                tickCountAtThisFrameIndex++;
-            }
+            tickCountAtThisFrameIndex++;
+            tickCursor++;
         }
 
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
@@ -555,9 +555,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (tickCountAtThisFrameIndex > 1)
         {
-            sequencer->getTransport()->bumpPositionByTicks(
+            sequencer->getTransport()->bumpPositionByTicksImmediateWithoutPublish(
                 tickCountAtThisFrameIndex - 1);
-            manager->drainQueueWithoutPublish();
         }
 
         tickFrameOffset = frameIndex;
@@ -572,8 +571,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
 
         if (sequencer->getTransport()->isCountingIn())
         {
-            sequencer->getTransport()->bumpPositionByTicks(1);
-            manager->drainQueueWithoutPublish();
+            sequencer->getTransport()->bumpPositionByTicksImmediateWithoutPublish(
+                1);
             stopCountingInIfRequired(seq->getSequenceIndex());
             continue;
         }
@@ -614,7 +613,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         {
             sequencer->playTick(sequencer->getTransport()->getTickPosition());
             processNoteRepeat();
-            sequencer->getTransport()->bumpPositionByTicks(1);
+            sequencer->getTransport()->bumpPositionByTicksImmediateWithoutPublish(
+                1);
         }
 
         manager->drainQueueWithoutPublish();

@@ -18,6 +18,8 @@ namespace
 {
     constexpr int kSampleRate = 44100;
     constexpr int kBufferSize = 2048;
+    constexpr int kStressSampleRate = 100;
+    constexpr int kStressBufferSize = 256;
 
     void runRealtimeCycle(mpc::Mpc &mpc)
     {
@@ -182,4 +184,84 @@ TEST_CASE("Song step and repetition updates remain correct in realtime",
     REQUIRE(sequencer->getSelectedSongStepIndex() == mpc::SongStepIndex(1));
     REQUIRE(sequencer->getCurrentlyPlayingSequenceIndex() == mpc::SequenceIndex(1));
     REQUIRE(sequencer->getTransport()->getPlayedStepRepetitions() == 1);
+}
+
+TEST_CASE("Stress cycle advances transport by all generated ticks",
+          "[sequencer-realtime]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto server = mpc.getEngineHost()->getAudioServer();
+
+    server->resizeBuffers(kStressBufferSize);
+    server->setSampleRate(kStressSampleRate);
+    server->start();
+
+    sequencer->getSelectedSequence()->init(8);
+    sequencer->getTransport()->setCountEnabled(false);
+    sequencer->getTransport()->setTempoSourceIsSequence(false);
+    sequencer->getTransport()->setMasterTempo(300.0);
+    stateManager->drainQueue();
+
+    sequencer->getTransport()->play(true);
+
+    mpc.getEngineHost()->prepareProcessBlock(kStressBufferSize);
+    mpc.getClock()->processBufferInternal(
+        sequencer->getTransport()->getTempo(), kStressSampleRate,
+        kStressBufferSize, 0);
+
+    const auto expectedTicksThisCycle = static_cast<int>(
+        mpc.getClock()->getTicksForCurrentBuffer().size());
+    REQUIRE(expectedTicksThisCycle > 0);
+
+    server->work(nullptr, nullptr, kStressBufferSize, {}, {}, {}, {});
+
+    REQUIRE(sequencer->getTransport()->getTickPosition() ==
+            expectedTicksThisCycle);
+}
+
+TEST_CASE("Metronome-only position advances by every generated tick",
+          "[sequencer-realtime]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto server = mpc.getEngineHost()->getAudioServer();
+
+    server->resizeBuffers(kStressBufferSize);
+    server->setSampleRate(kStressSampleRate);
+    server->start();
+
+    sequencer->getTransport()->setTempoSourceIsSequence(false);
+    sequencer->getTransport()->setMasterTempo(300.0);
+    stateManager->drainQueue();
+
+    sequencer->getTransport()->playMetronomeOnly();
+
+    const auto posBefore =
+        stateManager->getSnapshot().getTransportStateView()
+            .getMetronomeOnlyPositionTicks();
+
+    mpc.getEngineHost()->prepareProcessBlock(kStressBufferSize);
+    server->work(nullptr, nullptr, kStressBufferSize, {}, {}, {}, {});
+
+    const auto posAfterFirstCycle =
+        stateManager->getSnapshot().getTransportStateView()
+            .getMetronomeOnlyPositionTicks();
+
+    mpc.getEngineHost()->prepareProcessBlock(kStressBufferSize);
+    server->work(nullptr, nullptr, kStressBufferSize, {}, {}, {}, {});
+
+    const auto transportSnapshot =
+        stateManager->getSnapshot().getTransportStateView();
+
+    REQUIRE(transportSnapshot.isMetronomeOnlyEnabled());
+    REQUIRE(posAfterFirstCycle > posBefore);
+    REQUIRE(transportSnapshot.getMetronomeOnlyPositionTicks() >
+            posAfterFirstCycle);
 }

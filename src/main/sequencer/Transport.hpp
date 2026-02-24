@@ -104,6 +104,8 @@ namespace mpc::sequencer
         void resetPlayedStepRepetitions() const;
 
         void bumpPositionByTicks(Tick) const;
+        void setPositionImmediateWithoutPublish(double positionQuarterNotes) const;
+        void bumpPositionByTicksImmediateWithoutPublish(Tick) const;
 
         void setMasterTempo(double) const;
 

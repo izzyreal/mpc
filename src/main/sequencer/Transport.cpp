@@ -491,6 +491,23 @@ void Transport::bumpPositionByTicks(const Tick ticks) const
     setPosition(newPos);
 }
 
+void Transport::setPositionImmediateWithoutPublish(
+    const double positionQuarterNotes) const
+{
+    sequencer.getStateManager()->applyMessageImmediateWithoutPublish(
+        SetPositionQuarterNotes{positionQuarterNotes});
+}
+
+void Transport::bumpPositionByTicksImmediateWithoutPublish(
+    const Tick ticks) const
+{
+    const auto snapshot =
+        sequencer.getStateManager()->getSnapshot().getTransportStateView();
+    const auto pos = snapshot.getPositionTicks();
+    const auto newPos = Sequencer::ticksToQuarterNotes(pos + ticks);
+    setPositionImmediateWithoutPublish(newPos);
+}
+
 void Transport::setMasterTempo(const double masterTempo) const
 {
     sequencer.getStateManager()->enqueue(
