@@ -148,6 +148,7 @@ TEST_CASE("MidiReader parses FRUTZLE.MID without crashing",
     }
 
     REQUIRE(totalEvents > 0);
+    REQUIRE(sequence->getBarCount() == 4);
 }
 
 TEST_CASE("MidiReader parses FRUTZLE.MID into temp sequence without crashing",
@@ -287,4 +288,118 @@ TEST_CASE("Busy 8-track midi roundtrip preserves note events",
             REQUIRE(actual[i] == expectedPerTrack[trackIndex][i]);
         }
     }
+}
+
+TEST_CASE("Cubase MID files load with valid bar count and name lengths",
+          "[file][midi-file]")
+{
+    const std::array<std::string, 2> fileNames{
+        "HWIF316.MID",
+        "HWIF6-0V2.MID"};
+
+    for (const auto &fileName : fileNames)
+    {
+        CAPTURE(fileName);
+
+        Mpc mpc;
+        TestMpc::initializeTestMpc(mpc);
+
+        auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
+        auto stateManager = mpc.getSequencer()->getStateManager();
+        sequence->init(1);
+        stateManager->drainQueue();
+
+        auto fs = cmrc::mpctest::get_filesystem();
+        auto file = fs.open("test/MidiFile/" + fileName);
+        std::string bytes(file.begin(), file.end());
+        auto stream = std::make_shared<std::istringstream>(bytes);
+
+        MidiReader reader(stream, sequence);
+        REQUIRE_NOTHROW(reader.parseSequence(mpc));
+        stateManager->drainQueue();
+
+        REQUIRE(sequence->getBarCount() > 0);
+        REQUIRE(sequence->getName().size() <=
+                Mpc2000XlSpecs::MAX_SEQUENCE_NAME_LENGTH);
+
+        for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
+        {
+            auto trackName = sequence->getTrack(trackIndex)->getName();
+            CAPTURE(trackIndex, trackName);
+            REQUIRE(trackName.size() <= Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
+        }
+    }
+}
+
+TEST_CASE("HWIF316.MID loads with 16 bars", "[file][midi-file]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    sequence->init(1);
+    stateManager->drainQueue();
+
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/MidiFile/HWIF316.MID");
+    std::string bytes(file.begin(), file.end());
+    auto stream = std::make_shared<std::istringstream>(bytes);
+
+    MidiReader reader(stream, sequence);
+    REQUIRE_NOTHROW(reader.parseSequence(mpc));
+    stateManager->drainQueue();
+
+    REQUIRE(sequence->getBarCount() == 16);
+}
+
+TEST_CASE("FRUTZLE.MID roundtrip keeps non-empty sequence", "[file][midi-file]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    sequence->init(1);
+    stateManager->drainQueue();
+
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/MidiFile/FRUTZLE.MID");
+    std::string bytes(file.begin(), file.end());
+    auto initialInput = std::make_shared<std::istringstream>(bytes);
+
+    MidiReader initialReader(initialInput, sequence);
+    REQUIRE_NOTHROW(initialReader.parseSequence(mpc));
+    stateManager->drainQueue();
+
+    int eventsAfterFirstLoad = 0;
+    for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
+    {
+        eventsAfterFirstLoad += static_cast<int>(
+            sequence->getTrack(trackIndex)->getEvents().size());
+    }
+    REQUIRE(eventsAfterFirstLoad > 0);
+    REQUIRE(sequence->getBarCount() == 4);
+
+    MidiWriter writer(sequence.get());
+    auto output = std::make_shared<std::ostringstream>();
+    writer.writeToOStream(output);
+
+    sequence->init(1);
+    stateManager->drainQueue();
+
+    auto secondInput = std::make_shared<std::istringstream>(output->str());
+    MidiReader secondReader(secondInput, sequence);
+    REQUIRE_NOTHROW(secondReader.parseSequence(mpc));
+    stateManager->drainQueue();
+
+    int eventsAfterRoundtrip = 0;
+    for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
+    {
+        eventsAfterRoundtrip += static_cast<int>(
+            sequence->getTrack(trackIndex)->getEvents().size());
+    }
+
+    REQUIRE(eventsAfterRoundtrip > 0);
+    REQUIRE(sequence->getBarCount() == 4);
 }

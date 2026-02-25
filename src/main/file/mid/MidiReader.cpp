@@ -23,6 +23,8 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
+#include <algorithm>
+
 using namespace mpc::file::mid;
 using namespace mpc::file::mid::event;
 using namespace mpc::sequencer;
@@ -38,8 +40,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
 {
     auto lSequencer = mpc.getSequencer();
     auto midiTracks = midiFile->getTracks();
-    auto lengthInTicks = midiFile->getLengthInTicks() +
-                         midiTracks[0].lock()->getEndOfTrackDelta();
+    int lengthInTicks = 0;
+    for (const auto &mtWeak : midiTracks)
+    {
+        if (const auto mt = mtWeak.lock())
+        {
+            lengthInTicks = std::max(lengthInTicks, mt->getLengthInTicks() +
+                                                        mt->getEndOfTrackDelta());
+        }
+    }
 
     std::vector<std::weak_ptr<meta::TimeSignature>> timeSignatures;
     std::vector<std::weak_ptr<meta::Tempo>> tempoChanges;
@@ -140,10 +149,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
         sequence->addTempoChangeEvent(lTcMidi->getTick(), amount);
     }
 
-    if (timeSignatures.size() == 1)
+    const bool hadExplicitTimeSignatures = !timeSignatures.empty();
+
+    if (!hadExplicitTimeSignatures)
     {
-        lengthInTicks = midiTracks[0].lock()->getEndOfTrackDelta();
+        timeSignatures.push_back(std::make_shared<meta::TimeSignature>(
+            0, 0, DefaultTimeSigNumerator, DefaultTimeSigDenominator, 24, 8));
     }
+
+    lengthInTicks = std::max(lengthInTicks, 1);
 
     int accumLength = 0;
     int barCounter = 0;
@@ -244,6 +258,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
         auto &track = (*updateSequenceTracks.trackStates)[trackIndex];
         track.deviceIndex = deviceIndex;
+        bool hasImportedEvents = false;
 
         struct OpenNote
         {
@@ -372,6 +387,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
         for (auto &n : noteOns)
         {
             (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(n);
+            hasImportedEvents = true;
         }
 
         //
@@ -398,6 +414,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     e.mixerValue = sysExEventBytes[6];
                     (*updateSequenceEvents.trackSnapshots)[trackIndex]
                         .push_back(e);
+                    hasImportedEvents = true;
                 }
                 else
                 {
@@ -414,6 +431,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                     (*updateSequenceEvents.trackSnapshots)[trackIndex]
                         .push_back(e);
+                    hasImportedEvents = true;
                 }
             }
             else if (const auto noteAfterTouch =
@@ -426,6 +444,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.noteNumber = NoteNumber(noteAfterTouch->getNoteValue());
                 e.amount = noteAfterTouch->getAmount();
                 (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                hasImportedEvents = true;
             }
             else if (const auto channelAfterTouch =
                          std::dynamic_pointer_cast<ChannelAftertouch>(
@@ -436,6 +455,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::ChannelPressure;
                 e.amount = channelAfterTouch->getAmount();
                 (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                hasImportedEvents = true;
             }
             else if (const auto programChange =
                          std::dynamic_pointer_cast<ProgramChange>(me.lock());
@@ -446,12 +466,14 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.programChangeProgramIndex =
                     ProgramIndex(programChange->getProgramNumber());
                 (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                hasImportedEvents = true;
             }
             else if (const auto trackName =
                          std::dynamic_pointer_cast<meta::TrackName>(me.lock());
                      trackName && !trackName->getTrackName().empty())
             {
-                track.name = trackName->getTrackName();
+                track.name = trackName->getTrackName().substr(
+                    0, Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
             }
             else if (const auto controller =
                          std::dynamic_pointer_cast<Controller>(me.lock());
@@ -462,6 +484,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.controllerNumber = controller->getControllerType();
                 e.controllerValue = controller->getValue();
                 (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                hasImportedEvents = true;
             }
             else if (const auto pitchBend =
                          std::dynamic_pointer_cast<PitchBend>(me.lock());
@@ -471,8 +494,11 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 e.type = EventType::PitchBend;
                 e.amount = pitchBend->getBendAmount();
                 (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                hasImportedEvents = true;
             }
         }
+
+        track.used = hasImportedEvents;
     }
 
     mpc.getSequencer()->getStateManager()->enqueue(updateSequenceTracks);
