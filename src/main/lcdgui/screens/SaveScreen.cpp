@@ -23,6 +23,18 @@ using namespace mpc::lcdgui::screens::dialog2;
 SaveScreen::SaveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer.lock()->getSelectedSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            if (type == 1)
+                            {
+                                displayFile();
+                                displaySize();
+                            }
+                        }});
 }
 
 void SaveScreen::open()
