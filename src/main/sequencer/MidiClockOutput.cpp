@@ -23,14 +23,13 @@ MidiClockOutput::MidiClockOutput(
     const std::function<bool()> &isBouncing)
     : engineHost(engineHost), getSampleRate(getSampleRate),
       getMidiOutput(getMidiOutput), sequencer(sequencer),
-      getScreens(getScreens), isBouncing(isBouncing)
+      syncScreen(getScreens()->get<ScreenId::SyncScreen>().get()),
+      isBouncing(isBouncing)
 {
 }
 
 void MidiClockOutput::sendMidiClockMsg(const int frameIndex) const
 {
-    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
-
     if (syncScreen->getModeOut() > 0)
     {
         ClientMidiEvent e;
@@ -43,8 +42,6 @@ void MidiClockOutput::sendMidiClockMsg(const int frameIndex) const
 void MidiClockOutput::sendMidiSyncMsg(
     const ClientMidiEvent::MessageType msgType, const int sampleNumber) const
 {
-    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
-
     if (syncScreen->getModeOut() > 0)
     {
         ClientMidiEvent e;
@@ -133,8 +130,6 @@ void MidiClockOutput::processFrame(const bool isRunningAtStartOfBuffer,
     {
         midiClockTickCounter = 0;
     }
-
-    const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
     if (syncScreen->modeOut > 0)
     {

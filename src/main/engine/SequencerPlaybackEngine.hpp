@@ -31,6 +31,19 @@ namespace mpc::lcdgui
     class Screens;
 } // namespace mpc::lcdgui
 
+namespace mpc::lcdgui::screens
+{
+    class SequencerScreen;
+    class UserScreen;
+    class SyncScreen;
+} // namespace mpc::lcdgui::screens
+
+namespace mpc::lcdgui::screens::window
+{
+    class CountMetronomeScreen;
+    class TimingCorrectScreen;
+} // namespace mpc::lcdgui::screens::window
+
 namespace mpc::engine
 {
     class NoteRepeatProcessor;
@@ -48,7 +61,7 @@ namespace mpc::engine
             const std::function<int()> &getSampleRate,
             const std::function<bool()> &isRecMainWithoutPlaying,
             const std::function<void(int velo, int frameOffset)> &playMetronome,
-            std::function<std::shared_ptr<lcdgui::Screens>()>,
+            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
             const std::function<bool()> &isNoteRepeatLockedOrPressed,
             const std::shared_ptr<NoteRepeatProcessor> &,
             const std::function<bool()> &isAudioServerCurrentlyRunningOffline);
@@ -61,7 +74,6 @@ namespace mpc::engine
         performance::PerformanceManager *performanceManager;
         EngineHost *engineHost;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
-        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         sequencer::Sequencer *sequencer;
         std::shared_ptr<sequencer::Clock> clock;
         std::function<bool()> isBouncing;
@@ -71,6 +83,11 @@ namespace mpc::engine
         std::function<bool()> isNoteRepeatLockedOrPressed;
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::function<bool()> isAudioServerCurrentlyRunningOffline;
+        lcdgui::screens::window::CountMetronomeScreen *countMetronomeScreen;
+        lcdgui::screens::SequencerScreen *sequencerScreen;
+        lcdgui::screens::UserScreen *userScreen;
+        lcdgui::screens::window::TimingCorrectScreen *timingCorrectScreen;
+        lcdgui::screens::SyncScreen *syncScreen;
 
         std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
