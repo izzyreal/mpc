@@ -39,7 +39,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
     const std::function<bool()> &isAudioServerCurrentlyRunningOffline)
     : performanceManager(performanceManager), engineHost(engineHost),
-      layeredScreen(layeredScreen), getScreens(getScreens),
+      layeredScreen(layeredScreen),
       sequencer(sequencer), clock(clock), isBouncing(isBouncing),
       getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
@@ -48,6 +48,13 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
       noteRepeatProcessor(noteRepeatProcessor),
       isAudioServerCurrentlyRunningOffline(
           isAudioServerCurrentlyRunningOffline),
+      countMetronomeScreen(
+          getScreens()->get<ScreenId::CountMetronomeScreen>().get()),
+      sequencerScreen(getScreens()->get<ScreenId::SequencerScreen>().get()),
+      userScreen(getScreens()->get<ScreenId::UserScreen>().get()),
+      timingCorrectScreen(
+          getScreens()->get<ScreenId::TimingCorrectScreen>().get()),
+      syncScreen(getScreens()->get<ScreenId::SyncScreen>().get()),
       midiClockOutput(std::make_shared<MidiClockOutput>(
           engineHost, getSampleRate, getMidiOutput, sequencer, getScreens,
           isBouncing))
@@ -95,9 +102,6 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
         layeredScreen->isCurrentScreen({ScreenId::StepEditorScreen});
 
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
-
-    const auto countMetronomeScreen =
-        getScreens()->get<ScreenId::CountMetronomeScreen>();
 
     if (transport.isRecordingOrOverdubbing())
     {
@@ -179,9 +183,6 @@ void SequencerPlaybackEngine::displayPunchRects() const
             sequencer->getTransport()->getAutoPunchMode() == 2;
         const auto punchInTime = sequencer->getTransport()->getPunchInTime();
         const auto punchOutTime = sequencer->getTransport()->getPunchOutTime();
-
-        const auto sequencerScreen =
-            getScreens()->get<ScreenId::SequencerScreen>();
 
         if (punchIn &&
             sequencer->getTransport()->getTickPosition() == punchInTime)
@@ -299,9 +300,6 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
             sequencer->getTransport()->getAutoPunchMode() == 1 ||
             sequencer->getTransport()->getAutoPunchMode() == 2;
 
-        const auto sequencerScreen =
-            getScreens()->get<ScreenId::SequencerScreen>();
-
         if (punch && punchIn)
         {
             sequencerScreen->setPunchRectOn(0, true);
@@ -340,8 +338,6 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
     {
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
-            const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
-
             seq->insertBars(1, BarIndex(seq->getLastBarIndex()));
             seq->setTimeSignature(
                 seq->getLastBarIndex(), seq->getLastBarIndex(),
@@ -372,9 +368,6 @@ void SequencerPlaybackEngine::processNoteRepeat() const
     {
         return;
     }
-
-    const auto timingCorrectScreen =
-        getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto repeatIntervalTicks =
         timingCorrectScreen->getNoteValueLengthInTicks();
@@ -533,8 +526,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
             continue;
         }
 
-        if (const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
-            syncScreen->modeOut != 0 && !isBouncing())
+        if (syncScreen->modeOut != 0 && !isBouncing())
         {
             if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {

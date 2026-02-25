@@ -21,6 +21,11 @@ namespace mpc::lcdgui
     class Screens;
 }
 
+namespace mpc::lcdgui::screens
+{
+    class SyncScreen;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;
@@ -59,7 +64,7 @@ namespace mpc::sequencer
         bool lastProcessedFrameIsMidiClockLock = false;
         LegacyClock clock;
         Sequencer *sequencer;
-        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
+        lcdgui::screens::SyncScreen *syncScreen;
         std::function<bool()> isBouncing;
 
         unsigned char midiClockTickCounter = 0;
