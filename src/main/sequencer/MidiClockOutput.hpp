@@ -38,7 +38,7 @@ namespace mpc::sequencer
             const std::function<std::shared_ptr<lcdgui::Screens>()> &,
             const std::function<bool()> &isBouncing);
 
-        void processTempoChange();
+        void processTempoChange(double tempo);
         void processSampleRateChange();
         void processFrame(bool isRunningAtStartOfBuffer, int frameIndex,
                           int tickCountAtThisFrame);

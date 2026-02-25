@@ -420,6 +420,100 @@ TEST_CASE("Focus returns to Sq after queued next sequence is consumed",
     REQUIRE(layeredScreen->getFocusedFieldName() == "sq");
 }
 
+TEST_CASE("Transport tick position advances monotonically during playback",
+          "[sequencer]")
+{
+    constexpr int BUFFER_SIZE = 512;
+    constexpr int SAMPLE_RATE = 44100;
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto transport = sequencer->getTransport();
+
+    transport->setCountEnabled(false);
+    sequencer->getSelectedSequence()->init(4);
+    stateManager->drainQueue();
+
+    auto server = mpc.getEngineHost()->getAudioServer();
+    server->resizeBuffers(BUFFER_SIZE);
+    server->setSampleRate(SAMPLE_RATE);
+    server->start();
+
+    transport->play();
+    stateManager->drainQueue();
+
+    int previousTick = transport->getTickPosition();
+
+    for (int i = 0; i < 40; i++)
+    {
+        mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
+        mpc.getClock()->processBufferInternal(
+            transport->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+        server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+        stateManager->drainQueue();
+
+        const auto currentTick = transport->getTickPosition();
+        REQUIRE(currentTick >= previousTick);
+        previousTick = currentTick;
+    }
+
+    REQUIRE(transport->getTickPosition() > 0);
+}
+
+TEST_CASE("Queued Next Sq is consumed at boundary during playback",
+          "[sequencer]")
+{
+    constexpr int BUFFER_SIZE = 2048;
+    constexpr int SAMPLE_RATE = 44100;
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto transport = sequencer->getTransport();
+
+    transport->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    sequencer->setSelectedSequenceIndex(mpc::SequenceIndex(0), false);
+    stateManager->drainQueue();
+
+    const auto nearBoundary =
+        Sequencer::ticksToQuarterNotes(seq0->getLastTick() - 1);
+    transport->setPosition(nearBoundary);
+    stateManager->drainQueue();
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    REQUIRE(sequencer->getNextSq() == mpc::SequenceIndex(1));
+
+    auto server = mpc.getEngineHost()->getAudioServer();
+    server->resizeBuffers(BUFFER_SIZE);
+    server->setSampleRate(SAMPLE_RATE);
+    server->start();
+
+    transport->play();
+    stateManager->drainQueue();
+
+    mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
+    mpc.getClock()->processBufferInternal(transport->getTempo(), SAMPLE_RATE,
+                                          BUFFER_SIZE, 0);
+    server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+    stateManager->drainQueue();
+
+    REQUIRE(sequencer->getSelectedSequenceIndex() == mpc::SequenceIndex(1));
+    REQUIRE(sequencer->getNextSq() == mpc::NoNextSequenceIndex);
+}
+
 TEST_CASE("Can record and playback from different threads",
           "[sequencer-multithread]")
 {

@@ -55,10 +55,8 @@ void MidiClockOutput::sendMidiSyncMsg(
     }
 }
 
-void MidiClockOutput::processTempoChange()
+void MidiClockOutput::processTempoChange(const double tempo)
 {
-    const double tempo = sequencer->getTransport()->getTempo();
-
     if (tempo != clock.getBpm())
     {
         clock.set_bpm(tempo);

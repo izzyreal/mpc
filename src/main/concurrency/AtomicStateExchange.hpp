@@ -20,6 +20,58 @@ namespace mpc::concurrency
         using CallbackQueue =
             BoundedMpmcQueue<utils::SimpleAction, MessageQueueCapacity>;
 
+    public:
+        class OwnerScopeGuard
+        {
+        public:
+            OwnerScopeGuard(AtomicStateExchange *exchange,
+                            const bool publishOnExit) noexcept
+                : exchange(exchange), publishOnExit(publishOnExit)
+            {
+                exchange->beginOwnerScope();
+            }
+
+            OwnerScopeGuard(const OwnerScopeGuard &) = delete;
+            OwnerScopeGuard &operator=(const OwnerScopeGuard &) = delete;
+
+            OwnerScopeGuard(OwnerScopeGuard &&other) noexcept
+                : exchange(other.exchange), publishOnExit(other.publishOnExit)
+            {
+                other.exchange = nullptr;
+            }
+
+            OwnerScopeGuard &operator=(OwnerScopeGuard &&other) noexcept
+            {
+                if (this == &other)
+                {
+                    return *this;
+                }
+
+                if (exchange)
+                {
+                    exchange->endOwnerScope(publishOnExit);
+                }
+
+                exchange = other.exchange;
+                publishOnExit = other.publishOnExit;
+                other.exchange = nullptr;
+
+                return *this;
+            }
+
+            ~OwnerScopeGuard()
+            {
+                if (exchange)
+                {
+                    exchange->endOwnerScope(publishOnExit);
+                }
+            }
+
+        private:
+            AtomicStateExchange *exchange{nullptr};
+            bool publishOnExit{true};
+        };
+
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn)
         {
@@ -64,7 +116,15 @@ namespace mpc::concurrency
 
             if (shouldPublish)
             {
-                publishState();
+                if (isOwnerScopeActiveOnCurrentThread())
+                {
+                    pendingPublish = true;
+                }
+                else
+                {
+                    publishState();
+                    pendingPublish = false;
+                }
             }
 
             for (auto &a : actions)
@@ -87,6 +147,11 @@ namespace mpc::concurrency
 
         View getSnapshot() const noexcept
         {
+            if (isOwnerScopeActiveOnCurrentThread())
+            {
+                return View{&activeState};
+            }
+
             State *s = currentSnapshot.load(std::memory_order_acquire);
             return View{s};
         }
@@ -94,7 +159,16 @@ namespace mpc::concurrency
         void applyMessageImmediate(Message &&msg) noexcept
         {
             applyMessage(msg);
-            publishState();
+
+            if (isOwnerScopeActiveOnCurrentThread())
+            {
+                pendingPublish = true;
+            }
+            else
+            {
+                publishState();
+                pendingPublish = false;
+            }
 
             for (auto &a : actions)
             {
@@ -112,6 +186,12 @@ namespace mpc::concurrency
                 (*cb)();
                 cb->~SmallFn();
             }
+        }
+
+        OwnerScopeGuard scopedOwnerAccess(
+            const bool publishOnExit = true) noexcept
+        {
+            return OwnerScopeGuard(this, publishOnExit);
         }
 
     protected:
@@ -152,7 +232,55 @@ namespace mpc::concurrency
         }
 
     private:
+        void beginOwnerScope() noexcept
+        {
+            if (tlsOwnerScopeInstance == nullptr)
+            {
+                tlsOwnerScopeInstance = this;
+                tlsOwnerScopeDepth = 1;
+                return;
+            }
+
+            if (tlsOwnerScopeInstance == this)
+            {
+                ++tlsOwnerScopeDepth;
+            }
+        }
+
+        void endOwnerScope(const bool publishOnExit) noexcept
+        {
+            if (tlsOwnerScopeInstance != this || tlsOwnerScopeDepth == 0)
+            {
+                return;
+            }
+
+            --tlsOwnerScopeDepth;
+
+            if (tlsOwnerScopeDepth > 0)
+            {
+                return;
+            }
+
+            if (publishOnExit && pendingPublish)
+            {
+                publishState();
+                pendingPublish = false;
+            }
+
+            tlsOwnerScopeInstance = nullptr;
+        }
+
+        bool isOwnerScopeActiveOnCurrentThread() const noexcept
+        {
+            return tlsOwnerScopeInstance == this && tlsOwnerScopeDepth > 0;
+        }
+
         std::atomic<uint64_t> publishCount{0};
+        bool pendingPublish{false};
+
+        inline static thread_local AtomicStateExchange *tlsOwnerScopeInstance{
+            nullptr};
+        inline static thread_local uint32_t tlsOwnerScopeDepth{0};
 
         MessageQueue queue;
         CallbackQueue callbackQueue;

@@ -62,11 +62,9 @@ unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
     const int newTickPos, const SequenceIndex sequenceIndex) const
 {
-    sequencer->getTransport()->setPosition(
-        Sequencer::ticksToQuarterNotes(newTickPos));
-
     const auto manager = sequencer->getStateManager();
-    manager->drainQueue();
+    manager->enqueue(
+        SetPositionQuarterNotes{Sequencer::ticksToQuarterNotes(newTickPos)});
     manager->enqueue(SyncTrackEventIndices{sequenceIndex});
     manager->drainQueue();
 }
@@ -428,10 +426,12 @@ void SequencerPlaybackEngine::work(const int nFrames)
 {
     // printf("BUFFER\n");
     const auto manager = sequencer->getStateManager();
+    const auto ownerScope = manager->scopedOwnerAccess();
     manager->drainQueue();
 
     const auto sequencerSnapshot = manager->getSnapshot();
     const auto transportSnapshot = sequencerSnapshot.getTransportStateView();
+    const auto tempoAtBufferStart = sequencer->getTransport()->getTempo();
 
     const bool sequencerIsRunningAtStartOfBuffer =
         transportSnapshot.isSequencerRunning();
@@ -440,8 +440,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
     if (sequencerIsRunningAtStartOfBuffer &&
         transportSnapshot.isMetronomeOnlyEnabled())
     {
-        clock->processBufferInternal(sequencer->getTransport()->getTempo(),
-                                     sampleRate, nFrames, 0);
+        clock->processBufferInternal(tempoAtBufferStart, sampleRate, nFrames,
+                                     0);
         const auto &ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
@@ -465,7 +465,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         isAudioServerCurrentlyRunningOffline())
     {
         clock->processBufferInternal(
-            sequencer->getTransport()->getTempo(), sampleRate, nFrames,
+            tempoAtBufferStart, sampleRate, nFrames,
             sequencer->getTransport()->getPlayStartPositionQuarterNotes());
     }
 
@@ -509,7 +509,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
     bool normalPlayHasStopped = false;
 
     midiClockOutput->processSampleRateChange();
-    midiClockOutput->processTempoChange();
+    midiClockOutput->processTempoChange(tempoAtBufferStart);
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {

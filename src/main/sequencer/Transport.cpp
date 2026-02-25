@@ -893,20 +893,29 @@ double Transport::getTempo() const
         return DefaultTempo;
     }
 
-    const auto tempoChangeEvent = sequencer.getCurrentTempoChangeEventData();
+    const auto currentPositionTicks = transportSnapshot.getPositionTicks();
+
+    const auto getTempoChangeEventForCurrentPosition =
+        [&]() -> mpc::sequencer::EventData *
+    {
+        return sequenceSnapshot.getTempoChangeEventForPositionTicks(
+            currentPositionTicks);
+    };
 
     if (transportSnapshot.isTempoSourceSequenceEnabled())
     {
         const auto ignoreTempoChangeScreen =
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
-        if (sequenceSnapshot.isTempoChangeEnabled() ||
-            (sequencer.isSongModeEnabled() &&
-             !ignoreTempoChangeScreen->getIgnore()))
+        const bool shouldApplyTempoChanges =
+            sequenceSnapshot.isTempoChangeEnabled() ||
+            (sequencer.isSongModeEnabled() && !ignoreTempoChangeScreen->getIgnore());
+
+        if (shouldApplyTempoChanges)
         {
+            const auto tempoChangeEvent = getTempoChangeEventForCurrentPosition();
             if (tempoChangeEvent)
             {
-
                 return tempoChangeEvent->getTempo(
                     sequenceSnapshot.getInitialTempo());
             }
@@ -914,6 +923,8 @@ double Transport::getTempo() const
 
         return sequenceSnapshot.getInitialTempo();
     }
+
+    const auto tempoChangeEvent = getTempoChangeEventForCurrentPosition();
 
     if (sequenceSnapshot.isTempoChangeEnabled() && tempoChangeEvent)
     {
