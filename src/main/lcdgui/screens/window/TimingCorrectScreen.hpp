@@ -46,6 +46,7 @@ namespace mpc::lcdgui::screens::window
         int getSwing() const;
         int getAmount() const;
         int isShiftTimingLater() const;
+        void reClampAmountToCurrentMode();
 
     private:
         void setAmount(int i);

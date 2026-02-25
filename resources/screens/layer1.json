@@ -593,16 +593,17 @@
 },
 "vmpc-settings":
 {
- "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "Name typing w. keybd:" ],
- "x" : [ 3, 3, 3, 3 ],
- "y" : [ 3, 12, 21, 30 ],
+ "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "Name typing w. keybd:", "Big time shift      :" ],
+ "x" : [ 3, 3, 3, 3, 3 ],
+ "y" : [ 3, 12, 21, 30, 39 ],
  "parameters" : [
   "initial-pad-mapping", [ "_", "_", "_", "16-levels-erase-mode" ],
   "16-levels-erase-mode", [ "_", "_", "initial-pad-mapping", "auto-convert-wavs" ],
   "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "name-typing-with-keyboard" ],
-  "name-typing-with-keyboard", [ "_", "_", "auto-convert-wavs", "_" ]
+  "name-typing-with-keyboard", [ "_", "_", "auto-convert-wavs", "big-time-shift" ],
+  "big-time-shift", [ "_", "_", "name-typing-with-keyboard", "_" ]
  ],
- "tfsize" : [ 60, 108, 18, 108 ],
+ "tfsize" : [ 60, 108, 18, 18, 78 ],
  "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI" ],
  "fbtypes" : [ 2, 0, 0, 0, 0, null ]
 },

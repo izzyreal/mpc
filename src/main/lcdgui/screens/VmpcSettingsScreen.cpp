@@ -1,5 +1,7 @@
 #include "VmpcSettingsScreen.hpp"
+#include "Mpc.hpp"
 #include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -18,6 +20,7 @@ void VmpcSettingsScreen::open()
     display16LevelsEraseMode();
     displayAutoConvertWavs();
     displayNameTypingWithKeyboard();
+    displayBigTimeShift();
 }
 
 void VmpcSettingsScreen::close()
@@ -82,6 +85,10 @@ void VmpcSettingsScreen::turnWheel(const int i)
     {
         setNameTypingWithKeyboard(i > 0);
     }
+    else if (focusedFieldName == "big-time-shift")
+    {
+        setBigTimeShift(i > 0);
+    }
 }
 
 void VmpcSettingsScreen::setInitialPadMapping(const int i)
@@ -141,4 +148,22 @@ void VmpcSettingsScreen::setNameTypingWithKeyboard(const bool shouldBeEnabled)
 bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled() const
 {
     return nameTypingWithKeyboardEnabled;
+}
+
+void VmpcSettingsScreen::displayBigTimeShift() const
+{
+    findField("big-time-shift")
+        ->setText(bigTimeShiftEnabled ? "YES" : "NO (ORIGINAL)");
+}
+
+void VmpcSettingsScreen::setBigTimeShift(const bool shouldBeEnabled)
+{
+    bigTimeShiftEnabled = shouldBeEnabled;
+    displayBigTimeShift();
+    mpc.screens->get<ScreenId::TimingCorrectScreen>()->reClampAmountToCurrentMode();
+}
+
+bool VmpcSettingsScreen::isBigTimeShiftEnabled() const
+{
+    return bigTimeShiftEnabled;
 }

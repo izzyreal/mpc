@@ -40,6 +40,7 @@ namespace mpc
         fs::path configPath() const;
 
         fs::path keyboardBindingsPath() const;
+        fs::path vmpcSpecificConfigPath() const;
 
         fs::path legacyKeyboardBindingsPath() const;
 

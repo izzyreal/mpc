@@ -64,7 +64,7 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
     const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     const auto engineHost = mpc.getEngineHost();
-    const auto path = mpc.paths->configPath() / "vmpc-specific.ini";
+    const auto path = mpc.paths->vmpcSpecificConfigPath();
 
     const std::vector<char> bytes{
         static_cast<char>(vmpcSettingsScreen->initialPadMapping),
@@ -79,7 +79,8 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(othersScreen->getContrast()),
         0x00, // This was MIDI control mode (VMPC or ORIGINAL), but this feature
               // (configurability) was removed.
-        static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled)};
+        static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled),
+        static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled)};
 
     set_file_data(path, bytes);
 }
@@ -88,7 +89,7 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
 {
     const auto engineHost = mpc.getEngineHost();
 
-    const auto path = mpc.paths->configPath() / "vmpc-specific.ini";
+    const auto path = mpc.paths->vmpcSpecificConfigPath();
 
     if (!fs::exists(path))
     {
@@ -163,5 +164,9 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
     {
         vmpcSettingsScreen->nameTypingWithKeyboardEnabled =
             static_cast<bool>(bytes[11]);
+    }
+    if (bytes.size() > 12)
+    {
+        vmpcSettingsScreen->bigTimeShiftEnabled = static_cast<bool>(bytes[12]);
     }
 }

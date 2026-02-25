@@ -45,6 +45,7 @@ namespace mpc::lcdgui::screens
         void function(int) override;
 
         bool isNameTypingWithKeyboardEnabled() const;
+        bool isBigTimeShiftEnabled() const;
 
     private:
         std::shared_ptr<Background> easterEgg;
@@ -57,16 +58,19 @@ namespace mpc::lcdgui::screens
         int sixteenLevelsEraseMode = 0;
         int autoConvertWavs = 1;
         bool nameTypingWithKeyboardEnabled = true;
+        bool bigTimeShiftEnabled = false;
 
         void setInitialPadMapping(int);
         void set16LevelsEraseMode(int);
         void setAutoConvertWavs(int);
         void setNameTypingWithKeyboard(bool);
+        void setBigTimeShift(bool);
 
         void displayInitialPadMapping() const;
         void display16LevelsEraseMode() const;
         void displayAutoConvertWavs() const;
         void displayNameTypingWithKeyboard() const;
+        void displayBigTimeShift() const;
 
         friend class sampler::Pad;
         friend class nvram::NvRam;

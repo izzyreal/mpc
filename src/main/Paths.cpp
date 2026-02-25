@@ -56,6 +56,12 @@ fs::path Paths::keyboardBindingsPath() const
     return path;
 }
 
+fs::path Paths::vmpcSpecificConfigPath() const
+{
+    auto path = configPath() / "vmpc-specific.ini";
+    return path;
+}
+
 Paths::Documents *Paths::getDocuments() const
 {
     return documents.get();

@@ -1,10 +1,12 @@
 #include "TimingCorrectScreen.hpp"
 
+#include "Mpc.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include <Util.hpp>
 
@@ -208,37 +210,47 @@ void TimingCorrectScreen::displayTime()
 
 void TimingCorrectScreen::setAmount(const int i)
 {
-    int maxVal = 0;
+    const auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
-    switch (noteValue.load())
+    if (vmpcSettingsScreen->isBigTimeShiftEnabled())
     {
-        case 0:
-            maxVal = 0;
-            break;
-        case 1:
-            maxVal = 23;
-            break;
-        case 2:
-            maxVal = 15;
-            break;
-        case 3:
-            maxVal = 11;
-            break;
-        case 4:
-            maxVal = 7;
-            break;
-        case 5:
-            maxVal = 5;
-            break;
-        case 6:
-            maxVal = 3;
-            break;
-        default:
-            maxVal = 0;
-            break;
+        amount = std::clamp(i, 0, 99);
+    }
+    else
+    {
+        int maxVal = 0;
+
+        switch (noteValue.load())
+        {
+            case 0:
+                maxVal = 0;
+                break;
+            case 1:
+                maxVal = 23;
+                break;
+            case 2:
+                maxVal = 15;
+                break;
+            case 3:
+                maxVal = 11;
+                break;
+            case 4:
+                maxVal = 7;
+                break;
+            case 5:
+                maxVal = 5;
+                break;
+            case 6:
+                maxVal = 3;
+                break;
+            default:
+                maxVal = 0;
+                break;
+        }
+
+        amount = std::clamp(i, 0, maxVal);
     }
 
-    amount = std::clamp(i, 0, maxVal);
     displayAmount();
 }
 
@@ -284,4 +296,9 @@ int TimingCorrectScreen::getAmount() const
 int TimingCorrectScreen::isShiftTimingLater() const
 {
     return shiftTimingLater;
+}
+
+void TimingCorrectScreen::reClampAmountToCurrentMode()
+{
+    setAmount(amount);
 }
