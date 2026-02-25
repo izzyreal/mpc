@@ -670,4 +670,11 @@ AbstractDisk::performIoOrOpenErrorPopup(
         showPopup(msg);
         return tl::make_unexpected(msg);
     }
+    catch (...)
+    {
+        MLOG("I/O error: unknown non-std exception");
+        auto msg = mpc_io_error_msg{"I/O error! See logs for info"};
+        showPopup(msg);
+        return tl::make_unexpected(msg);
+    }
 }

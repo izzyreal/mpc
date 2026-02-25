@@ -237,6 +237,11 @@ void MidiReader::parseSequence(Mpc &mpc) const
             }
         }
 
+        if (trackIndex < 0 || trackIndex > Mpc2000XlSpecs::LAST_TRACK_INDEX)
+        {
+            continue;
+        }
+
         auto &track = (*updateSequenceTracks.trackStates)[trackIndex];
         track.deviceIndex = deviceIndex;
 

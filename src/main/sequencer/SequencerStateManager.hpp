@@ -71,10 +71,12 @@ namespace mpc::sequencer
 
         void flushNoteCache();
 
-        std::array<SequenceTrackEventsSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+        std::array<SequenceTrackEventsSnapshot,
+                   Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
             trackEventsSnapshots;
 
-        std::array<SequenceTrackStatesSnapshot, Mpc2000XlSpecs::SEQUENCE_COUNT>
+        std::array<SequenceTrackStatesSnapshot,
+                   Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT>
             trackStatesSnapshots;
 
     protected:

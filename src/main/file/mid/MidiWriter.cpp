@@ -350,7 +350,7 @@ void MidiWriter::createDeltas(const std::weak_ptr<MidiTrack> &midiTrack) const
 
     for (auto &me : mt->getEvents())
     {
-        if (const auto event = std::dynamic_pointer_cast<NoteOn>(me.lock()))
+        if (const auto event = me.lock())
         {
             if (previousEvent)
             {
