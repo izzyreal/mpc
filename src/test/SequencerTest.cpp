@@ -18,6 +18,8 @@
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/EventData.hpp"
 
 #include "hardware/Component.hpp"
 #include "sequencer/EventRef.hpp"
@@ -418,6 +420,43 @@ TEST_CASE("Focus returns to Sq after queued next sequence is consumed",
     REQUIRE(sequencer->getSelectedSequenceIndex() == mpc::SequenceIndex(1));
     REQUIRE(sequencer->getNextSq() == mpc::NoNextSequenceIndex);
     REQUIRE(layeredScreen->getFocusedFieldName() == "sq");
+}
+
+TEST_CASE("Step editor note velocity is clamped at zero",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+
+    mpc::sequencer::EventData eventData;
+    eventData.type = mpc::sequencer::EventType::NoteOn;
+    eventData.tick = 0;
+    eventData.noteNumber = mpc::MinDrumNoteNumber;
+    eventData.velocity = mpc::MinVelocity;
+    eventData.duration = mpc::Duration(10);
+    seq->getTrack(0)->acquireAndInsertEvent(eventData);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::StepEditorScreen);
+
+    REQUIRE(layeredScreen->setFocus("e0"));
+    REQUIRE(layeredScreen->getFocusedFieldName() == "e0");
+
+    mpc.getScreen()->turnWheel(-1);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    auto noteEvent =
+        std::dynamic_pointer_cast<NoteOnEvent>(seq->getTrack(0)->getEvent(0));
+    REQUIRE(noteEvent);
+    REQUIRE(noteEvent->getVelocity() == mpc::MinVelocity);
 }
 
 TEST_CASE("Focus returns to Sq after stopping with queued next sequence",

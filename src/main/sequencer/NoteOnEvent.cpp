@@ -1,5 +1,7 @@
 #include "sequencer/NoteOnEvent.hpp"
 
+#include <algorithm>
+
 using namespace mpc::sequencer;
 
 NoteOnEvent::NoteOnEvent(EventData *const ptr, const EventData &snapshot,
@@ -76,7 +78,7 @@ int NoteOnEvent::getVariationValue() const
 void NoteOnEvent::setVelocity(const Velocity velocity) const
 {
     auto e = snapshot;
-    e.velocity = velocity;
+    e.velocity = std::clamp(velocity, MinVelocity, MaxVelocity);
     dispatch(UpdateEvent{handle, e});
 }
 
