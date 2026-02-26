@@ -451,6 +451,40 @@ TEST_CASE("Focus returns to Sq after stopping with queued next sequence",
     REQUIRE(layeredScreen->getFocusedFieldName() == "sq");
 }
 
+TEST_CASE("Stopping with queued next sequence preserves non-nextsq focus",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(0);
+    sequencer->getSequence(1)->init(0);
+    stateManager->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SequencerScreen);
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    sequencer->setNextSq(mpc::SequenceIndex(1), true);
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+    REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
+
+    REQUIRE(layeredScreen->setFocus("tempo"));
+    REQUIRE(layeredScreen->getFocusedFieldName() == "tempo");
+
+    mpc.getScreen()->stop();
+    stateManager->drainQueue();
+    layeredScreen->timerCallback();
+
+    REQUIRE(sequencer->getNextSq() == mpc::NoNextSequenceIndex);
+    REQUIRE(layeredScreen->getFocusedFieldName() == "tempo");
+}
+
 TEST_CASE("Can record and playback from different threads",
           "[sequencer-multithread]")
 {

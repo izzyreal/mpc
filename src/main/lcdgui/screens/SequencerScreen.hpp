@@ -80,6 +80,7 @@ namespace mpc::lcdgui::screens
         // `hideHoldHintAndRestoreFooterWidgets` is invoked when the function
         // keys and Next Sq widgets should be shown again, and the bespoke hold
         // hint label hidden.
-        void hideHoldHintAndRestoreFooterWidgets();
+        void hideHoldHintAndRestoreFooterWidgets(
+            bool focusNextSqIfAvailable = true);
     };
 } // namespace mpc::lcdgui::screens

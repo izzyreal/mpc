@@ -405,13 +405,15 @@ void SequencerScreen::tap()
     }
 }
 
-void SequencerScreen::hideHoldHintAndRestoreFooterWidgets()
+void SequencerScreen::hideHoldHintAndRestoreFooterWidgets(
+    const bool focusNextSqIfAvailable)
 {
     findChild("footer-label")->Hide(true);
     findChild("function-keys")->Hide(false);
     displayNextSq();
 
-    if (sequencer.lock()->getNextSq() >= MinSequenceIndex)
+    if (focusNextSqIfAvailable &&
+        sequencer.lock()->getNextSq() >= MinSequenceIndex)
     {
         ls.lock()->setFocus("nextsq");
     }
