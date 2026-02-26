@@ -277,7 +277,6 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                                 ls.lock()->setFocus("nextsq");
                             }
                             else if (
-                                sequencer.lock()->getTransport()->isPlaying() &&
                                 ls.lock()->getFocusedFieldName() == "nextsq")
                             {
                                 ls.lock()->setFocus("sq");
