@@ -26,7 +26,7 @@ namespace mpc::concurrency
         }
 
     private:
-        static constexpr size_t CAPACITY = 64;
+        static constexpr size_t CAPACITY = 128;
         BoundedMpmcQueue<utils::Task, CAPACITY> queue;
     };
 } // namespace mpc::concurrency

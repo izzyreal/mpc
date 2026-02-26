@@ -92,7 +92,7 @@ namespace mpc::concurrency
         }
 
     private:
-        static constexpr int Capacity = 128;
+        static constexpr int Capacity = 256;
         BoundedMpmcQueue<SamplePreciseTask, Capacity> queue;
     };
 } // namespace mpc::concurrency
