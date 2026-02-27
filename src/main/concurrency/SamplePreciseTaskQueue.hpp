@@ -64,24 +64,26 @@ namespace mpc::concurrency
         {
             SamplePreciseTask temp[Capacity];
             size_t reinsertIndex = 0;
-            SamplePreciseTask task;
+            alignas(
+                SamplePreciseTask) unsigned char buf[sizeof(SamplePreciseTask)];
+            auto *task = reinterpret_cast<SamplePreciseTask *>(buf);
 
-            while (queue.dequeue(task))
+            while (queue.dequeue(*task))
             {
-                auto remaining = task.nFrames - task.frameCounter;
+                auto remaining = task->nFrames - task->frameCounter;
 
                 if (remaining < nFrames) // fires in this buffer
                 {
                     auto p = std::max<int64_t>(
                         0, std::min<int64_t>(remaining, nFrames - 1));
-                    task.f((int)p);
-                    task.~SamplePreciseTask();
+                    task->f((int)p);
+                    task->~SamplePreciseTask();
                 }
                 else
                 {
-                    task.frameCounter += nFrames;
-                    temp[reinsertIndex++] = std::move(task);
-                    task.~SamplePreciseTask();
+                    task->frameCounter += nFrames;
+                    temp[reinsertIndex++] = std::move(*task);
+                    task->~SamplePreciseTask();
                 }
             }
 
