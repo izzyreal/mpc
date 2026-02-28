@@ -11,8 +11,8 @@ void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
 {
     mpc.paths = std::make_shared<TestPaths>();
     auto testDocPath = mpc.paths->getDocuments()->appDocumentsPath();
-    fs::remove_all(testDocPath);
-    fs::create_directories(testDocPath);
+    mpc_fs::remove_all(testDocPath);
+    mpc_fs::create_directories(testDocPath);
     mpc.init();
     mpc.getEngineHost()->getAudioServer()->start();
 }

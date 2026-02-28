@@ -9,27 +9,27 @@ namespace mpc
     class Paths
     {
     protected:
-        virtual fs::path appConfigHome() const;
-        virtual fs::path appDocumentsPath() const;
+        virtual mpc_fs::path appConfigHome() const;
+        virtual mpc_fs::path appDocumentsPath() const;
 
     public:
         struct Documents
         {
             explicit Documents(const Paths *paths);
 
-            fs::path appDocumentsPath() const;
+            mpc_fs::path appDocumentsPath() const;
 
-            fs::path storesPath() const;
-            fs::path defaultLocalVolumePath() const;
+            mpc_fs::path storesPath() const;
+            mpc_fs::path defaultLocalVolumePath() const;
 
-            fs::path logFilePath() const;
-            fs::path recordingsPath() const;
-            fs::path midiControlPresetsPath() const;
-            fs::path activeMidiControlPresetPath() const;
-            fs::path autoSavePath() const;
+            mpc_fs::path logFilePath() const;
+            mpc_fs::path recordingsPath() const;
+            mpc_fs::path midiControlPresetsPath() const;
+            mpc_fs::path activeMidiControlPresetPath() const;
+            mpc_fs::path autoSavePath() const;
 
-            fs::path demoDataPath() const;
-            fs::path tempPath() const;
+            mpc_fs::path demoDataPath() const;
+            mpc_fs::path tempPath() const;
 
         private:
             const Paths *paths;
@@ -37,14 +37,14 @@ namespace mpc
 
         Paths();
 
-        fs::path configPath() const;
+        mpc_fs::path configPath() const;
 
-        fs::path keyboardBindingsPath() const;
-        fs::path vmpcSpecificConfigPath() const;
+        mpc_fs::path keyboardBindingsPath() const;
+        mpc_fs::path vmpcSpecificConfigPath() const;
 
-        fs::path legacyKeyboardBindingsPath() const;
+        mpc_fs::path legacyKeyboardBindingsPath() const;
 
-        fs::path legacyActiveMidiControlPresetPath() const;
+        mpc_fs::path legacyActiveMidiControlPresetPath() const;
 
         Documents *getDocuments() const;
 

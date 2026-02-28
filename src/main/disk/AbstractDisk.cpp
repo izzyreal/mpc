@@ -210,12 +210,12 @@ bool AbstractDisk::checkExists(const std::string &fileName)
 {
     initFiles();
 
-    const auto path = fs::path(fileName);
+    const auto path = mpc_fs::path(fileName);
 
     return std::any_of(allFiles.begin(), allFiles.end(),
                        [path](const std::shared_ptr<MpcFile> &file)
                        {
-                           const auto path2 = fs::path(file->getName());
+                           const auto path2 = mpc_fs::path(file->getName());
                            const auto nameIsSame = StrUtil::eqIgnoreCase(
                                path2.stem().string(), path.stem().string());
                            const auto extIsSame =
@@ -407,7 +407,7 @@ void AbstractDisk::writeAll(const std::string &fileName)
 }
 
 void AbstractDisk::writeMidiControlPreset(
-    std::shared_ptr<MidiControlPresetV3> preset, const fs::path &p)
+    std::shared_ptr<MidiControlPresetV3> preset, const mpc_fs::path &p)
 {
     const std::function<preset_or_error()> ioFunc = [preset, p]
     {
@@ -423,7 +423,7 @@ void AbstractDisk::writeMidiControlPreset(
 }
 
 void AbstractDisk::readMidiControlPreset(
-    const fs::path &p, const std::shared_ptr<MidiControlPresetV3> &preset)
+    const mpc_fs::path &p, const std::shared_ptr<MidiControlPresetV3> &preset)
 {
     MLOG("Trying to read MIDI control preset at path " + p.string());
 
@@ -431,7 +431,7 @@ void AbstractDisk::readMidiControlPreset(
     {
         auto pathToUse = p;
 
-        if (!fs::exists(p))
+        if (!mpc_fs::exists(p))
         {
             if (p.extension().string().find("json") != std::string::npos)
             {
@@ -443,7 +443,7 @@ void AbstractDisk::readMidiControlPreset(
             }
         }
 
-        if (!fs::exists(pathToUse))
+        if (!mpc_fs::exists(pathToUse))
         {
             return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
         }

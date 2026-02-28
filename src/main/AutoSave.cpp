@@ -55,7 +55,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const std::vector<fs::path> files{"APS.APS",
+    const std::vector<mpc_fs::path> files{"APS.APS",
                                       "ALL.ALL",
                                       "soundIndex.txt",
                                       "selectedPad.txt",
@@ -67,7 +67,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                                       "last_aps_file_name.txt",
                                       "last_all_file_name.txt"};
 
-    std::vector<fs::path> availableFiles;
+    std::vector<mpc_fs::path> availableFiles;
     for (const auto &f : files)
     {
         if (saveTarget->exists(f))
@@ -85,7 +85,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         [&mpc, availableFiles, saveTarget, headless, this]
     {
         auto layeredScreen = mpc.getLayeredScreen();
-        std::map<fs::path, std::vector<char>> processInOrder;
+        std::map<mpc_fs::path, std::vector<char>> processInOrder;
 
         auto showMsg = [&](const std::string &msg)
         {
@@ -260,8 +260,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                                ProgramPadIndex(v));
                        });
 
-        auto currentDir = fs::path(getStringProperty("currentDir.txt"));
-        auto relativePath = fs::relative(
+        auto currentDir = mpc_fs::path(getStringProperty("currentDir.txt"));
+        auto relativePath = mpc_fs::relative(
             currentDir, mpc.paths->getDocuments()->defaultLocalVolumePath());
         for (auto &seg : relativePath)
         {

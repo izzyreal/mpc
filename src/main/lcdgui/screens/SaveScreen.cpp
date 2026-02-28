@@ -416,9 +416,9 @@ void SaveScreen::displayFree() const
     try
     {
         availableSpaceInBytes =
-            fs::space(mpc.paths->getDocuments()->storesPath()).available;
+            mpc_fs::space(mpc.paths->getDocuments()->storesPath()).available;
     }
-    catch (fs::filesystem_error &)
+    catch (mpc_fs::filesystem_error &)
     {
         MLOG(
             "An exception occurred when SaveScreen::displayFree was trying to "

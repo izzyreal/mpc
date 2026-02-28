@@ -10,21 +10,21 @@ namespace mpc
 
     class DirectorySaveTarget : public SaveTarget
     {
-        fs::path basePath;
+        mpc_fs::path basePath;
 
     public:
-        explicit DirectorySaveTarget(fs::path basePath);
+        explicit DirectorySaveTarget(mpc_fs::path basePath);
 
-        void setFileData(const fs::path &path,
+        void setFileData(const mpc_fs::path &path,
                          const std::vector<char> &data) override;
 
-        std::vector<char> getFileData(const fs::path &path) const override;
+        std::vector<char> getFileData(const mpc_fs::path &path) const override;
 
-        bool exists(const fs::path &path) const override;
+        bool exists(const mpc_fs::path &path) const override;
 
-        std::uintmax_t fileSize(const fs::path &path) const override;
+        std::uintmax_t fileSize(const mpc_fs::path &path) const override;
 
-        const fs::path &getBasePath() const
+        const mpc_fs::path &getBasePath() const
         {
             return basePath;
         }

@@ -33,6 +33,6 @@ namespace mpc::input::midi
         static void ensureTargetsAreInSameOrderAsInSchema(
             std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
 
-        static bool doesPresetWithNameExist(const fs::path &, std::string name);
+        static bool doesPresetWithNameExist(const mpc_fs::path &, std::string name);
     };
 } // namespace mpc::input::midi

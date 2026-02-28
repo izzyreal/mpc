@@ -11,23 +11,23 @@
 using namespace mpc::disk;
 using namespace mpc::file;
 
-void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
+void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 {
-    assert(fs::is_directory(p));
+    assert(mpc_fs::is_directory(p));
 
     auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
-    if (fs::exists(tempRoot))
+    if (mpc_fs::exists(tempRoot))
     {
-        fs::remove_all(tempRoot);
+        mpc_fs::remove_all(tempRoot);
     }
 
-    auto tempRootWasCreated = fs::create_directory(tempRoot);
+    auto tempRootWasCreated = mpc_fs::create_directory(tempRoot);
     assert(tempRootWasCreated);
 
     std::vector<std::string> existingNames;
 
-    for (auto &e : fs::directory_iterator(p))
+    for (auto &e : mpc_fs::directory_iterator(p))
     {
         std::string akaiName;
 
@@ -36,7 +36,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
             continue;
         }
 
-        if (fs::is_directory(e))
+        if (mpc_fs::is_directory(e))
         {
             const auto tidyString =
                 ShortNameGenerator::tidyString(e.path().filename().string());
@@ -52,7 +52,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
         if (akaiName != e.path().filename().string())
         {
             existingNames.push_back(akaiName);
-            fs::rename(e, tempRoot / akaiName);
+            mpc_fs::rename(e, tempRoot / akaiName);
         }
         else
         {
@@ -60,8 +60,8 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
         }
     }
 
-    for (auto &e : fs::directory_iterator(tempRoot))
+    for (auto &e : mpc_fs::directory_iterator(tempRoot))
     {
-        fs::rename(e, p / e.path().filename());
+        mpc_fs::rename(e, p / e.path().filename());
     }
 }

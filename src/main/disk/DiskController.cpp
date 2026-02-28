@@ -32,7 +32,7 @@ void DiskController::initDisks()
     defaultVolume.localDirectoryPath =
         mpc.paths->getDocuments()->defaultLocalVolumePath().string();
     defaultVolume.volumeSize =
-        fs::space(defaultVolume.localDirectoryPath).capacity;
+        mpc_fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();
 
     MLOG("Disk root initialized");

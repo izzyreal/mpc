@@ -49,7 +49,7 @@ void DirectoryScreen::setFunctionKeys()
     if (getSelectedFile())
     {
         const auto ext =
-            fs::path(getSelectedFile()->getName()).extension().string();
+            mpc_fs::path(getSelectedFile()->getName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
         setFunctionKeysArrangement(playable ? 1 : 0);
@@ -230,7 +230,7 @@ void DirectoryScreen::function(const int f)
             if (const auto file = loadScreen->getSelectedFile();
                 !file->isDirectory())
             {
-                const auto ext = fs::path(file->getName()).extension().string();
+                const auto ext = mpc_fs::path(file->getName()).extension().string();
 
                 const bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
                 const bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
@@ -649,7 +649,7 @@ void DirectoryScreen::displayRightFields() const
         }
         else
         {
-            auto fileName = fs::path(disk->getFileName(i + yOffset1));
+            auto fileName = mpc_fs::path(disk->getFileName(i + yOffset1));
             auto name = StrUtil::padRight(fileName.stem().string(), " ", 16);
             auto ext = fileName.extension().string();
 

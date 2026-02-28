@@ -9,7 +9,7 @@ using namespace mpc::nvram;
 using namespace mpc::disk;
 using json = nlohmann::json;
 
-fs::path getVolumesPersistencePath(mpc::Mpc &mpc)
+mpc_fs::path getVolumesPersistencePath(mpc::Mpc &mpc)
 {
     return mpc.paths->configPath() / "volumes.json";
 }
@@ -22,7 +22,7 @@ json read(mpc::Mpc &mpc)
 
     const auto path = getVolumesPersistencePath(mpc);
 
-    if (fs::exists(path))
+    if (mpc_fs::exists(path))
     {
         const auto bytes = get_file_data(path);
         try

@@ -35,7 +35,7 @@ void VmpcKnownControllerDetectedScreen::open()
         mpc.paths->getDocuments()->midiControlPresetsPath() /
         (controllerName + ".json");
 
-    if (!fs::exists(presetPath))
+    if (!mpc_fs::exists(presetPath))
     {
         ls.lock()->openPreviousScreen();
         return;

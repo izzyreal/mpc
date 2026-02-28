@@ -9,7 +9,7 @@
 using namespace mpc::nvram;
 using namespace mpc::file::all;
 
-Defaults DefaultsParser::AllDefaultsFromFile(Mpc &mpc, fs::path p)
+Defaults DefaultsParser::AllDefaultsFromFile(Mpc &mpc, mpc_fs::path p)
 {
 
     auto data = get_file_data(std::move(p));

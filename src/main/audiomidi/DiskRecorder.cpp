@@ -31,7 +31,7 @@ DiskRecorder::DiskRecorder(Mpc &mpcToUse, AudioProcess *process,
 
 bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
                            const bool isStereo,
-                           fs::path destinationDirectoryToUse)
+                           mpc_fs::path destinationDirectoryToUse)
 {
     if (bufferLeft.empty())
     {
@@ -326,14 +326,14 @@ void DiskRecorder::removeFilesIfEmpty() const
 
         const auto absolutePath = destinationDirectory / fileName;
 
-        if (!fs::exists(absolutePath))
+        if (!mpc_fs::exists(absolutePath))
         {
             continue;
         }
 
         if (isOnlySilence)
         {
-            fs::remove(absolutePath);
+            mpc_fs::remove(absolutePath);
         }
     }
 }

@@ -123,7 +123,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                         {
                             MLOG("A new MIDI device was connected: " + name);
 
-                            fs::path path;
+                            mpc_fs::path path;
                             const auto knownControllerDetectedScreen =
                                 mpc.screens->get<
                                     ScreenId::
@@ -164,7 +164,7 @@ void MidiDeviceDetector::start(Mpc &mpc)
                                     ->setControllerName("MPC_Studio");
                             }
 
-                            if (!path.empty() && fs::exists(path))
+                            if (!path.empty() && mpc_fs::exists(path))
                             {
                                 auto layeredScreen = mpc.getLayeredScreen();
                                 layeredScreen->postToUiThread(utils::Task(

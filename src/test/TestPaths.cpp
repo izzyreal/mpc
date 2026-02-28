@@ -1,11 +1,11 @@
 #include "TestPaths.hpp"
 
-fs::path mpc::TestPaths::appConfigHome() const
+mpc_fs::path mpc::TestPaths::appConfigHome() const
 {
     return appDocumentsPath() / "config";
 }
 
-fs::path mpc::TestPaths::appDocumentsPath() const
+mpc_fs::path mpc::TestPaths::appDocumentsPath() const
 {
-    return fs::temp_directory_path() / "VMPC2000XL-test";
+    return mpc_fs::temp_directory_path() / "VMPC2000XL-test";
 }

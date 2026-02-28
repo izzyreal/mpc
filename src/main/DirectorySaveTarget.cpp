@@ -2,18 +2,18 @@
 
 using namespace mpc;
 
-DirectorySaveTarget::DirectorySaveTarget(fs::path basePath)
+DirectorySaveTarget::DirectorySaveTarget(mpc_fs::path basePath)
     : basePath(std::move(basePath))
 {
 }
 
-void DirectorySaveTarget::setFileData(const fs::path &path,
+void DirectorySaveTarget::setFileData(const mpc_fs::path &path,
                                       const std::vector<char> &data)
 {
     const auto absPath = basePath / path;
     if (data.empty())
     {
-        fs::remove(absPath);
+        mpc_fs::remove(absPath);
     }
     else
     {
@@ -21,17 +21,17 @@ void DirectorySaveTarget::setFileData(const fs::path &path,
     }
 }
 
-std::vector<char> DirectorySaveTarget::getFileData(const fs::path &path) const
+std::vector<char> DirectorySaveTarget::getFileData(const mpc_fs::path &path) const
 {
     return get_file_data(basePath / path);
 }
 
-bool DirectorySaveTarget::exists(const fs::path &path) const
+bool DirectorySaveTarget::exists(const mpc_fs::path &path) const
 {
-    return fs::exists(basePath / path);
+    return mpc_fs::exists(basePath / path);
 }
 
-std::uintmax_t DirectorySaveTarget::fileSize(const fs::path &path) const
+std::uintmax_t DirectorySaveTarget::fileSize(const mpc_fs::path &path) const
 {
-    return fs::file_size(basePath / path);
+    return mpc_fs::file_size(basePath / path);
 }

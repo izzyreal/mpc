@@ -100,7 +100,7 @@ namespace mpc::disk
         {
             if (type == LOCAL_DIRECTORY)
             {
-                return std::make_shared<MpcFile>(fs::path(localDirectoryPath));
+                return std::make_shared<MpcFile>(mpc_fs::path(localDirectoryPath));
             }
             return {};
         }

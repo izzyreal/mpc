@@ -8,10 +8,10 @@ using namespace mpc::disk;
 using namespace akaifat::fat;
 
 MpcFile::MpcFile(
-    const std::variant<fs::path, std::shared_ptr<AkaiFatLfnDirectoryEntry>>
+    const std::variant<mpc_fs::path, std::shared_ptr<AkaiFatLfnDirectoryEntry>>
         &fileObject)
 {
-    if (auto fsPath = std::get_if<fs::path>(&fileObject))
+    if (auto fsPath = std::get_if<mpc_fs::path>(&fileObject))
     {
         fs_path = *fsPath;
         return;
@@ -49,8 +49,8 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
     else
     {
         std::error_code ec;
-        for (auto pathIterator = fs::directory_iterator(fs_path, ec);
-             pathIterator != fs::directory_iterator();
+        for (auto pathIterator = mpc_fs::directory_iterator(fs_path, ec);
+             pathIterator != mpc_fs::directory_iterator();
              pathIterator.increment(ec))
         {
             if (!ec)
@@ -115,7 +115,7 @@ bool MpcFile::isDirectory() const
     {
         return rawEntry->isDirectory();
     }
-    return fs::is_directory(fs_path);
+    return mpc_fs::is_directory(fs_path);
 }
 
 bool MpcFile::isFile()
@@ -146,10 +146,10 @@ bool MpcFile::setName(const std::string &s) const
             return false;
         }
     }
-    fs::path new_path = fs_path;
+    mpc_fs::path new_path = fs_path;
     new_path.replace_filename(s);
     std::error_code ec;
-    fs::rename(fs_path, new_path, ec);
+    mpc_fs::rename(fs_path, new_path, ec);
     return ec.value() == 0;
 }
 
@@ -170,7 +170,7 @@ unsigned long MpcFile::length()
         }
         return 0;
     }
-    return fs::file_size(fs_path);
+    return mpc_fs::file_size(fs_path);
 }
 
 void MpcFile::setFileData(std::vector<char> &data)
@@ -196,7 +196,7 @@ bool MpcFile::exists() const
     {
         return rawEntry->isValid();
     }
-    return fs::exists(fs_path);
+    return mpc_fs::exists(fs_path);
 }
 
 bool MpcFile::del() const
@@ -213,7 +213,7 @@ bool MpcFile::del() const
             return false;
         }
     }
-    return fs::remove(fs_path);
+    return mpc_fs::remove(fs_path);
 }
 
 std::vector<char> MpcFile::getBytes()
@@ -270,7 +270,7 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
                                            std::ios::out | std::ios::binary);
 }
 
-fs::path MpcFile::getPath()
+mpc_fs::path MpcFile::getPath()
 {
     return fs_path;
 }
