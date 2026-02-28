@@ -12,6 +12,6 @@ namespace mpc::disk
     class AkaiFileRenamer
     {
     public:
-        static void renameFilesInDirectory(Mpc &, const fs::path &p);
+        static void renameFilesInDirectory(Mpc &, const mpc_fs::path &p);
     };
 } // namespace mpc::disk

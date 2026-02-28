@@ -233,7 +233,7 @@ void Bitmap::openFromData(char *data, const int size)
     } // end else (is an image)
 }
 
-void Bitmap::open(fs::path p)
+void Bitmap::open(mpc_fs::path p)
 {
     auto fileStream = std::ifstream(p);
 

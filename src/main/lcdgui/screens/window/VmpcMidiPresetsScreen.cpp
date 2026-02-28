@@ -105,7 +105,7 @@ void VmpcMidiPresetsScreen::open()
 {
     presetMetas.clear();
 
-    for (const auto entry : fs::directory_iterator(
+    for (const auto entry : mpc_fs::directory_iterator(
              mpc.paths->getDocuments()->midiControlPresetsPath()))
     {
         const auto presetPath = entry.path();

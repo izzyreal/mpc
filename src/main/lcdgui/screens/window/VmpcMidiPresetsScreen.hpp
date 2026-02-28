@@ -27,7 +27,7 @@ namespace mpc::lcdgui::screens::window
     private:
         struct PresetMeta
         {
-            fs::path path;
+            mpc_fs::path path;
             std::string name;
             input::midi::AutoLoadMode autoLoadMode;
         };

@@ -46,7 +46,7 @@ namespace mpc::lcdgui
         PixelMatrix pixels;
 
     public:
-        void open(fs::path p);
+        void open(mpc_fs::path p);
 
         /**
          * @brief Validates whether or not the current matrix of pixels

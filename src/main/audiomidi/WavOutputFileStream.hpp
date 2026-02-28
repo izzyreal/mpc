@@ -10,7 +10,7 @@ static const int RIFF_TYPE_ID{1163280727};
 static const int FMT_CHUNK_ID{544501094};
 static const int DATA_CHUNK_ID{1635017060};
 
-std::ofstream wav_init_ofstream(const fs::path &path)
+std::ofstream wav_init_ofstream(const mpc_fs::path &path)
 {
     std::ofstream result(path, std::ios::out | std::ios::binary);
     return result;

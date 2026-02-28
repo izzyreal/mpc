@@ -60,7 +60,7 @@ namespace mpc::audiomidi
         static const std::vector<std::string> fileNamesStereo;
 
         int index = 0;
-        fs::path destinationDirectory;
+        mpc_fs::path destinationDirectory;
         engine::audio::core::AudioFormat *outputFileFormat = nullptr;
         std::vector<std::ofstream> fileStreams;
         std::atomic<bool> writing{false};
@@ -77,7 +77,7 @@ namespace mpc::audiomidi
         bool start();
         bool stopEarly();
         bool prepare(int lengthInFrames, int sampleRate, bool isStereo,
-                     fs::path destinationDirectory);
+                     mpc_fs::path destinationDirectory);
         void unprepare();
 
         int processAudio(engine::audio::core::AudioBuffer *,

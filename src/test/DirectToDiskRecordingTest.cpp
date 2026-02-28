@@ -31,9 +31,9 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto recordingsRoot = mpc.paths->getDocuments()->recordingsPath();
-    fs::create_directories(recordingsRoot);
-    for (const auto& e : fs::directory_iterator(recordingsRoot))
-        fs::remove_all(e.path());
+    mpc_fs::create_directories(recordingsRoot);
+    for (const auto& e : mpc_fs::directory_iterator(recordingsRoot))
+        mpc_fs::remove_all(e.path());
 
     auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
@@ -100,13 +100,13 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc.getScreen()->function(4);
     ls->timerCallback();
 
-    fs::path recordingPath;
-    fs::file_time_type bestTime{};
+    mpc_fs::path recordingPath;
+    mpc_fs::file_time_type bestTime{};
     bool have = false;
 
     for (int tries = 0; tries < 400 && !have; ++tries)
     {
-        for (const auto& entry : fs::recursive_directory_iterator(recordingsRoot))
+        for (const auto& entry : mpc_fs::recursive_directory_iterator(recordingsRoot))
         {
             if (!entry.is_regular_file())
                 continue;
@@ -114,7 +114,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
             if (entry.path().filename() != "L.wav")
                 continue;
 
-            const auto t = fs::last_write_time(entry.path());
+            const auto t = mpc_fs::last_write_time(entry.path());
             if (!have || t > bestTime)
             {
                 have = true;
@@ -128,7 +128,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     }
 
     REQUIRE(have);
-    REQUIRE(fs::exists(recordingPath));
+    REQUIRE(mpc_fs::exists(recordingPath));
 
     constexpr std::uintmax_t WAV_HEADER_BYTES = 44;
     constexpr std::uintmax_t MIN_DATA_BYTES_FOR_100_MONO_SAMPLES = 100 * 2;
@@ -140,7 +140,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     for (int tries = 0; tries < 400 && stable < 5; ++tries)
     {
         std::error_code ec;
-        const auto size = fs::file_size(recordingPath, ec);
+        const auto size = mpc_fs::file_size(recordingPath, ec);
 
         if (!ec && size >= WAV_HEADER_BYTES + MIN_DATA_BYTES_FOR_100_MONO_SAMPLES)
         {
@@ -283,9 +283,9 @@ TEST_CASE(
 
         auto recordingsPath = mpc.paths->getDocuments()->recordingsPath();
 
-        for (const auto &entry : fs::directory_iterator(recordingsPath))
+        for (const auto &entry : mpc_fs::directory_iterator(recordingsPath))
         {
-            if (fs::is_directory(entry))
+            if (mpc_fs::is_directory(entry))
             {
                 recordingsPath = entry.path();
                 break;
@@ -293,7 +293,7 @@ TEST_CASE(
         }
 
         auto recordingPath = recordingsPath / "L.wav";
-        REQUIRE(fs::exists(recordingPath));
+        REQUIRE(mpc_fs::exists(recordingPath));
 
         std::uintmax_t lastSize = 0;
         int stable = 0;
@@ -302,7 +302,7 @@ TEST_CASE(
         for (int attempt = 0; attempt < 400 && stable < 5; ++attempt)
         {
             std::error_code ec;
-            auto size = fs::file_size(recordingPath, ec);
+            auto size = mpc_fs::file_size(recordingPath, ec);
 
             if (!ec && size > 44)
             {
@@ -347,8 +347,8 @@ TEST_CASE(
             wav->readFrames(frames, 100);
         }
 
-        fs::remove_all(recordingsPath);
-        REQUIRE(!fs::exists(recordingsPath));
+        mpc_fs::remove_all(recordingsPath);
+        REQUIRE(!mpc_fs::exists(recordingsPath));
         return frames;
     };
 

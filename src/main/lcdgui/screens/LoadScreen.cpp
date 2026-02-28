@@ -50,7 +50,7 @@ void LoadScreen::open()
     displayFreeSnd();
     findLabel("freeseq")->setText("  2640K");
 
-    const auto ext = fs::path(getSelectedFileName()).extension().string();
+    const auto ext = mpc_fs::path(getSelectedFileName()).extension().string();
     const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                           StrUtil::eqIgnoreCase(ext, ".wav");
 
@@ -137,7 +137,7 @@ void LoadScreen::function(const int i)
 
             if (const auto file = getSelectedFile(); !file->isDirectory())
             {
-                const auto ext = fs::path(file->getName()).extension().string();
+                const auto ext = mpc_fs::path(file->getName()).extension().string();
 
                 const bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
                 const bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
@@ -196,7 +196,7 @@ void LoadScreen::function(const int i)
 
             const auto selectedFile = getSelectedFile();
             const auto ext =
-                fs::path(selectedFile->getName()).extension().string();
+                mpc_fs::path(selectedFile->getName()).extension().string();
 
             if (isSelectedFileDirectory())
             {
@@ -212,7 +212,7 @@ void LoadScreen::function(const int i)
                     displaySize();
 
                     const auto ext1 =
-                        fs::path(getSelectedFileName()).extension().string();
+                        mpc_fs::path(getSelectedFileName()).extension().string();
                     const auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
                                           StrUtil::eqIgnoreCase(ext, ".wav");
                     setFunctionKeysArrangement(playable ? 1 : 0);
@@ -326,7 +326,7 @@ void LoadScreen::turnWheel(const int i)
     }
 
     const auto newSelectedFileExtension =
-        fs::path(getSelectedFileName()).extension().string();
+        mpc_fs::path(getSelectedFileName()).extension().string();
     const auto playable =
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") ||
         StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
@@ -368,7 +368,7 @@ void LoadScreen::displayFile() const
     {
         findField("file")->setText(
             u8"\u00C3" +
-            StrUtil::padRight(fs::path(selectedFileName).stem().string(), " ",
+            StrUtil::padRight(mpc_fs::path(selectedFileName).stem().string(), " ",
                               16));
     }
     else
@@ -510,7 +510,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     if (result.success)
     {
-        const auto path = fs::path(getSelectedFileName());
+        const auto path = mpc_fs::path(getSelectedFileName());
         const auto name = path.stem().string();
         const auto ext = path.extension().string();
         const std::string msg =
@@ -556,7 +556,7 @@ void LoadScreen::up()
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
-        const auto ext = fs::path(getSelectedFileName()).extension().string();
+        const auto ext = mpc_fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
         setFunctionKeysArrangement(playable ? 1 : 0);
