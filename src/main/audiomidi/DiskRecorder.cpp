@@ -326,14 +326,14 @@ void DiskRecorder::removeFilesIfEmpty() const
 
         const auto absolutePath = destinationDirectory / fileName;
 
-        if (!mpc_fs::exists(absolutePath))
+        if (!mpc_fs::exists(absolutePath).value_or(false))
         {
             continue;
         }
 
         if (isOnlySilence)
         {
-            mpc_fs::remove(absolutePath);
+            (void) mpc_fs::remove(absolutePath);
         }
     }
 }

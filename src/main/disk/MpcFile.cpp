@@ -48,23 +48,31 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
     }
     else
     {
+        const auto pathIteratorRes = mpc_fs::make_directory_iterator(fs_path);
+        if (!pathIteratorRes)
+        {
+            return result;
+        }
+
         std::error_code ec;
-        for (auto pathIterator = mpc_fs::directory_iterator(fs_path, ec);
-             pathIterator != mpc_fs::directory_iterator();
+        for (auto pathIterator = *pathIteratorRes;
+             pathIterator != mpc_fs::directory_end();
              pathIterator.increment(ec))
         {
-            if (!ec)
+            if (ec)
             {
-                auto &path = pathIterator->path();
-                std::string filename = path.filename().string();
-
-                if (filename.length() > 0 && filename[0] == '.')
-                {
-                    continue;
-                }
-
-                result.emplace_back(std::make_shared<MpcFile>(path));
+                break;
             }
+
+            auto &path = pathIterator->path();
+            std::string filename = path.filename().string();
+
+            if (filename.length() > 0 && filename[0] == '.')
+            {
+                continue;
+            }
+
+            result.emplace_back(std::make_shared<MpcFile>(path));
         }
     }
 
@@ -115,7 +123,7 @@ bool MpcFile::isDirectory() const
     {
         return rawEntry->isDirectory();
     }
-    return mpc_fs::is_directory(fs_path);
+    return mpc_fs::is_directory(fs_path).value_or(false);
 }
 
 bool MpcFile::isFile()
@@ -148,9 +156,7 @@ bool MpcFile::setName(const std::string &s) const
     }
     mpc_fs::path new_path = fs_path;
     new_path.replace_filename(s);
-    std::error_code ec;
-    mpc_fs::rename(fs_path, new_path, ec);
-    return ec.value() == 0;
+    return mpc_fs::rename(fs_path, new_path).has_value();
 }
 
 unsigned long MpcFile::length()
@@ -170,7 +176,7 @@ unsigned long MpcFile::length()
         }
         return 0;
     }
-    return mpc_fs::file_size(fs_path);
+    return mpc_fs::file_size(fs_path).value_or(0);
 }
 
 void MpcFile::setFileData(std::vector<char> &data)
@@ -196,7 +202,7 @@ bool MpcFile::exists() const
     {
         return rawEntry->isValid();
     }
-    return mpc_fs::exists(fs_path);
+    return mpc_fs::exists(fs_path).value_or(false);
 }
 
 bool MpcFile::del() const
@@ -213,7 +219,7 @@ bool MpcFile::del() const
             return false;
         }
     }
-    return mpc_fs::remove(fs_path);
+    return mpc_fs::remove(fs_path).value_or(false);
 }
 
 std::vector<char> MpcFile::getBytes()

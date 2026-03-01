@@ -105,10 +105,16 @@ void VmpcMidiPresetsScreen::open()
 {
     presetMetas.clear();
 
-    for (const auto entry : mpc_fs::directory_iterator(
-             mpc.paths->getDocuments()->midiControlPresetsPath()))
+    const auto dirItRes = mpc_fs::make_directory_iterator(
+        mpc.paths->getDocuments()->midiControlPresetsPath());
+    if (!dirItRes)
     {
-        const auto presetPath = entry.path();
+        return;
+    }
+
+    for (auto entry = *dirItRes; entry != mpc_fs::directory_end(); ++entry)
+    {
+        const auto presetPath = entry->path();
 
         if (presetPath.extension() != ".json" ||
             presetPath ==

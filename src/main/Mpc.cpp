@@ -64,22 +64,22 @@ void Mpc::init()
 
     for (auto &p : requiredPaths)
     {
-        if (!mpc_fs::exists(p))
+        if (!mpc_fs::exists(p).value_or(false))
         {
-            mpc_fs::create_directories(p);
+            (void) mpc_fs::create_directories(p);
         }
     }
 
-    mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST1");
-    mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST2");
-    mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TRAIN1");
-    mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "RESIST");
+    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST1");
+    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST2");
+    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TRAIN1");
+    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "RESIST");
 
     for (const auto &demo_file : demo_files)
     {
         const auto dst = paths->getDocuments()->demoDataPath() / demo_file;
         const bool should_update =
-            !mpc_fs::exists(dst) ||
+            !mpc_fs::exists(dst).value_or(false) ||
             std::find(always_update_demo_files.begin(),
                       always_update_demo_files.end(),
                       demo_file) != always_update_demo_files.end();
@@ -92,7 +92,7 @@ void Mpc::init()
         }
     }
 
-    mpc_fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
+    (void) mpc_fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
 
     const std::vector<std::string> factory_midi_control_presets{
         "MPD16.json", "MPD218.json", "iRig_PADS.json", "MPC_Studio.json"};
@@ -103,9 +103,9 @@ void Mpc::init()
             MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
         if (!mpc_fs::exists(paths->getDocuments()->midiControlPresetsPath() /
-                        preset) ||
+                        preset).value_or(false) ||
             mpc_fs::file_size(paths->getDocuments()->midiControlPresetsPath() /
-                          preset) != data.size())
+                          preset).value_or(0) != data.size())
         {
             set_file_data(
                 paths->getDocuments()->midiControlPresetsPath() / preset, data);
@@ -218,7 +218,7 @@ void Mpc::init()
     nvram::NvRam::loadUserScreenValues(*this);
 
     if (const auto p = paths->getDocuments()->activeMidiControlPresetPath();
-        mpc_fs::exists(p))
+        mpc_fs::exists(p).value_or(false))
     {
         const auto data = get_file_data(p);
         const auto dataJson = json::parse(data);

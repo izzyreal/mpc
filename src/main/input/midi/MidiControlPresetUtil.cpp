@@ -113,12 +113,16 @@ void MidiControlPresetUtil::resetMidiControlPreset(
 bool MidiControlPresetUtil::doesPresetWithNameExist(const mpc_fs::path &path,
                                                     std::string name)
 {
-    auto path_it = mpc_fs::directory_iterator(path);
+    auto path_it_res = mpc_fs::make_directory_iterator(path);
+    if (!path_it_res)
+    {
+        return false;
+    }
 
-    return std::any_of(path_it, mpc_fs::directory_iterator(),
+    return std::any_of(*path_it_res, mpc_fs::directory_end(),
                        [name](const mpc_fs::directory_entry &e)
                        {
-                           return !mpc_fs::is_directory(e) &&
+                           return !mpc_fs::is_directory(e).value_or(false) &&
                                   mpc::StrUtil::eqIgnoreCase(
                                       e.path().stem().string(), name);
                        });

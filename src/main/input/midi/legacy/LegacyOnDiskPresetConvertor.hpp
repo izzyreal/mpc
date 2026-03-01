@@ -16,9 +16,9 @@ namespace mpc::input::midi::legacy
         const auto jsonFilePath =
             newPath.value_or(mpc_fs::path(p).replace_extension(".json"));
 
-        if (!mpc_fs::exists(p) || !mpc_fs::is_regular_file(p) ||
+        if (!mpc_fs::exists(p).value_or(false) || !mpc_fs::is_regular_file(p).value_or(false) ||
             p.extension().string().find("vmp") == std::string::npos ||
-            mpc_fs::exists(jsonFilePath))
+            mpc_fs::exists(jsonFilePath).value_or(false))
         {
             return;
         }
@@ -85,14 +85,20 @@ namespace mpc::input::midi::legacy
 
         newFilePath += ".bk";
 
-        mpc_fs::rename(p, newFilePath);
+        (void) mpc_fs::rename(p, newFilePath);
     }
 
     inline void convertOnDiskLegacyPresets(const mpc_fs::path &p)
     {
-        for (const auto &f : mpc_fs::directory_iterator(p))
+        const auto dir_it_res = mpc_fs::make_directory_iterator(p);
+        if (!dir_it_res)
         {
-            convertOnDiskLegacyPreset(f.path());
+            return;
+        }
+
+        for (auto f = *dir_it_res; f != mpc_fs::directory_end(); ++f)
+        {
+            convertOnDiskLegacyPreset(f->path());
         }
     }
 } // namespace mpc::input::midi::legacy

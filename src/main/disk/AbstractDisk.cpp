@@ -431,7 +431,7 @@ void AbstractDisk::readMidiControlPreset(
     {
         auto pathToUse = p;
 
-        if (!mpc_fs::exists(p))
+        if (!mpc_fs::exists(p).value_or(false))
         {
             if (p.extension().string().find("json") != std::string::npos)
             {
@@ -443,7 +443,7 @@ void AbstractDisk::readMidiControlPreset(
             }
         }
 
-        if (!mpc_fs::exists(pathToUse))
+        if (!mpc_fs::exists(pathToUse).value_or(false))
         {
             return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
         }

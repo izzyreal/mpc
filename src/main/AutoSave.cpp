@@ -263,7 +263,11 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         auto currentDir = mpc_fs::path(getStringProperty("currentDir.txt"));
         auto relativePath = mpc_fs::relative(
             currentDir, mpc.paths->getDocuments()->defaultLocalVolumePath());
-        for (auto &seg : relativePath)
+        if (!relativePath)
+        {
+            return;
+        }
+        for (auto &seg : *relativePath)
         {
             mpc.getDisk()->moveForward(seg.string());
             mpc.getDisk()->initFiles();
