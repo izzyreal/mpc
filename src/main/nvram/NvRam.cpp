@@ -25,8 +25,8 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
 {
     const auto path = mpc.paths->configPath() / "nvram.vmp";
 
-    if (!mpc_fs::exists(path) ||
-        mpc_fs::file_size(path) != file::all::AllParser::DEFAULTS_LENGTH)
+    if (!mpc_fs::exists(path).value_or(false) ||
+        mpc_fs::file_size(path).value_or(0) != file::all::AllParser::DEFAULTS_LENGTH)
     {
         return;
     }
@@ -91,7 +91,7 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
 
     const auto path = mpc.paths->vmpcSpecificConfigPath();
 
-    if (!mpc_fs::exists(path))
+    if (!mpc_fs::exists(path).value_or(false))
     {
         engineHost->setRecordLevel(DEFAULT_REC_GAIN);
         mpc.getHardware()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);

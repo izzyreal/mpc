@@ -4,8 +4,11 @@
 #include <vector>
 #include <cmath>
 #include <system_error>
+#include <string>
 
 #include <ghc/filesystem.hpp>
+#include <Logger.hpp>
+#include <tl/expected.hpp>
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) ||                         \
      (defined(__cplusplus) && __cplusplus >= 201703L)) &&                      \
     defined(__has_include)
@@ -39,134 +42,299 @@ using file_time_type = detail::fs::file_time_type;
 using space_info = detail::fs::space_info;
 using filesystem_error = detail::fs::filesystem_error;
 
-inline bool create_directories(const path &p)
+struct fs_error
 {
-    return detail::fs::create_directories(p);
+    std::string operation;
+    path path1;
+    path path2;
+    bool has_path2 = false;
+    std::error_code ec;
+    std::string message;
+};
+
+template <typename T>
+using result = tl::expected<T, fs_error>;
+
+inline fs_error make_error(const std::string &operation, const path &path1,
+                           const std::error_code &ec,
+                           const path *path2 = nullptr)
+{
+    fs_error error;
+    error.operation = operation;
+    error.path1 = path1;
+    if (path2 != nullptr)
+    {
+        error.path2 = *path2;
+        error.has_path2 = true;
+    }
+    error.ec = ec;
+    error.message = ec.message();
+
+    auto msg = "mpc_fs::" + operation + " failed";
+    if (!path1.empty())
+    {
+        msg += " path1='" + path1.string() + "'";
+    }
+    if (path2 != nullptr && !path2->empty())
+    {
+        msg += " path2='" + path2->string() + "'";
+    }
+    if (ec)
+    {
+        msg += " ec=" + std::to_string(ec.value()) + " (" + ec.message() + ")";
+    }
+    MLOG(msg);
+
+    return error;
 }
 
-inline bool create_directories(const path &p, std::error_code &ec)
+inline fs_error make_exception_error(const std::string &operation, const path &path1,
+                                     const std::exception &exception,
+                                     const path *path2 = nullptr)
 {
-    return detail::fs::create_directories(p, ec);
+    fs_error error;
+    error.operation = operation;
+    error.path1 = path1;
+    if (path2 != nullptr)
+    {
+        error.path2 = *path2;
+        error.has_path2 = true;
+    }
+    error.message = exception.what();
+    MLOG("mpc_fs::" + operation + " threw exception: " + error.message);
+    return error;
 }
 
-inline bool create_directory(const path &p)
+inline fs_error make_unknown_exception_error(const std::string &operation,
+                                             const path &path1,
+                                             const path *path2 = nullptr)
 {
-    return detail::fs::create_directory(p);
+    fs_error error;
+    error.operation = operation;
+    error.path1 = path1;
+    if (path2 != nullptr)
+    {
+        error.path2 = *path2;
+        error.has_path2 = true;
+    }
+    error.message = "unknown exception";
+    MLOG("mpc_fs::" + operation + " threw unknown exception");
+    return error;
 }
 
-inline bool create_directory(const path &p, std::error_code &ec)
+[[nodiscard]] inline result<bool> create_directories(const path &p)
 {
-    return detail::fs::create_directory(p, ec);
+    std::error_code ec;
+    const auto created = detail::fs::create_directories(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("create_directories", p, ec));
+    }
+    return created;
 }
 
-inline bool exists(const path &p)
+[[nodiscard]] inline result<bool> create_directory(const path &p)
 {
-    return detail::fs::exists(p);
+    std::error_code ec;
+    const auto created = detail::fs::create_directory(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("create_directory", p, ec));
+    }
+    return created;
 }
 
-inline bool exists(const path &p, std::error_code &ec)
+[[nodiscard]] inline result<directory_iterator>
+make_directory_iterator(const path &p)
 {
-    return detail::fs::exists(p, ec);
+    std::error_code ec;
+    directory_iterator it(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("directory_iterator", p, ec));
+    }
+    return it;
 }
 
-inline bool is_directory(const path &p)
+[[nodiscard]] inline result<recursive_directory_iterator>
+make_recursive_directory_iterator(const path &p)
 {
-    return detail::fs::is_directory(p);
+    std::error_code ec;
+    recursive_directory_iterator it(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("recursive_directory_iterator", p, ec));
+    }
+    return it;
 }
 
-inline bool is_directory(const directory_entry &entry)
+inline directory_iterator directory_end()
 {
-    return detail::fs::is_directory(entry);
+    return {};
 }
 
-inline bool is_regular_file(const path &p)
+inline recursive_directory_iterator recursive_directory_end()
 {
-    return detail::fs::is_regular_file(p);
+    return {};
 }
 
-inline bool is_regular_file(const path &p, std::error_code &ec)
+[[nodiscard]] inline result<bool> exists(const path &p)
 {
-    return detail::fs::is_regular_file(p, ec);
+    std::error_code ec;
+    const auto value = detail::fs::exists(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("exists", p, ec));
+    }
+    return value;
 }
 
-inline bool is_regular_file(const directory_entry &entry)
+[[nodiscard]] inline result<bool> is_directory(const path &p)
 {
-    return detail::fs::is_regular_file(entry);
+    std::error_code ec;
+    const auto value = detail::fs::is_directory(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("is_directory", p, ec));
+    }
+    return value;
 }
 
-inline std::uintmax_t file_size(const path &p)
+[[nodiscard]] inline result<bool> is_directory(const directory_entry &entry)
 {
-    return detail::fs::file_size(p);
+    try
+    {
+        return detail::fs::is_directory(entry);
+    }
+    catch (const std::exception &e)
+    {
+        return tl::unexpected(
+            make_exception_error("is_directory(directory_entry)", entry.path(), e));
+    }
+    catch (...)
+    {
+        return tl::unexpected(
+            make_unknown_exception_error("is_directory(directory_entry)",
+                                         entry.path()));
+    }
 }
 
-inline std::uintmax_t file_size(const path &p, std::error_code &ec) noexcept
+[[nodiscard]] inline result<bool> is_regular_file(const path &p)
 {
-    return detail::fs::file_size(p, ec);
+    std::error_code ec;
+    const auto value = detail::fs::is_regular_file(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("is_regular_file", p, ec));
+    }
+    return value;
 }
 
-inline file_time_type last_write_time(const path &p)
+[[nodiscard]] inline result<bool> is_regular_file(const directory_entry &entry)
 {
-    return detail::fs::last_write_time(p);
+    try
+    {
+        return detail::fs::is_regular_file(entry);
+    }
+    catch (const std::exception &e)
+    {
+        return tl::unexpected(make_exception_error("is_regular_file(directory_entry)",
+                                                   entry.path(), e));
+    }
+    catch (...)
+    {
+        return tl::unexpected(
+            make_unknown_exception_error("is_regular_file(directory_entry)",
+                                         entry.path()));
+    }
 }
 
-inline path relative(const path &p, const path &base)
+[[nodiscard]] inline result<std::uintmax_t> file_size(const path &p)
 {
-    return detail::fs::relative(p, base);
+    std::error_code ec;
+    const auto value = detail::fs::file_size(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("file_size", p, ec));
+    }
+    return value;
 }
 
-inline path relative(const path &p, const path &base, std::error_code &ec)
+[[nodiscard]] inline result<file_time_type> last_write_time(const path &p)
 {
-    return detail::fs::relative(p, base, ec);
+    std::error_code ec;
+    const auto value = detail::fs::last_write_time(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("last_write_time", p, ec));
+    }
+    return value;
 }
 
-inline bool remove(const path &p)
+[[nodiscard]] inline result<path> relative(const path &p, const path &base)
 {
-    return detail::fs::remove(p);
+    std::error_code ec;
+    const auto value = detail::fs::relative(p, base, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("relative", p, ec, &base));
+    }
+    return value;
 }
 
-inline bool remove(const path &p, std::error_code &ec)
+[[nodiscard]] inline result<bool> remove(const path &p)
 {
-    return detail::fs::remove(p, ec);
+    std::error_code ec;
+    const auto value = detail::fs::remove(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("remove", p, ec));
+    }
+    return value;
 }
 
-inline std::uintmax_t remove_all(const path &p)
+[[nodiscard]] inline result<std::uintmax_t> remove_all(const path &p)
 {
-    return detail::fs::remove_all(p);
+    std::error_code ec;
+    const auto value = detail::fs::remove_all(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("remove_all", p, ec));
+    }
+    return value;
 }
 
-inline std::uintmax_t remove_all(const path &p, std::error_code &ec)
+[[nodiscard]] inline result<void> rename(const path &from, const path &to)
 {
-    return detail::fs::remove_all(p, ec);
-}
-
-inline void rename(const path &from, const path &to)
-{
-    detail::fs::rename(from, to);
-}
-
-inline void rename(const path &from, const path &to, std::error_code &ec)
-{
+    std::error_code ec;
     detail::fs::rename(from, to, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("rename", from, ec, &to));
+    }
+    return {};
 }
 
-inline space_info space(const path &p)
+[[nodiscard]] inline result<space_info> space(const path &p)
 {
-    return detail::fs::space(p);
+    std::error_code ec;
+    const auto value = detail::fs::space(p, ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("space", p, ec));
+    }
+    return value;
 }
 
-inline space_info space(const path &p, std::error_code &ec) noexcept
+[[nodiscard]] inline result<path> temp_directory_path()
 {
-    return detail::fs::space(p, ec);
-}
-
-inline path temp_directory_path()
-{
-    return detail::fs::temp_directory_path();
-}
-
-inline path temp_directory_path(std::error_code &ec)
-{
-    return detail::fs::temp_directory_path(ec);
+    std::error_code ec;
+    const auto value = detail::fs::temp_directory_path(ec);
+    if (ec)
+    {
+        return tl::unexpected(make_error("temp_directory_path", {}, ec));
+    }
+    return value;
 }
 } // namespace mpc_fs
 

@@ -246,7 +246,7 @@ bool StdDisk::deleteAllFiles(int extensionIndex)
 
 bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> f)
 {
-    return mpc_fs::remove_all(f.lock()->fs_path) != 0;
+    return mpc_fs::remove_all(f.lock()->fs_path).value_or(0) != 0;
 }
 
 bool StdDisk::newFolder(const std::string &newDirName)
@@ -255,7 +255,7 @@ bool StdDisk::newFolder(const std::string &newDirName)
         StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
     auto new_path = getDir()->fs_path;
     new_path.append(copy);
-    return mpc_fs::create_directory(new_path);
+    return mpc_fs::create_directory(new_path).value_or(false);
 }
 
 std::shared_ptr<MpcFile> StdDisk::newFile(const std::string &newFileName)

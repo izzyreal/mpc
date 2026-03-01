@@ -13,55 +13,67 @@ using namespace mpc::file;
 
 void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 {
-    assert(mpc_fs::is_directory(p));
+    assert(mpc_fs::is_directory(p).value_or(false));
 
     auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
-    if (mpc_fs::exists(tempRoot))
+    if (mpc_fs::exists(tempRoot).value_or(false))
     {
-        mpc_fs::remove_all(tempRoot);
+        (void) mpc_fs::remove_all(tempRoot);
     }
 
     auto tempRootWasCreated = mpc_fs::create_directory(tempRoot);
-    assert(tempRootWasCreated);
+    assert(tempRootWasCreated && *tempRootWasCreated);
 
     std::vector<std::string> existingNames;
 
-    for (auto &e : mpc_fs::directory_iterator(p))
+    auto dirItRes = mpc_fs::make_directory_iterator(p);
+    if (!dirItRes)
+    {
+        return;
+    }
+
+    for (auto e = *dirItRes; e != mpc_fs::directory_end(); ++e)
     {
         std::string akaiName;
 
-        if (e.path().filename() == ".DS_Store")
+        if (e->path().filename() == ".DS_Store")
         {
             continue;
         }
 
-        if (mpc_fs::is_directory(e))
+        if (mpc_fs::is_directory(*e).value_or(false))
         {
             const auto tidyString =
-                ShortNameGenerator::tidyString(e.path().filename().string());
+                ShortNameGenerator::tidyString(e->path().filename().string());
             ShortNameGenerator generator(existingNames);
             akaiName = generator.generateShortName(tidyString).asSimpleString();
         }
         else
         {
             akaiName =
-                AkaiName::generate(e.path().filename().string(), existingNames);
+                AkaiName::generate(e->path().filename().string(), existingNames);
         }
 
-        if (akaiName != e.path().filename().string())
+        if (akaiName != e->path().filename().string())
         {
             existingNames.push_back(akaiName);
-            mpc_fs::rename(e, tempRoot / akaiName);
+            (void) mpc_fs::rename(e->path(), tempRoot / akaiName);
         }
         else
         {
-            existingNames.push_back(e.path().filename().string());
+            existingNames.push_back(e->path().filename().string());
         }
     }
 
-    for (auto &e : mpc_fs::directory_iterator(tempRoot))
+    auto tempDirItRes = mpc_fs::make_directory_iterator(tempRoot);
+    if (!tempDirItRes)
     {
-        mpc_fs::rename(e, p / e.path().filename());
+        return;
+    }
+
+    for (auto e = *tempDirItRes; e != mpc_fs::directory_end(); ++e)
+    {
+        (void) mpc_fs::rename(e->path(), p / e->path().filename());
     }
 }

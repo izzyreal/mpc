@@ -31,9 +31,14 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto recordingsRoot = mpc.paths->getDocuments()->recordingsPath();
-    mpc_fs::create_directories(recordingsRoot);
-    for (const auto& e : mpc_fs::directory_iterator(recordingsRoot))
-        mpc_fs::remove_all(e.path());
+    (void) mpc_fs::create_directories(recordingsRoot);
+    if (const auto dirItRes = mpc_fs::make_directory_iterator(recordingsRoot))
+    {
+        for (auto e = *dirItRes; e != mpc_fs::directory_end(); ++e)
+        {
+            (void) mpc_fs::remove_all(e->path());
+        }
+    }
 
     auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
@@ -106,20 +111,27 @@ TEST_CASE("Direct to disk recording does not start with silence",
 
     for (int tries = 0; tries < 400 && !have; ++tries)
     {
-        for (const auto& entry : mpc_fs::recursive_directory_iterator(recordingsRoot))
+        const auto recDirItRes =
+            mpc_fs::make_recursive_directory_iterator(recordingsRoot);
+        if (!recDirItRes)
         {
-            if (!entry.is_regular_file())
+            break;
+        }
+        for (auto entry = *recDirItRes; entry != mpc_fs::recursive_directory_end();
+             ++entry)
+        {
+            if (!entry->is_regular_file())
                 continue;
 
-            if (entry.path().filename() != "L.wav")
+            if (entry->path().filename() != "L.wav")
                 continue;
 
-            const auto t = mpc_fs::last_write_time(entry.path());
-            if (!have || t > bestTime)
+            const auto t = mpc_fs::last_write_time(entry->path());
+            if (t && (!have || *t > bestTime))
             {
                 have = true;
-                bestTime = t;
-                recordingPath = entry.path();
+                bestTime = *t;
+                recordingPath = entry->path();
             }
         }
 
@@ -128,7 +140,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     }
 
     REQUIRE(have);
-    REQUIRE(mpc_fs::exists(recordingPath));
+    REQUIRE(mpc_fs::exists(recordingPath).value_or(false));
 
     constexpr std::uintmax_t WAV_HEADER_BYTES = 44;
     constexpr std::uintmax_t MIN_DATA_BYTES_FOR_100_MONO_SAMPLES = 100 * 2;
@@ -139,24 +151,22 @@ TEST_CASE("Direct to disk recording does not start with silence",
 
     for (int tries = 0; tries < 400 && stable < 5; ++tries)
     {
-        std::error_code ec;
-        const auto size = mpc_fs::file_size(recordingPath, ec);
-
-        if (!ec && size >= WAV_HEADER_BYTES + MIN_DATA_BYTES_FOR_100_MONO_SAMPLES)
+        const auto size = mpc_fs::file_size(recordingPath);
+        if (size && *size >= WAV_HEADER_BYTES + MIN_DATA_BYTES_FOR_100_MONO_SAMPLES)
         {
             if (!haveSize)
             {
                 haveSize = true;
-                lastSize = size;
+                lastSize = *size;
                 stable = 1;
             }
-            else if (size == lastSize)
+            else if (*size == lastSize)
             {
                 ++stable;
             }
             else
             {
-                lastSize = size;
+                lastSize = *size;
                 stable = 1;
             }
         }
@@ -283,17 +293,20 @@ TEST_CASE(
 
         auto recordingsPath = mpc.paths->getDocuments()->recordingsPath();
 
-        for (const auto &entry : mpc_fs::directory_iterator(recordingsPath))
+        if (const auto dirItRes = mpc_fs::make_directory_iterator(recordingsPath))
         {
-            if (mpc_fs::is_directory(entry))
+            for (auto entry = *dirItRes; entry != mpc_fs::directory_end(); ++entry)
             {
-                recordingsPath = entry.path();
-                break;
+                if (mpc_fs::is_directory(*entry).value_or(false))
+                {
+                    recordingsPath = entry->path();
+                    break;
+                }
             }
         }
 
         auto recordingPath = recordingsPath / "L.wav";
-        REQUIRE(mpc_fs::exists(recordingPath));
+        REQUIRE(mpc_fs::exists(recordingPath).value_or(false));
 
         std::uintmax_t lastSize = 0;
         int stable = 0;
@@ -301,24 +314,22 @@ TEST_CASE(
 
         for (int attempt = 0; attempt < 400 && stable < 5; ++attempt)
         {
-            std::error_code ec;
-            auto size = mpc_fs::file_size(recordingPath, ec);
-
-            if (!ec && size > 44)
+            auto size = mpc_fs::file_size(recordingPath);
+            if (size && *size > 44)
             {
                 if (!haveSize)
                 {
                     haveSize = true;
-                    lastSize = size;
+                    lastSize = *size;
                     stable = 1;
                 }
-                else if (size == lastSize)
+                else if (*size == lastSize)
                 {
                     ++stable;
                 }
                 else
                 {
-                    lastSize = size;
+                    lastSize = *size;
                     stable = 1;
                 }
             }
@@ -347,8 +358,8 @@ TEST_CASE(
             wav->readFrames(frames, 100);
         }
 
-        mpc_fs::remove_all(recordingsPath);
-        REQUIRE(!mpc_fs::exists(recordingsPath));
+        (void) mpc_fs::remove_all(recordingsPath);
+        REQUIRE(!mpc_fs::exists(recordingsPath).value_or(false));
         return frames;
     };
 

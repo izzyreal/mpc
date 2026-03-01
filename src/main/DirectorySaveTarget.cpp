@@ -13,7 +13,7 @@ void DirectorySaveTarget::setFileData(const mpc_fs::path &path,
     const auto absPath = basePath / path;
     if (data.empty())
     {
-        mpc_fs::remove(absPath);
+        (void) mpc_fs::remove(absPath);
     }
     else
     {
@@ -28,10 +28,10 @@ std::vector<char> DirectorySaveTarget::getFileData(const mpc_fs::path &path) con
 
 bool DirectorySaveTarget::exists(const mpc_fs::path &path) const
 {
-    return mpc_fs::exists(basePath / path);
+    return mpc_fs::exists(basePath / path).value_or(false);
 }
 
 std::uintmax_t DirectorySaveTarget::fileSize(const mpc_fs::path &path) const
 {
-    return mpc_fs::file_size(basePath / path);
+    return mpc_fs::file_size(basePath / path).value_or(0);
 }

@@ -411,21 +411,14 @@ void SaveScreen::displaySize() const
 
 void SaveScreen::displayFree() const
 {
-    std::uintmax_t availableSpaceInBytes = 0;
-
-    try
+    const auto spaceRes = mpc_fs::space(mpc.paths->getDocuments()->storesPath());
+    if (!spaceRes)
     {
-        availableSpaceInBytes =
-            mpc_fs::space(mpc.paths->getDocuments()->storesPath()).available;
-    }
-    catch (mpc_fs::filesystem_error &)
-    {
-        MLOG(
-            "An exception occurred when SaveScreen::displayFree was trying to "
-            "query available space!");
+        findLabel("free")->setText("N/A");
+        return;
     }
 
-    const auto text = byte_count_to_short_string(availableSpaceInBytes);
+    const auto text = byte_count_to_short_string(spaceRes->available);
     findLabel("free")->setText(text);
 }
 
