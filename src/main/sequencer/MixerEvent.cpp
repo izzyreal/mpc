@@ -11,7 +11,7 @@ MixerEvent::MixerEvent(EventData *const ptr, const EventData &snapshot,
 void MixerEvent::setParameter(const int i) const
 {
     auto e = snapshot;
-    e.mixerParameter = i;
+    e.mixerParameter = static_cast<int8_t>(std::clamp(i, 0, 3));
     dispatch(UpdateEvent{handle, e});
 }
 
@@ -23,7 +23,9 @@ int MixerEvent::getParameter() const
 void MixerEvent::setPadNumber(const int i) const
 {
     auto e = snapshot;
-    e.mixerPad = i;
+    e.mixerPad =
+        static_cast<int8_t>(std::clamp(i, static_cast<int>(MinProgramPadIndex),
+                                       static_cast<int>(MaxProgramPadIndex)));
     dispatch(UpdateEvent{handle, e});
 }
 
@@ -35,7 +37,7 @@ int MixerEvent::getPad() const
 void MixerEvent::setValue(const int i) const
 {
     auto e = snapshot;
-    e.mixerValue = i;
+    e.mixerValue = static_cast<int8_t>(std::clamp(i, 0, 100));
     dispatch(UpdateEvent{handle, e});
 }
 
