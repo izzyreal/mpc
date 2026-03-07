@@ -1,9 +1,11 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "MpcSpecs.hpp"
 #include "engine/audio/server/AudioClient.hpp"
 #include "engine/NoteRepeatProcessor.hpp"
 
+#include <array>
 #include <memory>
 #include <functional>
 
@@ -94,6 +96,19 @@ namespace mpc::engine
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
+        struct SecondSequencePlaybackState
+        {
+            bool initialized = false;
+            bool enabled = false;
+            bool active = false;
+            SequenceIndex sequenceIndex = NoSequenceIndex;
+            Tick positionTicks = 0;
+            std::array<EventIndex, Mpc2000XlSpecs::TOTAL_TRACK_COUNT>
+                playEventIndices{};
+        };
+
+        mutable SecondSequencePlaybackState secondSequencePlaybackState;
+
         void triggerClickIfNeeded() const;
 
         void displayPunchRects() const;
@@ -114,5 +129,12 @@ namespace mpc::engine
                                                  SequenceIndex) const;
 
         void stopSequencer() const;
+        void resetSecondSequencePlaybackState() const;
+        void initializeSecondSequencePlaybackState(Tick elapsedTicks) const;
+        void syncSecondSequencePlayEventIndices(Tick targetTick) const;
+        void playSecondSequenceTick() const;
+        void advanceSecondSequencePlaybackState() const;
+        Tick normalizeSecondSequenceStartTick(const sequencer::Sequence &,
+                                              Tick elapsedTicks) const;
     };
 } // namespace mpc::engine

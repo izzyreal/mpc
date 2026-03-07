@@ -13,6 +13,7 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 #include "engine/EngineHost.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "performance/PerformanceManager.hpp"
 
@@ -20,14 +21,20 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/EventData.hpp"
+#include "sequencer/Song.hpp"
 
 #include "hardware/Component.hpp"
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SequencerStateManager.hpp"
+#include "lcdgui/screens/SecondSeqScreen.hpp"
+#include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "audiomidi/MidiOutput.hpp"
 
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <unordered_map>
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -36,6 +43,100 @@ using namespace mpc::command::context;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
 using namespace mpc::lcdgui;
+
+namespace
+{
+constexpr int kPlaybackBufferSize = 512;
+constexpr int kPlaybackSampleRate = 44100;
+
+void prepareMidiPlaybackTrack(const std::shared_ptr<mpc::sequencer::Track> &track,
+                              const mpc::Tick tick,
+                              const int noteNumber)
+{
+    track->setBusType(mpc::sequencer::BusType::MIDI);
+    track->setDeviceIndex(1);
+    auto *note = track->recordNoteEventNonLive(
+        tick, mpc::NoteNumber(noteNumber), mpc::Velocity(100));
+    track->finalizeNoteEventNonLive(note, mpc::Duration(1));
+}
+
+void processPlaybackBuffers(mpc::Mpc &mpc, const int bufferCount)
+{
+    auto server = mpc.getEngineHost()->getAudioServer();
+    auto sequencer = mpc.getSequencer();
+
+    server->resizeBuffers(kPlaybackBufferSize);
+    server->setSampleRate(kPlaybackSampleRate);
+    server->start();
+
+    for (int i = 0; i < bufferCount; ++i)
+    {
+        mpc.getEngineHost()->prepareProcessBlock(kPlaybackBufferSize);
+        mpc.getClock()->processBufferInternal(
+            sequencer->getTransport()->getTempo(), kPlaybackSampleRate,
+            kPlaybackBufferSize,
+            sequencer->getTransport()->getPlayStartPositionQuarterNotes());
+        server->work(nullptr, nullptr, kPlaybackBufferSize, {}, {}, {}, {});
+    }
+}
+
+void processExternalPlaybackBuffer(mpc::Mpc &mpc,
+                                   const double positionQuarterNotes,
+                                   const int nFrames,
+                                   const int64_t timeInSamples)
+{
+    auto server = mpc.getEngineHost()->getAudioServer();
+    server->resizeBuffers(nFrames);
+    server->setSampleRate(kPlaybackSampleRate);
+    server->start();
+
+    mpc.getEngineHost()->prepareProcessBlock(nFrames);
+    mpc.getClock()->processBufferExternal(positionQuarterNotes, nFrames,
+                                          kPlaybackSampleRate,
+                                          mpc.getSequencer()->getTransport()->getTempo(),
+                                          timeInSamples);
+    mpc.getEngineHost()->getSequencerPlaybackEngine()->work(nFrames);
+}
+
+std::unordered_map<int, int> dequeueMidiNoteOnCounts(mpc::Mpc &mpc)
+{
+    std::unordered_map<int, int> result;
+    std::vector<mpc::client::event::ClientMidiEvent> buffer(256);
+
+    while (true)
+    {
+        const auto dequeued = mpc.getMidiOutput()->dequeue(buffer);
+
+        if (dequeued == 0)
+        {
+            break;
+        }
+
+        for (int i = 0; i < dequeued; ++i)
+        {
+            const auto &event = buffer[i];
+
+            if (event.getMessageType() ==
+                mpc::client::event::ClientMidiEvent::NOTE_ON)
+            {
+                result[event.getNoteNumber()]++;
+            }
+        }
+    }
+
+    return result;
+}
+
+void configureSecondSequence(mpc::Mpc &mpc, const int sequenceIndex)
+{
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::SecondSeqScreen);
+    auto secondSeqScreen = mpc.screens->get<ScreenId::SecondSeqScreen>();
+    secondSeqScreen->turnWheel(sequenceIndex - secondSeqScreen->getSq());
+    mpc.getSequencer()->setSecondSequenceEnabled(true);
+    mpc.getSequencer()->getStateManager()->drainQueue();
+}
+}
 
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
@@ -832,4 +933,310 @@ TEST_CASE("Undo", "[sequencer]")
 
     REQUIRE(sequencer->getSelectedSequence()->getTrack(0)->getEvents().size() ==
             10);
+}
+
+TEST_CASE("Second sequence loops independently on repeated master loops",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 0, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    sequencer->getTransport()->play(true);
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 420);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) >= 2);
+    REQUIRE(noteOns.at(61) >= 2);
+}
+
+TEST_CASE("Second sequence does not wrap when its own loop is disabled",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    seq1->setTimeSignature(0, 1, 4);
+    seq1->setLoopEnabled(false);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 0, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    sequencer->getTransport()->play(true);
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 420);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) >= 2);
+    REQUIRE(noteOns.at(61) == 1);
+}
+
+TEST_CASE("Second sequence stops with master when master loop is disabled",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    seq0->setTimeSignature(0, 1, 4);
+    seq0->setLoopEnabled(false);
+    seq1->setTimeSignature(0, 1, 4);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 0, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    sequencer->getTransport()->play(true);
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 220);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) == 1);
+    REQUIRE(noteOns.at(61) == 1);
+    REQUIRE_FALSE(sequencer->getTransport()->isPlaying());
+}
+
+TEST_CASE("Second sequence can double-play the master sequence",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    seq0->init(0);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 0);
+
+    sequencer->getTransport()->play(true);
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 32);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) == 2);
+}
+
+TEST_CASE("Second sequence start position follows elapsed non-zero start time",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    seq1->setTimeSignature(0, 2, 4);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 240, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 48, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    sequencer->getTransport()->setPosition(Sequencer::ticksToQuarterNotes(240));
+    stateManager->drainQueue();
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 32);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) == 1);
+    REQUIRE(noteOns.at(61) == 1);
+}
+
+TEST_CASE("Second sequence stays continuous across song step changes",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    auto seq2 = sequencer->getSequence(2);
+    seq0->init(0);
+    seq1->init(0);
+    seq2->init(0);
+    stateManager->drainQueue();
+
+    seq0->setTimeSignature(0, 1, 4);
+    seq1->setTimeSignature(0, 1, 4);
+    seq2->setTimeSignature(0, 6, 16);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 0, 61);
+    prepareMidiPlaybackTrack(seq2->getTrack(0), 96, 62);
+    stateManager->drainQueue();
+
+    auto song = sequencer->getSong(0);
+    song->setUsed(true);
+    song->setStepSequenceIndex(mpc::SongStepIndex(0), mpc::SequenceIndex(0));
+    song->setStepSequenceIndex(mpc::SongStepIndex(1), mpc::SequenceIndex(1));
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 2);
+    mpc.getLayeredScreen()->openScreenById(ScreenId::SongScreen);
+
+    sequencer->getTransport()->play(true);
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 120);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) == 1);
+    REQUIRE(noteOns.at(61) == 1);
+    REQUIRE(noteOns.at(62) == 1);
+}
+
+TEST_CASE("Second sequence stays read-only during punched recording",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 0, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 0, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    auto transport = sequencer->getTransport();
+    transport->setPunchEnabled(true);
+    transport->setAutoPunchMode(2);
+    transport->setPunchInTime(0);
+    transport->setPunchOutTime(96);
+
+    transport->recFromStart();
+    stateManager->drainQueue();
+
+    processPlaybackBuffers(mpc, 32);
+    transport->stop();
+    stateManager->drainQueue();
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(61) == 1);
+    REQUIRE(seq0->getTrack(0)->getEvents().empty());
+    REQUIRE(seq1->getTrack(0)->getEvents().size() == 1);
+    REQUIRE(seq1->getTrack(0)->getEvent(0)->getTick() == 0);
+}
+
+TEST_CASE("Second sequence repositions from absolute elapsed time on host jump",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto syncScreen = mpc.screens->get<ScreenId::SyncScreen>();
+    sequencer->getTransport()->setCountEnabled(false);
+    syncScreen->modeIn = 1;
+
+    auto seq0 = sequencer->getSequence(0);
+    auto seq1 = sequencer->getSequence(1);
+    seq0->init(0);
+    seq1->init(0);
+    stateManager->drainQueue();
+
+    seq1->setTimeSignature(0, 2, 4);
+    stateManager->drainQueue();
+
+    prepareMidiPlaybackTrack(seq0->getTrack(0), 241, 60);
+    prepareMidiPlaybackTrack(seq1->getTrack(0), 49, 61);
+    stateManager->drainQueue();
+
+    configureSecondSequence(mpc, 1);
+
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    processExternalPlaybackBuffer(mpc, 0.0, kPlaybackBufferSize, 0);
+    processExternalPlaybackBuffer(mpc, 0.1, kPlaybackBufferSize,
+                                  kPlaybackBufferSize);
+    processExternalPlaybackBuffer(
+        mpc, Sequencer::ticksToQuarterNotes(240), kPlaybackBufferSize,
+        kPlaybackBufferSize * 4);
+    processExternalPlaybackBuffer(
+        mpc, Sequencer::ticksToQuarterNotes(245), kPlaybackBufferSize,
+        kPlaybackBufferSize * 5);
+
+    const auto noteOns = dequeueMidiNoteOnCounts(mpc);
+    REQUIRE(noteOns.at(60) == 1);
+    REQUIRE(noteOns.at(61) == 1);
 }

@@ -104,39 +104,44 @@ void Sequencer::playTick(const Tick tick) const
 
     const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
                                               : getSelectedSequenceIndex();
-    auto seq = sequences[seqIndex].get();
-    const auto secondSequenceScreen =
-        getScreens()->get<ScreenId::SecondSeqScreen>();
+    playSequenceTick(seqIndex, tick, true);
+}
 
-    for (int i = 0; i < 2; i++)
+void Sequencer::playSequenceTick(const SequenceIndex sequenceIndex,
+                                 const Tick tick,
+                                 const bool allowPlaybackMutation) const
+{
+    auto seq = sequences[sequenceIndex].get();
+
+    if (!seq || !seq->isUsed())
     {
-        if (i == 1)
-        {
-            if (!secondSequenceEnabled.load() ||
-                secondSequenceScreen->sq ==
-                    seqIndex) // Real 2KXL would play all events twice (i.e.
-                              // double as loud as normal) for the last clause
-            {
-                break;
-            }
+        return;
+    }
 
-            seq = sequences[secondSequenceScreen->sq].get();
-
-            if (!seq->isUsed())
-            {
-                break;
-            }
-        }
-
+    if (allowPlaybackMutation)
+    {
         getStateManager()->processLiveNoteEventRecordingQueues(
             tick, seq->getSnapshot(seq->getSequenceIndex()));
+    }
 
-        for (const auto &track : seq->getTracks())
+    for (const auto &track : seq->getTracks())
+    {
+        if (allowPlaybackMutation)
         {
             while (track->getNextTick() == tick)
             {
                 track->playNext();
             }
+
+            continue;
+        }
+
+        auto eventIndex = track->findPlayEventIndexAtTick(tick);
+
+        while (track->getTickForEventIndex(eventIndex) == tick)
+        {
+            track->playEventAtIndex(eventIndex, false);
+            eventIndex = eventIndex + 1;
         }
     }
 }

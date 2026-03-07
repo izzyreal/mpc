@@ -118,6 +118,11 @@ namespace mpc::sequencer
         std::vector<EventData> getEventStates() const;
         std::vector<EventData *> getEventHandles() const;
 
+        EventIndex findPlayEventIndexAtTick(Tick tick) const;
+        int getTickForEventIndex(EventIndex eventIndex) const;
+        bool playEventAtIndex(EventIndex eventIndex,
+                              bool allowPlaybackMutation) const;
+
         int getNextTick() const;
         bool shouldRemovePlayIndexEventDueToRecording() const;
         bool shouldRemovePlayIndexEventDueToErasePressed() const;

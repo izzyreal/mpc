@@ -9,6 +9,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Clock.hpp"
+#include "sequencer/Track.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
@@ -16,6 +17,7 @@
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
+#include "lcdgui/screens/SecondSeqScreen.hpp"
 
 #include "performance/PerformanceManager.hpp"
 #include "performance/PerformanceMessage.hpp"
@@ -66,6 +68,169 @@ unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
     return tickFrameOffset;
 }
 
+void SequencerPlaybackEngine::resetSecondSequencePlaybackState() const
+{
+    secondSequencePlaybackState = {};
+    secondSequencePlaybackState.sequenceIndex = NoSequenceIndex;
+}
+
+mpc::Tick SequencerPlaybackEngine::normalizeSecondSequenceStartTick(
+    const Sequence &sequence, const Tick elapsedTicks) const
+{
+    if (!sequence.isLoopEnabled())
+    {
+        return elapsedTicks;
+    }
+
+    const auto loopStartTick = sequence.getLoopStartTick();
+    const auto loopEndTick = sequence.getLoopEndTick();
+
+    if (elapsedTicks < loopStartTick || loopEndTick <= loopStartTick)
+    {
+        return elapsedTicks;
+    }
+
+    const auto loopLength = loopEndTick - loopStartTick;
+    return loopStartTick + ((elapsedTicks - loopStartTick) % loopLength);
+}
+
+void SequencerPlaybackEngine::syncSecondSequencePlayEventIndices(
+    const Tick targetTick) const
+{
+    if (!secondSequencePlaybackState.enabled ||
+        secondSequencePlaybackState.sequenceIndex == NoSequenceIndex)
+    {
+        return;
+    }
+
+    const auto seq =
+        sequencer->getSequence(secondSequencePlaybackState.sequenceIndex);
+
+    if (!seq || !seq->isUsed())
+    {
+        secondSequencePlaybackState.active = false;
+        return;
+    }
+
+    for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TOTAL_TRACK_COUNT;
+         ++trackIndex)
+    {
+        secondSequencePlaybackState.playEventIndices[trackIndex] =
+            seq->getTrack(trackIndex)->findPlayEventIndexAtTick(targetTick);
+    }
+}
+
+void SequencerPlaybackEngine::initializeSecondSequencePlaybackState(
+    const Tick elapsedTicks) const
+{
+    resetSecondSequencePlaybackState();
+    secondSequencePlaybackState.initialized = true;
+
+    if (!sequencer->isSecondSequenceEnabled())
+    {
+        return;
+    }
+
+    const auto secondSequenceScreen =
+        sequencer->getScreens()->get<ScreenId::SecondSeqScreen>();
+    const auto sequenceIndex = SequenceIndex(secondSequenceScreen->getSq());
+    const auto seq = sequencer->getSequence(sequenceIndex);
+
+    if (!seq || !seq->isUsed() || seq->getLastTick() <= 0)
+    {
+        return;
+    }
+
+    secondSequencePlaybackState.enabled = true;
+    secondSequencePlaybackState.sequenceIndex = sequenceIndex;
+    secondSequencePlaybackState.positionTicks =
+        normalizeSecondSequenceStartTick(*seq, elapsedTicks);
+
+    if (!seq->isLoopEnabled() && elapsedTicks >= seq->getLastTick())
+    {
+        secondSequencePlaybackState.active = false;
+        return;
+    }
+
+    secondSequencePlaybackState.active = true;
+    syncSecondSequencePlayEventIndices(secondSequencePlaybackState.positionTicks);
+}
+
+void SequencerPlaybackEngine::playSecondSequenceTick() const
+{
+    if (!secondSequencePlaybackState.enabled ||
+        !secondSequencePlaybackState.active ||
+        secondSequencePlaybackState.sequenceIndex == NoSequenceIndex)
+    {
+        return;
+    }
+
+    const auto seq =
+        sequencer->getSequence(secondSequencePlaybackState.sequenceIndex);
+
+    if (!seq || !seq->isUsed())
+    {
+        return;
+    }
+
+    for (int trackIndex = 0; trackIndex < Mpc2000XlSpecs::TOTAL_TRACK_COUNT;
+         ++trackIndex)
+    {
+        auto &eventIndex = secondSequencePlaybackState.playEventIndices[trackIndex];
+        auto track = seq->getTrack(trackIndex);
+
+        while (track->getTickForEventIndex(eventIndex) ==
+               secondSequencePlaybackState.positionTicks)
+        {
+            if (track->playEventAtIndex(eventIndex, false))
+            {
+                eventIndex = eventIndex + 1;
+                continue;
+            }
+
+            break;
+        }
+    }
+}
+
+void SequencerPlaybackEngine::advanceSecondSequencePlaybackState() const
+{
+    if (!secondSequencePlaybackState.enabled ||
+        !secondSequencePlaybackState.active ||
+        secondSequencePlaybackState.sequenceIndex == NoSequenceIndex)
+    {
+        return;
+    }
+
+    const auto seq =
+        sequencer->getSequence(secondSequencePlaybackState.sequenceIndex);
+
+    if (!seq || !seq->isUsed())
+    {
+        secondSequencePlaybackState.active = false;
+        return;
+    }
+
+    secondSequencePlaybackState.positionTicks += 1;
+
+    if (seq->isLoopEnabled())
+    {
+        if (secondSequencePlaybackState.positionTicks >= seq->getLoopEndTick())
+        {
+            secondSequencePlaybackState.positionTicks = seq->getLoopStartTick();
+            syncSecondSequencePlayEventIndices(
+                secondSequencePlaybackState.positionTicks);
+        }
+
+        return;
+    }
+
+    if (secondSequencePlaybackState.positionTicks >= seq->getLastTick())
+    {
+        secondSequencePlaybackState.active = false;
+    }
+}
+
 void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
     const int newTickPos, const SequenceIndex sequenceIndex) const
 {
@@ -81,12 +246,14 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playTick(sequencer->getTransport()->getTickPosition());
+    playSecondSequenceTick();
     const auto nextSequenceIndex = sequencer->getNextSq();
     sequencer->setSelectedSequenceIndex(nextSequenceIndex, false);
     sequencer->getStateManager()->drainQueue();
     sequencer->clearNextSq();
     sequencer->getStateManager()->drainQueue();
     setTickPositionEffectiveImmediately(0, nextSequenceIndex);
+    advanceSecondSequencePlaybackState();
     return sequencer->getCurrentlyPlayingSequence();
 }
 
@@ -225,6 +392,8 @@ bool SequencerPlaybackEngine::processSongMode() const
     }
 
     sequencer->playTick(seq->getLastTick() - 1);
+    playSecondSequenceTick();
+    advanceSecondSequencePlaybackState();
     sequencer->getTransport()->incrementPlayedStepRepetitions();
     sequencer->getStateManager()->drainQueue();
     const auto song = sequencer->getSelectedSong();
@@ -278,6 +447,8 @@ bool SequencerPlaybackEngine::processSongMode() const
         else
         {
             sequencer->playTick(seq->getLastTick() - 1);
+            playSecondSequenceTick();
+            advanceSecondSequencePlaybackState();
         }
 
         setTickPositionEffectiveImmediately(0, seq->getSequenceIndex());
@@ -319,8 +490,10 @@ bool SequencerPlaybackEngine::processSeqLoopEnabled() const
         }
 
         sequencer->playTick(sequencer->getTransport()->getTickPosition());
+        playSecondSequenceTick();
         setTickPositionEffectiveImmediately(seq->getLoopStartTick(),
                                             seq->getSequenceIndex());
+        advanceSecondSequencePlaybackState();
 
         if (sequencer->getTransport()->isRecording())
         {
@@ -415,6 +588,7 @@ void SequencerPlaybackEngine::stopSequencer() const
     const auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->getTransport()->stop();
     setTickPositionEffectiveImmediately(0, seq->getSequenceIndex());
+    resetSecondSequencePlaybackState();
 }
 
 void SequencerPlaybackEngine::work(const int nFrames)
@@ -429,6 +603,15 @@ void SequencerPlaybackEngine::work(const int nFrames)
     const bool sequencerIsRunningAtStartOfBuffer =
         transportSnapshot.isSequencerRunning();
     const auto sampleRate = getSampleRate();
+
+    if (!sequencerIsRunningAtStartOfBuffer)
+    {
+        resetSecondSequencePlaybackState();
+    }
+    else if (!secondSequencePlaybackState.initialized)
+    {
+        initializeSecondSequencePlaybackState(transportSnapshot.getPositionTicks());
+    }
 
     if (sequencerIsRunningAtStartOfBuffer &&
         transportSnapshot.isMetronomeOnlyEnabled())
@@ -496,6 +679,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
         seq = sequencer->getCurrentlyPlayingSequence();
         manager->applyMessageImmediate(
             SyncTrackEventIndices{seq->getSequenceIndex()});
+        initializeSecondSequencePlaybackState(
+            sequencer->getTransport()->getTickPosition());
     }
 
     bool songHasStopped = false;
@@ -603,8 +788,10 @@ void SequencerPlaybackEngine::work(const int nFrames)
         if (!songHasStopped && !normalPlayHasStopped)
         {
             sequencer->playTick(sequencer->getTransport()->getTickPosition());
+            playSecondSequenceTick();
             processNoteRepeat();
             sequencer->getTransport()->bumpPositionByTicks(1);
+            advanceSecondSequencePlaybackState();
         }
 
         manager->drainQueue();

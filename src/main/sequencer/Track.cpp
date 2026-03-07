@@ -356,47 +356,91 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     return result;
 }
 
-int Track::getNextTick() const
+mpc::EventIndex Track::findPlayEventIndexAtTick(const Tick tick) const
 {
     const auto snapshot = getSnapshot(getIndex());
-    const auto playEventIndex = snapshot.getPlayEventIndex();
 
-    if (playEventIndex >= snapshot.getEventCount())
+    if (tick == 0 || snapshot.isEventsEmpty())
+    {
+        return EventIndex(0);
+    }
+
+    auto eventCounter = EventIndex(0);
+
+    for (const auto *ev = snapshot.getEventByIndex(eventCounter); ev;
+         ++eventCounter, ev = snapshot.getEventByIndex(eventCounter))
+    {
+        if (ev->tick >= tick)
+        {
+            return eventCounter;
+        }
+    }
+
+    return EventIndex(snapshot.getEventCount());
+}
+
+int Track::getTickForEventIndex(const EventIndex eventIndex) const
+{
+    const auto snapshot = getSnapshot(getIndex());
+
+    if (eventIndex >= snapshot.getEventCount())
     {
         return std::numeric_limits<int>::max();
     }
 
-    return snapshot.getEventByIndex(playEventIndex)->tick;
+    return snapshot.getEventByIndex(eventIndex)->tick;
 }
 
-void Track::playNext() const
+bool Track::playEventAtIndex(const EventIndex eventIndex,
+                             const bool allowPlaybackMutation) const
 {
     const auto snapshot = getSnapshot(getIndex());
-    auto playEventIndex = snapshot.getPlayEventIndex();
-    const auto event = snapshot.getEventByIndex(playEventIndex);
+    const auto event = snapshot.getEventByIndex(eventIndex);
 
     if (!event)
     {
-        return;
+        return false;
     }
 
-    const bool shouldDelete = shouldRemovePlayIndexEventDueToRecording() ||
-                              shouldRemovePlayIndexEventDueToErasePressed();
-
-    if (shouldDelete && !event->dontDelete)
+    if (allowPlaybackMutation)
     {
-        dispatch(RemoveEvent{event});
-        manager->drainQueue();
-        return;
-    }
+        const bool shouldDelete = shouldRemovePlayIndexEventDueToRecording() ||
+                                  shouldRemovePlayIndexEventDueToErasePressed();
 
-    event->dontDelete = false;
+        if (shouldDelete && !event->dontDelete)
+        {
+            dispatch(RemoveEvent{event});
+            manager->drainQueue();
+            return false;
+        }
+
+        event->dontDelete = false;
+    }
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
         eventHandler->handleFinalizedEvent(*event, getIndex(),
                                            getVelocityRatio(), getBusType(),
                                            getDeviceIndex());
+    }
+
+    return true;
+}
+
+int Track::getNextTick() const
+{
+    const auto snapshot = getSnapshot(getIndex());
+    return getTickForEventIndex(snapshot.getPlayEventIndex());
+}
+
+void Track::playNext() const
+{
+    const auto snapshot = getSnapshot(getIndex());
+    auto playEventIndex = snapshot.getPlayEventIndex();
+
+    if (!playEventAtIndex(playEventIndex, true))
+    {
+        return;
     }
 
     playEventIndex = playEventIndex + 1;
