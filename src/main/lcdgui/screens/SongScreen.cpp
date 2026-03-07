@@ -147,6 +147,15 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
+                            return sequencer.lock()->isSecondSequenceEnabled();
+                        },
+                        [&](auto)
+                        {
+                            displayBackground();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
                             const auto lockedSequencer = sequencer.lock();
                             const auto song =
                                 lockedSequencer->getSelectedSong();
@@ -185,6 +194,7 @@ void SongScreen::open()
     }
 
     displaySongName();
+    displayBackground();
     displayNow0();
     displayNow1();
     displayNow2();
@@ -192,6 +202,13 @@ void SongScreen::open()
     displayTempo();
     displayLoop();
     displaySteps();
+}
+
+void SongScreen::displayBackground()
+{
+    findBackground()->setBackgroundName(sequencer.lock()->isSecondSequenceEnabled()
+                                            ? "song-2nd"
+                                            : "song");
 }
 
 void SongScreen::up()

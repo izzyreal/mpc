@@ -36,6 +36,7 @@ namespace mpc::lcdgui::screens
         void displayNow1() const;
         void displayNow2() const;
         void displaySongName() const;
+        void displayBackground();
 
         friend class NameScreen;
     };
