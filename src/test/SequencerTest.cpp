@@ -27,6 +27,7 @@
 #include "sequencer/EventRef.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "lcdgui/screens/SecondSeqScreen.hpp"
+#include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "audiomidi/MidiOutput.hpp"
@@ -276,6 +277,72 @@ TEST_CASE("Next Sq focus is preserved across note repeat press/release",
 
     REQUIRE(layeredScreen->getFocusedFieldName() == "nextsq");
     REQUIRE_FALSE(mpc.getScreen()->findField("nextsq")->IsHidden());
+}
+
+TEST_CASE("Punch screen function keys are visible when stopped", "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::PunchScreen);
+
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "punch");
+    REQUIRE_FALSE(mpc.getScreen()->findChild("function-keys")->IsHidden());
+}
+
+TEST_CASE("Opening punch while playing redirects to trans with hidden function keys",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSelectedSequence()->init(0);
+    stateManager->drainQueue();
+    sequencer->getTransport()->setCountEnabled(false);
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::PunchScreen);
+
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "trans");
+    REQUIRE(mpc.getScreen()->findChild("function-keys")->IsHidden());
+}
+
+TEST_CASE("Second sequence screen function keys are visible when stopped",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::SecondSeqScreen);
+
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "second-seq");
+    REQUIRE_FALSE(mpc.getScreen()->findChild("function-keys")->IsHidden());
+}
+
+TEST_CASE("Trans screen function keys reappear after stopping", "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSelectedSequence()->init(0);
+    stateManager->drainQueue();
+    sequencer->getTransport()->setCountEnabled(false);
+    sequencer->getTransport()->play();
+    stateManager->drainQueue();
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::PunchScreen);
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "trans");
+    REQUIRE(mpc.getScreen()->findChild("function-keys")->IsHidden());
+
+    mpc.getScreen()->stop();
+    stateManager->drainQueue();
+
+    REQUIRE_FALSE(mpc.getScreen()->findChild("function-keys")->IsHidden());
 }
 
 TEST_CASE("Next Sq focus is preserved when releasing TAP after locking note repeat",

@@ -49,6 +49,8 @@ void PunchScreen::open()
     displayBackground();
     displayAutoPunch();
 
+    findChild("function-keys")
+        ->Hide(sequencer.lock()->getTransport()->isPlaying());
     setFunctionKeysArrangement(
         sequencer.lock()->getTransport()->isPunchEnabled());
 }
@@ -161,6 +163,24 @@ void PunchScreen::overDub()
 {
     openScreenById(ScreenId::SequencerScreen);
     ScreenComponent::rec();
+}
+
+void PunchScreen::play()
+{
+    ScreenComponent::play();
+    findChild("function-keys")->Hide(true);
+}
+
+void PunchScreen::playStart()
+{
+    ScreenComponent::playStart();
+    findChild("function-keys")->Hide(true);
+}
+
+void PunchScreen::stop()
+{
+    ScreenComponent::stop();
+    findChild("function-keys")->Hide(false);
 }
 
 int PunchScreen::getActiveTab() const

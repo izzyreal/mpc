@@ -5,6 +5,7 @@
 #include "lcdgui/Label.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Transport.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -17,6 +18,8 @@ void SecondSeqScreen::open()
 {
     displaySq();
     displayFunctionKeys();
+    findChild("function-keys")
+        ->Hide(sequencer.lock()->getTransport()->isPlaying());
 }
 
 void SecondSeqScreen::function(int i)
@@ -79,4 +82,34 @@ void SecondSeqScreen::displayFunctionKeys() const
     {
         setFunctionKeysArrangement(0);
     }
+}
+
+void SecondSeqScreen::play()
+{
+    ScreenComponent::play();
+    findChild("function-keys")->Hide(true);
+}
+
+void SecondSeqScreen::playStart()
+{
+    ScreenComponent::playStart();
+    findChild("function-keys")->Hide(true);
+}
+
+void SecondSeqScreen::rec()
+{
+    ScreenComponent::rec();
+    findChild("function-keys")->Hide(true);
+}
+
+void SecondSeqScreen::overDub()
+{
+    ScreenComponent::overDub();
+    findChild("function-keys")->Hide(true);
+}
+
+void SecondSeqScreen::stop()
+{
+    ScreenComponent::stop();
+    findChild("function-keys")->Hide(false);
 }

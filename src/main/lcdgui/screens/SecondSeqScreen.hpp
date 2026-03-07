@@ -28,6 +28,11 @@ namespace mpc::lcdgui::screens
         SecondSeqScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
+        void play() override;
+        void playStart() override;
+        void rec() override;
+        void overDub() override;
+        void stop() override;
 
         int getSq()
         {

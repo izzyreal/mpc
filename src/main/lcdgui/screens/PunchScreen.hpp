@@ -16,6 +16,9 @@ namespace mpc::lcdgui::screens
         PunchScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
+        void play() override;
+        void playStart() override;
+        void stop() override;
 
         void rec() override;
         void overDub() override;

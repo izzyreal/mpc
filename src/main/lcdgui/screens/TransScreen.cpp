@@ -175,34 +175,29 @@ void TransScreen::displayBars() const
 void TransScreen::play()
 {
     ScreenComponent::play();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
+    findChild("function-keys")->Hide(true);
 }
 
 void TransScreen::playStart()
 {
     ScreenComponent::playStart();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
+    findChild("function-keys")->Hide(true);
 }
 
 void TransScreen::rec()
 {
     ScreenComponent::rec();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
+    findChild("function-keys")->Hide(true);
 }
 
 void TransScreen::overDub()
 {
     ScreenComponent::overDub();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
+    findChild("function-keys")->Hide(true);
 }
 
 void TransScreen::stop()
 {
     ScreenComponent::stop();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
+    findChild("function-keys")->Hide(false);
 }
