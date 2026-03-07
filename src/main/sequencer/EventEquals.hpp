@@ -91,7 +91,8 @@ namespace mpc::sequencer
     {
         return static_cast<const EventRef &>(a) ==
                    static_cast<const EventRef &>(b) &&
-               a.getBytes() == b.getBytes();
+               a.getByteA() == b.getByteA() &&
+               a.getByteB() == b.getByteB();
     }
 
     inline bool eventsEqual(const std::shared_ptr<EventRef> &a,

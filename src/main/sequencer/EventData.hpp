@@ -62,6 +62,8 @@ namespace mpc::sequencer
         int8_t mixerParameter;
         int8_t mixerPad;
         int8_t mixerValue;
+        uint8_t sysExByteA;
+        uint8_t sysExByteB;
 
         EventData()
         {
@@ -92,6 +94,8 @@ namespace mpc::sequencer
             mixerParameter = 0;
             mixerPad = 0;
             mixerValue = 0;
+            sysExByteA = 0;
+            sysExByteB = 0;
         }
 
         bool operator==(EventData const &other) const
@@ -112,7 +116,10 @@ namespace mpc::sequencer
                    programChangeProgramIndex ==
                        other.programChangeProgramIndex &&
                    mixerParameter == other.mixerParameter &&
-                   mixerPad == other.mixerPad && mixerValue == other.mixerValue;
+                   mixerPad == other.mixerPad &&
+                   mixerValue == other.mixerValue &&
+                   sysExByteA == other.sysExByteA &&
+                   sysExByteB == other.sysExByteB;
         }
 
         bool operator!=(EventData const &other) const

@@ -10,6 +10,7 @@
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
+#include "file/all/AllSequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::disk;
@@ -107,6 +108,39 @@ TEST_CASE("ALL file song", "[allfile]")
     REQUIRE(song->getStep(mpc::SongStepIndex(0)).repetitionCount == 1);
     REQUIRE(song->getStep(mpc::SongStepIndex(1)).sequenceIndex == 1);
     REQUIRE(song->getStep(mpc::SongStepIndex(1)).repetitionCount == 2);
+}
+
+TEST_CASE("ALL file save does not crash with sysex event", "[allfile]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSequence(0);
+    seq->init(1);
+    stateManager->drainQueue();
+
+    EventData eventData;
+    eventData.type = EventType::SystemExclusive;
+    eventData.tick = 0;
+    eventData.sysExByteA = 0x12;
+    eventData.sysExByteB = 0x34;
+
+    seq->getTrack(0)->acquireAndInsertEvent(eventData);
+    stateManager->drainQueue();
+
+    AllParser allParser(mpc);
+    REQUIRE_NOTHROW(allParser.getBytes());
+
+    auto bytes = allParser.getBytes();
+    AllParser reparsed(mpc, bytes);
+    auto allSequences = reparsed.getAllSequences();
+    REQUIRE_FALSE(allSequences.empty());
+    REQUIRE(allSequences[0]->getEventAmount() == 1);
+    REQUIRE(allSequences[0]->allEvents[0].type == EventType::SystemExclusive);
+    REQUIRE(allSequences[0]->allEvents[0].sysExByteA == 0x12);
+    REQUIRE(allSequences[0]->allEvents[0].sysExByteB == 0x34);
 }
 
 TEST_CASE("ALL file track is on, used and transmits program changes",

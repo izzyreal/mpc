@@ -112,7 +112,7 @@ int SequenceNames::getSegmentCount(sequencer::Sequence *seq)
 
             if (sysEx)
             {
-                auto dataSegments = (int)ceil(sysEx->getBytes().size() / 8.0);
+                constexpr int dataSegments = 1;
                 segmentCount += dataSegments + 1;
             }
             else if (std::dynamic_pointer_cast<sequencer::MixerEvent>(e))

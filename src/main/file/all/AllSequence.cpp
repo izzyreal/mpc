@@ -450,8 +450,7 @@ int AllSequence::getSegmentCount(Sequence *seq)
                     std::dynamic_pointer_cast<SystemExclusiveEvent>(e);
                 sysExEvent)
             {
-                const int dataSegments = static_cast<int>(ceil(
-                    static_cast<int>(sysExEvent->getBytes().size()) / 8.0));
+                constexpr int dataSegments = 1;
                 segmentCount += dataSegments + 2;
             }
             else if (const auto mixerEvent =

@@ -220,13 +220,9 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
             }
             else if (mpcSysExEvent)
             {
-                auto sysExData = std::vector<char>(
-                    static_cast<int>(mpcSysExEvent->getBytes().size()) - 1);
-
-                for (int j = 0; j < sysExData.size(); j++)
-                {
-                    sysExData[j] = mpcSysExEvent->getBytes()[j + 1];
-                }
+                auto sysExData = std::vector<char>{
+                    static_cast<char>(mpcSysExEvent->getByteA()),
+                    static_cast<char>(mpcSysExEvent->getByteB())};
 
                 auto see = std::make_shared<SystemExclusiveEvent>(
                     240, mpcSysExEvent->getTick(), sysExData);

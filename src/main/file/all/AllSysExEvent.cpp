@@ -45,7 +45,12 @@ EventData AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     else
     {
         e.type = EventType::SystemExclusive;
-        // e.sysexData = sysexLoadData;
+        e.sysExByteA = sysexLoadData.size() > 0
+                           ? static_cast<unsigned char>(sysexLoadData[0])
+                           : 0;
+        e.sysExByteB = sysexLoadData.size() > 1
+                           ? static_cast<unsigned char>(sysexLoadData[1])
+                           : 0;
         e.tick = AllEvent::readTick(bytes);
     }
 
@@ -88,11 +93,11 @@ std::vector<char> AllSysExEvent::mpcEventToBytes(const EventData &e)
     }
     else if (e.type == EventType::SystemExclusive)
     {
-        AllEvent::writeTick(bytes, e.tick);
-        constexpr int dataSize = 0;
-        constexpr int dataSegments = static_cast<int>(dataSize / 8.0);
+        constexpr int dataSize = 2;
+        constexpr int dataSegments = (dataSize + 7) / 8;
         bytes = std::vector<char>((dataSegments + 2) *
                                   AllSequence::EVENT_SEG_LENGTH);
+        AllEvent::writeTick(bytes, e.tick);
         bytes[AllEvent::TRACK_OFFSET] = e.trackIndex;
         bytes[AllEvent::TRACK_OFFSET +
               (dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH] =
@@ -100,10 +105,8 @@ std::vector<char> AllSysExEvent::mpcEventToBytes(const EventData &e)
         bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
         bytes[BYTE_COUNT_OFFSET] = static_cast<char>(dataSize);
 
-        for (int i = 0; i < dataSize; i++)
-        {
-            // bytes[DATA_OFFSET + i] = sysExEvent->getBytes()[i];
-        }
+        bytes[DATA_OFFSET] = static_cast<char>(e.sysExByteA);
+        bytes[DATA_OFFSET + 1] = static_cast<char>(e.sysExByteB);
 
         bytes[static_cast<int>(bytes.size()) - 4] = CHUNK_TERMINATOR_ID;
     }

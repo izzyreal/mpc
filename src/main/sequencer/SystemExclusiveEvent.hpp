@@ -6,12 +6,11 @@ namespace mpc::sequencer
     class SystemExclusiveEvent final : public EventRef
     {
     public:
-        void setByteA(unsigned char i);
+        void setByteA(int i) const;
         unsigned char getByteA() const;
-        void setByteB(unsigned char i);
+        void setByteB(int i) const;
         unsigned char getByteB() const;
-        void setBytes(const std::vector<unsigned char> &ba);
-        const std::vector<unsigned char> &getBytes() const;
+        void setBytes(const std::vector<unsigned char> &ba) const;
 
         explicit SystemExclusiveEvent(
             EventData *ptr, const EventData &snapshot,
