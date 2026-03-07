@@ -9,6 +9,7 @@
 #include <memory>
 #include <map>
 #include <functional>
+#include <optional>
 
 namespace mpc::sequencer
 {
@@ -55,7 +56,7 @@ namespace mpc::lcdgui::screens
         void setFromNote(DrumNoteNumber);
 
     private:
-        bool isFirstTickPosChangeAfterScreenHasBeenOpened = true;
+        std::optional<Tick> initialTickPositionToIgnore;
 
         void refreshSelection();
         void refreshEventRows();

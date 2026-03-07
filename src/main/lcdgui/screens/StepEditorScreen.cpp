@@ -92,16 +92,22 @@ StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
          {
              return sequencer.lock()->getTransport()->getTickPosition();
          },
-         [&](auto)
+         [&](const auto tickPosition)
          {
-             if (isFirstTickPosChangeAfterScreenHasBeenOpened)
+             const bool shouldIgnoreInitialTick =
+                 initialTickPositionToIgnore &&
+                 *initialTickPositionToIgnore == tickPosition;
+
+             if (initialTickPositionToIgnore)
              {
-                 isFirstTickPosChangeAfterScreenHasBeenOpened = false;
+                 initialTickPositionToIgnore.reset();
              }
-             else
+
+             if (!shouldIgnoreInitialTick)
              {
                  const auto track = sequencer.lock()->getSelectedTrack();
                  track->removeDoubles();
+                 clearSelection();
                  resetYPosAndYOffset();
                  restoreColumnForEventAtActiveRow();
                  adhocPlayNoteEventsAtCurrentPosition();
@@ -127,6 +133,8 @@ void StepEditorScreen::openWindow()
 void StepEditorScreen::open()
 {
     sequencer.lock()->copySelectedSequenceToUndoSequence();
+    initialTickPositionToIgnore =
+        sequencer.lock()->getTransport()->getTickPosition();
 
     findField("tonote")->setLocation(115, 0);
     findLabel("fromnote")->Hide(true);
@@ -220,7 +228,7 @@ void StepEditorScreen::close()
     }
 
     mpc.getEngineHost()->flushNoteOffs();
-    isFirstTickPosChangeAfterScreenHasBeenOpened = true;
+    initialTickPositionToIgnore.reset();
 
     storeColumnForEventAtActiveRow();
 
@@ -757,8 +765,8 @@ void StepEditorScreen::turnWheel(const int increment)
 void StepEditorScreen::setSequencerTickPos(
     const std::function<void()> &tickPosSetter)
 {
-    isFirstTickPosChangeAfterScreenHasBeenOpened = false;
     storeColumnForEventAtActiveRow();
+    clearSelection();
     tickPosSetter();
 }
 
