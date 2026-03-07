@@ -16,12 +16,6 @@ namespace mpc::lcdgui::screens
 
         void open() override;
 
-        void play() override;
-        void playStart() override;
-        void rec() override;
-        void overDub() override;
-        void stop() override;
-
         void setTransposeAmount(int i);
         int getTransposeAmount() const;
         int getTr() const;
@@ -34,7 +28,7 @@ namespace mpc::lcdgui::screens
         int bar0 = 0;
         int bar1 = 0;
 
-        void setTr(int8_t i);
+        void setTr(int);
         void setBar0(int i);
         void setBar1(int i);
 

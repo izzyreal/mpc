@@ -19,7 +19,7 @@ void SecondSeqScreen::open()
     displayFunctionKeys();
 }
 
-void SecondSeqScreen::function(int i)
+void SecondSeqScreen::function(const int i)
 {
     const auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
@@ -41,23 +41,23 @@ void SecondSeqScreen::function(int i)
             sequencer.lock()->setSecondSequenceEnabled(true);
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
-void SecondSeqScreen::turnWheel(int i)
+void SecondSeqScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "sq")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "sq")
     {
         setSq(sq + i);
     }
 }
 
-void SecondSeqScreen::setSq(int i)
+void SecondSeqScreen::setSq(const int i)
 {
-    sq = std::clamp(i, 0, 98);
+    sq =
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     displaySq();
     displayFunctionKeys();
 }

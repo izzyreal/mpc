@@ -15,6 +15,16 @@ using namespace mpc::lcdgui::screens;
 TransScreen::TransScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "trans", layerIndex)
 {
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer.lock()->getTransport()->isPlaying();
+         },
+         [&](auto &)
+         {
+             findChild("function-keys")
+                 ->Hide(sequencer.lock()->getTransport()->isPlaying());
+         }});
 }
 
 void TransScreen::open()
@@ -31,6 +41,11 @@ void TransScreen::open()
 
 void TransScreen::function(const int i)
 {
+    if (sequencer.lock()->getTransport()->isPlaying())
+    {
+        return;
+    }
+
     const auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     switch (i)
@@ -41,7 +56,6 @@ void TransScreen::function(const int i)
             ls.lock()->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
-            // if (amount == 0) break; // does 2kxl do that?
             openScreenById(ScreenId::TransposePermanentScreen);
             break;
         default:;
@@ -111,9 +125,10 @@ int TransScreen::getBar1() const
     return bar1;
 }
 
-void TransScreen::setTr(const int8_t i)
+void TransScreen::setTr(const int i)
 {
-    tr = std::clamp(i, ALL_TRACKS, Mpc2000XlSpecs::LAST_TRACK_INDEX);
+    tr = static_cast<int8_t>(std::clamp(i, static_cast<int>(ALL_TRACKS),
+                    static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
     displayTr();
 }
 
@@ -170,39 +185,4 @@ void TransScreen::displayBars() const
 {
     findField("bar0")->setTextPadded(std::to_string(bar0 + 1), "0");
     findField("bar1")->setTextPadded(std::to_string(bar1 + 1), "0");
-}
-
-void TransScreen::play()
-{
-    ScreenComponent::play();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
-}
-
-void TransScreen::playStart()
-{
-    ScreenComponent::playStart();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
-}
-
-void TransScreen::rec()
-{
-    ScreenComponent::rec();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
-}
-
-void TransScreen::overDub()
-{
-    ScreenComponent::overDub();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
-}
-
-void TransScreen::stop()
-{
-    ScreenComponent::stop();
-    findChild("function-keys")
-        ->Hide(sequencer.lock()->getTransport()->isPlaying());
 }

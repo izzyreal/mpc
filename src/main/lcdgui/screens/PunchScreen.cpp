@@ -53,12 +53,10 @@ void PunchScreen::open()
         sequencer.lock()->getTransport()->isPunchEnabled());
 }
 
-void PunchScreen::turnWheel(int i)
+void PunchScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "auto-punch")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "auto-punch")
     {
         setAutoPunch(sequencer.lock()->getTransport()->getAutoPunchMode() + i);
         return;
@@ -70,9 +68,8 @@ void PunchScreen::turnWheel(int i)
     sequencer.lock()->getTransport()->setPunchOutTime(time1);
 }
 
-void PunchScreen::function(int i)
+void PunchScreen::function(const int i)
 {
-
     switch (i)
     {
         case 1: // Intentional fall-through
@@ -85,10 +82,11 @@ void PunchScreen::function(int i)
                 !sequencer.lock()->getTransport()->isPunchEnabled());
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
-void PunchScreen::setAutoPunch(int i)
+void PunchScreen::setAutoPunch(const int i)
 {
     sequencer.lock()->getTransport()->setAutoPunchMode(std::clamp(i, 0, 2));
 
@@ -160,7 +158,7 @@ void PunchScreen::rec()
 void PunchScreen::overDub()
 {
     openScreenById(ScreenId::SequencerScreen);
-    ScreenComponent::rec();
+    ScreenComponent::overDub();
 }
 
 int PunchScreen::getActiveTab() const
