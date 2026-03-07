@@ -12,7 +12,8 @@ PolyPressureEvent::PolyPressureEvent(
 void PolyPressureEvent::setNote(const int i) const
 {
     auto e = snapshot;
-    e.noteNumber = NoteNumber(i);
+    e.noteNumber = NoteNumber(static_cast<int8_t>(std::clamp(
+        i, static_cast<int>(MinNoteNumber), static_cast<int>(MaxNoteNumber))));
     dispatch(UpdateEvent{handle, e});
 }
 
@@ -24,7 +25,7 @@ int PolyPressureEvent::getNote() const
 void PolyPressureEvent::setAmount(const int i) const
 {
     auto e = snapshot;
-    e.amount = i;
+    e.amount = static_cast<uint8_t>(std::clamp(i, 0, 127));
     dispatch(UpdateEvent{handle, e});
 }
 

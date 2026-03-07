@@ -60,13 +60,38 @@ void NoteOnEvent::setVariationType(const NoteVariationType type) const
 {
     auto e = snapshot;
     e.noteVariationType = type;
+
+    if (e.noteVariationType == NoteVariationTypeTune)
+    {
+        e.noteVariationValue =
+            std::clamp(e.noteVariationValue, static_cast<NoteVariationValue>(4),
+                       static_cast<NoteVariationValue>(124));
+    }
+    else
+    {
+        e.noteVariationValue =
+            std::clamp(e.noteVariationValue, static_cast<NoteVariationValue>(0),
+                       static_cast<NoteVariationValue>(100));
+    }
+
     dispatch(UpdateEvent{handle, e});
 }
 
 void NoteOnEvent::setVariationValue(const int i) const
 {
     auto e = snapshot;
-    e.noteVariationValue = NoteVariationValue(i);
+    int8_t newValue;
+
+    if (e.noteVariationType == NoteVariationTypeTune)
+    {
+        newValue = static_cast<int8_t>(std::clamp(i, 4, 124));
+    }
+    else
+    {
+        newValue = static_cast<int8_t>(std::clamp(i, 0, 100));
+    }
+
+    e.noteVariationValue = NoteVariationValue(newValue);
     dispatch(UpdateEvent{handle, e});
 }
 

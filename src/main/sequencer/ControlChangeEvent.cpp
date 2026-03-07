@@ -12,7 +12,7 @@ ControlChangeEvent::ControlChangeEvent(
 void ControlChangeEvent::setController(const int i) const
 {
     auto e = snapshot;
-    e.controllerNumber = i;
+    e.controllerNumber = static_cast<int8_t>(std::clamp(i, 0, 127));
     dispatch(UpdateEvent{handle, e});
 }
 
@@ -24,7 +24,7 @@ int ControlChangeEvent::getController() const
 void ControlChangeEvent::setAmount(const int i) const
 {
     auto e = snapshot;
-    e.controllerValue = i;
+    e.controllerValue = static_cast<int8_t>(std::clamp(i, 0, 127));
     dispatch(UpdateEvent{handle, e});
 }
 

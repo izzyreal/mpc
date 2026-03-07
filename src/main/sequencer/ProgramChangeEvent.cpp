@@ -12,7 +12,8 @@ ProgramChangeEvent::ProgramChangeEvent(
 void ProgramChangeEvent::setProgram(const int i) const
 {
     auto e = snapshot;
-    e.programChangeProgramIndex = ProgramIndex(i);
+    e.programChangeProgramIndex = ProgramIndex(static_cast<int8_t>(
+        std::clamp(i, 0, static_cast<int>(MaxProgramIndex))));
     dispatch(UpdateEvent{handle, e});
 }
 
