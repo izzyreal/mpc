@@ -1,3 +1,13 @@
+## v0.9.2 (27-2-2026)
+* Fix iOS file export via share button.
+* Fix field focus issues when using next sequence in MAIN screen.
+* Fix time range UI in EVENTS screen.
+* Fix ERASE window function keys disappearance.
+* Performance improvement (mainly noticeable on old machines).
+* Fix MID file reading.
+* Add Big Time Shift feature (allows up to 99 ticks time shift in Timing Correct).
+* Fix step editor note event velocity range.
+
 ## v0.9.0 RC25 (15-2-2026)
 * Crash when trying to open 16 LEVELS when active track is a MIDI track.
 * Typo in MIDI file saving popup.
