@@ -1,8 +1,128 @@
 #include "sequencer/SequencerStateManager.hpp"
 
+#include "lcdgui/screens/UserScreen.hpp"
 #include "sequencer/SequenceStateView.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "StrUtil.hpp"
+
+#include <vector>
 
 using namespace mpc::sequencer;
+
+namespace
+{
+void removeEventWithoutLock(SequencerStateManager *manager, TrackState &track,
+                            EventData *e)
+{
+    const EventData *head = track.eventsHead;
+
+    int removedIndex = 0;
+    {
+        const EventData *it = head;
+        int idx = 0;
+        while (it && it != e)
+        {
+            it = it->next;
+            idx++;
+        }
+        removedIndex = idx;
+    }
+
+    if (e->prev)
+    {
+        e->prev->next = e->next;
+    }
+
+    if (e->next)
+    {
+        e->next->prev = e->prev;
+    }
+
+    if (track.eventsHead == e)
+    {
+        track.eventsHead = e->next;
+    }
+
+    if (track.playEventIndex > removedIndex)
+    {
+        --track.playEventIndex;
+    }
+    else if (track.playEventIndex == removedIndex)
+    {
+        track.playEventIndex =
+            std::max(mpc::EventIndex(0), track.playEventIndex);
+    }
+
+    e->prev = nullptr;
+    e->next = nullptr;
+
+    manager->returnEventToPool(e);
+}
+
+void ensureTrackUsedForCopy(Sequencer *sequencer, TrackState &track,
+                            mpc::TrackIndex trackIndex)
+{
+    if (track.used || trackIndex == mpc::TempoChangeTrackIndex)
+    {
+        track.used = true;
+        return;
+    }
+
+    track.name = sequencer->getDefaultTrackName(trackIndex);
+    track.used = true;
+}
+
+void initializeUnusedDestinationSequence(SequencerStateManager *manager,
+                                         Sequencer *sequencer,
+                                         SequenceState &destSeq,
+                                         mpc::SequenceIndex destSequenceIndex,
+                                         int sourceLastBarIndex)
+{
+    const auto userScreen =
+        sequencer->getScreens()->get<mpc::lcdgui::ScreenId::UserScreen>();
+
+    destSeq.initializeDefaults();
+    destSeq.initialTempo = userScreen->getTempo();
+    destSeq.loopEnabled = userScreen->isLoopEnabled();
+    destSeq.lastBarIndex = mpc::BarIndex(sourceLastBarIndex);
+    destSeq.firstLoopBarIndex = mpc::BarIndex(0);
+    destSeq.lastLoopBarIndex = mpc::EndOfSequence;
+    destSeq.used = true;
+    destSeq.tempoChangeEnabled = true;
+    destSeq.name = sequencer->getDefaultSequenceName() +
+                   mpc::StrUtil::padLeft(
+                       std::to_string(destSequenceIndex + 1), "0", 2);
+
+    const auto timeSig = userScreen->getTimeSig();
+
+    for (int i = 0; i <= sourceLastBarIndex; ++i)
+    {
+        destSeq.timeSignatures[i] = timeSig;
+        destSeq.barLengths[i] = timeSig.getBarLength();
+    }
+
+    for (auto &track : destSeq.tracks)
+    {
+        track.initializeDefaults();
+        track.deviceIndex = userScreen->getDevice();
+        track.velocityRatio = userScreen->getVelo();
+        track.busType = userScreen->getBusType();
+        track.programChange = userScreen->getPgm();
+    }
+
+    EventData *tempoEvent = manager->acquireEvent();
+    if (tempoEvent)
+    {
+        tempoEvent->type = EventType::TempoChange;
+        tempoEvent->tick = 0;
+        tempoEvent->amount = 1000;
+        tempoEvent->sequenceIndex = destSequenceIndex;
+        tempoEvent->trackIndex = mpc::TempoChangeTrackIndex;
+        manager->insertAcquiredEvent(destSeq.tracks[mpc::TempoChangeTrackIndex],
+                                     tempoEvent);
+    }
+}
+} // namespace
 
 void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 {
@@ -26,10 +146,37 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
             ? m.sourceSequenceIndex
             : activeState.selectedSequenceIndex;
 
+    const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
     auto &destSeq = activeState.sequences[m.destSequenceIndex];
-    const SequenceStateView destSeqView(destSeq);
     auto &destTrack = destSeq.tracks[m.destTrackIndex];
 
+    std::vector<EventData> sourceEvents;
+    const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].eventsHead;
+    while (src)
+    {
+        if (src->tick >= m.sourceEndTick)
+        {
+            break;
+        }
+
+        if (src->tick >= m.sourceStartTick &&
+            (src->type != EventType::NoteOn ||
+             m.sourceNoteRange.contains(src->noteNumber)))
+        {
+            sourceEvents.push_back(*src);
+        }
+
+        src = src->next;
+    }
+
+    if (!destSeq.used)
+    {
+        initializeUnusedDestinationSequence(this, sequencer, destSeq,
+                                            m.destSequenceIndex,
+                                            sourceSeq.lastBarIndex);
+    }
+
+    const SequenceStateView destSeqView(destSeq);
     const auto destSequenceBarCount = destSeq.lastBarIndex + 1;
 
     for (int i = 0; i < destSequenceBarCount; i++)
@@ -48,12 +195,26 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
         }
     }
 
+    if (destBarLength < 0 && destSequenceBarCount > 0)
+    {
+        const auto ts = destSeqView.getTimeSignature(destSequenceBarCount - 1);
+        destNumerator = ts.numerator;
+        destDenominator = ts.denominator;
+        destBarLength = destSeqView.getBarLength(destSequenceBarCount - 1);
+    }
+
+    if (destBarLength <= 0)
+    {
+        lock.release();
+        return;
+    }
+
     const auto minimumRequiredNewSequenceLength = m.destStartTick + segLength;
     const auto ticksToAdd =
         minimumRequiredNewSequenceLength - destSeqView.getLastTick();
 
-    const auto barsToAdd =
-        static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
+    const auto barsToAdd = std::max(
+        0, static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength)));
 
     const auto initialLastBarIndex = destSeqView.getLastBarIndex();
 
@@ -86,19 +247,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
             if (inRange)
             {
-                if (prev)
-                {
-                    prev->next = next;
-                }
-                else
-                {
-                    destTrack.eventsHead = next;
-                }
-                if (next)
-                {
-                    next->prev = prev;
-                }
-                returnEventToPool(cur);
+                removeEventWithoutLock(this, destTrack, cur);
             }
             else
             {
@@ -109,47 +258,32 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
         }
     }
 
-    const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
-    const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].eventsHead;
-
-    while (src)
+    for (const auto &sourceEvent : sourceEvents)
     {
-        if (src->type == EventType::NoteOn &&
-            !m.sourceNoteRange.contains(src->noteNumber))
+        for (int copyIndex = 0; copyIndex < m.copyCount; copyIndex++)
         {
-            src = src->next;
-            continue;
-        }
+            const int tickCandidate =
+                sourceEvent.tick + destOffset + copyIndex * segLength;
 
-        if (src->tick >= m.sourceEndTick)
-        {
-            break;
-        }
-
-        if (src->tick >= m.sourceStartTick)
-        {
-            for (int copyIndex = 0; copyIndex < m.copyCount; copyIndex++)
+            if (tickCandidate >= destSeqView.getLastTick())
             {
-                const int tickCandidate =
-                    src->tick + destOffset + copyIndex * segLength;
-
-                if (tickCandidate >= destSeqView.getLastTick())
-                {
-                    break;
-                }
-
-                EventData *ev = acquireEvent();
-                *ev = *src;
-
-                ev->sequenceIndex = m.destSequenceIndex;
-                ev->trackIndex = m.destTrackIndex;
-                ev->tick = tickCandidate;
-
-                insertAcquiredEvent(destTrack, ev);
+                break;
             }
-        }
 
-        src = src->next;
+            EventData *ev = acquireEvent();
+            if (!ev)
+            {
+                continue;
+            }
+            *ev = sourceEvent;
+
+            ev->sequenceIndex = m.destSequenceIndex;
+            ev->trackIndex = m.destTrackIndex;
+            ev->tick = tickCandidate;
+
+            ensureTrackUsedForCopy(sequencer, destTrack, m.destTrackIndex);
+            insertAcquiredEvent(destTrack, ev);
+        }
     }
 
     lock.release();

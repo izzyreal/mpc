@@ -419,6 +419,58 @@ TEST_CASE("COPY6", "[events-screen]")
     }
 }
 
+TEST_CASE("COPY8 - copy to unused sequence", "[events-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto sourceSeq = sequencer->getSelectedSequence();
+    sourceSeq->init(0);
+    stateManager->drainQueue();
+    sourceSeq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
+
+    auto sourceTrack = sourceSeq->getTrack(0);
+
+    for (int i = 0; i < 4; i++)
+    {
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = i * 48;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(24);
+        sourceTrack->acquireAndInsertEvent(eventData);
+    }
+
+    stateManager->drainQueue();
+
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
+
+    eventsScreen->performCopy(0, 192, SequenceIndex(1), 0, 0, true, 1, 34, 127);
+
+    stateManager->drainQueue();
+
+    auto destSeq = sequencer->getSequence(1);
+    auto destTrack = destSeq->getTrack(0);
+
+    REQUIRE(destSeq->isUsed());
+    REQUIRE(destSeq->getLastTick() == 384);
+    REQUIRE(destTrack->isUsed());
+    REQUIRE(destTrack->getName() == sequencer->getDefaultTrackName(0));
+    REQUIRE(destTrack->getEvents().size() == 4);
+
+    for (int i = 0; i < 4; i++)
+    {
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(destTrack->getEvent(i));
+        REQUIRE(noteEvent->getTick() == i * 48);
+        REQUIRE(noteEvent->getNote() == 35 + i);
+    }
+}
+
 TEST_CASE("COPY7 - time0 scroll in 8 bars of 2/4", "[events-screen]")
 {
     Mpc mpc;

@@ -53,6 +53,12 @@ namespace mpc::lcdgui::screens
 
         int getLastBar() const;
         double getTempo() const;
+        bool isLoopEnabled() const;
+        sequencer::BusType getBusType() const;
+        int getDevice() const;
+        int getPgm() const;
+        int getVelo() const;
+        sequencer::TimeSignature getTimeSig() const;
 
     private:
         void displayTempo() const;

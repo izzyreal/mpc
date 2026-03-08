@@ -107,6 +107,36 @@ int UserScreen::getLastBar() const
     return lastBar;
 }
 
+bool UserScreen::isLoopEnabled() const
+{
+    return loop;
+}
+
+BusType UserScreen::getBusType() const
+{
+    return busType;
+}
+
+int UserScreen::getDevice() const
+{
+    return device;
+}
+
+int UserScreen::getPgm() const
+{
+    return pgm;
+}
+
+int UserScreen::getVelo() const
+{
+    return velo;
+}
+
+TimeSignature UserScreen::getTimeSig() const
+{
+    return timeSig;
+}
+
 void UserScreen::displayTempo() const
 {
     findField("tempo")->setText(Util::tempoString(tempo));
