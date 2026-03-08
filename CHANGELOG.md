@@ -1,3 +1,11 @@
+## v0.9.3 (8-3-2026)
+* Fix running of iOS version on macOS.
+* Fix out-of-range values in step editor events.
+* Fix step editor deselect when moving.
+* Fix second sequence.
+* Fix PUNCH/TRANS/2ndSEQ function keys visibility in those screens.
+* Fix copy events into empty sequence (via EDIT from the MAIN screen).
+
 ## v0.9.2 (27-2-2026)
 * Fix iOS file export via share button.
 * Fix field focus issues when using next sequence in MAIN screen.
