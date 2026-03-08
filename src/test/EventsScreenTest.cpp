@@ -521,3 +521,118 @@ TEST_CASE("COPY8 - all time fields scroll by their component", "[events-screen]"
     controls->turnWheel(1);
     REQUIRE(text("time5") == "01");
 }
+
+TEST_CASE("COPY9 - replace mode handles empty destination track",
+          "[events-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+    seq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
+
+    auto tr = seq->getTrack(0);
+
+    for (int i = 0; i < 4; i++)
+    {
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = i * 24;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->acquireAndInsertEvent(eventData);
+    }
+
+    stateManager->drainQueue();
+
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
+
+    eventsScreen->performCopy(0, 96, SequenceIndex(0), 192, 1, false, 1, 34,
+                              0);
+
+    stateManager->drainQueue();
+
+    const auto destTrack = seq->getTrack(1);
+    REQUIRE(destTrack->getEvents().size() == 4);
+
+    for (int i = 0; i < 4; i++)
+    {
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(destTrack->getEvent(i));
+        REQUIRE(noteEvent->getTick() == 192 + i * 24);
+        REQUIRE(noteEvent->getNote() == 35 + i);
+    }
+}
+
+TEST_CASE("COPY10 - replace mode clears the actual destination range",
+          "[events-screen]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+    seq->setTimeSignature(0, 4, 4);
+    stateManager->drainQueue();
+
+    auto tr = seq->getTrack(0);
+
+    for (int i = 0; i < 4; i++)
+    {
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = 96 + i * 24;
+        eventData.noteNumber = NoteNumber(35 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->acquireAndInsertEvent(eventData);
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        EventData eventData;
+        eventData.type = EventType::NoteOn;
+        eventData.tick = 240 + i * 24;
+        eventData.noteNumber = NoteNumber(70 + i);
+        eventData.velocity = MaxVelocity;
+        eventData.duration = Duration(42);
+        tr->acquireAndInsertEvent(eventData);
+    }
+
+    stateManager->drainQueue();
+
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
+
+    eventsScreen->performCopy(96, 192, SequenceIndex(0), 240, 0, false, 1, 34,
+                              0);
+
+    stateManager->drainQueue();
+
+    const auto events = tr->getEvents();
+    REQUIRE(events.size() == 8);
+
+    for (int i = 0; i < 4; i++)
+    {
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(events[i]);
+        REQUIRE(noteEvent->getTick() == 96 + i * 24);
+        REQUIRE(noteEvent->getNote() == 35 + i);
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(events[4 + i]);
+        REQUIRE(noteEvent->getTick() == 240 + i * 24);
+        REQUIRE(noteEvent->getNote() == 35 + i);
+    }
+}
