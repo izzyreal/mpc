@@ -767,12 +767,12 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
     if (!copyModeMerge)
     {
         const auto destTrackEvents = destTrack->getEvents();
-        for (auto it = destTrackEvents.rbegin(); it != destTrackEvents.rend();
-             ++it)
+        for (auto it = destTrackEvents.end() - 1; it != destTrackEvents.begin();
+             --it)
         {
+
             if (const auto tick = (*it)->getTick();
-                tick >= destStart &&
-                tick < destStart + segLength * copyCount)
+                tick >= destOffset && tick < destOffset + segLength * copyCount)
             {
                 destTrack->removeEvent(*it);
             }
