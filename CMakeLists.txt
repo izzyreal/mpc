@@ -102,6 +102,10 @@ FetchContent_MakeAvailable(libsamplerate)
 message(STATUS "Downloading platformfolders...")
 FetchContent_MakeAvailable(platformfolders)
 
+target_include_directories(platform_folders INTERFACE
+    $<BUILD_INTERFACE:${PlatformFolders_SOURCE_DIR}>
+)
+
 message(STATUS "Downloading json...")
 FetchContent_MakeAvailable(json)
 

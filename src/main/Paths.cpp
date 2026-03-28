@@ -1,6 +1,6 @@
 #include "Paths.hpp"
 
-#include <platform_folders.h>
+#include <sago/platform_folders.h>
 #include <cstdlib>
 
 #ifdef __APPLE__
