@@ -105,7 +105,10 @@ void VmpcMidiScreen::open()
 
     screen->saveAndLeave = [this]
     {
-        uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
+        if (persistActivePreset())
+        {
+            refreshUneditedActivePresetCopy();
+        }
     };
 
     screen->stayScreen = "vmpc-midi";
@@ -119,9 +122,7 @@ void VmpcMidiScreen::open()
             mpc.clientEventController->getClientMidiEventController()
                 ->getExtendedController();
 
-        const auto activePreset = controller->getActivePreset();
-
-        uneditedActivePresetCopy->setBindings(activePreset->getBindings());
+        refreshUneditedActivePresetCopy();
     }
 
     findChild<Label>("up")->setText("\u00C7");
@@ -338,6 +339,23 @@ bool VmpcMidiScreen::hasMappingChanged() const
     return false;
 }
 
+bool VmpcMidiScreen::persistActivePreset() const
+{
+    const auto path = mpc.paths->getDocuments()->activeMidiControlPresetPath();
+
+    json presetJson;
+    to_json(presetJson, *getActivePreset());
+
+    const auto writeRes = set_file_data(path, presetJson.dump(4));
+    return writeRes.has_value();
+}
+
+void VmpcMidiScreen::refreshUneditedActivePresetCopy()
+{
+    uneditedActivePresetCopy = std::make_shared<MidiControlPresetV3>();
+    uneditedActivePresetCopy->setBindings(getActivePreset()->getBindings());
+}
+
 void VmpcMidiScreen::function(const int i)
 {
     switch (i)
@@ -418,16 +436,15 @@ void VmpcMidiScreen::function(const int i)
 
             if (hasMappingChanged())
             {
-                const auto path =
-                    mpc.paths->getDocuments()->activeMidiControlPresetPath();
-
-                json presetJson;
-
-                to_json(presetJson, *getActivePreset());
-
-                (void) set_file_data(path, presetJson.dump(4));
-
-                popupMsg = "MIDI mapping saved";
+                if (persistActivePreset())
+                {
+                    refreshUneditedActivePresetCopy();
+                    popupMsg = "MIDI mapping saved";
+                }
+                else
+                {
+                    popupMsg = "Error saving MIDI mapping";
+                }
             }
             else
             {

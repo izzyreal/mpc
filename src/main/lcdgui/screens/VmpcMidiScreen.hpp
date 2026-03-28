@@ -54,6 +54,8 @@ namespace mpc::lcdgui::screens
         void setLearning(bool b);
         void setLearnCandidateToSelectedBinding();
         void acceptLearnCandidate() const;
+        bool persistActivePreset() const;
+        void refreshUneditedActivePresetCopy();
         void displayRows();
         void displayUpAndDown();
     };
