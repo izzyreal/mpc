@@ -123,22 +123,13 @@ void VmpcMidiPresetsScreen::open()
             continue;
         }
 
-        const auto preset = std::make_shared<MidiControlPresetV3>();
-
-        try
-        {
-            const auto presetFileData = get_file_data(presetPath);
-            if (!presetFileData)
-            {
-                continue;
-            }
-            const auto presetJson = json::parse(*presetFileData);
-            from_json(presetJson, *preset);
-        }
-        catch (const std::exception &)
+        const auto presetRes =
+            MidiControlPresetUtil::loadPresetFromFile(presetPath);
+        if (!presetRes)
         {
             continue;
         }
+        const auto &preset = *presetRes;
 
         PresetMeta meta;
         meta.path = presetPath;
@@ -179,31 +170,21 @@ void VmpcMidiPresetsScreen::turnWheel(const int i)
 
     if (presetMetas[presetIndex].autoLoadMode != candidate)
     {
-        const auto preset = std::make_shared<MidiControlPresetV3>();
-
-        try
-        {
-            const auto presetFileData =
-                get_file_data(presetMetas[presetIndex].path);
-            if (!presetFileData)
-            {
-                throw std::runtime_error("Unable to read preset");
-            }
-            const auto presetJson = json::parse(*presetFileData);
-            from_json(presetJson, *preset);
-        }
-        catch (const std::exception &e)
+        const auto presetRes = MidiControlPresetUtil::loadPresetFromFile(
+            presetMetas[presetIndex].path);
+        if (!presetRes)
         {
             ls.lock()->showPopupAndAwaitInteraction(
                 "Error! See vmpc.log for info");
 
             MLOG(
                 "Error while trying to change MIDI control preset auto-load "
-                "mode. Pass the following information to the developer: " +
-                std::string(e.what()));
+                "mode for '" + presetMetas[presetIndex].path.string() +
+                "': " + presetRes.error().message);
 
             return;
         }
+        const auto preset = *presetRes;
 
         presetMetas[presetIndex].autoLoadMode =
             static_cast<AutoLoadMode>(candidate);

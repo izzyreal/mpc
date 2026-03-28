@@ -453,36 +453,17 @@ void AbstractDisk::readMidiControlPreset(
             return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
         }
 
-        const auto fileData = get_file_data(pathToUse);
-        if (!fileData)
-        {
-            return tl::make_unexpected(
-                mpc_io_error_msg{"Unable to read MIDI control preset"});
-        }
-
-        json fileAsJson;
-
-        bool success = false;
-
         if (pathToUse.extension().string().find("json") != std::string::npos)
         {
-            fileAsJson = json::parse(*fileData);
-            success = true;
-        }
-
-        if (success)
-        {
-            try
-            {
-                from_json(fileAsJson, *preset);
-            }
-            catch (const std::exception &e)
+            const auto presetRes =
+                MidiControlPresetUtil::loadPresetFromFile(pathToUse);
+            if (!presetRes)
             {
                 return tl::make_unexpected(
-                    mpc_io_error_msg{"Unable to parse JSON to preset: " +
-                                     std::string(e.what())});
+                    mpc_io_error_msg{"Unable to read MIDI control preset"});
             }
 
+            *preset = **presetRes;
             MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(preset);
             MidiControlPresetUtil::ensureTargetsAreInSameOrderAsInSchema(
                 preset);

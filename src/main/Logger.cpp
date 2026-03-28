@@ -4,6 +4,7 @@
 #include <mpc_fs.hpp>
 
 #include <string>
+#include <fstream>
 
 using namespace mpc;
 
@@ -26,12 +27,12 @@ void Logger::log(std::string s) const
     }
 
     s += "\n";
-    const auto data = get_file_data(path);
-    std::vector<char> bytes;
-    if (data)
+
+    auto fp = std::ofstream(path, std::ios::app | std::ios::binary);
+    if (!fp.is_open())
     {
-        bytes = *data;
+        return;
     }
-    bytes.insert(bytes.end(), s.begin(), s.end());
-    (void) set_file_data(path, bytes);
+
+    fp.write(s.c_str(), s.length());
 }

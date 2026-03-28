@@ -403,8 +403,16 @@ Mpc::~Mpc()
         autoSave->interruptRestorationIfStillOngoing();
     }
 
-    nvram::NvRam::saveUserScreenValues(*this);
-    nvram::NvRam::saveVmpcSettings(*this);
+    if (screens)
+    {
+        nvram::NvRam::saveUserScreenValues(*this);
+    }
+
+    if (screens && engineHost && hardware)
+    {
+        nvram::NvRam::saveVmpcSettings(*this);
+    }
+
     if (engineHost)
     {
         engineHost->destroyServices();

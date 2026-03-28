@@ -71,6 +71,12 @@ std::string VolumesPersistence::getPersistedActiveUUID(Mpc &mpc)
 
     for (auto &vol : volumes)
     {
+        if (!vol.is_object() || !vol.contains("uuid") || !vol["uuid"].is_string() ||
+            !vol.contains("active") || !vol["active"].is_boolean())
+        {
+            continue;
+        }
+
         auto uuid = vol["uuid"].get<std::string>();
         auto isActive = vol["active"].get<bool>();
 
@@ -93,6 +99,12 @@ VolumesPersistence::getPersistedConfigs(Mpc &mpc)
 
     for (auto &vol : volumes)
     {
+        if (!vol.is_object() || !vol.contains("uuid") || !vol["uuid"].is_string() ||
+            !vol.contains("mode") || !vol["mode"].is_number_integer())
+        {
+            continue;
+        }
+
         auto uuid = vol["uuid"].get<std::string>();
         persistedConfigs[uuid] = static_cast<MountMode>(vol["mode"].get<int>());
     }
