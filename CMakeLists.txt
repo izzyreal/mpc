@@ -167,6 +167,7 @@ add_library(mpc ${_source_list_main})
 
 target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
     ${akaifat_SOURCE_DIR}/src/main
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
@@ -193,6 +194,7 @@ endif()
 set(_src_root_path_test "${CMAKE_CURRENT_SOURCE_DIR}/src/test")
 
 include_directories(${_src_root_path_test})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 file(
     GLOB_RECURSE _source_list_test

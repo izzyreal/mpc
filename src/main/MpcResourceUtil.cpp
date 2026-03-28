@@ -11,11 +11,22 @@
 
 #include "mpc_fs.hpp"
 
+std::string resolve_resource_path_from_mac_os_bundle(const std::string &path)
+{
+    return mpc::MacBundleResources::getResourcePath(path);
+}
+
 std::vector<char> get_resource_data_from_mac_os_bundle(const std::string &path)
 {
-    const auto resource_path = mpc::MacBundleResources::getResourcePath(path);
+    const auto resource_path = resolve_resource_path_from_mac_os_bundle(path);
 
     return get_file_data(resource_path).value_or(std::vector<char>{});
+}
+
+bool resource_exists_in_mac_os_bundle(const std::string &path)
+{
+    const auto resource_path = resolve_resource_path_from_mac_os_bundle(path);
+    return mpc_fs::exists(resource_path).value_or(false);
 }
 #else
 
@@ -31,9 +42,31 @@ get_resource_data_from_in_memory_filesystem(const std::string &path)
     const std::vector<char> data_vec(data, data + file.size());
     return data_vec;
 }
+
+bool resource_exists_in_memory_filesystem(const std::string &path)
+{
+    try
+    {
+        (void) cmrc::mpc::get_filesystem().open(path.c_str());
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
 #endif
 
 using namespace mpc;
+
+std::string MpcResourceUtil::resolve_resource_path(const std::string &path)
+{
+#ifdef MAC_BUNDLE_RESOURCES
+    return resolve_resource_path_from_mac_os_bundle(path);
+#else
+    return path;
+#endif
+}
 
 std::vector<char> MpcResourceUtil::get_resource_data(const std::string &path)
 {
@@ -52,4 +85,13 @@ std::vector<char> MpcResourceUtil::get_resource_data(const std::string &path)
         MLOG(message);
     }
     return {};
+}
+
+bool MpcResourceUtil::resource_exists(const std::string &path)
+{
+#ifdef MAC_BUNDLE_RESOURCES
+    return resource_exists_in_mac_os_bundle(path);
+#else
+    return resource_exists_in_memory_filesystem(path);
+#endif
 }
