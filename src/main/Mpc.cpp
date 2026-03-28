@@ -54,6 +54,20 @@ Mpc::Mpc()
 
 void Mpc::init()
 {
+    const auto logFsError = [](const mpc_fs::fs_error &error)
+    {
+        auto msg = "Filesystem error during " + error.operation;
+        if (!error.path1.empty())
+        {
+            msg += " path='" + error.path1.string() + "'";
+        }
+        if (!error.message.empty())
+        {
+            msg += " message='" + error.message + "'";
+        }
+        MLOG(msg);
+    };
+
     const std::vector requiredPaths{
         paths->getDocuments()->appDocumentsPath(),
         paths->configPath(),
@@ -64,22 +78,46 @@ void Mpc::init()
 
     for (auto &p : requiredPaths)
     {
-        if (!mpc_fs::exists(p).value_or(false))
+        const auto existsRes = mpc_fs::exists(p);
+        if (!existsRes)
         {
-            (void) mpc_fs::create_directories(p);
+            logFsError(existsRes.error());
+            continue;
+        }
+
+        if (!*existsRes)
+        {
+            const auto createRes = mpc_fs::create_directories(p);
+            if (!createRes)
+            {
+                logFsError(createRes.error());
+            }
         }
     }
 
-    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST1");
-    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TEST2");
-    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "TRAIN1");
-    (void) mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / "RESIST");
+    for (const auto &dir : {mpc_fs::path{"TEST1"}, mpc_fs::path{"TEST2"},
+                            mpc_fs::path{"TRAIN1"}, mpc_fs::path{"RESIST"}})
+    {
+        const auto createRes =
+            mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / dir);
+        if (!createRes)
+        {
+            logFsError(createRes.error());
+        }
+    }
 
     for (const auto &demo_file : demo_files)
     {
         const auto dst = paths->getDocuments()->demoDataPath() / demo_file;
+        const auto existsRes = mpc_fs::exists(dst);
+        if (!existsRes)
+        {
+            logFsError(existsRes.error());
+            continue;
+        }
+
         const bool should_update =
-            !mpc_fs::exists(dst).value_or(false) ||
+            !*existsRes ||
             std::find(always_update_demo_files.begin(),
                       always_update_demo_files.end(),
                       demo_file) != always_update_demo_files.end();
@@ -88,11 +126,20 @@ void Mpc::init()
         {
             const auto data =
                 MpcResourceUtil::get_resource_data("demodata/" + demo_file);
-            (void) set_file_data(dst, data);
+            const auto writeRes = set_file_data(dst, data);
+            if (!writeRes)
+            {
+                logFsError(writeRes.error());
+            }
         }
     }
 
-    (void) mpc_fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
+    if (const auto createRes =
+            mpc_fs::create_directories(paths->getDocuments()->midiControlPresetsPath());
+        !createRes)
+    {
+        logFsError(createRes.error());
+    }
 
     const std::vector<std::string> factory_midi_control_presets{
         "MPD16.json", "MPD218.json", "iRig_PADS.json", "MPC_Studio.json"};
@@ -102,13 +149,34 @@ void Mpc::init()
         const auto data =
             MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
-        if (!mpc_fs::exists(paths->getDocuments()->midiControlPresetsPath() /
-                        preset).value_or(false) ||
-            mpc_fs::file_size(paths->getDocuments()->midiControlPresetsPath() /
-                          preset).value_or(0) != data.size())
+        const auto presetPath =
+            paths->getDocuments()->midiControlPresetsPath() / preset;
+        const auto existsRes = mpc_fs::exists(presetPath);
+        if (!existsRes)
         {
-            (void) set_file_data(
-                paths->getDocuments()->midiControlPresetsPath() / preset, data);
+            logFsError(existsRes.error());
+            continue;
+        }
+
+        bool shouldWrite = !*existsRes;
+        if (*existsRes)
+        {
+            const auto sizeRes = mpc_fs::file_size(presetPath);
+            if (!sizeRes)
+            {
+                logFsError(sizeRes.error());
+                continue;
+            }
+            shouldWrite = *sizeRes != data.size();
+        }
+
+        if (shouldWrite)
+        {
+            const auto writeRes = set_file_data(presetPath, data);
+            if (!writeRes)
+            {
+                logFsError(writeRes.error());
+            }
         }
     }
 
@@ -217,17 +285,27 @@ void Mpc::init()
 
     nvram::NvRam::loadUserScreenValues(*this);
 
-    if (const auto p = paths->getDocuments()->activeMidiControlPresetPath();
-        mpc_fs::exists(p).value_or(false))
+    const auto activePresetPath =
+        paths->getDocuments()->activeMidiControlPresetPath();
+    const auto activePresetExistsRes = mpc_fs::exists(activePresetPath);
+    if (!activePresetExistsRes)
     {
-        const auto data = get_file_data(p);
-        if (data)
+        logFsError(activePresetExistsRes.error());
+    }
+    else if (*activePresetExistsRes)
+    {
+        const auto presetRes =
+            input::midi::MidiControlPresetUtil::loadPresetFromFile(
+                activePresetPath);
+        if (presetRes)
         {
-            const auto dataJson = json::parse(*data);
-            input::midi::from_json(
-                dataJson, *clientEventController->getClientMidiEventController()
-                               ->getExtendedController()
-                               ->getActivePreset());
+            *clientEventController->getClientMidiEventController()
+                 ->getExtendedController()
+                 ->getActivePreset() = **presetRes;
+        }
+        else
+        {
+            logFsError(presetRes.error());
         }
     }
 

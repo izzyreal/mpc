@@ -25,8 +25,28 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
 {
     const auto path = mpc.paths->configPath() / "nvram.vmp";
 
-    if (!mpc_fs::exists(path).value_or(false) ||
-        mpc_fs::file_size(path).value_or(0) != file::all::AllParser::DEFAULTS_LENGTH)
+    const auto existsRes = mpc_fs::exists(path);
+    if (!existsRes)
+    {
+        MLOG("NvRam::loadUserScreenValues could not check existence for '" +
+             path.string() + "': " + existsRes.error().message);
+        return;
+    }
+
+    if (!*existsRes)
+    {
+        return;
+    }
+
+    const auto sizeRes = mpc_fs::file_size(path);
+    if (!sizeRes)
+    {
+        MLOG("NvRam::loadUserScreenValues could not read size for '" +
+             path.string() + "': " + sizeRes.error().message);
+        return;
+    }
+
+    if (*sizeRes != file::all::AllParser::DEFAULTS_LENGTH)
     {
         return;
     }
@@ -52,7 +72,12 @@ void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
     const auto path = mpc.paths->configPath() / "nvram.vmp";
-    (void) set_file_data(path, dp.getBytes());
+    const auto writeRes = set_file_data(path, dp.getBytes());
+    if (!writeRes)
+    {
+        MLOG("NvRam::saveUserScreenValues failed for '" + path.string() +
+             "': " + writeRes.error().message);
+    }
 }
 
 void NvRam::saveVmpcSettings(Mpc &mpc)
@@ -82,7 +107,12 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled),
         static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled)};
 
-    (void) set_file_data(path, bytes);
+    const auto writeRes = set_file_data(path, bytes);
+    if (!writeRes)
+    {
+        MLOG("NvRam::saveVmpcSettings failed for '" + path.string() + "': " +
+             writeRes.error().message);
+    }
 }
 
 void NvRam::loadVmpcSettings(Mpc &mpc)
@@ -91,7 +121,14 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
 
     const auto path = mpc.paths->vmpcSpecificConfigPath();
 
-    if (!mpc_fs::exists(path).value_or(false))
+    const auto existsRes = mpc_fs::exists(path);
+    if (!existsRes)
+    {
+        MLOG("NvRam::loadVmpcSettings could not check existence for '" +
+             path.string() + "': " + existsRes.error().message);
+    }
+
+    if (!existsRes || !*existsRes)
     {
         engineHost->setRecordLevel(DEFAULT_REC_GAIN);
         mpc.getHardware()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);
@@ -106,7 +143,14 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    const auto bytes = get_file_data(path).value_or(std::vector<char>{});
+    const auto bytesRes = get_file_data(path);
+    if (!bytesRes)
+    {
+        MLOG("NvRam::loadVmpcSettings failed for '" + path.string() + "': " +
+             bytesRes.error().message);
+        return;
+    }
+    const auto &bytes = *bytesRes;
 
     if (bytes.size() > 0)
     {

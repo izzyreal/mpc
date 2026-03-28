@@ -51,6 +51,8 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         const auto pathIteratorRes = mpc_fs::make_directory_iterator(fs_path);
         if (!pathIteratorRes)
         {
+            MLOG("MpcFile::listFiles failed for '" + fs_path.string() + "': " +
+                 pathIteratorRes.error().message);
             return result;
         }
 
@@ -61,6 +63,8 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         {
             if (ec)
             {
+                MLOG("MpcFile::listFiles iteration failed for '" +
+                     fs_path.string() + "': " + ec.message());
                 break;
             }
 
@@ -123,7 +127,14 @@ bool MpcFile::isDirectory() const
     {
         return rawEntry->isDirectory();
     }
-    return mpc_fs::is_directory(fs_path).value_or(false);
+    const auto isDirectoryRes = mpc_fs::is_directory(fs_path);
+    if (!isDirectoryRes)
+    {
+        MLOG("MpcFile::isDirectory failed for '" + fs_path.string() + "': " +
+             isDirectoryRes.error().message);
+        return false;
+    }
+    return *isDirectoryRes;
 }
 
 bool MpcFile::isFile()
@@ -156,7 +167,14 @@ bool MpcFile::setName(const std::string &s) const
     }
     mpc_fs::path new_path = fs_path;
     new_path.replace_filename(s);
-    return mpc_fs::rename(fs_path, new_path).has_value();
+    const auto renameRes = mpc_fs::rename(fs_path, new_path);
+    if (!renameRes)
+    {
+        MLOG("MpcFile::setName failed from '" + fs_path.string() + "' to '" +
+             new_path.string() + "': " + renameRes.error().message);
+        return false;
+    }
+    return true;
 }
 
 unsigned long MpcFile::length()
@@ -176,7 +194,14 @@ unsigned long MpcFile::length()
         }
         return 0;
     }
-    return mpc_fs::file_size(fs_path).value_or(0);
+    const auto sizeRes = mpc_fs::file_size(fs_path);
+    if (!sizeRes)
+    {
+        MLOG("MpcFile::length failed for '" + fs_path.string() + "': " +
+             sizeRes.error().message);
+        return 0;
+    }
+    return *sizeRes;
 }
 
 void MpcFile::setFileData(std::vector<char> &data)
@@ -191,8 +216,12 @@ void MpcFile::setFileData(std::vector<char> &data)
     }
     else
     {
-        auto ostream = getOutputStream();
-        ostream->write(&data[0], data.size());
+        const auto writeRes = set_file_data(fs_path, data);
+        if (!writeRes)
+        {
+            MLOG("MpcFile::setFileData failed for '" + fs_path.string() + "': " +
+                 writeRes.error().message);
+        }
     }
 }
 
@@ -202,7 +231,14 @@ bool MpcFile::exists() const
     {
         return rawEntry->isValid();
     }
-    return mpc_fs::exists(fs_path).value_or(false);
+    const auto existsRes = mpc_fs::exists(fs_path);
+    if (!existsRes)
+    {
+        MLOG("MpcFile::exists failed for '" + fs_path.string() + "': " +
+             existsRes.error().message);
+        return false;
+    }
+    return *existsRes;
 }
 
 bool MpcFile::del() const
@@ -219,7 +255,14 @@ bool MpcFile::del() const
             return false;
         }
     }
-    return mpc_fs::remove(fs_path).value_or(false);
+    const auto removeRes = mpc_fs::remove(fs_path);
+    if (!removeRes)
+    {
+        MLOG("MpcFile::del failed for '" + fs_path.string() + "': " +
+             removeRes.error().message);
+        return false;
+    }
+    return *removeRes;
 }
 
 std::vector<char> MpcFile::getBytes()
@@ -246,9 +289,14 @@ std::vector<char> MpcFile::getBytes()
     }
     else
     {
-        auto istream = getInputStream();
-        bytes.resize(length());
-        istream->read(&bytes[0], length());
+        const auto dataRes = get_file_data(fs_path);
+        if (!dataRes)
+        {
+            MLOG("MpcFile::getBytes failed for '" + fs_path.string() + "': " +
+                 dataRes.error().message);
+            return {};
+        }
+        bytes = *dataRes;
     }
 
     return bytes;
@@ -261,8 +309,13 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
         return std::dynamic_pointer_cast<FatFile>(rawEntry->getFile())
             ->getInputStream();
     }
-    return std::make_shared<std::ifstream>(fs_path,
-                                           std::ios::in | std::ios::binary);
+    auto inputStream = std::make_shared<std::ifstream>(fs_path,
+                                                       std::ios::in | std::ios::binary);
+    if (!inputStream->is_open())
+    {
+        MLOG("MpcFile::getInputStream failed for '" + fs_path.string() + "'");
+    }
+    return inputStream;
 }
 
 std::shared_ptr<std::ostream> MpcFile::getOutputStream()
@@ -272,8 +325,13 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
         return std::dynamic_pointer_cast<FatFile>(rawEntry->getFile())
             ->getOutputStream();
     }
-    return std::make_shared<std::ofstream>(fs_path,
-                                           std::ios::out | std::ios::binary);
+    auto outputStream = std::make_shared<std::ofstream>(fs_path,
+                                                        std::ios::out | std::ios::binary);
+    if (!outputStream->is_open())
+    {
+        MLOG("MpcFile::getOutputStream failed for '" + fs_path.string() + "'");
+    }
+    return outputStream;
 }
 
 mpc_fs::path MpcFile::getPath()

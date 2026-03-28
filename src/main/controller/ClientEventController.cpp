@@ -242,15 +242,17 @@ void ClientEventController::restoreKeyboardBindings() const
     }
     else if (persistedBindingsExist && *persistedBindingsExist)
     {
-        const auto persistedData =
-            get_file_data(mpc.paths->keyboardBindingsPath());
-        if (!persistedData)
+        const auto persistedBindingsRes =
+            KeyboardBindingsReader::fromJsonFile(
+                mpc.paths->keyboardBindingsPath());
+        if (!persistedBindingsRes)
         {
+            MLOG("ClientEventController::restoreKeyboardBindings failed for '" +
+                 mpc.paths->keyboardBindingsPath().string() + "': " +
+                 persistedBindingsRes.error().message);
             return;
         }
-        const auto persistedBindings =
-            KeyboardBindingsReader::fromJson(json::parse(*persistedData));
-        keyboardBindings->setBindingsData(persistedBindings);
+        keyboardBindings->setBindingsData(*persistedBindingsRes);
     }
 
     keyboardBindings->deduplicateBindings();

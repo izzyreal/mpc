@@ -1,6 +1,7 @@
 #include "AkaiFileRenamer.hpp"
 
 #include "Mpc.hpp"
+#include "Logger.hpp"
 
 #include <cassert>
 
@@ -13,17 +14,44 @@ using namespace mpc::file;
 
 void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 {
-    assert(mpc_fs::is_directory(p).value_or(false));
+    const auto isDirectoryRes = mpc_fs::is_directory(p);
+    assert(isDirectoryRes.value_or(false));
+    if (!isDirectoryRes)
+    {
+        MLOG("AkaiFileRenamer: failed to inspect '" + p.string() + "': " +
+             isDirectoryRes.error().message);
+        return;
+    }
 
     auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
-    if (mpc_fs::exists(tempRoot).value_or(false))
+    const auto tempRootExistsRes = mpc_fs::exists(tempRoot);
+    if (!tempRootExistsRes)
     {
-        (void) mpc_fs::remove_all(tempRoot);
+        MLOG("AkaiFileRenamer: failed to inspect temp root '" +
+             tempRoot.string() + "': " + tempRootExistsRes.error().message);
+        return;
+    }
+
+    if (*tempRootExistsRes)
+    {
+        const auto removeAllRes = mpc_fs::remove_all(tempRoot);
+        if (!removeAllRes)
+        {
+            MLOG("AkaiFileRenamer: failed to clear temp root '" +
+                 tempRoot.string() + "': " + removeAllRes.error().message);
+            return;
+        }
     }
 
     auto tempRootWasCreated = mpc_fs::create_directory(tempRoot);
     assert(tempRootWasCreated && *tempRootWasCreated);
+    if (!tempRootWasCreated)
+    {
+        MLOG("AkaiFileRenamer: failed to create temp root '" +
+             tempRoot.string() + "': " + tempRootWasCreated.error().message);
+        return;
+    }
 
     std::vector<std::string> existingNames;
 
@@ -42,7 +70,15 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
             continue;
         }
 
-        if (mpc_fs::is_directory(*e).value_or(false))
+        const auto entryIsDirectoryRes = mpc_fs::is_directory(*e);
+        if (!entryIsDirectoryRes)
+        {
+            MLOG("AkaiFileRenamer: failed to inspect entry '" +
+                 e->path().string() + "': " + entryIsDirectoryRes.error().message);
+            return;
+        }
+
+        if (*entryIsDirectoryRes)
         {
             const auto tidyString =
                 ShortNameGenerator::tidyString(e->path().filename().string());
@@ -58,7 +94,13 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
         if (akaiName != e->path().filename().string())
         {
             existingNames.push_back(akaiName);
-            (void) mpc_fs::rename(e->path(), tempRoot / akaiName);
+            const auto renameRes = mpc_fs::rename(e->path(), tempRoot / akaiName);
+            if (!renameRes)
+            {
+                MLOG("AkaiFileRenamer: failed moving '" + e->path().string() +
+                     "' to temp root: " + renameRes.error().message);
+                return;
+            }
         }
         else
         {
@@ -74,6 +116,12 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 
     for (auto e = *tempDirItRes; e != mpc_fs::directory_end(); ++e)
     {
-        (void) mpc_fs::rename(e->path(), p / e->path().filename());
+        const auto renameRes = mpc_fs::rename(e->path(), p / e->path().filename());
+        if (!renameRes)
+        {
+            MLOG("AkaiFileRenamer: failed restoring '" + e->path().string() +
+                 "' from temp root: " + renameRes.error().message);
+            return;
+        }
     }
 }

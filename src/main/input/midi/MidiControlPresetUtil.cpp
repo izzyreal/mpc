@@ -128,6 +128,34 @@ bool MidiControlPresetUtil::doesPresetWithNameExist(const mpc_fs::path &path,
                        });
 }
 
+mpc_fs::result<std::shared_ptr<mpc::input::midi::MidiControlPresetV3>>
+MidiControlPresetUtil::loadPresetFromFile(const mpc_fs::path &path)
+{
+    const auto dataRes = get_file_data(path);
+    if (!dataRes)
+    {
+        return tl::unexpected(dataRes.error());
+    }
+
+    try
+    {
+        const auto presetJson = json::parse(*dataRes);
+        auto preset = std::make_shared<MidiControlPresetV3>();
+        from_json(presetJson, *preset);
+        return preset;
+    }
+    catch (const std::exception &e)
+    {
+        return tl::unexpected(
+            mpc_fs::make_exception_error("load_midi_preset_file", path, e));
+    }
+    catch (...)
+    {
+        return tl::unexpected(
+            mpc_fs::make_unknown_exception_error("load_midi_preset_file", path));
+    }
+}
+
 void MidiControlPresetUtil::ensurePresetHasAllAvailableTargets(
     std::shared_ptr<mpc::input::midi::MidiControlPresetV3> p)
 {

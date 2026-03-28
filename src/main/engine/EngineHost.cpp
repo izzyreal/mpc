@@ -383,7 +383,15 @@ bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
     const auto destinationDirectory =
         mpc.paths->getDocuments()->recordingsPath() / settings->recordingName;
 
-    (void) mpc_fs::create_directory(destinationDirectory);
+    const auto createDirectoryRes = mpc_fs::create_directory(destinationDirectory);
+    if (!createDirectoryRes)
+    {
+        MLOG("EngineHost::startBouncing failed to create '" +
+             destinationDirectory.string() + "': " +
+             createDirectoryRes.error().message);
+        onBounceStart = {};
+        return false;
+    }
 
     for (int i = 0; i < diskRecorders.size(); i++)
     {

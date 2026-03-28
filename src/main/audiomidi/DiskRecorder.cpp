@@ -5,6 +5,7 @@
 #include "engine/EngineHost.hpp"
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
+#include "Logger.hpp"
 
 #include <readerwriterqueue.h>
 
@@ -63,6 +64,8 @@ bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
 
         if (!fileStreams.back().is_open())
         {
+            MLOG("DiskRecorder::prepare failed to open '" +
+                 absolutePath.string() + "'");
             fileStreams.clear();
             return false;
         }
@@ -71,6 +74,12 @@ bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
     for (auto &fileStream : fileStreams)
     {
         wav_writeHeader(fileStream, sampleRate, isStereo ? 2 : 1);
+        if (!fileStream)
+        {
+            MLOG("DiskRecorder::prepare failed while writing WAV header");
+            fileStreams.clear();
+            return false;
+        }
     }
 
     constexpr int numBytesPerSample = 2; // assume 16 bit PCM
@@ -249,11 +258,21 @@ void DiskRecorder::writeRingBufferToDisk()
         wav_write_bytes(fileStreams[0], byteBufferLeft, bytesToWritePerChannel);
         wav_write_bytes(fileStreams[1], byteBufferRight,
                         bytesToWritePerChannel);
+        if (!fileStreams[0] || !fileStreams[1])
+        {
+            MLOG("DiskRecorder::writeRingBufferToDisk failed while writing mono data");
+            writing.store(false);
+        }
     }
     else if (outputFileFormat->getChannels() == 2)
     {
         wav_write_bytes(fileStreams[0], stereoByteBuffer,
                         bytesToWritePerChannel * 2);
+        if (!fileStreams[0])
+        {
+            MLOG("DiskRecorder::writeRingBufferToDisk failed while writing stereo data");
+            writing.store(false);
+        }
     }
 
     if (writtenByteCount == 0)
@@ -326,14 +345,27 @@ void DiskRecorder::removeFilesIfEmpty() const
 
         const auto absolutePath = destinationDirectory / fileName;
 
-        if (!mpc_fs::exists(absolutePath).value_or(false))
+        const auto existsRes = mpc_fs::exists(absolutePath);
+        if (!existsRes)
+        {
+            MLOG("DiskRecorder::removeFilesIfEmpty failed to inspect '" +
+                 absolutePath.string() + "': " + existsRes.error().message);
+            continue;
+        }
+
+        if (!*existsRes)
         {
             continue;
         }
 
         if (isOnlySilence)
         {
-            (void) mpc_fs::remove(absolutePath);
+            const auto removeRes = mpc_fs::remove(absolutePath);
+            if (!removeRes)
+            {
+                MLOG("DiskRecorder::removeFilesIfEmpty failed to remove '" +
+                     absolutePath.string() + "': " + removeRes.error().message);
+            }
         }
     }
 }

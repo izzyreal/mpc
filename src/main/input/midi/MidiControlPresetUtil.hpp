@@ -34,5 +34,8 @@ namespace mpc::input::midi
             std::shared_ptr<mpc::input::midi::MidiControlPresetV3>);
 
         static bool doesPresetWithNameExist(const mpc_fs::path &, std::string name);
+
+        static mpc_fs::result<std::shared_ptr<mpc::input::midi::MidiControlPresetV3>>
+        loadPresetFromFile(const mpc_fs::path &path);
     };
 } // namespace mpc::input::midi

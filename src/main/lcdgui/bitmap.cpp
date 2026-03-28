@@ -244,8 +244,22 @@ void Bitmap::open(mpc_fs::path p)
     }
     else
     {
+        auto readOrFail = [&](char *dst, std::streamsize size) -> bool
+        {
+            fileStream.read(dst, size);
+            if (!fileStream)
+            {
+                std::cout << p << " could not be read completely.\n";
+                return false;
+            }
+            return true;
+        };
+
         bmpfile_magic magic;
-        fileStream.read(reinterpret_cast<char *>(magic.magic), BMP_MAGIC_ID);
+        if (!readOrFail(reinterpret_cast<char *>(magic.magic), BMP_MAGIC_ID))
+        {
+            return;
+        }
 
         if (magic.magic[0] != 'B' || magic.magic[1] != 'M')
         {
@@ -255,61 +269,73 @@ void Bitmap::open(mpc_fs::path p)
         else
         {
             bmpfile_header header;
-            fileStream.read(reinterpret_cast<char *>(&header.file_size),
-                            sizeof(header.file_size));
-            fileStream.read(reinterpret_cast<char *>(&header.creator1),
-                            sizeof(header.creator1));
-            fileStream.read(reinterpret_cast<char *>(&header.creator2),
-                            sizeof(header.creator2));
-            fileStream.read(reinterpret_cast<char *>(&header.bmp_offset),
-                            sizeof(header.bmp_offset));
+            if (!readOrFail(reinterpret_cast<char *>(&header.file_size),
+                            sizeof(header.file_size)) ||
+                !readOrFail(reinterpret_cast<char *>(&header.creator1),
+                            sizeof(header.creator1)) ||
+                !readOrFail(reinterpret_cast<char *>(&header.creator2),
+                            sizeof(header.creator2)) ||
+                !readOrFail(reinterpret_cast<char *>(&header.bmp_offset),
+                            sizeof(header.bmp_offset)))
+            {
+                return;
+            }
 
             bmpfile_dib_info dib_info;
 
-            fileStream.read(reinterpret_cast<char *>(&dib_info.header_size),
-                            sizeof(dib_info.header_size));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.width),
-                            sizeof(dib_info.width));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.height),
-                            sizeof(dib_info.height));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.num_planes),
-                            sizeof(dib_info.num_planes));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.bits_per_pixel),
-                            sizeof(dib_info.bits_per_pixel));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.compression),
-                            sizeof(dib_info.compression));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.bmp_byte_size),
-                            sizeof(dib_info.bmp_byte_size));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.hres),
-                            sizeof(dib_info.hres));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.vres),
-                            sizeof(dib_info.vres));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.num_colors),
-                            sizeof(dib_info.num_colors));
-            fileStream.read(
-                reinterpret_cast<char *>(&dib_info.num_important_colors),
-                sizeof(dib_info.num_important_colors));
+            if (!readOrFail(reinterpret_cast<char *>(&dib_info.header_size),
+                            sizeof(dib_info.header_size)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.width),
+                            sizeof(dib_info.width)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.height),
+                            sizeof(dib_info.height)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.num_planes),
+                            sizeof(dib_info.num_planes)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.bits_per_pixel),
+                            sizeof(dib_info.bits_per_pixel)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.compression),
+                            sizeof(dib_info.compression)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.bmp_byte_size),
+                            sizeof(dib_info.bmp_byte_size)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.hres),
+                            sizeof(dib_info.hres)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.vres),
+                            sizeof(dib_info.vres)) ||
+                !readOrFail(reinterpret_cast<char *>(&dib_info.num_colors),
+                            sizeof(dib_info.num_colors)) ||
+                !readOrFail(
+                    reinterpret_cast<char *>(&dib_info.num_important_colors),
+                    sizeof(dib_info.num_important_colors)))
+            {
+                return;
+            }
 
             // Read the 2-color palette for monochrome
             bmpfile_color_table color1;
-            fileStream.read(reinterpret_cast<char *>(&color1.blue),
-                            sizeof(color1.blue));
-            fileStream.read(reinterpret_cast<char *>(&color1.green),
-                            sizeof(color1.green));
-            fileStream.read(reinterpret_cast<char *>(&color1.red),
-                            sizeof(color1.red));
-            fileStream.read(reinterpret_cast<char *>(&color1.reserved),
-                            sizeof(color1.reserved));
+            if (!readOrFail(reinterpret_cast<char *>(&color1.blue),
+                            sizeof(color1.blue)) ||
+                !readOrFail(reinterpret_cast<char *>(&color1.green),
+                            sizeof(color1.green)) ||
+                !readOrFail(reinterpret_cast<char *>(&color1.red),
+                            sizeof(color1.red)) ||
+                !readOrFail(reinterpret_cast<char *>(&color1.reserved),
+                            sizeof(color1.reserved)))
+            {
+                return;
+            }
 
             bmpfile_color_table color2;
-            fileStream.read(reinterpret_cast<char *>(&color2.blue),
-                            sizeof(color2.blue));
-            fileStream.read(reinterpret_cast<char *>(&color2.green),
-                            sizeof(color2.green));
-            fileStream.read(reinterpret_cast<char *>(&color2.red),
-                            sizeof(color2.red));
-            fileStream.read(reinterpret_cast<char *>(&color2.reserved),
-                            sizeof(color2.reserved));
+            if (!readOrFail(reinterpret_cast<char *>(&color2.blue),
+                            sizeof(color2.blue)) ||
+                !readOrFail(reinterpret_cast<char *>(&color2.green),
+                            sizeof(color2.green)) ||
+                !readOrFail(reinterpret_cast<char *>(&color2.red),
+                            sizeof(color2.red)) ||
+                !readOrFail(reinterpret_cast<char *>(&color2.reserved),
+                            sizeof(color2.reserved)))
+            {
+                return;
+            }
 
             // Only support for 1-bit images
             if (dib_info.bits_per_pixel != 1)

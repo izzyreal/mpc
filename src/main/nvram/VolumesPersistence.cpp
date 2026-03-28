@@ -21,24 +21,33 @@ json read(mpc::Mpc &mpc)
     json result;
 
     const auto path = getVolumesPersistencePath(mpc);
-
-    if (mpc_fs::exists(path).value_or(false))
+    const auto existsRes = mpc_fs::exists(path);
+    if (!existsRes)
     {
-        const auto bytes = get_file_data(path);
-        if (!bytes)
+        MLOG("VolumesPersistence::read could not check existence for '" +
+             path.string() + "': " + existsRes.error().message);
+    }
+    else if (*existsRes)
+    {
+        const auto bytesRes = get_file_data(path);
+        if (!bytesRes)
         {
+            MLOG("VolumesPersistence::read failed for '" + path.string() +
+                 "': " + bytesRes.error().message);
             result = json::object();
         }
         else
         {
-        try
-        {
-            result = json::parse(bytes->begin(), bytes->end());
-        }
-        catch (...)
-        {
-            result = json::object();
-        }
+            try
+            {
+                result = json::parse(bytesRes->begin(), bytesRes->end());
+            }
+            catch (...)
+            {
+                MLOG("VolumesPersistence::read found invalid JSON in '" +
+                     path.string() + "'");
+                result = json::object();
+            }
         }
     }
 
@@ -139,5 +148,10 @@ void VolumesPersistence::save(Mpc &mpc)
     const auto data = d.dump(4); // pretty print (optional)
     const auto path = getVolumesPersistencePath(mpc);
 
-    (void) set_file_data(path, std::vector(data.begin(), data.end()));
+    const auto writeRes = set_file_data(path, std::vector(data.begin(), data.end()));
+    if (!writeRes)
+    {
+        MLOG("VolumesPersistence::save failed for '" + path.string() + "': " +
+             writeRes.error().message);
+    }
 }
