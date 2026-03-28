@@ -338,34 +338,89 @@ inline recursive_directory_iterator recursive_directory_end()
 }
 } // namespace mpc_fs
 
-inline std::vector<char> get_file_data(const mpc_fs::path &p)
+[[nodiscard]] inline mpc_fs::result<std::vector<char>>
+get_file_data(const mpc_fs::path &p)
 {
     std::ifstream ifs(p, std::ios::in | std::ios::binary | std::ios::ate);
 
     if (!ifs.is_open())
     {
-        return {};
+        return tl::unexpected(mpc_fs::make_error(
+            "get_file_data", p,
+            std::make_error_code(std::errc::no_such_file_or_directory)));
     }
 
     const std::ifstream::pos_type fileSize = ifs.tellg();
+    if (fileSize < 0)
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "get_file_data", p, std::make_error_code(std::io_errc::stream)));
+    }
+
     ifs.seekg(0, std::ios::beg);
+    if (!ifs)
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "get_file_data", p, std::make_error_code(std::io_errc::stream)));
+    }
 
     std::vector<char> bytes(static_cast<size_t>(fileSize));
-    ifs.read(bytes.data(), fileSize);
+    if (fileSize > 0)
+    {
+        ifs.read(bytes.data(), fileSize);
+        if (!ifs)
+        {
+            return tl::unexpected(
+                mpc_fs::make_error("get_file_data", p,
+                                   std::make_error_code(std::io_errc::stream)));
+        }
+    }
 
     return bytes;
 }
 
-inline void set_file_data(const mpc_fs::path &p, const std::vector<char> &bytes)
+[[nodiscard]] inline mpc_fs::result<void>
+set_file_data(const mpc_fs::path &p, const std::vector<char> &bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
-    ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    if (!ofs.is_open())
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "set_file_data", p,
+            std::make_error_code(std::errc::io_error)));
+    }
+    if (!bytes.empty())
+    {
+        ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    }
+    if (!ofs)
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "set_file_data", p, std::make_error_code(std::io_errc::stream)));
+    }
+    return {};
 }
 
-inline void set_file_data(const mpc_fs::path &p, const std::string &bytes)
+[[nodiscard]] inline mpc_fs::result<void>
+set_file_data(const mpc_fs::path &p, const std::string &bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
-    ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    if (!ofs.is_open())
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "set_file_data", p,
+            std::make_error_code(std::errc::io_error)));
+    }
+    if (!bytes.empty())
+    {
+        ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    }
+    if (!ofs)
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "set_file_data", p, std::make_error_code(std::io_errc::stream)));
+    }
+    return {};
 }
 
 inline std::string

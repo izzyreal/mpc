@@ -24,6 +24,10 @@ namespace mpc::input::midi::legacy
         }
 
         const auto fileData = get_file_data(p);
+        if (!fileData)
+        {
+            return;
+        }
 
         json fileAsJson;
 
@@ -34,7 +38,7 @@ namespace mpc::input::midi::legacy
         try
         {
             fileAsJson = parseLegacyMidiControlPresetV2(
-                std::string(fileData.begin(), fileData.end()));
+                std::string(fileData->begin(), fileData->end()));
             shouldTryV1Parser = false;
             success = true;
         }
@@ -47,7 +51,7 @@ namespace mpc::input::midi::legacy
             try
             {
                 fileAsJson = parseLegacyMidiControlPresetV1(
-                    std::string(fileData.begin(), fileData.end()));
+                    std::string(fileData->begin(), fileData->end()));
                 success = true;
             }
             catch (const std::exception &)
@@ -79,7 +83,10 @@ namespace mpc::input::midi::legacy
 
         to_json(fileAsJson, *preset);
 
-        set_file_data(jsonFilePath, fileAsJson.dump(4));
+        if (!set_file_data(jsonFilePath, fileAsJson.dump(4)))
+        {
+            return;
+        }
 
         auto newFilePath = p;
 

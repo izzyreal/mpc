@@ -409,12 +409,17 @@ void AbstractDisk::writeAll(const std::string &fileName)
 void AbstractDisk::writeMidiControlPreset(
     std::shared_ptr<MidiControlPresetV3> preset, const mpc_fs::path &p)
 {
-    const std::function<preset_or_error()> ioFunc = [preset, p]
+    const std::function<preset_or_error()> ioFunc = [preset, p]() -> preset_or_error
     {
         json fileData;
         to_json(fileData, *preset);
 
-        set_file_data(p, fileData.dump(4));
+        if (const auto writeRes = set_file_data(p, fileData.dump(4));
+            !writeRes)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to write MIDI control preset"});
+        }
 
         return preset;
     };
@@ -449,6 +454,11 @@ void AbstractDisk::readMidiControlPreset(
         }
 
         const auto fileData = get_file_data(pathToUse);
+        if (!fileData)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to read MIDI control preset"});
+        }
 
         json fileAsJson;
 
@@ -456,7 +466,7 @@ void AbstractDisk::readMidiControlPreset(
 
         if (pathToUse.extension().string().find("json") != std::string::npos)
         {
-            fileAsJson = json::parse(fileData);
+            fileAsJson = json::parse(*fileData);
             success = true;
         }
 

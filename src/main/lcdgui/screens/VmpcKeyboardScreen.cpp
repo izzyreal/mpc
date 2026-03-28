@@ -61,7 +61,7 @@ void VmpcKeyboardScreen::open()
     screen->saveAndLeave = [this, path = mpc.paths->keyboardBindingsPath()]
     {
         const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
-        set_file_data(path, jsonData.dump());
+        (void) set_file_data(path, jsonData.dump());
         mpc.clientEventController->getKeyboardBindings()->setBindingsData(
             bindings->getKeyboardBindingsData());
     };
@@ -227,8 +227,8 @@ void VmpcKeyboardScreen::function(const int i)
             if (hasMappingChanged())
             {
                 const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
-                set_file_data(mpc.paths->keyboardBindingsPath(),
-                              jsonData.dump());
+                (void) set_file_data(mpc.paths->keyboardBindingsPath(),
+                                     jsonData.dump());
 
                 mpc.clientEventController->getKeyboardBindings()
                     ->setBindingsData(bindings->getKeyboardBindingsData());

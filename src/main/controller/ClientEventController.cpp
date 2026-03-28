@@ -224,24 +224,32 @@ void ClientEventController::restoreKeyboardBindings() const
 {
     if (const auto persistedBindingsExist =
             mpc_fs::exists(mpc.paths->keyboardBindingsPath());
-        !persistedBindingsExist &&
-        mpc_fs::exists(mpc.paths->legacyKeyboardBindingsPath()))
+        (!persistedBindingsExist || !*persistedBindingsExist) &&
+        mpc_fs::exists(mpc.paths->legacyKeyboardBindingsPath()).value_or(false))
     {
         const auto legacyData =
             get_file_data(mpc.paths->legacyKeyboardBindingsPath());
+        if (!legacyData)
+        {
+            return;
+        }
 
         const KeyboardBindingsData persistedLegacyData = legacy::
             LegacyKeyboardBindingsConvertor::parseLegacyKeyboardBindings(
-                std::string(legacyData.begin(), legacyData.end()));
+                std::string(legacyData->begin(), legacyData->end()));
 
         keyboardBindings->setBindingsData(persistedLegacyData);
     }
-    else if (persistedBindingsExist)
+    else if (persistedBindingsExist && *persistedBindingsExist)
     {
         const auto persistedData =
             get_file_data(mpc.paths->keyboardBindingsPath());
+        if (!persistedData)
+        {
+            return;
+        }
         const auto persistedBindings =
-            KeyboardBindingsReader::fromJson(json::parse(persistedData));
+            KeyboardBindingsReader::fromJson(json::parse(*persistedData));
         keyboardBindings->setBindingsData(persistedBindings);
     }
 

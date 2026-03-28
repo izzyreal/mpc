@@ -52,7 +52,7 @@ void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
     const auto path = mpc.paths->configPath() / "nvram.vmp";
-    set_file_data(path, dp.getBytes());
+    (void) set_file_data(path, dp.getBytes());
 }
 
 void NvRam::saveVmpcSettings(Mpc &mpc)
@@ -82,7 +82,7 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled),
         static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled)};
 
-    set_file_data(path, bytes);
+    (void) set_file_data(path, bytes);
 }
 
 void NvRam::loadVmpcSettings(Mpc &mpc)
@@ -106,7 +106,7 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    const auto bytes = get_file_data(path);
+    const auto bytes = get_file_data(path).value_or(std::vector<char>{});
 
     if (bytes.size() > 0)
     {

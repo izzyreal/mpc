@@ -70,7 +70,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     std::vector<mpc_fs::path> availableFiles;
     for (const auto &f : files)
     {
-        if (saveTarget->exists(f))
+        const auto existsRes = saveTarget->exists(f);
+        if (existsRes && *existsRes)
         {
             availableFiles.push_back(f);
         }
@@ -110,7 +111,13 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                 break;
             }
 
-            if (auto size = saveTarget->fileSize(f); size == 0)
+            const auto sizeRes = saveTarget->fileSize(f);
+            if (!sizeRes)
+            {
+                continue;
+            }
+
+            if (*sizeRes == 0)
             {
                 continue;
             }
@@ -163,7 +170,12 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
             showMsg("Loading " + desc);
 
-            auto data = saveTarget->getFileData(f);
+            const auto dataRes = saveTarget->getFileData(f);
+            if (!dataRes)
+            {
+                continue;
+            }
+            const auto &data = *dataRes;
 
             if (f == "APS.APS")
             {
@@ -195,7 +207,12 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
                     showMsg("Loading " + soundName.substr(0, 20));
 
-                    auto soundData = saveTarget->getFileData(soundName);
+                    const auto soundDataRes = saveTarget->getFileData(soundName);
+                    if (!soundDataRes)
+                    {
+                        continue;
+                    }
+                    const auto &soundData = *soundDataRes;
                     SndReader sndReader(soundData);
                     auto sound =
                         mpc.getSampler()->addSound(sndReader.getSampleRate());
@@ -424,30 +441,40 @@ void AutoSave::storeAutoSavedState(
         const auto lastAllFileName = saveAllFileScreen->getFileName();
         const auto lastApsFileName = saveApsFileScreen->getFileName();
 
-        saveTarget->setFileData("screen.txt",
-                                {currentScreen.begin(), currentScreen.end()});
+        auto writeOrAbort = [&](const mpc_fs::path &path,
+                                const std::vector<char> &data)
+        {
+            const auto writeRes = saveTarget->setFileData(path, data);
+            if (!writeRes)
+            {
+                MLOG("AutoSave failed to write '" + path.string() + "'");
+                return false;
+            }
+            return true;
+        };
 
-        saveTarget->setFileData("last_all_file_name.txt",
-                                {lastAllFileName.begin(),
-                                 lastAllFileName.end()});
-
-        saveTarget->setFileData("last_aps_file_name.txt",
-                                {lastApsFileName.begin(),
-                                 lastApsFileName.end()});
-
-        saveTarget->setFileData("focus.txt", {focus.begin(), focus.end()});
-        saveTarget->setFileData("currentDir.txt",
-                                {currentDir.begin(), currentDir.end()});
-        saveTarget->setFileData("soundIndex.txt",
-                                {static_cast<char>(soundIndex)});
-        saveTarget->setFileData("selectedNote.txt",
-                                {static_cast<char>(selectedNote)});
-        saveTarget->setFileData("selectedPad.txt",
-                                {static_cast<char>(selectedPad)});
+        if (!writeOrAbort("screen.txt", {currentScreen.begin(), currentScreen.end()}) ||
+            !writeOrAbort("last_all_file_name.txt",
+                          {lastAllFileName.begin(), lastAllFileName.end()}) ||
+            !writeOrAbort("last_aps_file_name.txt",
+                          {lastApsFileName.begin(), lastApsFileName.end()}) ||
+            !writeOrAbort("focus.txt", {focus.begin(), focus.end()}) ||
+            !writeOrAbort("currentDir.txt", {currentDir.begin(), currentDir.end()}) ||
+            !writeOrAbort("soundIndex.txt", {static_cast<char>(soundIndex)}) ||
+            !writeOrAbort("selectedNote.txt", {static_cast<char>(selectedNote)}) ||
+            !writeOrAbort("selectedPad.txt", {static_cast<char>(selectedPad)}))
+        {
+            layeredScreen->closeCurrentScreen();
+            return;
+        }
 
         {
             ApsParser apsParser(mpc, "stateinfo");
-            saveTarget->setFileData("APS.APS", apsParser.getBytes());
+            if (!writeOrAbort("APS.APS", apsParser.getBytes()))
+            {
+                layeredScreen->closeCurrentScreen();
+                return;
+            }
         }
 
         std::string soundNames;
@@ -455,19 +482,30 @@ void AutoSave::storeAutoSavedState(
         {
             const auto sndPath = sound->getName() + ".SND";
             SndWriter sndWriter(sound.get());
-            saveTarget->setFileData(sndPath,
-                                    {sndWriter.getSndFileArray().begin(),
-                                     sndWriter.getSndFileArray().end()});
+            if (!writeOrAbort(sndPath,
+                              {sndWriter.getSndFileArray().begin(),
+                               sndWriter.getSndFileArray().end()}))
+            {
+                layeredScreen->closeCurrentScreen();
+                return;
+            }
             soundNames += sndPath + "\n";
         }
 
         {
             AllParser allParser(mpc);
-            saveTarget->setFileData("ALL.ALL", allParser.getBytes());
+            if (!writeOrAbort("ALL.ALL", allParser.getBytes()))
+            {
+                layeredScreen->closeCurrentScreen();
+                return;
+            }
         }
 
-        saveTarget->setFileData("sounds.txt",
-                                {soundNames.begin(), soundNames.end()});
+        if (!writeOrAbort("sounds.txt", {soundNames.begin(), soundNames.end()}))
+        {
+            layeredScreen->closeCurrentScreen();
+            return;
+        }
         layeredScreen->closeCurrentScreen();
     };
 

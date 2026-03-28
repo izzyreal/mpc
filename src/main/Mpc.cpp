@@ -88,7 +88,7 @@ void Mpc::init()
         {
             const auto data =
                 MpcResourceUtil::get_resource_data("demodata/" + demo_file);
-            set_file_data(dst, data);
+            (void) set_file_data(dst, data);
         }
     }
 
@@ -107,7 +107,7 @@ void Mpc::init()
             mpc_fs::file_size(paths->getDocuments()->midiControlPresetsPath() /
                           preset).value_or(0) != data.size())
         {
-            set_file_data(
+            (void) set_file_data(
                 paths->getDocuments()->midiControlPresetsPath() / preset, data);
         }
     }
@@ -221,11 +221,14 @@ void Mpc::init()
         mpc_fs::exists(p).value_or(false))
     {
         const auto data = get_file_data(p);
-        const auto dataJson = json::parse(data);
-        input::midi::from_json(
-            dataJson, *clientEventController->getClientMidiEventController()
-                           ->getExtendedController()
-                           ->getActivePreset());
+        if (data)
+        {
+            const auto dataJson = json::parse(*data);
+            input::midi::from_json(
+                dataJson, *clientEventController->getClientMidiEventController()
+                               ->getExtendedController()
+                               ->getActivePreset());
+        }
     }
 
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();

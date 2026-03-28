@@ -425,7 +425,7 @@ void VmpcMidiScreen::function(const int i)
 
                 to_json(presetJson, *getActivePreset());
 
-                set_file_data(path, presetJson.dump(4));
+                (void) set_file_data(path, presetJson.dump(4));
 
                 popupMsg = "MIDI mapping saved";
             }

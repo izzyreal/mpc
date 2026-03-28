@@ -128,7 +128,11 @@ void VmpcMidiPresetsScreen::open()
         try
         {
             const auto presetFileData = get_file_data(presetPath);
-            const auto presetJson = json::parse(presetFileData);
+            if (!presetFileData)
+            {
+                continue;
+            }
+            const auto presetJson = json::parse(*presetFileData);
             from_json(presetJson, *preset);
         }
         catch (const std::exception &)
@@ -181,7 +185,11 @@ void VmpcMidiPresetsScreen::turnWheel(const int i)
         {
             const auto presetFileData =
                 get_file_data(presetMetas[presetIndex].path);
-            const auto presetJson = json::parse(presetFileData);
+            if (!presetFileData)
+            {
+                throw std::runtime_error("Unable to read preset");
+            }
+            const auto presetJson = json::parse(*presetFileData);
             from_json(presetJson, *preset);
         }
         catch (const std::exception &e)

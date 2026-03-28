@@ -22,16 +22,23 @@ json read(mpc::Mpc &mpc)
 
     const auto path = getVolumesPersistencePath(mpc);
 
-    if (mpc_fs::exists(path))
+    if (mpc_fs::exists(path).value_or(false))
     {
         const auto bytes = get_file_data(path);
+        if (!bytes)
+        {
+            result = json::object();
+        }
+        else
+        {
         try
         {
-            result = json::parse(bytes.begin(), bytes.end());
+            result = json::parse(bytes->begin(), bytes->end());
         }
         catch (...)
         {
             result = json::object();
+        }
         }
     }
 
@@ -132,5 +139,5 @@ void VolumesPersistence::save(Mpc &mpc)
     const auto data = d.dump(4); // pretty print (optional)
     const auto path = getVolumesPersistencePath(mpc);
 
-    set_file_data(path, std::vector(data.begin(), data.end()));
+    (void) set_file_data(path, std::vector(data.begin(), data.end()));
 }
