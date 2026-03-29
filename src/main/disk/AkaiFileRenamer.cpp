@@ -1,5 +1,6 @@
 #include "AkaiFileRenamer.hpp"
 
+#include "FileIoPolicy.hpp"
 #include "Mpc.hpp"
 #include "Logger.hpp"
 
@@ -10,6 +11,7 @@
 #include "file/AkaiName.hpp"
 
 using namespace mpc::disk;
+using namespace mpc::file_io;
 using namespace mpc::file;
 
 void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
@@ -25,31 +27,36 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 
     auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
-    const auto tempRootExistsRes = mpc_fs::exists(tempRoot);
-    if (!tempRootExistsRes)
+    const auto tempRootExistsValue = value(
+        mpc_fs::exists(tempRoot), FailurePolicy::Required,
+        "Akai rename temp root existence check for '" + tempRoot.string() + "'");
+    if (!tempRootExistsValue)
     {
-        MLOG("AkaiFileRenamer: failed to inspect temp root '" +
-             tempRoot.string() + "': " + tempRootExistsRes.error().message);
         return;
     }
 
-    if (*tempRootExistsRes)
+    if (*tempRootExistsValue)
     {
-        const auto removeAllRes = mpc_fs::remove_all(tempRoot);
-        if (!removeAllRes)
+        const auto removeAllValue = value(
+            mpc_fs::remove_all(tempRoot), FailurePolicy::Required,
+            "Akai rename temp root cleanup for '" + tempRoot.string() + "'");
+        if (!removeAllValue)
         {
-            MLOG("AkaiFileRenamer: failed to clear temp root '" +
-                 tempRoot.string() + "': " + removeAllRes.error().message);
             return;
         }
     }
 
     auto tempRootWasCreated = mpc_fs::create_directory(tempRoot);
     assert(tempRootWasCreated && *tempRootWasCreated);
-    if (!tempRootWasCreated)
+    if (!tempRootWasCreated || !*tempRootWasCreated)
     {
-        MLOG("AkaiFileRenamer: failed to create temp root '" +
-             tempRoot.string() + "': " + tempRootWasCreated.error().message);
+        if (!tempRootWasCreated)
+        {
+            logFailure(FailurePolicy::Required,
+                       "Akai rename temp root create for '" + tempRoot.string() +
+                           "'",
+                       tempRootWasCreated.error());
+        }
         return;
     }
 
@@ -94,11 +101,11 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
         if (akaiName != e->path().filename().string())
         {
             existingNames.push_back(akaiName);
-            const auto renameRes = mpc_fs::rename(e->path(), tempRoot / akaiName);
-            if (!renameRes)
+            if (!success(mpc_fs::rename(e->path(), tempRoot / akaiName),
+                         FailurePolicy::Required,
+                         "Akai rename move to temp root from '" +
+                             e->path().string() + "'"))
             {
-                MLOG("AkaiFileRenamer: failed moving '" + e->path().string() +
-                     "' to temp root: " + renameRes.error().message);
                 return;
             }
         }
@@ -116,11 +123,11 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 
     for (auto e = *tempDirItRes; e != mpc_fs::directory_end(); ++e)
     {
-        const auto renameRes = mpc_fs::rename(e->path(), p / e->path().filename());
-        if (!renameRes)
+        if (!success(mpc_fs::rename(e->path(), p / e->path().filename()),
+                     FailurePolicy::Required,
+                     "Akai rename restore from temp root for '" +
+                         e->path().string() + "'"))
         {
-            MLOG("AkaiFileRenamer: failed restoring '" + e->path().string() +
-                 "' from temp root: " + renameRes.error().message);
             return;
         }
     }

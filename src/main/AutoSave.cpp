@@ -9,6 +9,7 @@
 
 #include "disk/AbstractDisk.hpp"
 #include "disk/ApsLoader.hpp"
+#include "FileIoPolicy.hpp"
 #include "file/aps/ApsParser.hpp"
 #include "file/ByteUtil.hpp"
 #include "file/sndreader/SndReader.hpp"
@@ -38,6 +39,7 @@
 #include <stdexcept>
 
 using namespace mpc;
+using namespace mpc::file_io;
 using namespace mpc::file;
 using namespace mpc::file::all;
 using namespace mpc::file::aps;
@@ -159,8 +161,10 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     std::vector<mpc_fs::path> availableFiles;
     for (const auto &f : files)
     {
-        const auto existsRes = saveTarget->exists(f);
-        if (existsRes && *existsRes)
+        const auto existsValue = value(
+            saveTarget->exists(f), FailurePolicy::Required,
+            "auto-save restore existence check for '" + f.string() + "'");
+        if (existsValue && *existsValue)
         {
             availableFiles.push_back(f);
         }
@@ -202,13 +206,15 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                     break;
                 }
 
-                const auto sizeRes = saveTarget->fileSize(f);
-                if (!sizeRes)
+                const auto sizeValue = value(
+                    saveTarget->fileSize(f), FailurePolicy::Required,
+                    "auto-save restore size check for '" + f.string() + "'");
+                if (!sizeValue)
                 {
                     continue;
                 }
 
-                if (*sizeRes == 0)
+                if (*sizeValue == 0)
                 {
                     continue;
                 }
@@ -261,12 +267,14 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
                 showMsg("Loading " + desc);
 
-                const auto dataRes = saveTarget->getFileData(f);
-                if (!dataRes)
+                const auto dataValue = value(
+                    saveTarget->getFileData(f), FailurePolicy::Required,
+                    "auto-save restore read for '" + f.string() + "'");
+                if (!dataValue)
                 {
                     continue;
                 }
-                const auto &data = *dataRes;
+                const auto &data = *dataValue;
 
                 try
                 {
@@ -308,13 +316,16 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
                             showMsg("Loading " + soundName.substr(0, 20));
 
-                            const auto soundDataRes =
-                                saveTarget->getFileData(soundName);
-                            if (!soundDataRes)
+                            const auto soundDataValue = value(
+                                saveTarget->getFileData(soundName),
+                                FailurePolicy::Required,
+                                "auto-save restore sound read for '" +
+                                    soundName + "'");
+                            if (!soundDataValue)
                             {
                                 continue;
                             }
-                            const auto &soundData = *soundDataRes;
+                            const auto &soundData = *soundDataValue;
                             if (!isValidAutoSaveSndData(soundData))
                             {
                                 MLOG("AutoSave restore skipped corrupt file '" +
@@ -572,28 +583,24 @@ void AutoSave::storeAutoSavedState(
         const auto lastAllFileName = saveAllFileScreen->getFileName();
         const auto lastApsFileName = saveApsFileScreen->getFileName();
 
-        auto writeOrAbort = [&](const mpc_fs::path &path,
-                                const std::vector<char> &data)
+        auto writeRequired = [&](const mpc_fs::path &path,
+                                 const std::vector<char> &data)
         {
-            const auto writeRes = saveTarget->setFileData(path, data);
-            if (!writeRes)
-            {
-                MLOG("AutoSave failed to write '" + path.string() + "'");
-                return false;
-            }
-            return true;
+            return success(saveTarget->setFileData(path, data),
+                           FailurePolicy::Required,
+                           "auto-save store write for '" + path.string() + "'");
         };
 
-        if (!writeOrAbort("screen.txt", {currentScreen.begin(), currentScreen.end()}) ||
-            !writeOrAbort("last_all_file_name.txt",
-                          {lastAllFileName.begin(), lastAllFileName.end()}) ||
-            !writeOrAbort("last_aps_file_name.txt",
-                          {lastApsFileName.begin(), lastApsFileName.end()}) ||
-            !writeOrAbort("focus.txt", {focus.begin(), focus.end()}) ||
-            !writeOrAbort("currentDir.txt", {currentDir.begin(), currentDir.end()}) ||
-            !writeOrAbort("soundIndex.txt", {static_cast<char>(soundIndex)}) ||
-            !writeOrAbort("selectedNote.txt", {static_cast<char>(selectedNote)}) ||
-            !writeOrAbort("selectedPad.txt", {static_cast<char>(selectedPad)}))
+        if (!writeRequired("screen.txt", {currentScreen.begin(), currentScreen.end()}) ||
+            !writeRequired("last_all_file_name.txt",
+                           {lastAllFileName.begin(), lastAllFileName.end()}) ||
+            !writeRequired("last_aps_file_name.txt",
+                           {lastApsFileName.begin(), lastApsFileName.end()}) ||
+            !writeRequired("focus.txt", {focus.begin(), focus.end()}) ||
+            !writeRequired("currentDir.txt", {currentDir.begin(), currentDir.end()}) ||
+            !writeRequired("soundIndex.txt", {static_cast<char>(soundIndex)}) ||
+            !writeRequired("selectedNote.txt", {static_cast<char>(selectedNote)}) ||
+            !writeRequired("selectedPad.txt", {static_cast<char>(selectedPad)}))
         {
             layeredScreen->closeCurrentScreen();
             return;
@@ -601,7 +608,7 @@ void AutoSave::storeAutoSavedState(
 
         {
             ApsParser apsParser(mpc, "stateinfo");
-            if (!writeOrAbort("APS.APS", apsParser.getBytes()))
+            if (!writeRequired("APS.APS", apsParser.getBytes()))
             {
                 layeredScreen->closeCurrentScreen();
                 return;
@@ -613,9 +620,9 @@ void AutoSave::storeAutoSavedState(
         {
             const auto sndPath = sound->getName() + ".SND";
             SndWriter sndWriter(sound.get());
-            if (!writeOrAbort(sndPath,
-                              {sndWriter.getSndFileArray().begin(),
-                               sndWriter.getSndFileArray().end()}))
+            if (!writeRequired(sndPath,
+                               {sndWriter.getSndFileArray().begin(),
+                                sndWriter.getSndFileArray().end()}))
             {
                 layeredScreen->closeCurrentScreen();
                 return;
@@ -625,14 +632,14 @@ void AutoSave::storeAutoSavedState(
 
         {
             AllParser allParser(mpc);
-            if (!writeOrAbort("ALL.ALL", allParser.getBytes()))
+            if (!writeRequired("ALL.ALL", allParser.getBytes()))
             {
                 layeredScreen->closeCurrentScreen();
                 return;
             }
         }
 
-        if (!writeOrAbort("sounds.txt", {soundNames.begin(), soundNames.end()}))
+        if (!writeRequired("sounds.txt", {soundNames.begin(), soundNames.end()}))
         {
             layeredScreen->closeCurrentScreen();
             return;

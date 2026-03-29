@@ -2,6 +2,7 @@
 
 #include "nvram/DefaultsParser.hpp"
 
+#include "FileIoPolicy.hpp"
 #include "Mpc.hpp"
 
 #include "lcdgui/screens/UserScreen.hpp"
@@ -18,6 +19,7 @@
 #include "file/all/Defaults.hpp"
 
 using namespace mpc::nvram;
+using namespace mpc::file_io;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
@@ -25,28 +27,28 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
 {
     const auto path = mpc.paths->configPath() / "nvram.vmp";
 
-    const auto existsRes = mpc_fs::exists(path);
-    if (!existsRes)
-    {
-        MLOG("NvRam::loadUserScreenValues could not check existence for '" +
-             path.string() + "': " + existsRes.error().message);
-        return;
-    }
-
-    if (!*existsRes)
+    const auto existsValue = value(
+        mpc_fs::exists(path), FailurePolicy::Recoverable,
+        "load user screen values existence check for '" + path.string() + "'");
+    if (!existsValue)
     {
         return;
     }
 
-    const auto sizeRes = mpc_fs::file_size(path);
-    if (!sizeRes)
+    if (!*existsValue)
     {
-        MLOG("NvRam::loadUserScreenValues could not read size for '" +
-             path.string() + "': " + sizeRes.error().message);
         return;
     }
 
-    if (*sizeRes != file::all::AllParser::DEFAULTS_LENGTH)
+    const auto sizeValue = value(
+        mpc_fs::file_size(path), FailurePolicy::Recoverable,
+        "load user screen values size check for '" + path.string() + "'");
+    if (!sizeValue)
+    {
+        return;
+    }
+
+    if (*sizeValue != file::all::AllParser::DEFAULTS_LENGTH)
     {
         return;
     }
@@ -72,12 +74,9 @@ void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
     const auto path = mpc.paths->configPath() / "nvram.vmp";
-    const auto writeRes = set_file_data(path, dp.getBytes());
-    if (!writeRes)
-    {
-        MLOG("NvRam::saveUserScreenValues failed for '" + path.string() +
-             "': " + writeRes.error().message);
-    }
+    (void) success(set_file_data(path, dp.getBytes()),
+                   FailurePolicy::BestEffort,
+                   "save user screen values for '" + path.string() + "'");
 }
 
 void NvRam::saveVmpcSettings(Mpc &mpc)
@@ -107,12 +106,8 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled),
         static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled)};
 
-    const auto writeRes = set_file_data(path, bytes);
-    if (!writeRes)
-    {
-        MLOG("NvRam::saveVmpcSettings failed for '" + path.string() + "': " +
-             writeRes.error().message);
-    }
+    (void) success(set_file_data(path, bytes), FailurePolicy::BestEffort,
+                   "save VMPC settings for '" + path.string() + "'");
 }
 
 void NvRam::loadVmpcSettings(Mpc &mpc)
@@ -121,14 +116,11 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
 
     const auto path = mpc.paths->vmpcSpecificConfigPath();
 
-    const auto existsRes = mpc_fs::exists(path);
-    if (!existsRes)
-    {
-        MLOG("NvRam::loadVmpcSettings could not check existence for '" +
-             path.string() + "': " + existsRes.error().message);
-    }
+    const auto existsValue = value(
+        mpc_fs::exists(path), FailurePolicy::Recoverable,
+        "load VMPC settings existence check for '" + path.string() + "'");
 
-    if (!existsRes || !*existsRes)
+    if (!existsValue || !*existsValue)
     {
         engineHost->setRecordLevel(DEFAULT_REC_GAIN);
         mpc.getHardware()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);
@@ -143,14 +135,14 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    const auto bytesRes = get_file_data(path);
-    if (!bytesRes)
+    const auto bytesValue = value(get_file_data(path), FailurePolicy::Recoverable,
+                                  "load VMPC settings read for '" +
+                                      path.string() + "'");
+    if (!bytesValue)
     {
-        MLOG("NvRam::loadVmpcSettings failed for '" + path.string() + "': " +
-             bytesRes.error().message);
         return;
     }
-    const auto &bytes = *bytesRes;
+    const auto &bytes = *bytesValue;
 
     if (bytes.size() > 0)
     {

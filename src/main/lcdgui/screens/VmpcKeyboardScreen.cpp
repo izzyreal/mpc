@@ -1,6 +1,7 @@
 #include "VmpcKeyboardScreen.hpp"
 
 #include "Mpc.hpp"
+#include "FileIoPolicy.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 
@@ -19,6 +20,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::input;
 using namespace mpc::input::keyboard;
+using namespace mpc::file_io;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
@@ -61,7 +63,13 @@ void VmpcKeyboardScreen::open()
     screen->saveAndLeave = [this, path = mpc.paths->keyboardBindingsPath()]
     {
         const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
-        (void) set_file_data(path, jsonData.dump());
+        if (!success(set_file_data(path, jsonData.dump()),
+                     FailurePolicy::Required,
+                     "keyboard mapping save for '" + path.string() + "'"))
+        {
+            ls.lock()->showPopupForMs("Failed to save keyboard mapping", 1500);
+            return;
+        }
         mpc.clientEventController->getKeyboardBindings()->setBindingsData(
             bindings->getKeyboardBindingsData());
     };
@@ -227,8 +235,16 @@ void VmpcKeyboardScreen::function(const int i)
             if (hasMappingChanged())
             {
                 const auto jsonData = KeyboardBindingsWriter::toJson(*bindings);
-                (void) set_file_data(mpc.paths->keyboardBindingsPath(),
-                                     jsonData.dump());
+                if (!success(set_file_data(mpc.paths->keyboardBindingsPath(),
+                                           jsonData.dump()),
+                             FailurePolicy::Required,
+                             "keyboard mapping save for '" +
+                                 mpc.paths->keyboardBindingsPath().string() + "'"))
+                {
+                    ls.lock()->showPopupForMs("Failed to save keyboard mapping",
+                                              1500);
+                    break;
+                }
 
                 mpc.clientEventController->getKeyboardBindings()
                     ->setBindingsData(bindings->getKeyboardBindingsData());

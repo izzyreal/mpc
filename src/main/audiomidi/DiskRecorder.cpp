@@ -5,6 +5,7 @@
 #include "engine/EngineHost.hpp"
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
+#include "FileIoPolicy.hpp"
 #include "Logger.hpp"
 
 #include <readerwriterqueue.h>
@@ -13,6 +14,7 @@
 
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
+using namespace mpc::file_io;
 
 const std::vector<std::pair<std::string, std::string>>
     DiskRecorder::fileNamesMono{{"L.wav", "R.wav"},
@@ -345,27 +347,24 @@ void DiskRecorder::removeFilesIfEmpty() const
 
         const auto absolutePath = destinationDirectory / fileName;
 
-        const auto existsRes = mpc_fs::exists(absolutePath);
-        if (!existsRes)
+        const auto existsValue =
+            value(mpc_fs::exists(absolutePath), FailurePolicy::BestEffort,
+                  "direct-to-disk empty-file cleanup");
+        if (!existsValue)
         {
-            MLOG("DiskRecorder::removeFilesIfEmpty failed to inspect '" +
-                 absolutePath.string() + "': " + existsRes.error().message);
             continue;
         }
 
-        if (!*existsRes)
+        if (!*existsValue)
         {
             continue;
         }
 
         if (isOnlySilence)
         {
-            const auto removeRes = mpc_fs::remove(absolutePath);
-            if (!removeRes)
-            {
-                MLOG("DiskRecorder::removeFilesIfEmpty failed to remove '" +
-                     absolutePath.string() + "': " + removeRes.error().message);
-            }
+            (void) success(mpc_fs::remove(absolutePath),
+                           FailurePolicy::BestEffort,
+                           "direct-to-disk empty-file cleanup");
         }
     }
 }

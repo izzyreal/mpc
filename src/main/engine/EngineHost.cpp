@@ -1,5 +1,6 @@
 #include "EngineHost.hpp"
 
+#include "FileIoPolicy.hpp"
 #include "Mpc.hpp"
 
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
@@ -57,6 +58,7 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::control;
 using namespace mpc::engine;
+using namespace mpc::file_io;
 
 using namespace mpc::sequencer;
 
@@ -384,11 +386,10 @@ bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
         mpc.paths->getDocuments()->recordingsPath() / settings->recordingName;
 
     const auto createDirectoryRes = mpc_fs::create_directory(destinationDirectory);
-    if (!createDirectoryRes)
+    if (!success(createDirectoryRes, FailurePolicy::Required,
+                 "start direct-to-disk bounce directory create for '" +
+                     destinationDirectory.string() + "'"))
     {
-        MLOG("EngineHost::startBouncing failed to create '" +
-             destinationDirectory.string() + "': " +
-             createDirectoryRes.error().message);
         onBounceStart = {};
         return false;
     }

@@ -1,10 +1,13 @@
 #include "disk/MpcFile.hpp"
 
+#include "FileIoPolicy.hpp"
+
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <Logger.hpp>
 
 using namespace mpc::disk;
+using namespace mpc::file_io;
 using namespace akaifat::fat;
 
 MpcFile::MpcFile(
@@ -167,14 +170,9 @@ bool MpcFile::setName(const std::string &s) const
     }
     mpc_fs::path new_path = fs_path;
     new_path.replace_filename(s);
-    const auto renameRes = mpc_fs::rename(fs_path, new_path);
-    if (!renameRes)
-    {
-        MLOG("MpcFile::setName failed from '" + fs_path.string() + "' to '" +
-             new_path.string() + "': " + renameRes.error().message);
-        return false;
-    }
-    return true;
+    return success(mpc_fs::rename(fs_path, new_path), FailurePolicy::Required,
+                   "rename file from '" + fs_path.string() + "' to '" +
+                       new_path.string() + "'");
 }
 
 unsigned long MpcFile::length()
@@ -217,11 +215,8 @@ void MpcFile::setFileData(std::vector<char> &data)
     else
     {
         const auto writeRes = set_file_data(fs_path, data);
-        if (!writeRes)
-        {
-            MLOG("MpcFile::setFileData failed for '" + fs_path.string() + "': " +
-                 writeRes.error().message);
-        }
+        (void) success(writeRes, FailurePolicy::Required,
+                       "write file data for '" + fs_path.string() + "'");
     }
 }
 
@@ -255,14 +250,14 @@ bool MpcFile::del() const
             return false;
         }
     }
-    const auto removeRes = mpc_fs::remove(fs_path);
-    if (!removeRes)
+    const auto removeValue = value(mpc_fs::remove(fs_path),
+                                   FailurePolicy::Required,
+                                   "delete file '" + fs_path.string() + "'");
+    if (!removeValue)
     {
-        MLOG("MpcFile::del failed for '" + fs_path.string() + "': " +
-             removeRes.error().message);
         return false;
     }
-    return *removeRes;
+    return *removeValue;
 }
 
 std::vector<char> MpcFile::getBytes()

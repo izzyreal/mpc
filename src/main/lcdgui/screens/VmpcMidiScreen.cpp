@@ -1,6 +1,7 @@
 #include "VmpcMidiScreen.hpp"
 
 #include "Mpc.hpp"
+#include "FileIoPolicy.hpp"
 
 #include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 
@@ -19,6 +20,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
+using namespace mpc::file_io;
 
 VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi", layerIndex)
@@ -108,7 +110,10 @@ void VmpcMidiScreen::open()
         if (persistActivePreset())
         {
             refreshUneditedActivePresetCopy();
+            return;
         }
+
+        ls.lock()->showPopupForMs("Error saving MIDI mapping", 1500);
     };
 
     screen->stayScreen = "vmpc-midi";
@@ -346,8 +351,9 @@ bool VmpcMidiScreen::persistActivePreset() const
     json presetJson;
     to_json(presetJson, *getActivePreset());
 
-    const auto writeRes = set_file_data(path, presetJson.dump(4));
-    return writeRes.has_value();
+    return success(set_file_data(path, presetJson.dump(4)),
+                   FailurePolicy::Required,
+                   "active MIDI preset save for '" + path.string() + "'");
 }
 
 void VmpcMidiScreen::refreshUneditedActivePresetCopy()

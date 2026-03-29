@@ -1,11 +1,13 @@
 #include "VolumesPersistence.hpp"
 
+#include "FileIoPolicy.hpp"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 
 #include <nlohmann/json.hpp>
 
 using namespace mpc::nvram;
+using namespace mpc::file_io;
 using namespace mpc::disk;
 using json = nlohmann::json;
 
@@ -21,26 +23,23 @@ json read(mpc::Mpc &mpc)
     json result;
 
     const auto path = getVolumesPersistencePath(mpc);
-    const auto existsRes = mpc_fs::exists(path);
-    if (!existsRes)
+    const auto existsValue = value(
+        mpc_fs::exists(path), FailurePolicy::Recoverable,
+        "read volumes persistence existence check for '" + path.string() + "'");
+    if (existsValue && *existsValue)
     {
-        MLOG("VolumesPersistence::read could not check existence for '" +
-             path.string() + "': " + existsRes.error().message);
-    }
-    else if (*existsRes)
-    {
-        const auto bytesRes = get_file_data(path);
-        if (!bytesRes)
+        const auto bytesValue = value(
+            get_file_data(path), FailurePolicy::Recoverable,
+            "read volumes persistence file for '" + path.string() + "'");
+        if (!bytesValue)
         {
-            MLOG("VolumesPersistence::read failed for '" + path.string() +
-                 "': " + bytesRes.error().message);
             result = json::object();
         }
         else
         {
             try
             {
-                result = json::parse(bytesRes->begin(), bytesRes->end());
+                result = json::parse(bytesValue->begin(), bytesValue->end());
             }
             catch (...)
             {
@@ -160,10 +159,7 @@ void VolumesPersistence::save(Mpc &mpc)
     const auto data = d.dump(4); // pretty print (optional)
     const auto path = getVolumesPersistencePath(mpc);
 
-    const auto writeRes = set_file_data(path, std::vector(data.begin(), data.end()));
-    if (!writeRes)
-    {
-        MLOG("VolumesPersistence::save failed for '" + path.string() + "': " +
-             writeRes.error().message);
-    }
+    (void) success(set_file_data(path, std::vector(data.begin(), data.end())),
+                   FailurePolicy::BestEffort,
+                   "save volumes persistence for '" + path.string() + "'");
 }
