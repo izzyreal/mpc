@@ -75,7 +75,8 @@ void SaveAProgramScreen::function(const int i)
             {
                 auto replaceAction = [disk, fileName, program]
                 {
-                    const auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->deleteFileOrOpenErrorPopup(
+                        disk->getFile(fileName));
 
                     if (success)
                     {

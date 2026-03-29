@@ -82,7 +82,8 @@ void SaveAllFileScreen::function(const int i)
             {
                 auto replaceAction = [disk, allFileName]
                 {
-                    if (disk->getFile(allFileName)->del())
+                    if (disk->deleteFileOrOpenErrorPopup(
+                            disk->getFile(allFileName)))
                     {
                         disk->flush();
                         disk->initFiles();

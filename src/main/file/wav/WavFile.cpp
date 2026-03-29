@@ -134,6 +134,12 @@ WavFile WavFile::writeWavStream(const std::shared_ptr<std::ostream> &_ostream,
 wav_or_error
 WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
 {
+    if (!_istream)
+    {
+        return tl::make_unexpected(
+            mpc_io_error_msg{"Unable to open WAV input stream"});
+    }
+
     auto result = std::make_shared<WavFile>();
     result->numSampleLoops = 0;
     result->iStream = _istream;

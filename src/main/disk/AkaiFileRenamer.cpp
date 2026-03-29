@@ -17,11 +17,16 @@ using namespace mpc::file;
 void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 {
     const auto isDirectoryRes = mpc_fs::is_directory(p);
-    assert(isDirectoryRes.value_or(false));
+    assert(isDirectoryRes && *isDirectoryRes);
     if (!isDirectoryRes)
     {
         MLOG("AkaiFileRenamer: failed to inspect '" + p.string() + "': " +
              isDirectoryRes.error().message);
+        return;
+    }
+    if (!*isDirectoryRes)
+    {
+        MLOG("AkaiFileRenamer: path is not a directory: '" + p.string() + "'");
         return;
     }
 
@@ -46,17 +51,13 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
         }
     }
 
-    auto tempRootWasCreated = mpc_fs::create_directory(tempRoot);
-    assert(tempRootWasCreated && *tempRootWasCreated);
-    if (!tempRootWasCreated || !*tempRootWasCreated)
+    auto tempRootCreateRes = mpc_fs::create_directories(tempRoot);
+    if (!tempRootCreateRes)
     {
-        if (!tempRootWasCreated)
-        {
-            logFailure(FailurePolicy::Required,
-                       "Akai rename temp root create for '" + tempRoot.string() +
-                           "'",
-                       tempRootWasCreated.error());
-        }
+        logFailure(FailurePolicy::Required,
+                   "Akai rename temp root create for '" + tempRoot.string() +
+                       "'",
+                   tempRootCreateRes.error());
         return;
     }
 

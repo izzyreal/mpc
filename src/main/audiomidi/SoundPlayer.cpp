@@ -50,6 +50,11 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
         readThread.join();
     }
 
+    if (!streamToUse)
+    {
+        return false;
+    }
+
     stream = streamToUse;
     fileFormat = fileFormatToUse;
 

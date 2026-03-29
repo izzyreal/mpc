@@ -164,8 +164,12 @@ void MidiDeviceDetector::start(Mpc &mpc)
                                     ->setControllerName("MPC_Studio");
                             }
 
-                            if (!path.empty() &&
-                                mpc_fs::exists(path).value_or(false))
+                            const auto presetExistsRes =
+                                path.empty() ? mpc_fs::result<bool>{false}
+                                             : mpc_fs::exists(path);
+
+                            if (!path.empty() && presetExistsRes &&
+                                *presetExistsRes)
                             {
                                 auto layeredScreen = mpc.getLayeredScreen();
                                 layeredScreen->postToUiThread(utils::Task(

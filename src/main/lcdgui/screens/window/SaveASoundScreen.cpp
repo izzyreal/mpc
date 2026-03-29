@@ -94,7 +94,8 @@ void SaveASoundScreen::function(const int i)
             {
                 auto replaceAction = [saveAction, disk, fileName]
                 {
-                    const auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->deleteFileOrOpenErrorPopup(
+                        disk->getFile(fileName));
 
                     if (success)
                     {

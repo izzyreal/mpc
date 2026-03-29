@@ -73,7 +73,8 @@ void SaveApsFileScreen::function(const int i)
             {
                 auto replaceAction = [disk, apsFileName]
                 {
-                    if (disk->getFile(apsFileName)->del())
+                    if (disk->deleteFileOrOpenErrorPopup(
+                            disk->getFile(apsFileName)))
                     {
                         disk->flush();
                         disk->initFiles();

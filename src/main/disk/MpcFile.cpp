@@ -309,6 +309,7 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
     if (!inputStream->is_open())
     {
         MLOG("MpcFile::getInputStream failed for '" + fs_path.string() + "'");
+        return {};
     }
     return inputStream;
 }
@@ -325,6 +326,7 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
     if (!outputStream->is_open())
     {
         MLOG("MpcFile::getOutputStream failed for '" + fs_path.string() + "'");
+        return {};
     }
     return outputStream;
 }

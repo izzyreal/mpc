@@ -222,10 +222,13 @@ bool ClientEventController::isEraseButtonPressed() const
 
 void ClientEventController::restoreKeyboardBindings() const
 {
+    const auto legacyBindingsExist =
+        mpc_fs::exists(mpc.paths->legacyKeyboardBindingsPath());
+
     if (const auto persistedBindingsExist =
             mpc_fs::exists(mpc.paths->keyboardBindingsPath());
         (!persistedBindingsExist || !*persistedBindingsExist) &&
-        mpc_fs::exists(mpc.paths->legacyKeyboardBindingsPath()).value_or(false))
+        legacyBindingsExist && *legacyBindingsExist)
     {
         const auto legacyData =
             get_file_data(mpc.paths->legacyKeyboardBindingsPath());

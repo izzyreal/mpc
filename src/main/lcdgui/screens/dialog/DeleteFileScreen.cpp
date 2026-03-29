@@ -52,7 +52,7 @@ void DeleteFileScreen::deleteFile()
 
     const auto disk = mpc.getDisk();
 
-    if (disk->deleteSelectedFile())
+    if (disk->deleteSelectedFileOrOpenErrorPopup())
     {
         disk->flush();
         disk->initFiles();

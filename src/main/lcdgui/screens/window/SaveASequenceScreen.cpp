@@ -81,7 +81,8 @@ void SaveASequenceScreen::function(const int i)
             {
                 auto replaceAction = [this, disk, fileName]
                 {
-                    const auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->deleteFileOrOpenErrorPopup(
+                        disk->getFile(fileName));
 
                     if (success)
                     {

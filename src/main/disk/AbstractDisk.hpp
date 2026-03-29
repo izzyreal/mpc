@@ -73,6 +73,8 @@ namespace mpc::disk
     public:
         virtual std::shared_ptr<MpcFile> newFile(const std::string &name) = 0;
         bool deleteSelectedFile() const;
+        bool deleteSelectedFileOrOpenErrorPopup() const;
+        bool deleteFileOrOpenErrorPopup(const std::shared_ptr<MpcFile> &) const;
 
         std::vector<std::string> getFileNames();
         std::string getFileName(int i) const;
@@ -151,7 +153,18 @@ namespace mpc::disk
                 ioFunc);
 
         template <typename return_type>
+        tl::expected<return_type, mpc_io_error_msg>
+        performRequiredIoOrOpenErrorPopup(
+            std::function<tl::expected<return_type, mpc_io_error_msg>()>
+                ioFunc);
+
+        template <typename return_type>
         void performIoOrOpenErrorPopupNonReturning(
+            std::function<tl::expected<return_type, mpc_io_error_msg>()>
+                ioFunc);
+
+        template <typename return_type>
+        void performRequiredIoOrOpenErrorPopupNonReturning(
             std::function<tl::expected<return_type, mpc_io_error_msg>()>
                 ioFunc);
 

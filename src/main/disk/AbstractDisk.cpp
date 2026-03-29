@@ -116,6 +116,38 @@ bool AbstractDisk::deleteSelectedFile() const
     return files[loadScreen->fileLoad]->del();
 }
 
+bool AbstractDisk::deleteFileOrOpenErrorPopup(
+    const std::shared_ptr<MpcFile> &file) const
+{
+    if (!file)
+    {
+        return false;
+    }
+
+    const std::function<tl::expected<bool, mpc_io_error_msg>()> ioFunc =
+        [file]() -> tl::expected<bool, mpc_io_error_msg>
+    {
+        if (file->del())
+        {
+            return true;
+        }
+
+        return tl::make_unexpected(
+            mpc_io_error_msg{"I/O error! See logs for info"});
+    };
+
+    const auto deleteRes =
+        const_cast<AbstractDisk *>(this)->performRequiredIoOrOpenErrorPopup(
+            ioFunc);
+    return deleteRes && *deleteRes;
+}
+
+bool AbstractDisk::deleteSelectedFileOrOpenErrorPopup() const
+{
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    return deleteFileOrOpenErrorPopup(files[loadScreen->fileLoad]);
+}
+
 std::vector<std::shared_ptr<MpcFile>> &AbstractDisk::getAllFiles()
 {
     return allFiles;
@@ -129,7 +161,7 @@ std::shared_ptr<MpcFile> AbstractDisk::getParentFile(const int i)
 void AbstractDisk::writeSnd(const std::shared_ptr<Sound> &s,
                             const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         const auto name = Util::getFileName(
             fileName == "" ? s->getName() + ".SND" : fileName);
@@ -142,18 +174,23 @@ void AbstractDisk::writeSnd(const std::shared_ptr<Sound> &s,
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 void AbstractDisk::writeWav(const std::shared_ptr<Sound> &s,
                             const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         const auto name = Util::getFileName(
             fileName == "" ? s->getName() + ".WAV" : fileName);
         auto f = newFile(name);
         const auto outputStream = f->getOutputStream();
+        if (!outputStream)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to open WAV output stream"});
+        }
         const auto isMono = s->isMono();
         const auto data = s->getSampleData();
         auto wavFile = WavFile::writeWavStream(outputStream, isMono ? 1 : 2,
@@ -185,17 +222,23 @@ void AbstractDisk::writeWav(const std::shared_ptr<Sound> &s,
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
                             const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
+        const auto outputStream = f->getOutputStream();
+        if (!outputStream)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to open MIDI output stream"});
+        }
         const MidiWriter writer(s.get());
-        writer.writeToOStream(f->getOutputStream());
+        writer.writeToOStream(outputStream);
         flush();
         initFiles();
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
@@ -203,7 +246,7 @@ void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 bool AbstractDisk::checkExists(const std::string &fileName)
@@ -259,6 +302,11 @@ bool AbstractDisk::deleteRecursive(const std::weak_ptr<MpcFile> _toDelete)
 {
     const auto toDelete = _toDelete.lock();
 
+    if (!toDelete)
+    {
+        return false;
+    }
+
     if (toDelete->isDirectory())
     {
         for (auto &f : toDelete->listFiles())
@@ -273,13 +321,13 @@ bool AbstractDisk::deleteRecursive(const std::weak_ptr<MpcFile> _toDelete)
         }
     }
 
-    return toDelete->del();
+    return deleteFileOrOpenErrorPopup(toDelete);
 }
 
 void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
                             const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
         const PgmWriter writer(p.get(), mpc.getSampler());
@@ -337,12 +385,12 @@ void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 void AbstractDisk::writeAps(const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
         const auto apsName = f->getNameWithoutExtension();
@@ -383,12 +431,12 @@ void AbstractDisk::writeAps(const std::string &fileName)
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 void AbstractDisk::writeAll(const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]
+    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
         AllParser allParser(mpc);
@@ -403,7 +451,7 @@ void AbstractDisk::writeAll(const std::string &fileName)
         return f;
     };
 
-    performIoOrOpenErrorPopupNonReturning(writeFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
 void AbstractDisk::writeMidiControlPreset(
@@ -424,7 +472,7 @@ void AbstractDisk::writeMidiControlPreset(
         return preset;
     };
 
-    performIoOrOpenErrorPopupNonReturning(ioFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(ioFunc);
 }
 
 void AbstractDisk::readMidiControlPreset(
@@ -436,7 +484,14 @@ void AbstractDisk::readMidiControlPreset(
     {
         auto pathToUse = p;
 
-        if (!mpc_fs::exists(p).value_or(false))
+        const auto existsRes = mpc_fs::exists(p);
+        if (!existsRes)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to inspect MIDI control preset"});
+        }
+
+        if (!*existsRes)
         {
             if (p.extension().string().find("json") != std::string::npos)
             {
@@ -448,7 +503,14 @@ void AbstractDisk::readMidiControlPreset(
             }
         }
 
-        if (!mpc_fs::exists(pathToUse).value_or(false))
+        const auto pathToUseExistsRes = mpc_fs::exists(pathToUse);
+        if (!pathToUseExistsRes)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to inspect MIDI control preset"});
+        }
+
+        if (!*pathToUseExistsRes)
         {
             return tl::make_unexpected(mpc_io_error_msg{"File does not exist"});
         }
@@ -474,28 +536,41 @@ void AbstractDisk::readMidiControlPreset(
             mpc_io_error_msg{"Unable to read MIDI control preset"});
     };
 
-    performIoOrOpenErrorPopupNonReturning(ioFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(ioFunc);
 }
 
 wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 {
-    const std::function readFunc = [f]
+    const std::function<wav_or_error()> readFunc = [f]() -> wav_or_error
     {
-        return WavFile::readWavStream(f->getInputStream());
+        const auto inputStream = f->getInputStream();
+        if (!inputStream)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to open WAV input stream"});
+        }
+        return WavFile::readWavStream(inputStream);
     };
 
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 sound_or_error AbstractDisk::readWav2(
     std::shared_ptr<MpcFile> f,
     std::function<sound_or_error(std::shared_ptr<WavFile>)> onSuccess)
 {
-    const std::function readFunc = [f, onSuccess]
+    const std::function<sound_or_error()> readFunc =
+        [f, onSuccess]() -> sound_or_error
     {
-        return WavFile::readWavStream(f->getInputStream()).and_then(onSuccess);
+        const auto inputStream = f->getInputStream();
+        if (!inputStream)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to open WAV input stream"});
+        }
+        return WavFile::readWavStream(inputStream).and_then(onSuccess);
     };
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 sound_or_error AbstractDisk::readSnd2(
@@ -506,7 +581,7 @@ sound_or_error AbstractDisk::readSnd2(
     {
         return onSuccess(std::make_shared<SndReader>(f.get()));
     };
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
@@ -519,6 +594,11 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
         }
 
         const auto fStream = f->getInputStream();
+        if (!fStream)
+        {
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Unable to open MIDI input stream"});
+        }
         auto newSeq = mpc.getSequencer()->getSequence(TempSequenceIndex);
 
         newSeq->init(0);
@@ -534,7 +614,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
         return newSeq;
     };
 
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
@@ -554,7 +634,7 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
                 return true;
             };
 
-            performIoOrOpenErrorPopupNonReturning(readFunc);
+            performRequiredIoOrOpenErrorPopupNonReturning(readFunc);
         });
 }
 
@@ -576,7 +656,7 @@ void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f,
                 return true;
             };
 
-            performIoOrOpenErrorPopupNonReturning(readFunc);
+            performRequiredIoOrOpenErrorPopupNonReturning(readFunc);
         });
 }
 
@@ -591,7 +671,7 @@ void AbstractDisk::readAll2(std::shared_ptr<MpcFile> f,
         return true;
     };
 
-    performIoOrOpenErrorPopupNonReturning(readFunc);
+    performRequiredIoOrOpenErrorPopupNonReturning(readFunc);
 }
 
 sequence_meta_infos_or_error
@@ -602,7 +682,7 @@ AbstractDisk::readSequenceMetaInfosFromAllFile(std::shared_ptr<MpcFile> f)
         return AllLoader::loadSequenceMetaInfosFromFile(mpc, f.get());
     };
 
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 sequence_or_error
@@ -618,7 +698,7 @@ AbstractDisk::loadOneSequenceFromAllFile(std::shared_ptr<MpcFile> f,
         return result;
     };
 
-    return performIoOrOpenErrorPopup(readFunc);
+    return performRequiredIoOrOpenErrorPopup(readFunc);
 }
 
 template <typename return_type>
@@ -626,6 +706,13 @@ void AbstractDisk::performIoOrOpenErrorPopupNonReturning(
     std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
 {
     (void)performIoOrOpenErrorPopup(ioFunc);
+}
+
+template <typename return_type>
+void AbstractDisk::performRequiredIoOrOpenErrorPopupNonReturning(
+    std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
+{
+    (void)performRequiredIoOrOpenErrorPopup(ioFunc);
 }
 
 template <typename return_type>
@@ -668,4 +755,12 @@ AbstractDisk::performIoOrOpenErrorPopup(
         showPopup(msg);
         return tl::make_unexpected(msg);
     }
+}
+
+template <typename return_type>
+tl::expected<return_type, mpc_io_error_msg>
+AbstractDisk::performRequiredIoOrOpenErrorPopup(
+    std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
+{
+    return performIoOrOpenErrorPopup(ioFunc);
 }

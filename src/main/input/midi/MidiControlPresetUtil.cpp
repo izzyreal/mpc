@@ -122,7 +122,9 @@ bool MidiControlPresetUtil::doesPresetWithNameExist(const mpc_fs::path &path,
     return std::any_of(*path_it_res, mpc_fs::directory_end(),
                        [name](const mpc_fs::directory_entry &e)
                        {
-                           return !mpc_fs::is_directory(e).value_or(false) &&
+                           const auto isDirectoryRes =
+                               mpc_fs::is_directory(e);
+                           return isDirectoryRes && !*isDirectoryRes &&
                                   mpc::StrUtil::eqIgnoreCase(
                                       e.path().stem().string(), name);
                        });

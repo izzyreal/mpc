@@ -19,14 +19,29 @@ std::string resolve_resource_path_from_mac_os_bundle(const std::string &path)
 std::vector<char> get_resource_data_from_mac_os_bundle(const std::string &path)
 {
     const auto resource_path = resolve_resource_path_from_mac_os_bundle(path);
+    const auto dataRes = get_file_data(resource_path);
+    if (!dataRes)
+    {
+        MLOG("Failed to read MPC resource '" + path + "' from '" +
+             resource_path + "': " + dataRes.error().message);
+        return {};
+    }
 
-    return get_file_data(resource_path).value_or(std::vector<char>{});
+    return *dataRes;
 }
 
 bool resource_exists_in_mac_os_bundle(const std::string &path)
 {
     const auto resource_path = resolve_resource_path_from_mac_os_bundle(path);
-    return mpc_fs::exists(resource_path).value_or(false);
+    const auto existsRes = mpc_fs::exists(resource_path);
+    if (!existsRes)
+    {
+        MLOG("Failed to inspect MPC resource '" + path + "' at '" +
+             resource_path + "': " + existsRes.error().message);
+        return false;
+    }
+
+    return *existsRes;
 }
 #else
 
