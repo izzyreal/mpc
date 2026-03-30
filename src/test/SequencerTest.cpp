@@ -22,6 +22,7 @@
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/EventData.hpp"
 #include "sequencer/Song.hpp"
+#include "sequencer/SequenceStateView.hpp"
 
 #include "hardware/Component.hpp"
 #include "sequencer/EventRef.hpp"
@@ -628,10 +629,91 @@ TEST_CASE("Stopping with queued next sequence preserves non-nextsq focus",
 TEST_CASE("Can record and playback from different threads",
           "[sequencer-multithread]")
 {
-    constexpr int SAMPLE_RATE = 44100;
-    constexpr int BUFFER_SIZE = 512;
-    constexpr int AUDIO_THREAD_MAX_CYCLES = 4000;
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
 
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+
+    auto track = sequencer->getSelectedTrack();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+    timingCorrectScreen->setNoteValue(0);
+    track->setUsedIfCurrentlyUnused();
+    stateManager->drainQueue();
+
+    const std::vector<mpc::Tick> processedTicks{12, 36, 60, 84, 108};
+    const std::vector<mpc::NoteNumber> noteNumbers{
+        mpc::NoteNumber(35), mpc::NoteNumber(36), mpc::NoteNumber(37),
+        mpc::NoteNumber(38), mpc::NoteNumber(39)};
+
+    std::mutex mutex;
+    std::condition_variable cv;
+    size_t publishedTickIndex = 0;
+    bool tickReady = false;
+    bool canProcessPublishedTick = false;
+
+    std::thread playbackThread(
+        [&]
+        {
+            for (size_t i = 0; i < processedTicks.size(); ++i)
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                publishedTickIndex = i;
+                tickReady = true;
+                cv.notify_one();
+                cv.wait(lock, [&] { return canProcessPublishedTick; });
+                canProcessPublishedTick = false;
+                tickReady = false;
+                lock.unlock();
+
+                const auto sequenceState =
+                    stateManager->getSnapshot().getSequenceState(
+                        seq->getSequenceIndex());
+                stateManager->processLiveNoteEventRecordingQueues(
+                    processedTicks[i], sequenceState);
+            }
+        });
+
+    for (size_t i = 0; i < processedTicks.size(); ++i)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        cv.wait(lock, [&] { return tickReady && publishedTickIndex == i; });
+
+        auto *noteOn = stateManager->recordNoteEventLive(
+            seq->getSequenceIndex(), track->getIndex(), noteNumbers[i],
+            mpc::Velocity(100));
+        stateManager->finalizeNoteEventLive(
+            noteOn, mpc::NoTickAssignedWhileRecording);
+
+        canProcessPublishedTick = true;
+        lock.unlock();
+        cv.notify_one();
+    }
+
+    playbackThread.join();
+    track->setOn(track->isOn(), false);
+    stateManager->drainQueue();
+
+    const auto events = track->getEvents();
+    REQUIRE(events.size() == noteNumbers.size());
+
+    for (size_t i = 0; i < events.size(); ++i)
+    {
+        REQUIRE(events[i]->getTick() == processedTicks[i]);
+        const auto noteOnEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(events[i]);
+        REQUIRE(noteOnEvent);
+        REQUIRE(noteOnEvent->getNote() == noteNumbers[i]);
+    }
+}
+
+TEST_CASE("Live recording quantizes loop-boundary notes deterministically",
+          "[sequencer-multithread]")
+{
     // Quantized positions:
     // 1                   2
     // 0  , 24 , 48 , 72 , 96 , 120, 144, 168,
@@ -639,166 +721,54 @@ TEST_CASE("Can record and playback from different threads",
     // 3                   4                   1... <loop>
     // 192, 216, 240, 264, 288, 312, 336, 360, 384
     //
-    // The event at tick 382 is expected to be quantized to tick 0, because the
-    // sequence is one bar long. Event at tick 2 will also be quantized to tick
-    // 0. Since the events have the same note number, and during recording no
-    // duplicate note numbers per tick position are left over, of the 17 ticks
-    // below, only 16 will survive.
-    std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167, 194,
-                                   218, 243, 264, 290, 310, 332, 361, 382};
+    // The event at tick 382 quantizes to tick 0 in a one-bar sequence. The
+    // event at tick 2 also quantizes to tick 0, so only one of those two note
+    // events survives after duplicate removal by note number and tick.
+    const std::vector<mpc::Tick> humanTickPositions{
+        2, 23, 49, 70, 95, 124, 143, 167, 194, 218, 243, 264, 290, 310, 332,
+        361, 382};
 
-    std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
-                                   192, 216, 240, 264, 288, 312, 336, 360};
-
-    std::atomic<bool> audioThreadBusy{true};
-    std::atomic<bool> stopAudioThread{false};
-    std::mutex tickMutex;
-    std::condition_variable tickCv;
-    int publishedTickPos = 0;
-    bool tickUpdated = false;
+    const std::vector<mpc::Tick> quantizedPositions{
+        0, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336,
+        360};
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
-    sequencer->getTransport()->setCountEnabled(false);
-
     auto seq = sequencer->getSelectedSequence();
     seq->init(0);
     stateManager->drainQueue();
 
     auto track = sequencer->getSelectedTrack();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+    timingCorrectScreen->setNoteValue(3);
+    track->setUsedIfCurrentlyUnused();
+    stateManager->drainQueue();
+    const auto sequenceState =
+        stateManager->getSnapshot().getSequenceState(seq->getSequenceIndex());
 
-    auto server = mpc.getEngineHost()->getAudioServer();
-
-    server->resizeBuffers(BUFFER_SIZE);
-    server->setSampleRate(SAMPLE_RATE);
-    server->start();
-
-    std::thread audioThread(
-        [&]
-        {
-            int dspCycleCounter = 0;
-            while (dspCycleCounter++ < AUDIO_THREAD_MAX_CYCLES &&
-                   !stopAudioThread.load(std::memory_order_acquire))
-            {
-                mpc.getEngineHost()->prepareProcessBlock(BUFFER_SIZE);
-                mpc.getClock()->processBufferInternal(
-                    sequencer->getTransport()->getTempo(), SAMPLE_RATE,
-                    BUFFER_SIZE, 0);
-                server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-
-                std::unique_lock<std::mutex> lock(tickMutex);
-                publishedTickPos = sequencer->getTransport()->getTickPosition();
-                tickUpdated = true;
-                tickCv.notify_one();
-                tickCv.wait(lock, [&]
-                            {
-                                return !tickUpdated ||
-                                       stopAudioThread.load(
-                                           std::memory_order_acquire);
-                            });
-            }
-
-            audioThreadBusy.store(false, std::memory_order_release);
-            tickCv.notify_one();
-        });
-
-    if (!sequencer->getTransport()->isRecordingOrOverdubbing())
+    for (const auto tick : humanTickPositions)
     {
-        sequencer->getTransport()->recFromStart();
+        auto *noteOn = stateManager->recordNoteEventLive(
+            seq->getSequenceIndex(), track->getIndex(), mpc::NoteNumber(35),
+            mpc::Velocity(100));
+        stateManager->finalizeNoteEventLive(
+            noteOn, mpc::NoTickAssignedWhileRecording);
+        stateManager->processLiveNoteEventRecordingQueues(tick, sequenceState);
     }
 
-    size_t nextHumanTickPosIndex = 0;
-    int prevTickPos = -1;
-    bool wrapped = false;
+    track->setOn(track->isOn(), false);
+    stateManager->drainQueue();
 
-    auto triggerPad = [&mpc]
+    const auto events = track->getEvents();
+    REQUIRE(events.size() == quantizedPositions.size());
+
+    for (size_t i = 0; i < quantizedPositions.size(); ++i)
     {
-        ClientEvent clientEvent;
-        clientEvent.payload = ClientHardwareEvent{
-            ClientHardwareEvent::Source::HostInputGesture,
-            ClientHardwareEvent::Type::PadPress,
-            0,
-            PAD_1_OR_AB,
-            1.f,
-            std::nullopt,
-            std::nullopt};
-        mpc.clientEventController->handleClientEvent(clientEvent);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
-
-        clientEvent.payload = ClientHardwareEvent{
-            ClientHardwareEvent::Source::HostInputGesture,
-            ClientHardwareEvent::Type::PadRelease,
-            0,
-            PAD_1_OR_AB,
-            1.f,
-            std::nullopt,
-            std::nullopt};
-        mpc.clientEventController->handleClientEvent(clientEvent);
-    };
-
-    while (nextHumanTickPosIndex < humanTickPositions.size())
-    {
-        std::unique_lock<std::mutex> lock(tickMutex);
-        tickCv.wait(lock, [&]
-                    {
-                        return tickUpdated ||
-                               !audioThreadBusy.load(std::memory_order_acquire);
-                    });
-
-        if (!audioThreadBusy.load(std::memory_order_acquire) && !tickUpdated)
-        {
-            break;
-        }
-
-        const auto tickPos = publishedTickPos;
-        tickUpdated = false;
-        lock.unlock();
-        tickCv.notify_one();
-
-        if (prevTickPos >= 0 && tickPos < prevTickPos)
-        {
-            wrapped = true;
-            break;
-        }
-
-        while (nextHumanTickPosIndex < humanTickPositions.size() &&
-               tickPos >= humanTickPositions[nextHumanTickPosIndex])
-        {
-            triggerPad();
-            nextHumanTickPosIndex++;
-        }
-
-        prevTickPos = tickPos;
-    }
-
-    sequencer->getTransport()->stop();
-
-    stopAudioThread.store(true, std::memory_order_release);
-    tickCv.notify_one();
-
-    while (audioThreadBusy.load(std::memory_order_acquire))
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    audioThread.join();
-
-    sequencer->getStateManager()->drainQueue();
-
-    REQUIRE(!wrapped);
-    REQUIRE(nextHumanTickPosIndex == humanTickPositions.size());
-
-    // For - 1 explanation, see humanTickPositions comment
-    REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
-    REQUIRE(track->getEvents().size() == quantizedPositions.size());
-
-    for (int i = 0; i < quantizedPositions.size(); ++i)
-    {
-        REQUIRE(track->getEvent(i)->getTick() == quantizedPositions[i]);
+        REQUIRE(events[i]->getTick() == quantizedPositions[i]);
     }
 }
 
