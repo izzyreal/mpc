@@ -72,11 +72,6 @@ FetchContent_Declare(readerwriterqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
 )
 
-FetchContent_Declare(json
-    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-
 FetchContent_Declare(json-schema-validator
     GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
     GIT_TAG        2.3.0
@@ -106,8 +101,17 @@ target_include_directories(platform_folders INTERFACE
     $<BUILD_INTERFACE:${PlatformFolders_SOURCE_DIR}>
 )
 
-message(STATUS "Downloading json...")
-FetchContent_MakeAvailable(json)
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    FetchContent_Declare(json
+        URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    message(STATUS "Downloading json...")
+    FetchContent_MakeAvailable(json)
+else()
+    message(STATUS "Using preconfigured nlohmann_json target")
+endif()
 
 message(STATUS "Downloading json-schema-validator...")
 FetchContent_MakeAvailable(json-schema-validator)
