@@ -20,9 +20,6 @@ DrumBus::DrumBus(
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse),
       performanceManager(performanceManager)
 {
-    receivePgmChange = true;
-    receiveMidiVolume = true;
-
     auto dispatch = [performanceManager](performance::PerformanceMessage &&m)
     {
         performanceManager.lock()->enqueue(std::move(m));
@@ -102,32 +99,47 @@ ProgramIndex DrumBus::getProgramIndex() const
 
 bool DrumBus::receivesPgmChange() const
 {
-    return receivePgmChange;
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .receivePgmChangeEnabled;
 }
 
 void DrumBus::setReceivePgmChange(const bool b)
 {
-    receivePgmChange = b;
+    auto drum = performanceManager.lock()->getSnapshot().getDrum(drumIndex);
+    drum.receivePgmChangeEnabled = b;
+    performanceManager.lock()->enqueue(performance::UpdateDrumBulk{drum});
 }
 
 bool DrumBus::receivesMidiVolume() const
 {
-    return receiveMidiVolume;
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .receiveMidiVolumeEnabled;
 }
 
 void DrumBus::setReceiveMidiVolume(const bool b)
 {
-    receiveMidiVolume = b;
+    auto drum = performanceManager.lock()->getSnapshot().getDrum(drumIndex);
+    drum.receiveMidiVolumeEnabled = b;
+    performanceManager.lock()->enqueue(performance::UpdateDrumBulk{drum});
 }
 
 int DrumBus::getLastReceivedMidiVolume() const
 {
-    return lastReceivedMidiVolume;
+    return performanceManager.lock()
+        ->getSnapshot()
+        .getDrum(drumIndex)
+        .lastReceivedMidiVolume;
 }
 
 void DrumBus::setLastReceivedMidiVolume(const int volume)
 {
-    lastReceivedMidiVolume = std::clamp(volume, 0, 127);
+    auto drum = performanceManager.lock()->getSnapshot().getDrum(drumIndex);
+    drum.lastReceivedMidiVolume = MidiValue(std::clamp(volume, 0, 127));
+    performanceManager.lock()->enqueue(performance::UpdateDrumBulk{drum});
 }
 
 std::map<int, int> &DrumBus::getSimultA()

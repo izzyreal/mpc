@@ -85,9 +85,6 @@ namespace mpc::sequencer
         std::map<int, int> simultA;
         std::map<int, int> simultB;
 
-        bool receivePgmChange = false;
-        bool receiveMidiVolume = false;
-        int lastReceivedMidiVolume = 127;
     };
 
     class MidiBus final : public Bus

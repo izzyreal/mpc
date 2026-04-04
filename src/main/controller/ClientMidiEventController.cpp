@@ -555,11 +555,34 @@ void ClientMidiEventController::handleProgramChange(
     }
     else
     {
-        if (const auto drumBus = getDrumBusForEvent(e); drumBus)
+        std::optional<ProgramIndex> matchingProgramIndex = std::nullopt;
+
+        const auto targetMidiProgramChange = e.getProgramNumber() + 1;
+
+        for (int i = 0; i < sampler.lock()->getProgramCount(); ++i)
         {
-            if (sampler.lock()->getProgram(e.getProgramNumber())->isUsed())
+            const auto program = sampler.lock()->getProgram(i);
+
+            if (program->isUsed() &&
+                program->getMidiProgramChange() == targetMidiProgramChange)
             {
-                drumBus->setProgramIndex(ProgramIndex(e.getProgramNumber()));
+                matchingProgramIndex = ProgramIndex(i);
+                break;
+            }
+        }
+
+        if (!matchingProgramIndex)
+        {
+            return;
+        }
+
+        for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++i)
+        {
+            const auto drumBus = sequencer.lock()->getDrumBus(DrumBusIndex(i));
+
+            if (drumBus->receivesPgmChange())
+            {
+                drumBus->setProgramIndex(*matchingProgramIndex);
             }
         }
     }

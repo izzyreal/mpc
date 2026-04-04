@@ -223,8 +223,8 @@ namespace mpc::performance
                    Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
             simultaneousNotesB{
                 std::pair{NoDrumNoteAssigned, NoDrumNoteAssigned}};
-        bool receivePgmChangeEnabled = false;
-        bool receiveMidiVolumeEnabled = false;
+        bool receivePgmChangeEnabled = true;
+        bool receiveMidiVolumeEnabled = true;
         MidiValue lastReceivedMidiVolume{MaxMidiValue};
 
         const StereoMixer &
