@@ -19,6 +19,14 @@ ProgramScreen::ProgramScreen(Mpc &mpc, const int layerIndex)
                         {
                             displayProgramName();
                         }});
+    addReactiveBinding({[&]
+                        {
+                            return getProgramOrThrow()->getMidiProgramChange();
+                        },
+                        [&](auto)
+                        {
+                            displayMidiProgramChange();
+                        }});
 }
 
 void ProgramScreen::open()
@@ -56,7 +64,6 @@ void ProgramScreen::turnWheel(const int i)
     {
         const auto program = getProgramOrThrow();
         program->setMidiProgramChange(program->getMidiProgramChange() + i);
-        displayMidiProgramChange();
     }
 }
 
