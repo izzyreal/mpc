@@ -214,3 +214,31 @@ TEST_CASE("Incoming MIDI program change updates all drum buses set to receive",
     REQUIRE(drumBus1->getProgramIndex() == matchingProgramIndex);
     REQUIRE(drumBus2->getProgramIndex() == matchingProgramIndex);
 }
+
+TEST_CASE("Incoming MIDI program change with prog change to seq enabled selects sequence when stopped",
+          "[midi-program-change-input]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    const auto sequencer = mpc.getSequencer();
+    sequencer->getSequence(0)->init(1);
+    sequencer->getSequence(1)->init(1);
+    drain(mpc);
+
+    sequencer->setSelectedSequenceIndex(SequenceIndex(0), false);
+    sequencer->setSelectedTrackIndex(7);
+    drain(mpc);
+
+    const auto midiInputScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::MidiInputScreen>();
+    midiInputScreen->setProgChangeSeq(true);
+
+    auto event = makeProgramChangeEvent(0, 1);
+    mpc.clientEventController->getClientMidiEventController()
+        ->handleClientMidiEvent(event);
+    drain(mpc);
+
+    REQUIRE(sequencer->getSelectedSequenceIndex() == SequenceIndex(1));
+    REQUIRE(sequencer->getSelectedTrackIndex() == TrackIndex(7));
+}

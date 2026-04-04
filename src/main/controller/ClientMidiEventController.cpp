@@ -549,7 +549,8 @@ void ClientMidiEventController::handleProgramChange(
             }
             else
             {
-                sequencer.lock()->setSelectedTrackIndex(e.getProgramNumber());
+                sequencer.lock()->setSelectedSequenceIndex(
+                    SequenceIndex(e.getProgramNumber()), false);
             }
         }
     }
