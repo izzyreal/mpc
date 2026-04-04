@@ -11,7 +11,7 @@ EventData AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     e.type = EventType::ProgramChange;
     e.tick = AllEvent::readTick(bytes);
     e.trackIndex = TrackIndex(bytes[AllEvent::TRACK_OFFSET]);
-    e.programChangeProgramIndex = ProgramIndex(bytes[PROGRAM_OFFSET] + 1);
+    e.programChangeProgramIndex = ProgramIndex(bytes[PROGRAM_OFFSET]);
 
     return e;
 }

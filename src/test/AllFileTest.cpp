@@ -5,6 +5,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
 #include "sequencer/Song.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/AllLoader.hpp"
@@ -17,38 +18,10 @@ using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-// Since we're writing the ALL file to the same directory as a production
-// instance of VMPC2000XL would, we choose a strange name that is unlikely to
-// exist.
-const std::string filename = "SHS4CABHNAXJ9LQ.ALL";
-
-void deleteTestAllFile(const std::shared_ptr<AbstractDisk> &disk)
-{
-    disk->initFiles();
-
-    for (int i = 0; i < disk->getAllFiles().size(); i++)
-    {
-        if (disk->getFileName(i) == filename)
-        {
-            (void)disk->getFile(i)->del();
-            disk->flush();
-            disk->initFiles();
-            break;
-        }
-    }
-}
-
 void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 {
-    const auto disk = mpc.getDisk();
-    const auto f = disk->newFile(filename);
-
     AllParser allParser(mpc);
     auto bytes = allParser.getBytes();
-    f->setFileData(bytes);
-
-    disk->flush();
-    disk->initFiles();
 
     const auto sequencer = mpc.getSequencer();
     const auto stateManager = sequencer->getStateManager();
@@ -63,7 +36,8 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 
     stateManager->drainQueue();
 
-    AllLoader::loadEverythingFromFile(mpc, disk->getFile(filename).get());
+    AllParser reparsed(mpc, bytes);
+    AllLoader::loadEverythingFromAllParser(mpc, reparsed);
 }
 
 TEST_CASE("ALL file song", "[allfile]")
@@ -92,10 +66,6 @@ TEST_CASE("ALL file song", "[allfile]")
     song->setStepRepetitionCount(mpc::SongStepIndex(1), 2);
 
     stateManager->drainQueue();
-
-    auto disk = mpc.getDisk();
-
-    deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
 
@@ -163,10 +133,6 @@ TEST_CASE("ALL file track is on, used and transmits program changes",
 
     stateManager->drainQueue();
 
-    auto disk = mpc.getDisk();
-
-    deleteTestAllFile(disk);
-
     saveAndLoadTestAllFile(mpc);
 
     stateManager->drainQueue();
@@ -206,10 +172,6 @@ TEST_CASE("ALL file note event", "[allfile]")
     tr->getNoteEvents().front()->setVariationValue(mpc::NoteVariationValue(20));
     stateManager->drainQueue();
 
-    auto disk = mpc.getDisk();
-
-    deleteTestAllFile(disk);
-
     saveAndLoadTestAllFile(mpc);
 
     stateManager->drainQueue();
@@ -231,6 +193,43 @@ TEST_CASE("ALL file note event", "[allfile]")
     REQUIRE(noteEvent->getVariationValue() == 20);
 }
 
+TEST_CASE("ALL file program change event", "[allfile]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSequence(0);
+    seq->init(1);
+    stateManager->drainQueue();
+
+    EventData eventData;
+    eventData.type = EventType::ProgramChange;
+    eventData.tick = 96;
+    eventData.programChangeProgramIndex = mpc::ProgramIndex(7);
+
+    seq->getTrack(63)->acquireAndInsertEvent(eventData);
+    stateManager->drainQueue();
+
+    saveAndLoadTestAllFile(mpc);
+
+    stateManager->drainQueue();
+
+    REQUIRE(sequencer->getUsedSequenceCount() == 1);
+
+    auto seq1 = sequencer->getSelectedSequence();
+    REQUIRE(seq1);
+    auto tr1 = seq1->getTrack(63);
+    REQUIRE(tr1);
+    auto event1 = tr1->getEvent(0);
+    REQUIRE(event1);
+    REQUIRE(event1->getTypeName() == "program-change");
+    auto programChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event1);
+    REQUIRE(programChangeEvent);
+    REQUIRE(programChangeEvent->getTick() == 96);
+    REQUIRE(programChangeEvent->getProgram() == 7);
+}
+
 TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
 {
     mpc::Mpc mpc;
@@ -247,10 +246,6 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
     seq->getTrack(63)->setDeviceIndex(4);
 
     stateManager->drainQueue();
-
-    auto disk = mpc.getDisk();
-
-    deleteTestAllFile(disk);
 
     saveAndLoadTestAllFile(mpc);
 

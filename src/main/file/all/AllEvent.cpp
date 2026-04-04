@@ -29,7 +29,7 @@ EventData AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
             case CONTROL_CHANGE_ID:
                 return AllControlChangeEvent::bytesToMpcEvent(bytes);
             case PGM_CHANGE_ID:
-                return AllPolyPressureEvent::bytesToMpcEvent(bytes);
+                return AllProgramChangeEvent::bytesToMpcEvent(bytes);
             case CH_PRESSURE_ID:
                 return AllChannelPressureEvent::bytesToMpcEvent(bytes);
             case PITCH_BEND_ID:
