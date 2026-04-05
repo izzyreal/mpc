@@ -9,9 +9,64 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
+namespace
+{
+BusType clampToDrumBusType(const BusType busType)
+{
+    const auto asInt = std::clamp(static_cast<int>(busType),
+                                  static_cast<int>(BusType::DRUM1),
+                                  static_cast<int>(BusType::DRUM4));
+    return static_cast<BusType>(asInt);
+}
+} // namespace
+
 DrumScreen::DrumScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "drum", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return drum;
+                        },
+                        [&](auto)
+                        {
+                            displayDrum();
+                            displayPgm();
+                            displayPgmChange();
+                            displayMidiVolume();
+                            displayCurrentVal();
+                        }});
+    addReactiveBinding({[&]
+                        {
+                            return getActiveDrumBus()->getProgramIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayPgm();
+                        }});
+    addReactiveBinding({[&]
+                        {
+                            return getActiveDrumBus()->receivesPgmChange();
+                        },
+                        [&](auto)
+                        {
+                            displayPgmChange();
+                        }});
+    addReactiveBinding({[&]
+                        {
+                            return getActiveDrumBus()->receivesMidiVolume();
+                        },
+                        [&](auto)
+                        {
+                            displayMidiVolume();
+                        }});
+    addReactiveBinding({[&]
+                        {
+                            return getActiveDrumBus()->getLastReceivedMidiVolume();
+                        },
+                        [&](auto)
+                        {
+                            displayCurrentVal();
+                        }});
 }
 
 void DrumScreen::open()
@@ -56,29 +111,31 @@ void DrumScreen::turnWheel(const int i)
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "drum")
     {
-        setDrum(drum + i);
+        setDrum(clampToDrumBusType(drum + i));
     }
     else if (focusedFieldName == "pgm")
     {
-        getActiveDrumBus()->setProgramIndex(
-            getActiveDrumBus()->getProgramIndex() + i);
-        displayPgm();
+        const auto current = getActiveDrumBus()->getProgramIndex();
+        const auto candidate = current + i;
+
+        if (candidate >= MinProgramIndex &&
+            candidate < sampler.lock()->getProgramCount())
+        {
+            getActiveDrumBus()->setProgramIndex(candidate);
+        }
     }
     else if (focusedFieldName == "program-change")
     {
         getActiveDrumBus()->setReceivePgmChange(i > 0);
-        displayPgmChange();
     }
     else if (focusedFieldName == "midi-volume")
     {
         getActiveDrumBus()->setReceiveMidiVolume(i > 0);
-        displayMidiVolume();
     }
     else if (focusedFieldName == "current-val")
     {
         getActiveDrumBus()->setLastReceivedMidiVolume(
             getActiveDrumBus()->getLastReceivedMidiVolume() + i);
-        displayCurrentVal();
     }
     else if (focusedFieldName == "padtointernalsound")
     {
@@ -94,7 +151,8 @@ void DrumScreen::displayCurrentVal() const
 
 void DrumScreen::displayDrum() const
 {
-    findField("drum")->setText(busTypeToString(drum));
+    findField("drum")
+        ->setText(std::to_string(drumBusTypeToDrumIndex(drum) + 1));
 }
 
 void DrumScreen::displayPadToInternalSound() const
@@ -136,15 +194,7 @@ void DrumScreen::setPadToIntSound(const bool b)
 
 void DrumScreen::setDrum(const BusType drumBusType)
 {
-    assert(isDrumBusType(drumBusType));
-
-    drum = drumBusType;
-
-    displayDrum();
-    displayPgm();
-    displayPgmChange();
-    displayMidiVolume();
-    displayCurrentVal();
+    drum = clampToDrumBusType(drumBusType);
 }
 
 BusType DrumScreen::getDrum() const
