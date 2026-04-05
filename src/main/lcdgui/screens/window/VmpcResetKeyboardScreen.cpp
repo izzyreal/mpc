@@ -1,6 +1,7 @@
 #include "VmpcResetKeyboardScreen.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
+#include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -19,9 +20,10 @@ void VmpcResetKeyboardScreen::function(const int i)
             openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         case 4:
-            mpc.clientEventController->getKeyboardBindings()
+            ls.lock()->closeCurrentScreen();
+            std::dynamic_pointer_cast<screens::VmpcKeyboardScreen>(
+                ls.lock()->getCurrentScreen())
                 ->initializeDefaults();
-            openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         default:;
     }

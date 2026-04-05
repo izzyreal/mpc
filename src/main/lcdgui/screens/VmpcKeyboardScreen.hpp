@@ -27,6 +27,7 @@ namespace mpc::lcdgui::screens
         void setLearnCandidate(int platformKeyCode);
 
         bool hasMappingChanged() const;
+        void initializeDefaults();
 
     private:
         int row = 0;

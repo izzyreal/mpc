@@ -155,6 +155,12 @@ bool VmpcKeyboardScreen::hasMappingChanged() const
     return !inMemoryBindings->isSameAs(bindings->getKeyboardBindingsData());
 }
 
+void VmpcKeyboardScreen::initializeDefaults()
+{
+    bindings->initializeDefaults();
+    updateRows();
+}
+
 void VmpcKeyboardScreen::function(const int i)
 {
     switch (i)
