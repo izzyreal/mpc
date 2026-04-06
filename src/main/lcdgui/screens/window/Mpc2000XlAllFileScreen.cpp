@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceFromAllScreen.hpp"
