@@ -14,6 +14,7 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
