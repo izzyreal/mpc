@@ -5,6 +5,7 @@
 
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceFromAllScreen.hpp"
+#include "lcdgui/screens/window/SaveAllFileScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
@@ -42,11 +43,14 @@ void Mpc2000XlAllFileScreen::function(const int i)
             break;
         case 4:
         {
-            auto on_success = [&]
+            const auto selectedFile = loadScreen->getSelectedFile();
+            auto on_success = [&, selectedFile]
             {
+                mpc.screens->get<ScreenId::SaveAllFileScreen>()->setFileName(
+                    selectedFile->getNameWithoutExtension());
                 openScreenById(ScreenId::LoadScreen);
             };
-            mpc.getDisk()->readAll2(loadScreen->getSelectedFile(), on_success);
+            mpc.getDisk()->readAll2(selectedFile, on_success);
             break;
         }
         default:;
