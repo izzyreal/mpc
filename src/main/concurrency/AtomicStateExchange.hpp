@@ -32,7 +32,6 @@ namespace mpc::concurrency
             }
 
             currentSnapshot.store(&pool[0], std::memory_order_relaxed);
-            writeBuffer = &pool[1];
         }
 
     public:
@@ -120,7 +119,6 @@ namespace mpc::concurrency
         State activeState;
         std::array<State, PoolSize> pool;
         std::atomic<State *> currentSnapshot{nullptr};
-        State *writeBuffer;
         size_t writeIndex = 1;
 
         std::vector<utils::SimpleAction> actions;
@@ -148,7 +146,6 @@ namespace mpc::concurrency
             currentSnapshot.store(dst, std::memory_order_release);
 
             writeIndex = nextIndex;
-            writeBuffer = dst;
         }
 
     private:
