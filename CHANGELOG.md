@@ -1,3 +1,13 @@
+## v0.9.4 (12-4-2026)
+* Safer file operations. No crashing when required or expected files do not exist.
+* Fix ALL file program change read bug.
+* Fix program change to select sequence.
+* Implement program change to select program.
+* Fix DRUM screen issues.
+* Fix keyboard mapping persistence.
+* Remember loaded ALL file name for SAVE screen.
+* [iOS] Fix recording manager play button state.
+
 ## v0.9.3 (8-3-2026)
 * Fix running of iOS version on macOS.
 * Fix out-of-range values in step editor events.
