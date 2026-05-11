@@ -1,3 +1,8 @@
+## v0.9.5 (11-5-2026)
+* Fix pressing pads to select notes to mute in the Mute Assign window.
+* Fix pad-note assignment. Users who rely on custom pad-note mappings may have noticed that this was broken since v0.9 was released. It should now work as intended again.
+* Fix iOS file import (was broken since v0.9.4).
+
 ## v0.9.4 (12-4-2026)
 * Safer file operations. No crashing when required or expected files do not exist.
 * Fix ALL file program change read bug.
