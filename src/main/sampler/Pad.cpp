@@ -49,11 +49,11 @@ std::vector<mpc::DrumNoteNumber> &Pad::getPadNotes(const Mpc &mpcToUse)
         // It is simply a collection of ascending note numbers from 35 to 98.
         static std::vector<DrumNoteNumber> vmpcPadNotes;
 
-        if (vmpcPadNotes.size() == 0)
+        if (vmpcPadNotes.empty())
         {
             for (int8_t i = MinDrumNoteNumber; i <= MaxDrumNoteNumber; i++)
             {
-                vmpcPadNotes.push_back(DrumNoteNumber(i));
+                vmpcPadNotes.emplace_back(i);
             }
         }
 
@@ -62,28 +62,30 @@ std::vector<mpc::DrumNoteNumber> &Pad::getPadNotes(const Mpc &mpcToUse)
     return originalPadNotes;
 }
 
-Pad::Pad(Mpc &mpc, const ProgramPadIndex indexToUse) : mpc(mpc)
+Pad::Pad(
+    Mpc &mpc, const ProgramIndex programIndex, const ProgramPadIndex indexToUse,
+    GetPadFn &getSnapshot,
+    const std::function<void(performance::PerformanceMessage &&)> &dispatch)
+    : programIndex(programIndex), getSnapshot(std::move(getSnapshot)), dispatch(dispatch),
+      mpc(mpc), index(indexToUse)
 {
-    index = indexToUse;
-    note = getPadNotes(mpc)[indexToUse];
 }
 
-void Pad::setNote(const DrumNoteNumber i)
+void Pad::setNote(const DrumNoteNumber note) const
 {
-    if (i < NoDrumNoteAssigned || i > MaxDrumNoteNumber)
-    {
-        return;
-    }
-
     if (const auto pgmAssignScreen =
             mpc.screens->get<ScreenId::PgmAssignScreen>();
         pgmAssignScreen->isPadAssignMaster())
     {
-        (*mpc.getSampler()->getMasterPadAssign())[index] = i;
+        (*mpc.getSampler()->getMasterPadAssign())[index] = note;
     }
     else
     {
-        note = i;
+        performance::SetPadNote msg;
+        msg.programIndex = programIndex;
+        msg.programPadIndex = index;
+        msg.drumNoteNumber = note;
+        dispatch(performance::PerformanceMessage{msg});
     }
 }
 
@@ -96,7 +98,7 @@ mpc::DrumNoteNumber Pad::getNote() const
         return (*mpc.getSampler()->getMasterPadAssign())[index];
     }
 
-    return note;
+    return getSnapshot().note;
 }
 
 mpc::ProgramPadIndex Pad::getIndex() const

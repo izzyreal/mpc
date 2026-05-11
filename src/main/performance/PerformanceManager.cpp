@@ -340,6 +340,12 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
             auto &noteParameters = p.noteParameters[noteParametersIndex];
             noteParameters = m.snapshot;
         },
+        [&](const SetPadNote &m)
+        {
+            auto &p = activeState.programs[m.programIndex];
+            auto &pad = p.pads[m.programPadIndex];
+            pad.note = m.drumNoteNumber;
+        },
         [&](const PhysicalPadPressEvent &m)
         {
             activeState.physicalPadEvents.push_back(m);

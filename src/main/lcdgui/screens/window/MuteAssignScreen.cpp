@@ -14,31 +14,39 @@ void MuteAssignScreen::open()
 {
     if (isReactiveBindingsEmpty())
     {
-        auto getSelectedNote = [this]
+        auto getDrumNoteToEditParameters = [this]
         {
-            return this->mpc.clientEventController->getSelectedNote();
+            return getProgramOrThrow()->getNoteParameters(drumNoteToEdit);
         };
-
-        auto getSelectedNoteParameters = [this, getSelectedNote]
-        {
-            return getProgramOrThrow()->getNoteParameters(getSelectedNote());
-        };
-
-        addReactiveBinding({[getSelectedNote]
-                            {
-                                return getSelectedNote();
-                            },
-                            [this](auto)
-                            {
-                                displayNote();
-                                displayNote0();
-                                displayNote1();
-                            }});
 
         addReactiveBinding(
-            {[getSelectedNoteParameters]
+            {[this]
              {
-                 return getSelectedNoteParameters()->getMuteAssignA();
+                 return mpc.clientEventController->getSelectedNote();
+             },
+             [this, getDrumNoteToEditParameters](const auto note)
+             {
+                 if (const auto focus = getFocusedFieldNameOrThrow();
+                     focus == "note")
+                 {
+                     drumNoteToEdit =
+                         std::clamp(note, MinDrumNoteNumber, MaxDrumNoteNumber);
+                     displayNote();
+                 }
+                 else if (focus == "note0")
+                 {
+                     getDrumNoteToEditParameters()->setMuteAssignA(note);
+                 }
+                 else if (focus == "note1")
+                 {
+                     getDrumNoteToEditParameters()->setMuteAssignB(note);
+                 }
+             }});
+
+        addReactiveBinding(
+            {[getDrumNoteToEditParameters]
+             {
+                 return getDrumNoteToEditParameters()->getMuteAssignA();
              },
              [this](auto)
              {
@@ -46,15 +54,18 @@ void MuteAssignScreen::open()
              }});
 
         addReactiveBinding(
-            {[getSelectedNoteParameters]
+            {[getDrumNoteToEditParameters]
              {
-                 return getSelectedNoteParameters()->getMuteAssignB();
+                 return getDrumNoteToEditParameters()->getMuteAssignB();
              },
              [this](auto)
              {
                  displayNote1();
              }});
     }
+
+    drumNoteToEdit = mpc.clientEventController->getSelectedNote();
+
     displayNote();
     displayNote0();
     displayNote1();
@@ -63,44 +74,40 @@ void MuteAssignScreen::open()
 void MuteAssignScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(
-        mpc.clientEventController->getSelectedNote());
+    const auto noteParameters = program->getNoteParameters(drumNoteToEdit);
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "note")
     {
-        mpc.clientEventController->setSelectedNote(
-            mpc.clientEventController->getSelectedNote() + i);
+        mpc.clientEventController->setSelectedNote(drumNoteToEdit + i);
     }
     else if (focusedFieldName == "note0")
     {
-        selectedNoteParameters->setMuteAssignA(
-            selectedNoteParameters->getMuteAssignA() + i);
+        noteParameters->setMuteAssignA(noteParameters->getMuteAssignA() + i);
     }
     else if (focusedFieldName == "note1")
     {
-        selectedNoteParameters->setMuteAssignB(
-            selectedNoteParameters->getMuteAssignB() + i);
+        noteParameters->setMuteAssignB(noteParameters->getMuteAssignB() + i);
     }
 }
 
 void MuteAssignScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
-    const auto selectedNote = mpc.clientEventController->getSelectedNote();
-    const auto pad = program->getPadIndexFromNote(selectedNote);
+
+    const auto pad = program->getPadIndexFromNote(drumNoteToEdit);
     std::string soundName = "OFF";
 
     const auto padName = sampler.lock()->getPadName(pad);
     const auto sound =
-        program->getNoteParameters(selectedNote)->getSoundIndex();
+        program->getNoteParameters(drumNoteToEdit)->getSoundIndex();
 
     if (sound != -1)
     {
         soundName = sampler.lock()->getSoundName(sound);
     }
 
-    findField("note")->setText(std::to_string(selectedNote) + "/" + padName +
+    findField("note")->setText(std::to_string(drumNoteToEdit) + "/" + padName +
                                "-" + soundName);
 }
 
@@ -108,9 +115,8 @@ void MuteAssignScreen::displayNote0() const
 {
     const auto program = getProgramOrThrow();
 
-    const auto selectedNoteParameters = program->getNoteParameters(
-        mpc.clientEventController->getSelectedNote());
-    const auto note0 = selectedNoteParameters->getMuteAssignA();
+    const auto noteParameters = program->getNoteParameters(drumNoteToEdit);
+    const auto note0 = noteParameters->getMuteAssignA();
 
     if (note0 == NoDrumNoteAssigned)
     {
@@ -135,9 +141,8 @@ void MuteAssignScreen::displayNote0() const
 void MuteAssignScreen::displayNote1() const
 {
     const auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(
-        mpc.clientEventController->getSelectedNote());
-    const auto note1 = selectedNoteParameters->getMuteAssignB();
+    const auto noteParameters = program->getNoteParameters(drumNoteToEdit);
+    const auto note1 = noteParameters->getMuteAssignB();
 
     if (note1 == NoDrumNoteAssigned)
     {

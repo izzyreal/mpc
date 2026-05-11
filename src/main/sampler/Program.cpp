@@ -44,7 +44,14 @@ Program::Program(
 
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        auto p = new Pad(mpc, ProgramPadIndex(i));
+        GetPadFn getPadSnapshot(
+            [this, programIndex, programPadIndex = ProgramPadIndex(i)]
+            {
+                return this->getSnapshot(programIndex).getPad(programPadIndex);
+            });
+
+        auto p = new Pad(mpc, programIndex, ProgramPadIndex(i), getPadSnapshot,
+                         dispatch);
         pads.push_back(p);
     }
 }

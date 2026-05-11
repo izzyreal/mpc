@@ -2,7 +2,12 @@
 
 #include "IntTypes.hpp"
 
+#include "performance/PerformanceMessage.hpp"
+
+#include "utils/SmallFn.hpp"
+
 #include <vector>
+#include <functional>
 
 namespace mpc
 {
@@ -11,12 +16,16 @@ namespace mpc
 
 namespace mpc::sampler
 {
+    using GetPadFn = utils::SmallFn<16, performance::Pad()>;
+
     class Pad
     {
     public:
-        Pad(Mpc &, ProgramPadIndex);
+        Pad(Mpc &, ProgramIndex, ProgramPadIndex, GetPadFn &getSnapshot,
+            const std::function<void(performance::PerformanceMessage &&)>
+                &dispatch);
 
-        void setNote(DrumNoteNumber);
+        void setNote(DrumNoteNumber) const;
         DrumNoteNumber getNote() const;
         ProgramPadIndex getIndex() const;
 
@@ -24,8 +33,10 @@ namespace mpc::sampler
 
     private:
         static std::vector<DrumNoteNumber> originalPadNotes;
+        const ProgramIndex programIndex;
+        const GetPadFn getSnapshot;
+        const std::function<void(performance::PerformanceMessage &&)> dispatch;
         Mpc &mpc;
-        DrumNoteNumber note = NoDrumNoteAssigned;
         ProgramPadIndex index{0};
     };
 } // namespace mpc::sampler

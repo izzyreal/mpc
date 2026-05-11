@@ -300,7 +300,10 @@ void ClientHardwareEventController::handlePadPress(
         [clientEventController =
              mpc.clientEventController](const DrumNoteNumber n)
         {
-            clientEventController->setSelectedNote(n);
+            if (n != NoDrumNoteAssigned)
+            {
+                clientEventController->setSelectedNote(n);
+            }
         },
         screen->isFocusedFieldName("fromnote")};
 

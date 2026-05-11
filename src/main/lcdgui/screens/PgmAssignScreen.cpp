@@ -85,6 +85,15 @@ void PgmAssignScreen::open()
                                 displayPadAndNoteParameters();
                             }});
 
+        addReactiveBinding({[getSelectedPadIndex]
+                            {
+                                return getSelectedPadIndex();
+                            },
+                            [displayPadAndNoteParameters](auto)
+                            {
+                                displayPadAndNoteParameters();
+                            }});
+
         addReactiveBinding({[this]
                             {
                                 return getActiveDrumBus()->getProgramIndex();
@@ -419,7 +428,7 @@ void PgmAssignScreen::displayPadNote() const
     const auto selectedPad =
         program->getPad(mpc.clientEventController->getSelectedPad());
 
-    if (selectedPad->getNote() == 34)
+    if (selectedPad->getNote() == NoDrumNoteAssigned)
     {
         findField("pad-note")->setText("--");
     }
@@ -515,7 +524,7 @@ void PgmAssignScreen::displayOptionalNoteA() const
         mpc.clientEventController->getSelectedNote());
     const auto noteIntA = selectedNoteParameters->getOptionalNoteA();
     const auto padIntA = program->getPadIndexFromNote(noteIntA);
-    const auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
+    const auto noteA = noteIntA != NoDrumNoteAssigned ? std::to_string(noteIntA) : "--";
     const auto padA = sampler.lock()->getPadName(padIntA);
     findField("optional-note-a")->setText(noteA + "/" + padA);
 }
@@ -527,7 +536,7 @@ void PgmAssignScreen::displayOptionalNoteB() const
         mpc.clientEventController->getSelectedNote());
     const auto noteIntB = selectedNoteParameters->getOptionalNoteB();
     const auto padIntB = program->getPadIndexFromNote(noteIntB);
-    const auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
+    const auto noteB = noteIntB != NoDrumNoteAssigned ? std::to_string(noteIntB) : "--";
     const auto padB = sampler.lock()->getPadName(padIntB);
     findField("optional-note-b")->setText(noteB + "/" + padB);
 }

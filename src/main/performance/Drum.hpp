@@ -189,6 +189,11 @@ namespace mpc::performance
             return noteParameters[noteNumber.get() - MinDrumNoteNumber.get()];
         }
 
+        Pad getPad(const ProgramPadIndex programPadIndex) const
+        {
+            return pads[programPadIndex];
+        }
+
         void resetValuesToDefaults()
         {
             used = false;

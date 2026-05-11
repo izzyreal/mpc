@@ -137,6 +137,13 @@ namespace mpc::performance
         Drum drum{};
     };
 
+    struct SetPadNote
+    {
+        ProgramIndex programIndex{};
+        ProgramPadIndex programPadIndex{};
+        DrumNoteNumber drumNoteNumber{};
+    };
+
     struct ActivateQuantizedLock
     {
     };
@@ -150,5 +157,5 @@ namespace mpc::performance
         DeleteSoundAndReindex, AddProgramSound, UpdateProgramBulk,
         UpdateProgramMidiProgramChange, SetProgramUsed, RepairProgramReferences,
         UpdateDrumBulk, UpdateNoteParametersBySnapshot, ActivateQuantizedLock,
-        UpdateAllNoteParametersBulk>;
+        UpdateAllNoteParametersBulk, SetPadNote>;
 } // namespace mpc::performance

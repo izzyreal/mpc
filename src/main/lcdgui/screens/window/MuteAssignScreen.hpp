@@ -11,6 +11,7 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
+        DrumNoteNumber drumNoteToEdit{MinDrumNoteNumber};
         void displayNote() const;
         void displayNote0() const;
         void displayNote1() const;

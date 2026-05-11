@@ -315,6 +315,13 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
         {
             p->setUsed();
 
+            const auto &padNotes = Pad::getPadNotes(mpc);
+
+            for (int8_t padIndex = 0; padIndex < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; ++padIndex)
+            {
+                p->getPad(padIndex)->setNote(padNotes[padIndex]);
+            }
+
             if (repairDrumPrograms)
             {
                 for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
@@ -329,7 +336,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
         }
     }
 
-    return std::weak_ptr<Program>();
+    return {};
 }
 
 void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
