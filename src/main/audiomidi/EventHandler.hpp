@@ -39,7 +39,8 @@ namespace mpc::audiomidi
         void
         handleUnfinalizedNoteOn(const sequencer::EventData &,
                                 std::optional<int> trackDevice,
-                                std::optional<sequencer::BusType> drumBusType);
+                                std::optional<sequencer::BusType> drumBusType,
+                                int frameOffset = 0);
 
         void handleNoteOffFromUnfinalizedNoteOn(NoteNumber,
                                                 std::optional<int> trackDevice,

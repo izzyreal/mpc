@@ -1,9 +1,10 @@
-#include "PreviewSoundPlayer.hpp"
+#include "BasicSoundPlayer.hpp"
 
 #include "Voice.hpp"
 
 #include "sampler/Sampler.hpp"
 #include "FaderControl.hpp"
+#include "engine/MixerConstants.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 #include <utility>
 
@@ -11,18 +12,18 @@ using namespace mpc::sampler;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
 
-PreviewSoundPlayer::PreviewSoundPlayer(std::shared_ptr<Sampler> samplerToUse,
+BasicSoundPlayer::BasicSoundPlayer(std::shared_ptr<Sampler> samplerToUse,
                                        std::shared_ptr<AudioMixer> mixerToUse,
                                        std::shared_ptr<Voice> voiceToUse)
     : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
       voice(std::move(voiceToUse))
 {
-    auto sc = mixer->getMixerControls()->getStripControls("65");
+    auto sc = mixer->getMixerControls()->getStripControls(PreviewSoundPlayerStrip);
     auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     fader = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
 }
 
-void PreviewSoundPlayer::playSound(int soundNumber, int velocity,
+void BasicSoundPlayer::playSound(int soundNumber, int velocity,
                                    int frameOffset)
 {
     if (velocity == 0)
@@ -66,13 +67,13 @@ void PreviewSoundPlayer::playSound(int soundNumber, int velocity,
                 mixer->getSharedBuffer()->getSampleRate(), 1, NoProgramIndex);
 }
 
-void PreviewSoundPlayer::finishVoice() const
+void BasicSoundPlayer::finishVoice() const
 {
     voice->finish(); // stops voice immediately, without a short fade-out/decay
                      // time
 }
 
-void PreviewSoundPlayer::finishVoiceIfSoundIsLooping() const
+void BasicSoundPlayer::finishVoiceIfSoundIsLooping() const
 {
     if (!soundHasLoop)
     {
@@ -82,7 +83,7 @@ void PreviewSoundPlayer::finishVoiceIfSoundIsLooping() const
     voice->startDecay();
 }
 
-void PreviewSoundPlayer::connectVoice() const
+void BasicSoundPlayer::connectVoice() const
 {
-    mixer->getStrip("65")->setInputProcess(voice);
+    mixer->getStrip(PreviewSoundPlayerStrip)->setInputProcess(voice);
 }

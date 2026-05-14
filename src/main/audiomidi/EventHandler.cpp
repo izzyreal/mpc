@@ -288,7 +288,8 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
 
 void EventHandler::handleUnfinalizedNoteOn(
     const EventData &noteOnEvent, const std::optional<int> trackDevice,
-    const std::optional<BusType> drumBusType)
+    const std::optional<BusType> drumBusType,
+    const int frameOffset)
 {
     assert(noteOnEvent.type == sequencer::EventType::NoteOn &&
            noteOnEvent.duration == NoDuration);
@@ -311,7 +312,7 @@ void EventHandler::handleUnfinalizedNoteOn(
             &mpc.getEngineHost()->getVoices(),
             mpc.getEngineHost()->getMixerConnections(), note,
             noteOnEvent.velocity, noteOnEvent.noteVariationType,
-            noteOnEvent.noteVariationValue, 0, true, -1, -1);
+            noteOnEvent.noteVariationValue, frameOffset, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
     }
