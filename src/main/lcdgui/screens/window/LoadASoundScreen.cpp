@@ -9,7 +9,7 @@
 
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/BasicSoundPlayer.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"

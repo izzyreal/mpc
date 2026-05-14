@@ -6,7 +6,7 @@
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "controller/ClientEventController.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/BasicSoundPlayer.hpp"
 #include "performance/EventTypes.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Component.hpp"

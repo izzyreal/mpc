@@ -53,7 +53,7 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
-    PreviewSoundPlayer *previewSoundPlayer)
+    BasicSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
       performanceManager(performanceManager), midiInputScreen(midiInputScreen),

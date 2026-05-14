@@ -18,12 +18,13 @@
 #include "controller/ClientMidiEventController.hpp"
 #include "controller/ClientExtendedMidiController.hpp"
 
+#include "engine/MixerConstants.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
 #include "engine/MixerInterconnection.hpp"
 #include "engine/FaderControl.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/BasicSoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "engine/audio/server/RealTimeAudioServer.hpp"
 #include "engine/audio/server/CompoundAudioClient.hpp"
@@ -103,15 +104,15 @@ void EngineHost::start()
 
     initializeDiskRecorders();
 
-    mixer->getStrip(std::string("66"))->setDirectOutputProcess(soundRecorder);
-    mixer->getStrip(std::string("67"))->setInputProcess(soundPlayer);
-    const auto sc = mixer->getMixerControls()->getStripControls("67");
+    mixer->getStrip(std::string(SoundRecorderInputStrip))->setDirectOutputProcess(soundRecorder);
+    mixer->getStrip(std::string(QuickPreviewStrip))->setInputProcess(soundPlayer);
+    const auto sc = mixer->getMixerControls()->getStripControls(QuickPreviewStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(100));
 
-    mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
+    mixer->getStrip(SoundRecorderInputStrip)->setInputProcess(monitorInputAdapter);
 
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
         mpc.getEventHandler().get(), mpc.getSequencer(), mpc.getSampler(),
@@ -197,7 +198,7 @@ void EngineHost::prepareProcessBlock(const int nFrames)
 
 void EngineHost::setMonitorLevel(const int8_t level) const
 {
-    const auto sc = mixer->getMixerControls()->getStripControls("66");
+    const auto sc = mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
@@ -206,7 +207,7 @@ void EngineHost::setMonitorLevel(const int8_t level) const
 
 void EngineHost::muteMonitor(const bool mute) const
 {
-    const auto sc = mixer->getMixerControls()->getStripControls("66");
+    const auto sc = mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     const auto mc =
@@ -247,13 +248,11 @@ void EngineHost::setupMixer()
      * There are 32 voices. Each voice has one channel for mixing to STEREO OUT
      * L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are
      * strips 1-64. There's one channel for the PreviewSoundPlayer, which plays
-     * the metronome, preview and playX sounds. This is strip 65. Finally,
-     * there's one channel to receive and monitor sampler input, this is strip
-     * 66, and one for playing quick previews, on strip 67. Hence, nMixerChans =
-     * 67
+     * the preview and playX sounds. This is strip 65. Finally, there's one
+     * channel to receive and monitor sampler input, which is strip
+     * 66, one for playing quick previews, strip 67, and a metronome strip, 68.
      */
-    constexpr int nMixerChans = 67;
-    MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
+    MixerControlsFactory::createChannelStrips(mixerControls, TotalMixerStripCount);
     mixer = std::make_shared<AudioMixer>(mixerControls, nonRealTimeAudioServer);
     muteMonitor(true);
     setAssignableMixOutLevels();
@@ -305,22 +304,31 @@ void EngineHost::setAssignableMixOutLevels() const
     }
 }
 
-std::shared_ptr<PreviewSoundPlayer> EngineHost::getPreviewSoundPlayer() const
+std::shared_ptr<BasicSoundPlayer> EngineHost::getPreviewSoundPlayer() const
 {
     return previewSoundPlayer;
 }
 
+std::shared_ptr<BasicSoundPlayer> EngineHost::getMetronomePlayer() const
+{
+    return metronomePlayer;
+}
+
 void EngineHost::createSynth()
 {
-    basicVoice = std::make_shared<Voice>(65, true);
+    previewSoundPlayerVoice = std::make_shared<Voice>(PreviewSoundPlayerStripIndex, true);
+    metronomeVoice = std::make_shared<Voice>(MetronomeStripIndex, true);
 
     for (int i = 0; i < 32; i++)
     {
         voices.emplace_back(std::make_shared<Voice>(i + 1, false));
     }
 
-    previewSoundPlayer = std::make_shared<PreviewSoundPlayer>(
-        mpc.getSampler(), mixer, basicVoice);
+    previewSoundPlayer = std::make_shared<BasicSoundPlayer>(
+        mpc.getSampler(), mixer, previewSoundPlayerVoice);
+
+    metronomePlayer = std::make_shared<BasicSoundPlayer>(
+        mpc.getSampler(), mixer, metronomeVoice);
 }
 
 void EngineHost::connectVoices()
@@ -339,6 +347,7 @@ void EngineHost::connectVoices()
     }
 
     previewSoundPlayer->connectVoice();
+    metronomePlayer->connectVoice();
 }
 
 void EngineHost::initializeDiskRecorders()

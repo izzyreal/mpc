@@ -18,7 +18,7 @@
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
-#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/BasicSoundPlayer.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
@@ -33,6 +33,7 @@
 #include <samplerate.h>
 
 #include "Logger.hpp"
+#include "audiomidi/EventHandler.hpp"
 #include "performance/PerformanceManager.hpp"
 
 using namespace mpc::lcdgui;
@@ -234,14 +235,19 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
 
     if (metronomeSoundScreen->getSound() == 0)
     {
+        const auto output = metronomeSoundScreen->getOutput();
+
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
-        mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
+
+        mpc.getEngineHost()->getMetronomePlayer()->playSound(
             CLICK_SOUND, velocity, framePos);
+
         return;
     }
 
-    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(
-        busIndexToBusType(metronomeSoundScreen->getSound()));
+    const auto drumBusIndex = metronomeSoundScreen->getSound() - 1;
+    const auto busType = drumBusIndexToDrumBusType(drumBusIndex);
+    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(busType);
 
     assert(drumBus);
 
@@ -254,10 +260,36 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
                             : metronomeSoundScreen->getNormalPad();
     const auto note =
         programs[programIndex]->getNoteFromPad(ProgramPadIndex(pad));
-    const auto soundNumber =
-        programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(soundNumber,
-                                                            velocity, framePos);
+
+    EventData noteOnEvent;
+    noteOnEvent.type = EventType::NoteOn;
+    noteOnEvent.noteNumber = note;
+    noteOnEvent.velocity = Velocity(velocity);
+
+    constexpr auto noTrackDevice = std::nullopt;
+
+    mpc.getEventHandler()->handleUnfinalizedNoteOn(
+        noteOnEvent,
+        noTrackDevice,
+        busType,
+        framePos);
+
+    concurrency::SamplePreciseTask noteOffTask;
+
+    noteOffTask.f.set([note, eventHandler = mpc.getEventHandler(), drumBusIndex](const int /*frameOffset*/)
+    {
+        constexpr auto noTrackDevice2 = std::nullopt;
+        eventHandler->handleNoteOffFromUnfinalizedNoteOn(
+            note,
+            noTrackDevice2,
+            std::optional<DrumBusIndex>(drumBusIndex));
+    });
+
+    // TODO What kind of duration does the real 2000XL use?
+    noteOffTask.nFrames = 10000;
+    noteOffTask.noteOff = true;
+
+    mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(noteOffTask);
 }
 
 void Sampler::playPreviewSample(const int start, const int end,

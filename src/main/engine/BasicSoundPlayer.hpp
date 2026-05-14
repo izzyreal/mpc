@@ -14,7 +14,7 @@ namespace mpc::engine
 {
     class Voice;
 
-    class PreviewSoundPlayer final
+    class BasicSoundPlayer final
     {
 
         std::shared_ptr<sampler::Sampler> sampler;
@@ -26,8 +26,8 @@ namespace mpc::engine
 
         bool soundHasLoop = false;
 
-        PreviewSoundPlayer(const PreviewSoundPlayer &other) = delete;
-        PreviewSoundPlayer &operator=(const PreviewSoundPlayer &other) = delete;
+        BasicSoundPlayer(const BasicSoundPlayer &other) = delete;
+        BasicSoundPlayer &operator=(const BasicSoundPlayer &other) = delete;
 
     public:
         void finishVoice() const;
@@ -38,7 +38,7 @@ namespace mpc::engine
 
         void connectVoice() const;
 
-        explicit PreviewSoundPlayer(
+        explicit BasicSoundPlayer(
             std::shared_ptr<sampler::Sampler> sampler,
             std::shared_ptr<audio::mixer::AudioMixer> mixer,
             std::shared_ptr<Voice> voice);

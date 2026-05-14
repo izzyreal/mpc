@@ -19,7 +19,7 @@ namespace mpc::engine
     class SequencerPlaybackEngine;
     class Voice;
     class MixerInterconnection;
-    class PreviewSoundPlayer;
+    class BasicSoundPlayer;
 } // namespace mpc::engine
 
 namespace mpc::engine::audio::core
@@ -83,7 +83,8 @@ namespace mpc::engine
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
-        std::shared_ptr<PreviewSoundPlayer> getPreviewSoundPlayer() const;
+        std::shared_ptr<BasicSoundPlayer> getPreviewSoundPlayer() const;
+        std::shared_ptr<BasicSoundPlayer> getMetronomePlayer() const;
         std::shared_ptr<audio::mixer::AudioMixer> getMixer();
         std::vector<std::shared_ptr<Voice>> &getVoices();
         std::vector<MixerInterconnection *> &getMixerConnections();
@@ -139,12 +140,14 @@ namespace mpc::engine
         bool wasRecordingSound = false;
         bool wasBouncing = false;
 
-        std::shared_ptr<PreviewSoundPlayer> previewSoundPlayer;
+        std::shared_ptr<BasicSoundPlayer> previewSoundPlayer;
+        std::shared_ptr<BasicSoundPlayer> metronomePlayer;
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
         std::vector<std::shared_ptr<Voice>> voices;
         std::vector<MixerInterconnection *> mixerConnections;
-        std::shared_ptr<Voice> basicVoice;
+        std::shared_ptr<Voice> previewSoundPlayerVoice;
+        std::shared_ptr<Voice> metronomeVoice;
         std::shared_ptr<RealTimeAudioServer> realTimeAudioServer;
         std::shared_ptr<NonRealTimeAudioServer> nonRealTimeAudioServer;
         std::shared_ptr<AudioMixer> mixer;
