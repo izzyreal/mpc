@@ -5,7 +5,14 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "engine/FaderControl.hpp"
+#include "engine/MixerConstants.hpp"
+#include "engine/audio/mixer/AudioMixer.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
+#include "engine/audio/mixer/PanControl.hpp"
+#include "engine/control/CompoundControl.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "disk/SoundLoader.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -16,6 +23,74 @@ CMRC_DECLARE(mpctest);
 using namespace mpc;
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
+using namespace mpc::engine;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::control;
+
+namespace
+{
+    std::shared_ptr<MainMixControls> getMainMixControls(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName)
+    {
+        const auto strip =
+            mixer->getMixerControls()->getStripControls(stripName);
+        REQUIRE(strip != nullptr);
+
+        const auto mainMixControls =
+            std::dynamic_pointer_cast<MainMixControls>(strip->find("Main"));
+        REQUIRE(mainMixControls != nullptr);
+
+        return mainMixControls;
+    }
+
+    std::shared_ptr<FaderControl> getMainLevelControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName)
+    {
+        const auto mainMixControls = getMainMixControls(mixer, stripName);
+        const auto levelControl =
+            std::dynamic_pointer_cast<FaderControl>(
+                mainMixControls->find("Level"));
+        REQUIRE(levelControl != nullptr);
+        return levelControl;
+    }
+
+    std::shared_ptr<CompoundControl> getAuxControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
+        const std::string &auxName)
+    {
+        const auto strip =
+            mixer->getMixerControls()->getStripControls(stripName);
+        REQUIRE(strip != nullptr);
+
+        const auto auxControl =
+            std::dynamic_pointer_cast<CompoundControl>(strip->find(auxName));
+        REQUIRE(auxControl != nullptr);
+
+        return auxControl;
+    }
+
+    std::shared_ptr<FaderControl> getAuxLevelControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
+        const std::string &auxName)
+    {
+        const auto auxControl = getAuxControl(mixer, stripName, auxName);
+        const auto levelControl =
+            std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
+        REQUIRE(levelControl != nullptr);
+        return levelControl;
+    }
+
+    std::shared_ptr<PanControl> getAuxPanControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
+        const std::string &auxName)
+    {
+        const auto auxControl = getAuxControl(mixer, stripName, auxName);
+        const auto panControl =
+            std::dynamic_pointer_cast<PanControl>(auxControl->find("Pan"));
+        REQUIRE(panControl != nullptr);
+        return panControl;
+    }
+} // namespace
 
 void prepareSamplerResources(Mpc &mpc)
 {
@@ -417,4 +492,59 @@ TEST_CASE("Purge unused sounds", "[sampler]")
     REQUIRE(sampler->getSound(2)->getName() == "sound4");
     REQUIRE(sampler->getSound(3)->getName() == "sound6");
     REQUIRE(sampler->getSound(4)->getName() == "sound8");
+}
+
+TEST_CASE("Click metronome routed to stereo keeps main send enabled",
+          "[sampler][metronome-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    const auto screen =
+        mpc.screens->get<lcdgui::ScreenId::MetronomeSoundScreen>();
+    screen->setSound(0);
+    screen->setOutput(0);
+    screen->setVolume(100);
+
+    mpc.getSampler()->playMetronome(127, 0);
+
+    const auto mixer = mpc.getEngineHost()->getMixer();
+    REQUIRE(
+        getMainLevelControl(mixer, MetronomeStrip)->getValue() == 100.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#1")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#2")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#3")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#4")->getValue() ==
+            0.f);
+}
+
+TEST_CASE("Click metronome routed to assignable out uses metronome AUX send",
+          "[sampler][metronome-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    const auto screen =
+        mpc.screens->get<lcdgui::ScreenId::MetronomeSoundScreen>();
+    screen->setSound(0);
+    screen->setOutput(3);
+    screen->setVolume(100);
+
+    mpc.getSampler()->playMetronome(127, 0);
+
+    const auto mixer = mpc.getEngineHost()->getMixer();
+    REQUIRE(getMainLevelControl(mixer, MetronomeStrip)->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#1")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#2")->getValue() ==
+            100.f);
+    REQUIRE(getAuxPanControl(mixer, MetronomeStrip, "AUX#2")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#3")->getValue() ==
+            0.f);
+    REQUIRE(getAuxLevelControl(mixer, MetronomeStrip, "AUX#4")->getValue() ==
+            0.f);
 }
