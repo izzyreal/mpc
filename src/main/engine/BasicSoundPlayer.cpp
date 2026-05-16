@@ -13,12 +13,13 @@ using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
 
 BasicSoundPlayer::BasicSoundPlayer(std::shared_ptr<Sampler> samplerToUse,
-                                       std::shared_ptr<AudioMixer> mixerToUse,
-                                       std::shared_ptr<Voice> voiceToUse)
+                                   std::shared_ptr<AudioMixer> mixerToUse,
+                                   std::shared_ptr<Voice> voiceToUse,
+                                   std::string stripNameToUse)
     : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
-      voice(std::move(voiceToUse))
+      voice(std::move(voiceToUse)), stripName(std::move(stripNameToUse))
 {
-    auto sc = mixer->getMixerControls()->getStripControls(PreviewSoundPlayerStrip);
+    auto sc = mixer->getMixerControls()->getStripControls(stripName);
     auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     fader = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
 }
@@ -85,5 +86,5 @@ void BasicSoundPlayer::finishVoiceIfSoundIsLooping() const
 
 void BasicSoundPlayer::connectVoice() const
 {
-    mixer->getStrip(PreviewSoundPlayerStrip)->setInputProcess(voice);
+    mixer->getStrip(stripName)->setInputProcess(voice);
 }

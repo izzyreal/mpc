@@ -3,6 +3,7 @@
 #include "engine/audio/mixer/AudioMixerStrip.hpp"
 
 #include <memory>
+#include <string>
 
 namespace mpc::sampler
 {
@@ -23,6 +24,7 @@ namespace mpc::engine
 
         std::shared_ptr<audio::mixer::AudioMixer> mixer;
         std::shared_ptr<FaderControl> fader;
+        std::string stripName;
 
         bool soundHasLoop = false;
 
@@ -41,6 +43,7 @@ namespace mpc::engine
         explicit BasicSoundPlayer(
             std::shared_ptr<sampler::Sampler> sampler,
             std::shared_ptr<audio::mixer::AudioMixer> mixer,
-            std::shared_ptr<Voice> voice);
+            std::shared_ptr<Voice> voice,
+            std::string stripName);
     };
 } // namespace mpc::engine

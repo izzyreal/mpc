@@ -1,7 +1,6 @@
 #include "DrumNoteEventHandler.hpp"
 
 #include "Voice.hpp"
-#include "MixerInterconnection.hpp"
 #include "FaderControl.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -26,7 +25,9 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::control;
 
 static constexpr float PAN_SCALE = 100.0f;
-static constexpr int STRIP_OFFSET = 32;
+static constexpr float AUX_PAN_LEFT = 0.0f;
+static constexpr float AUX_PAN_CENTER = 0.5f;
+static constexpr float AUX_PAN_RIGHT = 1.0f;
 
 namespace
 {
@@ -101,67 +102,46 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
     auto mixerControls = c.mixer->getMixerControls();
     auto stripNumber = voice->getStripNumber();
-    auto mainStrip =
+    auto voiceStrip =
         mixerControls->getStripControls(std::to_string(stripNumber));
     auto mmc =
-        std::dynamic_pointer_cast<MainMixControls>(mainStrip->find("Main"));
+        std::dynamic_pointer_cast<MainMixControls>(voiceStrip->find("Main"));
 
     std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))
         ->setValue(static_cast<float>(stereoMixer.panning) / PAN_SCALE);
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(stereoMixer.level);
 
-    auto duplicateStrip = mixerControls->getStripControls(
-        std::to_string(stripNumber + STRIP_OFFSET));
-    mmc = std::dynamic_pointer_cast<MainMixControls>(
-        duplicateStrip->find("Main"));
-    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(0);
-
-    if (indivFxMixer.individualOutput > 0)
-    {
-        if (sound->isMono())
-        {
-            auto connection = c.mixerConnections->at(stripNumber - 1);
-
-            if (indivFxMixer.individualOutput % 2 == 1)
-            {
-                connection->setLeftEnabled(true);
-                connection->setRightEnabled(false);
-            }
-            else
-            {
-                connection->setLeftEnabled(false);
-                connection->setRightEnabled(true);
-            }
-        }
-        else
-        {
-            auto connection = c.mixerConnections->at(stripNumber - 1);
-            connection->setLeftEnabled(true);
-            connection->setRightEnabled(true);
-        }
-    }
-
-    int selectedAssignableMixOutPair = static_cast<int>(
-        std::ceil((static_cast<int>(indivFxMixer.individualOutput) - 2) * 0.5));
+    const int individualOutput = static_cast<int>(indivFxMixer.individualOutput);
+    const int selectedAssignableMixOutPair =
+        individualOutput > 0 ? (individualOutput - 1) / 2 : -1;
 
     for (int i = 0; i < 4; i++)
     {
-        auto mainAuxControl = std::dynamic_pointer_cast<CompoundControl>(
-            mainStrip->find("AUX#" + std::to_string(i + 1)));
-        auto duplicateAuxControl = std::dynamic_pointer_cast<CompoundControl>(
-            duplicateStrip->find("AUX#" + std::to_string(i + 1)));
+        auto auxControl = std::dynamic_pointer_cast<CompoundControl>(
+            voiceStrip->find("AUX#" + std::to_string(i + 1)));
+        auto auxLevel =
+            std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
+        auto auxPan =
+            std::dynamic_pointer_cast<PanControl>(auxControl->find("Pan"));
 
-        auto mainAuxLevel = std::dynamic_pointer_cast<FaderControl>(
-            mainAuxControl->find("Level"));
-        auto duplicateAuxLevel = std::dynamic_pointer_cast<FaderControl>(
-            duplicateAuxControl->find("Level"));
+        const bool isSelectedPair = i == selectedAssignableMixOutPair;
+        auxLevel->setValue(
+            isSelectedPair ? static_cast<float>(indivFxMixer.individualOutLevel)
+                           : 0);
 
-        mainAuxLevel->setValue(0);
-        duplicateAuxLevel->setValue(
-            i == selectedAssignableMixOutPair
-                ? static_cast<float>(indivFxMixer.individualOutLevel)
-                : 0);
+        if (!isSelectedPair || !sound->isMono())
+        {
+            auxPan->setValue(AUX_PAN_CENTER);
+        }
+        else if (individualOutput % 2 == 1)
+        {
+            auxPan->setValue(AUX_PAN_LEFT);
+        }
+        else
+        {
+            auxPan->setValue(AUX_PAN_RIGHT);
+        }
     }
 
     if (!sound->isLoopEnabled() &&
