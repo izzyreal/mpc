@@ -9,9 +9,9 @@
 #include "sequencer/Sequencer.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "engine/EngineHost.hpp"
-#include "engine/MixerInterconnection.hpp"
 #include "engine/audio/mixer/AudioMixer.hpp"
 #include "engine/audio/mixer/MixerControls.hpp"
+#include "engine/audio/mixer/PanControl.hpp"
 #include "engine/control/CompoundControl.hpp"
 #include "engine/FaderControl.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -35,8 +35,10 @@ namespace
     static constexpr int kBufferSize = 64;
     static constexpr DrumNoteNumber kTestNote{35};
     static constexpr int kIndivLevel = 73;
+    static constexpr float kPanLeft = 0.f;
+    static constexpr float kPanCenter = 0.5f;
 
-    std::shared_ptr<FaderControl> getAuxLevelControl(
+    std::shared_ptr<CompoundControl> getAuxControl(
         const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
         const std::string &auxName)
     {
@@ -48,11 +50,29 @@ namespace
             std::dynamic_pointer_cast<CompoundControl>(strip->find(auxName));
         REQUIRE(auxControl != nullptr);
 
+        return auxControl;
+    }
+
+    std::shared_ptr<FaderControl> getAuxLevelControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
+        const std::string &auxName)
+    {
+        const auto auxControl = getAuxControl(mixer, stripName, auxName);
         const auto levelControl =
             std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
         REQUIRE(levelControl != nullptr);
-
         return levelControl;
+    }
+
+    std::shared_ptr<PanControl> getAuxPanControl(
+        const std::shared_ptr<AudioMixer> &mixer, const std::string &stripName,
+        const std::string &auxName)
+    {
+        const auto auxControl = getAuxControl(mixer, stripName, auxName);
+        const auto panControl =
+            std::dynamic_pointer_cast<PanControl>(auxControl->find("Pan"));
+        REQUIRE(panControl != nullptr);
+        return panControl;
     }
 
     void configureProgramNote(Mpc &mpc, const bool mono,
@@ -104,7 +124,7 @@ namespace
     }
 } // namespace
 
-TEST_CASE("Mono sound routed to individual out uses one channel and duplicate strip AUX",
+TEST_CASE("Mono sound routed to individual out uses a single strip AUX send",
           "[drum-note-routing]")
 {
     Mpc mpc;
@@ -113,14 +133,13 @@ TEST_CASE("Mono sound routed to individual out uses one channel and duplicate st
     configureProgramNote(mpc, true, DrumMixerIndividualOutput(3));
     triggerUnfinalizedDrumNoteOn(mpc);
 
-    const auto &connections = mpc.getEngineHost()->getMixerConnections();
-    REQUIRE(connections.at(0)->isLeftEnabled());
-    REQUIRE(!connections.at(0)->isRightEnabled());
-
     const auto mixer = mpc.getEngineHost()->getMixer();
-    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() == 0.f);
-    REQUIRE(getAuxLevelControl(mixer, "33", "AUX#2")->getValue() ==
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#1")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#3")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() ==
             static_cast<float>(kIndivLevel));
+    REQUIRE(getAuxPanControl(mixer, "1", "AUX#2")->getValue() == kPanLeft);
 }
 
 TEST_CASE("Mono sound routed to main keeps both channels and no individual AUX send",
@@ -132,16 +151,14 @@ TEST_CASE("Mono sound routed to main keeps both channels and no individual AUX s
     configureProgramNote(mpc, true, DrumMixerIndividualOutput(0));
     triggerUnfinalizedDrumNoteOn(mpc);
 
-    const auto &connections = mpc.getEngineHost()->getMixerConnections();
-    REQUIRE(connections.at(0)->isLeftEnabled());
-    REQUIRE(connections.at(0)->isRightEnabled());
-
     const auto mixer = mpc.getEngineHost()->getMixer();
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#1")->getValue() == 0.f);
-    REQUIRE(getAuxLevelControl(mixer, "33", "AUX#1")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#3")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
 }
 
-TEST_CASE("Stereo sound to indiv out keeps both chans & uses duplicate AUX",
+TEST_CASE("Stereo sound to indiv out keeps both chans on a single strip AUX",
           "[drum-note-routing]")
 {
     Mpc mpc;
@@ -150,14 +167,13 @@ TEST_CASE("Stereo sound to indiv out keeps both chans & uses duplicate AUX",
     configureProgramNote(mpc, false, DrumMixerIndividualOutput(3));
     triggerUnfinalizedDrumNoteOn(mpc);
 
-    const auto &connections = mpc.getEngineHost()->getMixerConnections();
-    REQUIRE(connections.at(0)->isLeftEnabled());
-    REQUIRE(connections.at(0)->isRightEnabled());
-
     const auto mixer = mpc.getEngineHost()->getMixer();
-    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() == 0.f);
-    REQUIRE(getAuxLevelControl(mixer, "33", "AUX#2")->getValue() ==
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#1")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#3")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() ==
             static_cast<float>(kIndivLevel));
+    REQUIRE(getAuxPanControl(mixer, "1", "AUX#2")->getValue() == kPanCenter);
 }
 
 TEST_CASE("Stereo sound routed to main keeps both channels and no individual AUX send",
@@ -169,11 +185,9 @@ TEST_CASE("Stereo sound routed to main keeps both channels and no individual AUX
     configureProgramNote(mpc, false, DrumMixerIndividualOutput(0));
     triggerUnfinalizedDrumNoteOn(mpc);
 
-    const auto &connections = mpc.getEngineHost()->getMixerConnections();
-    REQUIRE(connections.at(0)->isLeftEnabled());
-    REQUIRE(connections.at(0)->isRightEnabled());
-
     const auto mixer = mpc.getEngineHost()->getMixer();
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#1")->getValue() == 0.f);
-    REQUIRE(getAuxLevelControl(mixer, "33", "AUX#1")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#3")->getValue() == 0.f);
+    REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
 }

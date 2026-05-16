@@ -7,6 +7,7 @@
 #include "engine/audio/mixer/MixerControls.hpp"
 #include "engine/audio/mixer/MixerControlsIds.hpp"
 #include "engine/audio/server/AudioServer.hpp"
+#include "engine/MixerConstants.hpp"
 
 using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::mixer;
@@ -65,18 +66,12 @@ void AudioMixer::work(int nFrames)
     silenceStrips(auxStrips);
     mainStrip->silence();
 
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < VoiceStripCount; i++)
     {
-        auto voiceStrip = channelStrips[i];
-
-        if (voiceStrip->processBuffer(nFrames))
-        {
-            auto indivOutStrip = channelStrips[i + 32];
-            indivOutStrip->processBuffer(nFrames);
-        }
+        channelStrips[i]->processBuffer(nFrames);
     }
 
-    for (int i = 64; i < channelStrips.size(); i++)
+    for (int i = VoiceStripCount; i < channelStrips.size(); i++)
     {
         channelStrips[i]->processBuffer(nFrames);
     }

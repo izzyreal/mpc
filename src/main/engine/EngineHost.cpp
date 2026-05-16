@@ -22,7 +22,6 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
-#include "engine/MixerInterconnection.hpp"
 #include "engine/FaderControl.hpp"
 #include "engine/BasicSoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -245,12 +244,11 @@ void EngineHost::setupMixer()
         std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R");
 
     /*
-     * There are 32 voices. Each voice has one channel for mixing to STEREO OUT
-     * L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are
-     * strips 1-64. There's one channel for the PreviewSoundPlayer, which plays
-     * the preview and playX sounds. This is strip 65. Finally, there's one
-     * channel to receive and monitor sampler input, which is strip
-     * 66, one for playing quick previews, strip 67, and a metronome strip, 68.
+     * There are 32 voices, each with one mixer strip. These are strips 1-32.
+     * There's one channel for the PreviewSoundPlayer, which plays the preview
+     * and playX sounds. This is strip 33. Finally, there's one channel to
+     * receive and monitor sampler input, which is strip 34, one for playing
+     * quick previews, strip 35, and a metronome strip, 36.
      */
     MixerControlsFactory::createChannelStrips(mixerControls, TotalMixerStripCount);
     mixer = std::make_shared<AudioMixer>(mixerControls, nonRealTimeAudioServer);
@@ -325,10 +323,11 @@ void EngineHost::createSynth()
     }
 
     previewSoundPlayer = std::make_shared<BasicSoundPlayer>(
-        mpc.getSampler(), mixer, previewSoundPlayerVoice);
+        mpc.getSampler(), mixer, previewSoundPlayerVoice,
+        PreviewSoundPlayerStrip);
 
     metronomePlayer = std::make_shared<BasicSoundPlayer>(
-        mpc.getSampler(), mixer, metronomeVoice);
+        mpc.getSampler(), mixer, metronomeVoice, MetronomeStrip);
 }
 
 void EngineHost::connectVoices()
@@ -338,12 +337,6 @@ void EngineHost::connectVoices()
         const auto ams1 = mixer->getStrip(std::to_string(j + 1));
         auto voice = voices[j];
         ams1->setInputProcess(voice);
-        mixerConnections.emplace_back(new MixerInterconnection(
-            "con" + std::to_string(j), realTimeAudioServer.get()));
-        const auto &mi = mixerConnections.back();
-        ams1->setDirectOutputProcess(mi->getInputProcess());
-        const auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
-        ams2->setInputProcess(mi->getOutputProcess());
     }
 
     previewSoundPlayer->connectVoice();
