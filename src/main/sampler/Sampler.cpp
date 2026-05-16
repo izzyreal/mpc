@@ -19,8 +19,13 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include "engine/BasicSoundPlayer.hpp"
+#include "engine/FaderControl.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
+#include "engine/MixerConstants.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
+#include "engine/audio/mixer/PanControl.hpp"
+#include "engine/control/CompoundControl.hpp"
 
 #include "StrUtil.hpp"
 
@@ -42,6 +47,52 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::control;
+
+namespace
+{
+    constexpr float kAuxPanLeft = 0.0f;
+    constexpr float kAuxPanRight = 1.0f;
+
+    void configureMetronomeClickRouting(
+        const std::shared_ptr<EngineHost> &engineHost, const int output)
+    {
+        const auto mixerControls = engineHost->getMixer()->getMixerControls();
+        const auto stripControls =
+            mixerControls->getStripControls(MetronomeStrip);
+        const auto mainMixControls =
+            std::dynamic_pointer_cast<MainMixControls>(
+                stripControls->find("Main"));
+
+        std::dynamic_pointer_cast<FaderControl>(mainMixControls->find("Level"))
+            ->setValue(output == 0 ? 100.f : 0.f);
+
+        const int selectedAssignableMixOutPair = output > 0 ? (output - 1) / 2
+                                                            : -1;
+
+        for (int i = 0; i < 4; i++)
+        {
+            const auto auxControls = std::dynamic_pointer_cast<CompoundControl>(
+                stripControls->find("AUX#" + std::to_string(i + 1)));
+
+            const bool isSelectedPair = i == selectedAssignableMixOutPair;
+
+            std::dynamic_pointer_cast<FaderControl>(auxControls->find("Level"))
+                ->setValue(isSelectedPair ? 100.f : 0.f);
+
+            if (!isSelectedPair)
+            {
+                continue;
+            }
+
+            const auto panControl =
+                std::dynamic_pointer_cast<PanControl>(auxControls->find("Pan"));
+
+            panControl->setValue(output % 2 == 1 ? kAuxPanLeft : kAuxPanRight);
+        }
+    }
+} // namespace
 
 Sampler::Sampler(
     Mpc &mpc, GetProgramFn &&getSnapshot,
@@ -241,6 +292,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
 
         mpc.getEngineHost()->getMetronomePlayer()->playSound(
             CLICK_SOUND, velocity, framePos);
+
+        configureMetronomeClickRouting(mpc.getEngineHost(), output);
 
         return;
     }
