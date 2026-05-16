@@ -35,12 +35,15 @@ namespace mpc::audiomidi
         unsigned long resamplerGeneratedFrameCounter = 0;
         std::shared_ptr<AudioFormat> inputAudioFormat;
         SoundPlayerFileFormat fileFormat;
+        bool wavSamplesAreFloat32 = false;
         float fadeFactor = -1.0f;
         std::atomic<bool> stopEarly{false};
         void readWithoutResampling();
         void readWithResampling(float ratio);
         short readNextShort() const;
         int32_t readNext24BitInt() const;
+        int32_t readNextInt32() const;
+        float readNextFloat32() const;
         float readNextFrame() const;
 
         std::atomic<bool> playing{false};

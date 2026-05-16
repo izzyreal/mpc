@@ -11,6 +11,7 @@
 #include <readerwriterqueue.h>
 
 #include <algorithm>
+#include <cstring>
 
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
@@ -67,12 +68,14 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
     if (fileFormat == WAV)
     {
         valid = wav_read_header(stream, sourceSampleRate, validBits,
-                                sourceNumChannels, sourceFrameCount);
+                                sourceNumChannels, sourceFrameCount,
+                                wavSamplesAreFloat32);
     }
     else if (fileFormat == SND)
     {
         valid = snd_read_header(stream, sourceSampleRate, validBits,
                                 sourceNumChannels, sourceFrameCount);
+        wavSamplesAreFloat32 = false;
     }
 
     if (!valid)
@@ -318,6 +321,13 @@ float SoundPlayer::readNextFrame() const
         return sampleops::int24_to_float(readNext24BitInt());
     }
 
+    if (inputAudioFormat->getSampleSizeInBits() == 32)
+    {
+        return wavSamplesAreFloat32 ? readNextFloat32()
+                                    : static_cast<float>(readNextInt32()) /
+                                          2147483648.0f;
+    }
+
     return sampleops::short_to_float(readNextShort());
 }
 
@@ -341,6 +351,30 @@ int32_t SoundPlayer::readNext24BitInt() const
     }
 
     return value;
+}
+
+int32_t SoundPlayer::readNextInt32() const
+{
+    char buffer[4];
+    stream->read(buffer, 4);
+
+    if (stream->gcount() != 4)
+    {
+        return 0;
+    }
+
+    return static_cast<int32_t>(static_cast<unsigned char>(buffer[0]) |
+                                static_cast<unsigned char>(buffer[1]) << 8 |
+                                static_cast<unsigned char>(buffer[2]) << 16 |
+                                static_cast<unsigned char>(buffer[3]) << 24);
+}
+
+float SoundPlayer::readNextFloat32() const
+{
+    const auto bits = static_cast<uint32_t>(readNextInt32());
+    float value = 0.0f;
+    std::memcpy(&value, &bits, sizeof(value));
+    return std::clamp(value, -1.0f, 1.0f);
 }
 
 short SoundPlayer::readNextShort() const

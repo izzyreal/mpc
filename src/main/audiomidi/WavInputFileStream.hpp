@@ -6,11 +6,14 @@ static const int RIFF_CHUNK_ID{1179011410};
 static const int RIFF_TYPE_ID{1163280727};
 static const int FMT_CHUNK_ID{544501094};
 static const int DATA_CHUNK_ID{1635017060};
+static const int WAVE_FORMAT_PCM{0x0001};
+static const int WAVE_FORMAT_IEEE_FLOAT{0x0003};
+static const int WAVE_FORMAT_EXTENSIBLE{0xFFFE};
 
 static const int EXPECTED_HEADER_SIZE = 44;
 // static const int EXPECTED_FMT_DATA_SIZE = 16;
 
-int wav_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
+inline int wav_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
 {
     if (numBytes < 1 || numBytes > 4)
     {
@@ -34,10 +37,11 @@ int wav_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
     return val;
 }
 
-bool wav_read_header(const std::shared_ptr<std::istream> &stream,
-                     int &sampleRate, int &validBits, int &numChannels,
-                     int &numFrames)
+inline bool wav_read_header(const std::shared_ptr<std::istream> &stream,
+                            int &sampleRate, int &validBits,
+                            int &numChannels, int &numFrames, bool &isFloat)
 {
+    isFloat = false;
     stream->seekg(0, stream->end);
 
     auto tell = stream->tellg();
@@ -73,16 +77,34 @@ bool wav_read_header(const std::shared_ptr<std::istream> &stream,
     }
 
     auto lengthOfFormatData = wav_get_LE(stream, 4);   // Offset 16
-    auto isPCM = wav_get_LE(stream, 2) == 1;           // Offset 20
+    const auto formatCode = wav_get_LE(stream, 2);     // Offset 20
     numChannels = wav_get_LE(stream, 2);               // Offset 22
     sampleRate = wav_get_LE(stream, 4);                // Offset 24
     /*auto avgBytesPerSecond =*/wav_get_LE(stream, 4); // Offset 28
     /*auto blockAlign =*/wav_get_LE(stream, 2);        // Offset 32
     validBits = wav_get_LE(stream, 2);                 // Offset 34
 
-    if (lengthOfFormatData != 16)
+    if (lengthOfFormatData > 16)
     {
-        stream->ignore(lengthOfFormatData - 16);
+        if (formatCode == WAVE_FORMAT_EXTENSIBLE && lengthOfFormatData >= 40)
+        {
+            stream->ignore(8);
+            const auto subFormat = wav_get_LE(stream, 2);
+            stream->ignore(lengthOfFormatData - 26);
+
+            if (subFormat == WAVE_FORMAT_IEEE_FLOAT)
+            {
+                isFloat = true;
+            }
+            else if (subFormat != WAVE_FORMAT_PCM)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            stream->ignore(lengthOfFormatData - 16);
+        }
     }
 
     auto dataChunkId = wav_get_LE(stream, 4); // Ofset 36
@@ -114,7 +136,12 @@ bool wav_read_header(const std::shared_ptr<std::istream> &stream,
     // return false;
     //}
 
-    if (!isPCM)
+    if (formatCode == WAVE_FORMAT_IEEE_FLOAT)
+    {
+        isFloat = true;
+    }
+    else if (formatCode != WAVE_FORMAT_PCM &&
+             formatCode != WAVE_FORMAT_EXTENSIBLE)
     {
         return false;
     }
@@ -130,6 +157,11 @@ bool wav_read_header(const std::shared_ptr<std::istream> &stream,
     }
 
     if (validBits != 16 && validBits != 24 && validBits != 32)
+    {
+        return false;
+    }
+
+    if (isFloat && validBits != 32)
     {
         return false;
     }

@@ -9,6 +9,11 @@
 
 namespace mpc::file::wav
 {
+    enum class WavSampleEncoding
+    {
+        PCM,
+        IEEE_FLOAT
+    };
 
     struct SampleLoop
     {
@@ -60,6 +65,7 @@ namespace mpc::file::wav
         unsigned long numFrames;
         double floatScale;
         double floatOffset;
+        WavSampleEncoding sampleEncoding{WavSampleEncoding::PCM};
         bool wordAlignAdjust;
         int numChannels;
         int sampleRate;
@@ -87,6 +93,7 @@ namespace mpc::file::wav
                           int numBytes);
         void writeSample(int val);
         int readSample();
+        float readFloatSample();
 
     public:
         int readFrames(std::vector<float> &sampleBuffer,

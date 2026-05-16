@@ -4,6 +4,10 @@
 #include <string>
 #endif
 
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+
 using namespace mpc::file::wav;
 using namespace mpc::disk;
 
@@ -12,6 +16,47 @@ const int WavFile::FMT_CHUNK_ID;
 const int WavFile::DATA_CHUNK_ID;
 const int WavFile::RIFF_CHUNK_ID;
 const int WavFile::RIFF_TYPE_ID;
+
+namespace
+{
+    constexpr int WAVE_FORMAT_PCM = 0x0001;
+    constexpr int WAVE_FORMAT_IEEE_FLOAT = 0x0003;
+    constexpr int WAVE_FORMAT_EXTENSIBLE = 0xFFFE;
+
+    WavSampleEncoding getSampleEncoding(const std::vector<char> &fmtChunkData,
+                                        int compressionCode)
+    {
+        if (compressionCode == WAVE_FORMAT_PCM)
+        {
+            return WavSampleEncoding::PCM;
+        }
+
+        if (compressionCode == WAVE_FORMAT_IEEE_FLOAT)
+        {
+            return WavSampleEncoding::IEEE_FLOAT;
+        }
+
+        if (compressionCode == WAVE_FORMAT_EXTENSIBLE &&
+            fmtChunkData.size() >= 40)
+        {
+            const auto subFormatTag =
+                static_cast<unsigned char>(fmtChunkData[24]) |
+                (static_cast<unsigned char>(fmtChunkData[25]) << 8);
+
+            if (subFormatTag == WAVE_FORMAT_PCM)
+            {
+                return WavSampleEncoding::PCM;
+            }
+
+            if (subFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+            {
+                return WavSampleEncoding::IEEE_FLOAT;
+            }
+        }
+
+        throw std::invalid_argument("Unsupported WAV encoding");
+    }
+} // namespace
 
 int WavFile::getNumChannels() const
 {
@@ -142,6 +187,7 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
 
     auto result = std::make_shared<WavFile>();
     result->numSampleLoops = 0;
+    result->sampleEncoding = WavSampleEncoding::PCM;
     result->iStream = _istream;
     result->iStream->seekg(0, std::ios::end);
 
@@ -198,23 +244,41 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
         if (chunkID == FMT_CHUNK_ID)
         {
             foundFormat = true;
-            result->iStream->read(&result->buffer[0], 16);
+            std::vector<char> fmtChunkData(chunkSize);
+            result->iStream->read(fmtChunkData.data(), chunkSize);
 
             totalBytesRead += chunkSize;
 
-            auto compressionCode =
-                static_cast<int>(getLE(result->buffer, 0, 2));
+            if (result->iStream->gcount() != chunkSize)
+            {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Could not read WAV format chunk"});
+            }
 
-            if (compressionCode != 1)
+            if (chunkSize < 16)
+            {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Invalid WAV format chunk size"});
+            }
+
+            auto compressionCode =
+                static_cast<int>(getLE(fmtChunkData, 0, 2));
+
+            try
+            {
+                result->sampleEncoding =
+                    getSampleEncoding(fmtChunkData, compressionCode);
+            }
+            catch (const std::invalid_argument &)
             {
                 return tl::make_unexpected(
                     mpc_io_error_msg{"Compressed WAV unsupported"});
             }
 
-            result->numChannels = static_cast<int>(getLE(result->buffer, 2, 2));
-            result->sampleRate = getLE(result->buffer, 4, 4);
-            result->blockAlign = static_cast<int>(getLE(result->buffer, 12, 2));
-            result->validBits = static_cast<int>(getLE(result->buffer, 14, 2));
+            result->numChannels = static_cast<int>(getLE(fmtChunkData, 2, 2));
+            result->sampleRate = getLE(fmtChunkData, 4, 4);
+            result->blockAlign = static_cast<int>(getLE(fmtChunkData, 12, 2));
+            result->validBits = static_cast<int>(getLE(fmtChunkData, 14, 2));
 
             if (result->numChannels == 0)
             {
@@ -240,6 +304,13 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
                     mpc_io_error_msg{"Valid bits in header over 64"});
             }
 
+            if (result->sampleEncoding == WavSampleEncoding::IEEE_FLOAT &&
+                result->validBits != 32)
+            {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Only 32-bit float WAV supported"});
+            }
+
             result->bytesPerSample = (result->validBits + 7) / 8;
 
             if (result->bytesPerSample * result->numChannels !=
@@ -247,13 +318,6 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
             {
                 return tl::make_unexpected(
                     mpc_io_error_msg{"Bad block align for format"});
-            }
-
-            numChunkBytes -= 16;
-
-            if (numChunkBytes > 0)
-            {
-                result->iStream->ignore(numChunkBytes);
             }
         }
         else if (chunkID == DATA_CHUNK_ID)
@@ -318,7 +382,7 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
     if (result->validBits > 8)
     {
         result->floatOffset = 0;
-        result->floatScale = 1 << (result->validBits - 1);
+        result->floatScale = std::ldexp(1.0, result->validBits - 1);
     }
     else
     {
@@ -402,6 +466,37 @@ int WavFile::readSample()
     return val;
 }
 
+float WavFile::readFloatSample()
+{
+    uint32_t bits = 0;
+
+    for (auto b = 0; b < bytesPerSample; b++)
+    {
+        if (bufferPointer == bytesRead)
+        {
+            iStream->read(&buffer[0], BUFFER_SIZE);
+            auto read = iStream->gcount();
+
+            if (read == 0)
+            {
+                return 0.0f;
+            }
+
+            bytesRead = read;
+            bufferPointer = 0;
+        }
+
+        bits |= static_cast<uint32_t>(
+                    static_cast<unsigned char>(buffer[bufferPointer]))
+                << (b * 8);
+        bufferPointer++;
+    }
+
+    float value = 0.0f;
+    std::memcpy(&value, &bits, sizeof(value));
+    return std::clamp(value, -1.0f, 1.0f);
+}
+
 int WavFile::readFrames(std::vector<float> &sampleBuffer,
                         unsigned long numFramesToRead)
 {
@@ -420,9 +515,16 @@ int WavFile::readFrames(std::vector<float> &sampleBuffer,
         }
         for (auto c = 0; c < numChannels; c++)
         {
-            auto v = readSample();
-            sampleBuffer[offset] =
-                floatOffset + static_cast<double>(v) / floatScale;
+            if (sampleEncoding == WavSampleEncoding::IEEE_FLOAT)
+            {
+                sampleBuffer[offset] = readFloatSample();
+            }
+            else
+            {
+                const auto v = readSample();
+                sampleBuffer[offset] =
+                    floatOffset + static_cast<double>(v) / floatScale;
+            }
             offset++;
         }
         frameCounter++;
