@@ -52,6 +52,7 @@ TEST_CASE("APS with program with unassigned pad", "[apsparser]")
     mpc.getSampler()->deleteAllPrograms(true);
 
     manager->drainQueue();
+    manager->drainQueue();
 
     assert(mpc.getSampler()
                ->getProgram(mpc::MinProgramIndex)
