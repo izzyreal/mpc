@@ -122,8 +122,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         noteEventIdToUse, performanceDrum, drumBus, mpc.getSampler(),
         mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
-        &mpc.getEngineHost()->getVoices(),
-        mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
+        &mpc.getEngineHost()->getVoices(), note, velocityToUse,
         noteVariationType, noteVariationValue, eventFrameOffsetInBuffer, true,
         noteOnEvent.tick,
         voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
@@ -309,8 +308,7 @@ void EventHandler::handleUnfinalizedNoteOn(
             0, performanceDrum, drumBus, mpc.getSampler(),
             mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
-            &mpc.getEngineHost()->getVoices(),
-            mpc.getEngineHost()->getMixerConnections(), note,
+            &mpc.getEngineHost()->getVoices(), note,
             noteOnEvent.velocity, noteOnEvent.noteVariationType,
             noteOnEvent.noteVariationValue, frameOffset, true, -1, -1);
 

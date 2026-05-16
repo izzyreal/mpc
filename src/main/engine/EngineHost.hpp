@@ -18,7 +18,6 @@ namespace mpc::engine
     class NoteRepeatProcessor;
     class SequencerPlaybackEngine;
     class Voice;
-    class MixerInterconnection;
     class BasicSoundPlayer;
 } // namespace mpc::engine
 
@@ -87,7 +86,6 @@ namespace mpc::engine
         std::shared_ptr<BasicSoundPlayer> getMetronomePlayer() const;
         std::shared_ptr<audio::mixer::AudioMixer> getMixer();
         std::vector<std::shared_ptr<Voice>> &getVoices();
-        std::vector<MixerInterconnection *> &getMixerConnections();
 
         std::shared_ptr<audiomidi::SoundRecorder> getSoundRecorder();
         std::shared_ptr<audiomidi::SoundPlayer> getSoundPlayer();
@@ -145,7 +143,6 @@ namespace mpc::engine
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
         std::vector<std::shared_ptr<Voice>> voices;
-        std::vector<MixerInterconnection *> mixerConnections;
         std::shared_ptr<Voice> previewSoundPlayerVoice;
         std::shared_ptr<Voice> metronomeVoice;
         std::shared_ptr<RealTimeAudioServer> realTimeAudioServer;

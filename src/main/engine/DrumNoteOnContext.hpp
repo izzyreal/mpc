@@ -24,7 +24,6 @@ namespace mpc::lcdgui::screens
 namespace mpc::engine
 {
     class Voice;
-    class MixerInterconnection;
 } // namespace mpc::engine
 namespace mpc::engine::audio::mixer
 {
@@ -44,7 +43,6 @@ namespace mpc::engine
         std::shared_ptr<audio::mixer::AudioMixer> mixer;
         std::shared_ptr<lcdgui::screens::MixerSetupScreen> mixerSetupScreen;
         std::vector<std::shared_ptr<Voice>> *voices{};
-        std::vector<MixerInterconnection *> *mixerConnections{};
         std::shared_ptr<sequencer::DrumBus> drumBus;
         performance::Drum drum;
         std::function<void(int, int)> setOptA;

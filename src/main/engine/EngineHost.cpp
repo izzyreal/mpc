@@ -118,7 +118,6 @@ void EngineHost::start()
         mixer, mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         mpc.getPerformanceManager(), mpc.getHardware()->getSlider(), &voices,
-        mixerConnections,
         [controller = mpc.clientEventController]
         {
             return controller->isFullLevelEnabled();
@@ -613,11 +612,6 @@ std::shared_ptr<AudioMixer> EngineHost::getMixer()
 std::vector<std::shared_ptr<Voice>> &EngineHost::getVoices()
 {
     return voices;
-}
-
-std::vector<MixerInterconnection *> &EngineHost::getMixerConnections()
-{
-    return mixerConnections;
 }
 
 std::shared_ptr<SequencerPlaybackEngine>

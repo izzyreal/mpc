@@ -171,9 +171,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         {
             auto ctxOptA = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 c.noteEventId, c.drum, c.drumBus, c.sampler, c.mixer,
-                c.mixerSetupScreen, c.voices, *c.mixerConnections, optA,
-                c.velocity, c.varType, c.varValue, c.frameOffset, false,
-                c.startTick, c.durationFrames);
+                c.mixerSetupScreen, c.voices, optA, c.velocity, c.varType,
+                c.varValue, c.frameOffset, false, c.startTick,
+                c.durationFrames);
 
             noteOn(ctxOptA);
 
@@ -184,9 +184,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         {
             auto ctxOptB = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 c.noteEventId, c.drum, c.drumBus, c.sampler, c.mixer,
-                c.mixerSetupScreen, c.voices, *c.mixerConnections, optB,
-                c.velocity, c.varType, c.varValue, c.frameOffset, false,
-                c.startTick, c.durationFrames);
+                c.mixerSetupScreen, c.voices, optB, c.velocity, c.varType,
+                c.varValue, c.frameOffset, false, c.startTick,
+                c.durationFrames);
 
             noteOn(ctxOptB);
 

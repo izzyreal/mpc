@@ -41,15 +41,15 @@ NoteRepeatProcessor::NoteRepeatProcessor(
     std::shared_ptr<Assign16LevelsScreen> a,
     std::shared_ptr<MixerSetupScreen> ms,
     const std::weak_ptr<PerformanceManager> &performanceManager,
-    std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
-    std::vector<MixerInterconnection *> &mi,
+    std::shared_ptr<hardware::Slider> h,
+    std::vector<std::shared_ptr<Voice>> *v,
     const std::function<bool()> &isFullLevelEnabled,
     const std::function<bool()> &isSixteenLevelsEnabled)
     : eventHandler(eventHandler), sequencer(std::move(s)),
       sampler(std::move(sa)), mixer(std::move(m)),
       assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
       performanceManager(performanceManager), hardwareSlider(std::move(h)),
-      voices(v), mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
+      voices(v), isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
 }
@@ -178,7 +178,7 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, performanceDrum, drumBus, sampler, mixer, mixerSetupScreen,
-                voices, mixerConnections, noteNumber, noteEvent.velocity,
+                voices, noteNumber, noteEvent.velocity,
                 noteEvent.noteVariationType, noteEvent.noteVariationValue,
                 eventFrameOffset,
                 /* firstGeneration */ true, // Always true for invokers that

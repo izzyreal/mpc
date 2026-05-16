@@ -16,8 +16,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<AudioMixer> &mixer,
     const std::shared_ptr<MixerSetupScreen> &mixerSetupScreen,
-    std::vector<std::shared_ptr<Voice>> *voices,
-    std::vector<MixerInterconnection *> &mixerConnections, const int note,
+    std::vector<std::shared_ptr<Voice>> *voices, const int note,
     const int velocity, const int varType, const int varValue,
     const int frameOffset, const bool firstGeneration, const int startTick,
     const int durationFrames)
@@ -30,7 +29,6 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     ctx.mixer = mixer;
     ctx.mixerSetupScreen = mixerSetupScreen;
     ctx.voices = voices;
-    ctx.mixerConnections = &mixerConnections;
     ctx.note = DrumNoteNumber(note);
     ctx.velocity = velocity;
     ctx.varType = varType;

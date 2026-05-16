@@ -44,8 +44,7 @@ namespace mpc::engine
             const std::shared_ptr<audio::mixer::AudioMixer> &mixer,
             const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
                 &mixerSetupScreen,
-            std::vector<std::shared_ptr<Voice>> *voices,
-            std::vector<MixerInterconnection *> &mixerConnections, int note,
+            std::vector<std::shared_ptr<Voice>> *voices, int note,
             int velocity, int varType, int varValue, int frameOffset,
             bool firstGeneration, int startTick, int durationFrames);
 

@@ -19,7 +19,6 @@ namespace mpc::engine
     class EngineHost;
     class SequencerPlaybackEngine;
     class Voice;
-    class MixerInterconnection;
 } // namespace mpc::engine
 namespace mpc::sampler
 {
@@ -58,9 +57,7 @@ namespace mpc::engine
             std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>,
             std::shared_ptr<lcdgui::screens::MixerSetupScreen>,
             const std::weak_ptr<performance::PerformanceManager> &,
-            std::shared_ptr<hardware::Slider>,
-            std::vector<std::shared_ptr<Voice>> *,
-            std::vector<MixerInterconnection *> &,
+            std::shared_ptr<hardware::Slider>, std::vector<std::shared_ptr<Voice>> *,
             const std::function<bool()> &isFullLevelEnabled,
             const std::function<bool()> &isSixteenLevelsEnabled);
 
@@ -80,7 +77,6 @@ namespace mpc::engine
         const std::weak_ptr<performance::PerformanceManager> performanceManager;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<Voice>> *voices;
-        std::vector<MixerInterconnection *> &mixerConnections;
         const std::function<bool()> isFullLevelEnabled;
         const std::function<bool()> isSixteenLevelsEnabled;
     };
