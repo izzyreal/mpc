@@ -53,32 +53,21 @@ void LoadAProgramScreen::function(const int i)
             break;
         case 4:
         {
-            const auto newProgram =
-                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
-
-            for (int pi = 0; pi < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pi++)
-            {
-                if (sampler.lock()->getProgram(pi) == newProgram)
+            sampler::ProgramHandlerFn andThen(
+                [this, selectedFile](const std::shared_ptr<sampler::Program> &p)
                 {
-                    mpc.getDisk()->readPgm2(selectedFile, newProgram, pi);
-                    break;
-                }
-            }
+                    mpc.getDisk()->readPgm2(selectedFile, p,
+                                            p->getProgramIndex());
 
-            if (const auto track = sequencer.lock()->getSelectedTrack();
-                sequencer::isDrumBusType(track->getBusType()))
-            {
-                for (int pgmIndex = 0;
-                     pgmIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pgmIndex++)
-                {
-                    if (sampler.lock()->getProgram(pgmIndex) == newProgram)
+                    if (const auto track = sequencer.lock()->getSelectedTrack();
+                        sequencer::isDrumBusType(track->getBusType()))
                     {
                         getActiveDrumBus()->setProgramIndex(
-                            ProgramIndex(pgmIndex));
-                        break;
+                            p->getProgramIndex());
                     }
-                }
-            }
+                });
+            sampler.lock()->createNewProgramAddFirstAvailableSlotAndThen(
+                std::move(andThen));
 
             break;
         }

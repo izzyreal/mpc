@@ -70,7 +70,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
     mpc.getSampler()->deleteAllSamples();
 
-    p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+    p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
     (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1, 0);
 
     mpc.getEngineHost()->prepareProcessBlock(512);
@@ -85,7 +85,6 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
 
     REQUIRE(p1->getName() == "PROGRAM1");
 
-    REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == 1);
 
@@ -103,7 +102,7 @@ void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
     disk->initFiles();
 
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
-    p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+    p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
 
     (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2, 1);
     mpc.getEngineHost()->prepareProcessBlock(512);
@@ -179,7 +178,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
     mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
     mpc.getSampler()->deleteAllSamples();
 
-    p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+    p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
 
     std::thread loadThread(
         [&]
@@ -240,7 +239,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
     disk->initFiles();
 
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
-    p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+    p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
 
     (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2, 1);
 }

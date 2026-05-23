@@ -56,7 +56,7 @@ namespace
                                                         const int midiPc)
     {
         const auto program =
-            mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+            mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
         REQUIRE(program);
         program->setMidiProgramChange(midiPc);
         drain(mpc);

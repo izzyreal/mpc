@@ -55,37 +55,35 @@ void AutoChromaticAssignmentScreen::function(const int i)
             break;
         case 4:
         {
-            const auto newProgram =
-                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
-            newProgram->setName(newName);
 
-            for (int j = MinDrumNoteNumber; j <= MaxDrumNoteNumber; j++)
-            {
-                const auto pad = newProgram->getPad(j - MinDrumNoteNumber);
-                pad->setNote(DrumNoteNumber(j));
-                auto noteParameters = newProgram->getNoteParameters(j);
-                //                const auto noteParameters =
-                //                    new NoteParameters(j - MinDrumNoteNumber);
-                //                newProgram->setNoteParameters(j -
-                //                MinDrumNoteNumber,
-                //                                              noteParameters);
-                noteParameters->setSoundIndex(sourceSoundIndex);
-
-                noteParameters->setTune((j - originalKey) * 10 + tune);
-            }
-
-            const auto programs = sampler.lock()->getPrograms();
-
-            for (int j = MinProgramIndex; j <= MaxProgramIndex; j++)
-            {
-                if (programs[j].lock() == newProgram)
+            ProgramHandlerFn andThen(
+                [this](const std::shared_ptr<Program> &p)
                 {
-                    getActiveDrumBus()->setProgramIndex(ProgramIndex(j));
-                    break;
-                }
-            }
+                    p->setName(newName);
 
-            openScreenById(ScreenId::PgmAssignScreen);
+                    for (int j = MinDrumNoteNumber; j <= MaxDrumNoteNumber; j++)
+                    {
+                        const auto pad = p->getPad(j - MinDrumNoteNumber);
+                        pad->setNote(DrumNoteNumber(j));
+                        const auto noteParameters = p->getNoteParameters(j);
+                        noteParameters->setSoundIndex(sourceSoundIndex);
+
+                        noteParameters->setTune((j - originalKey) * 10 + tune);
+                    }
+
+                    getActiveDrumBus()->setProgramIndex(p->getProgramIndex());
+
+                    ls.lock()->postToUiThread(utils::Task(
+                        [layeredScreen = ls.lock()]
+                        {
+                            layeredScreen->openScreenById(
+                                ScreenId::PgmAssignScreen);
+                        }));
+                });
+
+            sampler.lock()->createNewProgramAddFirstAvailableSlotAndThen(
+                std::move(andThen));
+
             break;
         }
         default:;

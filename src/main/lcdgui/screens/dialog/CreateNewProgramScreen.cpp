@@ -71,24 +71,24 @@ void CreateNewProgramScreen::function(const int i)
             break;
         case 4:
         {
-            const auto newProgram =
-                sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
-            newProgram->setName(newName);
-            newProgram->setMidiProgramChange(midiProgramChange);
-
-            auto index = ProgramIndex(sampler.lock()->getProgramCount() - 1);
-
-            for (int j = 0; j < sampler.lock()->getPrograms().size(); j++)
-            {
-                if (sampler.lock()->getProgram(j) == newProgram)
+            sampler::ProgramHandlerFn andThen([
+                this
+                ](const std::shared_ptr<sampler::Program> &p)
                 {
-                    index = ProgramIndex(j);
-                    break;
-                }
-            }
+                    p->setName(newName);
+                    p->setMidiProgramChange(midiProgramChange);
+                    getActiveDrumBus()->setProgramIndex(p->getProgramIndex());
 
-            getActiveDrumBus()->setProgramIndex(index);
-            openScreenById(ScreenId::ProgramScreen);
+                    ls.lock()->postToUiThread(utils::Task(
+                        [layeredScreen = ls.lock()]
+                        {
+                            layeredScreen->openScreenById(
+                                ScreenId::ProgramScreen);
+                        }));
+                });
+
+            sampler.lock()->createNewProgramAddFirstAvailableSlotAndThen(
+                std::move(andThen));
             break;
         }
         default:;

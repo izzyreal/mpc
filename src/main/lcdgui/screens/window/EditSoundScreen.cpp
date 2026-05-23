@@ -734,24 +734,34 @@ void EditSoundScreen::handleSliceSound() const
         return;
     }
 
-    const auto p =
-        sampler.lock()->createNewProgramAddFirstAvailableSlot().lock();
-    p->setName(source->getName());
-
-    for (int i = 0; i < zoneCount; i++)
+    ProgramHandlerFn andThen([
+        programName = source->getName(),
+        zoneCount,
+        soundCount = sampler.lock()->getSoundCount(),
+        sequencer = sequencer.lock()
+        ](const std::shared_ptr<Program> &p)
     {
-        const auto pad = p->getPad(i);
-        const auto noteParams = p->getNoteParameters(pad->getNote());
-        noteParams->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount +
-                                  i);
-    }
+        p->setName(programName);
 
-    if (const auto drumBus = sequencer.lock()->getBus<DrumBus>(
-            sequencer.lock()->getSelectedTrack()->getBusType()))
-    {
-        drumBus->setProgramIndex(
-            ProgramIndex(sampler.lock()->getProgramCount() - 1));
-    }
+        for (int i = 0; i < zoneCount; i++)
+        {
+            const auto pad = p->getPad(i);
+            const auto noteParams = p->getNoteParameters(pad->getNote());
+            noteParams->setSoundIndex(soundCount - zoneCount +
+                                      i);
+        }
+
+        if (const auto drumBus = sequencer->getBus<DrumBus>(
+                sequencer->getSelectedTrack()->getBusType()))
+        {
+            drumBus->setProgramIndex(
+                ProgramIndex(p->getProgramIndex()));
+        }
+    });
+
+    sampler.lock()->createNewProgramAddFirstAvailableSlotAndThen(
+        std::move(andThen));
+
 }
 
 std::pair<int, int> EditSoundScreen::getStartEndFromContext() const

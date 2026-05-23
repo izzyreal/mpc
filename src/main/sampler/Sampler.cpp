@@ -424,6 +424,15 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
     return {};
 }
 
+std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlotAndThen(
+    ProgramHandlerFn andThen)
+{
+    const auto p = createNewProgramAddFirstAvailableSlot();
+    utils::SimpleAction action([p, andThen = std::move(andThen)]{andThen(p.lock());});
+    mpc.getPerformanceManager().lock()->enqueueCallback(std::move(action));
+    return p;
+}
+
 void Sampler::deleteProgram(const std::weak_ptr<Program> &program) const
 {
     for (auto &&p : programs)

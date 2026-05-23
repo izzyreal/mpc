@@ -4,12 +4,15 @@
 #include "sampler/Sound.hpp"
 #include "MpcSpecs.hpp"
 #include "IntTypes.hpp"
+#include "utils/SmallFn.hpp"
 
 #include <memory>
 #include <string>
 
 namespace mpc::sampler
 {
+    using ProgramHandlerFn = utils::SmallFn<64, void(std::shared_ptr<Program>)>;
+
     constexpr int16_t PLAYX_SOUND = -4;
     constexpr int16_t PREVIEW_SOUND = -3;
     constexpr int16_t CLICK_SOUND = -2;
@@ -49,13 +52,7 @@ namespace mpc::sampler
         void playPreviewSample(int start, int end, int loopTo) const;
         int getProgramCount() const;
 
-        /**
-         * The `programs` collection is always of size MAX_PROGRAM_COUNT (which
-         * is 24 for an MPC2000XL), where a nullptr element indicates a free
-         * slot. This method creates a new program at the first available slot.
-         * A nullptr is returned if all slots are occupied.
-         */
-        std::weak_ptr<Program> createNewProgramAddFirstAvailableSlot();
+        std::weak_ptr<Program> createNewProgramAddFirstAvailableSlotAndThen(ProgramHandlerFn);
 
         std::weak_ptr<Program> addProgram(int i);
 
@@ -147,6 +144,15 @@ namespace mpc::sampler
         std::shared_ptr<Sound> clickSound;
         std::vector<std::string> sortNames =
             std::vector<std::string>{"MEMORY", "NAME", "SIZE"};
+
+        /**
+         * The `programs` collection is always of size MAX_PROGRAM_COUNT (which
+         * is 24 for an MPC2000XL), where a nullptr element indicates a free
+         * slot. This method creates a new program at the first available slot.
+         * A nullptr is returned if all slots are occupied.
+         */
+        std::weak_ptr<Program> createNewProgramAddFirstAvailableSlot();
+
         std::vector<std::shared_ptr<Sound>> getUsedSounds() const;
 
         static int getLastInt(const std::string &s);

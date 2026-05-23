@@ -15,11 +15,11 @@ TEST_CASE("Delete program", "[program]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sampler = mpc.getSampler();
 
-    sampler->createNewProgramAddFirstAvailableSlot();
+    sampler->createNewProgramAddFirstAvailableSlotAndThen({});
     mpc.getEngineHost()->prepareProcessBlock(512);
-    sampler->createNewProgramAddFirstAvailableSlot();
+    sampler->createNewProgramAddFirstAvailableSlotAndThen({});
     mpc.getEngineHost()->prepareProcessBlock(512);
-    sampler->createNewProgramAddFirstAvailableSlot();
+    sampler->createNewProgramAddFirstAvailableSlotAndThen({});
     mpc.getEngineHost()->prepareProcessBlock(512);
 
     mpc.getSequencer()
