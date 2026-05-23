@@ -1,3 +1,8 @@
+## v0.9.7 (23-5-2026)
+* Fix operations that involve creating a program, such as slicing zones.
+* Fix 32 bit float and integer WAV support.
+* Fix metronome assignable mix output routing.
+
 ## v0.9.5 (11-5-2026)
 * Fix pressing pads to select notes to mute in the Mute Assign window.
 * Fix pad-note assignment. Users who rely on custom pad-note mappings may have noticed that this was broken since v0.9 was released. It should now work as intended again.
