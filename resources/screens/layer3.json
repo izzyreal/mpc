@@ -183,7 +183,15 @@
  "x" : [ 40, 52, 52, 52, 52, 156, 156  ],
  "y" : [ 12, 24, 34,  24, 34, 24, 34 ],
  "tfsize" : [ 30, 18, 36, 36, 36, 18, 18 ],
- "parameters" : [ "sound", "volume", "output", "accent", "normal", "velocity-accent", "velocity-normal" ],
+ "parameters" : [
+  "sound", ["_","_","_","volume,accent"],
+  "volume", ["_","_","sound","output"],
+  "output", ["_","_","volume","_"],
+  "accent", ["_","velocity-accent","sound","normal"],
+  "normal", ["_","velocity-normal","accent","_"],
+  "velocity-accent", ["accent","_","sound","velocity-normal"],
+  "velocity-normal", ["normal","_","velocity-accent","_"]
+ ],
  "fblabels" : [ null, null, null, "CLOSE", null, null],
  "fbtypes" : [ null, null, null, 0, null, null ]
 },
