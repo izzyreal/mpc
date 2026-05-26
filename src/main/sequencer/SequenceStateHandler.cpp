@@ -463,22 +463,22 @@ void SequenceStateHandler::appleEraseEvents(const EraseEvents &m,
     const auto lastTrackIndex =
         m.trackIndex == AllTracks ? MaxTrackIndex : m.trackIndex;
 
-    const auto seq = state.sequences[m.sequenceIndex];
-
     const auto selectedType = m.type;
 
     for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex;
          ++trackIndex)
     {
-        const auto t = seq.tracks[trackIndex];
+        auto &track = state.sequences[m.sequenceIndex].tracks[trackIndex];
 
-        EventData *it = t.eventsHead;
+        EventData *it = track.eventsHead;
 
         while (it)
         {
+            EventData *next = it->next;
+
             if (m.startTick > it->tick || m.endTick < it->tick)
             {
-                it = it->next;
+                it = next;
                 continue;
             }
 
@@ -501,7 +501,7 @@ void SequenceStateHandler::appleEraseEvents(const EraseEvents &m,
                 }
             }
 
-            it = it->next;
+            it = next;
         }
     }
 }
