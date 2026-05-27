@@ -1,6 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
+#include "performance/PerformanceManager.hpp"
+#include "sampler/Pad.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Transport.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
@@ -13,6 +20,22 @@
 using namespace mpc;
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::client::event;
+
+namespace
+{
+ClientHardwareEvent createErasePressEvent()
+{
+    return ClientHardwareEvent{
+        ClientHardwareEvent::Source::HostInputGesture,
+        ClientHardwareEvent::Type::MpcButtonPress,
+        std::nullopt,
+        hardware::ComponentId::ERASE,
+        1.f,
+        std::nullopt,
+        std::nullopt};
+}
+}
 
 TEST_CASE("timing-correct", "[track]")
 {
@@ -158,4 +181,63 @@ TEST_CASE("quantize", "[track]")
         stateManager->drainQueue();
         REQUIRE(tr->getEvent(0)->getTick() == 48);
     }
+}
+
+TEST_CASE("erase removes matching event even when another pad is pressed",
+          "[track]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto performanceManager = mpc.getPerformanceManager().lock();
+    auto seq = sequencer->getSequence(0);
+    seq->init(0);
+    stateManager->drainQueue();
+
+    auto track = seq->getTrack(0);
+    track->setBusType(BusType::DRUM1);
+    stateManager->drainQueue();
+
+    auto program = mpc.getSampler()->getProgram(0);
+    program->getPad(0)->setNote(MinDrumNoteNumber);
+    program->getPad(1)->setNote(DrumNoteNumber(MinDrumNoteNumber + 1));
+    performanceManager->drainQueue();
+
+    const auto firstPadNote = program->getNoteFromPad(ProgramPadIndex(0));
+    const auto secondPadNote = program->getNoteFromPad(ProgramPadIndex(1));
+
+    REQUIRE(firstPadNote != secondPadNote);
+
+    auto *event =
+        track->recordNoteEventNonLive(0, secondPadNote, Velocity(100));
+    track->finalizeNoteEventNonLive(event, Duration(1));
+    stateManager->drainQueue();
+
+    sequencer->getTransport()->setOverdubbing(true);
+    stateManager->drainQueue();
+
+    const auto hwController =
+        mpc.clientEventController->clientHardwareEventController;
+    hwController->handleClientHardwareEvent(createErasePressEvent());
+
+    performanceManager->registerProgramPadPress(
+        performance::PerformanceEventSource::VirtualMpcHardware, std::nullopt,
+        lcdgui::ScreenId::SequencerScreen, track->getIndex(),
+        track->getBusType(), ProgramPadIndex(0), Velocity(100), ProgramIndex(0),
+        PhysicalPadIndex(0));
+    performanceManager->registerProgramPadPress(
+        performance::PerformanceEventSource::VirtualMpcHardware, std::nullopt,
+        lcdgui::ScreenId::SequencerScreen, track->getIndex(),
+        track->getBusType(), ProgramPadIndex(1), Velocity(100), ProgramIndex(0),
+        PhysicalPadIndex(1));
+    performanceManager->drainQueue();
+
+    REQUIRE(track->shouldRemovePlayIndexEventDueToErasePressed());
+
+    track->playNext();
+    stateManager->drainQueue();
+
+    REQUIRE(track->getNoteEvents().empty());
 }
