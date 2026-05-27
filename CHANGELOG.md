@@ -1,3 +1,7 @@
+## v0.9.8 (27-5-2026)
+* Fix Erase window (erasing while not playing).
+* Animating buttons.
+
 ## v0.9.7 (23-5-2026)
 * Fix operations that involve creating a program, such as slicing zones.
 * Fix 32 bit float and integer WAV support.
