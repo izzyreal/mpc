@@ -91,14 +91,13 @@ bool Track::shouldRemovePlayIndexEventDueToErasePressed() const
     {
         if (isProgramPadPressed(ProgramPadIndex(programPadIndex), programIndex))
         {
+            oneOrMorePadsArePressed = true;
+
             if (program->getNoteFromPad(ProgramPadIndex(programPadIndex)) ==
                 noteNumber)
             {
                 return true;
             }
-
-            oneOrMorePadsArePressed = true;
-            break;
         }
     }
 
