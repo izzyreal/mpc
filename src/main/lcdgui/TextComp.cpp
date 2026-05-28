@@ -161,7 +161,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
                         ypos--;
                     }
 
-                    if (xpos < 0 || x >= pixels->size() ||
+                    if (xpos < 0 || xpos >= pixels->size() ||
                         ypos < 0 || ypos >= pixels[0].size())
                     {
                         continue;
