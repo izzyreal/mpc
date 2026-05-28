@@ -161,6 +161,12 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
                         ypos--;
                     }
 
+                    if (xpos < 0 || x >= pixels->size() ||
+                        ypos < 0 || ypos >= pixels[0].size())
+                    {
+                        continue;
+                    }
+
                     (*pixels)[xpos][ypos] = !isInverted();
 
                     if (field != nullptr && field->isSplit())
