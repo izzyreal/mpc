@@ -1,3 +1,7 @@
+## v0.9.11 (29-5-2026)
+* Fix live note event erase.
+* Fix crash when changing sequence in a song's step.
+
 ## v0.9.8 (27-5-2026)
 * Fix Erase window (erasing while not playing).
 * Animating buttons.
