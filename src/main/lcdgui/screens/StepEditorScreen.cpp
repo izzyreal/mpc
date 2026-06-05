@@ -255,7 +255,12 @@ void StepEditorScreen::function(int i)
             {
                 // CopySelectedNotes
                 setSelectedEvents();
-                placeHolder = selectedEvents;
+                placeHolder.clear();
+                placeHolder.reserve(selectedEvents.size());
+                for (const auto &event : selectedEvents)
+                {
+                    placeHolder.push_back(event->snapshot);
+                }
                 clearSelection();
             }
             else if (selectionStartIndex == -1 &&
@@ -271,7 +276,7 @@ void StepEditorScreen::function(int i)
 
                 if (!maybeEmptyEvent)
                 {
-                    placeHolder = {visibleEvents[eventIndex]};
+                    placeHolder = {visibleEvents[eventIndex]->snapshot};
                 }
             }
             break;
@@ -1502,7 +1507,7 @@ std::shared_ptr<EventRef> StepEditorScreen::getSelectedEvent()
     return selectedEvent;
 }
 
-std::vector<std::shared_ptr<EventRef>> &StepEditorScreen::getPlaceHolder()
+std::vector<EventData> &StepEditorScreen::getPlaceHolder()
 {
     return placeHolder;
 }

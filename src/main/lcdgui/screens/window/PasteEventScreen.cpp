@@ -37,8 +37,8 @@ void PasteEventScreen::function(const int i)
     for (int eventIndex = 0;
          eventIndex < stepEditorScreen->getPlaceHolder().size(); ++eventIndex)
     {
-        const auto event = stepEditorScreen->getPlaceHolder()[eventIndex];
-        sequencer::EventData eventState = *event->handle;
+        sequencer::EventData eventState =
+            stepEditorScreen->getPlaceHolder()[eventIndex];
         eventState.tick = sequencer.lock()->getTransport()->getTickPosition();
 
         utils::SimpleAction onComplete([] {});

@@ -2,6 +2,7 @@
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/WithLocateStepEventBarSequence.hpp"
 
+#include <sequencer/EventData.hpp>
 #include <sequencer/EventRef.hpp>
 #include <sequencer/EmptyEvent.hpp>
 
@@ -76,7 +77,7 @@ namespace mpc::lcdgui::screens
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
         const std::shared_ptr<sequencer::EmptyEvent> emptyEvent =
             std::make_shared<sequencer::EmptyEvent>();
-        std::vector<std::shared_ptr<sequencer::EventRef>> placeHolder;
+        std::vector<sequencer::EventData> placeHolder;
         std::shared_ptr<sequencer::EventRef> selectedEvent;
         std::vector<std::shared_ptr<sequencer::EventRef>> selectedEvents;
         std::map<std::string, std::string> lastColumn;
@@ -113,6 +114,6 @@ namespace mpc::lcdgui::screens
         std::string getSelectedParameterLetter();
         void clearSelection();
         int getYOffset() const;
-        std::vector<std::shared_ptr<sequencer::EventRef>> &getPlaceHolder();
+        std::vector<sequencer::EventData> &getPlaceHolder();
     };
 } // namespace mpc::lcdgui::screens
