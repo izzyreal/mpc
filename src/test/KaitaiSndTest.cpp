@@ -97,7 +97,7 @@ TEST_CASE("Kaitai MPC2000 SND matches handwritten SND bytes", "[kaitai-snd]")
     REQUIRE((*outputData)[1] == (*inputData)[1]);
 }
 
-TEST_CASE("Kaitai MPC2000 SND parses real mono and stereo files", "[kaitai-snd][hardware-files]")
+TEST_CASE("Kaitai MPC2000 SND parses real 2KXL mono and stereo files", "[kaitai-snd][real-2kxl]")
 {
     auto parseFile = [](const std::string& resourcePath, auto&& assertions) {
         auto fs = cmrc::mpctest::get_filesystem();
@@ -114,7 +114,7 @@ TEST_CASE("Kaitai MPC2000 SND parses real mono and stereo files", "[kaitai-snd][
         assertions(parsed);
     };
 
-    parseFile("test/KaitaiSnd/mpc2000snd_mono_loop_off.SND", [](const mpc2000snd_t& mono) {
+    parseFile("test/RealMpc2000xl/Snd/mono_loop_off.SND", [](const mpc2000snd_t& mono) {
         REQUIRE(mono.magic() == std::string("\x01\x04", 2));
         REQUIRE(mono.level() == 100);
         REQUIRE(mono.tune() == 0);
@@ -127,7 +127,7 @@ TEST_CASE("Kaitai MPC2000 SND parses real mono and stereo files", "[kaitai-snd][
         REQUIRE(mono.stereo() == false);
     });
 
-    parseFile("test/KaitaiSnd/mpc2000snd_stereo_loop_off.SND", [](const mpc2000snd_t& stereo) {
+    parseFile("test/RealMpc2000xl/Snd/stereo_loop_off.SND", [](const mpc2000snd_t& stereo) {
         REQUIRE(stereo.magic() == std::string("\x01\x04", 2));
         REQUIRE(stereo.level() == 100);
         REQUIRE(stereo.tune() == 0);
