@@ -149,13 +149,19 @@ MidiWriter::MidiWriter(sequencer::Sequence *sequence)
         if (t->getDeviceIndex() > 0)
         {
             auto value = stoi(trackDevice, nullptr, 16);
-            value += t->getDeviceIndex();
+            value += t->getDeviceIndex() - 1;
             trackDevice = util::MidiUtil::byteToHex(static_cast<char>(value));
         }
 
+        const auto busIndex = util::MidiUtil::byteToHex(
+            static_cast<char>(busTypeToIndex(t->getBusType())));
+        const auto deviceNumber = util::MidiUtil::byteToHex(
+            static_cast<char>(t->getDeviceIndex()));
+
         auto text = std::make_shared<meta::Text>(
             0, 0,
-            "TRACK DATA:" + trackNumber + trackDevice + "006403  000107   ");
+            "TRACK DATA:" + trackNumber + trackDevice + "006403  " +
+                deviceNumber + busIndex + deviceNumber + "   ");
         mt->insertEvent(text);
         auto tn = std::make_shared<meta::TrackName>(
             0, 0, StrUtil::padRight(t->getName(), " ", 16));

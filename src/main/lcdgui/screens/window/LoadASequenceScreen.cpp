@@ -92,7 +92,11 @@ void LoadASequenceScreen::displayLoadInto() const
 
 void LoadASequenceScreen::displayFile() const
 {
-    const auto s = sequencer.lock()->getSequence(TempSequenceIndex);
-    findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +
-                               ".MID");
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto midFile = loadScreen->getSelectedFile();
+    findLabel("file")->setText(
+        "File:" +
+        StrUtil::padRight(StrUtil::toUpper(midFile->getNameWithoutExtension()),
+                          " ", 16) +
+        ".MID");
 }

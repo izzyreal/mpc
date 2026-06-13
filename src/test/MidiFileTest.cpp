@@ -83,7 +83,8 @@ SCENARIO("A MidiFile can be written", "[file]")
         auto track0 = sequence->getTrack(0);
         auto track1 = sequence->getTrack(1);
         track0->setUsedIfCurrentlyUnused();
-        track0->setDeviceIndex(2);
+        track0->setBusType(BusType::DRUM2);
+        track0->setDeviceIndex(7);
 
         EventData eventData;
         eventData.type = EventType::NoteOn;
@@ -115,7 +116,8 @@ SCENARIO("A MidiFile can be written", "[file]")
         REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
                     sequence->getTrack(0)->getEvents()[0])
                     ->getNote() == 37);
-        REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 2);
+        REQUIRE(sequence->getTrack(0)->getBusType() == BusType::DRUM2);
+        REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 7);
         REQUIRE(sequence->getTrack(1)->getDeviceIndex() == 0);
     }
 }
@@ -351,6 +353,60 @@ TEST_CASE("HWIF316.MID loads with 16 bars", "[file][midi-file]")
     stateManager->drainQueue();
 
     REQUIRE(sequence->getBarCount() == 16);
+}
+
+TEST_CASE("Real 2KXL SEQ.MID preserves MPC note variation semantics",
+          "[file][midi-file][real-2kxl]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    sequence->init(1);
+    stateManager->drainQueue();
+
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/MidiFile/SEQ.MID");
+    std::string bytes(file.begin(), file.end());
+    auto stream = std::make_shared<std::istringstream>(bytes);
+
+    MidiReader reader(stream, sequence);
+    REQUIRE_NOTHROW(reader.parseSequence(mpc));
+    stateManager->drainQueue();
+
+    REQUIRE(sequence->getBarCount() == 1);
+
+    const auto track0 = sequence->getTrack(0);
+    REQUIRE(track0->getBusType() == BusType::DRUM2);
+    REQUIRE(track0->getDeviceIndex() == 7);
+
+    const auto actual = collectNoteSnapshots(track0);
+    const std::vector<NoteSnapshot> expected{
+        {0, 37, 65, 13, 0, 0},
+        {24, 37, 35, 49, 1, 0},
+        {48, 37, 75, 101, 2, 0},
+        {72, 37, 30, 35, 3, 0},
+        {96, 37, 22, 89, 3, 0},
+        {120, 37, 46, 174, 0, 0},
+        {144, 37, 19, 161, 0, 0},
+    };
+
+    REQUIRE(actual.size() == expected.size());
+    for (size_t i = 0; i < actual.size(); ++i)
+    {
+        CAPTURE(i);
+        CAPTURE(actual[i].tick, expected[i].tick);
+        CAPTURE(actual[i].note, expected[i].note);
+        CAPTURE(actual[i].velocity, expected[i].velocity);
+        CAPTURE(actual[i].duration, expected[i].duration);
+        CAPTURE(actual[i].variationType, expected[i].variationType);
+        REQUIRE(actual[i].tick == expected[i].tick);
+        REQUIRE(actual[i].note == expected[i].note);
+        REQUIRE(actual[i].velocity == expected[i].velocity);
+        REQUIRE(actual[i].duration == expected[i].duration);
+        REQUIRE(actual[i].variationType == expected[i].variationType);
+    }
 }
 
 TEST_CASE("FRUTZLE.MID roundtrip keeps non-empty sequence", "[file][midi-file]")

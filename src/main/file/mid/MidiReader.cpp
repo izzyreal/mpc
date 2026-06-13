@@ -228,6 +228,7 @@ void MidiReader::parseSequence(Mpc &mpc) const
         auto mt = midiTracks[i].lock();
         auto trackIndex = isMpc2000XlMidiFile ? i - 1 : i;
         auto deviceIndex = 0;
+        auto busType = BusType::DRUM1;
 
         for (auto &e : mt->getEvents())
         {
@@ -243,8 +244,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
                     if (auto deviceIndexStr = payload.substr(2, 2);
                         deviceIndexStr != "C0")
                     {
-                        deviceIndex = stoi(deviceIndexStr, nullptr, 16) -
-                                      stoi(std::string("E0"), nullptr, 16);
+                        deviceIndex =
+                            stoi(deviceIndexStr, nullptr, 16) -
+                            stoi(std::string("E0"), nullptr, 16) + 1;
+                    }
+
+                    if (payload.size() >= 16)
+                    {
+                        busType = busIndexToBusType(
+                            stoi(payload.substr(14, 2), nullptr, 16));
                     }
                     break;
                 }
@@ -258,15 +266,13 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
         auto &track = (*updateSequenceTracks.trackStates)[trackIndex];
         track.deviceIndex = deviceIndex;
+        track.busType = busType;
         bool hasImportedEvents = false;
 
         struct OpenNote
         {
-            int noteValue;
-            int tick;
-            int velocity;
-            NoteVariationType nvType;
-            NoteVariationValue nvValue;
+            EventData event;
+            bool isClosed = false;
         };
 
         std::vector<OpenNote> openNotes;
@@ -290,14 +296,120 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 {
                     if (noteOn->getVelocity() == 0)
                     {
-                        noteOffs.push_back(noteOn);
+                        const auto isDefaultVariation = [](const EventData &event)
+                        {
+                            if (event.noteVariationType == NoteVariationTypeTune)
+                            {
+                                return event.noteVariationValue ==
+                                       DefaultNoteVariationValue;
+                            }
+
+                            if (event.noteVariationType ==
+                                    NoteVariationTypeDecay ||
+                                event.noteVariationType ==
+                                    NoteVariationTypeAttack)
+                            {
+                                return event.noteVariationValue == 0;
+                            }
+
+                            if (event.noteVariationType ==
+                                NoteVariationTypeFilter)
+                            {
+                                return event.noteVariationValue == 50;
+                            }
+
+                            return false;
+                        };
+
+                        auto bestIt = openNotes.end();
+
+                        auto isEligible = [&](const OpenNote &openNote)
+                        {
+                            return !openNote.isClosed &&
+                                   openNote.event.noteNumber ==
+                                       NoteNumber(noteOn->getNoteValue()) &&
+                                   openNote.event.tick <= noteOn->getTick();
+                        };
+
+                        auto latestNonDefaultIt = openNotes.end();
+                        for (auto it = openNotes.rbegin(); it != openNotes.rend();
+                             ++it)
+                        {
+                            if (!isEligible(*it) ||
+                                isDefaultVariation(it->event))
+                            {
+                                continue;
+                            }
+
+                            latestNonDefaultIt = std::prev(it.base());
+                            break;
+                        }
+
+                        if (latestNonDefaultIt != openNotes.end())
+                        {
+                            auto sameVariationCount = 0;
+                            for (auto it = openNotes.begin(); it != openNotes.end();
+                                 ++it)
+                            {
+                                if (!isEligible(*it))
+                                {
+                                    continue;
+                                }
+
+                                if (it->event.noteVariationType ==
+                                        latestNonDefaultIt->event.noteVariationType &&
+                                    it->event.noteVariationValue ==
+                                        latestNonDefaultIt->event.noteVariationValue)
+                                {
+                                    sameVariationCount++;
+                                    if (bestIt == openNotes.end())
+                                    {
+                                        bestIt = it;
+                                    }
+                                }
+                            }
+
+                            if (sameVariationCount < 2)
+                            {
+                                bestIt = openNotes.end();
+                            }
+                        }
+
+                        if (bestIt == openNotes.end())
+                        {
+                            for (auto it = openNotes.begin(); it != openNotes.end();
+                                 ++it)
+                            {
+                                if (!isEligible(*it))
+                                {
+                                    continue;
+                                }
+
+                                bestIt = it;
+                                break;
+                            }
+                        }
+
+                        if (bestIt != openNotes.end())
+                        {
+                            bestIt->event.duration =
+                                Duration(noteOn->getTick() - bestIt->event.tick);
+                            bestIt->isClosed = true;
+                        }
                     }
                     else
                     {
-                        openNotes.push_back(OpenNote{
-                            noteOn->getNoteValue(), noteOn->getTick(),
-                            noteOn->getVelocity(), noteVariationData.first,
-                            noteVariationData.second});
+                        EventData ne;
+                        ne.type = EventType::NoteOn;
+                        ne.noteNumber = NoteNumber(noteOn->getNoteValue());
+                        ne.tick = noteOn->getTick();
+                        ne.velocity = Velocity(noteOn->getVelocity());
+                        ne.noteVariationType = noteVariationData.first;
+                        ne.noteVariationValue = noteVariationData.second;
+                        ne.duration = Duration(24);
+                        openNotes.push_back(OpenNote{ne});
+                        noteVariationData = {NoteVariationTypeTune,
+                                             DefaultNoteVariationValue};
                     }
                 }
             }
@@ -315,10 +427,15 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
                 else if (noteOn)
                 {
-                    openNotes.push_back(
-                        OpenNote{noteOn->getNoteValue(), noteOn->getTick(),
-                                 noteOn->getVelocity(), noteVariationData.first,
-                                 noteVariationData.second});
+                    EventData ne;
+                    ne.type = EventType::NoteOn;
+                    ne.noteNumber = NoteNumber(noteOn->getNoteValue());
+                    ne.tick = noteOn->getTick();
+                    ne.velocity = Velocity(noteOn->getVelocity());
+                    ne.noteVariationType = noteVariationData.first;
+                    ne.noteVariationValue = noteVariationData.second;
+                    ne.duration = Duration(24);
+                    openNotes.push_back(OpenNote{ne});
                 }
             }
         }
@@ -328,6 +445,12 @@ void MidiReader::parseSequence(Mpc &mpc) const
         //
         for (auto &on : openNotes)
         {
+            if (isMpc2000XlMidiFile)
+            {
+                noteOns.emplace_back(on.event);
+                continue;
+            }
+
             int bestIdx = -1;
             int endTick = -1;
 
@@ -338,21 +461,17 @@ void MidiReader::parseSequence(Mpc &mpc) const
 
                 if (auto nOn = std::dynamic_pointer_cast<NoteOn>(noteOffs[k]))
                 {
-                    // isMpc2000XlMidiFile == true. MPC2000XL MIDI files use
-                    // MIDI Note On events to indicate the end of a note.
                     offVal = nOn->getNoteValue();
                     offTick = nOn->getTick();
                 }
                 else
                 {
-                    // Ordinary MIDI file. The end of a note is indicated by a
-                    // note off event.
                     auto nOff = std::dynamic_pointer_cast<NoteOff>(noteOffs[k]);
                     offVal = nOff->getNoteValue();
                     offTick = nOff->getTick();
                 }
 
-                if (offVal == on.noteValue && offTick >= on.tick)
+                if (offVal == on.event.noteNumber && offTick >= on.event.tick)
                 {
                     endTick = offTick;
                     bestIdx = k;
@@ -360,22 +479,12 @@ void MidiReader::parseSequence(Mpc &mpc) const
                 }
             }
 
-            EventData ne;
-            ne.type = EventType::NoteOn;
-            ne.noteNumber = NoteNumber(on.noteValue);
-            ne.tick = on.tick;
-            ne.velocity = Velocity(on.velocity);
-            ne.noteVariationType = on.nvType;
-            ne.noteVariationValue = on.nvValue;
+            EventData ne = on.event;
 
             if (bestIdx != -1)
             {
-                ne.duration = Duration(endTick - on.tick);
+                ne.duration = Duration(endTick - on.event.tick);
                 noteOffs.erase(noteOffs.begin() + bestIdx);
-            }
-            else
-            {
-                ne.duration = Duration(24);
             }
 
             noteOns.emplace_back(ne);
