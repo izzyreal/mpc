@@ -72,6 +72,11 @@ FetchContent_Declare(readerwriterqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
 )
 
+FetchContent_Declare(kaitai_runtime
+    GIT_REPOSITORY https://github.com/izzyreal/kaitai_struct_cpp_stl_runtime
+    GIT_TAG        cpp-serialization
+)
+
 FetchContent_Declare(json-schema-validator
     GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
     GIT_TAG        2.3.0
@@ -100,6 +105,11 @@ FetchContent_MakeAvailable(platformfolders)
 target_include_directories(platform_folders INTERFACE
     $<BUILD_INTERFACE:${PlatformFolders_SOURCE_DIR}>
 )
+
+message(STATUS "Downloading kaitai runtime...")
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(kaitai_runtime)
+unset(BUILD_TESTS CACHE)
 
 if(NOT TARGET nlohmann_json::nlohmann_json)
     FetchContent_Declare(json
@@ -179,7 +189,7 @@ target_include_directories(mpc PUBLIC
     ${readerwriterqueue_SOURCE_DIR}
 )
 
-target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator lodepng)
+target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator lodepng kaitai_struct_cpp_stl_runtime)
 
 if(MSVC)
   target_compile_options(mpc PRIVATE "/MP")
