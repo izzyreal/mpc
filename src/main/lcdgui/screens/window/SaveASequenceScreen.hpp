@@ -21,6 +21,7 @@ namespace mpc::lcdgui::screens::window
         void displayFile() const;
 
         int saveSequenceAs = 1;
+        std::string fileName;
         void setSaveSequenceAs(int i);
     };
 } // namespace mpc::lcdgui::screens::window
