@@ -9,7 +9,9 @@ namespace mpc::lcdgui
 {
     struct ReactiveBinding
     {
-        std::function<void()> refreshFn;
+        std::function<void(bool)> refreshFn;
+
+        bool shouldClearPrevValue = false;
 
         ReactiveBinding() = default;
 
@@ -28,9 +30,15 @@ namespace mpc::lcdgui
             refreshFn = [get = std::forward<Getter>(getter),
                          upd = std::forward<Updater>(updater),
                          cmp = std::move(comp),
-                         prev = std::optional<T>()]() mutable
+                         prev = std::optional<T>()](const bool shouldClear) mutable
             {
+                if (shouldClear)
+                {
+                    prev.reset();
+                }
+
                 const T current = get();
+
                 if (!prev.has_value() || !cmp(current, *prev))
                 {
                     prev = current;
@@ -39,12 +47,19 @@ namespace mpc::lcdgui
             };
         }
 
-        void refresh() const
+        void clearPrevValue()
+        {
+            shouldClearPrevValue = true;
+        }
+
+        void refresh()
         {
             if (refreshFn)
             {
-                refreshFn();
+                refreshFn(shouldClearPrevValue);
             }
+
+            shouldClearPrevValue = false;
         }
     };
 } // namespace mpc::lcdgui

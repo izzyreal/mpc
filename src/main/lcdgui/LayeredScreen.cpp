@@ -304,6 +304,8 @@ void LayeredScreen::openPreviousScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
+    newScreen->resetReactiveBindings();
+
     const auto oldScreenComponent = history.empty()
                                         ? std::shared_ptr<ScreenComponent>()
                                         : getCurrentScreen();

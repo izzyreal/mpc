@@ -45,6 +45,15 @@ namespace mpc::lcdgui
 
     public:
         virtual ~Component() = default;
+
+        void resetReactiveBindings()
+        {
+            for (auto &r : reactiveBindings)
+            {
+                r.clearPrevValue();
+            }
+        }
+
         void timerCallback()
         {
             for (auto &b : reactiveBindings)
