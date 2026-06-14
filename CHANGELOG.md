@@ -1,3 +1,11 @@
+## v0.9.13 (14-6-2026)
+* Improved MID file reading and writing.
+* Fix MID file name change when saving a MID file.
+* Fix a rare cosmetic glitch where the MAIN screen does not show the correct sequence.
+
+## v0.9.12 (6-6-2026)
+* Fix Step Editor paste event after deleting the original that was copied to the clipboard.
+
 ## v0.9.11 (29-5-2026)
 * Fix live note event erase.
 * Fix crash when changing sequence in a song's step.
