@@ -45,10 +45,10 @@ void Mpc2000XlAllFileScreen::function(const int i)
         case 4:
         {
             const auto selectedFile = loadScreen->getSelectedFile();
+            mpc.screens->get<ScreenId::SaveAllFileScreen>()->setFileName(
+                selectedFile->getNameWithoutExtension());
             auto on_success = [&, selectedFile]
             {
-                mpc.screens->get<ScreenId::SaveAllFileScreen>()->setFileName(
-                    selectedFile->getNameWithoutExtension());
                 openScreenById(ScreenId::LoadScreen);
             };
             mpc.getDisk()->readAll2(selectedFile, on_success);

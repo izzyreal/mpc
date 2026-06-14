@@ -4,6 +4,7 @@
 #include "disk/MpcFile.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "file/wav/WavFile.hpp"
+#include "file/kaitai/SndIo.hpp"
 #include "file/sndreader/SndReader.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
@@ -83,42 +84,8 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {
-        auto onSndReaderSuccess =
-            [sampler, sound, nameWithoutExtension, &existingSoundIndex](
-                const std::shared_ptr<SndReader> &sndReader) -> sound_or_error
-        {
-            if (!sndReader->isHeaderValid())
-            {
-                return tl::make_unexpected(
-                    mpc_io_error_msg{"Invalid SND header"});
-            }
-
-            if (StrUtil::eqIgnoreCase(sndReader->getName(),
-                                      nameWithoutExtension))
-            {
-                existingSoundIndex = sampler->checkExists(sndReader->getName());
-                sound->setName(sndReader->getName());
-            }
-            else
-            {
-                existingSoundIndex = sampler->checkExists(nameWithoutExtension);
-                sound->setName(nameWithoutExtension);
-            }
-
-            sndReader->readData(sound->getMutableSampleData());
-            sound->setMono(sndReader->isMono());
-            sound->setStart(sndReader->getStart());
-            sound->setEnd(sndReader->getEnd());
-            sound->setLoopTo(sndReader->getEnd() - sndReader->getLoopLength());
-            sound->setSampleRate(sndReader->getSampleRate());
-            sound->setLoopEnabled(sndReader->isLoopEnabled());
-            sound->setLevel(sndReader->getLevel());
-            sound->setTune(sndReader->getTune());
-            sound->setBeatCount(sndReader->getNumberOfBeats());
-            return sound;
-        };
-
-        soundOrError = mpc.getDisk()->readSnd2(f, onSndReaderSuccess);
+        existingSoundIndex = sampler->checkExists(nameWithoutExtension);
+        soundOrError = file::kaitai::SndIo::loadSound(f, sound, nameWithoutExtension);
     }
 
     if (!soundOrError.has_value())

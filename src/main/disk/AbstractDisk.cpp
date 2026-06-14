@@ -15,6 +15,11 @@
 #include "file/sndreader/SndReader.hpp"
 #include "file/aps/ApsParser.hpp"
 #include "file/all/AllParser.hpp"
+#include "file/kaitai/SndIo.hpp"
+#include "file/kaitai/PgmIo.hpp"
+#include "file/kaitai/ApsIo.hpp"
+#include "file/kaitai/MidIo.hpp"
+#include "file/kaitai/AllIo.hpp"
 
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
@@ -166,8 +171,7 @@ void AbstractDisk::writeSnd(const std::shared_ptr<Sound> &s,
         const auto name = Util::getFileName(
             fileName == "" ? s->getName() + ".SND" : fileName);
         auto f = newFile(name);
-        auto sw = SndWriter(s.get());
-        auto &sndArray = sw.getSndFileArray();
+        auto sndArray = file::kaitai::SndIo::saveSound(*s);
         f->setFileData(sndArray);
         flush();
         initFiles();
@@ -237,8 +241,7 @@ void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
             return tl::make_unexpected(
                 mpc_io_error_msg{"Unable to open MIDI output stream"});
         }
-        const MidiWriter writer(s.get());
-        writer.writeToOStream(outputStream);
+        file::kaitai::MidIo::save(s, outputStream);
         flush();
         initFiles();
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
@@ -330,8 +333,7 @@ void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
     const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
-        const PgmWriter writer(p.get(), mpc.getSampler());
-        auto bytes = writer.get();
+        auto bytes = file::kaitai::PgmIo::saveProgram(*p, mpc.getSampler());
         f->setFileData(bytes);
 
         const std::string popupMsg = "Saving " + fileName;
@@ -394,8 +396,7 @@ void AbstractDisk::writeAps(const std::string &fileName)
     {
         auto f = newFile(fileName);
         const auto apsName = f->getNameWithoutExtension();
-        ApsParser apsParser(mpc, apsName);
-        auto bytes = apsParser.getBytes();
+        auto bytes = file::kaitai::ApsIo::save(mpc, apsName);
         f->setFileData(bytes);
 
         auto saveAProgramScreen =
@@ -439,8 +440,7 @@ void AbstractDisk::writeAll(const std::string &fileName)
     const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
     {
         auto f = newFile(fileName);
-        AllParser allParser(mpc);
-        auto bytes = allParser.getBytes();
+        auto bytes = file::kaitai::AllIo::save(mpc);
         f->setFileData(bytes);
 
         flush();
@@ -588,30 +588,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 {
     const std::function readFunc = [this, f]() -> sequence_or_error
     {
-        if (!f)
-        {
-            return tl::make_unexpected(mpc_io_error_msg{"Empty file"});
-        }
-
-        const auto fStream = f->getInputStream();
-        if (!fStream)
-        {
-            return tl::make_unexpected(
-                mpc_io_error_msg{"Unable to open MIDI input stream"});
-        }
-        auto newSeq = mpc.getSequencer()->getSequence(TempSequenceIndex);
-
-        newSeq->init(0);
-
-        const MidiReader midiReader(fStream, newSeq);
-        midiReader.parseSequence(mpc);
-
-        if (newSeq->getName().empty())
-        {
-            newSeq->setName(f->getNameWithoutExtension());
-        }
-
-        return newSeq;
+        return file::kaitai::MidIo::load(mpc, f);
     };
 
     return performRequiredIoOrOpenErrorPopup(readFunc);
