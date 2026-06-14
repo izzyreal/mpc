@@ -4,6 +4,7 @@
 
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "file/kaitai/PgmIo.hpp"
 #include "disk/PgmFileToProgramConverter.hpp"
 #include "disk/SoundLoader.hpp"
 #include "sampler/Program.hpp"
@@ -81,8 +82,7 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
 
     std::vector<std::string> pgmSoundNames;
 
-    return PgmFileToProgramConverter::loadFromFileAndConvert(mpc, file, program,
-                                                             pgmSoundNames)
+    return file::kaitai::PgmIo::loadProgram(mpc, file, program, pgmSoundNames)
         .map(
             [pgmSoundNames, &mpc, programIndex](std::shared_ptr<Program> p)
             {

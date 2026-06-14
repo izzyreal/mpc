@@ -27,16 +27,16 @@ void mpc2000snd_t::_read() {
     m_loop_enabled = m__io->read_bits_int_le(1);
     m_beat_count = m__io->read_u1();
     m_sample_rate = m__io->read_u2le();
-    m_frames = std::unique_ptr<std::vector<int16_t>>(new std::vector<int16_t>());
-    const int l_frames = frame_count();
-    for (int i = 0; i < l_frames; i++) {
-        m_frames->push_back(std::move(m__io->read_s2le()));
+    m_sample_data = std::unique_ptr<std::vector<int16_t>>(new std::vector<int16_t>());
+    const int l_sample_data = ((stereo()) ? (frame_count() * 2) : (frame_count()));
+    for (int i = 0; i < l_sample_data; i++) {
+        m_sample_data->push_back(std::move(m__io->read_s2le()));
     }
     m__dirty = false;
 }
 
 void mpc2000snd_t::_fetch_instances() {
-    for (std::size_t i = 0; i < m_frames->size(); ++i) {
+    for (std::size_t i = 0; i < m_sample_data->size(); ++i) {
     }
 }
 
@@ -53,10 +53,10 @@ void mpc2000snd_t::_write() {
     m__io->write_bits_int_le(1, ((m_loop_enabled) ? 1 : 0));
     m__io->write_u1(m_beat_count);
     m__io->write_u2le(m_sample_rate);
-    if (m_frames == nullptr) {
+    if (m_sample_data == nullptr) {
         throw std::runtime_error("/seq/12: repeated field is not set");
     }
-    for (std::vector<int16_t>::const_iterator it = m_frames->begin(); it != m_frames->end(); ++it) {
+    for (std::vector<int16_t>::const_iterator it = m_sample_data->begin(); it != m_sample_data->end(); ++it) {
         m__io->write_s2le((*it));
     }
     _fetch_instances();
@@ -73,13 +73,13 @@ void mpc2000snd_t::_check() {
     if (m_name.size() != static_cast<std::string::size_type>(17)) {
         throw std::runtime_error("/seq/1: size mismatch");
     }
-    if (m_frames == nullptr) {
+    if (m_sample_data == nullptr) {
         throw std::runtime_error("/seq/12: repeated field is not set");
     }
-    if (m_frames->size() != static_cast<std::size_t>(frame_count())) {
+    if (m_sample_data->size() != static_cast<std::size_t>(((stereo()) ? (frame_count() * 2) : (frame_count())))) {
         throw std::runtime_error("/seq/12: repeat-expr size mismatch");
     }
-    for (std::vector<int16_t>::const_iterator it = m_frames->begin(); it != m_frames->end(); ++it) {
+    for (std::vector<int16_t>::const_iterator it = m_sample_data->begin(); it != m_sample_data->end(); ++it) {
     }
     m__dirty = false;
 }

@@ -7,6 +7,7 @@
 #include "controller/ClientMidiEventController.hpp"
 #include "controller/MidiFootswitchFunctionMap.hpp"
 #include "file/all/AllParser.hpp"
+#include "file/kaitai/AllIo.hpp"
 #include "file/all/Count.hpp"
 #include "file/all/Defaults.hpp"
 #include "file/all/MidiInput.hpp"
@@ -51,8 +52,7 @@ using namespace mpc::sequencer;
 
 void AllLoader::loadEverythingFromFile(Mpc &mpc, MpcFile *f)
 {
-    AllParser allParser(mpc, f->getBytes());
-    loadEverythingFromAllParser(mpc, allParser);
+    file::kaitai::AllIo::loadEverything(mpc, f);
 }
 
 void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
@@ -302,18 +302,12 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 std::vector<SequenceMetaInfo>
 AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc, MpcFile *f)
 {
-    std::vector<SequenceMetaInfo> result;
-    const AllParser allParser(mpc, f->getBytes());
-
-    const auto allSeqNames = allParser.getSeqNames()->getNames();
-    const auto allSeqUsednesses = allParser.getSeqNames()->getUsednesses();
-
-    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; ++i)
+    auto result = file::kaitai::AllIo::loadSequenceMetaInfos(mpc, f);
+    if (!result)
     {
-        result.push_back({allSeqUsednesses[i], allSeqNames[i]});
+        throw std::runtime_error(result.error());
     }
-
-    return result;
+    return *result;
 }
 
 std::shared_ptr<Sequence>
@@ -321,18 +315,6 @@ AllLoader::loadOneSequenceFromFile(Mpc &mpc, MpcFile *f,
                                    const SequenceIndex sourceIndexInAllFile,
                                    const SequenceIndex destIndexInMpcMemory)
 {
-    AllParser allParser(mpc, f->getBytes());
-
-    const auto allSequences = allParser.getAllSequences();
-
-    const auto allSeqNames = allParser.getSeqNames()->getNames();
-
-    const auto sequencer = mpc.getSequencer();
-
-    const auto sequence = sequencer->getSequence(destIndexInMpcMemory);
-
-    allSequences[sourceIndexInAllFile]->applyToInMemorySequence(
-        sequence, sequencer->getStateManager().get());
-
-    return sequence;
+    return file::kaitai::AllIo::loadOneSequence(
+        mpc, f, sourceIndexInAllFile, destIndexInMpcMemory);
 }
