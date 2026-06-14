@@ -52,8 +52,8 @@ public:
     void set_beat_count(uint8_t _v) { m__dirty = true; m_beat_count = std::move(_v); }
     uint16_t sample_rate() const { return m_sample_rate; }
     void set_sample_rate(uint16_t _v) { m__dirty = true; m_sample_rate = std::move(_v); }
-    std::vector<int16_t>* frames() const { return m_frames.get(); }
-    void set_frames(std::unique_ptr<std::vector<int16_t>> _v) { m__dirty = true; m_frames = std::move(_v); }
+    std::vector<int16_t>* sample_data() const { return m_sample_data.get(); }
+    void set_sample_data(std::unique_ptr<std::vector<int16_t>> _v) { m__dirty = true; m_sample_data = std::move(_v); }
     mpc2000snd_t* _root() const { return m__root; }
     void set__root(mpc2000snd_t* _v) { m__dirty = true; m__root = std::move(_v); }
     kaitai::kstruct* _parent() const { return m__parent; }
@@ -72,7 +72,7 @@ private:
     bool m_loop_enabled;
     uint8_t m_beat_count;
     uint16_t m_sample_rate;
-    std::unique_ptr<std::vector<int16_t>> m_frames;
+    std::unique_ptr<std::vector<int16_t>> m_sample_data;
     mpc2000snd_t* m__root;
     kaitai::kstruct* m__parent;
 };

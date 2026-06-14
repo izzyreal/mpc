@@ -62,10 +62,10 @@ TEST_CASE("Kaitai MPC2000 SND matches handwritten SND bytes", "[kaitai-snd]")
     REQUIRE(parsed.loop_enabled() == true);
     REQUIRE(parsed.beat_count() == 4);
     REQUIRE(parsed.sample_rate() == 44100);
-    REQUIRE(parsed.frames() != nullptr);
-    REQUIRE(parsed.frames()->size() == 2U);
-    REQUIRE(parsed.frames()->at(0) == 1234);
-    REQUIRE(parsed.frames()->at(1) == -1234);
+    REQUIRE(parsed.sample_data() != nullptr);
+    REQUIRE(parsed.sample_data()->size() == 2U);
+    REQUIRE(parsed.sample_data()->at(0) == 1234);
+    REQUIRE(parsed.sample_data()->at(1) == -1234);
 
     std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
     kaitai::kstream writeIo(&writeStream);

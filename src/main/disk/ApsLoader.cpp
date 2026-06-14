@@ -8,6 +8,7 @@
 #include "disk/SoundLoader.hpp"
 #include "file/aps/ApsNoteParameters.hpp"
 #include "file/aps/ApsParser.hpp"
+#include "file/kaitai/ApsIo.hpp"
 #include "file/aps/ApsSlider.hpp"
 
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -37,33 +38,7 @@ using namespace mpc::file::aps;
 void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                      const bool headless)
 {
-    if (!file->exists())
-    {
-        throw std::invalid_argument("File does not exist");
-    }
-
-    const auto seqScreen = mpc.screens->get<ScreenId::DrumScreen>();
-
-    const auto cantFindFileScreen =
-        mpc.screens->get<ScreenId::CantFindFileScreen>();
-    cantFindFileScreen->skipAll = false;
-
-    ApsParser apsParser(file->getBytes());
-
-    if (!apsParser.isHeaderValid())
-    {
-        MLOG(
-            "The APS file you're trying to load does not have a valid ID. The "
-            "first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 "
-            "APS files start with 0A 04 and are not supported (yet?).");
-
-        throw std::runtime_error("Invalid APS header");
-    }
-
-    constexpr auto withoutSounds = false;
-    loadFromParsedAps(apsParser, mpc, withoutSounds, headless);
-
-    mpc.getSampler()->setSoundIndex(0);
+    file::kaitai::ApsIo::load(mpc, file, headless);
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
