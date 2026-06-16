@@ -39,6 +39,26 @@ using namespace mpc::hardware;
 using namespace mpc::engine;
 using namespace mpc::command::context;
 
+namespace
+{
+bool isChannelVoiceMessage(const ClientMidiEvent::MessageType messageType)
+{
+    switch (messageType)
+    {
+        case ClientMidiEvent::NOTE_ON:
+        case ClientMidiEvent::NOTE_OFF:
+        case ClientMidiEvent::CONTROLLER:
+        case ClientMidiEvent::AFTERTOUCH:
+        case ClientMidiEvent::CHANNEL_PRESSURE:
+        case ClientMidiEvent::PROGRAM_CHANGE:
+        case ClientMidiEvent::PITCH_WHEEL:
+            return true;
+        default:
+            return false;
+    }
+}
+} // namespace
+
 ClientMidiEventController::ClientMidiEventController(
     const std::weak_ptr<PerformanceManager> &performanceManager,
     const std::shared_ptr<ClientEventController> &clientEventController,
@@ -79,6 +99,12 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());
         notifyObservers(notificationMessage);
+    }
+
+    if (sequencer.lock()->isRecordingModeMulti() &&
+        isChannelVoiceMessage(e.getMessageType()) && !getTrackForEvent(e))
+    {
+        return;
     }
 
     switch (e.getMessageType())
@@ -213,6 +239,10 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
     noteOnInternal(e.getChannel(), e.getNoteNumber(), e.getVelocity());
 
     auto track = getTrackForEvent(e);
+    if (!track)
+    {
+        return;
+    }
 
     auto program = getProgramForEvent(e);
 
@@ -411,7 +441,11 @@ void ClientMidiEventController::handleKeyAftertouch(
     const auto pressure = e.getAftertouchValue();
     const auto note = e.getAftertouchNote();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer.lock()->getBus(track->getBusType());
+    if (!track)
+    {
+        return;
+    }
+
     performanceManager.lock()->registerNoteAftertouch(
         PerformanceEventSource::MidiInput, NoteNumber(note), Pressure(pressure),
         std::optional<MidiChannel>(e.getChannel()));
@@ -439,7 +473,10 @@ void ClientMidiEventController::handleChannelAftertouch(
 {
     const auto pressure = e.getChannelPressure();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer.lock()->getBus(track->getBusType());
+    if (!track)
+    {
+        return;
+    }
 
     for (auto &p : sampler.lock()->getPrograms())
     {
@@ -700,7 +737,8 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
                 multiRecordingSetupScreen.lock()->getMrsLines();
             e.getChannel() < static_cast<int>(mrsLines.size()))
         {
-            return mrsLines[e.getChannel()]->getTrack();
+            const auto trackIndex = mrsLines[e.getChannel()]->getTrack();
+            return trackIndex >= 0 ? std::optional(trackIndex) : std::nullopt;
         }
         return std::nullopt;
     }
@@ -712,6 +750,11 @@ ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 {
     if (const auto trackIndex = getTrackIndexForEvent(e); trackIndex)
     {
+        if (*trackIndex < 0 || *trackIndex >= Mpc2000XlSpecs::TRACK_COUNT)
+        {
+            return {};
+        }
+
         const auto seq = sequencer.lock()->getTransport()->isPlaying()
                              ? sequencer.lock()->getCurrentlyPlayingSequence()
                              : sequencer.lock()->getSelectedSequence();
