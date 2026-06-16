@@ -41,7 +41,7 @@ using namespace mpc::command::context;
 
 namespace
 {
-bool isChannelVoiceMessage(const ClientMidiEvent::MessageType messageType)
+bool isTrackRoutedChannelMessage(const ClientMidiEvent::MessageType messageType)
 {
     switch (messageType)
     {
@@ -102,7 +102,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     }
 
     if (sequencer.lock()->isRecordingModeMulti() &&
-        isChannelVoiceMessage(e.getMessageType()) && !getTrackForEvent(e))
+        isTrackRoutedChannelMessage(e.getMessageType()) && !getTrackForEvent(e))
     {
         return;
     }
@@ -450,10 +450,8 @@ void ClientMidiEventController::handleKeyAftertouch(
         PerformanceEventSource::MidiInput, NoteNumber(note), Pressure(pressure),
         std::optional<MidiChannel>(e.getChannel()));
 
-    if (const auto program = getProgramForEvent(e))
+    if (const auto program = getProgramForEvent(e); program && program->isUsed())
     {
-        assert(program->isUsed());
-
         if (isDrumNote(NoteNumber(note)))
         {
             if (const auto programPadIndex =
