@@ -203,9 +203,12 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
                 }
                 else if (e.getMessageType() == ClientMidiEvent::AFTERTOUCH)
                 {
-                    constexpr bool isAftertouch = true;
-                    pressPad(componentId, e.getAftertouchValue() / 127.f,
-                             isAftertouch);
+                    if (isPad)
+                    {
+                        constexpr bool isAftertouch = true;
+                        pressPad(componentId, e.getAftertouchValue() / 127.f,
+                                 isAftertouch);
+                    }
                 }
                 else
                 {
