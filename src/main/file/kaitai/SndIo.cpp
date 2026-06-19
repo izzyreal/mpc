@@ -68,7 +68,7 @@ std::vector<char> SndIo::saveSound(mpc::sampler::Sound &sound)
 {
     mpc2000snd_t parsed(nullptr);
     parsed.set_magic(std::string("\x01\x04", 2));
-    parsed.set_name(StrUtil::padRight(sound.getName(), " ", 16) + '\0');
+    parsed.set_name(StrUtil::padRight(sound.getName().substr(0, 16), " ", 16) + '\0');
     parsed.set_level(sound.getSndLevel());
     parsed.set_tune(static_cast<int8_t>(sound.getTune()));
     parsed.set_stereo(!sound.isMono());
