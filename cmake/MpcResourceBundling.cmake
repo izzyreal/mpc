@@ -40,7 +40,7 @@ function(_bundle_resources)
 
   _generate_mpc_required_resource_manifest()
 
-  file(GLOB_RECURSE MPC_RESOURCES "${_mpc_resources_root}/*")
+  file(GLOB_RECURSE MPC_RESOURCES CONFIGURE_DEPENDS "${_mpc_resources_root}/*")
   list(FILTER MPC_RESOURCES EXCLUDE REGEX "\\.DS_Store$")
 
   if (APPLE)
@@ -62,7 +62,7 @@ function(_bundle_resources)
     target_link_libraries(mpc mpc::rc)
   endif()
 
-  file(GLOB_RECURSE MPC_TEST_RESOURCES "${_mpc_test_resources_root}/*")
+  file(GLOB_RECURSE MPC_TEST_RESOURCES CONFIGURE_DEPENDS "${_mpc_test_resources_root}/*")
   list(FILTER MPC_TEST_RESOURCES EXCLUDE REGEX "\\.DS_Store$")
 
   cmrc_add_resource_library(
