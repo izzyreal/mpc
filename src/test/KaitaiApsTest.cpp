@@ -40,6 +40,21 @@ void prepareApsResources(mpc::Mpc& mpc)
     disk->initFiles();
 }
 
+std::shared_ptr<mpc::disk::MpcFile> installApsResourceFile(
+    mpc::Mpc& mpc,
+    const std::string& resourcePath,
+    const std::string& fileName)
+{
+    auto disk = mpc.getDisk();
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open(resourcePath);
+    std::vector<char> data(file.begin(), file.end());
+    auto newFile = disk->newFile(fileName);
+    newFile->setFileData(data);
+    disk->initFiles();
+    return newFile;
+}
+
 void loadAllPgmsAps(mpc::Mpc& mpc)
 {
     prepareApsResources(mpc);
@@ -249,4 +264,33 @@ TEST_CASE("Kaitai MPC2000 APS saves MIDI program change separately from slider c
         mpc::file::kaitai::ApsIo::save(mpc, "ALL_PGMS");
 
     REQUIRE(bytesWithNonZeroControl == bytesWithZeroControl);
+}
+
+TEST_CASE("Kaitai MPC2000 APS loads real 2KXL ALL_PGMS through production seam", "[kaitai-aps][real-2kxl]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto apsFile = installApsResourceFile(
+        mpc,
+        "test/RealMpc2000xl/Aps/ALL_PGMS.APS",
+        "ALL_PGMS.APS"
+    );
+    REQUIRE(apsFile);
+
+    constexpr bool headless = true;
+    mpc::file::kaitai::ApsIo::load(mpc, apsFile, headless);
+    mpc.getEngineHost()->prepareProcessBlock(512);
+
+    auto sampler = mpc.getSampler();
+    REQUIRE(sampler->getProgramCount() == 1);
+    REQUIRE(sampler->getSoundCount() == 0);
+
+    auto p1 = sampler->getProgram(0);
+    REQUIRE(p1 != nullptr);
+    REQUIRE(p1->getName() == "NewPgm-A");
+    REQUIRE(p1->getMidiProgramChange() == 1);
+    REQUIRE(p1->getSlider()->getControlChange() == 0);
+    REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == -1);
+    REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == -1);
 }
