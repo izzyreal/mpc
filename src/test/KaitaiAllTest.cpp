@@ -7,6 +7,8 @@
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
+#include "file/all/AllSong.hpp"
+#include "file/all/Defaults.hpp"
 #include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
 #include "lcdgui/ScreenId.hpp"
@@ -56,6 +58,19 @@ std::shared_ptr<mpc::disk::MpcFile> installResourceFile(
     std::vector<char> data(file.begin(), file.end());
     auto newFile = disk->newFile(fileName);
     newFile->setFileData(data);
+    disk->initFiles();
+    return newFile;
+}
+
+std::shared_ptr<mpc::disk::MpcFile> installAllBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& bytes,
+    const std::string& fileName)
+{
+    auto disk = mpc.getDisk();
+    auto newFile = disk->newFile(fileName);
+    auto mutableBytes = bytes;
+    newFile->setFileData(mutableBytes);
     disk->initFiles();
     return newFile;
 }
@@ -241,4 +256,81 @@ TEST_CASE("Kaitai MPC2000 ALL loads real 2KXL ALL through production seam", "[ka
     REQUIRE(song1->getStep(mpc::SongStepIndex(0)).repetitionCount == 2);
     REQUIRE(song1->getStep(mpc::SongStepIndex(1)).sequenceIndex == 0);
     REQUIRE(song1->getStep(mpc::SongStepIndex(1)).repetitionCount == 3);
+}
+
+TEST_CASE("AllParser reads mutated default tempo and song repeat count", "[kaitai-all]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_all_t parsed(&parseIo);
+    parsed._read();
+    parsed.defaults()->set_tempo(999);
+    parsed.songs()->at(1)->steps()->at(1)->set_repeat_count(7);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewritten = writeStream.str();
+    std::vector<char> bytes(rewritten.begin(), rewritten.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    mpc::file::all::AllParser handwritten(mpc, bytes);
+
+    REQUIRE(handwritten.getDefaults()->getTempo() == 999);
+    REQUIRE(handwritten.getSongs().at(1)->getSteps().at(1).second == 7);
+}
+
+TEST_CASE("AllLoader loads mutated default tempo and song repeat count", "[kaitai-all]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_all_t parsed(&parseIo);
+    parsed._read();
+    parsed.defaults()->set_tempo(999);
+    parsed.songs()->at(1)->steps()->at(1)->set_repeat_count(7);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewritten = writeStream.str();
+    std::vector<char> bytes(rewritten.begin(), rewritten.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    auto allFile = installAllBytes(mpc, bytes, "MUTATED.ALL");
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(mpc, allFile.get());
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto userScreen = mpc.screens->get<mpc::lcdgui::ScreenId::UserScreen>();
+    auto song1 = mpc.getSequencer()->getSong(1);
+    REQUIRE(userScreen);
+    REQUIRE_THAT(userScreen->getTempo(), Catch::Matchers::WithinAbs(99.9, 0.001));
+    REQUIRE(song1->getStep(mpc::SongStepIndex(1)).repetitionCount == 7);
 }
