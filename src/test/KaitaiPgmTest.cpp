@@ -2,14 +2,21 @@
 
 #include "TestMpc.hpp"
 #include "Mpc.hpp"
+#include "IntTypes.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/ProgramLoader.hpp"
+#include "engine/IndivFxMixer.hpp"
 #include "engine/EngineHost.hpp"
+#include "engine/StereoMixer.hpp"
+#include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_pgm.h"
 #include "file/pgmwriter/PgmWriter.hpp"
+#include "performance/PerformanceManager.hpp"
+#include "sampler/PgmSlider.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sampler/VoiceOverlapMode.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
@@ -66,6 +73,97 @@ std::shared_ptr<mpc::sampler::Program> loadProgram1(mpc::Mpc& mpc)
     return program;
 }
 
+std::shared_ptr<mpc::sampler::Program> loadProgram1FromBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& programBytes)
+{
+    prepareProgramLoadingResources(mpc);
+
+    auto disk = mpc.getDisk();
+    disk->moveForward("program1");
+    disk->initFiles();
+    auto pgmFile = disk->getFile("PROGRAM1.PGM");
+    auto mutableBytes = programBytes;
+    pgmFile->setFileData(mutableBytes);
+
+    auto sampler = mpc.getSampler();
+    sampler->deleteAllPrograms(false);
+    sampler->deleteAllSamples();
+
+    auto program = sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
+    (void)mpc::disk::ProgramLoader::loadProgram(mpc, pgmFile, program, 0);
+    mpc.getEngineHost()->prepareProcessBlock(512);
+    return program;
+}
+
+void requireProgram1LoadedState(mpc::Mpc& mpc,
+                                const std::shared_ptr<mpc::sampler::Program>& program)
+{
+    REQUIRE(program != nullptr);
+    REQUIRE(program->getName() == "PROGRAM1");
+
+    auto sampler = mpc.getSampler();
+    REQUIRE(sampler->getSoundCount() == 2);
+    REQUIRE(sampler->getSoundName(0) == "sound1");
+    REQUIRE(sampler->getSoundName(1) == "sound2");
+    REQUIRE(sampler->getSound(1)->getEnd() == 1000);
+
+    const auto note35 = program->getNoteParameters(35);
+    const auto note36 = program->getNoteParameters(36);
+    const auto note37 = program->getNoteParameters(37);
+
+    REQUIRE(note35->getSoundIndex() == 0);
+    REQUIRE(note36->getSoundIndex() == 1);
+    REQUIRE(note37->getSoundIndex() == -1);
+
+    REQUIRE(note35->getSoundGenerationMode() == 0);
+    REQUIRE(note35->getVelocityRangeLower() == 44);
+    REQUIRE(note35->getVelocityRangeUpper() == 88);
+    REQUIRE(note35->getTune() == 0);
+    REQUIRE(note35->getAttack() == 0);
+    REQUIRE(note35->getDecay() == 5);
+    REQUIRE(note35->getDecayMode() == 0);
+    REQUIRE(note35->getFilterFrequency() == 100);
+    REQUIRE(note35->getFilterResonance() == 0);
+    REQUIRE(note35->getFilterAttack() == 0);
+    REQUIRE(note35->getFilterDecay() == 0);
+    REQUIRE(note35->getFilterEnvelopeAmount() == 0);
+    REQUIRE(note35->getVeloToLevel() == 100);
+    REQUIRE(note35->getVelocityToAttack() == 0);
+    REQUIRE(note35->getVelocityToStart() == 0);
+    REQUIRE(note35->getVelocityToFilterFrequency() == 0);
+    REQUIRE(note35->getSliderParameterNumber() == 0);
+    REQUIRE(note35->getVelocityToPitch() == 0);
+    REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::POLY);
+    REQUIRE(note35->getOptionalNoteA() == mpc::NoDrumNoteAssigned);
+    REQUIRE(note35->getOptionalNoteB() == mpc::NoDrumNoteAssigned);
+    REQUIRE(note35->getMuteAssignA() == mpc::NoDrumNoteAssigned);
+    REQUIRE(note35->getMuteAssignB() == mpc::NoDrumNoteAssigned);
+
+    const auto stereoMixer = note35->getStereoMixer();
+    const auto indivFxMixer = note35->getIndivFxMixer();
+    REQUIRE(stereoMixer->getLevel() == mpc::MaxDrumMixerLevel);
+    REQUIRE(stereoMixer->getPanning() == mpc::PanningCenter);
+    REQUIRE(indivFxMixer->getVolumeIndividualOut() == mpc::MaxDrumMixerLevel);
+    REQUIRE(indivFxMixer->getOutput() == mpc::MinDrumMixerIndividualOut);
+    REQUIRE(indivFxMixer->getFxPath() == mpc::MinDrumMixerFxPath);
+    REQUIRE(indivFxMixer->getFxSendLevel() == mpc::MinDrumMixerLevel);
+
+    const auto slider = program->getSlider();
+    REQUIRE(slider->getNote() == mpc::NoDrumNoteAssigned);
+    REQUIRE(slider->getTuneLowRange() == -120);
+    REQUIRE(slider->getTuneHighRange() == 120);
+    REQUIRE(slider->getDecayLowRange() == 12);
+    REQUIRE(slider->getDecayHighRange() == 45);
+    REQUIRE(slider->getAttackLowRange() == 0);
+    REQUIRE(slider->getAttackHighRange() == 20);
+    REQUIRE(slider->getFilterLowRange() == -50);
+    REQUIRE(slider->getFilterHighRange() == 50);
+    REQUIRE(slider->getControlChange() == 0);
+    REQUIRE(slider->getParameter() == mpc::NoteVariationTypeTune);
+    REQUIRE(program->getMidiProgramChange() == 1);
+}
+
 }
 
 TEST_CASE("Kaitai MPC2000 PGM parses and rewrites PROGRAM1", "[kaitai-pgm]")
@@ -101,6 +199,9 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites PROGRAM1", "[kaitai-pgm]")
     REQUIRE(parsed.note_parameters()->size() == 64U);
     REQUIRE(parsed.note_parameters()->at(0)->sound_index() == 0);
     REQUIRE(parsed.note_parameters()->at(1)->sound_index() == 1);
+    // Hardware-backed comparison shows this standalone byte stores MIDI
+    // program change as a zero-based value.
+    REQUIRE(parsed.program_change() == 0);
     REQUIRE(parsed.pad_to_note_mapping() != nullptr);
     REQUIRE(parsed.pad_to_note_mapping()->size() == 64U);
 
@@ -215,4 +316,74 @@ TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
     REQUIRE(sampler->getSoundName(1) == "sound2");
     REQUIRE(reparsedProgram->getNoteParameters(35)->getSoundIndex() == 0);
     REQUIRE(reparsedProgram->getNoteParameters(36)->getSoundIndex() == 1);
+}
+
+TEST_CASE("Kaitai MPC2000 PGM loads PROGRAM1 through the production seam with explicit semantics", "[kaitai-pgm]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    const auto program = loadProgram1(mpc);
+    requireProgram1LoadedState(mpc, program);
+}
+
+TEST_CASE("Kaitai MPC2000 PGM load uses standalone byte as MIDI program change", "[kaitai-pgm]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_pgm_t parsed(&parseIo);
+    parsed._read();
+    parsed.set_program_change(1);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    std::vector<char> programBytes(writeStream.str().begin(), writeStream.str().end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto program = loadProgram1FromBytes(mpc, programBytes);
+
+    REQUIRE(program->getMidiProgramChange() == 2);
+    REQUIRE(program->getSlider()->getControlChange() == 0);
+}
+
+TEST_CASE("Kaitai MPC2000 PGM save writes MIDI program change and ignores slider control change", "[kaitai-pgm]")
+{
+    mpc::Mpc mpc;
+        mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto program = loadProgram1(mpc);
+
+    program->setMidiProgramChange(2);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    program->getSlider()->setControlChange(0);
+    const auto bytesWithZeroControl =
+        mpc::file::kaitai::PgmIo::saveProgram(*program, mpc.getSampler());
+
+    std::stringstream parseStreamZero(
+        std::string(bytesWithZeroControl.begin(), bytesWithZeroControl.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIoZero(&parseStreamZero);
+    mpc2000xl_pgm_t parsedZero(&parseIoZero);
+    parsedZero._read();
+    REQUIRE(parsedZero.program_change() == 1);
+
+    program->getSlider()->setControlChange(17);
+    const auto bytesWithNonZeroControl =
+        mpc::file::kaitai::PgmIo::saveProgram(*program, mpc.getSampler());
+
+    REQUIRE(bytesWithNonZeroControl == bytesWithZeroControl);
 }

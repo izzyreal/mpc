@@ -52,7 +52,7 @@ Mpc::Mpc()
     clock = std::make_shared<Clock>();
 }
 
-void Mpc::init()
+void Mpc::init(const MpcInitOptions &options)
 {
     const auto logFsError = [](const mpc_fs::fs_error &error)
     {
@@ -315,8 +315,15 @@ void Mpc::init()
 
     layeredScreen->openScreenById(ScreenId::SequencerScreen);
 
-    startMidiDeviceDetector();
-    getEngineHost()->getAudioServer()->start();
+    if (options.startMidiDeviceDetector)
+    {
+        startMidiDeviceDetector();
+    }
+
+    if (options.startAudioServer)
+    {
+        getEngineHost()->getAudioServer()->start();
+    }
 
     autoSave = std::make_unique<AutoSave>();
 }

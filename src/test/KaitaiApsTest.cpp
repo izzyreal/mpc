@@ -6,8 +6,10 @@
 #include "disk/ApsLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/kaitai/ApsIo.hpp"
 #include "file/aps/ApsParser.hpp"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
+#include "performance/PerformanceManager.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 
@@ -138,7 +140,7 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites real 2KXL ALL_PGMS", "[kaitai-
 TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     loadAllPgmsAps(mpc);
 
     REQUIRE(mpc.getSampler()->getProgramCount() == 2);
@@ -204,4 +206,47 @@ TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == 1);
     REQUIRE(p2->getNoteParameters(35)->getSoundIndex() == 1);
     REQUIRE(p2->getNoteParameters(36)->getSoundIndex() == 2);
+}
+
+TEST_CASE("Kaitai MPC2000 APS saves MIDI program change separately from slider control change", "[kaitai-aps]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    loadAllPgmsAps(mpc);
+
+    auto p1 = mpc.getSampler()->getProgram(0);
+    REQUIRE(p1 != nullptr);
+
+    p1->setMidiProgramChange(2);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    REQUIRE(p1->getMidiProgramChange() == 2);
+    p1->getSlider()->setControlChange(0);
+    mpc::file::aps::ApsParser handwrittenWriterZero(mpc, "ALL_PGMS");
+    const auto handwrittenBytesWithZeroControl = handwrittenWriterZero.getBytes();
+    std::stringstream handwrittenParseStreamZero(
+        std::string(handwrittenBytesWithZeroControl.begin(), handwrittenBytesWithZeroControl.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream handwrittenParseIoZero(&handwrittenParseStreamZero);
+    mpc2000xl_aps_t handwrittenParsedZero(&handwrittenParseIoZero);
+    handwrittenParsedZero._read();
+    REQUIRE(handwrittenParsedZero.aps_programs()->at(0)->body()->program_change() == 1);
+
+    const auto bytesWithZeroControl =
+        mpc::file::kaitai::ApsIo::save(mpc, "ALL_PGMS");
+
+    std::stringstream parseStreamZero(
+        std::string(bytesWithZeroControl.begin(), bytesWithZeroControl.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIoZero(&parseStreamZero);
+    mpc2000xl_aps_t parsedZero(&parseIoZero);
+    parsedZero._read();
+    REQUIRE(parsedZero.aps_programs()->at(0)->body()->program_change() == 1);
+
+    p1->getSlider()->setControlChange(17);
+    const auto bytesWithNonZeroControl =
+        mpc::file::kaitai::ApsIo::save(mpc, "ALL_PGMS");
+
+    REQUIRE(bytesWithNonZeroControl == bytesWithZeroControl);
 }

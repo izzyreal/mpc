@@ -40,7 +40,6 @@ void PgmFileToProgramConverter::setSlider(
     pgmSlider->setAssignNote(nn);
     pgmSlider->setAttackHighRange(slider->getAttackHigh());
     pgmSlider->setAttackLowRange(slider->getAttackLow());
-    pgmSlider->setControlChange(slider->getControlChange());
     pgmSlider->setDecayHighRange(slider->getDecayHigh());
     pgmSlider->setDecayLowRange(slider->getDecayLow());
     pgmSlider->setFilterHighRange(slider->getFilterHigh());
@@ -184,6 +183,7 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
     setNoteParameters(mpc, reader, program);
     setMixer(reader, program);
     setSlider(reader, program);
+    program->setMidiProgramChange(reader.getSlider()->getProgramChange() + 1);
 
     return program;
 }

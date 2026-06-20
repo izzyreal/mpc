@@ -33,7 +33,7 @@ namespace mpc
                 void setAttackHigh(int attackHigh);
                 void setFilterLow(int filterLow);
                 void setFilterHigh(int filterHigh);
-                void setControlChange(int controlChange);
+                void setProgramChange(int programChange);
 
             public:
                 Slider(sampler::Program *program);

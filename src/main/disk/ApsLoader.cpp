@@ -212,8 +212,6 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
             apsProgram->getSlider()->getAttackHigh();
         perfProgram.slider.attackLowRange =
             apsProgram->getSlider()->getAttackLow();
-        perfProgram.slider.controlChange =
-            apsProgram->getSlider()->getProgramChange();
         perfProgram.slider.decayHighRange =
             apsProgram->getSlider()->getDecayHigh();
         perfProgram.slider.decayLowRange =
@@ -227,6 +225,8 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
         perfProgram.slider.tuneHighRange =
             apsProgram->getSlider()->getTuneHigh();
         perfProgram.slider.tuneLowRange = apsProgram->getSlider()->getTuneLow();
+        perfProgram.midiProgramChange =
+            apsProgram->getSlider()->getProgramChange() + 1;
 
         mpc.getPerformanceManager().lock()->enqueue(
             performance::PerformanceMessage{std::move(msg)});
