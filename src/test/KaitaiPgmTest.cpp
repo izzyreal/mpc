@@ -258,7 +258,7 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-
 TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
 
     auto program = loadProgram1(mpc);
     REQUIRE(program != nullptr);
@@ -321,7 +321,7 @@ TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
 TEST_CASE("Kaitai MPC2000 PGM loads PROGRAM1 through the production seam with explicit semantics", "[kaitai-pgm]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
 
     const auto program = loadProgram1(mpc);
     requireProgram1LoadedState(mpc, program);
@@ -350,7 +350,8 @@ TEST_CASE("Kaitai MPC2000 PGM load uses standalone byte as MIDI program change",
     parsed._check();
     parsed._write();
 
-    std::vector<char> programBytes(writeStream.str().begin(), writeStream.str().end());
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> programBytes(rewrittenBytes.begin(), rewrittenBytes.end());
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
@@ -386,4 +387,39 @@ TEST_CASE("Kaitai MPC2000 PGM save writes MIDI program change and ignores slider
         mpc::file::kaitai::PgmIo::saveProgram(*program, mpc.getSampler());
 
     REQUIRE(bytesWithNonZeroControl == bytesWithZeroControl);
+}
+
+TEST_CASE("Kaitai MPC2000 PGM load preserves mixer effects send level", "[kaitai-pgm]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_pgm_t parsed(&parseIo);
+    parsed._read();
+
+    parsed.pad_mixers()->at(1)->set_effects_send_level(50);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> programBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto program = loadProgram1FromBytes(mpc, programBytes);
+
+    REQUIRE(program != nullptr);
+    REQUIRE(program->getNoteParameters(36)->getIndivFxMixer()->getFxSendLevel() == 50);
 }

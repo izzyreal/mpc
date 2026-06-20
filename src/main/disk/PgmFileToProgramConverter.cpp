@@ -142,6 +142,8 @@ void PgmFileToProgramConverter::setMixer(
             DrumMixerIndividualOutput(pgmMixer->getOutput(i)));
         indivFxMixer->setFxPath(
             DrumMixerIndividualFxPath(pgmMixer->getEffectsOutput(i)));
+        indivFxMixer->setFxSendLevel(
+            DrumMixerLevel(pgmMixer->getEffectsSendLevel(i)));
     }
 }
 
