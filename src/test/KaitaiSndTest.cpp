@@ -525,3 +525,83 @@ TEST_CASE("Generated MPC2000XL SND corpus loads through the production loader", 
         }
     }
 }
+
+TEST_CASE("SndReader reads mutated header semantics from Kaitai-written bytes", "[kaitai-snd]")
+{
+    auto bytes = resourceBytes("test/GeneratedMpc2000xl/Snd/mono_loop_mid.SND");
+
+    std::vector<char> rewrittenBytes;
+    withParsedSndBytes(bytes, [&](mpc2000snd_t &parsed)
+    {
+        parsed.set_tune(120);
+        parsed.set_start(0);
+        parsed.set_end(3);
+        parsed.set_loop_frame_count(2);
+        parsed.set_loop_enabled(false);
+        parsed.set_beat_count(32);
+
+        std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+        kaitai::kstream writeIo(&writeStream);
+        parsed._set_io(&writeIo);
+        parsed._check();
+        parsed._write();
+
+        const auto written = writeStream.str();
+        rewrittenBytes.assign(written.begin(), written.end());
+    });
+
+    SndReader handwrittenReader(rewrittenBytes);
+    auto outputData = std::make_shared<std::vector<float>>();
+    handwrittenReader.readData(outputData);
+
+    REQUIRE(handwrittenReader.isHeaderValid());
+    REQUIRE(handwrittenReader.getName() == "mono_loop_mid");
+    REQUIRE(handwrittenReader.isMono());
+    REQUIRE(handwrittenReader.getSampleRate() == 44100);
+    REQUIRE(handwrittenReader.getLevel() == 100);
+    REQUIRE(handwrittenReader.getTune() == 120);
+    REQUIRE(handwrittenReader.getStart() == 0);
+    REQUIRE(handwrittenReader.getEnd() == 3);
+    REQUIRE(handwrittenReader.getLoopLength() == 2);
+    REQUIRE(!handwrittenReader.isLoopEnabled());
+    REQUIRE(handwrittenReader.getNumberOfBeats() == 32);
+    REQUIRE(outputData->size() == 4U);
+}
+
+TEST_CASE("SoundLoader loads mutated SND header semantics from Kaitai-written bytes", "[kaitai-snd]")
+{
+    auto bytes = resourceBytes("test/GeneratedMpc2000xl/Snd/stereo_span.SND");
+
+    std::vector<char> rewrittenBytes;
+    withParsedSndBytes(bytes, [&](mpc2000snd_t &parsed)
+    {
+        parsed.set_tune(-120);
+        parsed.set_start(1);
+        parsed.set_end(4);
+        parsed.set_loop_frame_count(1);
+        parsed.set_loop_enabled(true);
+        parsed.set_beat_count(1);
+
+        std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+        kaitai::kstream writeIo(&writeStream);
+        parsed._set_io(&writeIo);
+        parsed._check();
+        parsed._write();
+
+        const auto written = writeStream.str();
+        rewrittenBytes.assign(written.begin(), written.end());
+    });
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    const auto loaded = loadWithSoundLoader(mpc, rewrittenBytes, "stereo_span.SND");
+
+    REQUIRE(loaded->getName() == "stereo_span");
+    REQUIRE(!loaded->isMono());
+    REQUIRE(loaded->getTune() == -120);
+    REQUIRE(loaded->getStart() == 1);
+    REQUIRE(loaded->getEnd() == 4);
+    REQUIRE(loaded->getLoopTo() == 3);
+    REQUIRE(loaded->isLoopEnabled());
+    REQUIRE(loaded->getBeatCount() == 1);
+}
