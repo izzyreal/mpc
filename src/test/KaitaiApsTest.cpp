@@ -5,14 +5,25 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/ApsLoader.hpp"
 #include "disk/MpcFile.hpp"
+#include "engine/IndivFxMixer.hpp"
 #include "engine/EngineHost.hpp"
+#include "engine/StereoMixer.hpp"
 #include "file/kaitai/ApsIo.hpp"
+#include "file/aps/ApsDrumConfiguration.hpp"
+#include "file/aps/ApsGlobalParameters.hpp"
+#include "file/aps/ApsNoteParameters.hpp"
 #include "file/aps/ApsParser.hpp"
 #include "file/aps/ApsSlider.hpp"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
+#include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/PgmAssignScreen.hpp"
 #include "performance/PerformanceManager.hpp"
+#include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
@@ -25,6 +36,103 @@
 CMRC_DECLARE(mpctest);
 
 namespace {
+
+std::vector<char> rewriteAllPgmsApsWithMutations(
+    const std::function<void(mpc2000xl_aps_t&)>& mutate)
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+
+    mutate(parsed);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    return std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end());
+}
+
+void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
+{
+    auto* program0 = parsed.aps_programs()->at(0)->body();
+    auto* note35 = program0->note_parameters()->at(0).get();
+    note35->set_sound_index(255);
+    note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
+    note35->set_velocity_range_lower(1);
+    note35->set_also_play_use_note_1(41);
+    note35->set_velocity_range_upper(127);
+    note35->set_also_play_use_note_2(42);
+    note35->set_voice_overlap_mode(mpc2000xl_pgm_t::VOICE_OVERLAP_MODE_NOTE_OFF);
+    note35->set_mute_assign_1(43);
+    note35->set_mute_assign_2(44);
+    note35->set_tune(-120);
+    note35->set_attack(99);
+    note35->set_decay(98);
+    note35->set_decay_mode(mpc2000xl_pgm_t::DECAY_MODE_START);
+    note35->set_cutoff(17);
+    note35->set_resonance(18);
+    note35->set_velocity_envelope_to_filter_attack(19);
+    note35->set_velocity_envelope_to_filter_decay(20);
+    note35->set_velocity_envelope_to_filter_amount(21);
+    note35->set_velocity_to_level(22);
+    note35->set_velocity_to_attack(23);
+    note35->set_velocity_to_start(24);
+    note35->set_velocity_to_cutoff(25);
+    note35->set_slider_parameter(mpc2000xl_pgm_t::SLIDER_PARAMETER_FILTER);
+    note35->set_velocity_to_pitch(26);
+
+    auto* mixer35 = program0->pad_mixers()->at(0).get();
+    mixer35->set_fx_output(mpc2000xl_pgm_t::FX_OUTPUT_R2);
+    mixer35->set_volume(12);
+    mixer35->set_pan(13);
+    mixer35->set_volume_individual(14);
+    mixer35->set_output(2);
+    mixer35->set_effects_send_level(15);
+
+    program0->slider()->set_note(52);
+    program0->slider()->set_tune_low(-119);
+    program0->slider()->set_tune_high(118);
+    program0->slider()->set_decay_low(11);
+    program0->slider()->set_decay_high(12);
+    program0->slider()->set_attack_low(13);
+    program0->slider()->set_attack_high(14);
+    program0->slider()->set_filter_low(-15);
+    program0->slider()->set_filter_high(16);
+    program0->set_program_change(126);
+    program0->pad_to_note_mapping()->at(0) = 50;
+    parsed.master_pad_to_note_mapping()->at(0) = 50;
+
+    auto* drum0 = parsed.drum1();
+    drum0->set_receive_program_change(mpc2000xl_aps_t::NO_YES_FALSE);
+    drum0->set_receive_midi_volume(mpc2000xl_aps_t::NO_YES_FALSE);
+    drum0->set_program(1);
+    drum0->set_receive_program_change_duplicate(mpc2000xl_aps_t::NO_YES_FALSE);
+    drum0->set_receive_midi_volume_duplicate(mpc2000xl_aps_t::NO_YES_FALSE);
+
+    auto* globals = parsed.global_parameters();
+    globals->set_pad_to_internal_sound(mpc2000xl_aps_t::NO_YES_TRUE);
+    globals->set_pad_assign(mpc2000xl_aps_t::PAD_ASSIGN_MASTERS);
+    globals->set_indiv_fx_source(mpc2000xl_aps_t::MIX_SOURCE_DRUM);
+    globals->set_stereo_mix_source(mpc2000xl_aps_t::MIX_SOURCE_DRUM);
+    globals->set_record_mix_changes(mpc2000xl_aps_t::NO_YES_TRUE);
+    globals->set_copy_pgm_mix_to_drum(mpc2000xl_aps_t::NO_YES_FALSE);
+    globals->set_fx_drum(3);
+    globals->set_master_level(6);
+}
 
 void prepareApsResources(mpc::Mpc& mpc)
 {
@@ -413,4 +521,148 @@ TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
     auto p1 = mpc.getSampler()->getProgram(0);
     REQUIRE(p1 != nullptr);
     REQUIRE(p1->getNoteParameters(35)->getTune() == -120);
+}
+
+TEST_CASE("ApsParser reads broad mutated APS semantics", "[kaitai-aps]")
+{
+    const auto apsBytes = rewriteAllPgmsApsWithMutations(applyBroadApsMutation);
+
+    mpc::file::aps::ApsParser handwrittenParser(apsBytes);
+    auto programs = handwrittenParser.getPrograms();
+    REQUIRE(programs.size() >= 1U);
+
+    auto* p1 = programs.at(0);
+    REQUIRE(p1->getName() == "PROGRAM1");
+    REQUIRE(p1->getAssignTable()->get().at(0) == 50);
+    REQUIRE(p1->getSlider()->getNote() == 52);
+    REQUIRE(p1->getSlider()->getTuneLow() == -119);
+    REQUIRE(p1->getSlider()->getTuneHigh() == 118);
+    REQUIRE(p1->getSlider()->getDecayLow() == 11);
+    REQUIRE(p1->getSlider()->getDecayHigh() == 12);
+    REQUIRE(p1->getSlider()->getAttackLow() == 13);
+    REQUIRE(p1->getSlider()->getAttackHigh() == 14);
+    REQUIRE(p1->getSlider()->getFilterLow() == -15);
+    REQUIRE(p1->getSlider()->getFilterHigh() == 16);
+    REQUIRE(p1->getSlider()->getProgramChange() == 126);
+
+    auto* note35 = p1->getNoteParameters(0);
+    REQUIRE(note35->getSoundIndex() == -1);
+    REQUIRE(note35->getSoundGenerationMode() == 2);
+    REQUIRE(note35->getVelocityRangeLower() == 1);
+    REQUIRE(note35->getAlsoPlay1() == 41);
+    REQUIRE(note35->getVelocityRangeUpper() == 127);
+    REQUIRE(note35->getAlsoPlay2() == 42);
+    REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
+    REQUIRE(note35->getMute1() == 43);
+    REQUIRE(note35->getMute2() == 44);
+    REQUIRE(note35->getTune() == -120);
+    REQUIRE(note35->getAttack() == 99);
+    REQUIRE(note35->getDecay() == 98);
+    REQUIRE(note35->getDecayMode() == 1);
+    REQUIRE(note35->getCutoffFrequency() == 17);
+    REQUIRE(note35->getResonance() == 18);
+    REQUIRE(note35->getVelocityToFilterAttack() == 19);
+    REQUIRE(note35->getVelocityToFilterDecay() == 20);
+    REQUIRE(note35->getVelocityToFilterAmount() == 21);
+    REQUIRE(note35->getVelocityToLevel() == 22);
+    REQUIRE(note35->getVelocityToAttack() == 23);
+    REQUIRE(note35->getVelocityToStart() == 24);
+    REQUIRE(note35->getVelocityToFilterFrequency() == 25);
+    REQUIRE(note35->getSliderParameter() == 3);
+    REQUIRE(note35->getVelocityToPitch() == 26);
+
+    auto* drum0 = handwrittenParser.getDrumConfiguration(0);
+    REQUIRE(drum0->getProgramIndex() == 1);
+    REQUIRE(!drum0->isReceivePgmChangeEnabled());
+    REQUIRE(!drum0->isReceiveMidiVolumeEnabled());
+
+    auto* globals = handwrittenParser.getGlobalParameters();
+    REQUIRE(globals->isPadToIntSoundEnabled());
+    REQUIRE(globals->isPadAssignMaster());
+    REQUIRE(globals->isIndivFxSourceDrum());
+    REQUIRE(globals->isStereoMixSourceDrum());
+    REQUIRE(globals->isRecordMixChangesEnabled());
+    REQUIRE(!globals->isCopyPgmMixToDrumEnabled());
+    REQUIRE(globals->getFxDrum() == 3);
+    REQUIRE(globals->getMasterLevel() == 6);
+}
+
+TEST_CASE("ApsLoader loads broad mutated APS semantics", "[kaitai-aps]")
+{
+    const auto apsBytes = rewriteAllPgmsApsWithMutations(applyBroadApsMutation);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    loadAllPgmsApsWithoutRender(mpc, apsBytes);
+
+    auto sampler = mpc.getSampler();
+    auto p1 = sampler->getProgram(0);
+    REQUIRE(p1 != nullptr);
+    REQUIRE(p1->getPad(0)->getNote() == 50);
+    REQUIRE(p1->getMidiProgramChange() == 127);
+
+    auto note35 = p1->getNoteParameters(35);
+    REQUIRE(note35->getSoundIndex() == -1);
+    REQUIRE(note35->getSoundGenerationMode() == 2);
+    REQUIRE(note35->getVelocityRangeLower() == 1);
+    REQUIRE(note35->getOptionalNoteA() == 41);
+    REQUIRE(note35->getVelocityRangeUpper() == 127);
+    REQUIRE(note35->getOptionalNoteB() == 42);
+    REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
+    REQUIRE(note35->getMuteAssignA() == 43);
+    REQUIRE(note35->getMuteAssignB() == 44);
+    REQUIRE(note35->getTune() == -120);
+    REQUIRE(note35->getAttack() == 99);
+    REQUIRE(note35->getDecay() == 98);
+    REQUIRE(note35->getDecayMode() == 1);
+    REQUIRE(note35->getFilterFrequency() == 17);
+    REQUIRE(note35->getFilterResonance() == 18);
+    REQUIRE(note35->getFilterAttack() == 19);
+    REQUIRE(note35->getFilterDecay() == 20);
+    REQUIRE(note35->getFilterEnvelopeAmount() == 21);
+    REQUIRE(note35->getVeloToLevel() == 22);
+    REQUIRE(note35->getVelocityToAttack() == 23);
+    REQUIRE(note35->getVelocityToStart() == 24);
+    REQUIRE(note35->getVelocityToFilterFrequency() == 25);
+    REQUIRE(note35->getSliderParameterNumber() == 3);
+    REQUIRE(note35->getVelocityToPitch() == 26);
+
+    auto stereoMixer = note35->getStereoMixer();
+    auto indivFxMixer = note35->getIndivFxMixer();
+    REQUIRE(stereoMixer->getLevel() == 12);
+    REQUIRE(stereoMixer->getPanning() == 13);
+    REQUIRE(indivFxMixer->getVolumeIndividualOut() == 14);
+    REQUIRE(indivFxMixer->getOutput() == 2);
+    REQUIRE(indivFxMixer->getFxPath() == 4);
+    REQUIRE(indivFxMixer->getFxSendLevel() == 15);
+
+    auto slider = p1->getSlider();
+    REQUIRE(slider->getNote() == 52);
+    REQUIRE(slider->getTuneLowRange() == -119);
+    REQUIRE(slider->getTuneHighRange() == 118);
+    REQUIRE(slider->getDecayLowRange() == 11);
+    REQUIRE(slider->getDecayHighRange() == 12);
+    REQUIRE(slider->getAttackLowRange() == 13);
+    REQUIRE(slider->getAttackHighRange() == 14);
+    REQUIRE(slider->getFilterLowRange() == -15);
+    REQUIRE(slider->getFilterHighRange() == 16);
+
+    auto drum0 = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(0));
+    REQUIRE(drum0->getProgramIndex() == 1);
+    REQUIRE(!drum0->receivesPgmChange());
+    REQUIRE(!drum0->receivesMidiVolume());
+
+    auto mixerSetup = mpc.screens->get<mpc::lcdgui::ScreenId::MixerSetupScreen>();
+    REQUIRE(mixerSetup->isRecordMixChangesEnabled());
+    REQUIRE(!mixerSetup->isCopyPgmMixToDrumEnabled());
+    REQUIRE(mixerSetup->getFxDrum() == 3);
+    REQUIRE(mixerSetup->isIndivFxSourceDrum());
+    REQUIRE(mixerSetup->isStereoMixSourceDrum());
+    REQUIRE(mixerSetup->getMasterLevel() == 6);
+
+    auto drumScreen = mpc.screens->get<mpc::lcdgui::ScreenId::DrumScreen>();
+    REQUIRE(drumScreen->isPadToIntSound());
+
+    auto pgmAssignScreen = mpc.screens->get<mpc::lcdgui::ScreenId::PgmAssignScreen>();
+    REQUIRE(pgmAssignScreen->isPadAssignMaster());
 }
