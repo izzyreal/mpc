@@ -37,7 +37,7 @@ namespace mpc
                 int getAttackHigh();
                 int getFilterLow();
                 int getFilterHigh();
-                int getControlChange();
+                int getProgramChange();
 
                 Slider(ProgramFileReader *programFile);
             };

@@ -19,5 +19,22 @@ void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
 {
     resetTestDataRoot(mpc);
     mpc.init();
-    mpc.getEngineHost()->getAudioServer()->start();
+}
+
+void mpc::TestMpc::initializeTestMpcWithoutMidiServices(Mpc &mpc)
+{
+    resetTestDataRoot(mpc);
+    MpcInitOptions options;
+    options.startMidiDeviceDetector = false;
+    options.startAudioServer = true;
+    mpc.init(options);
+}
+
+void mpc::TestMpc::initializeTestMpcWithoutIoServices(Mpc &mpc)
+{
+    resetTestDataRoot(mpc);
+    MpcInitOptions options;
+    options.startMidiDeviceDetector = false;
+    options.startAudioServer = false;
+    mpc.init(options);
 }

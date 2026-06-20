@@ -1,6 +1,7 @@
 #include "file/aps/ApsSlider.hpp"
 
 #include "file/aps/ApsProgram.hpp"
+#include "sampler/Program.hpp"
 #include "sampler/PgmSlider.hpp"
 
 using namespace mpc::file::aps;
@@ -19,8 +20,9 @@ ApsSlider::ApsSlider(const std::vector<char> &loadBytes)
     programChange = loadBytes[9];
 }
 
-ApsSlider::ApsSlider(sampler::PgmSlider *slider)
+ApsSlider::ApsSlider(sampler::Program *program)
 {
+    auto slider = program->getSlider();
     saveBytes = std::vector<char>(ApsProgram::SLIDER_LENGTH);
     saveBytes[0] = slider->getNote() == 34 ? 0 : slider->getNote();
     saveBytes[1] = slider->getTuneLowRange();
@@ -31,7 +33,7 @@ ApsSlider::ApsSlider(sampler::PgmSlider *slider)
     saveBytes[6] = slider->getAttackHighRange();
     saveBytes[7] = slider->getFilterLowRange();
     saveBytes[8] = slider->getFilterHighRange();
-    saveBytes[9] = slider->getControlChange();
+    saveBytes[9] = program->getMidiProgramChange() - 1;
 }
 
 std::vector<char> ApsSlider::PADDING = std::vector<char>{0, 35, 64, 0, 26, 0};
