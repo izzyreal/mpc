@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "TestMpc.hpp"
 #include "Mpc.hpp"
@@ -6,10 +7,16 @@
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/all/AllParser.hpp"
+#include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
+#include "lcdgui/ScreenId.hpp"
+#include "lcdgui/screens/UserScreen.hpp"
+#include "sequencer/BusType.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/Track.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
@@ -36,6 +43,21 @@ void prepareAllResources(mpc::Mpc& mpc)
     }
 
     disk->initFiles();
+}
+
+std::shared_ptr<mpc::disk::MpcFile> installResourceFile(
+    mpc::Mpc& mpc,
+    const std::string& resourcePath,
+    const std::string& fileName)
+{
+    auto disk = mpc.getDisk();
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open(resourcePath);
+    std::vector<char> data(file.begin(), file.end());
+    auto newFile = disk->newFile(fileName);
+    newFile->setFileData(data);
+    disk->initFiles();
+    return newFile;
 }
 
 }
@@ -163,4 +185,60 @@ TEST_CASE("Kaitai MPC2000 ALL matches handwritten ALL bytes", "[kaitai-all]")
 
     REQUIRE(reparsedMpc.getSequencer()->getSequence(0)->isUsed());
     REQUIRE(reparsedMpc.getSequencer()->getSequence(20)->isUsed());
+}
+
+TEST_CASE("Kaitai MPC2000 ALL loads real 2KXL ALL through production seam", "[kaitai-all][real-2kxl]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installResourceFile(
+        mpc,
+        "test/RealMpc2000xl/All/ALL.ALL",
+        "ALL.ALL"
+    );
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(mpc, allFile.get());
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sequencer = mpc.getSequencer();
+    auto userScreen = mpc.screens->get<mpc::lcdgui::ScreenId::UserScreen>();
+    REQUIRE(userScreen);
+
+    REQUIRE_THAT(userScreen->getTempo(), Catch::Matchers::WithinAbs(116.2, 0.001));
+    REQUIRE(userScreen->getBusType() == mpc::sequencer::BusType::DRUM2);
+    REQUIRE(userScreen->getDevice() == 7);
+    REQUIRE(userScreen->getTimeSig().numerator == 4);
+    REQUIRE(userScreen->getTimeSig().denominator == 4);
+
+    auto sequence0 = sequencer->getSequence(0);
+    auto sequence1 = sequencer->getSequence(1);
+    REQUIRE(sequence0->isUsed());
+    REQUIRE(sequence1->isUsed());
+    REQUIRE_THAT(sequence0->getInitialTempo(), Catch::Matchers::WithinAbs(116.2, 0.001));
+    REQUIRE_THAT(sequence1->getInitialTempo(), Catch::Matchers::WithinAbs(116.2, 0.001));
+    REQUIRE(sequence0->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM2);
+    REQUIRE(sequence1->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM2);
+    REQUIRE(sequence0->getTrack(0)->getDeviceIndex() == 7);
+    REQUIRE(sequence1->getTrack(0)->getDeviceIndex() == 7);
+    REQUIRE(sequence0->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(sequence0->getTimeSignatureFromBarIndex(0).denominator == 4);
+    REQUIRE(sequence1->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(sequence1->getTimeSignatureFromBarIndex(0).denominator == 4);
+
+    auto song0 = sequencer->getSong(0);
+    auto song1 = sequencer->getSong(1);
+    REQUIRE(song0->isUsed());
+    REQUIRE(song1->isUsed());
+    REQUIRE(song0->getStepCount() == 2);
+    REQUIRE(song1->getStepCount() == 2);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(0)).sequenceIndex == 0);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(0)).repetitionCount == 1);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(1)).sequenceIndex == 1);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(1)).repetitionCount == 1);
+    REQUIRE(song1->getStep(mpc::SongStepIndex(0)).sequenceIndex == 1);
+    REQUIRE(song1->getStep(mpc::SongStepIndex(0)).repetitionCount == 2);
+    REQUIRE(song1->getStep(mpc::SongStepIndex(1)).sequenceIndex == 0);
+    REQUIRE(song1->getStep(mpc::SongStepIndex(1)).repetitionCount == 3);
 }

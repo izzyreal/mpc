@@ -2,6 +2,9 @@
 
 #include "TestMpc.hpp"
 
+#include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
+#include "file/kaitai/MidIo.hpp"
 #include "file/kaitai/generated/standard_midi_file_with_running_status.h"
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
@@ -29,6 +32,14 @@ struct ParsedNoteSnapshot {
     int velocity;
     int duration;
     int variationType;
+
+    bool operator==(const ParsedNoteSnapshot& other) const
+    {
+        return note == other.note &&
+               velocity == other.velocity &&
+               duration == other.duration &&
+               variationType == other.variationType;
+    }
 };
 
 std::vector<ParsedNoteSnapshot> collectParsedNotes(const std::shared_ptr<mpc::sequencer::Track>& track)
@@ -47,6 +58,21 @@ std::vector<ParsedNoteSnapshot> collectParsedNotes(const std::shared_ptr<mpc::se
         });
     }
     return result;
+}
+
+std::shared_ptr<mpc::disk::MpcFile> installMidiResourceFile(
+    mpc::Mpc& mpc,
+    const std::string& resourcePath,
+    const std::string& fileName)
+{
+    auto disk = mpc.getDisk();
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open(resourcePath);
+    std::vector<char> data(file.begin(), file.end());
+    auto newFile = disk->newFile(fileName);
+    newFile->setFileData(data);
+    disk->initFiles();
+    return newFile;
 }
 
 }
@@ -222,4 +248,49 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid
         CHECK(parsedNotes[i].duration == expected[i].duration);
         CHECK(parsedNotes[i].variationType == expected[i].variationType);
     }
+}
+
+TEST_CASE("Kaitai standard MIDI loads real 2KXL SEQ through production seam", "[kaitai-mid][real-2kxl]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto midiFile = installMidiResourceFile(
+        mpc,
+        "test/RealMpc2000xl/Mid/mpc2000xl_seq_variations.MID",
+        "SEQ.MID"
+    );
+    REQUIRE(midiFile);
+
+    const auto sequenceOrError = mpc::file::kaitai::MidIo::load(mpc, midiFile);
+    REQUIRE(sequenceOrError.has_value());
+
+    auto sequence = sequenceOrError.value();
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    stateManager->drainQueue();
+
+    REQUIRE(sequence == mpc.getSequencer()->getSequence(mpc::TempSequenceIndex));
+    REQUIRE(sequence->getBarCount() == 1);
+
+    const auto track0 = sequence->getTrack(0);
+    REQUIRE(track0->getBusType() == mpc::sequencer::BusType::DRUM2);
+    REQUIRE(track0->getDeviceIndex() == 7);
+
+    int totalEvents = 0;
+    for (int trackIndex = 0; trackIndex < 64; ++trackIndex) {
+        totalEvents += static_cast<int>(sequence->getTrack(trackIndex)->getEvents().size());
+    }
+    REQUIRE(totalEvents == 7);
+
+    const auto parsedNotes = collectParsedNotes(track0);
+    const std::vector<ParsedNoteSnapshot> expected{
+        {37, 65, 13, mpc::NoteVariationTypeTune},
+        {37, 35, 49, mpc::NoteVariationTypeDecay},
+        {37, 75, 101, mpc::NoteVariationTypeAttack},
+        {37, 30, 35, mpc::NoteVariationTypeFilter},
+        {37, 22, 89, mpc::NoteVariationTypeFilter},
+        {37, 46, 174, mpc::NoteVariationTypeTune},
+        {37, 19, 161, mpc::NoteVariationTypeTune},
+    };
+    REQUIRE(parsedNotes == expected);
 }
