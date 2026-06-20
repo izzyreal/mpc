@@ -13,6 +13,7 @@
 #include "engine/control/CompoundControl.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "performance/PerformanceManager.hpp"
 #include "disk/SoundLoader.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -391,6 +392,47 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
         REQUIRE(soundName() == "sound" + std::to_string(expected[i]));
         controls->turnWheel(1);
     }
+}
+
+TEST_CASE("Assign screen parameter follows assigned note and edits that note", "[sampler]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    auto sampler = mpc.getSampler();
+    auto program = sampler->getProgram(0);
+    REQUIRE(program != nullptr);
+
+    program->getSlider()->setAssignNote(mpc::DrumNoteNumber(42));
+    program->getSlider()->setParameter(mpc::NoteVariationTypeTune);
+    program->getNoteParameters(42)->setSliderParameterNumber(mpc::NoteVariationTypeFilter);
+    program->getNoteParameters(43)->setSliderParameterNumber(mpc::NoteVariationTypeAttack);
+    mpc.getPerformanceManager().lock()->drainQueue();
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::AssignScreen);
+    auto controls = mpc.getScreen();
+    REQUIRE(controls != nullptr);
+
+    auto parameterField = [&]
+    {
+        return controls->findChild<Field>("parameter");
+    };
+
+    REQUIRE(parameterField() != nullptr);
+    REQUIRE(parameterField()->getText() == "FILTER");
+
+    REQUIRE(mpc.getLayeredScreen()->setFocus("assignnote"));
+    controls->turnWheel(1);
+    REQUIRE(parameterField()->getText() == "ATTACK");
+    REQUIRE(program->getSlider()->getParameter() == mpc::NoteVariationTypeAttack);
+
+    REQUIRE(mpc.getLayeredScreen()->setFocus("parameter"));
+    controls->turnWheel(1);
+    REQUIRE(parameterField()->getText() == "FILTER");
+    mpc.getPerformanceManager().lock()->drainQueue();
+    REQUIRE(program->getNoteParameters(43)->getSliderParameterNumber() == mpc::NoteVariationTypeFilter);
+    REQUIRE(program->getSlider()->getParameter() == mpc::NoteVariationTypeFilter);
+    REQUIRE(program->getNoteParameters(42)->getSliderParameterNumber() == mpc::NoteVariationTypeFilter);
 }
 
 TEST_CASE("Delete sound 1", "[sampler]")

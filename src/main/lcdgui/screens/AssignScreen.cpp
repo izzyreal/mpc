@@ -15,6 +15,7 @@ AssignScreen::AssignScreen(Mpc &mpc, const int layerIndex)
 
 void AssignScreen::open()
 {
+    syncSliderParameterToAssignedNote();
     displayAssignNote();
     displayParameter();
     displayHighRange();
@@ -47,7 +48,13 @@ void AssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "parameter")
     {
-        slider->setParameter(slider->getParameter() + i);
+        const auto nextParameter = getSelectedSliderParameter() + i;
+        if (slider->getNote() != mpc::NoDrumNoteAssigned)
+        {
+            program->getNoteParameters(slider->getNote())
+                ->setSliderParameterNumber(nextParameter);
+        }
+        slider->setParameter(nextParameter);
     }
     else if (focusedFieldName == "highrange")
     {
@@ -202,7 +209,11 @@ void AssignScreen::update(Observable *observable, Message message)
 
     if (msg == "assignnote")
     {
+        syncSliderParameterToAssignedNote();
         displayAssignNote();
+        displayParameter();
+        displayHighRange();
+        displayLowRange();
     }
     else if (msg == "parameter")
     {
@@ -221,5 +232,31 @@ void AssignScreen::update(Observable *observable, Message message)
     else if (msg == "controlchange")
     {
         displayAssignNv();
+    }
+}
+
+int AssignScreen::getSelectedSliderParameter() const
+{
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
+    const auto note = slider->getNote();
+
+    if (note == mpc::NoDrumNoteAssigned)
+    {
+        return slider->getParameter();
+    }
+
+    return program->getNoteParameters(note)->getSliderParameterNumber();
+}
+
+void AssignScreen::syncSliderParameterToAssignedNote() const
+{
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
+    const auto selectedParameter = getSelectedSliderParameter();
+
+    if (slider->getParameter() != selectedParameter)
+    {
+        slider->setParameter(selectedParameter);
     }
 }

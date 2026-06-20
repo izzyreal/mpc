@@ -15,6 +15,8 @@ namespace mpc::lcdgui::screens
         void update(Observable *o, Message message) override;
 
     private:
+        int getSelectedSliderParameter() const;
+        void syncSliderParameterToAssignedNote() const;
         void displayAssignNote() const;
         void displayParameter() const;
         void displayHighRange() const;
