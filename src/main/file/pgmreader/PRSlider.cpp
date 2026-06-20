@@ -92,8 +92,8 @@ int Slider::getFilterHigh()
     return filterHigh;
 }
 
-int Slider::getControlChange()
+int Slider::getProgramChange()
 {
-    auto controlChange = getSliderArray()[9];
-    return controlChange;
+    auto programChange = getSliderArray()[9];
+    return programChange;
 }

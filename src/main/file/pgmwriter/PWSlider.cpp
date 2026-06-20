@@ -23,7 +23,7 @@ Slider::Slider(sampler::Program *program)
     setAttackHigh(program->getSlider()->getAttackHighRange());
     setFilterLow(program->getSlider()->getFilterLowRange());
     setFilterHigh(program->getSlider()->getFilterHighRange());
-    setControlChange(program->getSlider()->getControlChange());
+    setProgramChange(program->getMidiProgramChange() - 1);
     sliderArray[10] = 35;
     sliderArray[11] = 64;
     sliderArray[12] = 0;
@@ -81,7 +81,7 @@ void Slider::setFilterHigh(int filterHigh)
     sliderArray[8] = filterHigh;
 }
 
-void Slider::setControlChange(int controlChange)
+void Slider::setProgramChange(int programChange)
 {
-    sliderArray[9] = controlChange;
+    sliderArray[9] = programChange;
 }

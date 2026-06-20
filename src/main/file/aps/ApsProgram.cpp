@@ -65,7 +65,7 @@ ApsProgram::ApsProgram(sampler::Program *program, int index)
 
     byteList.push_back({0}); // Name terminator
 
-    ApsSlider apsSlider(program->getSlider());
+    ApsSlider apsSlider(program);
     byteList.push_back(apsSlider.getBytes());
     byteList.push_back({35, 64, 0, 26, 0});
 

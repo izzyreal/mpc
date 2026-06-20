@@ -5,6 +5,7 @@
 namespace mpc::sampler
 {
     class PgmSlider;
+    class Program;
 }
 
 namespace mpc::file::aps
@@ -42,6 +43,6 @@ namespace mpc::file::aps
         std::vector<char> getBytes();
 
         ApsSlider(const std::vector<char> &loadBytes);
-        ApsSlider(sampler::PgmSlider *slider);
+        ApsSlider(sampler::Program *program);
     };
 } // namespace mpc::file::aps

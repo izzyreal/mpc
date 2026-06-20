@@ -71,6 +71,12 @@ namespace mpc::sampler
 
 namespace mpc
 {
+    struct MpcInitOptions
+    {
+        bool startMidiDeviceDetector = true;
+        bool startAudioServer = true;
+    };
+
     class Mpc
     {
         bool pluginModeEnabled = false;
@@ -95,7 +101,7 @@ namespace mpc
         std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
 
     public:
-        void init();
+        void init(const MpcInitOptions &options = {});
         void startMidiDeviceDetector();
         void panic() const;
         void setPluginModeEnabled(bool);
