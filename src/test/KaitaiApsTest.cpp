@@ -8,6 +8,7 @@
 #include "engine/EngineHost.hpp"
 #include "file/kaitai/ApsIo.hpp"
 #include "file/aps/ApsParser.hpp"
+#include "file/aps/ApsSlider.hpp"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Program.hpp"
@@ -62,6 +63,26 @@ void loadAllPgmsAps(mpc::Mpc& mpc)
     constexpr bool headless = true;
     mpc::disk::ApsLoader::load(mpc, apsFile, headless);
     mpc.getEngineHost()->prepareProcessBlock(512);
+}
+
+std::shared_ptr<mpc::disk::MpcFile> loadAllPgmsApsFileFromBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& apsBytes)
+{
+    prepareApsResources(mpc);
+    auto apsFile = mpc.getDisk()->getFile("ALL_PGMS.APS");
+    auto mutableBytes = apsBytes;
+    apsFile->setFileData(mutableBytes);
+    mpc.getDisk()->initFiles();
+    return apsFile;
+}
+
+void loadAllPgmsApsWithoutRender(mpc::Mpc& mpc, const std::vector<char>& apsBytes)
+{
+    auto apsFile = loadAllPgmsApsFileFromBytes(mpc, apsBytes);
+    constexpr bool headless = true;
+    mpc::disk::ApsLoader::load(mpc, apsFile, headless);
+    mpc.getPerformanceManager().lock()->drainQueue();
 }
 
 }
@@ -293,4 +314,103 @@ TEST_CASE("Kaitai MPC2000 APS loads real 2KXL ALL_PGMS through production seam",
     REQUIRE(p1->getSlider()->getControlChange() == 0);
     REQUIRE(p1->getNoteParameters(35)->getSoundIndex() == -1);
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == -1);
+}
+
+TEST_CASE("ApsParser reads upper-bound MIDI program change", "[kaitai-aps]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+    parsed.aps_programs()->at(0)->body()->set_program_change(127);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> apsBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+    mpc::file::aps::ApsParser handwrittenParser(apsBytes);
+    REQUIRE(handwrittenParser.getPrograms().at(0)->getSlider()->getProgramChange() == 127);
+}
+
+TEST_CASE("ApsLoader loads upper-bound MIDI program change", "[kaitai-aps]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+    parsed.aps_programs()->at(0)->body()->set_program_change(127);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> apsBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    loadAllPgmsApsWithoutRender(mpc, apsBytes);
+
+    auto p1 = mpc.getSampler()->getProgram(0);
+    REQUIRE(p1 != nullptr);
+    REQUIRE(p1->getMidiProgramChange() == 128);
+}
+
+TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+    parsed.aps_programs()->at(0)->body()->note_parameters()->at(0)->set_tune(-120);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> apsBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    loadAllPgmsApsWithoutRender(mpc, apsBytes);
+
+    auto p1 = mpc.getSampler()->getProgram(0);
+    REQUIRE(p1 != nullptr);
+    REQUIRE(p1->getNoteParameters(35)->getTune() == -120);
 }
