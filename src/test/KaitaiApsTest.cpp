@@ -29,6 +29,8 @@
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -64,6 +66,28 @@ std::vector<char> rewriteAllPgmsApsWithMutations(
 
     const auto rewrittenBytes = writeStream.str();
     return std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end());
+}
+
+std::string describeFirstByteDiff(
+    const std::string& lhs,
+    const std::string& rhs)
+{
+    const auto mismatch = std::mismatch(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    if (mismatch.first == lhs.end() && mismatch.second == rhs.end())
+    {
+        return "no diff";
+    }
+
+    const auto offset = static_cast<size_t>(mismatch.first - lhs.begin());
+    std::ostringstream oss;
+    oss << "first diff at offset " << offset
+        << ": lhs=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << (static_cast<unsigned>(static_cast<unsigned char>(*mismatch.first)))
+        << " rhs=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << (static_cast<unsigned>(static_cast<unsigned char>(*mismatch.second)));
+    return oss.str();
 }
 
 void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
@@ -131,7 +155,7 @@ void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
     globals->set_record_mix_changes(mpc2000xl_aps_t::NO_YES_TRUE);
     globals->set_copy_pgm_mix_to_drum(mpc2000xl_aps_t::NO_YES_FALSE);
     globals->set_fx_drum(3);
-    globals->set_master_level(6);
+    globals->set_master_level(2);
 }
 
 void prepareApsResources(mpc::Mpc& mpc)
@@ -230,7 +254,6 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites ALL_PGMS", "[kaitai-aps]")
     REQUIRE(parsed.aps_programs()->at(1)->body()->name().substr(0, 8) == "PROGRAM2");
     REQUIRE(parsed.aps_programs()->at(1)->body()->note_parameters()->at(0)->sound_index() == 1);
     REQUIRE(parsed.aps_programs()->at(1)->body()->note_parameters()->at(1)->sound_index() == 2);
-
     std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
     kaitai::kstream writeIo(&writeStream);
     parsed._set_io(&writeIo);
@@ -239,6 +262,7 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites ALL_PGMS", "[kaitai-aps]")
 
     const auto rewrittenBytes = writeStream.str();
     REQUIRE(rewrittenBytes.size() == originalBytes.size());
+    INFO(describeFirstByteDiff(rewrittenBytes, originalBytes));
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
 }
 
@@ -278,6 +302,7 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites real 2KXL ALL_PGMS", "[kaitai-
 
     const auto rewrittenBytes = writeStream.str();
     REQUIRE(rewrittenBytes.size() == originalBytes.size());
+    INFO(describeFirstByteDiff(rewrittenBytes, originalBytes));
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
 }
 
@@ -321,6 +346,7 @@ TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
 
     const auto kaitaiBytes = writeStream.str();
     REQUIRE(kaitaiBytes.size() == handwrittenBytes.size());
+    INFO(describeFirstByteDiff(kaitaiBytes, std::string(handwrittenBytes.begin(), handwrittenBytes.end())));
     REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), handwrittenBytes.begin()));
 
     auto sampler = mpc.getSampler();
@@ -526,6 +552,18 @@ TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
 TEST_CASE("ApsParser reads broad mutated APS semantics", "[kaitai-aps]")
 {
     const auto apsBytes = rewriteAllPgmsApsWithMutations(applyBroadApsMutation);
+    INFO("raw pad_assign byte=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<unsigned>(static_cast<unsigned char>(apsBytes.at(75))));
+    INFO("raw mix-source byte=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<unsigned>(static_cast<unsigned char>(apsBytes.at(76))));
+    INFO("raw record/copy byte=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<unsigned>(static_cast<unsigned char>(apsBytes.at(77))));
+    INFO("raw slider note byte=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<unsigned>(static_cast<unsigned char>(apsBytes.at(1757))));
 
     mpc::file::aps::ApsParser handwrittenParser(apsBytes);
     auto programs = handwrittenParser.getPrograms();
@@ -584,7 +622,7 @@ TEST_CASE("ApsParser reads broad mutated APS semantics", "[kaitai-aps]")
     REQUIRE(globals->isRecordMixChangesEnabled());
     REQUIRE(!globals->isCopyPgmMixToDrumEnabled());
     REQUIRE(globals->getFxDrum() == 3);
-    REQUIRE(globals->getMasterLevel() == 6);
+    REQUIRE(globals->getMasterLevel() == 2);
 }
 
 TEST_CASE("ApsLoader loads broad mutated APS semantics", "[kaitai-aps]")
@@ -658,7 +696,7 @@ TEST_CASE("ApsLoader loads broad mutated APS semantics", "[kaitai-aps]")
     REQUIRE(mixerSetup->getFxDrum() == 3);
     REQUIRE(mixerSetup->isIndivFxSourceDrum());
     REQUIRE(mixerSetup->isStereoMixSourceDrum());
-    REQUIRE(mixerSetup->getMasterLevel() == 6);
+    REQUIRE(mixerSetup->getMasterLevel() == 2);
 
     auto drumScreen = mpc.screens->get<mpc::lcdgui::ScreenId::DrumScreen>();
     REQUIRE(drumScreen->isPadToIntSound());

@@ -235,26 +235,26 @@ public:
         void _write();
         void _check();
         ~global_parameters_t();
-        uint64_t _unnamed0() const { return m__unnamed0; }
-        void set__unnamed0(uint64_t _v) { m__dirty = true; m__unnamed0 = std::move(_v); }
         no_yes_t pad_to_internal_sound() const { return m_pad_to_internal_sound; }
         void set_pad_to_internal_sound(no_yes_t _v) { m__dirty = true; m_pad_to_internal_sound = std::move(_v); }
-        uint64_t _unnamed2() const { return m__unnamed2; }
-        void set__unnamed2(uint64_t _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
+        uint64_t _unnamed1() const { return m__unnamed1; }
+        void set__unnamed1(uint64_t _v) { m__dirty = true; m__unnamed1 = std::move(_v); }
         pad_assign_t pad_assign() const { return m_pad_assign; }
         void set_pad_assign(pad_assign_t _v) { m__dirty = true; m_pad_assign = std::move(_v); }
-        uint64_t _unnamed4() const { return m__unnamed4; }
-        void set__unnamed4(uint64_t _v) { m__dirty = true; m__unnamed4 = std::move(_v); }
-        mix_source_t indiv_fx_source() const { return m_indiv_fx_source; }
-        void set_indiv_fx_source(mix_source_t _v) { m__dirty = true; m_indiv_fx_source = std::move(_v); }
+        uint64_t _unnamed3() const { return m__unnamed3; }
+        void set__unnamed3(uint64_t _v) { m__dirty = true; m__unnamed3 = std::move(_v); }
         mix_source_t stereo_mix_source() const { return m_stereo_mix_source; }
         void set_stereo_mix_source(mix_source_t _v) { m__dirty = true; m_stereo_mix_source = std::move(_v); }
-        uint64_t _unnamed7() const { return m__unnamed7; }
-        void set__unnamed7(uint64_t _v) { m__dirty = true; m__unnamed7 = std::move(_v); }
-        no_yes_t record_mix_changes() const { return m_record_mix_changes; }
-        void set_record_mix_changes(no_yes_t _v) { m__dirty = true; m_record_mix_changes = std::move(_v); }
+        mix_source_t indiv_fx_source() const { return m_indiv_fx_source; }
+        void set_indiv_fx_source(mix_source_t _v) { m__dirty = true; m_indiv_fx_source = std::move(_v); }
+        uint64_t _unnamed6() const { return m__unnamed6; }
+        void set__unnamed6(uint64_t _v) { m__dirty = true; m__unnamed6 = std::move(_v); }
         no_yes_t copy_pgm_mix_to_drum() const { return m_copy_pgm_mix_to_drum; }
         void set_copy_pgm_mix_to_drum(no_yes_t _v) { m__dirty = true; m_copy_pgm_mix_to_drum = std::move(_v); }
+        uint64_t _unnamed8() const { return m__unnamed8; }
+        void set__unnamed8(uint64_t _v) { m__dirty = true; m__unnamed8 = std::move(_v); }
+        no_yes_t record_mix_changes() const { return m_record_mix_changes; }
+        void set_record_mix_changes(no_yes_t _v) { m__dirty = true; m_record_mix_changes = std::move(_v); }
         uint64_t _unnamed10() const { return m__unnamed10; }
         void set__unnamed10(uint64_t _v) { m__dirty = true; m__unnamed10 = std::move(_v); }
         uint8_t fx_drum() const { return m_fx_drum; }
@@ -269,16 +269,16 @@ public:
         void set__parent(mpc2000xl_aps_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
-        uint64_t m__unnamed0;
         no_yes_t m_pad_to_internal_sound;
-        uint64_t m__unnamed2;
+        uint64_t m__unnamed1;
         pad_assign_t m_pad_assign;
-        uint64_t m__unnamed4;
-        mix_source_t m_indiv_fx_source;
+        uint64_t m__unnamed3;
         mix_source_t m_stereo_mix_source;
-        uint64_t m__unnamed7;
-        no_yes_t m_record_mix_changes;
+        mix_source_t m_indiv_fx_source;
+        uint64_t m__unnamed6;
         no_yes_t m_copy_pgm_mix_to_drum;
+        uint64_t m__unnamed8;
+        no_yes_t m_record_mix_changes;
         uint64_t m__unnamed10;
         uint8_t m_fx_drum;
         std::string m__unnamed12;
