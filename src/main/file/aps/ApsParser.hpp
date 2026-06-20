@@ -64,6 +64,7 @@ namespace mpc::file::aps
         std::vector<ApsMixer *> getDrumMixers() const;
         ApsDrumConfiguration *getDrumConfiguration(int i) const;
         ApsGlobalParameters *getGlobalParameters() const;
+        std::vector<int> getMasterAssignTable() const;
 
         std::vector<char> getBytes();
 

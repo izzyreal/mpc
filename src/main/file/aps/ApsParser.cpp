@@ -217,6 +217,11 @@ ApsGlobalParameters *ApsParser::getGlobalParameters() const
     return globalParameters.get();
 }
 
+std::vector<int> ApsParser::getMasterAssignTable() const
+{
+    return maTable->get();
+}
+
 std::vector<char> ApsParser::getBytes()
 {
     return saveBytes;

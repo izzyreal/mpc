@@ -616,17 +616,17 @@ mpc2000xl_aps_t::global_parameters_t::global_parameters_t(kaitai::kstream* p__io
 }
 
 void mpc2000xl_aps_t::global_parameters_t::_read() {
-    m__unnamed0 = m__io->read_bits_int_be(7);
-    m_pad_to_internal_sound = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_be(1));
-    m__unnamed2 = m__io->read_bits_int_be(7);
-    m_pad_assign = static_cast<mpc2000xl_aps_t::pad_assign_t>(m__io->read_bits_int_be(1));
-    m__unnamed4 = m__io->read_bits_int_be(6);
-    m_indiv_fx_source = static_cast<mpc2000xl_aps_t::mix_source_t>(m__io->read_bits_int_be(1));
-    m_stereo_mix_source = static_cast<mpc2000xl_aps_t::mix_source_t>(m__io->read_bits_int_be(1));
-    m__unnamed7 = m__io->read_bits_int_be(3);
-    m_record_mix_changes = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_be(1));
-    m_copy_pgm_mix_to_drum = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_be(1));
-    m__unnamed10 = m__io->read_bits_int_be(3);
+    m_pad_to_internal_sound = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_le(1));
+    m__unnamed1 = m__io->read_bits_int_le(7);
+    m_pad_assign = static_cast<mpc2000xl_aps_t::pad_assign_t>(m__io->read_bits_int_le(1));
+    m__unnamed3 = m__io->read_bits_int_le(7);
+    m_stereo_mix_source = static_cast<mpc2000xl_aps_t::mix_source_t>(m__io->read_bits_int_le(1));
+    m_indiv_fx_source = static_cast<mpc2000xl_aps_t::mix_source_t>(m__io->read_bits_int_le(1));
+    m__unnamed6 = m__io->read_bits_int_le(6);
+    m_copy_pgm_mix_to_drum = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_le(1));
+    m__unnamed8 = m__io->read_bits_int_le(3);
+    m_record_mix_changes = static_cast<mpc2000xl_aps_t::no_yes_t>(m__io->read_bits_int_le(1));
+    m__unnamed10 = m__io->read_bits_int_le(3);
     m_fx_drum = m__io->read_u1();
     m__unnamed12 = m__io->read_bytes(1);
     m_master_level = m__io->read_u1();
@@ -637,17 +637,17 @@ void mpc2000xl_aps_t::global_parameters_t::_fetch_instances() {
 }
 
 void mpc2000xl_aps_t::global_parameters_t::_write() {
-    m__io->write_bits_int_be(7, m__unnamed0);
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_pad_to_internal_sound));
-    m__io->write_bits_int_be(7, m__unnamed2);
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_pad_assign));
-    m__io->write_bits_int_be(6, m__unnamed4);
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_indiv_fx_source));
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_stereo_mix_source));
-    m__io->write_bits_int_be(3, m__unnamed7);
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_record_mix_changes));
-    m__io->write_bits_int_be(1, static_cast<uint64_t>(m_copy_pgm_mix_to_drum));
-    m__io->write_bits_int_be(3, m__unnamed10);
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_pad_to_internal_sound));
+    m__io->write_bits_int_le(7, m__unnamed1);
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_pad_assign));
+    m__io->write_bits_int_le(7, m__unnamed3);
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_stereo_mix_source));
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_indiv_fx_source));
+    m__io->write_bits_int_le(6, m__unnamed6);
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_copy_pgm_mix_to_drum));
+    m__io->write_bits_int_le(3, m__unnamed8);
+    m__io->write_bits_int_le(1, static_cast<uint64_t>(m_record_mix_changes));
+    m__io->write_bits_int_le(3, m__unnamed10);
     m__io->write_u1(m_fx_drum);
     m__io->write_bytes(m__unnamed12);
     m__io->write_u1(m_master_level);

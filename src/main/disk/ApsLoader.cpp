@@ -115,6 +115,16 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
     for (auto &apsProgram : apsParser.getPrograms())
     {
         sampler->getProgram(apsProgram->index)->setName(apsProgram->getName());
+        const auto slider = sampler->getProgram(apsProgram->index)->getSlider();
+        slider->setAssignNote(DrumNoteNumber(apsProgram->getSlider()->getNote()));
+        slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
+        slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
+        slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
+        slider->setDecayHighRange(apsProgram->getSlider()->getDecayHigh());
+        slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
+        slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
+        slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
+        slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
 
         performance::UpdateProgramBulk msg;
         auto &perfProgram = msg.program;
@@ -275,7 +285,13 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
     mixerSetupScreen->setMasterLevel(globals->getMasterLevel());
 
     auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
-
+    std::vector<DrumNoteNumber> masterPadAssign;
+    masterPadAssign.reserve(64);
+    for (const auto note : apsParser.getMasterAssignTable())
+    {
+        masterPadAssign.emplace_back(note);
+    }
+    mpc.getSampler()->setMasterPadAssign(masterPadAssign);
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
 
