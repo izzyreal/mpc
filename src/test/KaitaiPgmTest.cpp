@@ -99,6 +99,29 @@ std::shared_ptr<mpc::sampler::Program> loadProgram1FromBytes(
     return program;
 }
 
+std::shared_ptr<mpc::sampler::Program> loadProgram1FromBytesWithoutRender(
+    mpc::Mpc& mpc,
+    const std::vector<char>& programBytes)
+{
+    prepareProgramLoadingResources(mpc);
+
+    auto disk = mpc.getDisk();
+    disk->moveForward("program1");
+    disk->initFiles();
+    auto pgmFile = disk->getFile("PROGRAM1.PGM");
+    auto mutableBytes = programBytes;
+    pgmFile->setFileData(mutableBytes);
+
+    auto sampler = mpc.getSampler();
+    sampler->deleteAllPrograms(false);
+    sampler->deleteAllSamples();
+
+    auto program = sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
+    (void)mpc::disk::ProgramLoader::loadProgram(mpc, pgmFile, program, 0);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    return program;
+}
+
 std::shared_ptr<mpc::disk::MpcFile> loadProgram1FileFromBytes(
     mpc::Mpc& mpc,
     const std::vector<char>& programBytes)
@@ -373,7 +396,7 @@ TEST_CASE("Kaitai MPC2000 PGM load uses standalone byte as MIDI program change",
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    const auto program = loadProgram1FromBytes(mpc, programBytes);
+    const auto program = loadProgram1FromBytesWithoutRender(mpc, programBytes);
 
     REQUIRE(program->getMidiProgramChange() == 2);
     REQUIRE(program->getSlider()->getControlChange() == 0);
@@ -436,7 +459,7 @@ TEST_CASE("Kaitai MPC2000 PGM load preserves mixer effects send level", "[kaitai
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    const auto program = loadProgram1FromBytes(mpc, programBytes);
+    const auto program = loadProgram1FromBytesWithoutRender(mpc, programBytes);
 
     REQUIRE(program != nullptr);
     REQUIRE(program->getNoteParameters(36)->getIndivFxMixer()->getFxSendLevel() == 50);
@@ -555,5 +578,73 @@ TEST_CASE("PgmFileToProgramConverter loads mutated note tune", "[kaitai-pgm]")
     REQUIRE(result);
 
     mpc.getPerformanceManager().lock()->drainQueue();
+    REQUIRE(program->getNoteParameters(35)->getTune() == -120);
+}
+
+TEST_CASE("ProgramLoader loads upper-bound MIDI program change", "[kaitai-pgm]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_pgm_t parsed(&parseIo);
+    parsed._read();
+    parsed.set_program_change(127);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> programBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const auto program = loadProgram1FromBytes(mpc, programBytes);
+
+    REQUIRE(program != nullptr);
+    REQUIRE(program->getMidiProgramChange() == 128);
+}
+
+TEST_CASE("ProgramLoader loads mutated note tune", "[kaitai-pgm]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_pgm_t parsed(&parseIo);
+    parsed._read();
+    parsed.note_parameters()->at(0)->set_tune(-120);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> programBytes(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const auto program = loadProgram1FromBytes(mpc, programBytes);
+
+    REQUIRE(program != nullptr);
     REQUIRE(program->getNoteParameters(35)->getTune() == -120);
 }
