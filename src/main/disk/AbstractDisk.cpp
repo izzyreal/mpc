@@ -13,7 +13,6 @@
 #include "file/pgmwriter/PgmWriter.hpp"
 #include "file/sndwriter/SndWriter.hpp"
 #include "file/sndreader/SndReader.hpp"
-#include "file/aps/ApsParser.hpp"
 #include "file/all/AllParser.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/PgmIo.hpp"
@@ -49,7 +48,6 @@ using namespace mpc::file::sndwriter;
 using namespace mpc::file::sndreader;
 using namespace mpc::file::mid;
 using namespace mpc::file::pgmwriter;
-using namespace mpc::file::aps;
 using namespace mpc::file::all;
 
 using namespace mpc::lcdgui;

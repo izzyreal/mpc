@@ -9,11 +9,6 @@
 #include "engine/EngineHost.hpp"
 #include "engine/StereoMixer.hpp"
 #include "file/kaitai/ApsIo.hpp"
-#include "file/aps/ApsDrumConfiguration.hpp"
-#include "file/aps/ApsGlobalParameters.hpp"
-#include "file/aps/ApsNoteParameters.hpp"
-#include "file/aps/ApsParser.hpp"
-#include "file/aps/ApsSlider.hpp"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -306,7 +301,7 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites real 2KXL ALL_PGMS", "[kaitai-
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
 }
 
-TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
+TEST_CASE("Kaitai MPC2000 APS saves and reloads ALL_PGMS through production seam", "[kaitai-aps]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
@@ -315,11 +310,10 @@ TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
     REQUIRE(mpc.getSampler()->getProgramCount() == 2);
     REQUIRE(mpc.getSampler()->getSoundCount() == 3);
 
-    mpc::file::aps::ApsParser handwrittenWriter(mpc, "ALL_PGMS");
-    const auto handwrittenBytes = handwrittenWriter.getBytes();
+    const auto directKaitaiBytes = mpc::file::kaitai::ApsIo::save(mpc, "ALL_PGMS");
 
     std::stringstream parseStream(
-        std::string(handwrittenBytes.begin(), handwrittenBytes.end()),
+        std::string(directKaitaiBytes.begin(), directKaitaiBytes.end()),
         std::ios::in | std::ios::out | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
@@ -345,9 +339,11 @@ TEST_CASE("Kaitai MPC2000 APS matches handwritten APS bytes", "[kaitai-aps]")
     parsed._write();
 
     const auto kaitaiBytes = writeStream.str();
-    REQUIRE(kaitaiBytes.size() == handwrittenBytes.size());
-    INFO(describeFirstByteDiff(kaitaiBytes, std::string(handwrittenBytes.begin(), handwrittenBytes.end())));
-    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), handwrittenBytes.begin()));
+    REQUIRE(kaitaiBytes.size() == directKaitaiBytes.size());
+    INFO(describeFirstByteDiff(
+        kaitaiBytes,
+        std::string(directKaitaiBytes.begin(), directKaitaiBytes.end())));
+    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), directKaitaiBytes.begin()));
 
     auto sampler = mpc.getSampler();
     sampler->deleteAllPrograms(false);
@@ -391,16 +387,6 @@ TEST_CASE("Kaitai MPC2000 APS saves MIDI program change separately from slider c
     mpc.getPerformanceManager().lock()->drainQueue();
     REQUIRE(p1->getMidiProgramChange() == 2);
     p1->getSlider()->setControlChange(0);
-    mpc::file::aps::ApsParser handwrittenWriterZero(mpc, "ALL_PGMS");
-    const auto handwrittenBytesWithZeroControl = handwrittenWriterZero.getBytes();
-    std::stringstream handwrittenParseStreamZero(
-        std::string(handwrittenBytesWithZeroControl.begin(), handwrittenBytesWithZeroControl.end()),
-        std::ios::in | std::ios::out | std::ios::binary
-    );
-    kaitai::kstream handwrittenParseIoZero(&handwrittenParseStreamZero);
-    mpc2000xl_aps_t handwrittenParsedZero(&handwrittenParseIoZero);
-    handwrittenParsedZero._read();
-    REQUIRE(handwrittenParsedZero.aps_programs()->at(0)->body()->program_change() == 1);
 
     const auto bytesWithZeroControl =
         mpc::file::kaitai::ApsIo::save(mpc, "ALL_PGMS");
@@ -450,7 +436,7 @@ TEST_CASE("Kaitai MPC2000 APS loads real 2KXL ALL_PGMS through production seam",
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == -1);
 }
 
-TEST_CASE("ApsParser reads upper-bound MIDI program change", "[kaitai-aps]")
+TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
@@ -474,9 +460,14 @@ TEST_CASE("ApsParser reads upper-bound MIDI program change", "[kaitai-aps]")
     parsed._write();
 
     const auto rewrittenBytes = writeStream.str();
-    std::vector<char> apsBytes(rewrittenBytes.begin(), rewrittenBytes.end());
-    mpc::file::aps::ApsParser handwrittenParser(apsBytes);
-    REQUIRE(handwrittenParser.getPrograms().at(0)->getSlider()->getProgramChange() == 127);
+    std::stringstream reparsedStream(
+        rewrittenBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream reparsedIo(&reparsedStream);
+    mpc2000xl_aps_t reparsed(&reparsedIo);
+    reparsed._read();
+    REQUIRE(reparsed.aps_programs()->at(0)->body()->program_change() == 127);
 }
 
 TEST_CASE("ApsLoader loads upper-bound MIDI program change", "[kaitai-aps]")
@@ -549,7 +540,7 @@ TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
     REQUIRE(p1->getNoteParameters(35)->getTune() == -120);
 }
 
-TEST_CASE("ApsParser reads broad mutated APS semantics", "[kaitai-aps]")
+TEST_CASE("Kaitai APS parses broad mutated APS semantics", "[kaitai-aps]")
 {
     const auto apsBytes = rewriteAllPgmsApsWithMutations(applyBroadApsMutation);
     INFO("raw pad_assign byte=0x"
@@ -565,64 +556,121 @@ TEST_CASE("ApsParser reads broad mutated APS semantics", "[kaitai-aps]")
         << std::hex << std::setw(2) << std::setfill('0')
         << static_cast<unsigned>(static_cast<unsigned char>(apsBytes.at(1757))));
 
-    mpc::file::aps::ApsParser handwrittenParser(apsBytes);
-    auto programs = handwrittenParser.getPrograms();
-    REQUIRE(programs.size() >= 1U);
+    std::stringstream parseStream(
+        std::string(apsBytes.begin(), apsBytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
 
-    auto* p1 = programs.at(0);
-    REQUIRE(p1->getName() == "PROGRAM1");
-    REQUIRE(p1->getAssignTable()->get().at(0) == 50);
-    REQUIRE(p1->getSlider()->getNote() == 52);
-    REQUIRE(p1->getSlider()->getTuneLow() == -119);
-    REQUIRE(p1->getSlider()->getTuneHigh() == 118);
-    REQUIRE(p1->getSlider()->getDecayLow() == 11);
-    REQUIRE(p1->getSlider()->getDecayHigh() == 12);
-    REQUIRE(p1->getSlider()->getAttackLow() == 13);
-    REQUIRE(p1->getSlider()->getAttackHigh() == 14);
-    REQUIRE(p1->getSlider()->getFilterLow() == -15);
-    REQUIRE(p1->getSlider()->getFilterHigh() == 16);
-    REQUIRE(p1->getSlider()->getProgramChange() == 126);
+    REQUIRE(parsed.aps_programs()->size() >= 1U);
 
-    auto* note35 = p1->getNoteParameters(0);
-    REQUIRE(note35->getSoundIndex() == -1);
-    REQUIRE(note35->getSoundGenerationMode() == 2);
-    REQUIRE(note35->getVelocityRangeLower() == 1);
-    REQUIRE(note35->getAlsoPlay1() == 41);
-    REQUIRE(note35->getVelocityRangeUpper() == 127);
-    REQUIRE(note35->getAlsoPlay2() == 42);
-    REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
-    REQUIRE(note35->getMute1() == 43);
-    REQUIRE(note35->getMute2() == 44);
-    REQUIRE(note35->getTune() == -120);
-    REQUIRE(note35->getAttack() == 99);
-    REQUIRE(note35->getDecay() == 98);
-    REQUIRE(note35->getDecayMode() == 1);
-    REQUIRE(note35->getCutoffFrequency() == 17);
-    REQUIRE(note35->getResonance() == 18);
-    REQUIRE(note35->getVelocityToFilterAttack() == 19);
-    REQUIRE(note35->getVelocityToFilterDecay() == 20);
-    REQUIRE(note35->getVelocityToFilterAmount() == 21);
-    REQUIRE(note35->getVelocityToLevel() == 22);
-    REQUIRE(note35->getVelocityToAttack() == 23);
-    REQUIRE(note35->getVelocityToStart() == 24);
-    REQUIRE(note35->getVelocityToFilterFrequency() == 25);
-    REQUIRE(note35->getSliderParameter() == 3);
-    REQUIRE(note35->getVelocityToPitch() == 26);
+    auto* p1 = parsed.aps_programs()->at(0)->body();
+    REQUIRE(p1->name().substr(0, 8) == "PROGRAM1");
+    REQUIRE(p1->pad_to_note_mapping()->at(0) == 50);
+    REQUIRE(p1->slider()->note() == 52);
+    REQUIRE(p1->slider()->tune_low() == -119);
+    REQUIRE(p1->slider()->tune_high() == 118);
+    REQUIRE(p1->slider()->decay_low() == 11);
+    REQUIRE(p1->slider()->decay_high() == 12);
+    REQUIRE(p1->slider()->attack_low() == 13);
+    REQUIRE(p1->slider()->attack_high() == 14);
+    REQUIRE(p1->slider()->filter_low() == -15);
+    REQUIRE(p1->slider()->filter_high() == 16);
+    REQUIRE(p1->program_change() == 126);
 
-    auto* drum0 = handwrittenParser.getDrumConfiguration(0);
-    REQUIRE(drum0->getProgramIndex() == 1);
-    REQUIRE(!drum0->isReceivePgmChangeEnabled());
-    REQUIRE(!drum0->isReceiveMidiVolumeEnabled());
+    auto* note35 = p1->note_parameters()->at(0).get();
+    REQUIRE(note35->sound_index() == 255);
+    REQUIRE(note35->sound_generation_mode() == mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
+    REQUIRE(note35->velocity_range_lower() == 1);
+    REQUIRE(note35->also_play_use_note_1() == 41);
+    REQUIRE(note35->velocity_range_upper() == 127);
+    REQUIRE(note35->also_play_use_note_2() == 42);
+    REQUIRE(note35->voice_overlap_mode() == mpc2000xl_pgm_t::VOICE_OVERLAP_MODE_NOTE_OFF);
+    REQUIRE(note35->mute_assign_1() == 43);
+    REQUIRE(note35->mute_assign_2() == 44);
+    REQUIRE(note35->tune() == -120);
+    REQUIRE(note35->attack() == 99);
+    REQUIRE(note35->decay() == 98);
+    REQUIRE(note35->decay_mode() == mpc2000xl_pgm_t::DECAY_MODE_START);
+    REQUIRE(note35->cutoff() == 17);
+    REQUIRE(note35->resonance() == 18);
+    REQUIRE(note35->velocity_envelope_to_filter_attack() == 19);
+    REQUIRE(note35->velocity_envelope_to_filter_decay() == 20);
+    REQUIRE(note35->velocity_envelope_to_filter_amount() == 21);
+    REQUIRE(note35->velocity_to_level() == 22);
+    REQUIRE(note35->velocity_to_attack() == 23);
+    REQUIRE(note35->velocity_to_start() == 24);
+    REQUIRE(note35->velocity_to_cutoff() == 25);
+    REQUIRE(note35->slider_parameter() == mpc2000xl_pgm_t::SLIDER_PARAMETER_FILTER);
+    REQUIRE(note35->velocity_to_pitch() == 26);
 
-    auto* globals = handwrittenParser.getGlobalParameters();
-    REQUIRE(globals->isPadToIntSoundEnabled());
-    REQUIRE(globals->isPadAssignMaster());
-    REQUIRE(globals->isIndivFxSourceDrum());
-    REQUIRE(globals->isStereoMixSourceDrum());
-    REQUIRE(globals->isRecordMixChangesEnabled());
-    REQUIRE(!globals->isCopyPgmMixToDrumEnabled());
-    REQUIRE(globals->getFxDrum() == 3);
-    REQUIRE(globals->getMasterLevel() == 2);
+    auto* drum0 = parsed.drum1();
+    REQUIRE(drum0->program() == 1);
+    REQUIRE(drum0->receive_program_change() == mpc2000xl_aps_t::NO_YES_FALSE);
+    REQUIRE(drum0->receive_midi_volume() == mpc2000xl_aps_t::NO_YES_FALSE);
+
+    auto* globals = parsed.global_parameters();
+    REQUIRE(globals->pad_to_internal_sound() == mpc2000xl_aps_t::NO_YES_TRUE);
+    REQUIRE(globals->pad_assign() == mpc2000xl_aps_t::PAD_ASSIGN_MASTERS);
+    REQUIRE(globals->indiv_fx_source() == mpc2000xl_aps_t::MIX_SOURCE_DRUM);
+    REQUIRE(globals->stereo_mix_source() == mpc2000xl_aps_t::MIX_SOURCE_DRUM);
+    REQUIRE(globals->record_mix_changes() == mpc2000xl_aps_t::NO_YES_TRUE);
+    REQUIRE(globals->copy_pgm_mix_to_drum() == mpc2000xl_aps_t::NO_YES_FALSE);
+    REQUIRE(globals->fx_drum() == 3);
+    REQUIRE(globals->master_level() == 2);
+}
+
+TEST_CASE("Kaitai APS saves maximum sound count in 16-bit header", "[kaitai-aps]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    for (uint16_t i = 0; i < 256; ++i)
+    {
+        auto sound = mpc.getSampler()->addSound();
+        REQUIRE(sound != nullptr);
+        sound->setName("S" + std::to_string(i));
+    }
+
+    const auto apsBytes = mpc::file::kaitai::ApsIo::save(mpc, "MAXSOUNDS");
+
+    std::stringstream parseStream(
+        std::string(apsBytes.begin(), apsBytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(parsed.sound_count() == 256);
+    REQUIRE(parsed.sound_names()->size() == 256U);
+}
+
+TEST_CASE("Kaitai APS saves unassigned pad mapping", "[kaitai-aps]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    const auto manager = mpc.getPerformanceManager().lock();
+    mpc.getSampler()
+        ->getProgram(mpc::MinProgramIndex)
+        ->getPad(mpc::MinProgramPadIndex)
+        ->setNote(mpc::NoDrumNoteAssigned);
+    manager->drainQueue();
+
+    const auto apsBytes = mpc::file::kaitai::ApsIo::save(mpc, "UNASSIGN");
+
+    std::stringstream parseStream(
+        std::string(apsBytes.begin(), apsBytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_aps_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(parsed.aps_programs()->at(0)->body()->pad_to_note_mapping()->at(0) == 34);
 }
 
 TEST_CASE("ApsLoader loads broad mutated APS semantics", "[kaitai-aps]")
