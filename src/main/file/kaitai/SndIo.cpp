@@ -10,12 +10,10 @@
 using namespace mpc::file::kaitai;
 using namespace mpc::sampleops;
 
-sound_or_error SndIo::loadSound(const std::shared_ptr<mpc::disk::MpcFile> &file,
+sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
                                 const std::shared_ptr<mpc::sampler::Sound> &sound,
                                 const std::string &nameWithoutExtension)
 {
-    const auto bytes = file->getBytes();
-
     std::stringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
         std::ios::in | std::ios::out | std::ios::binary
@@ -62,6 +60,13 @@ sound_or_error SndIo::loadSound(const std::shared_ptr<mpc::disk::MpcFile> &file,
     sound->setLoopTo(parsed.end() - parsed.loop_frame_count());
 
     return sound;
+}
+
+sound_or_error SndIo::loadSound(const std::shared_ptr<mpc::disk::MpcFile> &file,
+                                const std::shared_ptr<mpc::sampler::Sound> &sound,
+                                const std::string &nameWithoutExtension)
+{
+    return loadBytes(file->getBytes(), sound, nameWithoutExtension);
 }
 
 std::vector<char> SndIo::saveSound(mpc::sampler::Sound &sound)

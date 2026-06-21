@@ -44,11 +44,6 @@ namespace mpc::file::wav
     class WavFile;
 }
 
-namespace mpc::file::sndreader
-{
-    class SndReader;
-}
-
 namespace mpc::disk
 {
 
@@ -173,10 +168,6 @@ namespace mpc::disk
             std::shared_ptr<MpcFile>,
             std::function<sound_or_error(std::shared_ptr<file::wav::WavFile>)>
                 onSuccess);
-        sound_or_error
-            readSnd2(std::shared_ptr<MpcFile>,
-                     std::function<sound_or_error(
-                         std::shared_ptr<file::sndreader::SndReader>)>);
         sequence_or_error readMid2(std::shared_ptr<MpcFile>);
 
         void readAps2(std::shared_ptr<MpcFile>, std::function<void()> onSuccess,

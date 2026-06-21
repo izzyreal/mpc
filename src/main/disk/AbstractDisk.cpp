@@ -10,9 +10,6 @@
 #include "file/wav/WavFile.hpp"
 #include "file/mid/MidiWriter.hpp"
 #include "file/mid/MidiReader.hpp"
-#include "file/pgmwriter/PgmWriter.hpp"
-#include "file/sndwriter/SndWriter.hpp"
-#include "file/sndreader/SndReader.hpp"
 #include "file/all/AllParser.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/PgmIo.hpp"
@@ -44,10 +41,7 @@ using namespace mpc::input::midi;
 
 using namespace mpc::file;
 using namespace mpc::file::wav;
-using namespace mpc::file::sndwriter;
-using namespace mpc::file::sndreader;
 using namespace mpc::file::mid;
-using namespace mpc::file::pgmwriter;
 using namespace mpc::file::all;
 
 using namespace mpc::lcdgui;
@@ -567,17 +561,6 @@ sound_or_error AbstractDisk::readWav2(
                 mpc_io_error_msg{"Unable to open WAV input stream"});
         }
         return WavFile::readWavStream(inputStream).and_then(onSuccess);
-    };
-    return performRequiredIoOrOpenErrorPopup(readFunc);
-}
-
-sound_or_error AbstractDisk::readSnd2(
-    std::shared_ptr<MpcFile> f,
-    std::function<sound_or_error(std::shared_ptr<SndReader>)> onSuccess)
-{
-    const std::function readFunc = [f, onSuccess]
-    {
-        return onSuccess(std::make_shared<SndReader>(f.get()));
     };
     return performRequiredIoOrOpenErrorPopup(readFunc);
 }

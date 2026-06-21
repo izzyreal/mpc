@@ -5,22 +5,12 @@
 #include "IntTypes.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
-#include "disk/PgmFileToProgramConverter.hpp"
 #include "disk/ProgramLoader.hpp"
 #include "engine/IndivFxMixer.hpp"
 #include "engine/EngineHost.hpp"
 #include "engine/StereoMixer.hpp"
 #include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_pgm.h"
-#include "file/pgmreader/PgmHeader.hpp"
-#include "file/pgmreader/ProgramName.hpp"
-#include "file/pgmreader/SoundNames.hpp"
-#include "file/pgmreader/PgmAllNoteParameters.hpp"
-#include "file/pgmreader/PRMixer.hpp"
-#include "file/pgmreader/PRPads.hpp"
-#include "file/pgmreader/ProgramFileReader.hpp"
-#include "file/pgmreader/PRSlider.hpp"
-#include "file/pgmwriter/PgmWriter.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/PgmSlider.hpp"
@@ -179,66 +169,6 @@ void requireBroadMutatedProgramState(
     REQUIRE(slider->getFilterHighRange() == 16);
 }
 
-void requireBroadMutatedProgramReaderState(
-    mpc::file::pgmreader::ProgramFileReader& reader)
-{
-    REQUIRE(reader.getHeader()->verifyMagic());
-    REQUIRE(reader.getHeader()->getSoundCount() == 2);
-    REQUIRE(reader.getProgramName()->getProgramNameASCII() == "VMPCTESTPROGRAM1");
-    REQUIRE(reader.getSampleNames()->getSampleName(0) ==
-        std::string("sound1") + std::string(10, ' '));
-    REQUIRE(reader.getSampleNames()->getSampleName(1) ==
-        std::string("sound2") + std::string(10, ' '));
-
-    REQUIRE(reader.getPads()->getNote(0) == 50);
-
-    auto allNotes = reader.getAllNoteParameters();
-    REQUIRE(allNotes->getSampleSelect(0) == -1);
-    REQUIRE(allNotes->getSoundGenerationMode(0) == 2);
-    REQUIRE(allNotes->getVelocityRangeLower(0) == 1);
-    REQUIRE(allNotes->getVelocityRangeUpper(0) == 127);
-    REQUIRE(allNotes->getAlsoPlayUse1(0) == 41);
-    REQUIRE(allNotes->getAlsoPlayUse2(0) == 42);
-    REQUIRE(allNotes->getVoiceOverlapMode(0) == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
-    REQUIRE(allNotes->getMuteAssign1(0) == 43);
-    REQUIRE(allNotes->getMuteAssign2(0) == 44);
-    REQUIRE(allNotes->getTune(0) == -120);
-    REQUIRE(allNotes->getAttack(0) == 99);
-    REQUIRE(allNotes->getDecay(0) == 98);
-    REQUIRE(allNotes->getDecayMode(0) == 1);
-    REQUIRE(allNotes->getCutoff(0) == 17);
-    REQUIRE(allNotes->getResonance(0) == 18);
-    REQUIRE(allNotes->getVelEnvToFiltAtt(0) == 19);
-    REQUIRE(allNotes->getVelEnvToFiltDec(0) == 20);
-    REQUIRE(allNotes->getVelEnvToFiltAmt(0) == 21);
-    REQUIRE(allNotes->getVelocityToLevel(0) == 22);
-    REQUIRE(allNotes->getVelocityToAttack(0) == 23);
-    REQUIRE(allNotes->getVelocityToStart(0) == 24);
-    REQUIRE(allNotes->getVelocityToCutoff(0) == 25);
-    REQUIRE(allNotes->getSliderParameter(0) == 3);
-    REQUIRE(allNotes->getVelocityToPitch(0) == 26);
-
-    auto mixer = reader.getMixer();
-    REQUIRE(mixer->getEffectsOutput(0) == 4);
-    REQUIRE(mixer->getVolume(0) == 12);
-    REQUIRE(mixer->getPan(0) == 13);
-    REQUIRE(mixer->getVolumeIndividual(0) == 14);
-    REQUIRE(mixer->getOutput(0) == 2);
-    REQUIRE(mixer->getEffectsSendLevel(0) == 15);
-
-    auto slider = reader.getSlider();
-    REQUIRE(slider->getMidiNoteAssign() == 52);
-    REQUIRE(slider->getTuneLow() == -119);
-    REQUIRE(slider->getTuneHigh() == 118);
-    REQUIRE(slider->getDecayLow() == 11);
-    REQUIRE(slider->getDecayHigh() == 12);
-    REQUIRE(slider->getAttackLow() == 13);
-    REQUIRE(slider->getAttackHigh() == 14);
-    REQUIRE(slider->getFilterLow() == -15);
-    REQUIRE(slider->getFilterHigh() == 16);
-    REQUIRE(slider->getProgramChange() == 126);
-}
-
 void prepareProgramLoadingResources(mpc::Mpc& mpc)
 {
     auto disk = mpc.getDisk();
@@ -340,6 +270,24 @@ std::shared_ptr<mpc::disk::MpcFile> loadProgram1FileFromBytes(
     auto mutableBytes = programBytes;
     pgmFile->setFileData(mutableBytes);
     return pgmFile;
+}
+
+std::shared_ptr<mpc::sampler::Program> loadProgram1ViaPgmIoFromBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& programBytes,
+    std::vector<std::string>& soundNames)
+{
+    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
+
+    auto sampler = mpc.getSampler();
+    sampler->deleteAllPrograms(false);
+    sampler->deleteAllSamples();
+
+    auto program = sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
+    auto result = mpc::file::kaitai::PgmIo::loadProgram(mpc, pgmFile, program, soundNames);
+    REQUIRE(result);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    return program;
 }
 
 void requireProgram1LoadedState(mpc::Mpc& mpc,
@@ -501,7 +449,7 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-
     REQUIRE(writeStream.str() == originalBytes);
 }
 
-TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM saves and reloads PROGRAM1 without handwritten code", "[kaitai-pgm]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
@@ -510,11 +458,10 @@ TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
     REQUIRE(program != nullptr);
     REQUIRE(program->getName() == "PROGRAM1");
 
-    mpc::file::pgmwriter::PgmWriter handwrittenWriter(program.get(), mpc.getSampler());
-    const auto handwrittenBytes = handwrittenWriter.get();
+    const auto kaitaiBytes = mpc::file::kaitai::PgmIo::saveProgram(*program, mpc.getSampler());
 
     std::stringstream parseStream(
-        std::string(handwrittenBytes.begin(), handwrittenBytes.end()),
+        std::string(kaitaiBytes.begin(), kaitaiBytes.end()),
         std::ios::in | std::ios::out | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
@@ -538,8 +485,7 @@ TEST_CASE("Kaitai MPC2000 PGM matches handwritten PGM bytes", "[kaitai-pgm]")
     parsed._check();
     parsed._write();
 
-    const auto kaitaiBytes = writeStream.str();
-    REQUIRE(kaitaiBytes == std::string(handwrittenBytes.begin(), handwrittenBytes.end()));
+    REQUIRE(writeStream.str() == std::string(kaitaiBytes.begin(), kaitaiBytes.end()));
 
     auto disk = mpc.getDisk();
     auto kaitaiFile = disk->newFile("KPGM.PGM");
@@ -670,7 +616,7 @@ TEST_CASE("Kaitai MPC2000 PGM load preserves mixer effects send level", "[kaitai
     REQUIRE(program->getNoteParameters(36)->getIndivFxMixer()->getFxSendLevel() == 50);
 }
 
-TEST_CASE("PgmFileToProgramConverter loads upper-bound MIDI program change", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM direct load handles upper-bound MIDI program change", "[kaitai-pgm]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
@@ -698,20 +644,13 @@ TEST_CASE("PgmFileToProgramConverter loads upper-bound MIDI program change", "[k
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
-    auto program = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
     std::vector<std::string> soundNames;
-
-    auto result = mpc::disk::PgmFileToProgramConverter::loadFromFileAndConvert(
-        mpc, pgmFile, program, soundNames
-    );
-    REQUIRE(result);
-
-    mpc.getPerformanceManager().lock()->drainQueue();
+    const auto program = loadProgram1ViaPgmIoFromBytes(mpc, programBytes, soundNames);
     REQUIRE(program->getMidiProgramChange() == 128);
+    REQUIRE(soundNames.size() == 2U);
 }
 
-TEST_CASE("ProgramFileReader reads upper-bound MIDI program change byte", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM direct parse reads upper-bound MIDI program change byte", "[kaitai-pgm]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
@@ -735,29 +674,28 @@ TEST_CASE("ProgramFileReader reads upper-bound MIDI program change byte", "[kait
     parsed._write();
 
     const auto rewrittenBytes = writeStream.str();
-    std::vector<char> programBytes(rewrittenBytes.begin(), rewrittenBytes.end());
-
-    mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
-
-    mpc::file::pgmreader::ProgramFileReader reader(pgmFile);
-    REQUIRE(reader.getSlider()->getProgramChange() == 127);
+    std::stringstream reparsedStream(
+        rewrittenBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream reparsedIo(&reparsedStream);
+    mpc2000xl_pgm_t reparsed(&reparsedIo);
+    reparsed._read();
+    REQUIRE(reparsed.program_change() == 127);
 }
 
-TEST_CASE("ProgramFileReader reads broad mutated program semantics", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM direct load preserves broad mutated program semantics", "[kaitai-pgm]")
 {
     const auto programBytes = rewriteProgram1WithMutations(applyBroadProgramMutation);
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
-
-    mpc::file::pgmreader::ProgramFileReader reader(pgmFile);
-    requireBroadMutatedProgramReaderState(reader);
+    std::vector<std::string> soundNames;
+    const auto program = loadProgram1ViaPgmIoFromBytes(mpc, programBytes, soundNames);
+    requireBroadMutatedProgramState(program, soundNames);
 }
 
-TEST_CASE("PgmFileToProgramConverter loads mutated note tune", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM direct load preserves mutated note tune", "[kaitai-pgm]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
@@ -785,16 +723,8 @@ TEST_CASE("PgmFileToProgramConverter loads mutated note tune", "[kaitai-pgm]")
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
-    auto program = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
     std::vector<std::string> soundNames;
-
-    auto result = mpc::disk::PgmFileToProgramConverter::loadFromFileAndConvert(
-        mpc, pgmFile, program, soundNames
-    );
-    REQUIRE(result);
-
-    mpc.getPerformanceManager().lock()->drainQueue();
+    const auto program = loadProgram1ViaPgmIoFromBytes(mpc, programBytes, soundNames);
     REQUIRE(program->getNoteParameters(35)->getTune() == -120);
 }
 
@@ -866,23 +796,21 @@ TEST_CASE("ProgramLoader loads mutated note tune", "[kaitai-pgm]")
     REQUIRE(program->getNoteParameters(35)->getTune() == -120);
 }
 
-TEST_CASE("PgmFileToProgramConverter loads broad mutated program semantics", "[kaitai-pgm]")
+TEST_CASE("Kaitai MPC2000 PGM save and production load preserve broad mutated program semantics", "[kaitai-pgm]")
 {
-    const auto programBytes = rewriteProgram1WithMutations(applyBroadProgramMutation);
-
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
-    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
-    auto program = mpc.getSampler()->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
-    std::vector<std::string> soundNames;
+    const auto mutatedBytes = rewriteProgram1WithMutations(applyBroadProgramMutation);
+    const auto mutatedProgram = loadProgram1FromBytesWithoutRender(mpc, mutatedBytes);
+    const std::vector<std::string> expectedSoundNames{
+        std::string("sound1") + std::string(10, ' '),
+        std::string("sound2") + std::string(10, ' ')
+    };
+    requireBroadMutatedProgramState(mutatedProgram, expectedSoundNames);
 
-    auto result = mpc::disk::PgmFileToProgramConverter::loadFromFileAndConvert(
-        mpc, pgmFile, program, soundNames
-    );
-    REQUIRE(result);
-
-    mpc.getPerformanceManager().lock()->drainQueue();
-    requireBroadMutatedProgramState(program, soundNames);
+    const auto savedBytes = mpc::file::kaitai::PgmIo::saveProgram(*mutatedProgram, mpc.getSampler());
+    const auto reparsedProgram = loadProgram1FromBytesWithoutRender(mpc, savedBytes);
+    requireBroadMutatedProgramState(reparsedProgram, expectedSoundNames);
 }
 
 TEST_CASE("ProgramLoader loads broad mutated program semantics", "[kaitai-pgm]")
