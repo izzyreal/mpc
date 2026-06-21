@@ -390,10 +390,8 @@ public:
 public:
     std::string magic() const { return m_magic; }
     void set_magic(std::string _v) { m__dirty = true; m_magic = std::move(_v); }
-    uint8_t sound_count() const { return m_sound_count; }
-    void set_sound_count(uint8_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
-    std::string _unnamed2() const { return m__unnamed2; }
-    void set__unnamed2(std::string _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
+    uint16_t sound_count() const { return m_sound_count; }
+    void set_sound_count(uint16_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
     std::vector<std::string>* sound_names() const { return m_sound_names.get(); }
     void set_sound_names(std::unique_ptr<std::vector<std::string>> _v) { m__dirty = true; m_sound_names = std::move(_v); }
     std::string _unnamed4() const { return m__unnamed4; }
@@ -433,8 +431,7 @@ public:
 
 private:
     std::string m_magic;
-    uint8_t m_sound_count;
-    std::string m__unnamed2;
+    uint16_t m_sound_count;
     std::unique_ptr<std::vector<std::string>> m_sound_names;
     std::string m__unnamed4;
     std::string m_name;

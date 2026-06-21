@@ -10,8 +10,8 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/ApsLoader.hpp"
 #include "FileIoPolicy.hpp"
-#include "file/aps/ApsParser.hpp"
 #include "file/ByteUtil.hpp"
+#include "file/kaitai/ApsIo.hpp"
 #include "file/sndreader/SndReader.hpp"
 #include "file/sndwriter/SndWriter.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
@@ -42,7 +42,6 @@ using namespace mpc;
 using namespace mpc::file_io;
 using namespace mpc::file;
 using namespace mpc::file::all;
-using namespace mpc::file::aps;
 using namespace mpc::file::sndwriter;
 using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
@@ -52,6 +51,17 @@ using namespace mpc::lcdgui::screens::dialog2;
 
 namespace
 {
+constexpr size_t kApsHeaderLength = 4;
+constexpr size_t kApsSoundNameLength = 17;
+constexpr size_t kApsPadLength1 = 2;
+constexpr size_t kApsNameLength = 17;
+constexpr size_t kApsParametersLength = 8;
+constexpr size_t kApsMasterTableLength = 64;
+constexpr size_t kApsPadLength2 = 7;
+constexpr size_t kApsMixerLength = 384;
+constexpr size_t kApsDrumConfigLength = 9;
+constexpr size_t kApsDrumPadLength = 3;
+
 bool rangeFits(const size_t totalSize, const size_t offset, const size_t length)
 {
     return offset <= totalSize && length <= totalSize - offset;
@@ -59,7 +69,7 @@ bool rangeFits(const size_t totalSize, const size_t offset, const size_t length)
 
 bool isValidAutoSaveApsData(const std::vector<char> &data)
 {
-    if (!rangeFits(data.size(), ApsParser::HEADER_OFFSET, ApsParser::HEADER_LENGTH))
+    if (!rangeFits(data.size(), 0, kApsHeaderLength))
     {
         return false;
     }
@@ -78,15 +88,15 @@ bool isValidAutoSaveApsData(const std::vector<char> &data)
         return false;
     }
 
-    const size_t minSize = static_cast<size_t>(ApsParser::HEADER_LENGTH) +
+    const size_t minSize = kApsHeaderLength +
                            static_cast<size_t>(soundCount) *
-                               ApsParser::SOUND_NAME_LENGTH +
-                           ApsParser::PAD_LENGTH1 + ApsParser::APS_NAME_LENGTH +
-                           ApsParser::PARAMETERS_LENGTH + ApsParser::TABLE_LENGTH +
-                           ApsParser::PAD_LENGTH2 +
-                           4u * (ApsParser::MIXER_LENGTH +
-                                 ApsParser::DRUM_CONFIG_LENGTH +
-                                 ApsParser::DRUM_PAD_LENGTH);
+                               kApsSoundNameLength +
+                           kApsPadLength1 + kApsNameLength +
+                           kApsParametersLength + kApsMasterTableLength +
+                           kApsPadLength2 +
+                           4u * (kApsMixerLength +
+                                 kApsDrumConfigLength +
+                                 kApsDrumPadLength);
 
     return data.size() >= minSize;
 }
@@ -284,15 +294,10 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                         {
                             throw std::invalid_argument("invalid APS autosave data");
                         }
-                        ApsParser apsParser(data);
                         constexpr bool withoutSounds = true;
-                        // Regardless of whether the outer context is headless,
-                        // we want the ApsLoader to always operate in headless
-                        // mode so it doesn't spawn popups. We manage popups
-                        // ourselves here in AutoSave.
                         constexpr bool apsLoadingHeadless = true;
-                        disk::ApsLoader::loadFromParsedAps(
-                            apsParser, mpc, withoutSounds, apsLoadingHeadless);
+                        file::kaitai::ApsIo::loadBytes(
+                            mpc, data, withoutSounds, apsLoadingHeadless);
                     }
                     else if (f == "ALL.ALL")
                     {
@@ -607,8 +612,7 @@ void AutoSave::storeAutoSavedState(
         }
 
         {
-            ApsParser apsParser(mpc, "stateinfo");
-            if (!writeRequired("APS.APS", apsParser.getBytes()))
+            if (!writeRequired("APS.APS", file::kaitai::ApsIo::save(mpc, "stateinfo")))
             {
                 layeredScreen->closeCurrentScreen();
                 return;
