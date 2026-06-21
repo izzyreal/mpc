@@ -75,6 +75,39 @@ std::shared_ptr<mpc::disk::MpcFile> installMidiResourceFile(
     return newFile;
 }
 
+std::shared_ptr<mpc::disk::MpcFile> installMidiBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& bytes,
+    const std::string& fileName)
+{
+    auto disk = mpc.getDisk();
+    auto newFile = disk->newFile(fileName);
+    auto mutableBytes = bytes;
+    newFile->setFileData(mutableBytes);
+    disk->initFiles();
+    return newFile;
+}
+
+void insertNote(
+    const std::shared_ptr<mpc::sequencer::Track>& track,
+    int tick,
+    int note,
+    int velocity,
+    int duration,
+    int variationType,
+    int variationValue)
+{
+    mpc::sequencer::EventData eventData;
+    eventData.type = mpc::sequencer::EventType::NoteOn;
+    eventData.tick = tick;
+    eventData.noteNumber = mpc::NoteNumber(note);
+    eventData.velocity = mpc::Velocity(velocity);
+    eventData.duration = mpc::Duration(duration);
+    eventData.noteVariationType = mpc::NoteVariationType(variationType);
+    eventData.noteVariationValue = mpc::NoteVariationValue(variationValue);
+    track->acquireAndInsertEvent(eventData);
+}
+
 }
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites FRUTZLE", "[kaitai-mid]")
@@ -180,6 +213,147 @@ TEST_CASE("Kaitai standard MIDI matches handwritten MIDI bytes", "[kaitai-mid]")
     REQUIRE(note->getNote() == 37);
     REQUIRE(note->getVelocity() == 127);
     REQUIRE(note->getDuration() == 10);
+}
+
+TEST_CASE("Kaitai standard MIDI roundtrips broad handwritten note semantics", "[kaitai-mid]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto sequence = sequencer->getSequence(0);
+    sequence->init(1);
+    sequence->setName("MIDBROAD");
+    stateManager->drainQueue();
+
+    auto track0 = sequence->getTrack(0);
+    track0->setUsedIfCurrentlyUnused();
+    track0->setBusType(mpc::sequencer::BusType::DRUM3);
+    track0->setDeviceIndex(7);
+    insertNote(track0, 0, 37, 65, 13, mpc::NoteVariationTypeTune, 80);
+    insertNote(track0, 120, 37, 35, 49, mpc::NoteVariationTypeDecay, 26);
+    insertNote(track0, 240, 37, 75, 101, mpc::NoteVariationTypeAttack, 31);
+    insertNote(track0, 360, 37, 30, 35, mpc::NoteVariationTypeFilter, 61);
+
+    auto track1 = sequence->getTrack(1);
+    track1->setUsedIfCurrentlyUnused();
+    track1->setBusType(mpc::sequencer::BusType::MIDI);
+    track1->setDeviceIndex(2);
+    insertNote(track1, 60, 45, 99, 88, mpc::NoteVariationTypeTune, 64);
+    stateManager->drainQueue();
+
+    mpc::file::mid::MidiWriter handwrittenWriter(sequence.get());
+    auto handwrittenStream = std::make_shared<std::ostringstream>();
+    handwrittenWriter.writeToOStream(handwrittenStream);
+    const auto handwrittenBytes = handwrittenStream->str();
+
+    std::stringstream parseStream(
+        handwrittenBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    standard_midi_file_with_running_status_t parsed(&parseIo);
+    parsed._read();
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto kaitaiBytes = writeStream.str();
+    REQUIRE(kaitaiBytes.size() == handwrittenBytes.size());
+    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), handwrittenBytes.begin()));
+
+    auto reloadSequence = sequencer->getSequence(0);
+    reloadSequence->init(1);
+    stateManager->drainQueue();
+
+    auto input = std::make_shared<std::istringstream>(kaitaiBytes);
+    mpc::file::mid::MidiReader reader(input, reloadSequence);
+    REQUIRE_NOTHROW(reader.parseSequence(mpc));
+    stateManager->drainQueue();
+
+    REQUIRE(reloadSequence->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM3);
+    REQUIRE(reloadSequence->getTrack(0)->getDeviceIndex() == 7);
+    REQUIRE(reloadSequence->getTrack(1)->getBusType() == mpc::sequencer::BusType::MIDI);
+    REQUIRE(reloadSequence->getTrack(1)->getDeviceIndex() == 2);
+
+    const std::vector<ParsedNoteSnapshot> expectedTrack0{
+        {37, 65, 13, mpc::NoteVariationTypeTune},
+        {37, 35, 49, mpc::NoteVariationTypeDecay},
+        {37, 75, 101, mpc::NoteVariationTypeAttack},
+        {37, 30, 35, mpc::NoteVariationTypeFilter},
+    };
+    const std::vector<ParsedNoteSnapshot> expectedTrack1{
+        {45, 99, 88, mpc::NoteVariationTypeTune},
+    };
+    REQUIRE(collectParsedNotes(reloadSequence->getTrack(0)) == expectedTrack0);
+    REQUIRE(collectParsedNotes(reloadSequence->getTrack(1)) == expectedTrack1);
+}
+
+TEST_CASE("Kaitai standard MIDI production load preserves broad handwritten note semantics", "[kaitai-mid]")
+{
+    mpc::Mpc sourceMpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(sourceMpc);
+
+    auto sourceSequencer = sourceMpc.getSequencer();
+    auto sourceStateManager = sourceSequencer->getStateManager();
+    auto sourceSequence = sourceSequencer->getSequence(0);
+    sourceSequence->init(1);
+    sourceSequence->setName("MIDBROAD");
+    sourceStateManager->drainQueue();
+
+    auto track0 = sourceSequence->getTrack(0);
+    track0->setUsedIfCurrentlyUnused();
+    track0->setBusType(mpc::sequencer::BusType::DRUM3);
+    track0->setDeviceIndex(7);
+    insertNote(track0, 0, 37, 65, 13, mpc::NoteVariationTypeTune, 80);
+    insertNote(track0, 120, 37, 35, 49, mpc::NoteVariationTypeDecay, 26);
+    insertNote(track0, 240, 37, 75, 101, mpc::NoteVariationTypeAttack, 31);
+    insertNote(track0, 360, 37, 30, 35, mpc::NoteVariationTypeFilter, 61);
+
+    auto track1 = sourceSequence->getTrack(1);
+    track1->setUsedIfCurrentlyUnused();
+    track1->setBusType(mpc::sequencer::BusType::MIDI);
+    track1->setDeviceIndex(2);
+    insertNote(track1, 60, 45, 99, 88, mpc::NoteVariationTypeTune, 64);
+    sourceStateManager->drainQueue();
+
+    auto output = std::make_shared<std::ostringstream>();
+    mpc::file::kaitai::MidIo::save(sourceSequence, output);
+    const auto saved = output->str();
+    std::vector<char> bytes(saved.begin(), saved.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    auto midiFile = installMidiBytes(mpc, bytes, "BROAD.MID");
+    REQUIRE(midiFile);
+
+    const auto sequenceOrError = mpc::file::kaitai::MidIo::load(mpc, midiFile);
+    REQUIRE(sequenceOrError.has_value());
+
+    auto sequence = sequenceOrError.value();
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    stateManager->drainQueue();
+
+    REQUIRE(sequence->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM3);
+    REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 7);
+    REQUIRE(sequence->getTrack(1)->getBusType() == mpc::sequencer::BusType::MIDI);
+    REQUIRE(sequence->getTrack(1)->getDeviceIndex() == 2);
+
+    const std::vector<ParsedNoteSnapshot> expectedTrack0{
+        {37, 65, 13, mpc::NoteVariationTypeTune},
+        {37, 35, 49, mpc::NoteVariationTypeDecay},
+        {37, 75, 101, mpc::NoteVariationTypeAttack},
+        {37, 30, 35, mpc::NoteVariationTypeFilter},
+    };
+    const std::vector<ParsedNoteSnapshot> expectedTrack1{
+        {45, 99, 88, mpc::NoteVariationTypeTune},
+    };
+    REQUIRE(collectParsedNotes(sequence->getTrack(0)) == expectedTrack0);
+    REQUIRE(collectParsedNotes(sequence->getTrack(1)) == expectedTrack1);
 }
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid][real-2kxl]")
