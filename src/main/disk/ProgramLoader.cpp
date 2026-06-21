@@ -5,7 +5,6 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/PgmIo.hpp"
-#include "disk/PgmFileToProgramConverter.hpp"
 #include "disk/SoundLoader.hpp"
 #include "sampler/Program.hpp"
 

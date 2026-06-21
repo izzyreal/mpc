@@ -12,8 +12,7 @@
 #include "FileIoPolicy.hpp"
 #include "file/ByteUtil.hpp"
 #include "file/kaitai/ApsIo.hpp"
-#include "file/sndreader/SndReader.hpp"
-#include "file/sndwriter/SndWriter.hpp"
+#include "file/kaitai/SndIo.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
 #include "lcdgui/screens/window/SaveAllFileScreen.hpp"
@@ -42,8 +41,6 @@ using namespace mpc;
 using namespace mpc::file_io;
 using namespace mpc::file;
 using namespace mpc::file::all;
-using namespace mpc::file::sndwriter;
-using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -141,6 +138,12 @@ bool isValidAutoSaveSndData(const std::vector<char> &data)
     const size_t sampleDataBytes =
         static_cast<size_t>(frameCount) * channelCount * sizeof(int16_t);
     return rangeFits(data.size(), sndHeaderSize, sampleDataBytes);
+}
+
+std::string stripExtension(const std::string &fileName)
+{
+    const auto dotPos = fileName.find_last_of('.');
+    return dotPos == std::string::npos ? fileName : fileName.substr(0, dotPos);
 }
 } // namespace
 
@@ -337,25 +340,21 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                                      soundName + "'");
                                 continue;
                             }
-                            SndReader sndReader(soundData);
-                            auto sound = mpc.getSampler()->addSound(
-                                sndReader.getSampleRate());
+                            auto sound = mpc.getSampler()->addSound();
                             if (!sound)
                             {
                                 break;
                             }
-
-                            sound->setMono(sndReader.isMono());
-                            sndReader.readData(sound->getMutableSampleData());
-                            sound->setName(sndReader.getName());
-                            sound->setTune(sndReader.getTune());
-                            sound->setLevel(sndReader.getLevel());
-                            sound->setStart(sndReader.getStart());
-                            sound->setEnd(sndReader.getEnd());
-                            sound->setLoopTo(sound->getEnd() -
-                                             sndReader.getLoopLength());
-                            sound->setBeatCount(sndReader.getNumberOfBeats());
-                            sound->setLoopEnabled(sndReader.isLoopEnabled());
+                            const auto loadResult = file::kaitai::SndIo::loadBytes(
+                                soundData,
+                                sound,
+                                stripExtension(soundName));
+                            if (!loadResult)
+                            {
+                                mpc.getSampler()->deleteSoundWithoutRepairingPrograms(sound);
+                                MLOG("AutoSave restore skipped corrupt file '" +
+                                     soundName + "'");
+                            }
                         }
                     }
                     else
@@ -623,10 +622,8 @@ void AutoSave::storeAutoSavedState(
         for (auto &sound : mpc.getSampler()->getSounds())
         {
             const auto sndPath = sound->getName() + ".SND";
-            SndWriter sndWriter(sound.get());
-            if (!writeRequired(sndPath,
-                               {sndWriter.getSndFileArray().begin(),
-                                sndWriter.getSndFileArray().end()}))
+            const auto soundBytes = file::kaitai::SndIo::saveSound(*sound);
+            if (!writeRequired(sndPath, soundBytes))
             {
                 layeredScreen->closeCurrentScreen();
                 return;

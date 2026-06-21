@@ -1,13 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "sampler/Sound.hpp"
-#include "file/sndwriter/SndWriter.hpp"
-#include "file/sndreader/SndReader.hpp"
+#include "disk/MpcFile.hpp"
+#include "file/kaitai/SndIo.hpp"
 
 #include "SampleOps.hpp"
 
-using namespace mpc::file::sndwriter;
-using namespace mpc::file::sndreader;
 using namespace mpc::sampleops;
 
 TEST_CASE("Sample ops", "[sample-ops]")
@@ -24,6 +22,7 @@ TEST_CASE("Sample ops", "[sample-ops]")
 TEST_CASE("Write and read non-destructively", "[snd-persistence]")
 {
     mpc::sampler::Sound snd1(44100);
+    snd1.setName("snd_persist");
     snd1.setMono(true);
 
     auto inputData = snd1.getMutableSampleData();
@@ -33,11 +32,13 @@ TEST_CASE("Write and read non-destructively", "[snd-persistence]")
         inputData->emplace_back(short_to_float(static_cast<int16_t>(i)));
     }
 
-    SndWriter sndWriter(&snd1);
-    auto &writtenData = sndWriter.getSndFileArray();
-    SndReader reader(writtenData);
-    auto outputData = std::make_shared<std::vector<float>>();
-    reader.readData(outputData);
+    const auto writtenData = mpc::file::kaitai::SndIo::saveSound(snd1);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    auto result = mpc::file::kaitai::SndIo::loadBytes(
+        writtenData, sound, "snd_persist");
+    REQUIRE(result);
+
+    const auto outputData = sound->getSampleData();
 
     REQUIRE(outputData->size() == snd1.getSampleData()->size());
 

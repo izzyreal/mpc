@@ -7,8 +7,6 @@
 #include "disk/SoundLoader.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
-#include "file/sndreader/SndReader.hpp"
-#include "file/sndwriter/SndWriter.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
 
@@ -27,8 +25,6 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc::disk;
 using namespace mpc::file::kaitai;
-using namespace mpc::file::sndreader;
-using namespace mpc::file::sndwriter;
 using namespace mpc::sampleops;
 
 namespace
@@ -152,7 +148,7 @@ namespace
     }
 }
 
-TEST_CASE("Kaitai MPC2000 SND matches handwritten SND bytes", "[kaitai-snd]")
+TEST_CASE("Kaitai MPC2000 SND saves and loads explicit semantics", "[kaitai-snd]")
 {
     mpc::sampler::Sound sound(44100);
     sound.setName("KICK_01");
@@ -170,15 +166,12 @@ TEST_CASE("Kaitai MPC2000 SND matches handwritten SND bytes", "[kaitai-snd]")
     sound.setLoopEnabled(true);
     sound.setBeatCount(4);
 
-    SndWriter handwrittenWriter(&sound);
-    const auto handwrittenBytes = handwrittenWriter.getSndFileArray();
+    const auto kaitaiBytes = SndIo::saveSound(sound);
 
-    std::string kaitaiBytes;
-
-    withParsedSndBytes(handwrittenBytes, [&](mpc2000snd_t &parsed)
+    withParsedSndBytes(kaitaiBytes, [&](mpc2000snd_t &parsed)
     {
         REQUIRE(parsed.magic() == std::string("\x01\x04", 2));
-        REQUIRE(parsed.name() == std::string(handwrittenBytes.begin() + 2, handwrittenBytes.begin() + 19));
+        REQUIRE(parsed.name() == expectedHeaderName("KICK_01"));
         REQUIRE(parsed.level() == 100);
         REQUIRE(parsed.tune() == -2);
         REQUIRE(parsed.stereo() == false);
@@ -193,37 +186,26 @@ TEST_CASE("Kaitai MPC2000 SND matches handwritten SND bytes", "[kaitai-snd]")
         REQUIRE(parsed.sample_data()->size() == 2U);
         REQUIRE(parsed.sample_data()->at(0) == 1234);
         REQUIRE(parsed.sample_data()->at(1) == -1234);
-
-        std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
-        kaitai::kstream writeIo(&writeStream);
-        parsed._set_io(&writeIo);
-        parsed._check();
-        parsed._write();
-
-        kaitaiBytes = writeStream.str();
     });
 
-    REQUIRE(kaitaiBytes == std::string(handwrittenBytes.begin(), handwrittenBytes.end()));
-
-    std::vector<char> kaitaiBytesVec(kaitaiBytes.begin(), kaitaiBytes.end());
-    SndReader handwrittenReader(kaitaiBytesVec);
-    auto outputData = std::make_shared<std::vector<float>>();
-    handwrittenReader.readData(outputData);
-
-    REQUIRE(handwrittenReader.isHeaderValid());
-    REQUIRE(handwrittenReader.getName() == "KICK_01");
-    REQUIRE(handwrittenReader.isMono());
-    REQUIRE(handwrittenReader.getLevel() == 100);
-    REQUIRE(handwrittenReader.getTune() == -2);
-    REQUIRE(handwrittenReader.getStart() == 0);
-    REQUIRE(handwrittenReader.getEnd() == 2);
-    REQUIRE(handwrittenReader.getLoopLength() == 1);
-    REQUIRE(handwrittenReader.isLoopEnabled());
-    REQUIRE(handwrittenReader.getNumberOfBeats() == 4);
-    REQUIRE(handwrittenReader.getSampleRate() == 44100);
-    REQUIRE(outputData->size() == inputData->size());
-    REQUIRE((*outputData)[0] == (*inputData)[0]);
-    REQUIRE((*outputData)[1] == (*inputData)[1]);
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    const auto loaded = loadWithSoundLoader(mpc, kaitaiBytes, "KICK_01.SND");
+    requireSoundMatches(
+        loaded,
+        ExpectedSound{
+            "KICK_01",
+            true,
+            44100,
+            100,
+            -2,
+            4,
+            0,
+            2,
+            1,
+            true,
+            *inputData
+        });
 }
 
 TEST_CASE("Kaitai MPC2000 SND save/load covers prod-used sound properties", "[kaitai-snd]")
@@ -526,7 +508,7 @@ TEST_CASE("Generated MPC2000XL SND corpus loads through the production loader", 
     }
 }
 
-TEST_CASE("SndReader reads mutated header semantics from Kaitai-written bytes", "[kaitai-snd]")
+TEST_CASE("SndIo reads mutated header semantics from Kaitai-written bytes", "[kaitai-snd]")
 {
     auto bytes = resourceBytes("test/GeneratedMpc2000xl/Snd/mono_loop_mid.SND");
 
@@ -550,22 +532,20 @@ TEST_CASE("SndReader reads mutated header semantics from Kaitai-written bytes", 
         rewrittenBytes.assign(written.begin(), written.end());
     });
 
-    SndReader handwrittenReader(rewrittenBytes);
-    auto outputData = std::make_shared<std::vector<float>>();
-    handwrittenReader.readData(outputData);
-
-    REQUIRE(handwrittenReader.isHeaderValid());
-    REQUIRE(handwrittenReader.getName() == "mono_loop_mid");
-    REQUIRE(handwrittenReader.isMono());
-    REQUIRE(handwrittenReader.getSampleRate() == 44100);
-    REQUIRE(handwrittenReader.getLevel() == 100);
-    REQUIRE(handwrittenReader.getTune() == 120);
-    REQUIRE(handwrittenReader.getStart() == 0);
-    REQUIRE(handwrittenReader.getEnd() == 3);
-    REQUIRE(handwrittenReader.getLoopLength() == 2);
-    REQUIRE(!handwrittenReader.isLoopEnabled());
-    REQUIRE(handwrittenReader.getNumberOfBeats() == 32);
-    REQUIRE(outputData->size() == 4U);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    auto result = SndIo::loadBytes(rewrittenBytes, sound, "mono_loop_mid");
+    REQUIRE(result);
+    REQUIRE(sound->getName() == "mono_loop_mid");
+    REQUIRE(sound->isMono());
+    REQUIRE(sound->getSampleRate() == 44100);
+    REQUIRE(sound->getSndLevel() == 100);
+    REQUIRE(sound->getTune() == 120);
+    REQUIRE(sound->getStart() == 0);
+    REQUIRE(sound->getEnd() == 3);
+    REQUIRE(sound->getLoopTo() == 1);
+    REQUIRE(!sound->isLoopEnabled());
+    REQUIRE(sound->getBeatCount() == 32);
+    REQUIRE(sound->getSampleData()->size() == 4U);
 }
 
 TEST_CASE("SoundLoader loads mutated SND header semantics from Kaitai-written bytes", "[kaitai-snd]")
