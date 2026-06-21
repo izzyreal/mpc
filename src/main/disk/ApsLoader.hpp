@@ -15,11 +15,6 @@ namespace mpc::disk
 {
     class MpcFile;
 }
-namespace mpc::file::aps
-{
-    class ApsParser;
-}
-
 namespace mpc::disk
 {
     class ApsLoader
@@ -27,17 +22,5 @@ namespace mpc::disk
     public:
         static void load(Mpc &, const std::shared_ptr<MpcFile> &,
                          bool headless);
-        static void loadFromParsedAps(file::aps::ApsParser &, Mpc &,
-                                      bool withoutSounds, bool headless);
-
-    private:
-        static void handleSoundNotFound(Mpc &,
-                                        const std::string &soundFileName);
-        static void loadSound(Mpc &, const std::string &soundFileName,
-                              const std::string &ext,
-                              const std::shared_ptr<MpcFile> &soundFile,
-                              bool headless = false);
-        static void showPopup(Mpc &, const std::string &name,
-                              const std::string &ext);
     };
 } // namespace mpc::disk

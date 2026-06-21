@@ -21,6 +21,7 @@ namespace mpc::file::kaitai
     {
     public:
         static void load(mpc::Mpc &, const std::shared_ptr<disk::MpcFile> &, bool headless);
+        static void loadBytes(mpc::Mpc &, const std::vector<char> &, bool withoutSounds, bool headless);
         static std::vector<char> save(mpc::Mpc &, const std::string &apsName);
     };
 }
