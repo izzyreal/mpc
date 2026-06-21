@@ -12,6 +12,12 @@
 #include "engine/StereoMixer.hpp"
 #include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_pgm.h"
+#include "file/pgmreader/PgmHeader.hpp"
+#include "file/pgmreader/ProgramName.hpp"
+#include "file/pgmreader/SoundNames.hpp"
+#include "file/pgmreader/PgmAllNoteParameters.hpp"
+#include "file/pgmreader/PRMixer.hpp"
+#include "file/pgmreader/PRPads.hpp"
 #include "file/pgmreader/ProgramFileReader.hpp"
 #include "file/pgmreader/PRSlider.hpp"
 #include "file/pgmwriter/PgmWriter.hpp"
@@ -171,6 +177,66 @@ void requireBroadMutatedProgramState(
     REQUIRE(slider->getAttackHighRange() == 14);
     REQUIRE(slider->getFilterLowRange() == -15);
     REQUIRE(slider->getFilterHighRange() == 16);
+}
+
+void requireBroadMutatedProgramReaderState(
+    mpc::file::pgmreader::ProgramFileReader& reader)
+{
+    REQUIRE(reader.getHeader()->verifyMagic());
+    REQUIRE(reader.getHeader()->getSoundCount() == 2);
+    REQUIRE(reader.getProgramName()->getProgramNameASCII() == "VMPCTESTPROGRAM1");
+    REQUIRE(reader.getSampleNames()->getSampleName(0) ==
+        std::string("sound1") + std::string(10, ' '));
+    REQUIRE(reader.getSampleNames()->getSampleName(1) ==
+        std::string("sound2") + std::string(10, ' '));
+
+    REQUIRE(reader.getPads()->getNote(0) == 50);
+
+    auto allNotes = reader.getAllNoteParameters();
+    REQUIRE(allNotes->getSampleSelect(0) == -1);
+    REQUIRE(allNotes->getSoundGenerationMode(0) == 2);
+    REQUIRE(allNotes->getVelocityRangeLower(0) == 1);
+    REQUIRE(allNotes->getVelocityRangeUpper(0) == 127);
+    REQUIRE(allNotes->getAlsoPlayUse1(0) == 41);
+    REQUIRE(allNotes->getAlsoPlayUse2(0) == 42);
+    REQUIRE(allNotes->getVoiceOverlapMode(0) == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
+    REQUIRE(allNotes->getMuteAssign1(0) == 43);
+    REQUIRE(allNotes->getMuteAssign2(0) == 44);
+    REQUIRE(allNotes->getTune(0) == -120);
+    REQUIRE(allNotes->getAttack(0) == 99);
+    REQUIRE(allNotes->getDecay(0) == 98);
+    REQUIRE(allNotes->getDecayMode(0) == 1);
+    REQUIRE(allNotes->getCutoff(0) == 17);
+    REQUIRE(allNotes->getResonance(0) == 18);
+    REQUIRE(allNotes->getVelEnvToFiltAtt(0) == 19);
+    REQUIRE(allNotes->getVelEnvToFiltDec(0) == 20);
+    REQUIRE(allNotes->getVelEnvToFiltAmt(0) == 21);
+    REQUIRE(allNotes->getVelocityToLevel(0) == 22);
+    REQUIRE(allNotes->getVelocityToAttack(0) == 23);
+    REQUIRE(allNotes->getVelocityToStart(0) == 24);
+    REQUIRE(allNotes->getVelocityToCutoff(0) == 25);
+    REQUIRE(allNotes->getSliderParameter(0) == 3);
+    REQUIRE(allNotes->getVelocityToPitch(0) == 26);
+
+    auto mixer = reader.getMixer();
+    REQUIRE(mixer->getEffectsOutput(0) == 4);
+    REQUIRE(mixer->getVolume(0) == 12);
+    REQUIRE(mixer->getPan(0) == 13);
+    REQUIRE(mixer->getVolumeIndividual(0) == 14);
+    REQUIRE(mixer->getOutput(0) == 2);
+    REQUIRE(mixer->getEffectsSendLevel(0) == 15);
+
+    auto slider = reader.getSlider();
+    REQUIRE(slider->getMidiNoteAssign() == 52);
+    REQUIRE(slider->getTuneLow() == -119);
+    REQUIRE(slider->getTuneHigh() == 118);
+    REQUIRE(slider->getDecayLow() == 11);
+    REQUIRE(slider->getDecayHigh() == 12);
+    REQUIRE(slider->getAttackLow() == 13);
+    REQUIRE(slider->getAttackHigh() == 14);
+    REQUIRE(slider->getFilterLow() == -15);
+    REQUIRE(slider->getFilterHigh() == 16);
+    REQUIRE(slider->getProgramChange() == 126);
 }
 
 void prepareProgramLoadingResources(mpc::Mpc& mpc)
@@ -677,6 +743,18 @@ TEST_CASE("ProgramFileReader reads upper-bound MIDI program change byte", "[kait
 
     mpc::file::pgmreader::ProgramFileReader reader(pgmFile);
     REQUIRE(reader.getSlider()->getProgramChange() == 127);
+}
+
+TEST_CASE("ProgramFileReader reads broad mutated program semantics", "[kaitai-pgm]")
+{
+    const auto programBytes = rewriteProgram1WithMutations(applyBroadProgramMutation);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    auto pgmFile = loadProgram1FileFromBytes(mpc, programBytes);
+
+    mpc::file::pgmreader::ProgramFileReader reader(pgmFile);
+    requireBroadMutatedProgramReaderState(reader);
 }
 
 TEST_CASE("PgmFileToProgramConverter loads mutated note tune", "[kaitai-pgm]")
