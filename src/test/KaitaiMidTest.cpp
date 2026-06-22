@@ -6,18 +6,23 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/MidIo.hpp"
 #include "file/kaitai/generated/standard_midi_file_with_running_status.h"
-#include "file/mid/MidiReader.hpp"
-#include "file/mid/MidiWriter.hpp"
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/MixerEvent.hpp"
 #include "sequencer/NoteOnEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/Transport.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -60,6 +65,17 @@ std::vector<ParsedNoteSnapshot> collectParsedNotes(const std::shared_ptr<mpc::se
     return result;
 }
 
+template<typename T>
+std::shared_ptr<T> findEventOfType(const std::shared_ptr<mpc::sequencer::Track>& track)
+{
+    for (const auto& event : track->getEvents()) {
+        if (const auto cast = std::dynamic_pointer_cast<T>(event)) {
+            return cast;
+        }
+    }
+    return {};
+}
+
 std::shared_ptr<mpc::disk::MpcFile> installMidiResourceFile(
     mpc::Mpc& mpc,
     const std::string& resourcePath,
@@ -86,6 +102,25 @@ std::shared_ptr<mpc::disk::MpcFile> installMidiBytes(
     newFile->setFileData(mutableBytes);
     disk->initFiles();
     return newFile;
+}
+
+std::vector<char> saveSequenceWithMidIo(
+    const std::shared_ptr<mpc::sequencer::Sequence>& sequence)
+{
+    return mpc::file::kaitai::MidIo::saveBytes(sequence);
+}
+
+std::shared_ptr<mpc::sequencer::Sequence> loadSequenceWithMidIo(
+    mpc::Mpc& mpc,
+    const std::vector<char>& bytes,
+    const std::string& fileName)
+{
+    const auto stem = fileName.substr(0, fileName.find_last_of('.'));
+    const auto sequenceOrError = mpc::file::kaitai::MidIo::loadBytes(mpc, bytes, stem);
+    REQUIRE(sequenceOrError.has_value());
+    auto stateManager = mpc.getSequencer()->getStateManager();
+    stateManager->drainQueue();
+    return sequenceOrError.value();
 }
 
 void insertNote(
@@ -142,7 +177,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites FRUTZLE", "[kaitai-mid]")
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
 }
 
-TEST_CASE("Kaitai standard MIDI matches handwritten MIDI bytes", "[kaitai-mid]")
+TEST_CASE("Kaitai standard MIDI saves and loads explicit sequence semantics", "[kaitai-mid]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -167,13 +202,10 @@ TEST_CASE("Kaitai standard MIDI matches handwritten MIDI bytes", "[kaitai-mid]")
     track0->acquireAndInsertEvent(eventData);
     stateManager->drainQueue();
 
-    mpc::file::mid::MidiWriter handwrittenWriter(sequence.get());
-    auto handwrittenStream = std::make_shared<std::ostringstream>();
-    handwrittenWriter.writeToOStream(handwrittenStream);
-    const auto handwrittenBytes = handwrittenStream->str();
+    const auto savedBytes = saveSequenceWithMidIo(sequence);
 
     std::stringstream parseStream(
-        handwrittenBytes,
+        std::string(savedBytes.begin(), savedBytes.end()),
         std::ios::in | std::ios::out | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
@@ -192,17 +224,13 @@ TEST_CASE("Kaitai standard MIDI matches handwritten MIDI bytes", "[kaitai-mid]")
     parsed._write();
 
     const auto kaitaiBytes = writeStream.str();
-    REQUIRE(kaitaiBytes.size() == handwrittenBytes.size());
-    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), handwrittenBytes.begin()));
+    REQUIRE(kaitaiBytes.size() == savedBytes.size());
+    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), savedBytes.begin()));
 
-    auto reloadSequence = sequencer->getSequence(0);
-    reloadSequence->init(1);
-    stateManager->drainQueue();
-
-    auto input = std::make_shared<std::istringstream>(kaitaiBytes);
-    mpc::file::mid::MidiReader reader(input, reloadSequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    auto reloadSequence = loadSequenceWithMidIo(
+        mpc,
+        std::vector<char>(kaitaiBytes.begin(), kaitaiBytes.end()),
+        "KTAIMID.MID");
 
     REQUIRE(reloadSequence->getTrack(0)->getDeviceIndex() == 2);
     REQUIRE(reloadSequence->getTrack(0)->getEvents().size() == 1);
@@ -215,7 +243,7 @@ TEST_CASE("Kaitai standard MIDI matches handwritten MIDI bytes", "[kaitai-mid]")
     REQUIRE(note->getDuration() == 10);
 }
 
-TEST_CASE("Kaitai standard MIDI roundtrips broad handwritten note semantics", "[kaitai-mid]")
+TEST_CASE("Kaitai standard MIDI roundtrips broad sequence semantics", "[kaitai-mid]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
@@ -243,13 +271,10 @@ TEST_CASE("Kaitai standard MIDI roundtrips broad handwritten note semantics", "[
     insertNote(track1, 60, 45, 99, 88, mpc::NoteVariationTypeTune, 64);
     stateManager->drainQueue();
 
-    mpc::file::mid::MidiWriter handwrittenWriter(sequence.get());
-    auto handwrittenStream = std::make_shared<std::ostringstream>();
-    handwrittenWriter.writeToOStream(handwrittenStream);
-    const auto handwrittenBytes = handwrittenStream->str();
+    const auto savedBytes = saveSequenceWithMidIo(sequence);
 
     std::stringstream parseStream(
-        handwrittenBytes,
+        std::string(savedBytes.begin(), savedBytes.end()),
         std::ios::in | std::ios::out | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
@@ -263,17 +288,13 @@ TEST_CASE("Kaitai standard MIDI roundtrips broad handwritten note semantics", "[
     parsed._write();
 
     const auto kaitaiBytes = writeStream.str();
-    REQUIRE(kaitaiBytes.size() == handwrittenBytes.size());
-    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), handwrittenBytes.begin()));
+    REQUIRE(kaitaiBytes.size() == savedBytes.size());
+    REQUIRE(std::equal(kaitaiBytes.begin(), kaitaiBytes.end(), savedBytes.begin()));
 
-    auto reloadSequence = sequencer->getSequence(0);
-    reloadSequence->init(1);
-    stateManager->drainQueue();
-
-    auto input = std::make_shared<std::istringstream>(kaitaiBytes);
-    mpc::file::mid::MidiReader reader(input, reloadSequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    auto reloadSequence = loadSequenceWithMidIo(
+        mpc,
+        std::vector<char>(kaitaiBytes.begin(), kaitaiBytes.end()),
+        "MIDBROAD.MID");
 
     REQUIRE(reloadSequence->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM3);
     REQUIRE(reloadSequence->getTrack(0)->getDeviceIndex() == 7);
@@ -293,7 +314,7 @@ TEST_CASE("Kaitai standard MIDI roundtrips broad handwritten note semantics", "[
     REQUIRE(collectParsedNotes(reloadSequence->getTrack(1)) == expectedTrack1);
 }
 
-TEST_CASE("Kaitai standard MIDI production load preserves broad handwritten note semantics", "[kaitai-mid]")
+TEST_CASE("Kaitai standard MIDI production load preserves broad sequence semantics", "[kaitai-mid]")
 {
     mpc::Mpc sourceMpc;
     mpc::TestMpc::initializeTestMpcWithoutMidiServices(sourceMpc);
@@ -356,6 +377,120 @@ TEST_CASE("Kaitai standard MIDI production load preserves broad handwritten note
     REQUIRE(collectParsedNotes(sequence->getTrack(1)) == expectedTrack1);
 }
 
+TEST_CASE("Kaitai standard MIDI roundtrips MPC2000XL meta and channel events", "[kaitai-mid]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto sequence = sequencer->getSequence(0);
+    sequence->init(1);
+    sequence->setName("MIDMETA");
+    sequence->setLoopEnabled(false);
+    sequence->setLastLoopBarIndex(mpc::BarIndex(1));
+    sequence->setInitialTempo(98.7);
+    sequence->setTempoChangeOn(true);
+    sequence->addTempoChangeEvent(96, 1250);
+    sequence->setTimeSignature(1, 3, 4);
+
+    auto track = sequence->getTrack(0);
+    track->setUsedIfCurrentlyUnused();
+    track->setName("CTRLMETA");
+    track->setBusType(mpc::sequencer::BusType::MIDI);
+    track->setDeviceIndex(5);
+
+    insertNote(track, 0, 57, 101, 24, mpc::NoteVariationTypeTune, 64);
+
+    mpc::sequencer::EventData polyPressure;
+    polyPressure.type = mpc::sequencer::EventType::PolyPressure;
+    polyPressure.tick = 12;
+    polyPressure.noteNumber = mpc::NoteNumber(57);
+    polyPressure.amount = 54;
+    track->acquireAndInsertEvent(polyPressure);
+
+    mpc::sequencer::EventData controlChange;
+    controlChange.type = mpc::sequencer::EventType::ControlChange;
+    controlChange.tick = 24;
+    controlChange.controllerNumber = 7;
+    controlChange.controllerValue = 99;
+    track->acquireAndInsertEvent(controlChange);
+
+    mpc::sequencer::EventData programChange;
+    programChange.type = mpc::sequencer::EventType::ProgramChange;
+    programChange.tick = 36;
+    programChange.programChangeProgramIndex = mpc::ProgramIndex(12);
+    track->acquireAndInsertEvent(programChange);
+
+    mpc::sequencer::EventData channelPressure;
+    channelPressure.type = mpc::sequencer::EventType::ChannelPressure;
+    channelPressure.tick = 48;
+    channelPressure.amount = 60;
+    track->acquireAndInsertEvent(channelPressure);
+
+    mpc::sequencer::EventData mixer;
+    mixer.type = mpc::sequencer::EventType::Mixer;
+    mixer.tick = 60;
+    mixer.mixerParameter = 3;
+    mixer.mixerPad = 12;
+    mixer.mixerValue = 87;
+    track->acquireAndInsertEvent(mixer);
+
+    stateManager->drainQueue();
+
+    auto reloaded = loadSequenceWithMidIo(mpc, saveSequenceWithMidIo(sequence), "MIDMETA.MID");
+    auto reloadedTrack = reloaded->getTrack(0);
+
+    REQUIRE(reloaded->getName() == "MIDMETA         ");
+    REQUIRE(reloaded->isLoopEnabled() == false);
+    REQUIRE(reloaded->getFirstLoopBarIndex() == mpc::BarIndex(0));
+    REQUIRE(reloaded->getLastLoopBarIndex() == mpc::EndOfSequence);
+    REQUIRE(mpc.getSequencer()->getTransport()->isTempoSourceSequence());
+    REQUIRE(std::abs(reloaded->getInitialTempo() - 98.7) < 0.2);
+    REQUIRE(reloaded->getNumerator(0) == 4);
+    REQUIRE(reloaded->getDenominator(0) == 4);
+    REQUIRE(reloaded->getNumerator(1) == 3);
+    REQUIRE(reloaded->getDenominator(1) == 4);
+    REQUIRE(reloadedTrack->getName() == "CTRLMETA        ");
+    REQUIRE(reloadedTrack->getBusType() == mpc::sequencer::BusType::MIDI);
+    REQUIRE(reloadedTrack->getDeviceIndex() == 5);
+
+    const auto notes = collectParsedNotes(reloadedTrack);
+    REQUIRE(notes == std::vector<ParsedNoteSnapshot>{
+        {57, 101, 24, mpc::NoteVariationTypeTune}
+    });
+
+    const auto reloadedPolyPressure =
+        findEventOfType<mpc::sequencer::PolyPressureEvent>(reloadedTrack);
+    REQUIRE(reloadedPolyPressure);
+    REQUIRE(reloadedPolyPressure->getNote() == 57);
+    REQUIRE(reloadedPolyPressure->getAmount() == 54);
+
+    const auto reloadedControlChange =
+        findEventOfType<mpc::sequencer::ControlChangeEvent>(reloadedTrack);
+    REQUIRE(reloadedControlChange);
+    REQUIRE(reloadedControlChange->getController() == 7);
+    REQUIRE(reloadedControlChange->getAmount() == 99);
+
+    const auto reloadedProgramChange =
+        findEventOfType<mpc::sequencer::ProgramChangeEvent>(reloadedTrack);
+    REQUIRE(reloadedProgramChange);
+    REQUIRE(reloadedProgramChange->getProgram() == 12);
+
+    const auto reloadedChannelPressure =
+        findEventOfType<mpc::sequencer::ChannelPressureEvent>(reloadedTrack);
+    REQUIRE(reloadedChannelPressure);
+    REQUIRE(reloadedChannelPressure->getAmount() == 60);
+
+    const auto reloadedMixer =
+        findEventOfType<mpc::sequencer::MixerEvent>(reloadedTrack);
+    REQUIRE(reloadedMixer);
+    REQUIRE(reloadedMixer->getParameter() == 3);
+    REQUIRE(reloadedMixer->getPad() == 12);
+    REQUIRE(reloadedMixer->getValue() == 87);
+
+}
+
 TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid][real-2kxl]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
@@ -389,9 +524,14 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid
     sequence->init(1);
     stateManager->drainQueue();
 
-    auto input = std::make_shared<std::istringstream>(rewrittenBytes);
-    mpc::file::mid::MidiReader reader(input, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
+    auto midiFile = installMidiBytes(
+        mpc,
+        std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end()),
+        "SEQ.MID");
+    REQUIRE(midiFile);
+    const auto sequenceOrError = mpc::file::kaitai::MidIo::load(mpc, midiFile);
+    REQUIRE(sequenceOrError.has_value());
+    sequence = sequenceOrError.value();
     stateManager->drainQueue();
 
     REQUIRE(sequence->getBarCount() == 1);

@@ -8,8 +8,6 @@
 #include "disk/ProgramLoader.hpp"
 
 #include "file/wav/WavFile.hpp"
-#include "file/mid/MidiWriter.hpp"
-#include "file/mid/MidiReader.hpp"
 #include "file/all/AllParser.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/PgmIo.hpp"
@@ -41,7 +39,6 @@ using namespace mpc::input::midi;
 
 using namespace mpc::file;
 using namespace mpc::file::wav;
-using namespace mpc::file::mid;
 using namespace mpc::file::all;
 
 using namespace mpc::lcdgui;
