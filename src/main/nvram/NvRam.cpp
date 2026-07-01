@@ -15,7 +15,6 @@
 #include "hardware/Hardware.hpp"
 #include "sequencer/TimeSignature.hpp"
 
-#include "file/all/AllParser.hpp"
 #include "file/all/Defaults.hpp"
 
 using namespace mpc::nvram;
@@ -48,7 +47,7 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
         return;
     }
 
-    if (*sizeValue != file::all::AllParser::DEFAULTS_LENGTH)
+    if (*sizeValue != file::all::Defaults::TOTAL_LENGTH)
     {
         return;
     }

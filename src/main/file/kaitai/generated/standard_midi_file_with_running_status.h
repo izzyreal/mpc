@@ -80,7 +80,7 @@ public:
         void set_pressure(uint8_t _v) { m__dirty = true; m_pressure = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -110,7 +110,7 @@ public:
         void set_value(uint8_t _v) { m__dirty = true; m_value = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -147,7 +147,7 @@ public:
         void set_division(int16_t _v) { m__dirty = true; m_division = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -207,7 +207,7 @@ public:
         void set_body(std::string _v) { m__dirty = true; m_body = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -239,7 +239,7 @@ public:
         void set_velocity(uint8_t _v) { m__dirty = true; m_velocity = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -270,7 +270,7 @@ public:
         void set_velocity(uint8_t _v) { m__dirty = true; m_velocity = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -305,7 +305,7 @@ public:
         void set_b2(uint8_t _v) { m__dirty = true; f_adj_bend_value = false; f_bend_value = false; m_b2 = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; f_adj_bend_value = false; f_bend_value = false; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; f_adj_bend_value = false; f_bend_value = false; m__parent = std::move(_v); }
 
     private:
@@ -340,7 +340,7 @@ public:
         void set_pressure(uint8_t _v) { m__dirty = true; m_pressure = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -369,7 +369,7 @@ public:
         void set_program(uint8_t _v) { m__dirty = true; m_program = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -399,7 +399,7 @@ public:
         void set_data(std::string _v) { m__dirty = true; m_data = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -432,7 +432,7 @@ public:
         void set_events(std::unique_ptr<track_events_t> _v) { m__dirty = true; m_events = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__parent = std::move(_v); }
         std::string _raw_events() const { return m__raw_events; }
         void set__raw_events(std::string _v) { m__dirty = true; m__raw_events = std::move(_v); }
@@ -492,7 +492,7 @@ public:
         void set_previous_event_type(uint8_t _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_previous_event_type = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_events_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_events_t* _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m__parent = std::move(_v); }
 
     private:
@@ -562,7 +562,7 @@ public:
         void set_event(std::unique_ptr<std::vector<std::unique_ptr<track_event_t>>> _v) { m__dirty = true; m_event = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
         void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        standard_midi_file_with_running_status_t::track_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(standard_midi_file_with_running_status_t::track_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:

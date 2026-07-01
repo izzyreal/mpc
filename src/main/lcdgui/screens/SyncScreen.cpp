@@ -222,3 +222,28 @@ int SyncScreen::getOut() const
 {
     return out;
 }
+
+int SyncScreen::getInput() const
+{
+    return in;
+}
+
+int SyncScreen::getShiftEarly() const
+{
+    return shiftEarly;
+}
+
+bool SyncScreen::isSendMMCEnabled() const
+{
+    return sendMMCEnabled;
+}
+
+int SyncScreen::getFrameRate() const
+{
+    return frameRate;
+}
+
+bool SyncScreen::isReceiveMMCEnabled() const
+{
+    return receiveMMCEnabled;
+}

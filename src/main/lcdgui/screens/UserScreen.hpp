@@ -59,6 +59,7 @@ namespace mpc::lcdgui::screens
         int getPgm() const;
         int getVelo() const;
         sequencer::TimeSignature getTimeSig() const;
+        int8_t getTrackStatus() const;
 
     private:
         void displayTempo() const;
@@ -91,8 +92,6 @@ namespace mpc::lcdgui::screens
         void setPgm(int i);
         void setVelo(int i);
         void setTimeSig(int num, int den);
-
-        int8_t getTrackStatus() const;
 
         void resetPreferences();
 

@@ -514,7 +514,7 @@ standard_midi_file_with_running_status_t::track_event_t::track_event_t(uint8_t p
     f_status_byte_lookahead = false;
     f_using_running_status = false;
     w_status_byte_lookahead = false;
-    e_status_byte_lookahead = false;
+    e_status_byte_lookahead = m__io != nullptr;
 }
 
 void standard_midi_file_with_running_status_t::track_event_t::_read() {
@@ -663,7 +663,7 @@ void standard_midi_file_with_running_status_t::track_event_t::_fetch_instances()
 }
 
 void standard_midi_file_with_running_status_t::track_event_t::_write() {
-    w_status_byte_lookahead = e_status_byte_lookahead;
+    w_status_byte_lookahead = false;
     if (m_v_time.get() == nullptr) {
         throw std::runtime_error("/types/track_event/seq/0: nested object is not set");
     }

@@ -37,7 +37,8 @@ void mpc2000xl_aps_t::_read() {
     if (!(m_magic == std::string("\x0A\x05", 2))) {
         throw kaitai::validation_not_equal_error<std::string>(std::string("\x0A\x05", 2), m_magic, m__io, std::string("/seq/0"));
     }
-    m_sound_count = m__io->read_u2le();
+    m_sound_count = m__io->read_u1();
+    m__unnamed2 = m__io->read_bytes(1);
     m_sound_names = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
     const int l_sound_names = sound_count();
     for (int i = 0; i < l_sound_names; i++) {
@@ -101,7 +102,8 @@ void mpc2000xl_aps_t::_fetch_instances() {
 
 void mpc2000xl_aps_t::_write() {
     m__io->write_bytes(m_magic);
-    m__io->write_u2le(m_sound_count);
+    m__io->write_u1(m_sound_count);
+    m__io->write_bytes(m__unnamed2);
     if (m_sound_names == nullptr) {
         throw std::runtime_error("/seq/3: repeated field is not set");
     }
@@ -171,15 +173,18 @@ void mpc2000xl_aps_t::_check() {
     if (!(m_magic == std::string("\x0A\x05", 2))) {
         throw kaitai::validation_not_equal_error<std::string>(std::string("\x0A\x05", 2), m_magic, m__io, std::string("/seq/0"));
     }
+    if (m__unnamed2.size() != static_cast<std::string::size_type>(1)) {
+        throw std::runtime_error("/seq/2: size mismatch");
+    }
     if (m_sound_names == nullptr) {
-        throw std::runtime_error("/seq/2: repeated field is not set");
+        throw std::runtime_error("/seq/3: repeated field is not set");
     }
     if (m_sound_names->size() != static_cast<std::size_t>(sound_count())) {
-        throw std::runtime_error("/seq/2: repeat-expr size mismatch");
+        throw std::runtime_error("/seq/3: repeat-expr size mismatch");
     }
     for (std::vector<std::string>::const_iterator it = m_sound_names->begin(); it != m_sound_names->end(); ++it) {
         if ((*it).size() != static_cast<std::string::size_type>(17)) {
-            throw std::runtime_error("/seq/2: size mismatch");
+            throw std::runtime_error("/seq/3: size mismatch");
         }
     }
     if (m__unnamed4.size() != static_cast<std::string::size_type>(2)) {
