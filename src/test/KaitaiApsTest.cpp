@@ -540,6 +540,53 @@ TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
     REQUIRE(p1->getNoteParameters(35)->getTune() == -120);
 }
 
+TEST_CASE("ApsLoader maps all four APS drum buses to distinct MPC drum buses", "[kaitai-aps]")
+{
+    const auto apsBytes = rewriteAllPgmsApsWithMutations([](mpc2000xl_aps_t& parsed)
+    {
+        parsed.drum1()->set_program(1);
+        parsed.drum1()->set_receive_program_change(mpc2000xl_aps_t::NO_YES_FALSE);
+        parsed.drum1()->set_receive_midi_volume(mpc2000xl_aps_t::NO_YES_TRUE);
+
+        parsed.drum2()->set_program(2);
+        parsed.drum2()->set_receive_program_change(mpc2000xl_aps_t::NO_YES_TRUE);
+        parsed.drum2()->set_receive_midi_volume(mpc2000xl_aps_t::NO_YES_FALSE);
+
+        parsed.drum3()->set_program(3);
+        parsed.drum3()->set_receive_program_change(mpc2000xl_aps_t::NO_YES_FALSE);
+        parsed.drum3()->set_receive_midi_volume(mpc2000xl_aps_t::NO_YES_FALSE);
+
+        parsed.drum4()->set_program(4);
+        parsed.drum4()->set_receive_program_change(mpc2000xl_aps_t::NO_YES_TRUE);
+        parsed.drum4()->set_receive_midi_volume(mpc2000xl_aps_t::NO_YES_TRUE);
+    });
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    loadAllPgmsApsWithoutRender(mpc, apsBytes);
+
+    auto drum0 = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(0));
+    auto drum1 = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(1));
+    auto drum2 = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(2));
+    auto drum3 = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(3));
+
+    REQUIRE(drum0->getProgramIndex() == 1);
+    REQUIRE(!drum0->receivesPgmChange());
+    REQUIRE(drum0->receivesMidiVolume());
+
+    REQUIRE(drum1->getProgramIndex() == 2);
+    REQUIRE(drum1->receivesPgmChange());
+    REQUIRE(!drum1->receivesMidiVolume());
+
+    REQUIRE(drum2->getProgramIndex() == 3);
+    REQUIRE(!drum2->receivesPgmChange());
+    REQUIRE(!drum2->receivesMidiVolume());
+
+    REQUIRE(drum3->getProgramIndex() == 4);
+    REQUIRE(drum3->receivesPgmChange());
+    REQUIRE(drum3->receivesMidiVolume());
+}
+
 TEST_CASE("Kaitai APS parses broad mutated APS semantics", "[kaitai-aps]")
 {
     const auto apsBytes = rewriteAllPgmsApsWithMutations(applyBroadApsMutation);

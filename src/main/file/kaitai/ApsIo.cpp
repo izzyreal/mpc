@@ -503,7 +503,11 @@ void loadDrums(mpc2000xl_aps_t& parsed, mpc::Mpc& mpc)
 {
     for (int i = 0; i < mpc::Mpc2000XlSpecs::DRUM_BUS_COUNT; ++i)
     {
-        auto* drum = i == 0 ? parsed.drum1() : parsed.drum2();
+        auto* drum =
+            i == 0 ? parsed.drum1()
+                   : i == 1 ? parsed.drum2()
+                            : i == 2 ? parsed.drum3()
+                                     : parsed.drum4();
 
         mpc::performance::Drum perfDrum;
         perfDrum.drumBusIndex = mpc::DrumBusIndex(i);
