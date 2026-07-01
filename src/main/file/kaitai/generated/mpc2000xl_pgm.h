@@ -160,7 +160,7 @@ public:
         void set_velocity_to_pitch(uint8_t _v) { m__dirty = true; m_velocity_to_pitch = std::move(_v); }
         mpc2000xl_pgm_t* _root() const { return m__root; }
         void set__root(mpc2000xl_pgm_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_pgm_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_pgm_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -221,7 +221,7 @@ public:
         void set_effects_send_level(uint8_t _v) { m__dirty = true; m_effects_send_level = std::move(_v); }
         mpc2000xl_pgm_t* _root() const { return m__root; }
         void set__root(mpc2000xl_pgm_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_pgm_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_pgm_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -270,7 +270,7 @@ public:
         void set_filter_high(int8_t _v) { m__dirty = true; m_filter_high = std::move(_v); }
         mpc2000xl_pgm_t* _root() const { return m__root; }
         void set__root(mpc2000xl_pgm_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_pgm_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_pgm_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:

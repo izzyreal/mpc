@@ -80,7 +80,7 @@ public:
         void set_value(uint64_t _v) { m__dirty = true; m_value = std::move(_v); }
         vlq_base128_be_t* _root() const { return m__root; }
         void set__root(vlq_base128_be_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        vlq_base128_be_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(vlq_base128_be_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:

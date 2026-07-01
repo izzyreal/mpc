@@ -658,7 +658,7 @@ public:
         void set_idx(int32_t _v) { m__dirty = true; f_denominator = false; f_first_tick = false; f_numerator = false; m_idx = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_denominator = false; f_first_tick = false; f_numerator = false; m__root = std::move(_v); }
-        mpc2000xl_all_t::sequence_body_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::sequence_body_t* _v) { m__dirty = true; f_denominator = false; f_first_tick = false; f_numerator = false; m__parent = std::move(_v); }
 
     private:
@@ -696,7 +696,7 @@ public:
         void set__unnamed1(std::string _v) { m__dirty = true; m__unnamed1 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -729,7 +729,7 @@ public:
         void set__unnamed2(std::string _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -791,7 +791,7 @@ public:
         void set_normal_velo(uint8_t _v) { m__dirty = true; m_normal_velo = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -867,7 +867,7 @@ public:
         void set__unnamed16(std::string _v) { m__dirty = true; m__unnamed16 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -937,7 +937,7 @@ public:
         void set_terminator(std::string _v) { m__dirty = true; n_terminator = false; m_terminator = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::sequence_body_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::sequence_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1055,7 +1055,7 @@ public:
         void set__unnamed3(std::string _v) { m__dirty = true; m__unnamed3 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1097,7 +1097,7 @@ public:
         void set_clock(uint8_t _v) { m__dirty = true; f_display_value = false; m_clock = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_display_value = false; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; f_display_value = false; m__parent = std::move(_v); }
 
     private:
@@ -1171,7 +1171,7 @@ public:
         void set_cc_pass_enabled(std::unique_ptr<std::vector<bool>> _v) { m__dirty = true; m_cc_pass_enabled = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1220,7 +1220,7 @@ public:
         void set_soft_thru_mode(soft_thru_mode_t _v) { m__dirty = true; m_soft_thru_mode = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1244,13 +1244,17 @@ public:
         void _write();
         void _check();
         ~midi_switch_t();
+
+        /**
+         * 0xFF is used for an unassigned footswitch controller.
+         */
         uint8_t controller() const { return m_controller; }
         void set_controller(uint8_t _v) { m__dirty = true; m_controller = std::move(_v); }
         midi_switch_function_t function() const { return m_function; }
         void set_function(midi_switch_function_t _v) { m__dirty = true; m_function = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::misc_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::misc_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1293,7 +1297,7 @@ public:
         void set_output(midi_sync_output_t _v) { m__dirty = true; m_output = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1332,7 +1336,7 @@ public:
         void set_midi_switch(std::unique_ptr<std::vector<std::unique_ptr<midi_switch_t>>> _v) { m__dirty = true; m_midi_switch = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1370,7 +1374,7 @@ public:
         void set__unnamed4(std::string _v) { m__dirty = true; m__unnamed4 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::exclusive_event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::exclusive_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1429,7 +1433,7 @@ public:
         void set_variation_type_bit_2(bool _v) { m__dirty = true; f_duration = false; f_note = false; f_variation_type = false; m_variation_type_bit_2 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_duration = false; f_note = false; f_variation_type = false; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; f_duration = false; f_note = false; f_variation_type = false; m__parent = std::move(_v); }
 
     private:
@@ -1473,7 +1477,7 @@ public:
         void set__unnamed2(std::string _v) { m__dirty = true; f_corrected_amount = false; m__unnamed2 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_corrected_amount = false; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; f_corrected_amount = false; m__parent = std::move(_v); }
 
     private:
@@ -1509,7 +1513,7 @@ public:
         void set__unnamed2(std::string _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1541,7 +1545,7 @@ public:
         void set__unnamed1(std::string _v) { m__dirty = true; m__unnamed1 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::event_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1576,7 +1580,7 @@ public:
         void set_body(std::unique_ptr<sequence_body_t> _v) { m__dirty = true; f_name = false; m_body = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_name = false; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; f_name = false; m__parent = std::move(_v); }
 
     private:
@@ -1650,7 +1654,7 @@ public:
             void set_frame_decimals(uint8_t _v) { m__dirty = true; m_frame_decimals = std::move(_v); }
             mpc2000xl_all_t* _root() const { return m__root; }
             void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-            mpc2000xl_all_t::sequence_body_t* _parent() const { return m__parent; }
+            kaitai::kstruct* _parent() const { return m__parent; }
             void set__parent(mpc2000xl_all_t::sequence_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
         private:
@@ -1712,7 +1716,7 @@ public:
         void set_events(std::unique_ptr<std::vector<std::unique_ptr<event_t>>> _v) { m__dirty = true; m_events = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::sequence_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::sequence_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1762,7 +1766,7 @@ public:
         void set_is_used(sequence_is_used_t _v) { m__dirty = true; m_is_used = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1815,7 +1819,7 @@ public:
         void set_sequence_sequence_index(uint8_t _v) { m__dirty = true; m_sequence_sequence_index = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1869,7 +1873,7 @@ public:
         void set__unnamed7(std::string _v) { m__dirty = true; m__unnamed7 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1908,7 +1912,7 @@ public:
         void set__unnamed2(uint64_t _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1940,7 +1944,7 @@ public:
         void set_repeat_count(uint8_t _v) { m__dirty = true; m_repeat_count = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::song_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::song_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -1973,7 +1977,7 @@ public:
         void set_tc_value_percentage(uint8_t _v) { m__dirty = true; m_tc_value_percentage = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -2052,7 +2056,7 @@ public:
         void set_unknown(std::string _v) { m__dirty = true; m_unknown = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_all_t::sequence_body_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::sequence_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:

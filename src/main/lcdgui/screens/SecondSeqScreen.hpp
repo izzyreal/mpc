@@ -6,11 +6,6 @@ namespace mpc::disk
     class AllLoader;
 }
 
-namespace mpc::file::all
-{
-    class AllSequencer;
-}
-
 namespace mpc::sequencer
 {
     class Sequencer;
@@ -43,6 +38,5 @@ namespace mpc::lcdgui::screens
 
         friend class sequencer::Sequencer;
         friend class disk::AllLoader;
-        friend class file::all::AllSequencer;
     };
 } // namespace mpc::lcdgui::screens

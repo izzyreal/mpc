@@ -7,12 +7,6 @@ namespace mpc::audiomidi
     class MidiInput;
 } // namespace mpc::audiomidi
 
-namespace mpc::file::all
-{
-    class MidiSyncMisc;
-    class Misc;
-} // namespace mpc::file::all
-
 namespace mpc::disk
 {
     class AllLoader;
@@ -30,6 +24,11 @@ namespace mpc::lcdgui::screens
         int getModeOut() const;
         int getModeIn() const;
         int getOut() const;
+        int getInput() const;
+        int getShiftEarly() const;
+        bool isSendMMCEnabled() const;
+        int getFrameRate() const;
+        bool isReceiveMMCEnabled() const;
 
         SyncScreen(Mpc &, int layerIndex);
 
@@ -73,7 +72,5 @@ namespace mpc::lcdgui::screens
         friend class audiomidi::EventHandler;
         friend class audiomidi::MidiInput;
         friend class disk::AllLoader;
-        friend class file::all::MidiSyncMisc;
-        friend class file::all::Misc;
     };
 } // namespace mpc::lcdgui::screens

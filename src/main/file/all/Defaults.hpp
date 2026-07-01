@@ -47,6 +47,9 @@ namespace mpc::file::all
         static const int TR_VELOS_LENGTH{64};
         static const int TR_STATUS_OFFSET{1664};
         static const int TR_STATUS_LENGTH{64};
+        static const int TOTAL_LENGTH{1728};
+        static const int NAME_LENGTH{16};
+        static const int DEV_NAME_LENGTH{8};
 
         std::string defaultSeqName;
         int tempo;

@@ -1,6 +1,5 @@
 #include "DefaultsParser.hpp"
 
-#include "file/all/AllParser.hpp"
 #include "file/all/Defaults.hpp"
 
 #include "Logger.hpp"
@@ -21,7 +20,7 @@ Defaults DefaultsParser::AllDefaultsFromFile(Mpc &mpc, mpc_fs::path p)
     }
 
     const auto &data = *dataRes;
-    return {mpc, Util::vecCopyOfRange(data, 0, AllParser::DEFAULTS_LENGTH)};
+    return {mpc, Util::vecCopyOfRange(data, 0, Defaults::TOTAL_LENGTH)};
 }
 
 DefaultsParser::DefaultsParser(Mpc &mpc)

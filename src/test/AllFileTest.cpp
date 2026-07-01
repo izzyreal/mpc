@@ -6,22 +6,20 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/Song.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
-#include "file/all/AllParser.hpp"
-#include "file/all/AllSequence.hpp"
+#include "file/kaitai/AllIo.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::disk;
-using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
 void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 {
-    AllParser allParser(mpc);
-    auto bytes = allParser.getBytes();
+    auto bytes = mpc::file::kaitai::AllIo::save(mpc);
 
     const auto sequencer = mpc.getSequencer();
     const auto stateManager = sequencer->getStateManager();
@@ -36,8 +34,7 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 
     stateManager->drainQueue();
 
-    AllParser reparsed(mpc, bytes);
-    AllLoader::loadEverythingFromAllParser(mpc, reparsed);
+    AllLoader::loadEverythingFromBytes(mpc, bytes);
 }
 
 TEST_CASE("ALL file song", "[allfile]")
@@ -100,17 +97,20 @@ TEST_CASE("ALL file save does not crash with sysex event", "[allfile]")
     seq->getTrack(0)->acquireAndInsertEvent(eventData);
     stateManager->drainQueue();
 
-    AllParser allParser(mpc);
-    REQUIRE_NOTHROW(allParser.getBytes());
+    REQUIRE_NOTHROW(mpc::file::kaitai::AllIo::save(mpc));
 
-    auto bytes = allParser.getBytes();
-    AllParser reparsed(mpc, bytes);
-    auto allSequences = reparsed.getAllSequences();
-    REQUIRE_FALSE(allSequences.empty());
-    REQUIRE(allSequences[0]->getEventAmount() == 1);
-    REQUIRE(allSequences[0]->allEvents[0].type == EventType::SystemExclusive);
-    REQUIRE(allSequences[0]->allEvents[0].sysExByteA == 0x12);
-    REQUIRE(allSequences[0]->allEvents[0].sysExByteB == 0x34);
+    saveAndLoadTestAllFile(mpc);
+    stateManager->drainQueue();
+
+    auto loadedSequence = sequencer->getSequence(0);
+    REQUIRE(loadedSequence->isUsed());
+    auto loadedTrack = loadedSequence->getTrack(0);
+    REQUIRE(loadedTrack->getEvents().size() == 1);
+    auto loadedSystemExclusive = std::dynamic_pointer_cast<SystemExclusiveEvent>(loadedTrack->getEvent(0));
+    REQUIRE(loadedSystemExclusive);
+    REQUIRE(loadedSystemExclusive->getTick() == 0);
+    REQUIRE(loadedSystemExclusive->getByteA() == 0x12);
+    REQUIRE(loadedSystemExclusive->getByteB() == 0x34);
 }
 
 TEST_CASE("ALL file track is on, used and transmits program changes",

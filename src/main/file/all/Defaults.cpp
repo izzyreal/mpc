@@ -2,7 +2,6 @@
 
 #include "Util.hpp"
 #include "Mpc.hpp"
-#include "file/all/AllParser.hpp"
 
 #include "lcdgui/screens/UserScreen.hpp"
 
@@ -124,7 +123,7 @@ Defaults::Defaults(Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
 
 Defaults::Defaults(Mpc &mpc) : mpc(mpc)
 {
-    saveBytes = std::vector<char>(AllParser::DEFAULTS_LENGTH);
+    saveBytes = std::vector<char>(TOTAL_LENGTH);
 
     setNames();
 
@@ -174,7 +173,7 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
 {
     std::vector<char> stringBuffer =
         Util::vecCopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET,
-                             DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
+                             DEF_SEQ_NAME_OFFSET + NAME_LENGTH);
 
     defaultSeqName = "";
 
@@ -192,9 +191,9 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 33; i++)
     {
-        offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        offset = DEV_NAMES_OFFSET + i * DEV_NAME_LENGTH;
         stringBuffer = Util::vecCopyOfRange(
-            loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
+            loadBytes, offset, offset + DEV_NAME_LENGTH);
         std::string s;
 
         for (const char c : stringBuffer)
@@ -212,9 +211,9 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 64; i++)
     {
-        offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
+        offset = TR_NAMES_OFFSET + i * NAME_LENGTH;
         stringBuffer = Util::vecCopyOfRange(loadBytes, offset,
-                                            offset + AllParser::NAME_LENGTH);
+                                            offset + NAME_LENGTH);
         std::string s;
 
         for (const char c : stringBuffer)
@@ -329,7 +328,7 @@ void Defaults::setNames()
 {
     auto const defSeqName =
         StrUtil::padRight(mpc.getSequencer()->getDefaultSequenceName(), " ",
-                          AllParser::NAME_LENGTH);
+                          NAME_LENGTH);
 
     for (int i = 0; i < 16; i++)
     {
@@ -342,9 +341,9 @@ void Defaults::setNames()
             i == 0 ? "        "
                    : "Device" + StrUtil::padLeft(std::to_string(i), "0", 2);
 
-        const auto offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
+        const auto offset = DEV_NAMES_OFFSET + i * DEV_NAME_LENGTH;
 
-        for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
+        for (int j = offset; j < offset + DEV_NAME_LENGTH; j++)
         {
             saveBytes[j] = deviceName[j - offset];
         }
@@ -354,11 +353,11 @@ void Defaults::setNames()
     {
         const auto trackName =
             StrUtil::padRight(mpc.getSequencer()->getDefaultTrackName(i), " ",
-                              AllParser::NAME_LENGTH);
+                              NAME_LENGTH);
 
-        const auto offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
+        const auto offset = TR_NAMES_OFFSET + i * NAME_LENGTH;
 
-        for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
+        for (int j = offset; j < offset + NAME_LENGTH; j++)
         {
             saveBytes[j] = trackName[j - offset];
         }

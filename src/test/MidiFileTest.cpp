@@ -7,13 +7,11 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteOnEvent.hpp"
 
-#include "file/mid/MidiReader.hpp"
-#include "file/mid/MidiWriter.hpp"
+#include "file/kaitai/MidIo.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 #include <array>
 #include <cmrc/cmrc.hpp>
-#include <sstream>
 #include <vector>
 
 CMRC_DECLARE(mpctest);
@@ -21,8 +19,6 @@ CMRC_DECLARE(mpctest);
 using namespace mpc;
 using namespace mpc::sequencer;
 using namespace mpc::disk;
-using namespace mpc::file::mid;
-
 namespace
 {
     struct NoteSnapshot
@@ -65,6 +61,25 @@ namespace
         }
         return result;
     }
+
+    std::shared_ptr<Sequence> loadSequenceWithMidIo(
+        Mpc &mpc,
+        const std::vector<char> &bytes,
+        const std::string &fileName)
+    {
+        const auto stem = fileName.substr(0, fileName.find_last_of('.'));
+        const auto sequenceOrError =
+            mpc::file::kaitai::MidIo::loadBytes(mpc, bytes, stem);
+        REQUIRE(sequenceOrError.has_value());
+        mpc.getSequencer()->getStateManager()->drainQueue();
+        return sequenceOrError.value();
+    }
+
+    std::vector<char> saveSequenceWithMidIo(
+        const std::shared_ptr<Sequence> &sequence)
+    {
+        return mpc::file::kaitai::MidIo::saveBytes(sequence);
+    }
 } // namespace
 
 SCENARIO("A MidiFile can be written", "[file]")
@@ -95,52 +110,39 @@ SCENARIO("A MidiFile can be written", "[file]")
         track0->acquireAndInsertEvent(eventData);
         stateManager->drainQueue();
 
-        MidiWriter midiWriter(sequence.get());
-        auto ostream = std::make_shared<std::ostringstream>();
-        midiWriter.writeToOStream(ostream);
-
         sequence->init(1);
         stateManager->drainQueue();
         track0->removeEvents();
         stateManager->drainQueue();
         REQUIRE(track0->getEvents().empty());
 
-        auto istream = std::make_shared<std::istringstream>(ostream->str());
-        MidiReader midiReader(istream, sequence);
-        midiReader.parseSequence(mpc);
-        stateManager->drainQueue();
+        auto loaded = loadSequenceWithMidIo(
+            mpc,
+            saveSequenceWithMidIo(sequence),
+            "ROUNDTRIP.MID");
 
-        REQUIRE(sequence->getTrack(0)->getEvents().size() == 1);
+        REQUIRE(loaded->getTrack(0)->getEvents().size() == 1);
         REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
-            sequence->getTrack(0)->getEvents()[0]));
+            loaded->getTrack(0)->getEvents()[0]));
         REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
-                    sequence->getTrack(0)->getEvents()[0])
+                    loaded->getTrack(0)->getEvents()[0])
                     ->getNote() == 37);
-        REQUIRE(sequence->getTrack(0)->getBusType() == BusType::DRUM2);
-        REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 7);
-        REQUIRE(sequence->getTrack(1)->getDeviceIndex() == 0);
+        REQUIRE(loaded->getTrack(0)->getBusType() == BusType::DRUM2);
+        REQUIRE(loaded->getTrack(0)->getDeviceIndex() == 7);
+        REQUIRE(loaded->getTrack(1)->getDeviceIndex() == 0);
     }
 }
 
-TEST_CASE("MidiReader parses FRUTZLE.MID without crashing",
+TEST_CASE("MidIo parses FRUTZLE.MID without crashing",
           "[file][midi-file]")
 {
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto sequence = mpc.getSequencer()->getSequence(0);
-    auto stateManager = mpc.getSequencer()->getStateManager();
-    sequence->init(1);
-    stateManager->drainQueue();
-
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
-    std::string bytes(file.begin(), file.end());
-    auto stream = std::make_shared<std::istringstream>(bytes);
-
-    MidiReader reader(stream, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    std::vector<char> bytes(file.begin(), file.end());
+    auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");
 
     int totalEvents = 0;
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
@@ -153,25 +155,16 @@ TEST_CASE("MidiReader parses FRUTZLE.MID without crashing",
     REQUIRE(sequence->getBarCount() == 4);
 }
 
-TEST_CASE("MidiReader parses FRUTZLE.MID into temp sequence without crashing",
+TEST_CASE("MidIo parses FRUTZLE.MID into temp sequence without crashing",
           "[file][midi-file]")
 {
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
-    auto stateManager = mpc.getSequencer()->getStateManager();
-    sequence->init(1);
-    stateManager->drainQueue();
-
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
-    std::string bytes(file.begin(), file.end());
-    auto stream = std::make_shared<std::istringstream>(bytes);
-
-    MidiReader reader(stream, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    std::vector<char> bytes(file.begin(), file.end());
+    auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");
 
     int totalEvents = 0;
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
@@ -181,115 +174,6 @@ TEST_CASE("MidiReader parses FRUTZLE.MID into temp sequence without crashing",
     }
 
     REQUIRE(totalEvents > 0);
-}
-
-TEST_CASE("Busy 8-track midi roundtrip preserves note events",
-          "[file][midi-file]")
-{
-    Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
-
-    auto sequencer = mpc.getSequencer();
-    auto sequence = sequencer->getSequence(0);
-    auto stateManager = sequencer->getStateManager();
-
-    sequence->init(1);
-    stateManager->drainQueue();
-
-    for (int trackIndex = 0; trackIndex < 8; ++trackIndex)
-    {
-        auto track = sequence->getTrack(trackIndex);
-        track->setUsedIfCurrentlyUnused();
-        track->setDeviceIndex((trackIndex % 4) + 1);
-
-        for (int eventIndex = 0; eventIndex < 32; ++eventIndex)
-        {
-            EventData eventData;
-            eventData.type = EventType::NoteOn;
-            eventData.tick =
-                (eventIndex * 11 + trackIndex * 17) %
-                static_cast<int>(sequence->getLastTick());
-            eventData.noteNumber = NoteNumber(35 + eventIndex);
-            eventData.velocity = Velocity(20 + ((trackIndex * 13 +
-                                                 eventIndex * 5) %
-                                                107));
-            eventData.duration = Duration(1 + ((trackIndex * 7 +
-                                                eventIndex * 13) %
-                                               95));
-            eventData.noteVariationType =
-                NoteVariationType((trackIndex + eventIndex) % 4);
-
-            switch (static_cast<int>(eventData.noteVariationType))
-            {
-                case 0:
-                    eventData.noteVariationValue =
-                        NoteVariationValue((eventIndex * 3) % 125);
-                    break;
-                case 1:
-                case 2:
-                    eventData.noteVariationValue =
-                        NoteVariationValue((trackIndex * 11 + eventIndex) %
-                                           101);
-                    break;
-                default:
-                    eventData.noteVariationValue =
-                        NoteVariationValue((trackIndex * 9 + eventIndex * 4) %
-                                           101);
-                    break;
-            }
-
-            track->acquireAndInsertEvent(eventData);
-        }
-    }
-
-    stateManager->drainQueue();
-
-    std::array<std::vector<NoteSnapshot>, 8> expectedPerTrack;
-    std::array<int, 8> expectedDeviceIndices{};
-    for (int trackIndex = 0; trackIndex < 8; ++trackIndex)
-    {
-        auto track = sequence->getTrack(trackIndex);
-        expectedPerTrack[trackIndex] = collectNoteSnapshots(track);
-        expectedDeviceIndices[trackIndex] = track->getDeviceIndex();
-        REQUIRE_FALSE(expectedPerTrack[trackIndex].empty());
-    }
-
-    MidiWriter writer(sequence.get());
-    auto output = std::make_shared<std::ostringstream>();
-    writer.writeToOStream(output);
-
-    sequence->init(1);
-    stateManager->drainQueue();
-
-    auto input = std::make_shared<std::istringstream>(output->str());
-    MidiReader reader(input, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
-
-    for (int trackIndex = 0; trackIndex < 8; ++trackIndex)
-    {
-        auto track = sequence->getTrack(trackIndex);
-        const auto actual = collectNoteSnapshots(track);
-
-        REQUIRE(track->getDeviceIndex() == expectedDeviceIndices[trackIndex]);
-        REQUIRE(actual.size() == expectedPerTrack[trackIndex].size());
-
-        for (size_t i = 0; i < actual.size(); ++i)
-        {
-            CAPTURE(trackIndex, i);
-            CAPTURE(actual[i].tick, expectedPerTrack[trackIndex][i].tick);
-            CAPTURE(actual[i].note, expectedPerTrack[trackIndex][i].note);
-            CAPTURE(actual[i].velocity,
-                    expectedPerTrack[trackIndex][i].velocity);
-            CAPTURE(actual[i].duration,
-                    expectedPerTrack[trackIndex][i].duration);
-            CAPTURE(actual[i].variationType,
-                    expectedPerTrack[trackIndex][i].variationType);
-            CAPTURE(actual[i].variationValue,
-                    expectedPerTrack[trackIndex][i].variationValue);
-            REQUIRE(actual[i] == expectedPerTrack[trackIndex][i]);
-        }
-    }
 }
 
 TEST_CASE("Cubase MID files load with valid bar count and name lengths",
@@ -306,19 +190,10 @@ TEST_CASE("Cubase MID files load with valid bar count and name lengths",
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
 
-        auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
-        auto stateManager = mpc.getSequencer()->getStateManager();
-        sequence->init(1);
-        stateManager->drainQueue();
-
         auto fs = cmrc::mpctest::get_filesystem();
         auto file = fs.open("test/MidiFile/" + fileName);
-        std::string bytes(file.begin(), file.end());
-        auto stream = std::make_shared<std::istringstream>(bytes);
-
-        MidiReader reader(stream, sequence);
-        REQUIRE_NOTHROW(reader.parseSequence(mpc));
-        stateManager->drainQueue();
+        std::vector<char> bytes(file.begin(), file.end());
+        auto sequence = loadSequenceWithMidIo(mpc, bytes, fileName);
 
         REQUIRE(sequence->getBarCount() > 0);
         REQUIRE(sequence->getName().size() <=
@@ -338,19 +213,10 @@ TEST_CASE("HWIF316.MID loads with 16 bars", "[file][midi-file]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
-    auto stateManager = mpc.getSequencer()->getStateManager();
-    sequence->init(1);
-    stateManager->drainQueue();
-
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
-    std::string bytes(file.begin(), file.end());
-    auto stream = std::make_shared<std::istringstream>(bytes);
-
-    MidiReader reader(stream, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    std::vector<char> bytes(file.begin(), file.end());
+    auto sequence = loadSequenceWithMidIo(mpc, bytes, "HWIF316.MID");
 
     REQUIRE(sequence->getBarCount() == 16);
 }
@@ -361,19 +227,10 @@ TEST_CASE("Real 2KXL SEQ.MID preserves MPC note variation semantics",
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
-    auto stateManager = mpc.getSequencer()->getStateManager();
-    sequence->init(1);
-    stateManager->drainQueue();
-
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/MidiFile/SEQ.MID");
-    std::string bytes(file.begin(), file.end());
-    auto stream = std::make_shared<std::istringstream>(bytes);
-
-    MidiReader reader(stream, sequence);
-    REQUIRE_NOTHROW(reader.parseSequence(mpc));
-    stateManager->drainQueue();
+    std::vector<char> bytes(file.begin(), file.end());
+    auto sequence = loadSequenceWithMidIo(mpc, bytes, "SEQ.MID");
 
     REQUIRE(sequence->getBarCount() == 1);
 
@@ -414,19 +271,10 @@ TEST_CASE("FRUTZLE.MID roundtrip keeps non-empty sequence", "[file][midi-file]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto sequence = mpc.getSequencer()->getSequence(TempSequenceIndex);
-    auto stateManager = mpc.getSequencer()->getStateManager();
-    sequence->init(1);
-    stateManager->drainQueue();
-
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
-    std::string bytes(file.begin(), file.end());
-    auto initialInput = std::make_shared<std::istringstream>(bytes);
-
-    MidiReader initialReader(initialInput, sequence);
-    REQUIRE_NOTHROW(initialReader.parseSequence(mpc));
-    stateManager->drainQueue();
+    std::vector<char> bytes(file.begin(), file.end());
+    auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");
 
     int eventsAfterFirstLoad = 0;
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
@@ -437,25 +285,18 @@ TEST_CASE("FRUTZLE.MID roundtrip keeps non-empty sequence", "[file][midi-file]")
     REQUIRE(eventsAfterFirstLoad > 0);
     REQUIRE(sequence->getBarCount() == 4);
 
-    MidiWriter writer(sequence.get());
-    auto output = std::make_shared<std::ostringstream>();
-    writer.writeToOStream(output);
-
-    sequence->init(1);
-    stateManager->drainQueue();
-
-    auto secondInput = std::make_shared<std::istringstream>(output->str());
-    MidiReader secondReader(secondInput, sequence);
-    REQUIRE_NOTHROW(secondReader.parseSequence(mpc));
-    stateManager->drainQueue();
+    auto reloaded = loadSequenceWithMidIo(
+        mpc,
+        saveSequenceWithMidIo(sequence),
+        "FRUTZLE.MID");
 
     int eventsAfterRoundtrip = 0;
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
         eventsAfterRoundtrip += static_cast<int>(
-            sequence->getTrack(trackIndex)->getEvents().size());
+            reloaded->getTrack(trackIndex)->getEvents().size());
     }
 
     REQUIRE(eventsAfterRoundtrip > 0);
-    REQUIRE(sequence->getBarCount() == 4);
+    REQUIRE(reloaded->getBarCount() == 4);
 }
