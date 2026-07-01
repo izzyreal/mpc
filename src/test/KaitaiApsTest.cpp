@@ -89,7 +89,7 @@ void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
 {
     auto* program0 = parsed.aps_programs()->at(0)->body();
     auto* note35 = program0->note_parameters()->at(0).get();
-    note35->set_sound_index(255);
+    note35->set_sound_index(0xFFFF);
     note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
     note35->set_velocity_range_lower(1);
     note35->set_also_play_use_note_1(41);
@@ -628,7 +628,7 @@ TEST_CASE("Kaitai APS parses broad mutated APS semantics", "[kaitai-aps]")
     REQUIRE(p1->program_change() == 126);
 
     auto* note35 = p1->note_parameters()->at(0).get();
-    REQUIRE(note35->sound_index() == 255);
+    REQUIRE(note35->sound_index() == 0xFFFF);
     REQUIRE(note35->sound_generation_mode() == mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
     REQUIRE(note35->velocity_range_lower() == 1);
     REQUIRE(note35->also_play_use_note_1() == 41);

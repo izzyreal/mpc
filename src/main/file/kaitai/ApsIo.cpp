@@ -430,7 +430,7 @@ void loadPrograms(mpc2000xl_aps_t& parsed,
             copyMixer(destNoteParams.stereoMixer, destNoteParams.indivFxMixer, *sourceMixer);
 
             const auto* srcNoteParams = body->note_parameters()->at(noteIndex).get();
-            auto soundIndex = srcNoteParams->sound_index() == kUnassignedSoundIndex
+            auto soundIndex = srcNoteParams->sound_index() == 0xFFFF
                 ? -1
                 : static_cast<int>(srcNoteParams->sound_index());
 
