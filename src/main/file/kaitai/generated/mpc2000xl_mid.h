@@ -64,7 +64,7 @@ public:
         void set_tempo_source(std::string _v) { m__dirty = true; m_tempo_source = std::move(_v); }
         mpc2000xl_mid_t* _root() const { return m__root; }
         void set__root(mpc2000xl_mid_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_mid_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_mid_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:

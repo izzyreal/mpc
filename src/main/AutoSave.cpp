@@ -12,6 +12,7 @@
 #include "FileIoPolicy.hpp"
 #include "file/ByteUtil.hpp"
 #include "file/kaitai/ApsIo.hpp"
+#include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
@@ -20,7 +21,6 @@
 #include "lcdgui/Screens.hpp"
 
 #include "disk/AllLoader.hpp"
-#include "file/all/AllParser.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -40,7 +40,6 @@
 using namespace mpc;
 using namespace mpc::file_io;
 using namespace mpc::file;
-using namespace mpc::file::all;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -58,6 +57,7 @@ constexpr size_t kApsPadLength2 = 7;
 constexpr size_t kApsMixerLength = 384;
 constexpr size_t kApsDrumConfigLength = 9;
 constexpr size_t kApsDrumPadLength = 3;
+constexpr size_t kAllSequencesOffset = 14406;
 
 bool rangeFits(const size_t totalSize, const size_t offset, const size_t length)
 {
@@ -100,7 +100,7 @@ bool isValidAutoSaveApsData(const std::vector<char> &data)
 
 bool isValidAutoSaveAllData(const std::vector<char> &data)
 {
-    if (data.size() < static_cast<size_t>(AllParser::SEQUENCES_OFFSET))
+    if (data.size() < kAllSequencesOffset)
     {
         return false;
     }
@@ -308,8 +308,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                         {
                             throw std::invalid_argument("invalid ALL autosave data");
                         }
-                        AllParser allParser(mpc, data);
-                        disk::AllLoader::loadEverythingFromAllParser(mpc, allParser);
+                        disk::AllLoader::loadEverythingFromBytes(mpc, data);
                     }
                     else if (f == "sounds.txt")
                     {
@@ -632,8 +631,7 @@ void AutoSave::storeAutoSavedState(
         }
 
         {
-            AllParser allParser(mpc);
-            if (!writeRequired("ALL.ALL", allParser.getBytes()))
+            if (!writeRequired("ALL.ALL", file::kaitai::AllIo::save(mpc)))
             {
                 layeredScreen->closeCurrentScreen();
                 return;

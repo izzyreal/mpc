@@ -4,11 +4,11 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/generated/standard_midi_file_with_running_status.h"
-#include "file/mid/MidiReader.hpp"
 #include "sequencer/BusType.hpp"
 #include "sequencer/EventData.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Transport.hpp"
@@ -28,7 +28,7 @@ using meta_type_t = midi_t::meta_event_body_t::meta_type_enum_t;
 
 std::string asciiBody(const std::string& body)
 {
-    return kaitai::kstream::bytes_to_str(body, "ASCII");
+    return body;
 }
 
 bool isInteger(const std::string& s)
@@ -610,6 +610,373 @@ std::vector<char> buildMpc2000xlMidiBytes(const std::shared_ptr<mpc::sequencer::
     return result;
 }
 
+bool loadGenericStandardMidi(mpc::Mpc& mpc,
+                             const midi_t& parsed,
+                             const std::shared_ptr<mpc::sequencer::Sequence>& sequence)
+{
+    auto sequencer = mpc.getSequencer();
+    auto transport = sequencer->getTransport();
+    auto stateManager = sequencer->getStateManager();
+
+    sequence->setUsed(true);
+
+    std::vector<std::pair<int, double>> tempoChanges;
+    struct TimeSigChange { int tick; int numerator; int denominator; };
+    std::vector<TimeSigChange> timeSignatures;
+
+    int lengthInTicks = 0;
+    for (const auto& midiTrack : *parsed.tracks())
+    {
+        int trackTick = 0;
+        for (const auto& eventPtr : *midiTrack->events()->event())
+        {
+            trackTick += eventPtr->v_time()->value();
+        }
+        lengthInTicks = std::max(lengthInTicks, trackTick);
+    }
+
+    int tick = 0;
+    for (const auto& eventPtr : *parsed.tracks()->at(0)->events()->event())
+    {
+        tick += eventPtr->v_time()->value();
+        const auto* meta = eventPtr->meta_event_body();
+        if (meta == nullptr)
+        {
+            continue;
+        }
+
+        if (meta->meta_type() == meta_type_t::META_TYPE_ENUM_TEMPO)
+        {
+            tempoChanges.push_back({tick, bpmFromTempoBody(meta->body())});
+        }
+        else if (meta->meta_type() == meta_type_t::META_TYPE_ENUM_TIME_SIGNATURE)
+        {
+            timeSignatures.push_back(
+                TimeSigChange{
+                    tick,
+                    meta->body().empty()
+                        ? mpc::DefaultTimeSigNumerator
+                        : static_cast<unsigned char>(meta->body()[0]),
+                    denominatorFromTimeSignatureBody(meta->body())
+                }
+            );
+        }
+    }
+
+    const auto initialTempo = tempoChanges.empty() ? 120.0 : tempoChanges[0].second;
+    sequence->setInitialTempo(initialTempo);
+    if (!transport->isTempoSourceSequence())
+    {
+        transport->setTempo(initialTempo);
+    }
+
+    for (size_t i = 1; i < tempoChanges.size(); ++i)
+    {
+        const auto ratio = tempoChanges[i].second / initialTempo;
+        sequence->addTempoChangeEvent(
+            tempoChanges[i].first,
+            static_cast<int>(ratio * 1000.0)
+        );
+    }
+
+    if (timeSignatures.empty())
+    {
+        timeSignatures.push_back(
+            TimeSigChange{0, mpc::DefaultTimeSigNumerator, mpc::DefaultTimeSigDenominator}
+        );
+    }
+
+    lengthInTicks = std::max(lengthInTicks, 1);
+    int accumLength = 0;
+    int barCounter = 0;
+    for (size_t i = 0; i < timeSignatures.size(); ++i)
+    {
+        const auto current = timeSignatures[i];
+        const auto nextTick =
+            i + 1 < timeSignatures.size() ? timeSignatures[i + 1].tick : lengthInTicks;
+
+        while (accumLength < nextTick)
+        {
+            sequence->setTimeSignature(barCounter, current.numerator, current.denominator);
+            const auto newDenTicks = 96 * (4.0 / current.denominator);
+            const auto barLength = static_cast<int>(newDenTicks * current.numerator);
+            accumLength += barLength;
+            barCounter++;
+        }
+    }
+
+    sequence->setLastBarIndex(barCounter - 1);
+    sequence->setFirstLoopBarIndex(mpc::BarIndex(-1));
+    sequence->setLastLoopBarIndex(mpc::EndOfSequence);
+
+    const auto sequenceIndex = sequence->getSequenceIndex();
+    mpc::sequencer::UpdateSequenceEvents updateSequenceEvents{sequenceIndex};
+    updateSequenceEvents.trackSnapshots = &stateManager->trackEventsSnapshots[sequenceIndex];
+    updateSequenceEvents.trackSnapshots->clear();
+
+    mpc::sequencer::UpdateSequenceTracks updateSequenceTracks{sequenceIndex};
+    updateSequenceTracks.trackStates = &stateManager->trackStatesSnapshots[sequenceIndex];
+    *updateSequenceTracks.trackStates = mpc::sequencer::SequenceTrackStatesSnapshot();
+
+    const std::string trackDataPrefix = "TRACK DATA:";
+
+    for (size_t i = 0; i < parsed.tracks()->size() && i < 64; ++i)
+    {
+        auto resolvedTrackIndex = static_cast<int>(i);
+        auto deviceIndex = 0;
+        auto busType = mpc::sequencer::BusType::DRUM1;
+
+        for (const auto& eventPtr : *parsed.tracks()->at(i)->events()->event())
+        {
+            const auto* meta = eventPtr->meta_event_body();
+            if (meta == nullptr || meta->meta_type() != meta_type_t::META_TYPE_ENUM_TEXT_EVENT)
+            {
+                continue;
+            }
+
+            const auto body = asciiBody(meta->body());
+            if (body.rfind(trackDataPrefix, 0) != 0)
+            {
+                continue;
+            }
+
+            const auto payload = body.substr(trackDataPrefix.size());
+            resolvedTrackIndex = std::stoi(payload.substr(0, 2));
+
+            const auto deviceIndexStr = payload.substr(2, 2);
+            if (deviceIndexStr != "C0")
+            {
+                deviceIndex = std::stoi(deviceIndexStr, nullptr, 16) - std::stoi(std::string("E0"), nullptr, 16) + 1;
+            }
+
+            if (payload.size() >= 16)
+            {
+                busType = mpc::sequencer::busIndexToBusType(std::stoi(payload.substr(14, 2), nullptr, 16));
+            }
+            break;
+        }
+
+        if (resolvedTrackIndex < 0 || resolvedTrackIndex > mpc::Mpc2000XlSpecs::LAST_TRACK_INDEX)
+        {
+            continue;
+        }
+
+        auto& trackState = (*updateSequenceTracks.trackStates)[resolvedTrackIndex];
+        trackState.busType = busType;
+        trackState.deviceIndex = deviceIndex;
+        std::string pendingTrackName;
+        bool hasPendingTrackName = false;
+        bool hasImportedEvents = false;
+
+        struct OpenNote
+        {
+            mpc::sequencer::EventData event;
+        };
+
+        std::vector<OpenNote> openNotes;
+        std::vector<std::pair<int, int>> noteOffs;
+
+        int absoluteTick = 0;
+        for (const auto& eventPtr : *parsed.tracks()->at(i)->events()->event())
+        {
+            absoluteTick += eventPtr->v_time()->value();
+
+            if (const auto* meta = eventPtr->meta_event_body(); meta != nullptr)
+            {
+                if (meta->meta_type() == meta_type_t::META_TYPE_ENUM_SEQUENCE_TRACK_NAME)
+                {
+                    const auto body = asciiBody(meta->body());
+                    if (!body.empty())
+                    {
+                        pendingTrackName = body.substr(0, mpc::Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
+                        hasPendingTrackName = true;
+                    }
+                }
+                continue;
+            }
+
+            switch (eventPtr->event_type())
+            {
+                case 0x80:
+                {
+                    const auto* noteOff =
+                        dynamic_cast<midi_t::note_off_event_t*>(eventPtr->event_body());
+                    if (noteOff != nullptr)
+                    {
+                        noteOffs.push_back({noteOff->note(), absoluteTick});
+                    }
+                    break;
+                }
+                case 0x90:
+                {
+                    const auto* noteOn =
+                        dynamic_cast<midi_t::note_on_event_t*>(eventPtr->event_body());
+                    if (noteOn == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData ne;
+                    ne.type = mpc::sequencer::EventType::NoteOn;
+                    ne.noteNumber = mpc::NoteNumber(noteOn->note());
+                    ne.tick = absoluteTick;
+                    ne.velocity = mpc::Velocity(noteOn->velocity());
+                    ne.noteVariationType = mpc::NoteVariationTypeTune;
+                    ne.noteVariationValue = mpc::DefaultNoteVariationValue;
+                    ne.duration = mpc::Duration(24);
+                    openNotes.push_back(OpenNote{ne});
+                    break;
+                }
+                case 0xA0:
+                {
+                    const auto* noteAftertouch =
+                        dynamic_cast<midi_t::polyphonic_pressure_event_t*>(eventPtr->event_body());
+                    if (noteAftertouch == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData e;
+                    e.type = mpc::sequencer::EventType::PolyPressure;
+                    e.tick = absoluteTick;
+                    e.noteNumber = mpc::NoteNumber(noteAftertouch->note());
+                    e.amount = noteAftertouch->pressure();
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    hasImportedEvents = true;
+                    break;
+                }
+                case 0xB0:
+                {
+                    const auto* controller =
+                        dynamic_cast<midi_t::controller_event_t*>(eventPtr->event_body());
+                    if (controller == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData e;
+                    e.type = mpc::sequencer::EventType::ControlChange;
+                    e.tick = absoluteTick;
+                    e.controllerNumber = controller->controller();
+                    e.controllerValue = controller->value();
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    hasImportedEvents = true;
+                    break;
+                }
+                case 0xC0:
+                {
+                    const auto* programChange =
+                        dynamic_cast<midi_t::program_change_event_t*>(eventPtr->event_body());
+                    if (programChange == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData e;
+                    e.type = mpc::sequencer::EventType::ProgramChange;
+                    e.tick = absoluteTick;
+                    e.programChangeProgramIndex = mpc::ProgramIndex(programChange->program());
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    hasImportedEvents = true;
+                    break;
+                }
+                case 0xD0:
+                {
+                    const auto* channelPressure =
+                        dynamic_cast<midi_t::channel_pressure_event_t*>(eventPtr->event_body());
+                    if (channelPressure == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData e;
+                    e.type = mpc::sequencer::EventType::ChannelPressure;
+                    e.tick = absoluteTick;
+                    e.amount = channelPressure->pressure();
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    hasImportedEvents = true;
+                    break;
+                }
+                case 0xE0:
+                {
+                    auto* pitchBend =
+                        dynamic_cast<midi_t::pitch_bend_event_t*>(eventPtr->event_body());
+                    if (pitchBend == nullptr)
+                    {
+                        break;
+                    }
+                    mpc::sequencer::EventData e;
+                    e.type = mpc::sequencer::EventType::PitchBend;
+                    e.tick = absoluteTick;
+                    e.amount = pitchBend->bend_value();
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    hasImportedEvents = true;
+                    break;
+                }
+                case 0xF0:
+                {
+                    const auto* sysEx = eventPtr->sysex_body();
+                    if (sysEx == nullptr)
+                    {
+                        break;
+                    }
+                    const auto& data = sysEx->data();
+                    if (data.size() == 8 &&
+                        static_cast<unsigned char>(data[0]) == 71 &&
+                        static_cast<unsigned char>(data[1]) == 0 &&
+                        static_cast<unsigned char>(data[2]) == 68 &&
+                        static_cast<unsigned char>(data[3]) == 69 &&
+                        static_cast<unsigned char>(data[7]) == 247)
+                    {
+                        mpc::sequencer::EventData e;
+                        e.type = mpc::sequencer::EventType::Mixer;
+                        e.tick = absoluteTick;
+                        e.mixerParameter = static_cast<unsigned char>(data[4]) - 1;
+                        e.mixerPad = static_cast<unsigned char>(data[5]);
+                        e.mixerValue = static_cast<unsigned char>(data[6]);
+                        (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    }
+                    else
+                    {
+                        mpc::sequencer::EventData e;
+                        e.type = mpc::sequencer::EventType::SystemExclusive;
+                        e.tick = absoluteTick;
+                        (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    }
+                    hasImportedEvents = true;
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        for (auto& on : openNotes)
+        {
+            for (auto it = noteOffs.begin(); it != noteOffs.end(); ++it)
+            {
+                if (it->first == on.event.noteNumber && it->second >= on.event.tick)
+                {
+                    on.event.duration = mpc::Duration(it->second - on.event.tick);
+                    noteOffs.erase(it);
+                    break;
+                }
+            }
+
+            (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(on.event);
+            hasImportedEvents = true;
+        }
+
+        if (hasPendingTrackName)
+        {
+            trackState.name = pendingTrackName;
+        }
+
+        trackState.used = hasImportedEvents;
+    }
+
+    stateManager->enqueue(updateSequenceTracks);
+    stateManager->enqueue(updateSequenceEvents);
+    stateManager->drainQueue();
+
+    return true;
+}
+
 bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                       const midi_t& parsed,
                       const std::shared_ptr<mpc::sequencer::Sequence>& sequence)
@@ -786,6 +1153,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
         auto noteVariationType = mpc::NoteVariationTypeTune;
         auto noteVariationValue = mpc::DefaultNoteVariationValue;
         std::vector<OpenNote> openNotes;
+        std::string pendingTrackName;
+        bool hasPendingTrackName = false;
         bool hasImportedEvents = false;
         int absoluteTick = 0;
 
@@ -820,8 +1189,9 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                              meta_type_t::META_TYPE_ENUM_SEQUENCE_TRACK_NAME &&
                          !body.empty())
                 {
-                    track->setName(
-                        body.substr(0, mpc::Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH));
+                    pendingTrackName =
+                        body.substr(0, mpc::Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
+                    hasPendingTrackName = true;
                 }
                 continue;
             }
@@ -1088,11 +1458,15 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
         {
             track->setUsedIfCurrentlyUnused();
         }
+
+        if (hasPendingTrackName)
+        {
+            track->setName(pendingTrackName);
+        }
     }
 
     return true;
 }
-
 } // namespace
 
 sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
@@ -1103,6 +1477,7 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
 
     auto newSeq = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
     newSeq->init(0);
+    mpc.getSequencer()->getStateManager()->drainQueue();
 
     std::stringstream kaitaiStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
@@ -1112,21 +1487,10 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
     midi_t parsed(&kaitaiIo);
     parsed._read();
 
-    if (tryLoadMpc2000xl(mpc, parsed, newSeq))
+    if (!tryLoadMpc2000xl(mpc, parsed, newSeq))
     {
-        if (newSeq->getName().empty())
-        {
-            newSeq->setName(fileNameWithoutExtension);
-        }
-        return newSeq;
+        loadGenericStandardMidi(mpc, parsed, newSeq);
     }
-
-    auto input = std::make_shared<std::istringstream>(
-        std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::in | std::ios::binary
-    );
-    mpc::file::mid::MidiReader reader(input, newSeq);
-    reader.parseSequence(mpc);
 
     if (newSeq->getName().empty())
     {

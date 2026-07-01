@@ -867,7 +867,7 @@ int32_t mpc2000xl_all_t::bar_t::first_tick() {
     if (f_first_tick)
         return m_first_tick;
     f_first_tick = true;
-    m_first_tick = ((idx() == 0) ? (0) : (_parent()->bars()->at(idx() - 1)->last_tick()));
+    m_first_tick = ((idx() == 0) ? (0) : (static_cast<mpc2000xl_all_t::sequence_body_t*>(_parent())->bars()->at(idx() - 1)->last_tick()));
     return m_first_tick;
 }
 
@@ -1909,12 +1909,6 @@ mpc2000xl_all_t::midi_switch_t::midi_switch_t(kaitai::kstream* p__io, mpc2000xl_
 
 void mpc2000xl_all_t::midi_switch_t::_read() {
     m_controller = m__io->read_u1();
-    if (!(m_controller >= 0)) {
-        throw kaitai::validation_less_than_error<uint8_t>(0, m_controller, m__io, std::string("/types/midi_switch/seq/0"));
-    }
-    if (!(m_controller <= 127)) {
-        throw kaitai::validation_greater_than_error<uint8_t>(127, m_controller, m__io, std::string("/types/midi_switch/seq/0"));
-    }
     m_function = static_cast<mpc2000xl_all_t::midi_switch_function_t>(m__io->read_u1());
     m__dirty = false;
 }
@@ -1930,12 +1924,6 @@ void mpc2000xl_all_t::midi_switch_t::_write() {
 }
 
 void mpc2000xl_all_t::midi_switch_t::_check() {
-    if (!(m_controller >= 0)) {
-        throw kaitai::validation_less_than_error<uint8_t>(0, m_controller, m__io, std::string("/types/midi_switch/seq/0"));
-    }
-    if (!(m_controller <= 127)) {
-        throw kaitai::validation_greater_than_error<uint8_t>(127, m_controller, m__io, std::string("/types/midi_switch/seq/0"));
-    }
     m__dirty = false;
 }
 
@@ -2161,7 +2149,7 @@ int32_t mpc2000xl_all_t::note_event_t::duration() {
     if (f_duration)
         return m_duration;
     f_duration = true;
-    m_duration = ((_parent()->duration_bits_1() << 10) + (_parent()->duration_bits_2() << 8)) + duration_bits_3();
+    m_duration = ((static_cast<mpc2000xl_all_t::event_t*>(_parent())->duration_bits_1() << 10) + (static_cast<mpc2000xl_all_t::event_t*>(_parent())->duration_bits_2() << 8)) + duration_bits_3();
     return m_duration;
 }
 
@@ -2169,7 +2157,7 @@ uint8_t mpc2000xl_all_t::note_event_t::note() {
     if (f_note)
         return m_note;
     f_note = true;
-    m_note = _parent()->id();
+    m_note = static_cast<mpc2000xl_all_t::event_t*>(_parent())->id();
     return m_note;
 }
 
@@ -2332,11 +2320,11 @@ mpc2000xl_all_t::sequence_t::sequence_t(kaitai::kstream* p__io, mpc2000xl_all_t*
 }
 
 void mpc2000xl_all_t::sequence_t::_read() {
-    m_name_part_1 = kaitai::kstream::bytes_to_str(kaitai::kstream::bytes_terminate(kaitai::kstream::bytes_strip_right(m__io->read_bytes(8), 255), 255, false), "ASCII");
+    m_name_part_1 = kaitai::kstream::bytes_to_str(kaitai::kstream::bytes_terminate(kaitai::kstream::bytes_strip_right(m__io->read_bytes(8), static_cast<char>(255)), static_cast<char>(255), false), "ASCII");
     n_name_part_2 = true;
     if (name_part_1() != std::string("")) {
         n_name_part_2 = false;
-        m_name_part_2 = kaitai::kstream::bytes_to_str(kaitai::kstream::bytes_terminate(kaitai::kstream::bytes_strip_right(m__io->read_bytes(8), 255), 255, false), "ASCII");
+        m_name_part_2 = kaitai::kstream::bytes_to_str(kaitai::kstream::bytes_terminate(kaitai::kstream::bytes_strip_right(m__io->read_bytes(8), static_cast<char>(255)), static_cast<char>(255), false), "ASCII");
     }
     if (name_part_1() != std::string("")) {
         m_body = std::unique_ptr<sequence_body_t>(new sequence_body_t(m__io, this, m__root));

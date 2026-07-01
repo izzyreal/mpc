@@ -108,7 +108,7 @@ public:
         void set__unnamed10(std::string _v) { m__dirty = true; m__unnamed10 = std::move(_v); }
         mpc2000xl_aps_t* _root() const { return m__root; }
         void set__root(mpc2000xl_aps_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_aps_t::aps_program_meta_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_aps_t::aps_program_meta_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -150,7 +150,7 @@ public:
         void set__unnamed2(std::unique_ptr<std::vector<uint8_t>> _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
         mpc2000xl_aps_t* _root() const { return m__root; }
         void set__root(mpc2000xl_aps_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_aps_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_aps_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -204,7 +204,7 @@ public:
         void set_receive_midi_volume_duplicate(no_yes_t _v) { m__dirty = true; m_receive_midi_volume_duplicate = std::move(_v); }
         mpc2000xl_aps_t* _root() const { return m__root; }
         void set__root(mpc2000xl_aps_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_aps_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_aps_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -265,7 +265,7 @@ public:
         void set_master_level(uint8_t _v) { m__dirty = true; m_master_level = std::move(_v); }
         mpc2000xl_aps_t* _root() const { return m__root; }
         void set__root(mpc2000xl_aps_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_aps_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_aps_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -354,7 +354,7 @@ public:
         void set_velocity_to_pitch(uint8_t _v) { m__dirty = true; m_velocity_to_pitch = std::move(_v); }
         mpc2000xl_aps_t* _root() const { return m__root; }
         void set__root(mpc2000xl_aps_t* _v) { m__dirty = true; m__root = std::move(_v); }
-        mpc2000xl_aps_t::aps_program_body_t* _parent() const { return m__parent; }
+        kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_aps_t::aps_program_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
@@ -390,8 +390,10 @@ public:
 public:
     std::string magic() const { return m_magic; }
     void set_magic(std::string _v) { m__dirty = true; m_magic = std::move(_v); }
-    uint16_t sound_count() const { return m_sound_count; }
-    void set_sound_count(uint16_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
+    uint8_t sound_count() const { return m_sound_count; }
+    void set_sound_count(uint8_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
+    std::string _unnamed2() const { return m__unnamed2; }
+    void set__unnamed2(std::string _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
     std::vector<std::string>* sound_names() const { return m_sound_names.get(); }
     void set_sound_names(std::unique_ptr<std::vector<std::string>> _v) { m__dirty = true; m_sound_names = std::move(_v); }
     std::string _unnamed4() const { return m__unnamed4; }
@@ -431,7 +433,8 @@ public:
 
 private:
     std::string m_magic;
-    uint16_t m_sound_count;
+    uint8_t m_sound_count;
+    std::string m__unnamed2;
     std::unique_ptr<std::vector<std::string>> m_sound_names;
     std::string m__unnamed4;
     std::string m_name;
