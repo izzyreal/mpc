@@ -302,10 +302,8 @@ public:
         void _write();
         void _check();
         ~note_t();
-        uint8_t sound_index() const { return m_sound_index; }
-        void set_sound_index(uint8_t _v) { m__dirty = true; m_sound_index = std::move(_v); }
-        std::string _unnamed1() const { return m__unnamed1; }
-        void set__unnamed1(std::string _v) { m__dirty = true; m__unnamed1 = std::move(_v); }
+        uint16_t sound_index() const { return m_sound_index; }
+        void set_sound_index(uint16_t _v) { m__dirty = true; m_sound_index = std::move(_v); }
         mpc2000xl_pgm_t::sound_generation_mode_t sound_generation_mode() const { return m_sound_generation_mode; }
         void set_sound_generation_mode(mpc2000xl_pgm_t::sound_generation_mode_t _v) { m__dirty = true; m_sound_generation_mode = std::move(_v); }
         uint8_t velocity_range_lower() const { return m_velocity_range_lower; }
@@ -358,8 +356,7 @@ public:
         void set__parent(mpc2000xl_aps_t::aps_program_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
-        uint8_t m_sound_index;
-        std::string m__unnamed1;
+        uint16_t m_sound_index;
         mpc2000xl_pgm_t::sound_generation_mode_t m_sound_generation_mode;
         uint8_t m_velocity_range_lower;
         uint8_t m_also_play_use_note_1;
@@ -390,40 +387,38 @@ public:
 public:
     std::string magic() const { return m_magic; }
     void set_magic(std::string _v) { m__dirty = true; m_magic = std::move(_v); }
-    uint8_t sound_count() const { return m_sound_count; }
-    void set_sound_count(uint8_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
-    std::string _unnamed2() const { return m__unnamed2; }
-    void set__unnamed2(std::string _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
+    uint16_t sound_count() const { return m_sound_count; }
+    void set_sound_count(uint16_t _v) { m__dirty = true; m_sound_count = std::move(_v); }
     std::vector<std::string>* sound_names() const { return m_sound_names.get(); }
     void set_sound_names(std::unique_ptr<std::vector<std::string>> _v) { m__dirty = true; m_sound_names = std::move(_v); }
-    std::string _unnamed4() const { return m__unnamed4; }
-    void set__unnamed4(std::string _v) { m__dirty = true; m__unnamed4 = std::move(_v); }
+    std::string _unnamed3() const { return m__unnamed3; }
+    void set__unnamed3(std::string _v) { m__dirty = true; m__unnamed3 = std::move(_v); }
     std::string name() const { return m_name; }
     void set_name(std::string _v) { m__dirty = true; m_name = std::move(_v); }
     global_parameters_t* global_parameters() const { return m_global_parameters.get(); }
     void set_global_parameters(std::unique_ptr<global_parameters_t> _v) { m__dirty = true; m_global_parameters = std::move(_v); }
-    std::string _unnamed7() const { return m__unnamed7; }
-    void set__unnamed7(std::string _v) { m__dirty = true; m__unnamed7 = std::move(_v); }
+    std::string _unnamed6() const { return m__unnamed6; }
+    void set__unnamed6(std::string _v) { m__dirty = true; m__unnamed6 = std::move(_v); }
     std::vector<int8_t>* master_pad_to_note_mapping() const { return m_master_pad_to_note_mapping.get(); }
     void set_master_pad_to_note_mapping(std::unique_ptr<std::vector<int8_t>> _v) { m__dirty = true; m_master_pad_to_note_mapping = std::move(_v); }
-    std::string _unnamed9() const { return m__unnamed9; }
-    void set__unnamed9(std::string _v) { m__dirty = true; m__unnamed9 = std::move(_v); }
+    std::string _unnamed8() const { return m__unnamed8; }
+    void set__unnamed8(std::string _v) { m__dirty = true; m__unnamed8 = std::move(_v); }
     drum_t* drum1() const { return m_drum1.get(); }
     void set_drum1(std::unique_ptr<drum_t> _v) { m__dirty = true; m_drum1 = std::move(_v); }
-    std::string _unnamed11() const { return m__unnamed11; }
-    void set__unnamed11(std::string _v) { m__dirty = true; m__unnamed11 = std::move(_v); }
+    std::string _unnamed10() const { return m__unnamed10; }
+    void set__unnamed10(std::string _v) { m__dirty = true; m__unnamed10 = std::move(_v); }
     drum_t* drum2() const { return m_drum2.get(); }
     void set_drum2(std::unique_ptr<drum_t> _v) { m__dirty = true; m_drum2 = std::move(_v); }
-    std::string _unnamed13() const { return m__unnamed13; }
-    void set__unnamed13(std::string _v) { m__dirty = true; m__unnamed13 = std::move(_v); }
+    std::string _unnamed12() const { return m__unnamed12; }
+    void set__unnamed12(std::string _v) { m__dirty = true; m__unnamed12 = std::move(_v); }
     drum_t* drum3() const { return m_drum3.get(); }
     void set_drum3(std::unique_ptr<drum_t> _v) { m__dirty = true; m_drum3 = std::move(_v); }
-    std::string _unnamed15() const { return m__unnamed15; }
-    void set__unnamed15(std::string _v) { m__dirty = true; m__unnamed15 = std::move(_v); }
+    std::string _unnamed14() const { return m__unnamed14; }
+    void set__unnamed14(std::string _v) { m__dirty = true; m__unnamed14 = std::move(_v); }
     drum_t* drum4() const { return m_drum4.get(); }
     void set_drum4(std::unique_ptr<drum_t> _v) { m__dirty = true; m_drum4 = std::move(_v); }
-    std::string _unnamed17() const { return m__unnamed17; }
-    void set__unnamed17(std::string _v) { m__dirty = true; m__unnamed17 = std::move(_v); }
+    std::string _unnamed16() const { return m__unnamed16; }
+    void set__unnamed16(std::string _v) { m__dirty = true; m__unnamed16 = std::move(_v); }
     std::vector<std::unique_ptr<aps_program_meta_t>>* aps_programs() const { return m_aps_programs.get(); }
     void set_aps_programs(std::unique_ptr<std::vector<std::unique_ptr<aps_program_meta_t>>> _v) { m__dirty = true; m_aps_programs = std::move(_v); }
     mpc2000xl_aps_t* _root() const { return m__root; }
@@ -433,23 +428,22 @@ public:
 
 private:
     std::string m_magic;
-    uint8_t m_sound_count;
-    std::string m__unnamed2;
+    uint16_t m_sound_count;
     std::unique_ptr<std::vector<std::string>> m_sound_names;
-    std::string m__unnamed4;
+    std::string m__unnamed3;
     std::string m_name;
     std::unique_ptr<global_parameters_t> m_global_parameters;
-    std::string m__unnamed7;
+    std::string m__unnamed6;
     std::unique_ptr<std::vector<int8_t>> m_master_pad_to_note_mapping;
-    std::string m__unnamed9;
+    std::string m__unnamed8;
     std::unique_ptr<drum_t> m_drum1;
-    std::string m__unnamed11;
+    std::string m__unnamed10;
     std::unique_ptr<drum_t> m_drum2;
-    std::string m__unnamed13;
+    std::string m__unnamed12;
     std::unique_ptr<drum_t> m_drum3;
-    std::string m__unnamed15;
+    std::string m__unnamed14;
     std::unique_ptr<drum_t> m_drum4;
-    std::string m__unnamed17;
+    std::string m__unnamed16;
     std::unique_ptr<std::vector<std::unique_ptr<aps_program_meta_t>>> m_aps_programs;
     mpc2000xl_aps_t* m__root;
     kaitai::kstruct* m__parent;

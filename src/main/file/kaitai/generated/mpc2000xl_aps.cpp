@@ -37,36 +37,35 @@ void mpc2000xl_aps_t::_read() {
     if (!(m_magic == std::string("\x0A\x05", 2))) {
         throw kaitai::validation_not_equal_error<std::string>(std::string("\x0A\x05", 2), m_magic, m__io, std::string("/seq/0"));
     }
-    m_sound_count = m__io->read_u1();
-    m__unnamed2 = m__io->read_bytes(1);
+    m_sound_count = m__io->read_u2le();
     m_sound_names = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
     const int l_sound_names = sound_count();
     for (int i = 0; i < l_sound_names; i++) {
         m_sound_names->push_back(std::move(kaitai::kstream::bytes_to_str(m__io->read_bytes(17), "ASCII")));
     }
-    m__unnamed4 = m__io->read_bytes(2);
+    m__unnamed3 = m__io->read_bytes(2);
     m_name = kaitai::kstream::bytes_to_str(m__io->read_bytes(17), "ASCII");
     m_global_parameters = std::unique_ptr<global_parameters_t>(new global_parameters_t(m__io, this, m__root));
     m_global_parameters->_read();
-    m__unnamed7 = m__io->read_bytes(1);
+    m__unnamed6 = m__io->read_bytes(1);
     m_master_pad_to_note_mapping = std::unique_ptr<std::vector<int8_t>>(new std::vector<int8_t>());
     const int l_master_pad_to_note_mapping = 64;
     for (int i = 0; i < l_master_pad_to_note_mapping; i++) {
         m_master_pad_to_note_mapping->push_back(std::move(m__io->read_s1()));
     }
-    m__unnamed9 = m__io->read_bytes(7);
+    m__unnamed8 = m__io->read_bytes(7);
     m_drum1 = std::unique_ptr<drum_t>(new drum_t(m__io, this, m__root));
     m_drum1->_read();
-    m__unnamed11 = m__io->read_bytes(4);
+    m__unnamed10 = m__io->read_bytes(4);
     m_drum2 = std::unique_ptr<drum_t>(new drum_t(m__io, this, m__root));
     m_drum2->_read();
-    m__unnamed13 = m__io->read_bytes(4);
+    m__unnamed12 = m__io->read_bytes(4);
     m_drum3 = std::unique_ptr<drum_t>(new drum_t(m__io, this, m__root));
     m_drum3->_read();
-    m__unnamed15 = m__io->read_bytes(4);
+    m__unnamed14 = m__io->read_bytes(4);
     m_drum4 = std::unique_ptr<drum_t>(new drum_t(m__io, this, m__root));
     m_drum4->_read();
-    m__unnamed17 = m__io->read_bytes(1);
+    m__unnamed16 = m__io->read_bytes(1);
     m_aps_programs = std::unique_ptr<std::vector<std::unique_ptr<aps_program_meta_t>>>(new std::vector<std::unique_ptr<aps_program_meta_t>>());
     {
         int i = 0;
@@ -102,62 +101,61 @@ void mpc2000xl_aps_t::_fetch_instances() {
 
 void mpc2000xl_aps_t::_write() {
     m__io->write_bytes(m_magic);
-    m__io->write_u1(m_sound_count);
-    m__io->write_bytes(m__unnamed2);
+    m__io->write_u2le(m_sound_count);
     if (m_sound_names == nullptr) {
-        throw std::runtime_error("/seq/3: repeated field is not set");
+        throw std::runtime_error("/seq/2: repeated field is not set");
     }
     for (std::vector<std::string>::const_iterator it = m_sound_names->begin(); it != m_sound_names->end(); ++it) {
         m__io->write_bytes((*it));
     }
-    m__io->write_bytes(m__unnamed4);
+    m__io->write_bytes(m__unnamed3);
     m__io->write_bytes(m_name);
     if (m_global_parameters.get() == nullptr) {
-        throw std::runtime_error("/seq/6: nested object is not set");
+        throw std::runtime_error("/seq/5: nested object is not set");
     }
     m_global_parameters.get()->_set_io(m__io);
     m_global_parameters.get()->_write();
-    m__io->write_bytes(m__unnamed7);
+    m__io->write_bytes(m__unnamed6);
     if (m_master_pad_to_note_mapping == nullptr) {
-        throw std::runtime_error("/seq/8: repeated field is not set");
+        throw std::runtime_error("/seq/7: repeated field is not set");
     }
     for (std::vector<int8_t>::const_iterator it = m_master_pad_to_note_mapping->begin(); it != m_master_pad_to_note_mapping->end(); ++it) {
         m__io->write_s1((*it));
     }
-    m__io->write_bytes(m__unnamed9);
+    m__io->write_bytes(m__unnamed8);
     if (m_drum1.get() == nullptr) {
-        throw std::runtime_error("/seq/10: nested object is not set");
+        throw std::runtime_error("/seq/9: nested object is not set");
     }
     m_drum1.get()->_set_io(m__io);
     m_drum1.get()->_write();
-    m__io->write_bytes(m__unnamed11);
+    m__io->write_bytes(m__unnamed10);
     if (m_drum2.get() == nullptr) {
-        throw std::runtime_error("/seq/12: nested object is not set");
+        throw std::runtime_error("/seq/11: nested object is not set");
     }
     m_drum2.get()->_set_io(m__io);
     m_drum2.get()->_write();
-    m__io->write_bytes(m__unnamed13);
+    m__io->write_bytes(m__unnamed12);
     if (m_drum3.get() == nullptr) {
-        throw std::runtime_error("/seq/14: nested object is not set");
+        throw std::runtime_error("/seq/13: nested object is not set");
     }
     m_drum3.get()->_set_io(m__io);
     m_drum3.get()->_write();
-    m__io->write_bytes(m__unnamed15);
+    m__io->write_bytes(m__unnamed14);
     if (m_drum4.get() == nullptr) {
-        throw std::runtime_error("/seq/16: nested object is not set");
+        throw std::runtime_error("/seq/15: nested object is not set");
     }
     m_drum4.get()->_set_io(m__io);
     m_drum4.get()->_write();
-    m__io->write_bytes(m__unnamed17);
+    m__io->write_bytes(m__unnamed16);
     if (m_aps_programs == nullptr) {
-        throw std::runtime_error("/seq/18: repeated field is not set");
+        throw std::runtime_error("/seq/17: repeated field is not set");
     }
     if (m_aps_programs == nullptr) {
-        throw std::runtime_error("/seq/18: repeated field is not set");
+        throw std::runtime_error("/seq/17: repeated field is not set");
     }
     for (std::vector<std::unique_ptr<aps_program_meta_t>>::const_iterator it = m_aps_programs->begin(); it != m_aps_programs->end(); ++it) {
         if ((*it).get() == nullptr) {
-            throw std::runtime_error("/seq/18: nested object is not set");
+            throw std::runtime_error("/seq/17: nested object is not set");
         }
         (*it).get()->_set_io(m__io);
         (*it).get()->_write();
@@ -173,85 +171,82 @@ void mpc2000xl_aps_t::_check() {
     if (!(m_magic == std::string("\x0A\x05", 2))) {
         throw kaitai::validation_not_equal_error<std::string>(std::string("\x0A\x05", 2), m_magic, m__io, std::string("/seq/0"));
     }
-    if (m__unnamed2.size() != static_cast<std::string::size_type>(1)) {
-        throw std::runtime_error("/seq/2: size mismatch");
-    }
     if (m_sound_names == nullptr) {
-        throw std::runtime_error("/seq/3: repeated field is not set");
+        throw std::runtime_error("/seq/2: repeated field is not set");
     }
     if (m_sound_names->size() != static_cast<std::size_t>(sound_count())) {
-        throw std::runtime_error("/seq/3: repeat-expr size mismatch");
+        throw std::runtime_error("/seq/2: repeat-expr size mismatch");
     }
     for (std::vector<std::string>::const_iterator it = m_sound_names->begin(); it != m_sound_names->end(); ++it) {
         if ((*it).size() != static_cast<std::string::size_type>(17)) {
-            throw std::runtime_error("/seq/3: size mismatch");
+            throw std::runtime_error("/seq/2: size mismatch");
         }
     }
-    if (m__unnamed4.size() != static_cast<std::string::size_type>(2)) {
-        throw std::runtime_error("/seq/4: size mismatch");
+    if (m__unnamed3.size() != static_cast<std::string::size_type>(2)) {
+        throw std::runtime_error("/seq/3: size mismatch");
     }
     if (m_name.size() != static_cast<std::string::size_type>(17)) {
-        throw std::runtime_error("/seq/5: size mismatch");
+        throw std::runtime_error("/seq/4: size mismatch");
     }
     if (m_global_parameters.get() == nullptr) {
-        throw std::runtime_error("/seq/6: nested object is not set");
+        throw std::runtime_error("/seq/5: nested object is not set");
     }
     m_global_parameters.get()->_set_io(m__io);
     m_global_parameters.get()->_check();
-    if (m__unnamed7.size() != static_cast<std::string::size_type>(1)) {
-        throw std::runtime_error("/seq/7: size mismatch");
+    if (m__unnamed6.size() != static_cast<std::string::size_type>(1)) {
+        throw std::runtime_error("/seq/6: size mismatch");
     }
     if (m_master_pad_to_note_mapping == nullptr) {
-        throw std::runtime_error("/seq/8: repeated field is not set");
+        throw std::runtime_error("/seq/7: repeated field is not set");
     }
     if (m_master_pad_to_note_mapping->size() != static_cast<std::size_t>(64)) {
-        throw std::runtime_error("/seq/8: repeat-expr size mismatch");
+        throw std::runtime_error("/seq/7: repeat-expr size mismatch");
     }
     for (std::vector<int8_t>::const_iterator it = m_master_pad_to_note_mapping->begin(); it != m_master_pad_to_note_mapping->end(); ++it) {
     }
-    if (m__unnamed9.size() != static_cast<std::string::size_type>(7)) {
-        throw std::runtime_error("/seq/9: size mismatch");
+    if (m__unnamed8.size() != static_cast<std::string::size_type>(7)) {
+        throw std::runtime_error("/seq/8: size mismatch");
     }
     if (m_drum1.get() == nullptr) {
-        throw std::runtime_error("/seq/10: nested object is not set");
+        throw std::runtime_error("/seq/9: nested object is not set");
     }
     m_drum1.get()->_set_io(m__io);
     m_drum1.get()->_check();
-    if (m__unnamed11.size() != static_cast<std::string::size_type>(4)) {
-        throw std::runtime_error("/seq/11: size mismatch");
+    if (m__unnamed10.size() != static_cast<std::string::size_type>(4)) {
+        throw std::runtime_error("/seq/10: size mismatch");
     }
     if (m_drum2.get() == nullptr) {
-        throw std::runtime_error("/seq/12: nested object is not set");
+        throw std::runtime_error("/seq/11: nested object is not set");
     }
     m_drum2.get()->_set_io(m__io);
     m_drum2.get()->_check();
-    if (m__unnamed13.size() != static_cast<std::string::size_type>(4)) {
-        throw std::runtime_error("/seq/13: size mismatch");
+    if (m__unnamed12.size() != static_cast<std::string::size_type>(4)) {
+        throw std::runtime_error("/seq/12: size mismatch");
     }
     if (m_drum3.get() == nullptr) {
-        throw std::runtime_error("/seq/14: nested object is not set");
+        throw std::runtime_error("/seq/13: nested object is not set");
     }
     m_drum3.get()->_set_io(m__io);
     m_drum3.get()->_check();
-    if (m__unnamed15.size() != static_cast<std::string::size_type>(4)) {
-        throw std::runtime_error("/seq/15: size mismatch");
+    if (m__unnamed14.size() != static_cast<std::string::size_type>(4)) {
+        throw std::runtime_error("/seq/14: size mismatch");
     }
     if (m_drum4.get() == nullptr) {
-        throw std::runtime_error("/seq/16: nested object is not set");
+        throw std::runtime_error("/seq/15: nested object is not set");
     }
     m_drum4.get()->_set_io(m__io);
     m_drum4.get()->_check();
-    if (m__unnamed17.size() != static_cast<std::string::size_type>(1)) {
-        throw std::runtime_error("/seq/17: size mismatch");
+    if (m__unnamed16.size() != static_cast<std::string::size_type>(1)) {
+        throw std::runtime_error("/seq/16: size mismatch");
     }
     if (m_aps_programs == nullptr) {
-        throw std::runtime_error("/seq/18: repeated field is not set");
+        throw std::runtime_error("/seq/17: repeated field is not set");
     }
     for (std::vector<std::unique_ptr<aps_program_meta_t>>::const_iterator it = m_aps_programs->begin(); it != m_aps_programs->end(); ++it) {
         const std::size_t i = static_cast<std::size_t>(it - m_aps_programs->begin());
         const aps_program_meta_t* _ = (*it).get();
         if ((*it).get() == nullptr) {
-            throw std::runtime_error("/seq/18: nested object is not set");
+            throw std::runtime_error("/seq/17: nested object is not set");
         }
         (*it).get()->_set_io(m__io);
         (*it).get()->_check();
@@ -671,8 +666,7 @@ mpc2000xl_aps_t::note_t::note_t(kaitai::kstream* p__io, mpc2000xl_aps_t::aps_pro
 }
 
 void mpc2000xl_aps_t::note_t::_read() {
-    m_sound_index = m__io->read_u1();
-    m__unnamed1 = m__io->read_bytes(1);
+    m_sound_index = m__io->read_u2le();
     m_sound_generation_mode = static_cast<mpc2000xl_pgm_t::sound_generation_mode_t>(m__io->read_u1());
     m_velocity_range_lower = m__io->read_u1();
     m_also_play_use_note_1 = m__io->read_u1();
@@ -703,8 +697,7 @@ void mpc2000xl_aps_t::note_t::_fetch_instances() {
 }
 
 void mpc2000xl_aps_t::note_t::_write() {
-    m__io->write_u1(m_sound_index);
-    m__io->write_bytes(m__unnamed1);
+    m__io->write_u2le(m_sound_index);
     m__io->write_u1(static_cast<uint8_t>(m_sound_generation_mode));
     m__io->write_u1(m_velocity_range_lower);
     m__io->write_u1(m_also_play_use_note_1);
@@ -733,9 +726,6 @@ void mpc2000xl_aps_t::note_t::_write() {
 }
 
 void mpc2000xl_aps_t::note_t::_check() {
-    if (m__unnamed1.size() != static_cast<std::string::size_type>(1)) {
-        throw std::runtime_error("/types/note/seq/1: size mismatch");
-    }
     m__dirty = false;
 }
 
