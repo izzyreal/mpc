@@ -31,6 +31,7 @@
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -80,6 +81,75 @@ std::shared_ptr<mpc::disk::MpcFile> installAllBytes(
     newFile->setFileData(mutableBytes);
     disk->initFiles();
     return newFile;
+}
+
+std::string describeFirstByteDiff(
+    const std::vector<char>& lhs,
+    const std::vector<char>& rhs)
+{
+    const auto mismatch = std::mismatch(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    if (mismatch.first == lhs.end() && mismatch.second == rhs.end())
+    {
+        return "no diff";
+    }
+
+    const auto offset = static_cast<size_t>(mismatch.first - lhs.begin());
+    std::ostringstream oss;
+    oss << "first diff at offset " << offset
+        << ": lhs=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << (static_cast<unsigned>(static_cast<unsigned char>(*mismatch.first)))
+        << " rhs=0x"
+        << std::hex << std::setw(2) << std::setfill('0')
+        << (static_cast<unsigned>(static_cast<unsigned char>(*mismatch.second)));
+    return oss.str();
+}
+
+std::vector<int> parseAllSequenceBodyIndexes(const std::vector<char>& bytes)
+{
+    std::stringstream parseStream(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc2000xl_all_t parsed(&parseIo);
+    parsed._read();
+
+    std::vector<int> result;
+    if (parsed.sequences() == nullptr)
+    {
+        return result;
+    }
+
+    for (const auto& sequence : *parsed.sequences())
+    {
+        if (sequence->body() != nullptr)
+        {
+            result.push_back(sequence->body()->index());
+        }
+        else
+        {
+            result.push_back(-1);
+        }
+    }
+
+    return result;
+}
+
+std::string describeSequenceBodyIndexes(const std::vector<int>& indexes)
+{
+    std::ostringstream oss;
+    oss << "[";
+    for (size_t i = 0; i < indexes.size(); ++i)
+    {
+        if (i != 0)
+        {
+            oss << ", ";
+        }
+        oss << indexes[i];
+    }
+    oss << "]";
+    return oss.str();
 }
 
 std::vector<char> buildBroadMutatedAllBytes()
@@ -189,8 +259,8 @@ TEST_CASE("Kaitai MPC2000 ALL parses and rewrites real 2KXL ALL", "[kaitai-all][
     REQUIRE(parsed.sequences() != nullptr);
     REQUIRE(parsed.sequences_metas()->size() >= 2U);
     REQUIRE(parsed.sequences()->size() >= 2U);
-    REQUIRE(parsed.sequences_metas()->at(0)->is_used() == mpc2000xl_all_t::SEQUENCE_IS_USED_TRUE);
-    REQUIRE(parsed.sequences_metas()->at(1)->is_used() == mpc2000xl_all_t::SEQUENCE_IS_USED_TRUE);
+    REQUIRE(parsed.sequences_metas()->at(0)->is_used());
+    REQUIRE(parsed.sequences_metas()->at(1)->is_used());
     std::vector<mpc2000xl_all_t::sequence_body_t*> usedSequenceBodies;
     for (const auto& seq : *parsed.sequences()) {
         if (seq->body() != nullptr) {
@@ -233,6 +303,36 @@ TEST_CASE("Kaitai MPC2000 ALL parses and rewrites real 2KXL ALL", "[kaitai-all][
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
 }
 
+TEST_CASE("Kaitai MPC2000 ALL production save preserves real RESIST.ALL bytes", "[kaitai-all][real-2kxl][resist]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installResourceFile(
+        mpc,
+        "test/RealMpc2000xl/Resist/RESIST.ALL",
+        "RESIST.ALL"
+    );
+    REQUIRE(allFile);
+
+    const auto originalBytes = allFile->getBytes();
+
+    mpc::disk::AllLoader::loadEverythingFromFile(mpc, allFile.get());
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    const auto savedBytes = mpc::file::kaitai::AllIo::save(mpc);
+    const auto originalSequenceBodyIndexes = parseAllSequenceBodyIndexes(originalBytes);
+    const auto savedSequenceBodyIndexes = parseAllSequenceBodyIndexes(savedBytes);
+
+    INFO("original size: " << originalBytes.size());
+    INFO("saved size: " << savedBytes.size());
+    INFO(describeFirstByteDiff(originalBytes, savedBytes));
+    INFO("original sequence bodies: " << describeSequenceBodyIndexes(originalSequenceBodyIndexes));
+    INFO("saved sequence bodies: " << describeSequenceBodyIndexes(savedSequenceBodyIndexes));
+    REQUIRE(savedBytes.size() == originalBytes.size());
+    REQUIRE(std::equal(savedBytes.begin(), savedBytes.end(), originalBytes.begin()));
+}
+
 TEST_CASE("Kaitai MPC2000 ALL saves and reloads ShouldLoadSeq21 semantics", "[kaitai-all]")
 {
     mpc::Mpc mpc;
@@ -270,8 +370,8 @@ TEST_CASE("Kaitai MPC2000 ALL saves and reloads ShouldLoadSeq21 semantics", "[ka
     parsed._read();
 
     REQUIRE(parsed.sequences_metas() != nullptr);
-    REQUIRE(parsed.sequences_metas()->at(0)->is_used() != mpc2000xl_all_t::SEQUENCE_IS_USED_FALSE);
-    REQUIRE(parsed.sequences_metas()->at(20)->is_used() != mpc2000xl_all_t::SEQUENCE_IS_USED_FALSE);
+    REQUIRE(parsed.sequences_metas()->at(0)->is_used());
+    REQUIRE(parsed.sequences_metas()->at(20)->is_used());
     REQUIRE(parsed.misc() != nullptr);
     REQUIRE(parsed.misc()->midi_switch() != nullptr);
     REQUIRE(parsed.misc()->midi_switch()->at(0)->controller() == 0xFF);
