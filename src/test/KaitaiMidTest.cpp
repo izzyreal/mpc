@@ -2,6 +2,7 @@
 
 #include "TestMpc.hpp"
 
+#include "disk/AllLoader.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/MidIo.hpp"
@@ -1184,6 +1185,109 @@ TEST_CASE("Kaitai standard MIDI production load preserves broad sequence semanti
     };
     REQUIRE(collectParsedNotes(sequence->getTrack(0)) == expectedTrack0);
     REQUIRE(collectParsedNotes(sequence->getTrack(1)) == expectedTrack1);
+}
+
+TEST_CASE("Kaitai standard MIDI preserves zero-valued filter note variation", "[kaitai-mid]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto sequence = sequencer->getSequence(0);
+    sequence->init(1);
+    sequence->setName("MIDFLT0");
+    stateManager->drainQueue();
+
+    auto track = sequence->getTrack(0);
+    track->setUsedIfCurrentlyUnused();
+    insertNote(track, 0, 37, 100, 24, mpc::NoteVariationTypeFilter, 0);
+    stateManager->drainQueue();
+
+    auto reloadSequence = loadSequenceWithMidIo(mpc, saveSequenceWithMidIo(sequence), "MIDFLT0.MID");
+    auto reloadTrack = reloadSequence->getTrack(0);
+
+    REQUIRE(reloadTrack->getEvents().size() == 1);
+    requireDetailedNote(
+        reloadTrack,
+        0,
+        0,
+        37,
+        100,
+        24,
+        mpc::NoteVariationTypeFilter,
+        0
+    );
+}
+
+TEST_CASE("Kaitai standard MIDI preserves default-valued non-tune note variation", "[kaitai-mid]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto sequence = sequencer->getSequence(0);
+    sequence->init(1);
+    sequence->setName("MIDFLT50");
+    stateManager->drainQueue();
+
+    auto track = sequence->getTrack(0);
+    track->setUsedIfCurrentlyUnused();
+    insertNote(track, 0, 37, 100, 24, mpc::NoteVariationTypeFilter, 50);
+    stateManager->drainQueue();
+
+    auto reloadSequence = loadSequenceWithMidIo(mpc, saveSequenceWithMidIo(sequence), "MIDFLT50.MID");
+    auto reloadTrack = reloadSequence->getTrack(0);
+
+    REQUIRE(reloadTrack->getEvents().size() == 1);
+    requireDetailedNote(
+        reloadTrack,
+        0,
+        0,
+        37,
+        100,
+        24,
+        mpc::NoteVariationTypeFilter,
+        50
+    );
+}
+
+TEST_CASE("Kaitai standard MIDI preserves RESIST INTRO note variation semantics", "[kaitai-mid][resist]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installMidiResourceFile(
+        mpc,
+        "test/RealMpc2000xl/Resist/RESIST.ALL",
+        "RESIST.ALL"
+    );
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(mpc, allFile.get());
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sourceSequence = mpc.getSequencer()->getSequence(0);
+    REQUIRE(sourceSequence->isUsed());
+    REQUIRE(sourceSequence->getName() == "Intro");
+
+    const auto sourceNotes = collectDetailedParsedNotes(sourceSequence->getTrack(0));
+    auto reloadedSequence = loadSequenceWithMidIo(mpc, saveSequenceWithMidIo(sourceSequence), "INTRO.MID");
+    const auto reloadedNotes = collectDetailedParsedNotes(reloadedSequence->getTrack(0));
+
+    REQUIRE(reloadedNotes.size() == sourceNotes.size());
+    for (size_t i = 0; i < sourceNotes.size(); ++i)
+    {
+        CAPTURE(i);
+        CAPTURE(sourceNotes[i].tick, reloadedNotes[i].tick);
+        CAPTURE(sourceNotes[i].note, reloadedNotes[i].note);
+        CAPTURE(sourceNotes[i].velocity, reloadedNotes[i].velocity);
+        CAPTURE(sourceNotes[i].duration, reloadedNotes[i].duration);
+        CAPTURE(sourceNotes[i].variationType, reloadedNotes[i].variationType);
+        CAPTURE(sourceNotes[i].variationValue, reloadedNotes[i].variationValue);
+        REQUIRE(reloadedNotes[i] == sourceNotes[i]);
+    }
 }
 
 TEST_CASE("Kaitai standard MIDI roundtrips MPC2000XL meta and channel events", "[kaitai-mid]")
