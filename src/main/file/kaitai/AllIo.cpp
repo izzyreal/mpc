@@ -129,7 +129,8 @@ std::unique_ptr<all_t::defaults_t> makeDefaults(mpc::Mpc& mpc, all_t& root)
     constexpr size_t kUnknownNumberOffset = 32;
     constexpr size_t kDefaultsUnknown2Offset = 48;
     constexpr size_t kLoopEnabledOffset = 52;
-    constexpr size_t kDeviceNamesOffset = 120;
+constexpr size_t kDeviceNamesOffset = 120;
+constexpr size_t kDefaultsUnknown2Length = 68;
     constexpr size_t kTrackNamesOffset = 384;
     constexpr size_t kDevicesOffset = 1408;
     constexpr size_t kBusesOffset = 1472;
@@ -176,7 +177,11 @@ std::unique_ptr<all_t::defaults_t> makeDefaults(mpc::Mpc& mpc, all_t& root)
         bytes[kUnknownNumberOffset + i * 4 + 3] = static_cast<char>((unknownNumber >> 24) & 0xFF);
     }
 
-    std::copy(std::begin(kDefaultsUnknown2), std::end(kDefaultsUnknown2), bytes.begin() + static_cast<std::ptrdiff_t>(kDefaultsUnknown2Offset));
+    std::copy(
+        std::begin(kDefaultsUnknown2),
+        std::begin(kDefaultsUnknown2) + static_cast<std::ptrdiff_t>(kDefaultsUnknown2Length),
+        bytes.begin() + static_cast<std::ptrdiff_t>(kDefaultsUnknown2Offset)
+    );
     bytes[kLoopEnabledOffset] = static_cast<char>(userScreen->isLoopEnabled() ? 0x01 : 0x00);
 
     for (int i = 0; i < 33; ++i)
@@ -408,6 +413,9 @@ std::unique_ptr<all_t::step_edit_options_t> makeStepEditOptions(mpc::Mpc& mpc, a
     return stepEditOptions;
 }
 
+int countSequenceMetaSegments(mpc::sequencer::Sequence& seq);
+int countSequenceBodySegments(mpc::sequencer::Sequence& seq);
+
 std::unique_ptr<std::vector<std::unique_ptr<all_t::sequence_meta_t>>> makeSequenceMetas(mpc::Mpc& mpc, all_t& root)
 {
     auto result = std::make_unique<std::vector<std::unique_ptr<all_t::sequence_meta_t>>>();
@@ -419,7 +427,17 @@ std::unique_ptr<std::vector<std::unique_ptr<all_t::sequence_meta_t>>> makeSequen
         auto meta = std::make_unique<all_t::sequence_meta_t>(nullptr, &root, &root);
         const auto seq = sequencer->getSequence(static_cast<int>(i));
         meta->set_name(padRight(seq->getName(), kVisibleNameLength));
-        meta->set_is_used(seq->isUsed() ? all_t::SEQUENCE_IS_USED_TRUE : all_t::SEQUENCE_IS_USED_FALSE);
+        auto segmentCount = countSequenceMetaSegments(*seq);
+        if ((segmentCount & 1) != 0)
+        {
+            segmentCount--;
+        }
+        auto lastEventIndex = 0;
+        if (seq->isUsed())
+        {
+            lastEventIndex = 641 + std::max(0, segmentCount / 2);
+        }
+        meta->set_last_event_index(static_cast<uint16_t>(lastEventIndex));
         result->push_back(std::move(meta));
     }
 
@@ -473,7 +491,36 @@ std::unique_ptr<std::vector<std::unique_ptr<all_t::song_t>>> makeSongs(mpc::Mpc&
     return result;
 }
 
-int countSequenceEventSegments(mpc::sequencer::Sequence& seq)
+int countSequenceMetaSegments(mpc::sequencer::Sequence& seq)
+{
+    int segmentCount = 0;
+    for (const auto& track : seq.getTracks())
+    {
+        if (track->getIndex() > 63)
+        {
+            break;
+        }
+
+        for (const auto& event : track->getEvents())
+        {
+            switch (event->handle->type)
+            {
+                case mpc::sequencer::EventType::SystemExclusive:
+                    segmentCount += 2;
+                    break;
+                case mpc::sequencer::EventType::Mixer:
+                    segmentCount += 2;
+                    break;
+                default:
+                    segmentCount += 1;
+                    break;
+            }
+        }
+    }
+    return segmentCount;
+}
+
+int countSequenceBodySegments(mpc::sequencer::Sequence& seq)
 {
     int segmentCount = 0;
     for (const auto& track : seq.getTracks())
@@ -801,8 +848,8 @@ std::vector<char> makeSequenceEventChunk(mpc::sequencer::Sequence& seq)
 
 std::vector<char> makeSequenceBytes(mpc::sequencer::Sequence& seq, int number)
 {
-    const auto segmentCountLastEventIndex = countSequenceEventSegments(seq);
-    auto segmentCount = segmentCountLastEventIndex;
+    const auto segmentCountLastEventIndex = countSequenceMetaSegments(seq);
+    auto segmentCount = countSequenceBodySegments(seq);
     const auto terminatorCount = (segmentCount & 1) == 0 ? 2 : 1;
     auto bytes = std::vector<char>(
         kSequenceHeaderLength + segmentCount * kSequenceEventSegmentLength + terminatorCount * kSequenceEventSegmentLength,
@@ -914,14 +961,29 @@ std::unique_ptr<std::vector<std::unique_ptr<all_t::sequence_t>>> makeSequences(m
 
     auto sequencer = mpc.getSequencer();
     const auto usedSequences = sequencer->getUsedSequences();
-    const auto usedSequenceIndexes = sequencer->getUsedSequenceIndexes();
 
-    result->reserve(usedSequences.size());
-
-    for (size_t i = 0; i < usedSequences.size(); ++i)
+    if (usedSequences.empty())
     {
-        auto sequenceBytes = makeSequenceBytes(*usedSequences[i], usedSequenceIndexes[i] + 1);
+        return result;
+    }
+
+    result->reserve(usedSequences.size() * 2);
+
+    for (size_t usedSequenceCursor = 0; usedSequenceCursor < usedSequences.size(); ++usedSequenceCursor)
+    {
+        const auto sequenceIndex = sequencer->getUsedSequenceIndexes()[usedSequenceCursor];
+        auto sequenceBytes =
+            makeSequenceBytes(*usedSequences[usedSequenceCursor], sequenceIndex + 1);
         result->push_back(parseSection<all_t::sequence_t>(sequenceBytes, root));
+
+        // On disk, an even body segment count is followed by an extra 0xFF
+        // terminator segment that Kaitai parses as an empty sequence record.
+        if ((countSequenceBodySegments(*usedSequences[usedSequenceCursor]) & 1) == 0)
+        {
+            result->push_back(
+                parseSection<all_t::sequence_t>(std::vector<char>(8, static_cast<char>(0xFF)), root)
+            );
+        }
     }
 
     return result;
@@ -963,7 +1025,7 @@ sequence_meta_infos_or_error AllIo::loadSequenceMetaInfos(mpc::Mpc &mpc, mpc::di
     {
         result.push_back(
             {
-                sequenceMeta->is_used() != mpc2000xl_all_t::SEQUENCE_IS_USED_FALSE,
+                sequenceMeta->is_used(),
                 sequenceMeta->name()
             }
         );

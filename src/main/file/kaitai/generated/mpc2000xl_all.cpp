@@ -2679,11 +2679,12 @@ mpc2000xl_all_t::sequence_meta_t::sequence_meta_t(kaitai::kstream* p__io, mpc200
     m__parent = p__parent;
     m__root = p__root;
     m__dirty = false;
+    f_is_used = false;
 }
 
 void mpc2000xl_all_t::sequence_meta_t::_read() {
     m_name = kaitai::kstream::bytes_to_str(m__io->read_bytes(16), "ASCII");
-    m_is_used = static_cast<mpc2000xl_all_t::sequence_is_used_t>(m__io->read_u2le());
+    m_last_event_index = m__io->read_u2le();
     m__dirty = false;
 }
 
@@ -2692,7 +2693,7 @@ void mpc2000xl_all_t::sequence_meta_t::_fetch_instances() {
 
 void mpc2000xl_all_t::sequence_meta_t::_write() {
     m__io->write_bytes(m_name);
-    m__io->write_u2le(static_cast<uint16_t>(m_is_used));
+    m__io->write_u2le(m_last_event_index);
     _fetch_instances();
     m__dirty = false;
 }
@@ -2705,6 +2706,14 @@ void mpc2000xl_all_t::sequence_meta_t::_check() {
 }
 
 mpc2000xl_all_t::sequence_meta_t::~sequence_meta_t() {}
+
+bool mpc2000xl_all_t::sequence_meta_t::is_used() {
+    if (f_is_used)
+        return m_is_used;
+    f_is_used = true;
+    m_is_used = last_event_index() != 0;
+    return m_is_used;
+}
 
 mpc2000xl_all_t::sequencer_t::sequencer_t(kaitai::kstream* p__io, mpc2000xl_all_t* p__parent, mpc2000xl_all_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
