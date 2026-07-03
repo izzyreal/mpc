@@ -198,20 +198,8 @@ std::string hexByte(const int value)
 
 bool isDefaultNoteVariation(const mpc::sequencer::EventData& event)
 {
-    if (event.noteVariationType == mpc::NoteVariationTypeTune)
-    {
-        return event.noteVariationValue == mpc::DefaultNoteVariationValue;
-    }
-    if (event.noteVariationType == mpc::NoteVariationTypeDecay ||
-        event.noteVariationType == mpc::NoteVariationTypeAttack)
-    {
-        return event.noteVariationValue == 0;
-    }
-    if (event.noteVariationType == mpc::NoteVariationTypeFilter)
-    {
-        return event.noteVariationValue == 50;
-    }
-    return false;
+    return event.noteVariationType == mpc::NoteVariationTypeTune &&
+           event.noteVariationValue == mpc::DefaultNoteVariationValue;
 }
 
 std::string sequenceParamsText(const mpc::sequencer::Sequence& sequence)
