@@ -1760,18 +1760,22 @@ public:
         void _write();
         void _check();
         ~sequence_meta_t();
+        bool is_used();
+        void _invalidate_is_used() { f_is_used = false; }
         std::string name() const { return m_name; }
-        void set_name(std::string _v) { m__dirty = true; m_name = std::move(_v); }
-        sequence_is_used_t is_used() const { return m_is_used; }
-        void set_is_used(sequence_is_used_t _v) { m__dirty = true; m_is_used = std::move(_v); }
+        void set_name(std::string _v) { m__dirty = true; f_is_used = false; m_name = std::move(_v); }
+        uint16_t last_event_index() const { return m_last_event_index; }
+        void set_last_event_index(uint16_t _v) { m__dirty = true; f_is_used = false; m_last_event_index = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
-        void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
+        void set__root(mpc2000xl_all_t* _v) { m__dirty = true; f_is_used = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
-        void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; m__parent = std::move(_v); }
+        void set__parent(mpc2000xl_all_t* _v) { m__dirty = true; f_is_used = false; m__parent = std::move(_v); }
 
     private:
+        bool f_is_used;
+        bool m_is_used;
         std::string m_name;
-        sequence_is_used_t m_is_used;
+        uint16_t m_last_event_index;
         mpc2000xl_all_t* m__root;
         mpc2000xl_all_t* m__parent;
     };

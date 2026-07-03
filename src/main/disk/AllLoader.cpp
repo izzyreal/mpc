@@ -288,7 +288,7 @@ void AllLoader::loadEverythingFromCanonicalBytes(
     auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
 
     userScreen->setLastBar(static_cast<int>(defaults->bar_count()) - 1);
-    userScreen->setLoop(defaults->unknown2()[4] == 0x01);
+    userScreen->setLoop(defaults->unknown2()[4] != 0x00);
     userScreen->setBus(mpc::sequencer::busIndexToBusType(static_cast<int>(defaults->buses()->at(0))));
 
     mpcSequencer->setDefaultSequenceName(bytesUntilNull(defaults->sequence_name()));
