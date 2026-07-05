@@ -156,7 +156,7 @@ Program::getPadIndexFromNote(const DrumNoteNumber note) const
 
     for (int8_t i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        if (pads[i]->getNote() == note)
+        if (getSnapshot(index).getPad(ProgramPadIndex(i)).note == note)
         {
             return ProgramPadIndex{i};
         }
@@ -208,7 +208,7 @@ void Program::initPadAssign() const
 
 mpc::DrumNoteNumber Program::getNoteFromPad(const ProgramPadIndex i) const
 {
-    return pads[i]->getNote();
+    return getSnapshot(index).getPad(i).note;
 }
 
 std::vector<mpc::ProgramPadIndex>
@@ -218,7 +218,7 @@ Program::getPadIndicesFromNote(const DrumNoteNumber note) const
 
     for (int i = 0; i < pads.size(); i++)
     {
-        if (pads[i]->getNote() == note)
+        if (getSnapshot(index).getPad(ProgramPadIndex(i)).note == note)
         {
             result.push_back(ProgramPadIndex(i));
         }

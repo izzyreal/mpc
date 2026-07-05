@@ -4,6 +4,20 @@
  "fblabels" : [ null, null, "REPLAC", "CANCEL", "RENAME", null],
  "fbtypes" : [ null, null, 1, 0, 1, null ]
 },
+"load-a-set-sound":
+{
+ "labels" : [ "MPC60 pad:" ],
+ "x" : [ 64 ],
+ "y" : [ 21 ],
+ "tfsize" : [ 90 ],
+ "parameters" : [ "mpc60-pad" ],
+ "infowidgets" : [ "file" ],
+ "infox" : [ 95 ],
+ "infoy" : [ 35 ],
+ "infosize" : [ 126 ],
+ "fblabels" : [ null, null, null, "CANCEL", "LOAD", null ],
+ "fbtypes" : [ null, null, null, 0, 1, null ]
+},
 "vmpc-record-jam":
 {
  "fblabels" : [ null, null, null, "CANCEL", "OK", null],

@@ -2,6 +2,8 @@
 #include "Mpc.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "sampler/Pad.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -99,6 +101,8 @@ void VmpcSettingsScreen::setInitialPadMapping(const int i)
     }
 
     initialPadMapping = i;
+    // Future PROGRAM/MASTER init-pad-assign operations copy from this cache.
+    *mpc.getSampler()->getInitMasterPadAssign() = sampler::Pad::getPadNotes(mpc);
 
     displayInitialPadMapping();
 }

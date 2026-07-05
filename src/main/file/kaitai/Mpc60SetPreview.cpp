@@ -1,0 +1,151 @@
+#include "Mpc60SetPreview.hpp"
+
+#include "disk/MpcFile.hpp"
+#include "file/kaitai/generated/mpc60_set_v1.h"
+
+#include <kaitai/kaitaistream.h>
+
+#include <array>
+#include <iomanip>
+#include <sstream>
+#include <stdexcept>
+#include <string_view>
+
+namespace
+{
+    constexpr uint8_t kNoSoundDirectoryEntry = 255;
+
+    std::string trimRightSpaces(std::string value)
+    {
+        while (!value.empty() && value.back() == ' ')
+        {
+            value.pop_back();
+        }
+        return value;
+    }
+
+    constexpr std::array<std::string_view, 34> kMpc60PadNames{
+        "hiht_clsd", "hiht_medm", "hiht_open", "snr1", "snr2", "bass",
+        "tom1",      "tom2",      "tom3",      "tom4", "rid1", "rid2",
+        "crs1",      "crs2",      "prc1",      "prc2", "prc3", "prc4",
+        "dr01",      "dr02",      "dr03",      "dr04", "dr05", "dr06",
+        "dr07",      "dr08",      "dr09",      "dr10", "dr11", "dr12",
+        "dr13",      "dr14",      "dr15",      "dr16",
+    };
+
+    std::string formatSourceSlotLabel(const char bank, const int slotNumber)
+    {
+        std::ostringstream oss;
+        oss << bank << std::setw(2) << std::setfill('0') << slotNumber;
+        return oss.str();
+    }
+}
+
+const mpc::file::kaitai::Mpc60SetPreviewEntry *
+mpc::file::kaitai::Mpc60SetPreview::assignedSoundAtMpc60Pad(
+    const size_t padIndex) const
+{
+    if (padIndex >= soundDirectoryEntryIndexByMpc60Pad.size())
+    {
+        return nullptr;
+    }
+
+    const auto soundIndex = soundDirectoryEntryIndexByMpc60Pad[padIndex];
+    if (soundIndex >= soundDirectoryEntries.size())
+    {
+        return nullptr;
+    }
+
+    return &soundDirectoryEntries[soundIndex];
+}
+
+std::string
+mpc::file::kaitai::Mpc60SetPreview::mpc60PadName(const size_t padIndex)
+{
+    if (padIndex >= kMpc60PadNames.size())
+    {
+        return {};
+    }
+
+    return std::string(kMpc60PadNames[padIndex]);
+}
+
+std::string
+mpc::file::kaitai::Mpc60SetPreview::mpc60SourceSlotLabel(
+    const size_t padIndex)
+{
+    if (padIndex <= 2)
+    {
+        return formatSourceSlotLabel('A', 1);
+    }
+
+    if (padIndex <= 17)
+    {
+        return formatSourceSlotLabel('A', static_cast<int>(padIndex) - 1);
+    }
+
+    if (padIndex <= 33)
+    {
+        return formatSourceSlotLabel('B', static_cast<int>(padIndex) - 17);
+    }
+
+    return {};
+}
+
+mpc::file::kaitai::Mpc60SetPreview
+mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
+    const std::shared_ptr<mpc::disk::MpcFile> &file)
+{
+    return loadPreview(file->getBytes());
+}
+
+mpc::file::kaitai::Mpc60SetPreview
+mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
+    const std::vector<char> &bytes)
+{
+    std::stringstream parseStream(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    ::kaitai::kstream parseIo(&parseStream);
+    mpc60_set_v1_t parsed(&parseIo);
+    parsed._read();
+
+    Mpc60SetPreview result;
+    result.totalNumberOfSampleWords = parsed.total_number_of_sample_words()->value();
+    result.useMasterMixData =
+        parsed.use_master_mix_data() == mpc60_set_v1_t::USE_MASTER_MIX_DATA_USE;
+
+    result.soundDirectoryEntries.reserve(parsed.sound_directory_entry()->size());
+    for (const auto &entry : *parsed.sound_directory_entry())
+    {
+        Mpc60SetPreviewEntry previewEntry;
+        previewEntry.name = trimRightSpaces(entry->name());
+        previewEntry.sharedSoundLink = entry->shared_sound_link();
+        previewEntry.lengthInSamples = entry->length_in_samples();
+        previewEntry.startAddressForPlaying = entry->start_address_for_playing();
+        previewEntry.soundDuration = entry->sound_duration();
+        previewEntry.requestedStereoMixVolume =
+            entry->requested_stereo_mix_volume();
+        previewEntry.requestedStereoMixPan = entry->requested_stereo_mix_pan();
+        previewEntry.isHihat =
+            entry->sound_characteristics()->normal_or_hihat_sound() ==
+            mpc60_set_v1_t::NORMAL_OR_HIHAT_HIHAT;
+        result.soundDirectoryEntries.push_back(std::move(previewEntry));
+    }
+
+    result.soundDirectoryEntryIndexByMpc60Pad.reserve(
+        parsed.sound_map()->size()
+    );
+    for (const auto entryIndex : *parsed.sound_map())
+    {
+        if (entryIndex != kNoSoundDirectoryEntry &&
+            entryIndex >= result.soundDirectoryEntries.size())
+        {
+            throw std::runtime_error("MPC60 SET sound_map entry index out of range");
+        }
+        result.soundDirectoryEntryIndexByMpc60Pad.push_back(entryIndex);
+    }
+
+    return result;
+}
