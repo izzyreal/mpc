@@ -47,6 +47,10 @@ namespace mpc::concurrency
             callbackQueue.enqueue(std::move(cb));
         }
 
+        // Must be called by the owner thread for this state exchange. For
+        // PerformanceManager, that is the audio thread; other threads should
+        // enqueue messages and, if needed, enqueue a callback to observe
+        // completion after the owner thread has published the new state.
         void drainQueue() noexcept
         {
             alignas(Message) unsigned char msgBuf[sizeof(Message)];

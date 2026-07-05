@@ -21,6 +21,7 @@ The generator we use is the C++ write-capable compiler from:
 - `standard_midi_file_with_running_status.ksy`
 - `mpc2000xl.mid.ksy`
 - `mpc2000xl.all.ksy`
+- `mpc60.set.v1.ksy`
 
 ## Regenerate parsers
 
@@ -38,7 +39,8 @@ From anywhere:
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.aps.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/standard_midi_file_with_running_status.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.mid.ksy \
-  /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.ksy
+  /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy
 ```
 
 ## Typical update flow
@@ -66,7 +68,7 @@ cmake --build build --target mpc-tests --config Debug
 Run the focused Kaitai suite:
 
 ```sh
-./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-snd],[kaitai-pgm],[kaitai-aps],[kaitai-mid],[kaitai-all]"
+./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-snd],[kaitai-pgm],[kaitai-aps],[kaitai-mid],[kaitai-all],[kaitai-set]"
 ```
 
 Run one format only if needed:
@@ -77,6 +79,7 @@ Run one format only if needed:
 ./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-snd]"
 ./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-mid]"
 ./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-all]"
+./build/Debug/mpc-tests.app/Contents/MacOS/mpc-tests "[kaitai-set]"
 ```
 
 ## Notes

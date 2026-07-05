@@ -98,6 +98,10 @@
     X(screens, SaveScreen, "save")                                             \
     X(screens::window, DirectoryScreen, "directory")                           \
     X(screens::window, LoadAProgramScreen, "load-a-program")                   \
+    X(screens::window, LoadASetScreen, "load-a-set")                           \
+    X(screens::window, ConversionTableScreen, "conversion-table")              \
+    X(screens::window, LoadASetReplaceAddScreen, "load-a-set-replace-add")     \
+    X(screens::window, LoadASetSoundScreen, "load-a-set-sound")                \
     X(screens::window, LoadASequenceScreen, "load-a-sequence")                 \
     X(screens::window, LoadASequenceFromAllScreen, "load-a-sequence-from-all") \
     X(screens::window, LoadASoundScreen, "load-a-sound")                       \
