@@ -93,6 +93,31 @@
  "fblabels" : [ null, null, "CLEAR", "CANCEL", "LOAD", null ],
  "fbtypes" : [ null, null, 1, 0, 1, null ]
 },
+"load-a-set":
+{
+ "fblabels" : [ null, null, "SOUND", "CANCEL", "LOAD", null ],
+ "fbtypes" : [ null, null, 1, 0, 1, null ]
+},
+"conversion-table":
+{
+ "labels" : [ "MPC60 Pad:", "Becomes note:" ],
+ "x" : [ 67, 67 ],
+ "y" : [ 15, 37 ],
+ "tfsize" : [ 90, 36 ],
+ "parameters" : [ "mpc60-pad", "becomes-note" ],
+ "fblabels" : [ null, null, null, "CANCEL", "DO IT", null ],
+ "fbtypes" : [ null, null, null, 0, 1, null ]
+},
+"load-a-set-replace-add":
+{
+ "labels" : [ ":" ],
+ "x" : [ 77 ],
+ "y" : [ 21 ],
+ "tfsize" : [ 60 ],
+ "parameters" : [ "load-replace-sound" ],
+ "fblabels" : [ null, null, "CLEAR", "CANCEL", "LOAD", null ],
+ "fbtypes" : [ null, null, 1, 0, 1, null ]
+},
 "save-all-file":
 {
  "labels" : [ "File\u00CEname:" ],
