@@ -46,7 +46,7 @@ namespace mpc::performance
         p.optionalNoteA = s->getOptionalNoteA();
         p.optionalNoteB = s->getOptionalNoteB();
         p.sliderParameterNumber = s->getSliderParameterNumber();
-        p.soundGenerationMode = s->getSoundGenerationMode();
+        p.soundGenerationMode = sampler::toRaw(s->getSoundGenerationMode());
 
         p.stereoMixer.level = s->getStereoMixer()->getLevel();
         p.stereoMixer.panning = s->getStereoMixer()->getPanning();
@@ -90,7 +90,7 @@ namespace mpc::performance
 
             perfNoteParameters.soundIndex = pgmNoteParameters->getSoundIndex();
             perfNoteParameters.soundGenerationMode =
-                pgmNoteParameters->getSoundGenerationMode();
+                sampler::toRaw(pgmNoteParameters->getSoundGenerationMode());
             perfNoteParameters.velocityRangeLower =
                 pgmNoteParameters->getVelocityRangeLower();
             perfNoteParameters.optionalNoteA =

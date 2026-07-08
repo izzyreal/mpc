@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IntTypes.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 #include "performance/PerformanceMessage.hpp"
 
@@ -91,7 +92,7 @@ namespace mpc::sampler
 
         int getSoundIndex() const;
 
-        int getSoundGenerationMode() const;
+        SoundGenerationMode getSoundGenerationMode() const;
 
         DrumNoteNumber getOptionalNoteA() const;
 

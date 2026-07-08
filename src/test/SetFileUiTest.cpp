@@ -203,7 +203,7 @@ TEST_CASE(".SET conversion table resolves pad names through DRUM1 program",
           "[load-set][ui]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareSetFile(mpc);
 
     auto layeredScreen = mpc.getLayeredScreen();
