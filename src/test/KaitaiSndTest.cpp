@@ -71,10 +71,12 @@ namespace
         assertions(parsed);
     }
 
-    std::shared_ptr<MpcFile> writeTempSndFile(const std::vector<char> &bytes,
+    std::shared_ptr<MpcFile> writeTempSndFile(mpc::Mpc &mpc,
+                                              const std::vector<char> &bytes,
                                               const std::string &fileName)
     {
-        const auto tempDir = mpc_fs::temp_directory_path().value_or(mpc_fs::path{});
+        const auto tempDir = mpc.paths->getDocuments()->tempPath();
+        (void) mpc_fs::create_directories(tempDir);
         const auto path = tempDir / fileName;
         auto file = std::make_shared<MpcFile>(path);
         auto bytesCopy = bytes;
@@ -86,7 +88,7 @@ namespace
                                                              const std::vector<char> &bytes,
                                                              const std::string &fileName)
     {
-        auto file = writeTempSndFile(bytes, fileName);
+        auto file = writeTempSndFile(mpc, bytes, fileName);
         auto sound = mpc.getSampler()->addSound();
         SoundLoaderResult result;
         SoundLoader loader(mpc, false);
