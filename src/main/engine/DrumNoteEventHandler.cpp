@@ -14,6 +14,7 @@
 
 #include "MpcSpecs.hpp"
 #include "sequencer/Bus.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 
 #include <utility>
 
@@ -31,6 +32,8 @@ static constexpr float AUX_PAN_RIGHT = 1.0f;
 
 namespace
 {
+    using mpc::sampler::SoundGenerationMode;
+
     void handleMuteGroups(const performance::NoteParameters &noteParameters,
                           const int drumIndex,
                           const std::vector<std::shared_ptr<Voice>> *voices)
@@ -52,6 +55,46 @@ namespace
             }
         }
     }
+
+    struct SwitchedNoteResolution
+    {
+        DrumNoteNumber note{NoDrumNoteAssigned};
+        bool useOptionalB = false;
+    };
+
+    std::optional<SwitchedNoteResolution> resolveSwitchedNote(
+        const performance::NoteParameters &noteParameters,
+        const DrumNoteOnContext &context)
+    {
+        const auto mode = mpc::sampler::soundGenerationModeFromRaw(
+            noteParameters.soundGenerationMode);
+
+        if (mode != SoundGenerationMode::VelocitySwitch &&
+            mode != SoundGenerationMode::DecaySwitch)
+        {
+            return std::nullopt;
+        }
+
+        const int switchValue = mode == SoundGenerationMode::VelocitySwitch
+                                    ? context.velocity
+                                    : (context.varType == NoteVariationTypeDecay.get()
+                                           ? context.varValue
+                                           : noteParameters.decay);
+
+        if (noteParameters.optionalNoteB != NoDrumNoteAssigned &&
+            switchValue > noteParameters.velocityRangeUpper)
+        {
+            return SwitchedNoteResolution{noteParameters.optionalNoteB, true};
+        }
+
+        if (noteParameters.optionalNoteA != NoDrumNoteAssigned &&
+            switchValue > noteParameters.velocityRangeLower)
+        {
+            return SwitchedNoteResolution{noteParameters.optionalNoteA, false};
+        }
+
+        return std::nullopt;
+    }
 } // namespace
 
 void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
@@ -64,6 +107,32 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
     const auto program = c.drumBus->getPerformanceProgram();
     const auto np = program.getNoteParameters(c.note);
+
+    if (c.firstGeneration)
+    {
+        if (const auto switched = resolveSwitchedNote(np, c);
+            switched && switched->note != c.note)
+        {
+            auto switchedCtx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
+                c.noteEventId, c.drum, c.drumBus, c.sampler, c.mixer,
+                c.mixerSetupScreen, c.voices, switched->note, c.velocity,
+                c.varType, c.varValue, c.frameOffset, false, c.startTick,
+                c.durationFrames);
+
+            noteOn(switchedCtx);
+
+            if (switched->useOptionalB)
+            {
+                c.setOptB(c.note, switched->note);
+            }
+            else
+            {
+                c.setOptA(c.note, switched->note);
+            }
+
+            return;
+        }
+    }
 
     handleMuteGroups(np, c.drum.drumBusIndex, c.voices);
 
@@ -162,7 +231,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
                 c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId,
                 c.drum.programIndex);
 
-    if (c.firstGeneration && np.soundGenerationMode == 1)
+    if (c.firstGeneration &&
+        mpc::sampler::soundGenerationModeFromRaw(np.soundGenerationMode) ==
+            SoundGenerationMode::Simult)
     {
         int optA = np.optionalNoteA;
         int optB = np.optionalNoteB;

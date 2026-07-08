@@ -18,7 +18,6 @@
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
-
 #include <stdexcept>
 
 using namespace mpc::lcdgui;

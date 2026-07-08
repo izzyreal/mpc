@@ -25,51 +25,51 @@ const std::set<mpc60_set_v1_t::filter_range_t> mpc60_set_v1_t::_values_filter_ra
 bool mpc60_set_v1_t::_is_defined_filter_range_t(mpc60_set_v1_t::filter_range_t v) {
     return mpc60_set_v1_t::_values_filter_range_t.find(v) != mpc60_set_v1_t::_values_filter_range_t.end();
 }
+const std::set<mpc60_set_v1_t::mpc60_pad_t> mpc60_set_v1_t::_values_mpc60_pad_t{
+    mpc60_set_v1_t::MPC60_PAD_HIHT_CLSD,
+    mpc60_set_v1_t::MPC60_PAD_HIHT_MEDM,
+    mpc60_set_v1_t::MPC60_PAD_HIHT_OPEN,
+    mpc60_set_v1_t::MPC60_PAD_SNR1,
+    mpc60_set_v1_t::MPC60_PAD_SNR2,
+    mpc60_set_v1_t::MPC60_PAD_BASS,
+    mpc60_set_v1_t::MPC60_PAD_TOM1,
+    mpc60_set_v1_t::MPC60_PAD_TOM2,
+    mpc60_set_v1_t::MPC60_PAD_TOM3,
+    mpc60_set_v1_t::MPC60_PAD_TOM4,
+    mpc60_set_v1_t::MPC60_PAD_RID1,
+    mpc60_set_v1_t::MPC60_PAD_RID2,
+    mpc60_set_v1_t::MPC60_PAD_CRS1,
+    mpc60_set_v1_t::MPC60_PAD_CRS2,
+    mpc60_set_v1_t::MPC60_PAD_PRC1,
+    mpc60_set_v1_t::MPC60_PAD_PRC2,
+    mpc60_set_v1_t::MPC60_PAD_PRC3,
+    mpc60_set_v1_t::MPC60_PAD_PRC4,
+    mpc60_set_v1_t::MPC60_PAD_DR01,
+    mpc60_set_v1_t::MPC60_PAD_DR02,
+    mpc60_set_v1_t::MPC60_PAD_DR03,
+    mpc60_set_v1_t::MPC60_PAD_DR04,
+    mpc60_set_v1_t::MPC60_PAD_DR05,
+    mpc60_set_v1_t::MPC60_PAD_DR06,
+    mpc60_set_v1_t::MPC60_PAD_DR07,
+    mpc60_set_v1_t::MPC60_PAD_DR08,
+    mpc60_set_v1_t::MPC60_PAD_DR09,
+    mpc60_set_v1_t::MPC60_PAD_DR10,
+    mpc60_set_v1_t::MPC60_PAD_DR11,
+    mpc60_set_v1_t::MPC60_PAD_DR12,
+    mpc60_set_v1_t::MPC60_PAD_DR13,
+    mpc60_set_v1_t::MPC60_PAD_DR14,
+    mpc60_set_v1_t::MPC60_PAD_DR15,
+    mpc60_set_v1_t::MPC60_PAD_DR16,
+};
+bool mpc60_set_v1_t::_is_defined_mpc60_pad_t(mpc60_set_v1_t::mpc60_pad_t v) {
+    return mpc60_set_v1_t::_values_mpc60_pad_t.find(v) != mpc60_set_v1_t::_values_mpc60_pad_t.end();
+}
 const std::set<mpc60_set_v1_t::normal_or_hihat_t> mpc60_set_v1_t::_values_normal_or_hihat_t{
     mpc60_set_v1_t::NORMAL_OR_HIHAT_NORMAL,
     mpc60_set_v1_t::NORMAL_OR_HIHAT_HIHAT,
 };
 bool mpc60_set_v1_t::_is_defined_normal_or_hihat_t(mpc60_set_v1_t::normal_or_hihat_t v) {
     return mpc60_set_v1_t::_values_normal_or_hihat_t.find(v) != mpc60_set_v1_t::_values_normal_or_hihat_t.end();
-}
-const std::set<mpc60_set_v1_t::physical_drum_t> mpc60_set_v1_t::_values_physical_drum_t{
-    mpc60_set_v1_t::PHYSICAL_DRUM_HIHT_CLSD,
-    mpc60_set_v1_t::PHYSICAL_DRUM_HIHT_MEDM,
-    mpc60_set_v1_t::PHYSICAL_DRUM_HIHT_OPEN,
-    mpc60_set_v1_t::PHYSICAL_DRUM_SNR1,
-    mpc60_set_v1_t::PHYSICAL_DRUM_SNR2,
-    mpc60_set_v1_t::PHYSICAL_DRUM_BASS,
-    mpc60_set_v1_t::PHYSICAL_DRUM_TOM1,
-    mpc60_set_v1_t::PHYSICAL_DRUM_TOM2,
-    mpc60_set_v1_t::PHYSICAL_DRUM_TOM3,
-    mpc60_set_v1_t::PHYSICAL_DRUM_TOM4,
-    mpc60_set_v1_t::PHYSICAL_DRUM_RID1,
-    mpc60_set_v1_t::PHYSICAL_DRUM_RID2,
-    mpc60_set_v1_t::PHYSICAL_DRUM_CRS1,
-    mpc60_set_v1_t::PHYSICAL_DRUM_CRS2,
-    mpc60_set_v1_t::PHYSICAL_DRUM_PRC1,
-    mpc60_set_v1_t::PHYSICAL_DRUM_PRC2,
-    mpc60_set_v1_t::PHYSICAL_DRUM_PRC3,
-    mpc60_set_v1_t::PHYSICAL_DRUM_PRC4,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR01,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR02,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR03,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR04,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR05,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR06,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR07,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR08,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR09,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR10,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR11,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR12,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR13,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR14,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR15,
-    mpc60_set_v1_t::PHYSICAL_DRUM_DR16,
-};
-bool mpc60_set_v1_t::_is_defined_physical_drum_t(mpc60_set_v1_t::physical_drum_t v) {
-    return mpc60_set_v1_t::_values_physical_drum_t.find(v) != mpc60_set_v1_t::_values_physical_drum_t.end();
 }
 const std::set<mpc60_set_v1_t::use_master_mix_data_t> mpc60_set_v1_t::_values_use_master_mix_data_t{
     mpc60_set_v1_t::USE_MASTER_MIX_DATA_IGNORE,

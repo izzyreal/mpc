@@ -7,6 +7,7 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/window/LoadASetReplaceAddScreen.hpp"
 
 #include "Paths.hpp"
 #include "nvram/NvRam.hpp"
@@ -418,6 +419,15 @@ Mpc::~Mpc()
     if (screens && engineHost && hardware)
     {
         nvram::NvRam::saveVmpcSettings(*this);
+    }
+
+    if (screens)
+    {
+        if (const auto setLoader =
+                screens->get<lcdgui::ScreenId::LoadASetReplaceAddScreen>())
+        {
+            setLoader->waitForLoadThread();
+        }
     }
 
     if (engineHost)

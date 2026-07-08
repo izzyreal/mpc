@@ -10,6 +10,7 @@
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -23,6 +24,43 @@ using namespace mpc::file::kaitai;
 
 namespace
 {
+constexpr int kImportedMpc60HihatVelocityThreshold1 = 14;
+constexpr int kImportedMpc60HihatVelocityThreshold2 = 42;
+
+void configureImportedHihatSwitching(
+    const Mpc60SetPreview &preview,
+    const Mpc60SetProgramLoader::ConversionTable &conversionTable,
+    mpc::performance::Program &perfProgram)
+{
+    if (preview.soundDirectoryEntryIndexByMpc60Pad.size() < 3 ||
+        conversionTable.size() < 3)
+    {
+        return;
+    }
+
+    const auto *closed = preview.assignedSoundAtMpc60Pad(0);
+    const auto *medium = preview.assignedSoundAtMpc60Pad(1);
+    const auto *open = preview.assignedSoundAtMpc60Pad(2);
+
+    if (closed == nullptr || medium == nullptr || open == nullptr ||
+        !closed->isHihat || !medium->isHihat || !open->isHihat)
+    {
+        return;
+    }
+
+    auto &closedHatNoteParams =
+        perfProgram.noteParameters[conversionTable[0].get() -
+                                   mpc::MinDrumNoteNumber.get()];
+    closedHatNoteParams.soundGenerationMode = mpc::sampler::toRaw(
+        mpc::sampler::SoundGenerationMode::VelocitySwitch);
+    closedHatNoteParams.velocityRangeLower =
+        kImportedMpc60HihatVelocityThreshold1;
+    closedHatNoteParams.velocityRangeUpper =
+        kImportedMpc60HihatVelocityThreshold2;
+    closedHatNoteParams.optionalNoteA = conversionTable[1];
+    closedHatNoteParams.optionalNoteB = conversionTable[2];
+}
+
 bool loadIntoProgram(
     mpc::Mpc &mpc,
     const std::shared_ptr<mpc::disk::MpcFile> &file,
@@ -108,6 +146,8 @@ bool loadIntoProgram(
                             mpc::MinDrumNoteNumber.get()]
             .soundIndex = soundIndex;
     }
+
+    configureImportedHihatSwitching(preview, conversionTable, perfProgram);
 
     if (const auto track = mpc.getSequencer()->getSelectedTrack();
         mpc::sequencer::isDrumBusType(track->getBusType()))

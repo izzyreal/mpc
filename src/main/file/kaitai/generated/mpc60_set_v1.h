@@ -49,6 +49,49 @@ private:
 
 public:
 
+    enum mpc60_pad_t {
+        MPC60_PAD_HIHT_CLSD = 0,
+        MPC60_PAD_HIHT_MEDM = 1,
+        MPC60_PAD_HIHT_OPEN = 2,
+        MPC60_PAD_SNR1 = 3,
+        MPC60_PAD_SNR2 = 4,
+        MPC60_PAD_BASS = 5,
+        MPC60_PAD_TOM1 = 6,
+        MPC60_PAD_TOM2 = 7,
+        MPC60_PAD_TOM3 = 8,
+        MPC60_PAD_TOM4 = 9,
+        MPC60_PAD_RID1 = 10,
+        MPC60_PAD_RID2 = 11,
+        MPC60_PAD_CRS1 = 12,
+        MPC60_PAD_CRS2 = 13,
+        MPC60_PAD_PRC1 = 14,
+        MPC60_PAD_PRC2 = 15,
+        MPC60_PAD_PRC3 = 16,
+        MPC60_PAD_PRC4 = 17,
+        MPC60_PAD_DR01 = 18,
+        MPC60_PAD_DR02 = 19,
+        MPC60_PAD_DR03 = 20,
+        MPC60_PAD_DR04 = 21,
+        MPC60_PAD_DR05 = 22,
+        MPC60_PAD_DR06 = 23,
+        MPC60_PAD_DR07 = 24,
+        MPC60_PAD_DR08 = 25,
+        MPC60_PAD_DR09 = 26,
+        MPC60_PAD_DR10 = 27,
+        MPC60_PAD_DR11 = 28,
+        MPC60_PAD_DR12 = 29,
+        MPC60_PAD_DR13 = 30,
+        MPC60_PAD_DR14 = 31,
+        MPC60_PAD_DR15 = 32,
+        MPC60_PAD_DR16 = 33
+    };
+    static bool _is_defined_mpc60_pad_t(mpc60_pad_t v);
+
+private:
+    static const std::set<mpc60_pad_t> _values_mpc60_pad_t;
+
+public:
+
     enum normal_or_hihat_t {
         NORMAL_OR_HIHAT_NORMAL = 0,
         NORMAL_OR_HIHAT_HIHAT = 1
@@ -57,49 +100,6 @@ public:
 
 private:
     static const std::set<normal_or_hihat_t> _values_normal_or_hihat_t;
-
-public:
-
-    enum physical_drum_t {
-        PHYSICAL_DRUM_HIHT_CLSD = 0,
-        PHYSICAL_DRUM_HIHT_MEDM = 1,
-        PHYSICAL_DRUM_HIHT_OPEN = 2,
-        PHYSICAL_DRUM_SNR1 = 3,
-        PHYSICAL_DRUM_SNR2 = 4,
-        PHYSICAL_DRUM_BASS = 5,
-        PHYSICAL_DRUM_TOM1 = 6,
-        PHYSICAL_DRUM_TOM2 = 7,
-        PHYSICAL_DRUM_TOM3 = 8,
-        PHYSICAL_DRUM_TOM4 = 9,
-        PHYSICAL_DRUM_RID1 = 10,
-        PHYSICAL_DRUM_RID2 = 11,
-        PHYSICAL_DRUM_CRS1 = 12,
-        PHYSICAL_DRUM_CRS2 = 13,
-        PHYSICAL_DRUM_PRC1 = 14,
-        PHYSICAL_DRUM_PRC2 = 15,
-        PHYSICAL_DRUM_PRC3 = 16,
-        PHYSICAL_DRUM_PRC4 = 17,
-        PHYSICAL_DRUM_DR01 = 18,
-        PHYSICAL_DRUM_DR02 = 19,
-        PHYSICAL_DRUM_DR03 = 20,
-        PHYSICAL_DRUM_DR04 = 21,
-        PHYSICAL_DRUM_DR05 = 22,
-        PHYSICAL_DRUM_DR06 = 23,
-        PHYSICAL_DRUM_DR07 = 24,
-        PHYSICAL_DRUM_DR08 = 25,
-        PHYSICAL_DRUM_DR09 = 26,
-        PHYSICAL_DRUM_DR10 = 27,
-        PHYSICAL_DRUM_DR11 = 28,
-        PHYSICAL_DRUM_DR12 = 29,
-        PHYSICAL_DRUM_DR13 = 30,
-        PHYSICAL_DRUM_DR14 = 31,
-        PHYSICAL_DRUM_DR15 = 32,
-        PHYSICAL_DRUM_DR16 = 33
-    };
-    static bool _is_defined_physical_drum_t(physical_drum_t v);
-
-private:
-    static const std::set<physical_drum_t> _values_physical_drum_t;
 
 public:
 

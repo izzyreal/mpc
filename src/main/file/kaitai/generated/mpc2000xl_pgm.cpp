@@ -34,6 +34,7 @@ const std::set<mpc2000xl_pgm_t::sound_generation_mode_t> mpc2000xl_pgm_t::_value
     mpc2000xl_pgm_t::SOUND_GENERATION_MODE_NORMAL,
     mpc2000xl_pgm_t::SOUND_GENERATION_MODE_SIMULT,
     mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW,
+    mpc2000xl_pgm_t::SOUND_GENERATION_MODE_DCY_SW,
 };
 bool mpc2000xl_pgm_t::_is_defined_sound_generation_mode_t(mpc2000xl_pgm_t::sound_generation_mode_t v) {
     return mpc2000xl_pgm_t::_values_sound_generation_mode_t.find(v) != mpc2000xl_pgm_t::_values_sound_generation_mode_t.end();

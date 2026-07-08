@@ -56,9 +56,9 @@ int NoteParameters::getSoundIndex() const
     return getSnapshot().soundIndex;
 }
 
-int NoteParameters::getSoundGenerationMode() const
+SoundGenerationMode NoteParameters::getSoundGenerationMode() const
 {
-    return getSnapshot().soundGenerationMode;
+    return soundGenerationModeFromRaw(getSnapshot().soundGenerationMode);
 }
 
 void NoteParameters::setSoundIndex(const int i) const

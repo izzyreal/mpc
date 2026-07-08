@@ -201,7 +201,8 @@ std::vector<char> buildProgramBytes(mpc::sampler::Program& program, const int in
         const auto* note = program.getNoteParameters(i + 35);
         bytes.push_back(static_cast<char>(note->getSoundIndex() == -1 ? 0xFF : note->getSoundIndex()));
         bytes.push_back(static_cast<char>(note->getSoundIndex() == -1 ? 0xFF : 0x00));
-        bytes.push_back(static_cast<char>(note->getSoundGenerationMode()));
+        bytes.push_back(static_cast<char>(mpc::sampler::toRaw(
+            note->getSoundGenerationMode())));
         bytes.push_back(static_cast<char>(note->getVelocityRangeLower()));
         bytes.push_back(static_cast<char>(note->getOptionalNoteA() == 34 ? 0 : note->getOptionalNoteA().get()));
         bytes.push_back(static_cast<char>(note->getVelocityRangeUpper()));

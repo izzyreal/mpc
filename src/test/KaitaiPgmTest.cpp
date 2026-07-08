@@ -16,6 +16,7 @@
 #include "sampler/PgmSlider.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -64,7 +65,7 @@ void applyBroadProgramMutation(mpc2000xl_pgm_t& parsed)
 {
     auto* note35 = parsed.note_parameters()->at(0).get();
     note35->set_sound_index(255);
-    note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
+    note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_DCY_SW);
     note35->set_velocity_range_lower(1);
     note35->set_velocity_range_upper(127);
     note35->set_also_play_use_note_1(41);
@@ -124,7 +125,8 @@ void requireBroadMutatedProgramState(
 
     const auto note35 = program->getNoteParameters(35);
     REQUIRE(note35->getSoundIndex() == -1);
-    REQUIRE(note35->getSoundGenerationMode() == 2);
+    REQUIRE(note35->getSoundGenerationMode() ==
+            mpc::sampler::SoundGenerationMode::DecaySwitch);
     REQUIRE(note35->getVelocityRangeLower() == 1);
     REQUIRE(note35->getVelocityRangeUpper() == 127);
     REQUIRE(note35->getOptionalNoteA() == 41);
@@ -310,7 +312,8 @@ void requireProgram1LoadedState(mpc::Mpc& mpc,
     REQUIRE(note36->getSoundIndex() == 1);
     REQUIRE(note37->getSoundIndex() == -1);
 
-    REQUIRE(note35->getSoundGenerationMode() == 0);
+    REQUIRE(note35->getSoundGenerationMode() ==
+            mpc::sampler::SoundGenerationMode::Normal);
     REQUIRE(note35->getVelocityRangeLower() == 44);
     REQUIRE(note35->getVelocityRangeUpper() == 88);
     REQUIRE(note35->getTune() == 0);

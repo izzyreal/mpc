@@ -241,7 +241,8 @@ void populateSavedNoteParameters(
             note->set_sound_index(static_cast<uint8_t>(soundIndexConversionTable.at(src->getSoundIndex())));
         }
 
-        note->set_sound_generation_mode(static_cast<mpc2000xl_pgm_t::sound_generation_mode_t>(src->getSoundGenerationMode()));
+        note->set_sound_generation_mode(static_cast<mpc2000xl_pgm_t::sound_generation_mode_t>(
+            mpc::sampler::toRaw(src->getSoundGenerationMode())));
         note->set_velocity_range_lower(src->getVelocityRangeLower());
         note->set_also_play_use_note_1(src->getOptionalNoteA());
         note->set_velocity_range_upper(src->getVelocityRangeUpper());
