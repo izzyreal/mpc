@@ -75,7 +75,8 @@ void Mpc::init(const MpcInitOptions &options)
         paths->getDocuments()->storesPath(),
         paths->getDocuments()->defaultLocalVolumePath(),
         paths->getDocuments()->recordingsPath(),
-        paths->getDocuments()->autoSavePath()};
+        paths->getDocuments()->autoSavePath(),
+        paths->getDocuments()->tempPath()};
 
     for (auto &p : requiredPaths)
     {
