@@ -62,7 +62,8 @@ public:
     enum sound_generation_mode_t {
         SOUND_GENERATION_MODE_NORMAL = 0,
         SOUND_GENERATION_MODE_SIMULT = 1,
-        SOUND_GENERATION_MODE_VEL_SW = 2
+        SOUND_GENERATION_MODE_VEL_SW = 2,
+        SOUND_GENERATION_MODE_DCY_SW = 3
     };
     static bool _is_defined_sound_generation_mode_t(sound_generation_mode_t v);
 

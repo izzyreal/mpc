@@ -18,6 +18,8 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/NoteParameters.hpp"
+#include "sampler/SoundGenerationMode.hpp"
+#include "engine/Voice.hpp"
 #include "engine/IndivFxMixer.hpp"
 
 #include <optional>
@@ -34,6 +36,8 @@ namespace
 {
     static constexpr int kBufferSize = 64;
     static constexpr DrumNoteNumber kTestNote{35};
+    static constexpr DrumNoteNumber kSwitchNoteA{36};
+    static constexpr DrumNoteNumber kSwitchNoteB{37};
     static constexpr int kIndivLevel = 73;
     static constexpr float kPanLeft = 0.f;
     static constexpr float kPanCenter = 0.5f;
@@ -122,6 +126,79 @@ namespace
         mpc.getSequencer()->getEventHandler()->handleUnfinalizedNoteOn(
             event, std::nullopt, BusType::DRUM1);
     }
+
+    void configureSwitchingProgramNote(
+        Mpc &mpc, const mpc::sampler::SoundGenerationMode mode)
+    {
+        const auto sampler = mpc.getSampler();
+        for (int i = 0; i < 3; ++i)
+        {
+            const auto sound = sampler->addSound();
+            REQUIRE(sound != nullptr);
+            sound->insertFrame(std::vector<float>{1.f}, 0);
+            sound->setStart(0);
+            sound->setEnd(1);
+        }
+
+        const auto program = sampler->getProgram(0);
+        REQUIRE(program != nullptr);
+
+        const auto note35 = program->getNoteParameters(kTestNote);
+        const auto note36 = program->getNoteParameters(kSwitchNoteA);
+        const auto note37 = program->getNoteParameters(kSwitchNoteB);
+        REQUIRE(note35 != nullptr);
+        REQUIRE(note36 != nullptr);
+        REQUIRE(note37 != nullptr);
+
+        note35->setSoundIndex(0);
+        note35->setSoundGenMode(mpc::sampler::toRaw(mode));
+        note35->setVeloRangeLower(44);
+        note35->setVeloRangeUpper(88);
+        note35->setOptionalNoteA(kSwitchNoteA);
+        note35->setOptionalNoteB(kSwitchNoteB);
+
+        note36->setSoundIndex(1);
+        note37->setSoundIndex(2);
+    }
+
+    std::vector<int> getActiveVoiceNotes(Mpc &mpc)
+    {
+        std::vector<int> result;
+        for (const auto &voice : mpc.getEngineHost()->getVoices())
+        {
+            if (!voice->isFinished())
+            {
+                result.push_back(voice->getNote());
+            }
+        }
+        return result;
+    }
+
+    void triggerUnfinalizedDrumNoteOn(
+        Mpc &mpc, const int velocity, const mpc::NoteVariationType variationType,
+        const int variationValue)
+    {
+        const auto mixerSetupScreen =
+            mpc.screens->get<lcdgui::ScreenId::MixerSetupScreen>();
+        mixerSetupScreen->setStereoMixSourceDrum(false);
+        mixerSetupScreen->setIndivFxSourceDrum(false);
+
+        mpc.getSequencer()->getDrumBus(DrumBusIndex(0))->setProgramIndex(
+            ProgramIndex(0));
+
+        mpc.getEngineHost()->prepareProcessBlock(kBufferSize);
+
+        EventData event;
+        event.type = EventType::NoteOn;
+        event.noteNumber = NoteNumber(kTestNote.get());
+        event.velocity = Velocity(velocity);
+        event.noteVariationType = variationType;
+        event.noteVariationValue = NoteVariationValue(variationValue);
+        event.duration = NoDuration;
+
+        mpc.getSequencer()->getEventHandler()->handleUnfinalizedNoteOn(
+            event, std::nullopt, BusType::DRUM1);
+    }
 } // namespace
 
 TEST_CASE("Mono sound routed to individual out uses a single strip AUX send",
@@ -190,4 +267,50 @@ TEST_CASE("Stereo sound routed to main keeps both channels and no individual AUX
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#2")->getValue() == 0.f);
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#3")->getValue() == 0.f);
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
+}
+
+TEST_CASE("Velocity switch mode selects the configured alternate notes",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::VelocitySwitch);
+    triggerUnfinalizedDrumNoteOn(mpc, 45, mpc::NoteVariationTypeTune, 64);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kSwitchNoteA.get());
+}
+
+TEST_CASE("Velocity switch mode uses the second alternate note above the upper threshold",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::VelocitySwitch);
+    triggerUnfinalizedDrumNoteOn(mpc, 89, mpc::NoteVariationTypeTune, 64);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kSwitchNoteB.get());
+}
+
+TEST_CASE("Decay switch mode uses note variation decay when selecting the target note",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::DecaySwitch);
+    triggerUnfinalizedDrumNoteOn(
+        mpc, 64, mpc::NoteVariationTypeDecay, 89);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kSwitchNoteB.get());
 }

@@ -23,6 +23,11 @@ LoadASetReplaceAddScreen::LoadASetReplaceAddScreen(Mpc &mpc,
 
 LoadASetReplaceAddScreen::~LoadASetReplaceAddScreen()
 {
+    waitForLoadThread();
+}
+
+void LoadASetReplaceAddScreen::waitForLoadThread()
+{
     if (loadThread.joinable())
     {
         loadThread.join();
@@ -71,10 +76,7 @@ void LoadASetReplaceAddScreen::function(const int i)
 
             layeredScreen->showPopup("Loading " + file->getName());
 
-            if (loadThread.joinable())
-            {
-                loadThread.join();
-            }
+            waitForLoadThread();
 
             loadThread = std::thread(
                 [this, file, previewCopy, conversionTableCopy, clearExisting,

@@ -10,6 +10,7 @@
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/LoadASetScreen.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -80,13 +81,29 @@ namespace
         REQUIRE(drumBus->getProgramIndex() == expected);
         REQUIRE(mpc.getSampler()->getProgram(expected.get())->isUsed());
     }
+
+    void requireImportedHihatVelocitySwitch(
+        const std::shared_ptr<mpc::sampler::Program> &program,
+        const mpc::DrumNoteNumber closedHatNote,
+        const mpc::DrumNoteNumber mediumHatNote,
+        const mpc::DrumNoteNumber openHatNote)
+    {
+        REQUIRE(program != nullptr);
+        const auto noteParameters = program->getNoteParameters(closedHatNote);
+        REQUIRE(noteParameters->getSoundGenerationMode() ==
+                mpc::sampler::SoundGenerationMode::VelocitySwitch);
+        REQUIRE(noteParameters->getVelocityRangeLower() == 14);
+        REQUIRE(noteParameters->getVelocityRangeUpper() == 42);
+        REQUIRE(noteParameters->getOptionalNoteA() == mediumHatNote);
+        REQUIRE(noteParameters->getOptionalNoteB() == openHatNote);
+    }
 }
 
 TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     mpc.getEngineHost()->prepareProcessBlock(512);
     prepareSetFile(mpc, "ROCK.SET");
 
@@ -99,6 +116,8 @@ TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
     const auto setScreen =
         mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
     const auto hiHatNote = setScreen->getConversionTargetNote(0);
+    const auto hiHatMediumNote = setScreen->getConversionTargetNote(1);
+    const auto hiHatOpenNote = setScreen->getConversionTargetNote(2);
     const auto rideNote = setScreen->getConversionTargetNote(10);
 
     mpc.getLayeredScreen()->getCurrentScreen()->function(4);
@@ -117,6 +136,9 @@ TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
     REQUIRE(mpc.getSampler()->getSoundName(16) == "RIDE4B");
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(rideNote)->getSoundIndex() == 16);
+    requireImportedHihatVelocitySwitch(
+        mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
+        hiHatOpenNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
 }
 
@@ -124,7 +146,7 @@ TEST_CASE("MPC60 SET default conversion table matches MPC2000XL",
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareSetFile(mpc, "ROCK.SET");
     selectSetFile(mpc, "ROCK.SET");
 
@@ -149,7 +171,7 @@ TEST_CASE("MPC60 SET LOAD adds imported program and offsets sound indices",
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     mpc.getEngineHost()->prepareProcessBlock(512);
     prepareSetFile(mpc, "ROCK.SET");
 
@@ -162,6 +184,8 @@ TEST_CASE("MPC60 SET LOAD adds imported program and offsets sound indices",
     const auto setScreen =
         mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
     const auto hiHatNote = setScreen->getConversionTargetNote(0);
+    const auto hiHatMediumNote = setScreen->getConversionTargetNote(1);
+    const auto hiHatOpenNote = setScreen->getConversionTargetNote(2);
 
     mpc.getLayeredScreen()->getCurrentScreen()->function(4);
     mpc.getLayeredScreen()->getCurrentScreen()->function(4);
@@ -175,6 +199,9 @@ TEST_CASE("MPC60 SET LOAD adds imported program and offsets sound indices",
     REQUIRE(mpc.getSampler()->getSoundName(0) == "dummy");
     REQUIRE(mpc.getSampler()->getProgram(1)->getName() == "ROCK");
     REQUIRE(mpc.getSampler()->getProgram(1)->getNoteParameters(hiHatNote)->getSoundIndex() == 20);
+    requireImportedHihatVelocitySwitch(
+        mpc.getSampler()->getProgram(1), hiHatNote, hiHatMediumNote,
+        hiHatOpenNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(1));
 }
 
@@ -182,7 +209,7 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     mpc.getEngineHost()->prepareProcessBlock(512);
     prepareSetFile(mpc, "STUDIO.SET");
 
@@ -191,6 +218,8 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
     const auto setScreen =
         mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
     const auto hiHatNote = setScreen->getConversionTargetNote(0);
+    const auto hiHatMediumNote = setScreen->getConversionTargetNote(1);
+    const auto hiHatOpenNote = setScreen->getConversionTargetNote(2);
     const auto rideNote = setScreen->getConversionTargetNote(10);
 
     mpc.getLayeredScreen()->getCurrentScreen()->function(4);
@@ -209,6 +238,9 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
     REQUIRE(mpc.getSampler()->getSoundName(23) == "RIDE_#1");
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(rideNote)->getSoundIndex() == 23);
+    requireImportedHihatVelocitySwitch(
+        mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
+        hiHatOpenNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
 }
 
@@ -216,7 +248,7 @@ TEST_CASE("MPC60 UK-8 SET load skips unassigned source pads and blank entries",
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     mpc.getEngineHost()->prepareProcessBlock(512);
     prepareSetFile(mpc, "UK-8.SET");
 
@@ -225,6 +257,8 @@ TEST_CASE("MPC60 UK-8 SET load skips unassigned source pads and blank entries",
     const auto setScreen =
         mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
     const auto hiHatNote = setScreen->getConversionTargetNote(0);
+    const auto hiHatMediumNote = setScreen->getConversionTargetNote(1);
+    const auto hiHatOpenNote = setScreen->getConversionTargetNote(2);
     const auto unassignedNote = setScreen->getConversionTargetNote(18);
     const auto scratchNote = setScreen->getConversionTargetNote(33);
 
@@ -245,5 +279,8 @@ TEST_CASE("MPC60 UK-8 SET load skips unassigned source pads and blank entries",
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 0);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(unassignedNote)->getSoundIndex() == -1);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(scratchNote)->getSoundIndex() == 20);
+    requireImportedHihatVelocitySwitch(
+        mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
+        hiHatOpenNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
 }

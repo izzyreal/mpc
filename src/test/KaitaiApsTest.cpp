@@ -17,6 +17,7 @@
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -90,7 +91,7 @@ void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
     auto* program0 = parsed.aps_programs()->at(0)->body();
     auto* note35 = program0->note_parameters()->at(0).get();
     note35->set_sound_index(0xFFFF);
-    note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
+    note35->set_sound_generation_mode(mpc2000xl_pgm_t::SOUND_GENERATION_MODE_DCY_SW);
     note35->set_velocity_range_lower(1);
     note35->set_also_play_use_note_1(41);
     note35->set_velocity_range_upper(127);
@@ -629,7 +630,7 @@ TEST_CASE("Kaitai APS parses broad mutated APS semantics", "[kaitai-aps]")
 
     auto* note35 = p1->note_parameters()->at(0).get();
     REQUIRE(note35->sound_index() == 0xFFFF);
-    REQUIRE(note35->sound_generation_mode() == mpc2000xl_pgm_t::SOUND_GENERATION_MODE_VEL_SW);
+    REQUIRE(note35->sound_generation_mode() == mpc2000xl_pgm_t::SOUND_GENERATION_MODE_DCY_SW);
     REQUIRE(note35->velocity_range_lower() == 1);
     REQUIRE(note35->also_play_use_note_1() == 41);
     REQUIRE(note35->velocity_range_upper() == 127);
@@ -736,7 +737,8 @@ TEST_CASE("ApsLoader loads broad mutated APS semantics", "[kaitai-aps]")
 
     auto note35 = p1->getNoteParameters(35);
     REQUIRE(note35->getSoundIndex() == -1);
-    REQUIRE(note35->getSoundGenerationMode() == 2);
+    REQUIRE(note35->getSoundGenerationMode() ==
+            mpc::sampler::SoundGenerationMode::DecaySwitch);
     REQUIRE(note35->getVelocityRangeLower() == 1);
     REQUIRE(note35->getOptionalNoteA() == 41);
     REQUIRE(note35->getVelocityRangeUpper() == 127);

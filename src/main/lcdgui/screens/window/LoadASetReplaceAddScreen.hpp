@@ -10,6 +10,7 @@ namespace mpc::lcdgui::screens::window
     public:
         LoadASetReplaceAddScreen(Mpc &mpc, int layerIndex);
         ~LoadASetReplaceAddScreen() override;
+        void waitForLoadThread();
 
         void open() override;
         void turnWheel(int i) override;

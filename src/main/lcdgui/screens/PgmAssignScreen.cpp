@@ -8,6 +8,7 @@
 #include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
+#include "sampler/SoundGenerationMode.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 
@@ -318,7 +319,7 @@ void PgmAssignScreen::turnWheel(const int i)
     else if (focusedFieldName == "mode")
     {
         selectedNoteParameters->setSoundGenMode(
-            selectedNoteParameters->getSoundGenerationMode() + i);
+            mpc::sampler::toRaw(selectedNoteParameters->getSoundGenerationMode()) + i);
     }
     else if (focusedFieldName == "velocity-range-lower")
     {
@@ -440,7 +441,8 @@ void PgmAssignScreen::displayPadNote() const
 
 void PgmAssignScreen::displaySoundGenerationMode()
 {
-    int soundGenerationMode = -1;
+    auto soundGenerationMode = mpc::sampler::SoundGenerationMode::Normal;
+    bool hasSoundGenerationMode = false;
 
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -449,9 +451,11 @@ void PgmAssignScreen::displaySoundGenerationMode()
     if (selectedNoteParameters != nullptr)
     {
         soundGenerationMode = selectedNoteParameters->getSoundGenerationMode();
-        findField("mode")->setText(soundGenerationModes[soundGenerationMode]);
+        hasSoundGenerationMode = true;
+        findField("mode")->setText(
+            soundGenerationModes[mpc::sampler::toRaw(soundGenerationMode)]);
 
-        if (soundGenerationMode != 0)
+        if (soundGenerationMode != mpc::sampler::SoundGenerationMode::Normal)
         {
             findLabel("velocity-range-lower")->Hide(true);
             findField("velocity-range-lower")->Hide(true);
@@ -467,7 +471,8 @@ void PgmAssignScreen::displaySoundGenerationMode()
             displayOptionalNoteB();
         }
 
-        if (soundGenerationMode == 2 || soundGenerationMode == 3)
+        if (soundGenerationMode == mpc::sampler::SoundGenerationMode::VelocitySwitch ||
+            soundGenerationMode == mpc::sampler::SoundGenerationMode::DecaySwitch)
         {
             findLabel("optional-note-a")->setText("over:    , use:");
             findLabel("optional-note-b")->setText("over:    , use:");
@@ -484,8 +489,8 @@ void PgmAssignScreen::displaySoundGenerationMode()
         }
     }
 
-    if (selectedNoteParameters == nullptr || soundGenerationMode == -1 ||
-        soundGenerationMode == 0)
+    if (selectedNoteParameters == nullptr || !hasSoundGenerationMode ||
+        soundGenerationMode == mpc::sampler::SoundGenerationMode::Normal)
     {
         findLabel("velocity-range-lower")->Hide(true);
         findField("velocity-range-lower")->Hide(true);
