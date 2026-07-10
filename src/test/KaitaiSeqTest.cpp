@@ -42,6 +42,13 @@ CMRC_DECLARE(mpctest);
 
 namespace
 {
+constexpr size_t kMpc3000SeqFixedPreludeSize =
+    2 + 37 + 5 + (64 * 4) + 2 + 15 + 3 + 16 + 1 + 1 + 1;
+constexpr size_t kMpc3000SeqTempoChangeCountOffset =
+    kMpc3000SeqFixedPreludeSize - 2;
+constexpr size_t kMpc3000SeqTrackHeaderCountOffset =
+    kMpc3000SeqFixedPreludeSize - 1;
+
 std::shared_ptr<mpc::disk::MpcFile> prepareSeqFile(
     mpc::Mpc &mpc,
     const std::vector<char> &data,
@@ -75,10 +82,10 @@ std::shared_ptr<T> eventAs(const std::shared_ptr<mpc::sequencer::EventRef> &even
 
 size_t tempoChangeOffset(const std::vector<char> &data, const size_t index)
 {
-    REQUIRE(data.size() > 338);
+    REQUIRE(data.size() > kMpc3000SeqTrackHeaderCountOffset);
     const auto numberOfTrackHeaders =
-        static_cast<unsigned char>(data[338]);
-    return 339 + (numberOfTrackHeaders * 24) + (index * 6);
+        static_cast<unsigned char>(data[kMpc3000SeqTrackHeaderCountOffset]);
+    return kMpc3000SeqFixedPreludeSize + (numberOfTrackHeaders * 24) + (index * 6);
 }
 
 void setTempoChangeFactorPercentage(
@@ -97,8 +104,9 @@ void insertTempoChange(
     const uint32_t tick,
     const uint16_t factorWord)
 {
-    REQUIRE(data.size() > 337);
-    const auto numberOfTempoChanges = static_cast<unsigned char>(data[337]);
+    REQUIRE(data.size() > kMpc3000SeqTempoChangeCountOffset);
+    const auto numberOfTempoChanges =
+        static_cast<unsigned char>(data[kMpc3000SeqTempoChangeCountOffset]);
     const auto insertOffset = tempoChangeOffset(data, numberOfTempoChanges);
 
     const std::vector<char> entry{
@@ -113,7 +121,8 @@ void insertTempoChange(
     data.insert(
         data.begin() + static_cast<std::ptrdiff_t>(insertOffset),
         entry.begin(), entry.end());
-    data[337] = static_cast<char>(numberOfTempoChanges + 1);
+    data[kMpc3000SeqTempoChangeCountOffset] =
+        static_cast<char>(numberOfTempoChanges + 1);
 }
 
 void setLoopToBar(std::vector<char> &data, const bool enabled,
@@ -129,11 +138,10 @@ void setLoopToBar(std::vector<char> &data, const bool enabled,
 
 size_t trackHeaderOffset(const std::vector<char> &data, const size_t index)
 {
-    REQUIRE(data.size() > 338);
-    const auto numberOfTempoChanges = static_cast<unsigned char>(data[337]);
-    const auto numberOfTrackHeaders = static_cast<unsigned char>(data[338]);
+    const auto numberOfTrackHeaders =
+        static_cast<unsigned char>(data[kMpc3000SeqTrackHeaderCountOffset]);
     REQUIRE(index < numberOfTrackHeaders);
-    return 339 + (numberOfTempoChanges * 6) + (index * 24);
+    return kMpc3000SeqFixedPreludeSize + (index * 24);
 }
 
 void setTrackHeaderFlags(
