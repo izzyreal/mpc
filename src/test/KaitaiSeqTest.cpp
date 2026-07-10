@@ -626,6 +626,43 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real track-off fixture",
     REQUIRE_FALSE(track0->isOn());
 }
 
+TEST_CASE("Kaitai MPC3000 SEQ production load imports real loop-enabled fixture",
+          "[kaitai-seq]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const std::string fileName = "M3KLPON.SEQ";
+    prepareSeqFile(mpc, "test/RealMpc3000/Seq/M3KLPON.SEQ", fileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("load");
+
+    const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
+    const auto fileNames = mpc.getDisk()->getFileNames();
+    const auto seqFileIt = std::find_if(
+        fileNames.begin(), fileNames.end(),
+        [&fileName](const std::string &candidate)
+        {
+            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
+        });
+    REQUIRE(seqFileIt != fileNames.end());
+
+    loadScreen->setFileLoad(static_cast<int>(
+        std::distance(fileNames.begin(), seqFileIt)));
+    loadScreen->function(5);
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
+
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sequence = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
+    REQUIRE(sequence->getName() == "SEQ01");
+    REQUIRE(sequence->getLastBarIndex() == 1);
+    REQUIRE(sequence->isLoopEnabled());
+    REQUIRE(sequence->getFirstLoopBarIndex() == 0);
+    REQUIRE(sequence->getLastLoopBarIndex() == 0);
+}
+
 TEST_CASE("Kaitai MPC3000 SEQ production load derives initial tempo from tick-zero tempo change",
           "[kaitai-seq]")
 {
