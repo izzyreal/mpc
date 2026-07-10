@@ -6,6 +6,7 @@
 #include "engine/SequencerPlaybackEngine.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
+#include "lcdgui/screens/window/LoadASequenceScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
@@ -32,6 +33,19 @@ void ReleaseFunctionCommand::execute()
             if (ls->isCurrentScreen({ScreenId::LoadASoundScreen}))
             {
                 mpc.getEngineHost()->finishPreviewSoundPlayerVoice();
+            }
+            else if (ls->isCurrentScreen(
+                         {ScreenId::LoadASequencePlayScreen,
+                          ScreenId::LoadASequenceScreen}))
+            {
+                mpc.screens->get<ScreenId::LoadASequenceScreen>()
+                    ->releasePlayPreview();
+
+                if (ls->isCurrentScreen(
+                        {ScreenId::LoadASequencePlayScreen}))
+                {
+                    ls->closeCurrentScreen();
+                }
             }
             break;
         case 4:

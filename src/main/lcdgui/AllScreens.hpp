@@ -93,6 +93,7 @@
 #include "lcdgui/screens/window/LoadASetReplaceAddScreen.hpp"
 #include "lcdgui/screens/window/LoadASetSoundScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceScreen.hpp"
+#include "lcdgui/screens/window/LoadASequencePlayScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceFromAllScreen.hpp"
 #include "lcdgui/screens/window/LoadASoundScreen.hpp"
 #include "lcdgui/screens/window/LoadApsFileScreen.hpp"

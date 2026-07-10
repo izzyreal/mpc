@@ -12,6 +12,7 @@
 #include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/ApsIo.hpp"
 #include "file/kaitai/MidIo.hpp"
+#include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "file/kaitai/AllIo.hpp"
 
 #include "sampler/Sampler.hpp"
@@ -564,6 +565,16 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
     const std::function readFunc = [this, f]() -> sequence_or_error
     {
         return file::kaitai::MidIo::load(mpc, f);
+    };
+
+    return performRequiredIoOrOpenErrorPopup(readFunc);
+}
+
+sequence_or_error AbstractDisk::readSeq2(std::shared_ptr<MpcFile> f)
+{
+    const std::function readFunc = [this, f]() -> sequence_or_error
+    {
+        return file::kaitai::Mpc3000SeqIo::load(mpc, f);
     };
 
     return performRequiredIoOrOpenErrorPopup(readFunc);

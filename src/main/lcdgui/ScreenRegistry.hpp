@@ -103,6 +103,7 @@
     X(screens::window, LoadASetReplaceAddScreen, "load-a-set-replace-add")     \
     X(screens::window, LoadASetSoundScreen, "load-a-set-sound")                \
     X(screens::window, LoadASequenceScreen, "load-a-sequence")                 \
+    X(screens::window, LoadASequencePlayScreen, "load-a-sequence-play")        \
     X(screens::window, LoadASequenceFromAllScreen, "load-a-sequence-from-all") \
     X(screens::window, LoadASoundScreen, "load-a-sound")                       \
     X(screens::window, LoadApsFileScreen, "load-aps-file")                     \
