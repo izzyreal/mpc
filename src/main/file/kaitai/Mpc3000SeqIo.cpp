@@ -203,7 +203,6 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
         std::ios::in | std::ios::out | std::ios::binary);
     ::kaitai::kstream kaitaiIo(&kaitaiStream);
     seq_t parsed(&kaitaiIo);
-    parsed._read();
 
     const auto barCount =
         std::max(1, static_cast<int>(parsed.sequence_header()->number_of_bars()));

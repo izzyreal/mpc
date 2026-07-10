@@ -10,6 +10,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
+#include "file/kaitai/generated/mpc3000_all_v3.h"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "sequencer/BusType.hpp"
@@ -519,6 +520,134 @@ TEST_CASE("Kaitai MPC2000 ALL loads one real 2KXL sequence with expected default
     REQUIRE(loaded->getTimeSignatureFromBarIndex(0).denominator == 4);
     REQUIRE(loaded->getTrack(0)->getBusType() == mpc::sequencer::BusType::DRUM2);
     REQUIRE(loaded->getTrack(0)->getDeviceIndex() == 7);
+}
+
+TEST_CASE("Kaitai MPC3000 ALL parser exposes expected embedded sequence and song structure", "[kaitai-all][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/All/M3K_2SEQ1SONG.ALL");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_all_v3_t parsed(&parseIo);
+
+    REQUIRE(parsed.sequences()->size() == 2U);
+    REQUIRE(parsed.sequences()->at(0)->misc_chunks()->sequence_header()->sequence_name() == "SEQ01           ");
+    REQUIRE(parsed.sequences()->at(1)->misc_chunks()->sequence_header()->sequence_name() == "SEQ02           ");
+    REQUIRE(parsed.sequences()->at(0)->events()->size() == 5U);
+    REQUIRE(parsed.sequences()->at(1)->events()->size() == 9U);
+
+    REQUIRE(parsed.songs()->size() == 3U);
+    REQUIRE(parsed.songs()->at(0)->number_of_steps() == 0xFF);
+    REQUIRE(parsed.songs()->at(0)->song_body() == nullptr);
+
+    const auto* songBody = parsed.songs()->at(1)->song_body();
+    REQUIRE(songBody != nullptr);
+    REQUIRE(parsed.songs()->at(1)->number_of_steps() == 2);
+    REQUIRE(songBody->song_number() == 1);
+    REQUIRE(songBody->song_name() == "SONG01");
+    REQUIRE(songBody->end_status() == mpc3000_all_v3_t::song_t::song_body_t::END_STATUS_STOP_AT_END);
+    REQUIRE(songBody->loop_back_step_number() == 2);
+    REQUIRE(songBody->steps()->size() == 2U);
+    REQUIRE(songBody->steps()->at(0)->sequence_number() == 1);
+    REQUIRE(songBody->steps()->at(0)->repetition_count() == 2);
+    REQUIRE(songBody->steps()->at(1)->sequence_number() == 1);
+    REQUIRE(songBody->steps()->at(1)->repetition_count() == 3);
+
+    REQUIRE(parsed.songs()->at(2)->number_of_steps() == 0);
+    REQUIRE(parsed.songs()->at(2)->song_body() == nullptr);
+}
+
+TEST_CASE("Kaitai MPC3000 ALL sequence meta infos expose expected names and usedness", "[kaitai-all][real-mpc3000]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installResourceFile(
+        mpc,
+        "test/RealMpc3000/All/M3K_2SEQ.ALL",
+        "M3K_2SEQ.ALL"
+    );
+    REQUIRE(allFile);
+
+    const auto metaInfos = mpc::disk::AllLoader::loadSequenceMetaInfosFromFile(mpc, allFile.get());
+    REQUIRE(metaInfos.size() == 2U);
+    REQUIRE(metaInfos[0].used);
+    REQUIRE(metaInfos[0].name == "SEQ01");
+    REQUIRE(metaInfos[1].used);
+    REQUIRE(metaInfos[1].name == "SEQ02");
+}
+
+TEST_CASE("Kaitai MPC3000 ALL loads one sequence with expected defaults", "[kaitai-all][real-mpc3000]")
+{
+    mpc::Mpc kaitaiMpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(kaitaiMpc);
+    auto kaitaiFile = installResourceFile(
+        kaitaiMpc,
+        "test/RealMpc3000/All/M3K_2SEQ.ALL",
+        "M3K_2SEQ.ALL"
+    );
+    REQUIRE(kaitaiFile);
+
+    const auto loaded = mpc::disk::AllLoader::loadOneSequenceFromFile(
+        kaitaiMpc,
+        kaitaiFile.get(),
+        mpc::SequenceIndex(1),
+        mpc::SequenceIndex(10)
+    );
+    REQUIRE(loaded);
+    kaitaiMpc.getSequencer()->getStateManager()->drainQueue();
+
+    REQUIRE(loaded->isUsed());
+    REQUIRE(loaded->getName() == "SEQ02");
+    REQUIRE_THAT(loaded->getInitialTempo(), Catch::Matchers::WithinAbs(99.0, 0.001));
+    REQUIRE(loaded->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(loaded->getTimeSignatureFromBarIndex(0).denominator == 4);
+    REQUIRE(loaded->isLoopEnabled());
+}
+
+TEST_CASE("Kaitai MPC3000 ALL loads sequences and songs through the production seam", "[kaitai-all][real-mpc3000]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installResourceFile(
+        mpc,
+        "test/RealMpc3000/All/M3K_2SEQ1SONG.ALL",
+        "M3K_2SEQ1SONG.ALL"
+    );
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(mpc, allFile.get());
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sequencer = mpc.getSequencer();
+    auto sequence0 = sequencer->getSequence(0);
+    auto sequence1 = sequencer->getSequence(1);
+    REQUIRE(sequence0->isUsed());
+    REQUIRE(sequence1->isUsed());
+    REQUIRE(sequence0->getName() == "SEQ01");
+    REQUIRE(sequence1->getName() == "SEQ02");
+    REQUIRE_THAT(sequence0->getInitialTempo(), Catch::Matchers::WithinAbs(99.0, 0.001));
+    REQUIRE_THAT(sequence1->getInitialTempo(), Catch::Matchers::WithinAbs(99.0, 0.001));
+
+    auto song0 = sequencer->getSong(0);
+    auto song1 = sequencer->getSong(1);
+    REQUIRE(song0->isUsed());
+    REQUIRE(song0->getName() == "SONG01");
+    REQUIRE(song0->getStepCount() == 2);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(0)).sequenceIndex == 0);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(0)).repetitionCount == 2);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(1)).sequenceIndex == 0);
+    REQUIRE(song0->getStep(mpc::SongStepIndex(1)).repetitionCount == 3);
+    REQUIRE_FALSE(song0->isLoopEnabled());
+    REQUIRE_FALSE(song1->isUsed());
 }
 
 TEST_CASE("AllParser reads mutated default tempo and song repeat count", "[kaitai-all]")

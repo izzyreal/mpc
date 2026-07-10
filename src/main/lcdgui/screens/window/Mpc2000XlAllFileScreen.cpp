@@ -11,9 +11,34 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
+namespace
+{
+    bool isMpc3000AllFile(const std::shared_ptr<mpc::disk::MpcFile>& file)
+    {
+        if (!file)
+        {
+            return false;
+        }
+
+        const auto bytes = file->getBytes();
+        return bytes.size() >= 2 &&
+            static_cast<unsigned char>(bytes[0]) == 0x04 &&
+            static_cast<unsigned char>(bytes[1]) == 0x03;
+    }
+}
+
 Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "mpc2000xl-all-file", layerIndex)
 {
+}
+
+void Mpc2000XlAllFileScreen::open()
+{
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto bgName = isMpc3000AllFile(loadScreen->getSelectedFile())
+        ? "mpc3000-all-file"
+        : "mpc2000xl-all-file";
+    findBackground()->setBackgroundName(bgName);
 }
 
 void Mpc2000XlAllFileScreen::function(const int i)
