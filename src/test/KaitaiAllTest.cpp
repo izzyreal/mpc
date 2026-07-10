@@ -844,3 +844,85 @@ TEST_CASE("AllLoader loads representative ALL sequence event types through produ
     REQUIRE(loadedMixer->getPad() == 9);
     REQUIRE(loadedMixer->getValue() == 87);
 }
+
+TEST_CASE("Kaitai MPC2000 ALL preserves all note variation types through production seam", "[kaitai-all]")
+{
+    mpc::Mpc sourceMpc;
+    mpc::TestMpc::initializeTestMpc(sourceMpc);
+
+    auto sourceSequencer = sourceMpc.getSequencer();
+    auto sourceStateManager = sourceSequencer->getStateManager();
+    auto sourceSequence = sourceSequencer->getSequence(0);
+    sourceSequence->init(0);
+    sourceStateManager->drainQueue();
+
+    auto sourceTrack = sourceSequence->getTrack(0);
+
+    const std::array<std::pair<mpc::NoteVariationType, int>, 4> noteVariations{{
+        {mpc::NoteVariationTypeTune, 11},
+        {mpc::NoteVariationTypeDecay, 22},
+        {mpc::NoteVariationTypeAttack, 33},
+        {mpc::NoteVariationTypeFilter, 44},
+    }};
+
+    int tick = 0;
+    int noteNumber = 60;
+    for (const auto& [variationType, variationValue] : noteVariations)
+    {
+        auto noteEvent = sourceTrack->recordNoteEventNonLive(
+            tick,
+            mpc::NoteNumber(noteNumber),
+            mpc::Velocity(100),
+            0
+        );
+        sourceTrack->finalizeNoteEventNonLive(noteEvent, mpc::Duration(24));
+        sourceStateManager->drainQueue();
+
+        auto insertedNote = sourceTrack->getNoteEvents().back();
+        insertedNote->setVariationType(variationType);
+        sourceStateManager->drainQueue();
+        insertedNote = sourceTrack->getNoteEvents().back();
+        insertedNote->setVariationValue(mpc::NoteVariationValue(variationValue));
+        sourceStateManager->drainQueue();
+
+        tick += 24;
+        noteNumber += 1;
+    }
+
+    REQUIRE(sourceTrack->getEvents().size() == noteVariations.size());
+    for (size_t i = 0; i < noteVariations.size(); ++i)
+    {
+        const auto& [expectedVariationType, expectedVariationValue] = noteVariations[i];
+        auto sourceNote =
+            std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(sourceTrack->getEvent(static_cast<int>(i)));
+        REQUIRE(sourceNote);
+        REQUIRE(sourceNote->getVariationType() == expectedVariationType);
+        REQUIRE(sourceNote->getVariationValue() == expectedVariationValue);
+    }
+
+    const auto bytes = mpc::file::kaitai::AllIo::save(sourceMpc);
+
+    mpc::Mpc loadedMpc;
+    mpc::TestMpc::initializeTestMpc(loadedMpc);
+    auto allFile = installAllBytes(loadedMpc, bytes, "VARIANTS.ALL");
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(loadedMpc, allFile.get());
+    loadedMpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto loadedTrack = loadedMpc.getSequencer()->getSequence(0)->getTrack(0);
+    REQUIRE(loadedTrack->getEvents().size() == noteVariations.size());
+
+    for (size_t i = 0; i < noteVariations.size(); ++i)
+    {
+        const auto& [expectedVariationType, expectedVariationValue] = noteVariations[i];
+        auto loadedNote =
+            std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(loadedTrack->getEvent(static_cast<int>(i)));
+        REQUIRE(loadedNote);
+        REQUIRE(loadedNote->getTick() == static_cast<int>(i) * 24);
+        REQUIRE(loadedNote->getNote() == 60 + static_cast<int>(i));
+        REQUIRE(loadedNote->getDuration() == 24);
+        REQUIRE(loadedNote->getVariationType() == expectedVariationType);
+        REQUIRE(loadedNote->getVariationValue() == expectedVariationValue);
+    }
+}
