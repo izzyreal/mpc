@@ -926,3 +926,56 @@ TEST_CASE("Kaitai MPC2000 ALL preserves all note variation types through product
         REQUIRE(loadedNote->getVariationValue() == expectedVariationValue);
     }
 }
+
+TEST_CASE("Kaitai MPC2000 ALL preserves minimum and maximum pitch bend through production seam", "[kaitai-all]")
+{
+    mpc::Mpc sourceMpc;
+    mpc::TestMpc::initializeTestMpc(sourceMpc);
+
+    auto sourceSequencer = sourceMpc.getSequencer();
+    auto sourceStateManager = sourceSequencer->getStateManager();
+    auto sourceSequence = sourceSequencer->getSequence(0);
+    sourceSequence->init(0);
+    sourceStateManager->drainQueue();
+
+    auto sourceTrack = sourceSequence->getTrack(0);
+
+    mpc::sequencer::EventData minPitchBend;
+    minPitchBend.type = mpc::sequencer::EventType::PitchBend;
+    minPitchBend.tick = 0;
+    minPitchBend.amount = -8192;
+    sourceTrack->acquireAndInsertEvent(minPitchBend);
+
+    mpc::sequencer::EventData maxPitchBend;
+    maxPitchBend.type = mpc::sequencer::EventType::PitchBend;
+    maxPitchBend.tick = 24;
+    maxPitchBend.amount = 8191;
+    sourceTrack->acquireAndInsertEvent(maxPitchBend);
+
+    sourceStateManager->drainQueue();
+
+    const auto bytes = mpc::file::kaitai::AllIo::save(sourceMpc);
+
+    mpc::Mpc loadedMpc;
+    mpc::TestMpc::initializeTestMpc(loadedMpc);
+    auto allFile = installAllBytes(loadedMpc, bytes, "PITCHMAX.ALL");
+    REQUIRE(allFile);
+
+    mpc::disk::AllLoader::loadEverythingFromFile(loadedMpc, allFile.get());
+    loadedMpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto loadedTrack = loadedMpc.getSequencer()->getSequence(0)->getTrack(0);
+    REQUIRE(loadedTrack->getEvents().size() == 2);
+
+    auto loadedMin =
+        std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(loadedTrack->getEvent(0));
+    REQUIRE(loadedMin);
+    REQUIRE(loadedMin->getTick() == 0);
+    REQUIRE(loadedMin->getAmount() == -8192);
+
+    auto loadedMax =
+        std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(loadedTrack->getEvent(1));
+    REQUIRE(loadedMax);
+    REQUIRE(loadedMax->getTick() == 24);
+    REQUIRE(loadedMax->getAmount() == 8191);
+}
