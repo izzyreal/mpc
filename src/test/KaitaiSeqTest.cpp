@@ -44,6 +44,8 @@ namespace
 {
 constexpr size_t kMpc3000SeqFixedPreludeSize =
     2 + 37 + 5 + (64 * 4) + 2 + 15 + 3 + 16 + 1 + 1 + 1;
+constexpr size_t kMpc3000SeqTrackHeaderSize = 24;
+constexpr size_t kMpc3000SeqTempoChangeSize = 6;
 constexpr size_t kMpc3000SeqTempoChangeCountOffset =
     kMpc3000SeqFixedPreludeSize - 2;
 constexpr size_t kMpc3000SeqTrackHeaderCountOffset =
@@ -85,7 +87,9 @@ size_t tempoChangeOffset(const std::vector<char> &data, const size_t index)
     REQUIRE(data.size() > kMpc3000SeqTrackHeaderCountOffset);
     const auto numberOfTrackHeaders =
         static_cast<unsigned char>(data[kMpc3000SeqTrackHeaderCountOffset]);
-    return kMpc3000SeqFixedPreludeSize + (numberOfTrackHeaders * 24) + (index * 6);
+    return kMpc3000SeqFixedPreludeSize +
+           (numberOfTrackHeaders * kMpc3000SeqTrackHeaderSize) +
+           (index * kMpc3000SeqTempoChangeSize);
 }
 
 void setTempoChangeFactorPercentage(
@@ -141,7 +145,19 @@ size_t trackHeaderOffset(const std::vector<char> &data, const size_t index)
     const auto numberOfTrackHeaders =
         static_cast<unsigned char>(data[kMpc3000SeqTrackHeaderCountOffset]);
     REQUIRE(index < numberOfTrackHeaders);
-    return kMpc3000SeqFixedPreludeSize + (index * 24);
+    return kMpc3000SeqFixedPreludeSize + (index * kMpc3000SeqTrackHeaderSize);
+}
+
+size_t eventStreamOffset(const std::vector<char> &data)
+{
+    REQUIRE(data.size() > kMpc3000SeqTrackHeaderCountOffset);
+    const auto numberOfTempoChanges =
+        static_cast<unsigned char>(data[kMpc3000SeqTempoChangeCountOffset]);
+    const auto numberOfTrackHeaders =
+        static_cast<unsigned char>(data[kMpc3000SeqTrackHeaderCountOffset]);
+    return kMpc3000SeqFixedPreludeSize +
+           (numberOfTrackHeaders * kMpc3000SeqTrackHeaderSize) +
+           (numberOfTempoChanges * kMpc3000SeqTempoChangeSize);
 }
 
 void setTrackHeaderFlags(
@@ -197,6 +213,82 @@ void setTrackName(
     paddedName.resize(16);
     std::copy(
         paddedName.begin(), paddedName.end(), data.begin() + offset + 5);
+}
+
+void configureTrackHeader(
+    std::vector<char> &data,
+    const size_t index,
+    const int8_t absoluteRecordedTrackNumber,
+    const uint8_t userTrackNumber,
+    const bool muted,
+    const bool inUse,
+    const bool drumTrack,
+    const uint8_t primaryPortChannelAssignment,
+    const int8_t secondaryPortChannelAssignment,
+    const std::string &name,
+    const uint8_t trackVolume,
+    const uint8_t programChangeNumber)
+{
+    auto offset = trackHeaderOffset(data, index);
+    data[offset] = static_cast<char>(absoluteRecordedTrackNumber);
+    data[offset + 1] = static_cast<char>(userTrackNumber);
+
+    unsigned char flags = 0;
+    if (muted)
+    {
+        flags |= 0x01;
+    }
+    if (inUse)
+    {
+        flags |= 0x02;
+    }
+    if (drumTrack)
+    {
+        flags |= 0x04;
+    }
+    data[offset + 2] = static_cast<char>(flags);
+    data[offset + 3] = static_cast<char>(primaryPortChannelAssignment);
+    data[offset + 4] = static_cast<char>(secondaryPortChannelAssignment);
+
+    auto paddedName = mpc::StrUtil::padRight(name, " ", 16);
+    paddedName.resize(16);
+    std::copy(
+        paddedName.begin(), paddedName.end(), data.begin() + offset + 5);
+
+    data[offset + 21] = static_cast<char>(trackVolume);
+    data[offset + 22] = static_cast<char>(programChangeNumber);
+    data[offset + 23] = 0;
+}
+
+void mutateBarEvent(
+    std::vector<char> &data,
+    const uint16_t oneBasedBarNumber,
+    const uint8_t numerator,
+    const uint8_t denominator)
+{
+    const auto offset = eventStreamOffset(data);
+    const unsigned char barNumber1 = static_cast<unsigned char>(oneBasedBarNumber & 0x7f);
+    const unsigned char barNumber2 =
+        static_cast<unsigned char>((oneBasedBarNumber >> 7) & 0x7f);
+
+    for (size_t i = offset; i + 4 < data.size(); ++i)
+    {
+        if (static_cast<unsigned char>(data[i]) != 0xA8)
+        {
+            continue;
+        }
+        if (static_cast<unsigned char>(data[i + 1]) != barNumber1 ||
+            static_cast<unsigned char>(data[i + 2]) != barNumber2)
+        {
+            continue;
+        }
+
+        data[i + 3] = static_cast<char>(numerator);
+        data[i + 4] = static_cast<char>(denominator);
+        return;
+    }
+
+    FAIL("Did not find target MPC3000 SEQ bar event to mutate");
 }
 
 void replaceProgramChangeWithPitchBend(
@@ -514,6 +606,53 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports loop header state",
     REQUIRE(sequence->getLastLoopBarIndex() == 1);
 }
 
+TEST_CASE("Kaitai MPC3000 SEQ production load applies bar time-signature events",
+          "[kaitai-seq]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Seq/M3KNOTE.SEQ");
+    std::vector<char> data(file.begin(), file.end());
+    mutateBarEvent(data, 2, 3, 8);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const std::string fileName = "M3KBAR2.SEQ";
+    prepareSeqFile(mpc, data, fileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("load");
+
+    const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
+    const auto fileNames = mpc.getDisk()->getFileNames();
+    const auto seqFileIt = std::find_if(
+        fileNames.begin(), fileNames.end(),
+        [&fileName](const std::string &candidate)
+        {
+            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
+        });
+    REQUIRE(seqFileIt != fileNames.end());
+
+    loadScreen->setFileLoad(static_cast<int>(
+        std::distance(fileNames.begin(), seqFileIt)));
+    loadScreen->function(5);
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
+
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sequence = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
+    REQUIRE(sequence->getLastBarIndex() == 1);
+    REQUIRE(sequence->getNumerator(0) == 4);
+    REQUIRE(sequence->getDenominator(0) == 4);
+    REQUIRE(sequence->getNumerator(1) == 3);
+    REQUIRE(sequence->getDenominator(1) == 8);
+
+    auto track0 = sequence->getTrack(0);
+    REQUIRE(track0->getEvents().size() == 1);
+    const auto note = eventAs<mpc::sequencer::NoteOnEvent>(track0->getEvents()[0]);
+    REQUIRE(note->getTick() == 24);
+}
+
 TEST_CASE("Kaitai MPC3000 SEQ production load maps MIDI track header fields",
           "[kaitai-seq]")
 {
@@ -558,6 +697,57 @@ TEST_CASE("Kaitai MPC3000 SEQ production load maps MIDI track header fields",
     REQUIRE(track0->getDeviceIndex() == 17);
     REQUIRE(track0->getProgramChange() == 42);
     REQUIRE_FALSE(track0->isOn());
+}
+
+TEST_CASE("Kaitai MPC3000 SEQ production load maps sparse additional track headers by user track number",
+          "[kaitai-seq]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Seq/M3KMIN.SEQ");
+    std::vector<char> data(file.begin(), file.end());
+
+    configureTrackHeader(
+        data, 1, 1, 8, false, true, false, 5, -1, "MIDITRK08", 100, 17);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const std::string fileName = "M3KTRK8.SEQ";
+    prepareSeqFile(mpc, data, fileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("load");
+
+    const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
+    const auto fileNames = mpc.getDisk()->getFileNames();
+    const auto seqFileIt = std::find_if(
+        fileNames.begin(), fileNames.end(),
+        [&fileName](const std::string &candidate)
+        {
+            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
+        });
+    REQUIRE(seqFileIt != fileNames.end());
+
+    loadScreen->setFileLoad(static_cast<int>(
+        std::distance(fileNames.begin(), seqFileIt)));
+    loadScreen->function(5);
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
+
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    auto sequence = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
+
+    auto track0 = sequence->getTrack(0);
+    REQUIRE(track0->getName() == "TRK01");
+    REQUIRE(track0->getBusType() == mpc::sequencer::BusType::DRUM1);
+
+    auto track7 = sequence->getTrack(7);
+    REQUIRE(track7->getName() == "MIDITRK08");
+    REQUIRE(track7->getBusType() == mpc::sequencer::BusType::MIDI);
+    REQUIRE(track7->getDeviceIndex() == 5);
+    REQUIRE(track7->getProgramChange() == 17);
+    REQUIRE(track7->isOn());
+    REQUIRE(track7->getEvents().empty());
 }
 
 TEST_CASE("Kaitai MPC3000 SEQ production load imports real MIDI track fixture",
