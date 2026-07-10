@@ -47,7 +47,7 @@ void LoadASequenceFromAllScreen::function(const int i)
 {
     if (i == 3)
     {
-        openScreenById(ScreenId::Mpc2000XlAllFileScreen);
+        openScreenById(ScreenId::LoadScreen);
     }
     else if (i == 4)
     {
