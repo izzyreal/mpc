@@ -232,7 +232,8 @@ void LoadScreen::function(const int i)
             {
                 openScreenById(ScreenId::LoadASetScreen);
             }
-            else if (StrUtil::eqIgnoreCase(ext, ".mid"))
+            else if (StrUtil::eqIgnoreCase(ext, ".mid") ||
+                     StrUtil::eqIgnoreCase(ext, ".seq"))
             {
                 openScreenById(ScreenId::LoadASequenceScreen);
             }
