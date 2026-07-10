@@ -169,6 +169,7 @@ namespace mpc::disk
             std::function<sound_or_error(std::shared_ptr<file::wav::WavFile>)>
                 onSuccess);
         sequence_or_error readMid2(std::shared_ptr<MpcFile>);
+        sequence_or_error readSeq2(std::shared_ptr<MpcFile>);
 
         void readAps2(std::shared_ptr<MpcFile>, std::function<void()> onSuccess,
                       bool headless);
