@@ -5,8 +5,8 @@ namespace mpc::lcdgui::screens::window
 {
     class Mpc2000XlAllFileScreen final : public ScreenComponent
     {
-
     public:
+        void open() override;
         void function(int i) override;
 
         Mpc2000XlAllFileScreen(Mpc &mpc, int layerIndex);

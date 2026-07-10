@@ -646,6 +646,35 @@ TEST_CASE("Kaitai MPC3000 SEQ production load applies bar time-signature events"
     REQUIRE(sequence->getDenominator(0) == 4);
     REQUIRE(sequence->getNumerator(1) == 3);
     REQUIRE(sequence->getDenominator(1) == 8);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(0).denominator == 4);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(1).numerator == 3);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(1).denominator == 8);
+
+    REQUIRE(sequence->getBarLength(0) == 384);
+    REQUIRE(sequence->getBarLength(1) == 144);
+    REQUIRE(sequence->getBarLengths()[0] == 384);
+    REQUIRE(sequence->getBarLengths()[1] == 144);
+
+    REQUIRE(sequence->getFirstTickOfBar(0) == 0);
+    REQUIRE(sequence->getLastTickOfBar(0) == 383);
+    REQUIRE(sequence->getFirstTickOfBar(1) == 384);
+    REQUIRE(sequence->getLastTickOfBar(1) == 527);
+    REQUIRE(sequence->getLastTick() == 528);
+
+    REQUIRE(sequence->getBarIndexForPositionTicks(0) == 0);
+    REQUIRE(sequence->getBarIndexForPositionTicks(383) == 0);
+    REQUIRE(sequence->getBarIndexForPositionTicks(384) == 1);
+    REQUIRE(sequence->getBarIndexForPositionTicks(527) == 1);
+
+    REQUIRE(sequence->getTimeSignatureFromTickPos(0).numerator == 4);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(0).denominator == 4);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(383).numerator == 4);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(383).denominator == 4);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(384).numerator == 3);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(384).denominator == 8);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(527).numerator == 3);
+    REQUIRE(sequence->getTimeSignatureFromTickPos(527).denominator == 8);
 
     auto track0 = sequence->getTrack(0);
     REQUIRE(track0->getEvents().size() == 1);
