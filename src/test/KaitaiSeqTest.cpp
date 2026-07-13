@@ -7,6 +7,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "command/ReleaseFunctionCommand.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -1494,4 +1495,38 @@ TEST_CASE("Unreadable .SEQ file reports error and returns to LOAD",
     REQUIRE(layeredScreen->getCurrentScreenName() == "popup");
     waitForTimedPopupToReturnToLoad(mpc);
     REQUIRE(layeredScreen->getCurrentScreenName() == "load");
+}
+
+TEST_CASE("Kaitai MPC60 v2 SEQ loads a real MPC60 2.14 sequence through the production seam", "[kaitai-seq][real-mpc60]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto seqFile = prepareSeqFile(
+        mpc,
+        "test/RealMpc60/Seq/MPC60_V214_SEQ01.SEQ",
+        "M60SEQ.SEQ"
+    );
+    REQUIRE(seqFile);
+
+    const auto loaded = mpc::file::kaitai::Mpc3000SeqIo::load(mpc, seqFile);
+    REQUIRE(loaded);
+    mpc.getSequencer()->getStateManager()->drainQueue();
+
+    const auto sequence = *loaded;
+    REQUIRE(sequence->isUsed());
+    REQUIRE(sequence->getName() == "SEQ01");
+    REQUIRE(sequence->getLastBarIndex() == 1);
+    REQUIRE(std::fabs(sequence->getInitialTempo() - 120.0) < 0.001);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(sequence->getTimeSignatureFromBarIndex(0).denominator == 4);
+    REQUIRE(sequence->isLoopEnabled());
+
+    REQUIRE(sequence->getTrack(0)->getEvents().size() == 1U);
+    const auto note = eventAs<mpc::sequencer::NoteOnEvent>(
+        sequence->getTrack(0)->getEvents().at(0));
+    REQUIRE(note->getTick() == 0);
+    REQUIRE(note->getNote() == 1);
+    REQUIRE(note->getVelocity() == 64);
+    REQUIRE(note->getDuration() == 96);
 }

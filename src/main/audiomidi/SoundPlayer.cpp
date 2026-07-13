@@ -74,7 +74,8 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
     else if (fileFormat == SND)
     {
         valid = snd_read_header(stream, sourceSampleRate, validBits,
-                                sourceNumChannels, sourceFrameCount);
+                                sourceNumChannels, sourceFrameCount,
+                                sndInputEncoding);
         wavSamplesAreFloat32 = false;
     }
 
@@ -114,6 +115,10 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
     stopEarly.store(false);
     playedFrameCount = 0;
     ingestedSourceFrameCount = 0;
+    mpc60SampleDecoder = mpc::file::kaitai::Mpc60SampleDecoder();
+    mpc60HasPendingSample = false;
+    mpc60PendingSample = 0.0f;
+    mpc60DecodedSampleIndex = 0;
 
     playing.store(true);
 
@@ -314,8 +319,14 @@ void SoundPlayer::readWithResampling(const float ratio)
     }
 }
 
-float SoundPlayer::readNextFrame() const
+float SoundPlayer::readNextFrame()
 {
+    if (fileFormat == SND &&
+        sndInputEncoding == SndInputEncoding::Mpc60Packed12)
+    {
+        return readNextMpc60Frame();
+    }
+
     if (inputAudioFormat->getSampleSizeInBits() == 24)
     {
         return sampleops::int24_to_float(readNext24BitInt());
@@ -329,6 +340,41 @@ float SoundPlayer::readNextFrame() const
     }
 
     return sampleops::short_to_float(readNextShort());
+}
+
+float SoundPlayer::readNextMpc60Frame()
+{
+    if (mpc60HasPendingSample)
+    {
+        mpc60HasPendingSample = false;
+        ++mpc60DecodedSampleIndex;
+        return mpc60PendingSample;
+    }
+
+    char buffer[3];
+    stream->read(buffer, 3);
+
+    if (stream->gcount() != 3)
+    {
+        return 0.0f;
+    }
+
+    const auto byte0 = static_cast<uint8_t>(buffer[0]);
+    const auto byte1 = static_cast<uint8_t>(buffer[1]);
+    const auto byte2 = static_cast<uint8_t>(buffer[2]);
+    const auto sample0 = static_cast<uint16_t>(
+        byte0 | ((byte1 & 0x0fU) << 8U));
+    const auto sample1 = static_cast<uint16_t>(
+        (byte2 << 4U) | ((byte1 & 0xf0U) >> 4U));
+
+    const auto decodedSample0 =
+        mpc60SampleDecoder.decodeImportedFloat(sample0, false);
+    mpc60PendingSample =
+        mpc60SampleDecoder.decodeImportedFloat(sample1, true);
+    mpc60HasPendingSample = true;
+
+    ++mpc60DecodedSampleIndex;
+    return decodedSample0;
 }
 
 int32_t SoundPlayer::readNext24BitInt() const

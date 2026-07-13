@@ -1,9 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "SampleOps.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "audiomidi/WavInputFileStream.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 #include "file/wav/WavFile.hpp"
+
+#include <cmrc/cmrc.hpp>
 
 #include <chrono>
 #include <cmath>
@@ -18,9 +21,19 @@
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
 using namespace mpc::file::wav;
+using namespace mpc::sampleops;
+
+CMRC_DECLARE(mpctest);
 
 namespace
 {
+    std::vector<char> resourceBytes(const std::string &resourcePath)
+    {
+        auto fs = cmrc::mpctest::get_filesystem();
+        auto file = fs.open(resourcePath);
+        return std::vector<char>(file.begin(), file.end());
+    }
+
     void appendLe(std::string &bytes, uint32_t value, int byteCount)
     {
         for (int i = 0; i < byteCount; i++)
@@ -137,4 +150,37 @@ TEST_CASE("32-bit PCM WAV preview reads full-width samples", "[wav][preview]")
     REQUIRE(std::fabs(buffer.getChannel(0)[0] - 0.5f) < 0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(0)[1] + 0.5f) < 0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(0)[2]) < 0.0001f);
+}
+
+TEST_CASE("MPC60 SND preview decodes packed 12-bit samples", "[snd][preview]")
+{
+    const auto bytes =
+        resourceBytes("test/RealMpc60/Snd/Mpc60V214Rock/HAT2CLSD.SND");
+    auto stream = std::make_shared<std::stringstream>(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary);
+
+    SoundPlayer soundPlayer;
+    REQUIRE(soundPlayer.start(stream, SoundPlayerFileFormat::SND, 40000));
+
+    AudioBuffer buffer("preview", 2, 4, 40000);
+
+    for (int i = 0; i < 20; i++)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        soundPlayer.processAudio(&buffer, 4);
+        if (!buffer.isSilent())
+        {
+            break;
+        }
+    }
+
+    REQUIRE(std::fabs(buffer.getChannel(0)[0] - short_to_float(27)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[1] - short_to_float(52)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[2] - short_to_float(55)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[3] - short_to_float(69)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(1)[0] - buffer.getChannel(0)[0]) <
+            0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(1)[3] - buffer.getChannel(0)[3]) <
+            0.0001f);
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/audio/core/AudioProcess.hpp"
 
+#include "SndInputFileStream.hpp"
+#include "file/kaitai/Mpc60SampleDecoder.hpp"
 #include "sampler/Sound.hpp"
 
 #include <samplerate.h>
@@ -35,6 +37,7 @@ namespace mpc::audiomidi
         unsigned long resamplerGeneratedFrameCounter = 0;
         std::shared_ptr<AudioFormat> inputAudioFormat;
         SoundPlayerFileFormat fileFormat;
+        SndInputEncoding sndInputEncoding = SndInputEncoding::Mpc2000XlPcm16;
         bool wavSamplesAreFloat32 = false;
         float fadeFactor = -1.0f;
         std::atomic<bool> stopEarly{false};
@@ -44,7 +47,8 @@ namespace mpc::audiomidi
         int32_t readNext24BitInt() const;
         int32_t readNextInt32() const;
         float readNextFloat32() const;
-        float readNextFrame() const;
+        float readNextFrame();
+        float readNextMpc60Frame();
 
         std::atomic<bool> playing{false};
         std::string filePath;
@@ -58,6 +62,10 @@ namespace mpc::audiomidi
         int srcLeftError = 0;
         int srcRightError = 0;
         std::shared_ptr<std::istream> stream;
+        mpc::file::kaitai::Mpc60SampleDecoder mpc60SampleDecoder;
+        bool mpc60HasPendingSample = false;
+        float mpc60PendingSample = 0.0f;
+        int mpc60DecodedSampleIndex = 0;
 
     public:
         bool start(const std::shared_ptr<std::istream> &, SoundPlayerFileFormat,

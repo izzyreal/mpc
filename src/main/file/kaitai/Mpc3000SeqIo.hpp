@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mpc_types.hpp"
+#include "file/kaitai/generated/mpc60_seq_body.h"
 
 #include <memory>
 #include <string>
@@ -21,6 +22,10 @@ namespace mpc::file::kaitai
     class Mpc3000SeqIo
     {
     public:
+        static sequence_or_error loadMpc60Sequence(
+            mpc::Mpc &,
+            const mpc60_seq_body_t::sequence_t &,
+            const std::string &fileNameWithoutExtension);
         static sequence_or_error loadBytes(
             mpc::Mpc &,
             const std::vector<char> &,
