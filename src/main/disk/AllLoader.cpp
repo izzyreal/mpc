@@ -11,6 +11,7 @@
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
+#include "file/kaitai/generated/mpc60_all_v2.h"
 #include "file/kaitai/generated/mpc3000_all_v3.h"
 
 #include "disk/MpcFile.hpp"
@@ -49,12 +50,13 @@ namespace {
 enum class all_variant_t
 {
     mpc2000xl,
+    mpc60_v2,
     mpc3000_v3,
     unknown
 };
 
-constexpr size_t kMpc3000AllHeaderSize = 6;
-constexpr size_t kMpc3000AllEmbeddedPreludeSize =
+constexpr size_t kLegacyAllHeaderSize = 6;
+constexpr size_t kLegacyAllEmbeddedPreludeSize =
     37 + 5 + (64 * 4) + 2 + 15 + 3 + 16 + 1 + 1 + 1;
 constexpr size_t kMpc3000TrackHeaderSize = 24;
 constexpr size_t kMpc3000TempoChangeSize = 6;
@@ -70,6 +72,13 @@ all_variant_t detectAllVariant(const std::vector<char>& bytes)
     if (startsWith(bytes, "MPC2KXL ALL 1.00"))
     {
         return all_variant_t::mpc2000xl;
+    }
+
+    if (bytes.size() >= 2 &&
+        static_cast<unsigned char>(bytes[0]) == 0x04 &&
+        static_cast<unsigned char>(bytes[1]) == 0x02)
+    {
+        return all_variant_t::mpc60_v2;
     }
 
     if (bytes.size() >= 2 &&
@@ -291,7 +300,7 @@ size_t embeddedMpc3000SequenceByteCount(
     const mpc3000_all_v3_t::sequence_t& sequence)
 {
     const auto* misc = sequence.misc_chunks();
-    return kMpc3000AllEmbeddedPreludeSize +
+    return kLegacyAllEmbeddedPreludeSize +
         (static_cast<size_t>(misc->number_of_active_track_headers()) *
             kMpc3000TrackHeaderSize) +
         (static_cast<size_t>(misc->number_of_tempo_changes()) *
@@ -345,7 +354,7 @@ void loadEverythingFromMpc3000AllBytes(
     }
     stateManager->drainQueue();
 
-    size_t sequenceOffset = kMpc3000AllHeaderSize;
+    size_t sequenceOffset = kLegacyAllHeaderSize;
     for (size_t i = 0; i < parsed.sequences()->size(); ++i)
     {
         const auto seqBytes = buildStandaloneMpc3000SequenceBytes(
@@ -421,6 +430,92 @@ void loadEverythingFromMpc3000AllBytes(
     }
 }
 
+void loadEverythingFromMpc60AllBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& bytes)
+{
+    std::stringstream parseStream(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc60_all_v2_t parsed(&parseIo);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    sequencer->deleteAllSequences();
+    for (int i = 0; i < 20; ++i)
+    {
+        sequencer->getSong(i)->setUsed(false);
+    }
+    stateManager->drainQueue();
+
+    for (size_t i = 0; i < parsed.body()->sequences()->size(); ++i)
+    {
+        const auto& sequence = *parsed.body()->sequences()->at(i);
+        const auto name = mpc::StrUtil::trim(sequence.sequence_header()->sequence_name());
+        const auto loaded =
+            mpc::file::kaitai::Mpc3000SeqIo::loadMpc60Sequence(mpc, sequence, name);
+        if (!loaded)
+        {
+            throw std::runtime_error(loaded.error());
+        }
+
+        sequencer->copySequence(
+            mpc::TempSequenceIndex,
+            mpc::SequenceIndex(static_cast<int>(i))
+        );
+        stateManager->drainQueue();
+    }
+
+    for (const auto& parsedSongPtr : *parsed.body()->songs())
+    {
+        auto* songBody =
+            dynamic_cast<mpc60_all_body_t::song_body_t*>(parsedSongPtr->body());
+        if (songBody == nullptr)
+        {
+            continue;
+        }
+
+        const auto targetIndex = std::clamp(
+            static_cast<int>(songBody->song_number()) - 1,
+            0,
+            19
+        );
+        const auto song = sequencer->getSong(targetIndex);
+        song->setUsed(true);
+        song->setName(mpc::StrUtil::trim(songBody->song_name()));
+
+        for (size_t stepIndex = 0; stepIndex < songBody->steps()->size(); ++stepIndex)
+        {
+            const auto* parsedStep = songBody->steps()->at(stepIndex).get();
+            const auto songStepIndex = mpc::SongStepIndex(static_cast<int>(stepIndex));
+            song->insertStep(songStepIndex);
+            song->setStepSequenceIndex(
+                songStepIndex,
+                mpc::SequenceIndex(std::max(
+                    0, static_cast<int>(parsedStep->sequence_number()) - 1))
+            );
+            song->setStepRepetitionCount(songStepIndex, parsedStep->repeats());
+        }
+
+        song->setFirstLoopStepIndex(mpc::SongStepIndex(0));
+        song->setLastLoopStepIndex(
+            mpc::SongStepIndex(std::max(
+                0, static_cast<int>(songBody->steps()->size()) - 1))
+        );
+        song->setLoopEnabled(false);
+    }
+
+    if (!parsed.body()->sequences()->empty())
+    {
+        sequencer->setSelectedSequenceIndex(mpc::MinSequenceIndex, false);
+        sequencer->setSelectedTrackIndex(0);
+        sequencer->getTransport()->setPosition(0);
+    }
+}
+
 std::vector<mpc::sequencer::SequenceMetaInfo> loadMpc3000SequenceMetaInfos(
     const std::vector<char>& bytes)
 {
@@ -439,6 +534,30 @@ std::vector<mpc::sequencer::SequenceMetaInfo> loadMpc3000SequenceMetaInfos(
         result.push_back(mpc::sequencer::SequenceMetaInfo{
             true,
             mpc::StrUtil::trim(sequence->misc_chunks()->sequence_header()->sequence_name())
+        });
+    }
+
+    return result;
+}
+
+std::vector<mpc::sequencer::SequenceMetaInfo> loadMpc60SequenceMetaInfos(
+    const std::vector<char>& bytes)
+{
+    std::stringstream parseStream(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc60_all_v2_t parsed(&parseIo);
+
+    std::vector<mpc::sequencer::SequenceMetaInfo> result;
+    result.reserve(parsed.body()->sequences()->size());
+
+    for (const auto& sequence : *parsed.body()->sequences())
+    {
+        result.push_back(mpc::sequencer::SequenceMetaInfo{
+            true,
+            mpc::StrUtil::trim(sequence->sequence_header()->sequence_name())
         });
     }
 
@@ -465,7 +584,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc3000AllBytes(
         return destination;
     }
 
-    size_t sequenceOffset = kMpc3000AllHeaderSize;
+    size_t sequenceOffset = kLegacyAllHeaderSize;
     for (size_t i = 0; i < sourceIndex; ++i)
     {
         sequenceOffset += embeddedMpc3000SequenceByteCount(*parsed.sequences()->at(i));
@@ -479,6 +598,40 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc3000AllBytes(
     const auto name = mpc::StrUtil::trim(
         parsed.sequences()->at(sourceIndex)->misc_chunks()->sequence_header()->sequence_name());
     const auto loaded = mpc::file::kaitai::Mpc3000SeqIo::loadBytes(mpc, seqBytes, name);
+    if (!loaded)
+    {
+        throw std::runtime_error(loaded.error());
+    }
+
+    mpc.getSequencer()->copySequence(mpc::TempSequenceIndex, destIndexInMpcMemory);
+    mpc.getSequencer()->getStateManager()->drainQueue();
+    return destination;
+}
+
+std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc60AllBytes(
+    mpc::Mpc& mpc,
+    const std::vector<char>& bytes,
+    const mpc::SequenceIndex sourceIndexInAllFile,
+    const mpc::SequenceIndex destIndexInMpcMemory)
+{
+    std::stringstream parseStream(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc60_all_v2_t parsed(&parseIo);
+
+    const auto sourceIndex = static_cast<size_t>(sourceIndexInAllFile);
+    const auto destination = mpc.getSequencer()->getSequence(destIndexInMpcMemory);
+    if (sourceIndex >= parsed.body()->sequences()->size())
+    {
+        return destination;
+    }
+
+    const auto& sequence = *parsed.body()->sequences()->at(sourceIndex);
+    const auto name = mpc::StrUtil::trim(sequence.sequence_header()->sequence_name());
+    const auto loaded =
+        mpc::file::kaitai::Mpc3000SeqIo::loadMpc60Sequence(mpc, sequence, name);
     if (!loaded)
     {
         throw std::runtime_error(loaded.error());
@@ -514,6 +667,9 @@ void AllLoader::loadEverythingFromBytes(Mpc &mpc, const std::vector<char> &bytes
             loadEverythingFromCanonicalBytes(mpc, canonicalBytes);
             return;
         }
+        case all_variant_t::mpc60_v2:
+            loadEverythingFromMpc60AllBytes(mpc, bytes);
+            return;
         case all_variant_t::mpc3000_v3:
             loadEverythingFromMpc3000AllBytes(mpc, bytes);
             return;
@@ -806,6 +962,8 @@ AllLoader::loadSequenceMetaInfosFromFile(Mpc &mpc, MpcFile *f)
             }
             return *result;
         }
+        case all_variant_t::mpc60_v2:
+            return loadMpc60SequenceMetaInfos(bytes);
         case all_variant_t::mpc3000_v3:
             return loadMpc3000SequenceMetaInfos(bytes);
         default:
@@ -872,6 +1030,9 @@ AllLoader::loadOneSequenceFromFile(Mpc &mpc, MpcFile *f,
         case all_variant_t::mpc2000xl:
             return file::kaitai::AllIo::loadOneSequence(
                 mpc, f, sourceIndexInAllFile, destIndexInMpcMemory);
+        case all_variant_t::mpc60_v2:
+            return loadOneSequenceFromMpc60AllBytes(
+                mpc, bytes, sourceIndexInAllFile, destIndexInMpcMemory);
         case all_variant_t::mpc3000_v3:
             return loadOneSequenceFromMpc3000AllBytes(
                 mpc, bytes, sourceIndexInAllFile, destIndexInMpcMemory);

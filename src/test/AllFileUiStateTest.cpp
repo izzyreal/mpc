@@ -36,6 +36,12 @@ namespace
     constexpr auto kMpc3000AllFileName = "M3K_2SEQ.ALL";
     constexpr auto kMpc3000AllSongResourcePath = "test/RealMpc3000/All/M3K_2SEQ1SONG.ALL";
     constexpr auto kMpc3000AllSongFileName = "M3K_2SEQ1SONG.ALL";
+    constexpr auto kMpc3000AllEmptyResourcePath = "test/RealMpc3000/All/M3K_EMPTY2.ALL";
+    constexpr auto kMpc3000AllEmptyFileName = "M3K_EMPTY2.ALL";
+    constexpr auto kMpc60AllResourcePath = "test/RealMpc60/All/MPC60_V214_ALL_SEQS.ALL";
+    constexpr auto kMpc60AllFileName = "M60SEQ.ALL";
+    constexpr auto kMpc60AllSongResourcePath = "test/RealMpc60/All/MPC60_V214_SONG_2REALSTEPS.ALL";
+    constexpr auto kMpc60AllSongFileName = "M60SONG.ALL";
 
     void addResourceFile(Mpc &mpc, const std::string& resourcePath,
                          const std::string& fileName)
@@ -54,6 +60,9 @@ namespace
         addResourceFile(mpc, kAllResourcePath, kCompatibleAllFileName);
         addResourceFile(mpc, kMpc3000AllResourcePath, kMpc3000AllFileName);
         addResourceFile(mpc, kMpc3000AllSongResourcePath, kMpc3000AllSongFileName);
+        addResourceFile(mpc, kMpc3000AllEmptyResourcePath, kMpc3000AllEmptyFileName);
+        addResourceFile(mpc, kMpc60AllResourcePath, kMpc60AllFileName);
+        addResourceFile(mpc, kMpc60AllSongResourcePath, kMpc60AllSongFileName);
         auto disk = mpc.getDisk();
         disk->initFiles();
     }
@@ -218,6 +227,44 @@ TEST_CASE("MPC3000 ALL <SEQ> KEEP loads the chosen embedded sequence into the ch
     REQUIRE(loadedSequence->getTrack(0)->getEvents().size() == 4);
 }
 
+TEST_CASE("MPC3000 ALL <SEQ> KEEP loads empty embedded sequences without phantom events",
+          "[load-all][ui][real-mpc3000]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAllResources(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(1);
+    sequencer->getSequence(0)->setName("DEST_A");
+    stateManager->drainQueue();
+
+    openAllWindowFor(mpc, kMpc3000AllEmptyFileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->getCurrentScreen()->function(2);
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-from-all");
+
+    const auto seqFromAllScreen =
+        mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+    REQUIRE(seqFromAllScreen->findField("file")->getText() == "01");
+    REQUIRE(seqFromAllScreen->findLabel("file0")->getText() == "-SEQ01");
+    seqFromAllScreen->turnWheel(1);
+    REQUIRE(seqFromAllScreen->findField("file")->getText() == "02");
+    REQUIRE(seqFromAllScreen->findLabel("file0")->getText() == "-SEQ02");
+
+    seqFromAllScreen->function(4);
+    stateManager->drainQueue();
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load");
+    auto loadedSequence = sequencer->getSequence(0);
+    REQUIRE(loadedSequence->isUsed());
+    REQUIRE(loadedSequence->getName() == "SEQ02");
+    REQUIRE(loadedSequence->getLastBarIndex() == 0);
+    REQUIRE(loadedSequence->getTrack(0)->getEvents().empty());
+}
+
 TEST_CASE("MPC3000 ALL LOAD imports sequences and songs through the real UI path",
           "[load-all][ui][real-mpc3000]")
 {
@@ -239,6 +286,65 @@ TEST_CASE("MPC3000 ALL LOAD imports sequences and songs through the real UI path
     REQUIRE(sequencer->getSequence(0)->getName() == "SEQ01");
     REQUIRE(sequencer->getSequence(1)->isUsed());
     REQUIRE(sequencer->getSequence(1)->getName() == "SEQ02");
+
+    auto song0 = sequencer->getSong(0);
+    REQUIRE(song0->isUsed());
+    REQUIRE(song0->getName() == "SONG01");
+    REQUIRE(song0->getStepCount() == 2);
+}
+
+TEST_CASE("MPC60 v2 ALL <SEQ> branch lets the user browse embedded sequences and keep",
+          "[load-all][ui][real-mpc60]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAllResources(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getSequence(0)->init(0);
+    sequencer->getSequence(0)->setName("DEST_A");
+    stateManager->drainQueue();
+
+    openAllWindowFor(mpc, kMpc60AllFileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->getCurrentScreen()->function(2);
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-from-all");
+
+    const auto seqFromAllScreen =
+        mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+    REQUIRE(seqFromAllScreen->findField("file")->getText() == "01");
+    REQUIRE(seqFromAllScreen->findLabel("file0")->getText() == "-SEQ01");
+
+    seqFromAllScreen->function(4);
+    stateManager->drainQueue();
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load");
+    auto loadedSequence = sequencer->getSequence(0);
+    REQUIRE(loadedSequence->isUsed());
+    REQUIRE(loadedSequence->getName() == "SEQ01");
+}
+
+TEST_CASE("MPC60 v2 ALL LOAD imports sequences and songs through the real UI path",
+          "[load-all][ui][real-mpc60]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAllResources(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+
+    openAllWindowFor(mpc, kMpc60AllSongFileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->getCurrentScreen()->function(4);
+    stateManager->drainQueue();
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load");
+    REQUIRE(sequencer->getSequence(0)->isUsed());
+    REQUIRE(sequencer->getSequence(0)->getName() == "SEQ01");
 
     auto song0 = sequencer->getSong(0);
     REQUIRE(song0->isUsed());
