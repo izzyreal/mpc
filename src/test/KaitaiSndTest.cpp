@@ -7,12 +7,14 @@
 #include "disk/SoundLoader.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
+#include "file/kaitai/generated/mpc60_snd_v1.h"
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
 
+#include <array>
 #include <cstdint>
 #include <fstream>
 #include <memory>
@@ -25,6 +27,7 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc::disk;
 using namespace mpc::file::kaitai;
+using namespace mpc::file::kaitai::generated;
 using namespace mpc::sampleops;
 
 namespace
@@ -68,6 +71,18 @@ namespace
         kaitai::kstream parseIo(&parseStream);
         mpc2000snd_t parsed(&parseIo);
         parsed._read();
+        assertions(parsed);
+    }
+
+    template <typename Assertions>
+    void withParsedMpc60SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
+    {
+        std::stringstream parseStream(
+            std::string(bytes.begin(), bytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary
+        );
+        kaitai::kstream parseIo(&parseStream);
+        mpc60_snd_v1_t parsed(&parseIo);
         assertions(parsed);
     }
 
@@ -148,6 +163,33 @@ namespace
         truncated.push_back('\0');
         return truncated;
     }
+
+    uint64_t fnv1aPcmHash(const std::vector<float> &samples)
+    {
+        uint64_t hash = 1469598103934665603ULL;
+        for (const auto sample : samples)
+        {
+            const auto pcm = static_cast<uint16_t>(mean_normalized_float_to_short(sample));
+            hash ^= (pcm & 0xffU);
+            hash *= 1099511628211ULL;
+            hash ^= ((pcm >> 8U) & 0xffU);
+            hash *= 1099511628211ULL;
+        }
+        return hash;
+    }
+
+    void requirePcmWindow(const std::vector<float> &samples,
+                          const std::size_t offset,
+                          const std::array<int16_t, 4> &expected)
+    {
+        REQUIRE(samples.size() >= offset + expected.size());
+        for (std::size_t i = 0; i < expected.size(); ++i)
+        {
+            REQUIRE(mean_normalized_float_to_short(samples[offset + i]) ==
+                    expected[i]);
+        }
+    }
+
 }
 
 TEST_CASE("Kaitai MPC2000 SND saves and loads explicit semantics", "[kaitai-snd]")
@@ -586,4 +628,19 @@ TEST_CASE("SoundLoader loads mutated SND header semantics from Kaitai-written by
     REQUIRE(loaded->getLoopTo() == 3);
     REQUIRE(loaded->isLoopEnabled());
     REQUIRE(loaded->getBeatCount() == 1);
+}
+
+TEST_CASE("SndIo rejects too-short and unsupported SND data", "[kaitai-snd]")
+{
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+
+    auto tooShort = SndIo::loadBytes({static_cast<char>(0x01)}, sound, "bad");
+    REQUIRE_FALSE(tooShort);
+    REQUIRE(tooShort.error() == "SND file is too short");
+
+    auto unsupported = SndIo::loadBytes(
+        {static_cast<char>(0x01), static_cast<char>(0x02)}, sound,
+        "bad");
+    REQUIRE_FALSE(unsupported);
+    REQUIRE(unsupported.error() == "Unsupported SND file format");
 }

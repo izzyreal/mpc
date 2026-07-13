@@ -7,6 +7,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "command/ReleaseFunctionCommand.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -1495,3 +1496,4 @@ TEST_CASE("Unreadable .SEQ file reports error and returns to LOAD",
     waitForTimedPopupToReturnToLoad(mpc);
     REQUIRE(layeredScreen->getCurrentScreenName() == "load");
 }
+

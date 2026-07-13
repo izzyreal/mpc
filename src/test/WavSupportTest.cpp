@@ -1,9 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "SampleOps.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "audiomidi/WavInputFileStream.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 #include "file/wav/WavFile.hpp"
+
+#include <cmrc/cmrc.hpp>
 
 #include <chrono>
 #include <cmath>
@@ -18,9 +21,19 @@
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
 using namespace mpc::file::wav;
+using namespace mpc::sampleops;
+
+CMRC_DECLARE(mpctest);
 
 namespace
 {
+    std::vector<char> resourceBytes(const std::string &resourcePath)
+    {
+        auto fs = cmrc::mpctest::get_filesystem();
+        auto file = fs.open(resourcePath);
+        return std::vector<char>(file.begin(), file.end());
+    }
+
     void appendLe(std::string &bytes, uint32_t value, int byteCount)
     {
         for (int i = 0; i < byteCount; i++)
@@ -138,3 +151,4 @@ TEST_CASE("32-bit PCM WAV preview reads full-width samples", "[wav][preview]")
     REQUIRE(std::fabs(buffer.getChannel(0)[1] + 0.5f) < 0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(0)[2]) < 0.0001f);
 }
+

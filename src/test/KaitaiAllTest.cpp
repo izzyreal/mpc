@@ -10,6 +10,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
+#include "file/kaitai/generated/mpc60_all_v2.h"
 #include "file/kaitai/generated/mpc3000_all_v3.h"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -584,6 +585,26 @@ TEST_CASE("Kaitai MPC3000 ALL sequence meta infos expose expected names and used
     REQUIRE(metaInfos[1].name == "SEQ02");
 }
 
+TEST_CASE("Kaitai MPC3000 ALL empty embedded sequences still expose used sequence meta infos", "[kaitai-all][real-mpc3000]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto allFile = installResourceFile(
+        mpc,
+        "test/RealMpc3000/All/M3K_EMPTY2.ALL",
+        "M3K_EMPTY2.ALL"
+    );
+    REQUIRE(allFile);
+
+    const auto metaInfos = mpc::disk::AllLoader::loadSequenceMetaInfosFromFile(mpc, allFile.get());
+    REQUIRE(metaInfos.size() == 2U);
+    REQUIRE(metaInfos[0].used);
+    REQUIRE(metaInfos[0].name == "SEQ01");
+    REQUIRE(metaInfos[1].used);
+    REQUIRE(metaInfos[1].name == "SEQ02");
+}
+
 TEST_CASE("Kaitai MPC3000 ALL loads one sequence with expected defaults", "[kaitai-all][real-mpc3000]")
 {
     mpc::Mpc kaitaiMpc;
@@ -610,6 +631,36 @@ TEST_CASE("Kaitai MPC3000 ALL loads one sequence with expected defaults", "[kait
     REQUIRE(loaded->getTimeSignatureFromBarIndex(0).numerator == 4);
     REQUIRE(loaded->getTimeSignatureFromBarIndex(0).denominator == 4);
     REQUIRE(loaded->isLoopEnabled());
+}
+
+TEST_CASE("Kaitai MPC3000 ALL loads empty embedded sequences without inventing musical events", "[kaitai-all][real-mpc3000]")
+{
+    mpc::Mpc kaitaiMpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(kaitaiMpc);
+    auto kaitaiFile = installResourceFile(
+        kaitaiMpc,
+        "test/RealMpc3000/All/M3K_EMPTY2.ALL",
+        "M3K_EMPTY2.ALL"
+    );
+    REQUIRE(kaitaiFile);
+
+    const auto loaded = mpc::disk::AllLoader::loadOneSequenceFromFile(
+        kaitaiMpc,
+        kaitaiFile.get(),
+        mpc::SequenceIndex(1),
+        mpc::SequenceIndex(10)
+    );
+    REQUIRE(loaded);
+    kaitaiMpc.getSequencer()->getStateManager()->drainQueue();
+
+    REQUIRE(loaded->isUsed());
+    REQUIRE(loaded->getName() == "SEQ02");
+    REQUIRE(loaded->getLastBarIndex() == 0);
+    REQUIRE_THAT(loaded->getInitialTempo(), Catch::Matchers::WithinAbs(99.0, 0.001));
+    REQUIRE(loaded->getTimeSignatureFromBarIndex(0).numerator == 4);
+    REQUIRE(loaded->getTimeSignatureFromBarIndex(0).denominator == 4);
+    REQUIRE(loaded->isLoopEnabled());
+    REQUIRE(loaded->getTrack(0)->getEvents().empty());
 }
 
 TEST_CASE("Kaitai MPC3000 ALL loads sequences and songs through the production seam", "[kaitai-all][real-mpc3000]")
@@ -1108,3 +1159,4 @@ TEST_CASE("Kaitai MPC2000 ALL preserves minimum and maximum pitch bend through p
     REQUIRE(loadedMax->getTick() == 24);
     REQUIRE(loadedMax->getAmount() == 8191);
 }
+

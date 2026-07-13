@@ -13,7 +13,7 @@ using namespace mpc::lcdgui::screens;
 
 namespace
 {
-    bool isMpc3000AllFile(const std::shared_ptr<mpc::disk::MpcFile>& file)
+    bool isLegacyForeignAllFile(const std::shared_ptr<mpc::disk::MpcFile>& file)
     {
         if (!file)
         {
@@ -23,7 +23,8 @@ namespace
         const auto bytes = file->getBytes();
         return bytes.size() >= 2 &&
             static_cast<unsigned char>(bytes[0]) == 0x04 &&
-            static_cast<unsigned char>(bytes[1]) == 0x03;
+            (static_cast<unsigned char>(bytes[1]) == 0x02 ||
+             static_cast<unsigned char>(bytes[1]) == 0x03);
     }
 }
 
@@ -35,7 +36,7 @@ Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(Mpc &mpc, const int layerIndex)
 void Mpc2000XlAllFileScreen::open()
 {
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-    const auto bgName = isMpc3000AllFile(loadScreen->getSelectedFile())
+    const auto bgName = isLegacyForeignAllFile(loadScreen->getSelectedFile())
         ? "mpc3000-all-file"
         : "mpc2000xl-all-file";
     findBackground()->setBackgroundName(bgName);

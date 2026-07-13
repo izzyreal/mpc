@@ -22,6 +22,7 @@ The generator we use is the C++ write-capable compiler from:
 - `mpc2000xl.mid.ksy`
 - `mpc2000xl.all.ksy`
 - `mpc60.set.v1.ksy`
+- `mpc60.snd.v1.ksy`
 
 ## Regenerate parsers
 
@@ -40,7 +41,8 @@ From anywhere:
   /Users/izmar/git/mpc2000xl_kaitai/standard_midi_file_with_running_status.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.mid.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.ksy \
-  /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.snd.v1.ksy
 ```
 
 ## Typical update flow

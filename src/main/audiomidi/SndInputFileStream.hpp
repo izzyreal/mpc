@@ -1,13 +1,25 @@
 #pragma once
 
+#include "file/kaitai/Mpc60SampleDecoder.hpp"
+
+#include <algorithm>
 #include <fstream>
+#include <memory>
+#include <string>
 #include <vector>
 
 #ifdef __linux__
 #include <string.h> // For strcmp
 #endif
 
-const char ID[] = {0x01, 0x04, '\0'};
+enum class SndInputEncoding
+{
+    Mpc2000XlPcm16,
+    Mpc60Packed12,
+};
+
+const char MPC2000XL_SND_ID[] = {0x01, 0x04, '\0'};
+const char MPC60_SND_ID[] = {0x01, 0x01, '\0'};
 
 const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and
                         // equal to or smaller than '15'
@@ -23,16 +35,18 @@ const int LOOP_LENGTH_INDEX = 34;     // 4-byte uint
 const int LOOP_ENABLED_INDEX = 38;    // 1 byte, 1 if true
 const int BEAT_COUNT_INDEX = 39;      // 1 byte
 const int SAMPLE_RATE_INDEX = 40;     // 2 byte unsigned short
+const int MPC2000XL_SND_HEADER_SIZE = 42;
+const int MPC60_SND_HEADER_SIZE = 39;
 
-void snd_read_bytes(const std::shared_ptr<std::istream> &stream,
-                    const std::vector<char> &bytes, const int maxLength)
+inline void snd_read_bytes(const std::shared_ptr<std::istream> &stream,
+                           const std::vector<char> &bytes, const int maxLength)
 {
     auto byteCountToRead = std::min((int)bytes.size(), maxLength);
     stream->read((char *)&bytes[0], byteCountToRead);
 }
 
-std::string snd_get_string(const std::shared_ptr<std::istream> &stream,
-                           const int maxLength)
+inline std::string snd_get_string(const std::shared_ptr<std::istream> &stream,
+                                  const int maxLength)
 {
     std::vector<char> buffer(maxLength);
     snd_read_bytes(stream, buffer, maxLength);
@@ -49,14 +63,16 @@ std::string snd_get_string(const std::shared_ptr<std::istream> &stream,
     return std::string(buffer.begin(), buffer.end());
 }
 
-uint16_t snd_get_unsigned_short_LE(const std::shared_ptr<std::istream> &stream)
+inline uint16_t snd_get_unsigned_short_LE(
+    const std::shared_ptr<std::istream> &stream)
 {
     char buffer[2];
     stream->read(buffer, 2);
     return static_cast<uint16_t>((buffer[1] & 0xFF) << 8 | buffer[0] & 0xFF);
 }
 
-int snd_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
+inline int snd_get_LE(const std::shared_ptr<std::istream> &stream,
+                      int numBytes)
 {
 
     if (numBytes < 1 || numBytes > 4)
@@ -82,24 +98,23 @@ int snd_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
     return val;
 }
 
-char snd_get_char(const std::shared_ptr<std::istream> &stream)
+inline uint32_t snd_get_unsigned_LE(
+    const std::shared_ptr<std::istream> &stream, int numBytes)
+{
+    return static_cast<uint32_t>(snd_get_LE(stream, numBytes));
+}
+
+inline char snd_get_char(const std::shared_ptr<std::istream> &stream)
 {
     char buf[1];
     stream->read(buf, 1);
     return *buf;
 }
 
-bool snd_read_header(const std::shared_ptr<std::istream> &stream,
-                     int &sampleRate, int &validBits, int &numChannels,
-                     int &numFrames)
+inline bool snd_read_mpc2000xl_header(
+    const std::shared_ptr<std::istream> &stream, int &sampleRate,
+    int &validBits, int &numChannels, int &numFrames)
 {
-    auto sndId = snd_get_string(stream, 2);
-
-    if (strcmp(sndId.c_str(), ID) != 0)
-    {
-        return false;
-    }
-
     auto name = snd_get_string(stream, 17);
 
     /*auto level =*/snd_get_char(stream);
@@ -131,4 +146,80 @@ bool snd_read_header(const std::shared_ptr<std::istream> &stream,
     }
 
     return true;
+}
+
+inline bool snd_read_mpc60_header(const std::shared_ptr<std::istream> &stream,
+                                  int &sampleRate, int &validBits,
+                                  int &numChannels, int &numFrames)
+{
+    stream->seekg(0, std::ios::end);
+    const auto fileSize = stream->tellg();
+
+    if (fileSize < MPC60_SND_HEADER_SIZE)
+    {
+        return false;
+    }
+
+    stream->seekg(2, std::ios::beg);
+
+    auto name = snd_get_string(stream, 17);
+    numFrames = static_cast<int>(snd_get_unsigned_LE(stream, 4));
+    /*auto startMsec =*/snd_get_unsigned_LE(stream, 2);
+    /*auto endMsec =*/snd_get_unsigned_LE(stream, 4);
+    /*auto decayMsec =*/snd_get_unsigned_LE(stream, 2);
+    /*auto volume =*/snd_get_char(stream);
+    /*auto tuning =*/snd_get_char(stream);
+    stream->ignore(5);
+    /*auto velocityToVolume =*/snd_get_char(stream);
+
+    const auto packedByteCount = static_cast<std::streamoff>(
+        ((static_cast<uint64_t>(numFrames) + 1U) / 2U) * 3U);
+
+    if (numFrames <= 0 ||
+        fileSize != MPC60_SND_HEADER_SIZE + packedByteCount)
+    {
+        return false;
+    }
+
+    sampleRate = mpc::file::kaitai::kMpc60SampleRate;
+    validBits = 16;
+    numChannels = 1;
+    stream->seekg(MPC60_SND_HEADER_SIZE, std::ios::beg);
+    return true;
+}
+
+inline bool snd_read_header(const std::shared_ptr<std::istream> &stream,
+                            int &sampleRate, int &validBits,
+                            int &numChannels, int &numFrames,
+                            SndInputEncoding &encoding)
+{
+    stream->clear();
+    stream->seekg(0, std::ios::beg);
+
+    const auto sndId = snd_get_string(stream, 2);
+
+    if (strcmp(sndId.c_str(), MPC2000XL_SND_ID) == 0)
+    {
+        encoding = SndInputEncoding::Mpc2000XlPcm16;
+        return snd_read_mpc2000xl_header(stream, sampleRate, validBits,
+                                         numChannels, numFrames);
+    }
+
+    if (strcmp(sndId.c_str(), MPC60_SND_ID) == 0)
+    {
+        encoding = SndInputEncoding::Mpc60Packed12;
+        return snd_read_mpc60_header(stream, sampleRate, validBits,
+                                     numChannels, numFrames);
+    }
+
+    return false;
+}
+
+inline bool snd_read_header(const std::shared_ptr<std::istream> &stream,
+                            int &sampleRate, int &validBits,
+                            int &numChannels, int &numFrames)
+{
+    SndInputEncoding encoding;
+    return snd_read_header(stream, sampleRate, validBits, numChannels,
+                           numFrames, encoding);
 }
