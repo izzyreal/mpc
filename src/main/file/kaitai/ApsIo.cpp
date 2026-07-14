@@ -15,6 +15,7 @@
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/PgmAssignScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/NoteParameters.hpp"
@@ -747,6 +748,8 @@ void loadGlobals(mpc2000xl_aps_t& parsed, mpc::Mpc& mpc)
 void loadGlobals(mpc3000_aps_v3_t& parsed, mpc::Mpc& mpc)
 {
     auto mixerSetupScreen = mpc.screens->get<mpc::lcdgui::ScreenId::MixerSetupScreen>();
+    auto assign16LevelsScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::Assign16LevelsScreen>();
 
     mixerSetupScreen->setRecordMixChangesEnabled(parsed.record_live_mix_changes() != 0);
 
@@ -755,6 +758,20 @@ void loadGlobals(mpc3000_aps_v3_t& parsed, mpc::Mpc& mpc)
     // imports and degrade unsupported MPC3000-only sources to PROGRAM.
     mixerSetupScreen->setStereoMixSourceDrum(false);
     mixerSetupScreen->setIndivFxSourceDrum(false);
+
+    // Real MPC3000 APS stores the visible Center pad value directly as 4..13.
+    // The 2000XL screen model stores originalKeyPad as a zero-based physical pad
+    // index 3..12 and then displays it as +1. Keep that translation explicit.
+    //
+    // Real 2000XL quirk: changing "Original key pad" for 16 Levels tuning can be
+    // blocked unless AFTER is cleared while the note variation slider is assigned.
+    // We preserve the persisted value here, but VMPC2000XL does not emulate that
+    // UI quirk.
+    assign16LevelsScreen->setOriginalKeyPad(
+        static_cast<mpc::PhysicalPadIndex>(
+            std::clamp<int>(parsed.center_pad_16_levels_if_param_tuning(), 4, 13) - 1
+        )
+    );
 }
 
 } // namespace
