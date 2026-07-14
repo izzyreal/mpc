@@ -23,6 +23,12 @@ The generator we use is the C++ write-capable compiler from:
 - `mpc2000xl.all.ksy`
 - `mpc60.set.v1.ksy`
 - `mpc60.snd.v1.ksy`
+- `mpc3000.seq.v3.ksy`
+- `mpc3000.all.v3.ksy`
+- `mpc60.seq.body.ksy`
+- `mpc60.seq.v2.ksy`
+- `mpc60.all.body.ksy`
+- `mpc60.all.v2.ksy`
 
 ## Regenerate parsers
 
@@ -42,7 +48,13 @@ From anywhere:
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.mid.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy \
-  /Users/izmar/git/mpc2000xl_kaitai/mpc60.snd.v1.ksy
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.snd.v1.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc3000.seq.v3.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc3000.all.v3.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.seq.body.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.seq.v2.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.all.body.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc60.all.v2.ksy
 ```
 
 ## Typical update flow
@@ -55,6 +67,7 @@ From anywhere:
    - `src/main/file/kaitai/ApsIo.*`
    - `src/main/file/kaitai/MidIo.*`
    - `src/main/file/kaitai/AllIo.*`
+   - `src/main/file/kaitai/Mpc3000SeqIo.*`
 4. Run downstream tests.
 5. Commit both the `.ksy` change and the regenerated vendored C++.
 

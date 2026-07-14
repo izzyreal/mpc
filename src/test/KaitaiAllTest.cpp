@@ -537,6 +537,7 @@ TEST_CASE("Kaitai MPC3000 ALL parser exposes expected embedded sequence and song
     );
     kaitai::kstream parseIo(&parseStream);
     mpc3000_all_v3_t parsed(&parseIo);
+    parsed._read();
 
     REQUIRE(parsed.sequences()->size() == 2U);
     REQUIRE(parsed.sequences()->at(0)->misc_chunks()->sequence_header()->sequence_name() == "SEQ01           ");
@@ -544,13 +545,11 @@ TEST_CASE("Kaitai MPC3000 ALL parser exposes expected embedded sequence and song
     REQUIRE(parsed.sequences()->at(0)->events()->size() == 5U);
     REQUIRE(parsed.sequences()->at(1)->events()->size() == 9U);
 
-    REQUIRE(parsed.songs()->size() == 3U);
-    REQUIRE(parsed.songs()->at(0)->number_of_steps() == 0xFF);
-    REQUIRE(parsed.songs()->at(0)->song_body() == nullptr);
+    REQUIRE(parsed.songs()->size() == 2U);
 
-    const auto* songBody = parsed.songs()->at(1)->song_body();
+    const auto* songBody = parsed.songs()->at(0)->song_body();
     REQUIRE(songBody != nullptr);
-    REQUIRE(parsed.songs()->at(1)->number_of_steps() == 2);
+    REQUIRE(parsed.songs()->at(0)->number_of_steps() == 2);
     REQUIRE(songBody->song_number() == 1);
     REQUIRE(songBody->song_name() == "SONG01");
     REQUIRE(songBody->end_status() == mpc3000_all_v3_t::song_t::song_body_t::END_STATUS_STOP_AT_END);
@@ -561,8 +560,8 @@ TEST_CASE("Kaitai MPC3000 ALL parser exposes expected embedded sequence and song
     REQUIRE(songBody->steps()->at(1)->sequence_number() == 1);
     REQUIRE(songBody->steps()->at(1)->repetition_count() == 3);
 
-    REQUIRE(parsed.songs()->at(2)->number_of_steps() == 0);
-    REQUIRE(parsed.songs()->at(2)->song_body() == nullptr);
+    REQUIRE(parsed.songs()->at(1)->number_of_steps() == 0);
+    REQUIRE(parsed.songs()->at(1)->song_body() == nullptr);
 }
 
 TEST_CASE("Kaitai MPC3000 ALL sequence meta infos expose expected names and usedness", "[kaitai-all][real-mpc3000]")
@@ -1174,6 +1173,7 @@ TEST_CASE("Kaitai MPC60 v2 ALL parser exposes expected embedded sequence and son
     );
     kaitai::kstream parseIo(&parseStream);
     mpc60_all_v2_t parsed(&parseIo);
+    parsed._read();
 
     REQUIRE(parsed.body()->sequences()->size() == 1U);
     REQUIRE(parsed.body()->sequences()->at(0)->sequence_header()->sequence_name() == "SEQ01           ");
