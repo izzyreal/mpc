@@ -301,12 +301,12 @@ size_t embeddedMpc3000SequenceByteCount(
 {
     const auto* misc = sequence.misc_chunks();
     return kLegacyAllEmbeddedPreludeSize +
-        (static_cast<size_t>(misc->number_of_active_track_headers()) *
+        (static_cast<size_t>(misc->num_track_headers()) *
             kMpc3000TrackHeaderSize) +
-        (static_cast<size_t>(misc->number_of_tempo_changes()) *
+        (static_cast<size_t>(misc->num_tempo_changes()) *
             kMpc3000TempoChangeSize) +
         static_cast<size_t>(
-            misc->sequence_header()->sequence_length_in_bytes()->value());
+            misc->sequence_header()->event_stream_length_in_bytes()->value());
 }
 
 std::vector<char> buildStandaloneMpc3000SequenceBytes(
@@ -343,6 +343,7 @@ void loadEverythingFromMpc3000AllBytes(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc3000_all_v3_t parsed(&parseIo);
+    parsed._read();
 
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
@@ -440,6 +441,7 @@ void loadEverythingFromMpc60AllBytes(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc60_all_v2_t parsed(&parseIo);
+    parsed._read();
 
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
@@ -525,6 +527,7 @@ std::vector<mpc::sequencer::SequenceMetaInfo> loadMpc3000SequenceMetaInfos(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc3000_all_v3_t parsed(&parseIo);
+    parsed._read();
 
     std::vector<mpc::sequencer::SequenceMetaInfo> result;
     result.reserve(parsed.sequences()->size());
@@ -549,6 +552,7 @@ std::vector<mpc::sequencer::SequenceMetaInfo> loadMpc60SequenceMetaInfos(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc60_all_v2_t parsed(&parseIo);
+    parsed._read();
 
     std::vector<mpc::sequencer::SequenceMetaInfo> result;
     result.reserve(parsed.body()->sequences()->size());
@@ -576,6 +580,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc3000AllBytes(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc3000_all_v3_t parsed(&parseIo);
+    parsed._read();
 
     const auto sourceIndex = static_cast<size_t>(sourceIndexInAllFile);
     const auto destination = mpc.getSequencer()->getSequence(destIndexInMpcMemory);
@@ -620,6 +625,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc60AllBytes(
     );
     kaitai::kstream parseIo(&parseStream);
     mpc60_all_v2_t parsed(&parseIo);
+    parsed._read();
 
     const auto sourceIndex = static_cast<size_t>(sourceIndexInAllFile);
     const auto destination = mpc.getSequencer()->getSequence(destIndexInMpcMemory);

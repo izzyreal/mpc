@@ -220,8 +220,8 @@ ParsedSequenceView makeParsedSequenceView(const mpc3000_seq_v3_t &parsed)
         static_cast<double>(parsed.sequence_header()->tempo()) / 10.0,
         parsed.sequence_header()->loop_to_bar() == mpc3000_seq_v3_t::OFF_ON_TRUE,
         std::max(0, static_cast<int>(parsed.sequence_header()->loop_to_bar_number())),
-        static_cast<int>(parsed.number_of_active_track_headers()),
-        static_cast<int>(parsed.number_of_tempo_changes()),
+        static_cast<int>(parsed.num_track_headers()),
+        static_cast<int>(parsed.num_tempo_changes()),
         std::nullopt,
         parsed.track_headers(),
         parsed.tempo_changes(),
@@ -238,8 +238,8 @@ ParsedSequenceView makeParsedSequenceView(mpc60_seq_body_t::sequence_t &sequence
         static_cast<double>(header->tempo()) / 10.0,
         header->loop_to_bar() == mpc60_seq_body_t::OFF_ON_TRUE,
         std::max(0, static_cast<int>(header->loop_to_bar_number())),
-        static_cast<int>(header->number_of_active_track_headers()),
-        static_cast<int>(header->number_of_tempo_changes()),
+        static_cast<int>(header->num_track_headers()),
+        static_cast<int>(header->num_tempo_changes()),
         static_cast<size_t>(sequence.events_start()),
         sequence.track_headers(),
         sequence.tempo_changes(),
@@ -778,6 +778,7 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
     if (version == 0x02)
     {
         mpc60_seq_v2_t parsed(&kaitaiIo);
+        parsed._read();
         return loadParsedSequence(
             mpc, bytes, fileNameWithoutExtension, makeParsedSequenceView(parsed));
     }
@@ -785,6 +786,7 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
     if (version == 0x03)
     {
         mpc3000_seq_v3_t parsed(&kaitaiIo);
+        parsed._read();
         return loadParsedSequence(
             mpc, bytes, fileNameWithoutExtension, makeParsedSequenceView(parsed));
     }

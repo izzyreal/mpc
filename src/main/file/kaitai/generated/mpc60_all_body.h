@@ -23,33 +23,45 @@ public:
     class song_body_t;
     class song_step_t;
 
-    mpc60_all_body_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
 private:
-    void _read();
+    bool m__dirty;
 
 public:
+
+    mpc60_all_body_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+    void _read();
     void _fetch_instances();
+    void _write();
+    void _check();
     ~mpc60_all_body_t();
 
     class all_file_body_t : public kaitai::kstruct {
 
     public:
 
-        all_file_body_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        all_file_body_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~all_file_body_t();
         uint32_t total_number_of_bytes_in_all_sequences() const { return m_total_number_of_bytes_in_all_sequences; }
+        void set_total_number_of_bytes_in_all_sequences(uint32_t _v) { m__dirty = true; m_total_number_of_bytes_in_all_sequences = std::move(_v); }
         std::vector<std::unique_ptr<mpc60_seq_body_t::sequence_t>>* sequences() const { return m_sequences.get(); }
+        void set_sequences(std::unique_ptr<std::vector<std::unique_ptr<mpc60_seq_body_t::sequence_t>>> _v) { m__dirty = true; m_sequences = std::move(_v); }
         std::string sequences_terminator() const { return m_sequences_terminator; }
+        void set_sequences_terminator(std::string _v) { m__dirty = true; m_sequences_terminator = std::move(_v); }
         std::vector<std::unique_ptr<song_t>>* songs() const { return m_songs.get(); }
+        void set_songs(std::unique_ptr<std::vector<std::unique_ptr<song_t>>> _v) { m__dirty = true; m_songs = std::move(_v); }
         mpc60_all_body_t* _root() const { return m__root; }
+        void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(kaitai::kstruct* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint32_t m_total_number_of_bytes_in_all_sequences;
@@ -64,16 +76,21 @@ public:
 
     public:
 
-        empty_song_t(kaitai::kstream* p__io, mpc60_all_body_t::song_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        empty_song_t(kaitai::kstream* p__io, mpc60_all_body_t::song_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~empty_song_t();
         mpc60_all_body_t* _root() const { return m__root; }
+        void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc60_all_body_t::song_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         mpc60_all_body_t* m__root;
@@ -84,18 +101,25 @@ public:
 
     public:
 
-        song_t(kaitai::kstream* p__io, mpc60_all_body_t::all_file_body_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        song_t(kaitai::kstream* p__io, mpc60_all_body_t::all_file_body_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~song_t();
         uint8_t step_count() const { return m_step_count; }
+        void set_step_count(uint8_t _v) { m__dirty = true; m_step_count = std::move(_v); }
         kaitai::kstruct* body() const { return m_body.get(); }
+        void set_body(std::unique_ptr<kaitai::kstruct> _v) { m__dirty = true; m_body = std::move(_v); }
         mpc60_all_body_t* _root() const { return m__root; }
+        void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc60_all_body_t::all_file_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_step_count;
@@ -108,22 +132,33 @@ public:
 
     public:
 
-        song_body_t(kaitai::kstream* p__io, mpc60_all_body_t::song_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        song_body_t(kaitai::kstream* p__io, mpc60_all_body_t::song_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~song_body_t();
         uint8_t song_number() const { return m_song_number; }
+        void set_song_number(uint8_t _v) { m__dirty = true; m_song_number = std::move(_v); }
         std::string reserved_1() const { return m_reserved_1; }
+        void set_reserved_1(std::string _v) { m__dirty = true; m_reserved_1 = std::move(_v); }
         std::string reserved_2() const { return m_reserved_2; }
+        void set_reserved_2(std::string _v) { m__dirty = true; m_reserved_2 = std::move(_v); }
         std::string song_name() const { return m_song_name; }
+        void set_song_name(std::string _v) { m__dirty = true; m_song_name = std::move(_v); }
         std::string reserved_3() const { return m_reserved_3; }
+        void set_reserved_3(std::string _v) { m__dirty = true; m_reserved_3 = std::move(_v); }
         std::vector<std::unique_ptr<song_step_t>>* steps() const { return m_steps.get(); }
+        void set_steps(std::unique_ptr<std::vector<std::unique_ptr<song_step_t>>> _v) { m__dirty = true; m_steps = std::move(_v); }
         mpc60_all_body_t* _root() const { return m__root; }
+        void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc60_all_body_t::song_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_song_number;
@@ -140,18 +175,25 @@ public:
 
     public:
 
-        song_step_t(kaitai::kstream* p__io, mpc60_all_body_t::song_body_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        song_step_t(kaitai::kstream* p__io, mpc60_all_body_t::song_body_t* p__parent = nullptr, mpc60_all_body_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~song_step_t();
         uint8_t sequence_number() const { return m_sequence_number; }
+        void set_sequence_number(uint8_t _v) { m__dirty = true; m_sequence_number = std::move(_v); }
         uint8_t repeats() const { return m_repeats; }
+        void set_repeats(uint8_t _v) { m__dirty = true; m_repeats = std::move(_v); }
         mpc60_all_body_t* _root() const { return m__root; }
+        void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc60_all_body_t::song_body_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_sequence_number;
@@ -162,7 +204,9 @@ public:
 
 public:
     mpc60_all_body_t* _root() const { return m__root; }
+    void set__root(mpc60_all_body_t* _v) { m__dirty = true; m__root = std::move(_v); }
     kaitai::kstruct* _parent() const { return m__parent; }
+    void set__parent(kaitai::kstruct* _v) { m__dirty = true; m__parent = std::move(_v); }
 
 private:
     mpc60_all_body_t* m__root;

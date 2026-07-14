@@ -7,6 +7,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/AkaiName.hpp"
 #include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "command/ReleaseFunctionCommand.hpp"
 #include "lcdgui/Label.hpp"
@@ -35,6 +36,7 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
@@ -73,6 +75,40 @@ std::shared_ptr<mpc::disk::MpcFile> prepareSeqFile(
     auto file = fs.open(resourcePath);
     std::vector<char> data(file.begin(), file.end());
     return prepareSeqFile(mpc, data, fileName);
+}
+
+void selectPreparedSeqFileForLoad(
+    mpc::Mpc &mpc,
+    const std::shared_ptr<mpc::lcdgui::screens::LoadScreen> &loadScreen,
+    const std::string &fileName)
+{
+    const auto akaiFileName = mpc::file::AkaiName::generate(fileName);
+    const auto fileNames = mpc.getDisk()->getFileNames();
+    std::ostringstream fileList;
+    for (const auto &candidate : fileNames)
+    {
+        fileList << "[" << candidate << "]";
+    }
+    INFO("looking for " << fileName << " or " << akaiFileName
+                        << " in " << fileList.str());
+    int selectedIndex = -1;
+    for (int i = 0; i < static_cast<int>(fileNames.size()); ++i)
+    {
+        const auto &candidate = fileNames[i];
+        if (mpc::StrUtil::eqIgnoreCase(candidate, fileName) ||
+            mpc::StrUtil::eqIgnoreCase(candidate, akaiFileName))
+        {
+            selectedIndex = i;
+            break;
+        }
+    }
+
+    if (selectedIndex < 0)
+    {
+        FAIL("SEQ fixture not found in test disk");
+    }
+
+    loadScreen->setFileLoad(selectedIndex);
 }
 
 template <typename T>
@@ -352,17 +388,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports verified event fixture",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -441,17 +467,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load handles real minimal sentinel fixt
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -485,17 +501,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real note event fixture",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -534,17 +540,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real duration-mutated note
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -584,17 +580,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports loop header state",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -624,17 +610,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load applies bar time-signature events"
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -703,17 +679,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load maps MIDI track header fields",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -748,17 +714,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load maps sparse additional track heade
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -792,17 +748,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real MIDI track fixture",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -829,17 +775,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real track-off fixture",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -866,17 +802,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real loop-enabled fixture"
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -910,17 +836,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load derives initial tempo from tick-ze
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -956,17 +872,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports additional tempo changes a
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -997,17 +903,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real non-default header te
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1040,17 +936,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports second real non-default he
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1083,17 +969,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports third real non-default hea
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1126,17 +1002,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real program change fixtur
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1173,17 +1039,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load decodes two-byte pitch bend payloa
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1220,17 +1076,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load decodes minimum pitch bend payload
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1263,17 +1109,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load decodes maximum pitch bend payload
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1301,17 +1137,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real pitch bend fixture",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
@@ -1353,17 +1179,7 @@ TEST_CASE("Load a sequence PLAY shows held preview overlay and release restores 
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
 
@@ -1417,17 +1233,7 @@ TEST_CASE("Load a sequence KEEP copies temp sequence into chosen slot and stops 
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence");
 
@@ -1478,17 +1284,7 @@ TEST_CASE("Unreadable .SEQ file reports error and returns to LOAD",
     layeredScreen->openScreen("load");
 
     const auto loadScreen = mpc.screens->get<mpc::lcdgui::ScreenId::LoadScreen>();
-    const auto fileNames = mpc.getDisk()->getFileNames();
-    const auto seqFileIt = std::find_if(
-        fileNames.begin(), fileNames.end(),
-        [&fileName](const std::string &candidate)
-        {
-            return mpc::StrUtil::eqIgnoreCase(candidate, fileName);
-        });
-    REQUIRE(seqFileIt != fileNames.end());
-
-    loadScreen->setFileLoad(static_cast<int>(
-        std::distance(fileNames.begin(), seqFileIt)));
+    selectPreparedSeqFileForLoad(mpc, loadScreen, fileName);
     loadScreen->function(5);
 
     layeredScreen->timerCallback();
