@@ -9,6 +9,7 @@
 #include "engine/EngineHost.hpp"
 #include "engine/StereoMixer.hpp"
 #include "file/kaitai/ApsIo.hpp"
+#include "file/kaitai/generated/mpc3000_aps_v3.h"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -26,7 +27,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <sstream>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -260,6 +260,78 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites ALL_PGMS", "[kaitai-aps]")
     REQUIRE(rewrittenBytes.size() == originalBytes.size());
     INFO(describeFirstByteDiff(rewrittenBytes, originalBytes));
     REQUIRE(std::equal(rewrittenBytes.begin(), rewrittenBytes.end(), originalBytes.begin()));
+}
+
+TEST_CASE("Kaitai MPC3000 APS parses a real hardware ALL_PGMS", "[kaitai-aps][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_aps_v3_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(static_cast<unsigned char>(bytes[0]) == 0x0a);
+    REQUIRE(static_cast<unsigned char>(bytes[1]) == 0x00);
+    REQUIRE(parsed.num_programs() == 24U);
+    REQUIRE(parsed.file_name() == "ALL_PGMS");
+    REQUIRE(parsed.active_program_number() == 0U);
+    REQUIRE(parsed.stereo_mix_source() == mpc3000_aps_v3_t::MIX_SOURCE_PROGRAM);
+    REQUIRE(parsed.indiv_out_echo_send_mix_source() == mpc3000_aps_v3_t::MIX_SOURCE_PROGRAM);
+    REQUIRE(parsed.effects_source() == mpc3000_aps_v3_t::MIX_SOURCE_PROGRAM);
+    REQUIRE(parsed.record_live_mix_changes() == 0U);
+    REQUIRE(parsed.center_pad_16_levels_if_param_tuning() == 13U);
+    REQUIRE(parsed.audio_trigger_assign() == 35U);
+
+    REQUIRE(parsed.mixer_settings() != nullptr);
+    REQUIRE(parsed.mixer_settings()->size() == 64U);
+    REQUIRE(parsed.programs() != nullptr);
+    REQUIRE(parsed.programs()->size() == 24U);
+    REQUIRE(parsed.sound_names() != nullptr);
+    REQUIRE(parsed.sound_names()->size() == 128U);
+
+    REQUIRE(parsed.programs()->at(0)->program_name() == "PROGRAM_01");
+    REQUIRE(parsed.programs()->at(1)->program_name() == "PROGRAM_02");
+    REQUIRE(parsed.programs()->at(23)->program_name() == "PROGRAM_24");
+
+    const auto* note35 = parsed.programs()->at(0)->sound_assignments()->at(0).get();
+    REQUIRE(note35 != nullptr);
+    REQUIRE(note35->sound_number() == 255U);
+    REQUIRE(note35->sound_generator_mode() == mpc3000_aps_v3_t::sound_assignment_t::SOUND_GENERATOR_MODE_NORMAL);
+    REQUIRE(note35->if_over1() == 44U);
+    REQUIRE(note35->use_also_plays1() == 34U);
+    REQUIRE(note35->if_over2() == 88U);
+    REQUIRE(note35->use_also_plays2() == 34U);
+    REQUIRE(note35->poly() == mpc3000_aps_v3_t::sound_assignment_t::POLY_MODE_POLY);
+    REQUIRE(note35->cutoff_note_1() == 34U);
+    REQUIRE(note35->cutoff_note_2() == 34U);
+    REQUIRE(note35->tune() == 0);
+    REQUIRE(note35->attack() == 0U);
+    REQUIRE(note35->decay() == 6U);
+    REQUIRE(note35->decay_mode() == mpc3000_aps_v3_t::sound_assignment_t::DECAY_MODE_END);
+    REQUIRE(note35->filter_frequency() == 100U);
+
+    REQUIRE(parsed.programs()->at(0)->pad_note_number_assignments()->at(0)->note_number() == 37U);
+    REQUIRE(parsed.programs()->at(0)->pad_note_number_assignments()->at(1)->note_number() == 36U);
+    REQUIRE(parsed.programs()->at(0)->pad_note_number_assignments()->at(2)->note_number() == 42U);
+    REQUIRE(parsed.programs()->at(0)->pad_note_number_assignments()->at(3)->note_number() == 82U);
+
+    size_t nonEmptyTrailingSoundNames = 0;
+    for (const auto& soundName : *parsed.sound_names())
+    {
+        if (!soundName.empty())
+        {
+            nonEmptyTrailingSoundNames++;
+        }
+    }
+    REQUIRE(nonEmptyTrailingSoundNames == 0U);
 }
 
 TEST_CASE("Kaitai MPC2000 APS parses and rewrites real 2KXL ALL_PGMS", "[kaitai-aps][real-2kxl]")
