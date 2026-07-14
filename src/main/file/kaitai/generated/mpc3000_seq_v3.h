@@ -227,34 +227,47 @@ private:
 
 public:
 
-    mpc3000_seq_v3_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
 private:
-    void _read();
+    bool m__dirty;
 
 public:
+
+    mpc3000_seq_v3_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+    void _read();
     void _fetch_instances();
+    void _write();
+    void _check();
     ~mpc3000_seq_v3_t();
 
     class bar_event_t : public kaitai::kstruct {
 
     public:
 
-        bar_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        bar_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~bar_event_t();
         int32_t bar_number();
+        void _invalidate_bar_number() { f_bar_number = false; }
         uint8_t bar_number1() const { return m_bar_number1; }
+        void set_bar_number1(uint8_t _v) { m__dirty = true; f_bar_number = false; m_bar_number1 = std::move(_v); }
         uint8_t bar_number2() const { return m_bar_number2; }
+        void set_bar_number2(uint8_t _v) { m__dirty = true; f_bar_number = false; m_bar_number2 = std::move(_v); }
         uint8_t numerator() const { return m_numerator; }
+        void set_numerator(uint8_t _v) { m__dirty = true; f_bar_number = false; m_numerator = std::move(_v); }
         uint8_t denominator() const { return m_denominator; }
+        void set_denominator(uint8_t _v) { m__dirty = true; f_bar_number = false; m_denominator = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_bar_number = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; f_bar_number = false; m__parent = std::move(_v); }
 
     private:
         bool f_bar_number;
@@ -271,17 +284,23 @@ public:
 
     public:
 
-        ch_pressure_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        ch_pressure_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~ch_pressure_event_t();
         uint8_t pressure() const { return m_pressure; }
+        void set_pressure(uint8_t _v) { m__dirty = true; m_pressure = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_pressure;
@@ -293,18 +312,25 @@ public:
 
     public:
 
-        control_change_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        control_change_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~control_change_event_t();
         controller_t controller() const { return m_controller; }
+        void set_controller(controller_t _v) { m__dirty = true; m_controller = std::move(_v); }
         uint8_t value() const { return m_value; }
+        void set_value(uint8_t _v) { m__dirty = true; m_value = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         controller_t m_controller;
@@ -317,28 +343,45 @@ public:
 
     public:
 
-        delays_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        delays_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~delays_t();
         uint8_t volume1() const { return m_volume1; }
+        void set_volume1(uint8_t _v) { m__dirty = true; m_volume1 = std::move(_v); }
         uint8_t volume2() const { return m_volume2; }
+        void set_volume2(uint8_t _v) { m__dirty = true; m_volume2 = std::move(_v); }
         uint8_t volume3() const { return m_volume3; }
+        void set_volume3(uint8_t _v) { m__dirty = true; m_volume3 = std::move(_v); }
         uint8_t pan1() const { return m_pan1; }
+        void set_pan1(uint8_t _v) { m__dirty = true; m_pan1 = std::move(_v); }
         uint8_t pan2() const { return m_pan2; }
+        void set_pan2(uint8_t _v) { m__dirty = true; m_pan2 = std::move(_v); }
         uint8_t pan3() const { return m_pan3; }
+        void set_pan3(uint8_t _v) { m__dirty = true; m_pan3 = std::move(_v); }
         uint16_t time1() const { return m_time1; }
+        void set_time1(uint16_t _v) { m__dirty = true; m_time1 = std::move(_v); }
         uint16_t time2() const { return m_time2; }
+        void set_time2(uint16_t _v) { m__dirty = true; m_time2 = std::move(_v); }
         uint16_t time3() const { return m_time3; }
+        void set_time3(uint16_t _v) { m__dirty = true; m_time3 = std::move(_v); }
         uint8_t feedback1() const { return m_feedback1; }
+        void set_feedback1(uint8_t _v) { m__dirty = true; m_feedback1 = std::move(_v); }
         uint8_t feedback2() const { return m_feedback2; }
+        void set_feedback2(uint8_t _v) { m__dirty = true; m_feedback2 = std::move(_v); }
         uint8_t feedback3() const { return m_feedback3; }
+        void set_feedback3(uint8_t _v) { m__dirty = true; m_feedback3 = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_volume1;
@@ -361,17 +404,23 @@ public:
 
     public:
 
-        delta_time_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        delta_time_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~delta_time_event_t();
         uint16_t delta_time() const { return m_delta_time; }
+        void set_delta_time(uint16_t _v) { m__dirty = true; m_delta_time = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint16_t m_delta_time;
@@ -383,27 +432,49 @@ public:
 
     public:
 
-        event_t(bool p_is_first_event, uint8_t p_preparsed_status, int32_t p_remaining_byte_count, kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        event_t(bool p_is_first_event, uint8_t p_preparsed_status, int32_t p_remaining_byte_count, kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~event_t();
         mpc3000_seq_v3_t::mixer_event_t* mixer_event();
+        void set_mixer_event(std::unique_ptr<mixer_event_t> _v) { m__dirty = true; f_next_status = false; f_status = false; f_mixer_event = true; m_mixer_event = std::move(_v); }
+        void set_mixer_event_enabled(bool _v) { m__dirty = true; e_mixer_event = _v; }
+
+    private:
+        void _write_mixer_event();
+
+    public:
         uint8_t next_status();
+        void _invalidate_next_status() { f_next_status = false; }
         uint8_t status();
+        void _invalidate_status() { f_status = false; }
         uint8_t parsed_status() const { return m_parsed_status; }
+        void set_parsed_status(uint8_t _v) { m__dirty = true; n_parsed_status = false; f_next_status = false; f_status = false; m_parsed_status = std::move(_v); }
         uint8_t track_number() const { return m_track_number; }
+        void set_track_number(uint8_t _v) { m__dirty = true; n_track_number = false; f_next_status = false; f_status = false; m_track_number = std::move(_v); }
         kaitai::kstruct* event_body() const { return m_event_body.get(); }
+        void set_event_body(std::unique_ptr<kaitai::kstruct> _v) { m__dirty = true; f_next_status = false; f_status = false; m_event_body = std::move(_v); }
         std::vector<uint8_t>* system_exclusive_body() const { return m_system_exclusive_body.get(); }
+        void set_system_exclusive_body(std::unique_ptr<std::vector<uint8_t>> _v) { m__dirty = true; f_next_status = false; f_status = false; m_system_exclusive_body = std::move(_v); }
         uint8_t parsed_next_status() const { return m_parsed_next_status; }
+        void set_parsed_next_status(uint8_t _v) { m__dirty = true; n_parsed_next_status = false; f_next_status = false; f_status = false; m_parsed_next_status = std::move(_v); }
         bool is_first_event() const { return m_is_first_event; }
+        void set_is_first_event(bool _v) { m__dirty = true; f_next_status = false; f_status = false; m_is_first_event = std::move(_v); }
         uint8_t preparsed_status() const { return m_preparsed_status; }
+        void set_preparsed_status(uint8_t _v) { m__dirty = true; f_next_status = false; f_status = false; m_preparsed_status = std::move(_v); }
         int32_t remaining_byte_count() const { return m_remaining_byte_count; }
+        void set_remaining_byte_count(int32_t _v) { m__dirty = true; f_next_status = false; f_status = false; m_remaining_byte_count = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_next_status = false; f_status = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; f_next_status = false; f_status = false; m__parent = std::move(_v); }
 
     private:
         bool f_mixer_event;
@@ -413,6 +484,8 @@ public:
         bool _is_null_mixer_event() { return !mixer_event(); };
 
     private:
+        bool w_mixer_event;
+        bool e_mixer_event;
         bool f_next_status;
         uint8_t m_next_status;
         bool f_status;
@@ -461,21 +534,31 @@ public:
 
     public:
 
-        mixer_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        mixer_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~mixer_t();
         uint8_t stereo_mix() const { return m_stereo_mix; }
+        void set_stereo_mix(uint8_t _v) { m__dirty = true; m_stereo_mix = std::move(_v); }
         uint8_t stereo_pan() const { return m_stereo_pan; }
+        void set_stereo_pan(uint8_t _v) { m__dirty = true; m_stereo_pan = std::move(_v); }
         uint8_t individual_out_mix() const { return m_individual_out_mix; }
+        void set_individual_out_mix(uint8_t _v) { m__dirty = true; m_individual_out_mix = std::move(_v); }
         individual_out_t individual_out() const { return m_individual_out; }
+        void set_individual_out(individual_out_t _v) { m__dirty = true; m_individual_out = std::move(_v); }
         no_yes_t follow_stereo() const { return m_follow_stereo; }
+        void set_follow_stereo(no_yes_t _v) { m__dirty = true; m_follow_stereo = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_stereo_mix;
@@ -491,20 +574,29 @@ public:
 
     public:
 
-        mixer_event_t(std::vector<uint8_t>* p_data, kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        mixer_event_t(std::vector<uint8_t>* p_data, kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~mixer_event_t();
         uint8_t pad_index();
+        void _invalidate_pad_index() { f_pad_index = false; }
         mpc3000_seq_v3_t::mixer_event_param_t param();
+        void _invalidate_param() { f_param = false; }
         uint8_t value();
+        void _invalidate_value() { f_value = false; }
         std::vector<uint8_t>* data() const { return m_data; }
+        void set_data(std::vector<uint8_t>* _v) { m__dirty = true; f_pad_index = false; f_param = false; f_value = false; m_data = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_pad_index = false; f_param = false; f_value = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; f_pad_index = false; f_param = false; f_value = false; m__parent = std::move(_v); }
 
     private:
         bool f_pad_index;
@@ -535,23 +627,35 @@ public:
 
     public:
 
-        note_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        note_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~note_event_t();
         int32_t duration();
+        void _invalidate_duration() { f_duration = false; }
         mpc3000_seq_v3_t::note_event_t::note_variation_type_t note_variation_type();
+        void _invalidate_note_variation_type() { f_note_variation_type = false; }
         uint8_t note_number() const { return m_note_number; }
+        void set_note_number(uint8_t _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m_note_number = std::move(_v); }
         uint8_t velocity() const { return m_velocity; }
+        void set_velocity(uint8_t _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m_velocity = std::move(_v); }
         uint8_t note_variation_value() const { return m_note_variation_value; }
+        void set_note_variation_value(uint8_t _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m_note_variation_value = std::move(_v); }
         uint8_t duration_byte_1() const { return m_duration_byte_1; }
+        void set_duration_byte_1(uint8_t _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m_duration_byte_1 = std::move(_v); }
         uint8_t duration_byte_2() const { return m_duration_byte_2; }
+        void set_duration_byte_2(uint8_t _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m_duration_byte_2 = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; f_duration = false; f_note_variation_type = false; m__parent = std::move(_v); }
 
     private:
         bool f_duration;
@@ -571,19 +675,27 @@ public:
 
     public:
 
-        pitch_bend_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        pitch_bend_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~pitch_bend_event_t();
         int32_t corrected_pitch_bend_amount();
+        void _invalidate_corrected_pitch_bend_amount() { f_corrected_pitch_bend_amount = false; }
         uint64_t pitch_bend_amount_bits_1() const { return m_pitch_bend_amount_bits_1; }
+        void set_pitch_bend_amount_bits_1(uint64_t _v) { m__dirty = true; f_corrected_pitch_bend_amount = false; m_pitch_bend_amount_bits_1 = std::move(_v); }
         uint64_t pitch_bend_amount_bits_2() const { return m_pitch_bend_amount_bits_2; }
+        void set_pitch_bend_amount_bits_2(uint64_t _v) { m__dirty = true; f_corrected_pitch_bend_amount = false; m_pitch_bend_amount_bits_2 = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_corrected_pitch_bend_amount = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; f_corrected_pitch_bend_amount = false; m__parent = std::move(_v); }
 
     private:
         bool f_corrected_pitch_bend_amount;
@@ -598,18 +710,25 @@ public:
 
     public:
 
-        poly_pressure_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        poly_pressure_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~poly_pressure_event_t();
         uint8_t note() const { return m_note; }
+        void set_note(uint8_t _v) { m__dirty = true; m_note = std::move(_v); }
         uint8_t pressure() const { return m_pressure; }
+        void set_pressure(uint8_t _v) { m__dirty = true; m_pressure = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_note;
@@ -622,17 +741,23 @@ public:
 
     public:
 
-        program_change_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        program_change_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~program_change_event_t();
         uint8_t program() const { return m_program; }
+        void set_program(uint8_t _v) { m__dirty = true; m_program = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_program;
@@ -644,36 +769,58 @@ public:
 
     public:
 
-        sequence_header_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        sequence_header_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~sequence_header_t();
         uint8_t sequence_number() const { return m_sequence_number; }
-        u3le_t* sequence_length_in_bytes() const { return m_sequence_length_in_bytes.get(); }
-        std::string _unnamed2() const { return m__unnamed2; }
+        void set_sequence_number(uint8_t _v) { m__dirty = true; m_sequence_number = std::move(_v); }
+        u3le_t* event_stream_length_in_bytes() const { return m_event_stream_length_in_bytes.get(); }
+        void set_event_stream_length_in_bytes(std::unique_ptr<u3le_t> _v) { m__dirty = true; m_event_stream_length_in_bytes = std::move(_v); }
+        std::string reserved_before_event_stream_sentinel_flag() const { return m_reserved_before_event_stream_sentinel_flag; }
+        void set_reserved_before_event_stream_sentinel_flag(std::string _v) { m__dirty = true; m_reserved_before_event_stream_sentinel_flag = std::move(_v); }
+        no_yes_t event_stream_starts_with_ff() const { return m_event_stream_starts_with_ff; }
+        void set_event_stream_starts_with_ff(no_yes_t _v) { m__dirty = true; m_event_stream_starts_with_ff = std::move(_v); }
+        std::string reserved_before_name() const { return m_reserved_before_name; }
+        void set_reserved_before_name(std::string _v) { m__dirty = true; m_reserved_before_name = std::move(_v); }
         std::string sequence_name() const { return m_sequence_name; }
-        std::string _unnamed4() const { return m__unnamed4; }
+        void set_sequence_name(std::string _v) { m__dirty = true; m_sequence_name = std::move(_v); }
+        std::string reserved_after_name() const { return m_reserved_after_name; }
+        void set_reserved_after_name(std::string _v) { m__dirty = true; m_reserved_after_name = std::move(_v); }
         off_on_t loop_to_bar() const { return m_loop_to_bar; }
-        uint64_t _unnamed6() const { return m__unnamed6; }
+        void set_loop_to_bar(off_on_t _v) { m__dirty = true; m_loop_to_bar = std::move(_v); }
+        uint64_t loop_flags_reserved() const { return m_loop_flags_reserved; }
+        void set_loop_flags_reserved(uint64_t _v) { m__dirty = true; m_loop_flags_reserved = std::move(_v); }
         uint16_t loop_to_bar_number() const { return m_loop_to_bar_number; }
+        void set_loop_to_bar_number(uint16_t _v) { m__dirty = true; m_loop_to_bar_number = std::move(_v); }
         uint16_t number_of_bars() const { return m_number_of_bars; }
+        void set_number_of_bars(uint16_t _v) { m__dirty = true; m_number_of_bars = std::move(_v); }
         uint32_t length_in_ticks() const { return m_length_in_ticks; }
+        void set_length_in_ticks(uint32_t _v) { m__dirty = true; m_length_in_ticks = std::move(_v); }
         uint16_t tempo() const { return m_tempo; }
+        void set_tempo(uint16_t _v) { m__dirty = true; m_tempo = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_sequence_number;
-        std::unique_ptr<u3le_t> m_sequence_length_in_bytes;
-        std::string m__unnamed2;
+        std::unique_ptr<u3le_t> m_event_stream_length_in_bytes;
+        std::string m_reserved_before_event_stream_sentinel_flag;
+        no_yes_t m_event_stream_starts_with_ff;
+        std::string m_reserved_before_name;
         std::string m_sequence_name;
-        std::string m__unnamed4;
+        std::string m_reserved_after_name;
         off_on_t m_loop_to_bar;
-        uint64_t m__unnamed6;
+        uint64_t m_loop_flags_reserved;
         uint16_t m_loop_to_bar_number;
         uint16_t m_number_of_bars;
         uint32_t m_length_in_ticks;
@@ -686,21 +833,31 @@ public:
 
     public:
 
-        smpte_offset_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        smpte_offset_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~smpte_offset_t();
         uint8_t hundredth_frames() const { return m_hundredth_frames; }
+        void set_hundredth_frames(uint8_t _v) { m__dirty = true; m_hundredth_frames = std::move(_v); }
         uint8_t frames() const { return m_frames; }
+        void set_frames(uint8_t _v) { m__dirty = true; m_frames = std::move(_v); }
         uint8_t seconds() const { return m_seconds; }
+        void set_seconds(uint8_t _v) { m__dirty = true; m_seconds = std::move(_v); }
         uint8_t minutes() const { return m_minutes; }
+        void set_minutes(uint8_t _v) { m__dirty = true; m_minutes = std::move(_v); }
         uint8_t hours() const { return m_hours; }
+        void set_hours(uint8_t _v) { m__dirty = true; m_hours = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         uint8_t m_hundredth_frames;
@@ -716,20 +873,29 @@ public:
 
     public:
 
-        tempo_change_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        tempo_change_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~tempo_change_t();
         double factor_percentage();
+        void _invalidate_factor_percentage() { f_factor_percentage = false; }
         uint32_t ticks_from_sequence_start() const { return m_ticks_from_sequence_start; }
+        void set_ticks_from_sequence_start(uint32_t _v) { m__dirty = true; f_factor_percentage = false; m_ticks_from_sequence_start = std::move(_v); }
         uint64_t factor1() const { return m_factor1; }
+        void set_factor1(uint64_t _v) { m__dirty = true; f_factor_percentage = false; m_factor1 = std::move(_v); }
         uint64_t factor2() const { return m_factor2; }
+        void set_factor2(uint64_t _v) { m__dirty = true; f_factor_percentage = false; m_factor2 = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_factor_percentage = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; f_factor_percentage = false; m__parent = std::move(_v); }
 
     private:
         bool f_factor_percentage;
@@ -745,37 +911,55 @@ public:
 
     public:
 
-        track_header_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        track_header_t(kaitai::kstream* p__io, mpc3000_seq_v3_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~track_header_t();
         int8_t absolute_recorded_track_number() const { return m_absolute_recorded_track_number; }
-        std::string _unnamed1() const { return m__unnamed1; }
+        void set_absolute_recorded_track_number(int8_t _v) { m__dirty = true; m_absolute_recorded_track_number = std::move(_v); }
+        std::string unused_track_header_padding() const { return m_unused_track_header_padding; }
+        void set_unused_track_header_padding(std::string _v) { m__dirty = true; n_unused_track_header_padding = false; m_unused_track_header_padding = std::move(_v); }
         uint8_t user_track_number() const { return m_user_track_number; }
+        void set_user_track_number(uint8_t _v) { m__dirty = true; n_user_track_number = false; m_user_track_number = std::move(_v); }
         bool track_mute() const { return m_track_mute; }
+        void set_track_mute(bool _v) { m__dirty = true; n_track_mute = false; m_track_mute = std::move(_v); }
         bool track_in_use() const { return m_track_in_use; }
+        void set_track_in_use(bool _v) { m__dirty = true; n_track_in_use = false; m_track_in_use = std::move(_v); }
         bool drum_track() const { return m_drum_track; }
-        uint64_t _unnamed6() const { return m__unnamed6; }
+        void set_drum_track(bool _v) { m__dirty = true; n_drum_track = false; m_drum_track = std::move(_v); }
+        uint64_t track_flags_reserved() const { return m_track_flags_reserved; }
+        void set_track_flags_reserved(uint64_t _v) { m__dirty = true; n_track_flags_reserved = false; m_track_flags_reserved = std::move(_v); }
         uint8_t primary_port_channel_assignment() const { return m_primary_port_channel_assignment; }
+        void set_primary_port_channel_assignment(uint8_t _v) { m__dirty = true; n_primary_port_channel_assignment = false; m_primary_port_channel_assignment = std::move(_v); }
         int8_t secondary_port_channel_assignment() const { return m_secondary_port_channel_assignment; }
+        void set_secondary_port_channel_assignment(int8_t _v) { m__dirty = true; n_secondary_port_channel_assignment = false; m_secondary_port_channel_assignment = std::move(_v); }
         std::string track_name() const { return m_track_name; }
+        void set_track_name(std::string _v) { m__dirty = true; n_track_name = false; m_track_name = std::move(_v); }
         uint8_t track_volume() const { return m_track_volume; }
+        void set_track_volume(uint8_t _v) { m__dirty = true; n_track_volume = false; m_track_volume = std::move(_v); }
         uint8_t program_change_number() const { return m_program_change_number; }
-        std::string _unnamed12() const { return m__unnamed12; }
+        void set_program_change_number(uint8_t _v) { m__dirty = true; n_program_change_number = false; m_program_change_number = std::move(_v); }
+        std::string reserved_after_program_change() const { return m_reserved_after_program_change; }
+        void set_reserved_after_program_change(std::string _v) { m__dirty = true; n_reserved_after_program_change = false; m_reserved_after_program_change = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         int8_t m_absolute_recorded_track_number;
-        std::string m__unnamed1;
-        bool n__unnamed1;
+        std::string m_unused_track_header_padding;
+        bool n_unused_track_header_padding;
 
     public:
-        bool _is_null__unnamed1() { _unnamed1(); return n__unnamed1; };
+        bool _is_null_unused_track_header_padding() { unused_track_header_padding(); return n_unused_track_header_padding; };
 
     private:
         uint8_t m_user_track_number;
@@ -806,11 +990,11 @@ public:
         bool _is_null_drum_track() { drum_track(); return n_drum_track; };
 
     private:
-        uint64_t m__unnamed6;
-        bool n__unnamed6;
+        uint64_t m_track_flags_reserved;
+        bool n_track_flags_reserved;
 
     public:
-        bool _is_null__unnamed6() { _unnamed6(); return n__unnamed6; };
+        bool _is_null_track_flags_reserved() { track_flags_reserved(); return n_track_flags_reserved; };
 
     private:
         uint8_t m_primary_port_channel_assignment;
@@ -848,11 +1032,11 @@ public:
         bool _is_null_program_change_number() { program_change_number(); return n_program_change_number; };
 
     private:
-        std::string m__unnamed12;
-        bool n__unnamed12;
+        std::string m_reserved_after_program_change;
+        bool n_reserved_after_program_change;
 
     public:
-        bool _is_null__unnamed12() { _unnamed12(); return n__unnamed12; };
+        bool _is_null_reserved_after_program_change() { reserved_after_program_change(); return n_reserved_after_program_change; };
 
     private:
         mpc3000_seq_v3_t* m__root;
@@ -863,17 +1047,23 @@ public:
 
     public:
 
-        tune_request_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        tune_request_event_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::event_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~tune_request_event_t();
         std::string tune_request_event() const { return m_tune_request_event; }
+        void set_tune_request_event(std::string _v) { m__dirty = true; m_tune_request_event = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         std::string m_tune_request_event;
@@ -885,19 +1075,27 @@ public:
 
     public:
 
-        u3le_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::sequence_header_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
-
     private:
-        void _read();
+        bool m__dirty;
 
     public:
+
+        u3le_t(kaitai::kstream* p__io, mpc3000_seq_v3_t::sequence_header_t* p__parent = nullptr, mpc3000_seq_v3_t* p__root = nullptr);
+        void _read();
         void _fetch_instances();
+        void _write();
+        void _check();
         ~u3le_t();
         int32_t value();
+        void _invalidate_value() { f_value = false; }
         uint16_t b12() const { return m_b12; }
+        void set_b12(uint16_t _v) { m__dirty = true; f_value = false; m_b12 = std::move(_v); }
         uint8_t b3() const { return m_b3; }
+        void set_b3(uint8_t _v) { m__dirty = true; f_value = false; m_b3 = std::move(_v); }
         mpc3000_seq_v3_t* _root() const { return m__root; }
+        void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; f_value = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
+        void set__parent(mpc3000_seq_v3_t::sequence_header_t* _v) { m__dirty = true; f_value = false; m__parent = std::move(_v); }
 
     private:
         bool f_value;
@@ -910,22 +1108,39 @@ public:
 
 public:
     std::string file_id() const { return m_file_id; }
+    void set_file_id(std::string _v) { m__dirty = true; m_file_id = std::move(_v); }
     std::string file_format_version() const { return m_file_format_version; }
+    void set_file_format_version(std::string _v) { m__dirty = true; m_file_format_version = std::move(_v); }
     sequence_header_t* sequence_header() const { return m_sequence_header.get(); }
+    void set_sequence_header(std::unique_ptr<sequence_header_t> _v) { m__dirty = true; m_sequence_header = std::move(_v); }
     smpte_offset_t* smpte_offset() const { return m_smpte_offset.get(); }
+    void set_smpte_offset(std::unique_ptr<smpte_offset_t> _v) { m__dirty = true; m_smpte_offset = std::move(_v); }
     std::vector<std::unique_ptr<mixer_t>>* mixer() const { return m_mixer.get(); }
-    std::string _unnamed5() const { return m__unnamed5; }
+    void set_mixer(std::unique_ptr<std::vector<std::unique_ptr<mixer_t>>> _v) { m__dirty = true; m_mixer = std::move(_v); }
+    std::string reserved_after_mixer() const { return m_reserved_after_mixer; }
+    void set_reserved_after_mixer(std::string _v) { m__dirty = true; m_reserved_after_mixer = std::move(_v); }
     delays_t* delays() const { return m_delays.get(); }
-    std::string _unnamed7() const { return m__unnamed7; }
-    std::string _unnamed8() const { return m__unnamed8; }
+    void set_delays(std::unique_ptr<delays_t> _v) { m__dirty = true; m_delays = std::move(_v); }
+    std::string reserved_after_delays() const { return m_reserved_after_delays; }
+    void set_reserved_after_delays(std::string _v) { m__dirty = true; m_reserved_after_delays = std::move(_v); }
+    std::string reserved_before_track_summary() const { return m_reserved_before_track_summary; }
+    void set_reserved_before_track_summary(std::string _v) { m__dirty = true; m_reserved_before_track_summary = std::move(_v); }
     uint8_t last_active_track() const { return m_last_active_track; }
-    uint8_t number_of_tempo_changes() const { return m_number_of_tempo_changes; }
-    uint8_t number_of_active_track_headers() const { return m_number_of_active_track_headers; }
+    void set_last_active_track(uint8_t _v) { m__dirty = true; m_last_active_track = std::move(_v); }
+    uint8_t num_tempo_changes() const { return m_num_tempo_changes; }
+    void set_num_tempo_changes(uint8_t _v) { m__dirty = true; m_num_tempo_changes = std::move(_v); }
+    uint8_t num_track_headers() const { return m_num_track_headers; }
+    void set_num_track_headers(uint8_t _v) { m__dirty = true; m_num_track_headers = std::move(_v); }
     std::vector<std::unique_ptr<track_header_t>>* track_headers() const { return m_track_headers.get(); }
+    void set_track_headers(std::unique_ptr<std::vector<std::unique_ptr<track_header_t>>> _v) { m__dirty = true; m_track_headers = std::move(_v); }
     std::vector<std::unique_ptr<tempo_change_t>>* tempo_changes() const { return m_tempo_changes.get(); }
+    void set_tempo_changes(std::unique_ptr<std::vector<std::unique_ptr<tempo_change_t>>> _v) { m__dirty = true; m_tempo_changes = std::move(_v); }
     std::vector<std::unique_ptr<event_t>>* events() const { return m_events.get(); }
+    void set_events(std::unique_ptr<std::vector<std::unique_ptr<event_t>>> _v) { m__dirty = true; m_events = std::move(_v); }
     mpc3000_seq_v3_t* _root() const { return m__root; }
+    void set__root(mpc3000_seq_v3_t* _v) { m__dirty = true; m__root = std::move(_v); }
     kaitai::kstruct* _parent() const { return m__parent; }
+    void set__parent(kaitai::kstruct* _v) { m__dirty = true; m__parent = std::move(_v); }
 
 private:
     std::string m_file_id;
@@ -933,13 +1148,13 @@ private:
     std::unique_ptr<sequence_header_t> m_sequence_header;
     std::unique_ptr<smpte_offset_t> m_smpte_offset;
     std::unique_ptr<std::vector<std::unique_ptr<mixer_t>>> m_mixer;
-    std::string m__unnamed5;
+    std::string m_reserved_after_mixer;
     std::unique_ptr<delays_t> m_delays;
-    std::string m__unnamed7;
-    std::string m__unnamed8;
+    std::string m_reserved_after_delays;
+    std::string m_reserved_before_track_summary;
     uint8_t m_last_active_track;
-    uint8_t m_number_of_tempo_changes;
-    uint8_t m_number_of_active_track_headers;
+    uint8_t m_num_tempo_changes;
+    uint8_t m_num_track_headers;
     std::unique_ptr<std::vector<std::unique_ptr<track_header_t>>> m_track_headers;
     std::unique_ptr<std::vector<std::unique_ptr<tempo_change_t>>> m_tempo_changes;
     std::unique_ptr<std::vector<std::unique_ptr<event_t>>> m_events;
