@@ -62,6 +62,36 @@ std::vector<char> rewriteProgram1WithMutations(
     return std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end());
 }
 
+std::vector<char> rewriteRealMpc3000ProgramWithMutations(
+    const std::string& resourcePath,
+    const std::function<void(mpc3000_pgm_v3_t&)>& mutate)
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open(resourcePath);
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    mutate(parsed);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    return std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end());
+}
+
 void applyBroadProgramMutation(mpc2000xl_pgm_t& parsed)
 {
     auto* note35 = parsed.note_parameters()->at(0).get();
@@ -110,6 +140,11 @@ void applyBroadProgramMutation(mpc2000xl_pgm_t& parsed)
 
     parsed.set_program_change(126);
     parsed.pad_to_note_mapping()->at(0) = 50;
+}
+
+std::string mpc3000SoundNameField(const std::string& name)
+{
+    return name.substr(0, 16);
 }
 
 void requireBroadMutatedProgramState(
@@ -288,6 +323,29 @@ std::shared_ptr<mpc::sampler::Program> loadProgram1ViaPgmIoFromBytes(
 
     auto program = sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
     auto result = mpc::file::kaitai::PgmIo::loadProgram(mpc, pgmFile, program, soundNames);
+    REQUIRE(result);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    return program;
+}
+
+std::shared_ptr<mpc::sampler::Program> loadProgramViaPgmIoFromBytes(
+    mpc::Mpc& mpc,
+    const std::string& filename,
+    const std::vector<char>& programBytes,
+    std::vector<std::string>& soundNames)
+{
+    auto disk = mpc.getDisk();
+    auto file = disk->newFile(filename);
+    auto mutableBytes = programBytes;
+    file->setFileData(mutableBytes);
+    disk->initFiles();
+
+    auto sampler = mpc.getSampler();
+    sampler->deleteAllPrograms(false);
+    sampler->deleteAllSamples();
+
+    auto program = sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
+    auto result = mpc::file::kaitai::PgmIo::loadProgram(mpc, file, program, soundNames);
     REQUIRE(result);
     mpc.getPerformanceManager().lock()->drainQueue();
     return program;
@@ -484,7 +542,7 @@ TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaita
 
     REQUIRE(parsed.sound_names()->at(0)->name().empty());
     REQUIRE(parsed.sound_sizes()->at(0) == 0U);
-    REQUIRE(parsed.program_name() == std::string("PROGRAM_01\0\0\0\0", 14));
+    REQUIRE(parsed.program_name().substr(0, 10) == "PROGRAM_01");
 
     REQUIRE(parsed.note_variation_screen()->note_number_assignment() == 34U);
     REQUIRE(parsed.note_variation_screen()->tuning_low_range() == 136U);
@@ -517,12 +575,12 @@ TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaita
     REQUIRE(parsed.sound_assignments()->at(0)->if_over2() == 88U);
     REQUIRE(parsed.sound_assignments()->at(0)->use_also_plays2() == 34U);
     REQUIRE(parsed.sound_assignments()->at(0)->poly() == mpc3000_pgm_v3_t::POLY_MODE_POLY);
-    REQUIRE(parsed.sound_assignments()->at(0)->cutoff1() == 34U);
-    REQUIRE(parsed.sound_assignments()->at(0)->cutoff2() == 34U);
-    REQUIRE(parsed.sound_assignments()->at(0)->tune() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->cutoff_note_1() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->cutoff_note_2() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->tune() == 0);
     REQUIRE(parsed.sound_assignments()->at(0)->attack() == 0U);
     REQUIRE(parsed.sound_assignments()->at(0)->decay() == 6U);
-    REQUIRE(parsed.sound_assignments()->at(0)->decay_mode() == mpc3000_pgm_v3_t::DECAY_MODE_START);
+    REQUIRE(parsed.sound_assignments()->at(0)->decay_mode() == mpc3000_pgm_v3_t::DECAY_MODE_END);
     REQUIRE(parsed.sound_assignments()->at(0)->filter_frequency() == 100U);
     REQUIRE(parsed.sound_assignments()->at(0)->filter_resonance() == 0U);
     REQUIRE(parsed.sound_assignments()->at(0)->filter_envel_attack() == 0U);
@@ -546,6 +604,229 @@ TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaita
     REQUIRE(parsed.pad_note_number_assignments()->at(3)->note_number() == 82U);
     REQUIRE(parsed.pad_note_number_assignments()->at(63)->note_number() == 98U);
 
+}
+
+TEST_CASE("Kaitai MPC3000 PGM decodes a probed SIMULT generator-mode variant", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_01_SIMULT.pgm");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(parsed.program_name().substr(0, 10) == "PROGRAM_01");
+
+    size_t simultCount = 0;
+    for (const auto &assignment : *parsed.sound_assignments()) {
+        if (assignment->sound_generator_mode() == mpc3000_pgm_v3_t::SOUND_GENERATOR_MODE_SIMULTANEOUS) {
+            simultCount++;
+        }
+    }
+
+    REQUIRE(simultCount == 1U);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW generator-mode variant", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_02_VELSW.pgm");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(parsed.program_name().substr(0, 10) == "PROGRAM_02");
+
+    size_t velocitySwitchCount = 0;
+    for (const auto &assignment : *parsed.sound_assignments()) {
+        if (assignment->sound_generator_mode() == mpc3000_pgm_v3_t::SOUND_GENERATOR_MODE_VELOCITY_SWITCH) {
+            velocitySwitchCount++;
+        }
+    }
+
+    REQUIRE(velocitySwitchCount == 1U);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW threshold and target variant", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_03_VELSW_43.pgm");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(parsed.program_name().substr(0, 10) == "PROGRAM_03");
+
+    size_t velocitySwitchCount = 0;
+    const mpc3000_pgm_v3_t::sound_assignment_t* switchedAssignment = nullptr;
+    for (const auto &assignment : *parsed.sound_assignments()) {
+        if (assignment->sound_generator_mode() == mpc3000_pgm_v3_t::SOUND_GENERATOR_MODE_VELOCITY_SWITCH) {
+            velocitySwitchCount++;
+            switchedAssignment = assignment.get();
+        }
+    }
+
+    REQUIRE(velocitySwitchCount == 1U);
+    REQUIRE(switchedAssignment != nullptr);
+    REQUIRE(switchedAssignment->if_over1() == 43U);
+    REQUIRE(switchedAssignment->use_also_plays1() == 35U);
+    REQUIRE(switchedAssignment->if_over2() == 88U);
+    REQUIRE(switchedAssignment->use_also_plays2() == 34U);
+    REQUIRE(switchedAssignment->poly() == mpc3000_pgm_v3_t::POLY_MODE_POLY);
+    REQUIRE(switchedAssignment->cutoff_note_1() == 34U);
+    REQUIRE(switchedAssignment->cutoff_note_2() == 34U);
+    REQUIRE(switchedAssignment->param() == mpc3000_pgm_v3_t::NOTE_VARIATION_TYPE_TUNE);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM captures raw tune and decay-mode bytes from an Env/Veloc probe", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_04_ENV_PROBE.pgm");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    const auto* assignment = parsed.sound_assignments()->at(2).get();
+    REQUIRE(assignment != nullptr);
+    REQUIRE(assignment->sound_generator_mode() == mpc3000_pgm_v3_t::SOUND_GENERATOR_MODE_VELOCITY_SWITCH);
+    REQUIRE(assignment->if_over1() == 43U);
+    REQUIRE(assignment->use_also_plays1() == 35U);
+    REQUIRE(assignment->if_over2() == 87U);
+    REQUIRE(assignment->use_also_plays2() == 35U);
+    REQUIRE(assignment->poly() == mpc3000_pgm_v3_t::POLY_MODE_NOTE_OFF);
+    REQUIRE(assignment->cutoff_note_1() == 64U);
+    REQUIRE(assignment->cutoff_note_2() == 65U);
+    // This fixture preserves the raw bytes proven live on MPC3000 v3.10:
+    // visible Tune:-1 wrote 0xffff and visible Dcy md:START wrote byte 1.
+    REQUIRE(assignment->tune() == -1);
+    REQUIRE(assignment->decay_mode() == mpc3000_pgm_v3_t::DECAY_MODE_START);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM loads through the production seam with imported semantics", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_04_ENV_PROBE.pgm");
+    std::vector<char> bytes(file.begin(), file.end());
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    std::vector<std::string> soundNames;
+    const auto program = loadProgramViaPgmIoFromBytes(mpc, "PROGRAM_04.PGM", bytes, soundNames);
+
+    REQUIRE(program != nullptr);
+    REQUIRE(program->getName() == "PROGRAM_04");
+    REQUIRE(soundNames.empty());
+
+    REQUIRE(program->getPad(0)->getNote() == 37);
+    REQUIRE(program->getPad(1)->getNote() == 36);
+    REQUIRE(program->getPad(2)->getNote() == 42);
+    REQUIRE(program->getPad(3)->getNote() == 82);
+
+    const auto note37 = program->getNoteParameters(37);
+    REQUIRE(note37->getSoundIndex() == -1);
+    REQUIRE(note37->getSoundGenerationMode() == mpc::sampler::SoundGenerationMode::VelocitySwitch);
+    REQUIRE(note37->getVelocityRangeLower() == 43);
+    REQUIRE(note37->getVelocityRangeUpper() == 87);
+    REQUIRE(note37->getOptionalNoteA() == 35);
+    REQUIRE(note37->getOptionalNoteB() == 35);
+    REQUIRE(note37->getMuteAssignA() == 64);
+    REQUIRE(note37->getMuteAssignB() == 65);
+    REQUIRE(note37->getTune() == -1);
+    REQUIRE(note37->getAttack() == 0);
+    REQUIRE(note37->getDecay() == 0);
+    REQUIRE(note37->getDecayMode() == 1);
+    REQUIRE(note37->getFilterFrequency() == 100);
+    REQUIRE(note37->getFilterResonance() == 0);
+    REQUIRE(note37->getFilterAttack() == 0);
+    REQUIRE(note37->getFilterDecay() == 0);
+    REQUIRE(note37->getFilterEnvelopeAmount() == 0);
+    REQUIRE(note37->getVeloToLevel() == 100);
+    REQUIRE(note37->getVelocityToAttack() == 0);
+    REQUIRE(note37->getVelocityToStart() == 0);
+    REQUIRE(note37->getVelocityToFilterFrequency() == 0);
+    REQUIRE(note37->getSliderParameterNumber() == 0);
+    REQUIRE(note37->getVelocityToPitch() == 0);
+    REQUIRE(note37->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::NOTE_OFF);
+
+    const auto stereoMixer = note37->getStereoMixer();
+    const auto indivFxMixer = note37->getIndivFxMixer();
+    REQUIRE(stereoMixer->getLevel() == 100);
+    REQUIRE(stereoMixer->getPanning() == 50);
+    REQUIRE(indivFxMixer->getVolumeIndividualOut() == 0);
+    REQUIRE(indivFxMixer->getOutput() == 0);
+    REQUIRE(indivFxMixer->getFxPath() == 1);
+    REQUIRE(indivFxMixer->getFxSendLevel() == 0);
+    REQUIRE(indivFxMixer->isFollowingStereo() == false);
+
+    const auto slider = program->getSlider();
+    REQUIRE(slider->getNote() == 34);
+    REQUIRE(slider->getTuneLowRange() == -120);
+    REQUIRE(slider->getTuneHighRange() == 120);
+    REQUIRE(slider->getDecayLowRange() == 0);
+    REQUIRE(slider->getDecayHighRange() == 20);
+    REQUIRE(slider->getAttackLowRange() == 12);
+    REQUIRE(slider->getAttackHighRange() == 45);
+    REQUIRE(slider->getFilterLowRange() == -50);
+    REQUIRE(slider->getFilterHighRange() == 50);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM compacts the 128-entry sound table for import", "[kaitai-pgm][real-mpc3000]")
+{
+    const auto bytes = rewriteRealMpc3000ProgramWithMutations(
+        "test/RealMpc3000/Pgm/PROGRAM.pgm",
+        [](mpc3000_pgm_v3_t& parsed)
+        {
+            parsed.sound_names()->at(0)->set_name(mpc3000SoundNameField("KICK"));
+            parsed.sound_names()->at(5)->set_name(mpc3000SoundNameField("SNARE"));
+
+            parsed.sound_assignments()->at(0)->set_sound_number(5);
+            parsed.sound_assignments()->at(1)->set_sound_number(0);
+            parsed.sound_assignments()->at(2)->set_sound_number(255);
+            parsed.sound_assignments()->at(3)->set_sound_number(255);
+        }
+    );
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    std::vector<std::string> soundNames;
+    const auto program =
+        loadProgramViaPgmIoFromBytes(mpc, "PROGRAM_05.PGM", bytes, soundNames);
+
+    REQUIRE(program != nullptr);
+    REQUIRE(soundNames.size() == 2U);
+    REQUIRE(soundNames[0] == "SNARE");
+    REQUIRE(soundNames[1] == "KICK");
 }
 
 TEST_CASE("Kaitai MPC2000 PGM saves and reloads PROGRAM1 without handwritten code", "[kaitai-pgm]")

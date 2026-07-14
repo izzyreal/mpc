@@ -25,8 +25,8 @@ public:
     class sound_name_t;
 
     enum decay_mode_t {
-        DECAY_MODE_START = 0,
-        DECAY_MODE_END = 1
+        DECAY_MODE_END = 0,
+        DECAY_MODE_START = 1
     };
     static bool _is_defined_decay_mode_t(decay_mode_t v);
 
@@ -336,28 +336,74 @@ public:
         ~sound_assignment_t();
         uint8_t sound_number() const { return m_sound_number; }
         void set_sound_number(uint8_t _v) { m__dirty = true; m_sound_number = std::move(_v); }
+
+        /**
+         * Confirmed by MAME MPC3000 v3.10 contrast saves and Roger Linn's MPC file-format notes. Byte value 0 is NORMAL, 1 is SIMULT, 2 is VEL SW, and the doc describes 3 as DCY SW.
+         */
         sound_generator_mode_t sound_generator_mode() const { return m_sound_generator_mode; }
         void set_sound_generator_mode(sound_generator_mode_t _v) { m__dirty = true; m_sound_generator_mode = std::move(_v); }
+
+        /**
+         * Active on switch-based generator modes. The exact UI-to-byte mapping was probed on MAME MPC3000 v3.10. In a saved VEL SW contrast, changing the first visible threshold from 44 to 43 changed this byte from 0x2c to 0x2b.
+         */
         uint8_t if_over1() const { return m_if_over1; }
         void set_if_over1(uint8_t _v) { m__dirty = true; m_if_over1 = std::move(_v); }
+
+        /**
+         * Active on switch-based generator modes. In a saved VEL SW contrast, changing the first visible target from OFF to 35/C14 changed this byte from 0x22 to 0x23.
+         */
         uint8_t use_also_plays1() const { return m_use_also_plays1; }
         void set_use_also_plays1(uint8_t _v) { m__dirty = true; m_use_also_plays1 = std::move(_v); }
+
+        /**
+         * Active on switch-based generator modes. Confirmed by MAME MPC3000 v3.10 contrast saves after correcting the note-record table start to file offset 2752.
+         */
         uint8_t if_over2() const { return m_if_over2; }
         void set_if_over2(uint8_t _v) { m__dirty = true; m_if_over2 = std::move(_v); }
+
+        /**
+         * Active on switch-based generator modes and simultaneous mode. Confirmed by MAME MPC3000 v3.10 contrast saves after correcting the note-record table start to file offset 2752.
+         */
         uint8_t use_also_plays2() const { return m_use_also_plays2; }
         void set_use_also_plays2(uint8_t _v) { m__dirty = true; m_use_also_plays2 = std::move(_v); }
+
+        /**
+         * Confirmed by MAME MPC3000 v3.10 contrast saves and Roger Linn's MPC file-format notes. 0 = POLY, 1 = MONO, 2 = NOTE OFF.
+         */
         poly_mode_t poly() const { return m_poly; }
         void set_poly(poly_mode_t _v) { m__dirty = true; m_poly = std::move(_v); }
-        uint8_t cutoff1() const { return m_cutoff1; }
-        void set_cutoff1(uint8_t _v) { m__dirty = true; m_cutoff1 = std::move(_v); }
-        uint8_t cutoff2() const { return m_cutoff2; }
-        void set_cutoff2(uint8_t _v) { m__dirty = true; m_cutoff2 = std::move(_v); }
-        uint16_t tune() const { return m_tune; }
-        void set_tune(uint16_t _v) { m__dirty = true; m_tune = std::move(_v); }
+
+        /**
+         * First cutoff-assignment note number from the Env,Veloc.. screen. This is not a filter cutoff value. Roger Linn's file-format notes describe it as 'Cutoff 1 (notes 35-98 or 0)' and live saves matched visible values like 64/B12.
+         */
+        uint8_t cutoff_note_1() const { return m_cutoff_note_1; }
+        void set_cutoff_note_1(uint8_t _v) { m__dirty = true; m_cutoff_note_1 = std::move(_v); }
+
+        /**
+         * Second cutoff-assignment note number from the Env,Veloc.. screen. This is not a filter cutoff value. Roger Linn's file-format notes describe it as 'Cutoff 2 (notes 35-98 or 0)' and live saves matched visible values like 65/B05.
+         */
+        uint8_t cutoff_note_2() const { return m_cutoff_note_2; }
+        void set_cutoff_note_2(uint8_t _v) { m__dirty = true; m_cutoff_note_2 = std::move(_v); }
+
+        /**
+         * Signed tune value. Confirmed by a MAME MPC3000 v3.10 contrast save where visible `Tune:-1` wrote `0xffff`.
+         */
+        int16_t tune() const { return m_tune; }
+        void set_tune(int16_t _v) { m__dirty = true; m_tune = std::move(_v); }
         uint8_t attack() const { return m_attack; }
         void set_attack(uint8_t _v) { m__dirty = true; m_attack = std::move(_v); }
+
+        /**
+         * Real empty hardware PROGRAM.pgm carries value 6 in every record, while MAME MPC3000 v3.10 Initialize Program writes 0 in every record.
+         */
         uint8_t decay() const { return m_decay; }
         void set_decay(uint8_t _v) { m__dirty = true; m_decay = std::move(_v); }
+
+        /**
+         * Confirmed by a dedicated MAME MPC3000 v3.10 contrast save:
+         * visible `Dcy md:START` wrote byte value 1, so the firmware's file
+         * encoding is 0 = END and 1 = START.
+         */
         decay_mode_t decay_mode() const { return m_decay_mode; }
         void set_decay_mode(decay_mode_t _v) { m__dirty = true; m_decay_mode = std::move(_v); }
         uint8_t filter_frequency() const { return m_filter_frequency; }
@@ -378,6 +424,10 @@ public:
         void set_veloc_mod_of_soft_start(uint8_t _v) { m__dirty = true; m_veloc_mod_of_soft_start = std::move(_v); }
         uint8_t veloc_mod_of_filter_freq() const { return m_veloc_mod_of_filter_freq; }
         void set_veloc_mod_of_filter_freq(uint8_t _v) { m__dirty = true; m_veloc_mod_of_filter_freq = std::move(_v); }
+
+        /**
+         * Per-note note-variation parameter selector. Roger Linn's file-format notes describe 0 = TUNING, 1 = DECAY, 2 = ATTACK, 3 = FILTER.
+         */
         note_variation_type_t param() const { return m_param; }
         void set_param(note_variation_type_t _v) { m__dirty = true; m_param = std::move(_v); }
         mpc3000_pgm_v3_t* _root() const { return m__root; }
@@ -393,9 +443,9 @@ public:
         uint8_t m_if_over2;
         uint8_t m_use_also_plays2;
         poly_mode_t m_poly;
-        uint8_t m_cutoff1;
-        uint8_t m_cutoff2;
-        uint16_t m_tune;
+        uint8_t m_cutoff_note_1;
+        uint8_t m_cutoff_note_2;
+        int16_t m_tune;
         uint8_t m_attack;
         uint8_t m_decay;
         decay_mode_t m_decay_mode;

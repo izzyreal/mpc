@@ -24,6 +24,7 @@ The generator we use is the C++ write-capable compiler from:
 - `mpc60.set.v1.ksy`
 - `mpc60.snd.v1.ksy`
 - `mpc3000.snd.v2.ksy`
+- `mpc3000.pgm.v3.ksy`
 - `mpc3000.seq.v3.ksy`
 - `mpc3000.all.v3.ksy`
 - `mpc60.seq.body.ksy`
@@ -51,6 +52,7 @@ From anywhere:
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.snd.v1.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.snd.v2.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc3000.pgm.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.seq.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.all.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.seq.body.ksy \

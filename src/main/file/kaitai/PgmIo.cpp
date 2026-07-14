@@ -8,6 +8,7 @@
 #include "file/ByteUtil.hpp"
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/generated/mpc2000xl_pgm.h"
+#include "file/kaitai/generated/mpc3000_pgm_v3.h"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/NoteParameters.hpp"
 #include "sampler/Pad.hpp"
@@ -38,6 +39,8 @@ constexpr int kDefaultNoteParametersTerminator = 6;
 constexpr int kDefaultMixerUnknown0 = 0;
 constexpr int kDefaultMixerUnknown1 = 64;
 constexpr int kDefaultMixerUnknown2 = 0;
+constexpr int kMpc3000SoundTableSize = 128;
+constexpr int kMpc3000EffectsGeneratorFxPath = 1;
 constexpr char kPadTailFxBoardSettingsHex[] =
     "02004800D0070000630114081DFC323302323C08050A1414320000020F19000541141E0105"
     "0000056300F4FF0C0000000000000002004F014F0100424F0100424F01004232006328003C"
@@ -49,6 +52,16 @@ constexpr char kPadTailFxBoardSettingsHex[] =
 int normalizeMuteAssign(const uint8_t rawValue)
 {
     return rawValue == kRawMuteAssignOff ? kNormalizedMuteAssignOff : rawValue;
+}
+
+int normalizeOptionalNote(const uint8_t rawValue)
+{
+    return rawValue == 0 ? kNormalizedMuteAssignOff : rawValue;
+}
+
+int decodeSignedByte(const uint8_t rawValue)
+{
+    return static_cast<int8_t>(rawValue);
 }
 
 std::string stripNullTerminatedField(const std::string& raw)
@@ -81,6 +94,25 @@ void setSlider(const mpc2000xl_pgm_t& parsed,
     pgmSlider->setFilterLowRange(slider->filter_low());
     pgmSlider->setTuneHighRange(slider->tune_high());
     pgmSlider->setTuneLowRange(slider->tune_low());
+}
+
+void setSlider(const mpc3000_pgm_v3_t& parsed,
+               const std::shared_ptr<mpc::sampler::Program>& program)
+{
+    const auto* slider = parsed.note_variation_screen();
+    const auto note = slider->note_number_assignment() == 0
+        ? mpc::NoDrumNoteAssigned
+        : mpc::DrumNoteNumber(normalizeOptionalNote(slider->note_number_assignment()));
+    const auto pgmSlider = program->getSlider();
+    pgmSlider->setAssignNote(note);
+    pgmSlider->setAttackHighRange(slider->attack_hi_range());
+    pgmSlider->setAttackLowRange(slider->attack_low_range());
+    pgmSlider->setDecayHighRange(slider->decay_hi_range());
+    pgmSlider->setDecayLowRange(slider->decay_low_range());
+    pgmSlider->setFilterHighRange(slider->filter_hi_range());
+    pgmSlider->setFilterLowRange(decodeSignedByte(slider->filter_low_range()));
+    pgmSlider->setTuneHighRange(decodeSignedByte(slider->tuning_hi_range()));
+    pgmSlider->setTuneLowRange(decodeSignedByte(slider->tuning_low_range()));
 }
 
 void setNoteParameters(mpc::Mpc& mpc,
@@ -134,6 +166,108 @@ void setNoteParameters(mpc::Mpc& mpc,
     mpc.getPerformanceManager().lock()->enqueue(msg);
 }
 
+std::array<int, kMpc3000SoundTableSize> buildMpc3000SoundIndexConversionTable(
+    const mpc3000_pgm_v3_t& parsed,
+    std::vector<std::string>& soundNames)
+{
+    std::array<int, kMpc3000SoundTableSize> conversionTable{};
+    conversionTable.fill(-1);
+
+    for (const auto& assignment : *parsed.sound_assignments())
+    {
+        const auto rawSoundNumber = assignment->sound_number();
+        if (rawSoundNumber == kUnassignedSoundIndex ||
+            rawSoundNumber >= kMpc3000SoundTableSize)
+        {
+            continue;
+        }
+
+        if (conversionTable[rawSoundNumber] != -1)
+        {
+            continue;
+        }
+
+        const auto soundName = mpc::StrUtil::trim(
+            stripNullTerminatedField(parsed.sound_names()->at(rawSoundNumber)->name())
+        );
+
+        if (soundName.empty())
+        {
+            continue;
+        }
+
+        conversionTable[rawSoundNumber] = static_cast<int>(soundNames.size());
+        soundNames.push_back(soundName);
+    }
+
+    return conversionTable;
+}
+
+void setNoteParameters(mpc::Mpc& mpc,
+                       const mpc3000_pgm_v3_t& parsed,
+                       const std::shared_ptr<mpc::sampler::Program>& program,
+                       const std::array<int, kMpc3000SoundTableSize>& soundIndexConversionTable)
+{
+    std::array<mpc::performance::NoteParameters, mpc::Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+        allPerfNoteParams;
+
+    for (int programPadIndex = 0;
+         programPadIndex < mpc::Mpc2000XlSpecs::PROGRAM_PAD_COUNT;
+         ++programPadIndex)
+    {
+        const auto padNote = parsed.pad_note_number_assignments()->at(programPadIndex)->note_number();
+        program->getPad(programPadIndex)->setNote(mpc::DrumNoteNumber(padNote));
+
+        const auto* parsedNote = parsed.sound_assignments()->at(programPadIndex).get();
+        auto& perfNoteParams = allPerfNoteParams[programPadIndex];
+
+        perfNoteParams.attack = parsedNote->attack();
+        perfNoteParams.decay = parsedNote->decay();
+        perfNoteParams.decayMode = static_cast<int>(parsedNote->decay_mode());
+        perfNoteParams.filterAttack = parsedNote->filter_envel_attack();
+        perfNoteParams.filterDecay = parsedNote->filter_envel_decay();
+        perfNoteParams.filterEnvelopeAmount = parsedNote->filter_envel_amount();
+        perfNoteParams.filterFrequency = parsedNote->filter_frequency();
+        perfNoteParams.filterResonance = parsedNote->filter_resonance();
+        perfNoteParams.muteAssignA =
+            mpc::DrumNoteNumber(normalizeOptionalNote(parsedNote->cutoff_note_1()));
+        perfNoteParams.muteAssignB =
+            mpc::DrumNoteNumber(normalizeOptionalNote(parsedNote->cutoff_note_2()));
+        perfNoteParams.optionalNoteA =
+            mpc::DrumNoteNumber(normalizeOptionalNote(parsedNote->use_also_plays1()));
+        perfNoteParams.optionalNoteB =
+            mpc::DrumNoteNumber(normalizeOptionalNote(parsedNote->use_also_plays2()));
+
+        const auto rawSoundNumber = parsedNote->sound_number();
+        if (rawSoundNumber == kUnassignedSoundIndex ||
+            rawSoundNumber >= kMpc3000SoundTableSize)
+        {
+            perfNoteParams.soundIndex = -1;
+        }
+        else
+        {
+            perfNoteParams.soundIndex = soundIndexConversionTable[rawSoundNumber];
+        }
+
+        perfNoteParams.sliderParameterNumber = static_cast<int>(parsedNote->param());
+        perfNoteParams.soundGenerationMode = static_cast<int>(parsedNote->sound_generator_mode());
+        perfNoteParams.tune = parsedNote->tune();
+        perfNoteParams.velocityRangeLower = parsedNote->if_over1();
+        perfNoteParams.velocityRangeUpper = parsedNote->if_over2();
+        perfNoteParams.velocityToAttack = parsedNote->veloc_mod_of_attack();
+        perfNoteParams.velocityToFilterFrequency = parsedNote->veloc_mod_of_filter_freq();
+        perfNoteParams.velocityToLevel = parsedNote->veloc_mod_of_volume();
+        perfNoteParams.velocityToPitch = 0;
+        perfNoteParams.velocityToStart = parsedNote->veloc_mod_of_soft_start();
+        perfNoteParams.voiceOverlapMode =
+            static_cast<mpc::sampler::VoiceOverlapMode>(static_cast<int>(parsedNote->poly()));
+    }
+
+    mpc::performance::UpdateAllNoteParametersBulk msg{program->getProgramIndex(),
+                                                      allPerfNoteParams};
+    mpc.getPerformanceManager().lock()->enqueue(msg);
+}
+
 void setMixer(const mpc2000xl_pgm_t& parsed,
               const std::shared_ptr<mpc::sampler::Program>& program)
 {
@@ -154,6 +288,41 @@ void setMixer(const mpc2000xl_pgm_t& parsed,
             mpc::DrumMixerIndividualFxPath(parsedMixer->fx_output()));
         indivFxMixer->setFxSendLevel(
             mpc::DrumMixerLevel(parsedMixer->effects_send_level()));
+    }
+}
+
+void setMixer(const mpc3000_pgm_v3_t& parsed,
+              const std::shared_ptr<mpc::sampler::Program>& program)
+{
+    for (int i = 0; i < 64; ++i)
+    {
+        const auto noteParameters = program->getNoteParameters(i + 35);
+        const auto stereoMixer = noteParameters->getStereoMixer();
+        const auto indivFxMixer = noteParameters->getIndivFxMixer();
+        const auto* parsedMixer = parsed.mixer_screens()->at(i).get();
+
+        stereoMixer->setLevel(mpc::DrumMixerLevel(parsedMixer->stereo_mix_volume()));
+        stereoMixer->setPanning(mpc::DrumMixerPanning(parsedMixer->stereo_mix_pan()));
+        indivFxMixer->setFollowStereo(parsedMixer->follow_stereo());
+        indivFxMixer->setVolumeIndividualOut(
+            mpc::DrumMixerLevel(parsedMixer->echo_volume()));
+
+        if (parsedMixer->out_assign() == mpc3000_pgm_v3_t::INDIVIDUAL_OUT_INTERNAL_EFFECTS_GENERATOR)
+        {
+            // MPC3000 stores a dedicated internal-effects routing value here,
+            // while the consumer model is MPC2000XL-shaped. For import we
+            // preserve the semantic intent by routing through the FX path.
+            indivFxMixer->setOutput(mpc::DrumMixerIndividualOutput(0));
+            indivFxMixer->setFxPath(mpc::DrumMixerIndividualFxPath(kMpc3000EffectsGeneratorFxPath));
+            indivFxMixer->setFxSendLevel(mpc::DrumMixerLevel(parsedMixer->echo_volume()));
+        }
+        else
+        {
+            indivFxMixer->setOutput(
+                mpc::DrumMixerIndividualOutput(static_cast<int>(parsedMixer->out_assign())));
+            indivFxMixer->setFxPath(mpc::DrumMixerIndividualFxPath(0));
+            indivFxMixer->setFxSendLevel(mpc::DrumMixerLevel(0));
+        }
     }
 }
 
@@ -318,43 +487,80 @@ program_or_error PgmIo::loadProgram(mpc::Mpc &mpc,
                                     std::vector<std::string> &soundNames)
 {
     const auto fileBytes = file->getBytes();
-    const auto canonicalBytes = parseRewrite<mpc2000xl_pgm_t>(fileBytes);
-    std::stringstream parseStream(
-        std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary
-    );
-    ::kaitai::kstream parseIo(&parseStream);
-    mpc2000xl_pgm_t parsed(&parseIo);
-    parsed._read();
-
-    if (parsed.magic() != std::string("\x07\x04", 2))
+    if (fileBytes.size() < 2)
     {
-        return tl::make_unexpected(mpc::disk::mpc_io_error_msg{"PGM first 2 bytes are incorrect"});
+        return tl::make_unexpected(mpc::disk::mpc_io_error_msg{"PGM file is too short"});
     }
 
-    soundNames.clear();
-    soundNames.reserve(parsed.sound_count());
-    for (int i = 0; i < parsed.sound_count(); ++i)
+    if (static_cast<uint8_t>(fileBytes[0]) == 0x07 &&
+        static_cast<uint8_t>(fileBytes[1]) == 0x04)
     {
-        soundNames.push_back(stripNullTerminatedField(parsed.sound_names()->at(i)));
+        const auto canonicalBytes = parseRewrite<mpc2000xl_pgm_t>(fileBytes);
+        std::stringstream parseStream(
+            std::string(canonicalBytes.begin(), canonicalBytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary
+        );
+        ::kaitai::kstream parseIo(&parseStream);
+        mpc2000xl_pgm_t parsed(&parseIo);
+        parsed._read();
+
+        soundNames.clear();
+        soundNames.reserve(parsed.sound_count());
+        for (int i = 0; i < parsed.sound_count(); ++i)
+        {
+            soundNames.push_back(stripNullTerminatedField(parsed.sound_names()->at(i)));
+        }
+
+        const std::string programNameInData = mpc::StrUtil::trim(stripNullTerminatedField(parsed.name()));
+        if (mpc::StrUtil::eqIgnoreCase(programNameInData, file->getNameWithoutExtension()))
+        {
+            program->setName(programNameInData);
+        }
+        else
+        {
+            program->setName(file->getNameWithoutExtension());
+        }
+
+        setNoteParameters(mpc, parsed, program);
+        setMixer(parsed, program);
+        setSlider(parsed, program);
+        program->setMidiProgramChange(parsed.program_change() + 1);
+        return program;
     }
 
-    const std::string programNameInData = mpc::StrUtil::trim(stripNullTerminatedField(parsed.name()));
-    if (mpc::StrUtil::eqIgnoreCase(programNameInData, file->getNameWithoutExtension()))
+    if (static_cast<uint8_t>(fileBytes[0]) == 0x07 &&
+        static_cast<uint8_t>(fileBytes[1]) == 0x00)
     {
-        program->setName(programNameInData);
-    }
-    else
-    {
-        program->setName(file->getNameWithoutExtension());
+        const auto canonicalBytes = parseRewrite<mpc3000_pgm_v3_t>(fileBytes);
+        std::stringstream parseStream(
+            std::string(canonicalBytes.begin(), canonicalBytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary
+        );
+        ::kaitai::kstream parseIo(&parseStream);
+        mpc3000_pgm_v3_t parsed(&parseIo);
+        parsed._read();
+
+        soundNames.clear();
+        const auto soundIndexConversionTable =
+            buildMpc3000SoundIndexConversionTable(parsed, soundNames);
+
+        const std::string programNameInData = mpc::StrUtil::trim(parsed.program_name());
+        if (mpc::StrUtil::eqIgnoreCase(programNameInData, file->getNameWithoutExtension()))
+        {
+            program->setName(programNameInData);
+        }
+        else
+        {
+            program->setName(file->getNameWithoutExtension());
+        }
+
+        setNoteParameters(mpc, parsed, program, soundIndexConversionTable);
+        setMixer(parsed, program);
+        setSlider(parsed, program);
+        return program;
     }
 
-    setNoteParameters(mpc, parsed, program);
-    setMixer(parsed, program);
-    setSlider(parsed, program);
-    program->setMidiProgramChange(parsed.program_change() + 1);
-
-    return program;
+    return tl::make_unexpected(mpc::disk::mpc_io_error_msg{"PGM first 2 bytes are incorrect"});
 }
 
 std::vector<char> PgmIo::saveProgram(mpc::sampler::Program &program,
