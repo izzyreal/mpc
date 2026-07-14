@@ -11,6 +11,7 @@
 #include "engine/StereoMixer.hpp"
 #include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_pgm.h"
+#include "file/kaitai/generated/mpc3000_pgm_v3.h"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/PgmSlider.hpp"
@@ -450,6 +451,101 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-
     parsed._write();
 
     REQUIRE(writeStream.str() == originalBytes);
+}
+
+TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaitai-pgm][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM.pgm");
+    const std::string bytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        bytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_pgm_v3_t parsed(&parseIo);
+    parsed._read();
+
+    REQUIRE(static_cast<unsigned char>(bytes[0]) == 0x07);
+    REQUIRE(static_cast<unsigned char>(bytes[1]) == 0x00);
+    REQUIRE(parsed.sound_names() != nullptr);
+    REQUIRE(parsed.sound_names()->size() == 128U);
+    REQUIRE(parsed.sound_sizes() != nullptr);
+    REQUIRE(parsed.sound_sizes()->size() == 128U);
+    REQUIRE(parsed.sound_assignments() != nullptr);
+    REQUIRE(parsed.sound_assignments()->size() == 64U);
+    REQUIRE(parsed.mixer_screens() != nullptr);
+    REQUIRE(parsed.mixer_screens()->size() == 64U);
+    REQUIRE(parsed.pad_note_number_assignments() != nullptr);
+    REQUIRE(parsed.pad_note_number_assignments()->size() == 64U);
+
+    REQUIRE(parsed.sound_names()->at(0)->name().empty());
+    REQUIRE(parsed.sound_sizes()->at(0) == 0U);
+    REQUIRE(parsed.program_name() == std::string("PROGRAM_01\0\0\0\0", 14));
+
+    REQUIRE(parsed.note_variation_screen()->note_number_assignment() == 34U);
+    REQUIRE(parsed.note_variation_screen()->tuning_low_range() == 136U);
+    REQUIRE(parsed.note_variation_screen()->tuning_hi_range() == 120U);
+    REQUIRE(parsed.note_variation_screen()->attack_low_range() == 12U);
+    REQUIRE(parsed.note_variation_screen()->attack_hi_range() == 45U);
+    REQUIRE(parsed.note_variation_screen()->decay_low_range() == 0U);
+    REQUIRE(parsed.note_variation_screen()->decay_hi_range() == 20U);
+    REQUIRE(parsed.note_variation_screen()->filter_low_range() == 206U);
+    REQUIRE(parsed.note_variation_screen()->filter_hi_range() == 50U);
+
+    REQUIRE(parsed.effects_screen()->effects_on() == false);
+    REQUIRE(parsed.effects_screen()->delay_volume_tap1() == 50U);
+    REQUIRE(parsed.effects_screen()->delay_volume_tap2() == 0U);
+    REQUIRE(parsed.effects_screen()->delay_volume_tap3() == 0U);
+    REQUIRE(parsed.effects_screen()->delay_pan_tap1() == 50U);
+    REQUIRE(parsed.effects_screen()->delay_pan_tap2() == 50U);
+    REQUIRE(parsed.effects_screen()->delay_pan_tap3() == 50U);
+    REQUIRE(parsed.effects_screen()->delay_msecs_tap1() == 100U);
+    REQUIRE(parsed.effects_screen()->delay_msecs_tap2() == 200U);
+    REQUIRE(parsed.effects_screen()->delay_msecs_tap3() == 300U);
+    REQUIRE(parsed.effects_screen()->delay_feedback_tap1() == 0U);
+    REQUIRE(parsed.effects_screen()->delay_feedback_tap2() == 0U);
+    REQUIRE(parsed.effects_screen()->delay_feedback_tap3() == 0U);
+
+    REQUIRE(parsed.sound_assignments()->at(0)->sound_number() == 255U);
+    REQUIRE(parsed.sound_assignments()->at(0)->sound_generator_mode() == mpc3000_pgm_v3_t::SOUND_GENERATOR_MODE_NORMAL);
+    REQUIRE(parsed.sound_assignments()->at(0)->if_over1() == 44U);
+    REQUIRE(parsed.sound_assignments()->at(0)->use_also_plays1() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->if_over2() == 88U);
+    REQUIRE(parsed.sound_assignments()->at(0)->use_also_plays2() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->poly() == mpc3000_pgm_v3_t::POLY_MODE_POLY);
+    REQUIRE(parsed.sound_assignments()->at(0)->cutoff1() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->cutoff2() == 34U);
+    REQUIRE(parsed.sound_assignments()->at(0)->tune() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->attack() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->decay() == 6U);
+    REQUIRE(parsed.sound_assignments()->at(0)->decay_mode() == mpc3000_pgm_v3_t::DECAY_MODE_START);
+    REQUIRE(parsed.sound_assignments()->at(0)->filter_frequency() == 100U);
+    REQUIRE(parsed.sound_assignments()->at(0)->filter_resonance() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->filter_envel_attack() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->filter_envel_decay() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->filter_envel_amount() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->veloc_mod_of_volume() == 100U);
+    REQUIRE(parsed.sound_assignments()->at(0)->veloc_mod_of_attack() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->veloc_mod_of_soft_start() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->veloc_mod_of_filter_freq() == 0U);
+    REQUIRE(parsed.sound_assignments()->at(0)->param() == mpc3000_pgm_v3_t::NOTE_VARIATION_TYPE_TUNE);
+
+    REQUIRE(parsed.mixer_screens()->at(0)->stereo_mix_volume() == 100U);
+    REQUIRE(parsed.mixer_screens()->at(0)->stereo_mix_pan() == 50U);
+    REQUIRE(parsed.mixer_screens()->at(0)->echo_volume() == 0U);
+    REQUIRE(parsed.mixer_screens()->at(0)->out_assign() == mpc3000_pgm_v3_t::INDIVIDUAL_OUT_INTERNAL_EFFECTS_GENERATOR);
+    REQUIRE(parsed.mixer_screens()->at(0)->follow_stereo() == false);
+
+    REQUIRE(parsed.pad_note_number_assignments()->at(0)->note_number() == 37U);
+    REQUIRE(parsed.pad_note_number_assignments()->at(1)->note_number() == 36U);
+    REQUIRE(parsed.pad_note_number_assignments()->at(2)->note_number() == 42U);
+    REQUIRE(parsed.pad_note_number_assignments()->at(3)->note_number() == 82U);
+    REQUIRE(parsed.pad_note_number_assignments()->at(63)->note_number() == 98U);
+
 }
 
 TEST_CASE("Kaitai MPC2000 PGM saves and reloads PROGRAM1 without handwritten code", "[kaitai-pgm]")
