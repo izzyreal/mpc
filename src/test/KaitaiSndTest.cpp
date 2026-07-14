@@ -7,6 +7,7 @@
 #include "disk/SoundLoader.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
+#include "file/kaitai/generated/mpc3000_snd_v2.h"
 #include "file/kaitai/generated/mpc60_snd_v1.h"
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
@@ -70,6 +71,19 @@ namespace
         );
         kaitai::kstream parseIo(&parseStream);
         mpc2000snd_t parsed(&parseIo);
+        parsed._read();
+        assertions(parsed);
+    }
+
+    template <typename Assertions>
+    void withParsedMpc3000SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
+    {
+        std::stringstream parseStream(
+            std::string(bytes.begin(), bytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary
+        );
+        kaitai::kstream parseIo(&parseStream);
+        mpc3000_snd_v2_t parsed(&parseIo);
         parsed._read();
         assertions(parsed);
     }
@@ -463,6 +477,52 @@ TEST_CASE("Kaitai MPC60 SND parses a real hardware 01 01 file through the produc
     REQUIRE(*minIt < *maxIt);
 }
 
+TEST_CASE("Kaitai MPC3000 SND parses a real hardware 01 02 file through the production loader", "[kaitai-snd][real-mpc3000]")
+{
+    const auto bytes = resourceBytes("test/RealMpc3000/Snd/SOUND017.SND");
+
+    withParsedMpc3000SndBytes(bytes, [&](mpc3000_snd_v2_t &parsed)
+    {
+        REQUIRE(static_cast<unsigned char>(bytes[0]) == 0x01);
+        REQUIRE(static_cast<unsigned char>(bytes[1]) == 0x02);
+        REQUIRE(parsed.name() == expectedHeaderName("sound017").substr(0, 16));
+        REQUIRE(parsed.level() == 100U);
+        REQUIRE(parsed.unknown_1() == std::string(2, '\0'));
+        REQUIRE(parsed.start() == 44U);
+        REQUIRE(parsed.end() == 4410U);
+        REQUIRE(parsed.frame_count() == 4410U);
+        REQUIRE(parsed.sample_rate() == 44100);
+        REQUIRE(parsed.header_size() == 38);
+        REQUIRE(parsed.sample_data() != nullptr);
+        REQUIRE(parsed.sample_data()->size() == 4410U);
+        REQUIRE(parsed.sample_data()->at(0) == 5);
+        REQUIRE(parsed.sample_data()->at(1) == 6);
+        REQUIRE(parsed.sample_data()->at(2) == 7);
+        REQUIRE(parsed.sample_data()->at(3) == 6);
+    });
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    const auto loaded = loadWithSoundLoader(mpc, bytes, "SOUND017.SND");
+
+    REQUIRE(loaded->getName() == "sound017");
+    REQUIRE(loaded->isMono());
+    REQUIRE(loaded->getSampleRate() == 44100);
+    REQUIRE(loaded->getSndLevel() == 100);
+    REQUIRE(loaded->getTune() == 0);
+    REQUIRE(loaded->getBeatCount() == 4);
+    REQUIRE(loaded->getStart() == 44);
+    REQUIRE(loaded->getEnd() == 4410);
+    REQUIRE(loaded->getLoopTo() == 0);
+    REQUIRE_FALSE(loaded->isLoopEnabled());
+    REQUIRE(loaded->getFrameCount() == 4410);
+    REQUIRE(loaded->getSampleData()->size() == 4410U);
+    REQUIRE((*loaded->getSampleData())[0] == short_to_float(5));
+    REQUIRE((*loaded->getSampleData())[1] == short_to_float(6));
+    REQUIRE((*loaded->getSampleData())[2] == short_to_float(7));
+    REQUIRE((*loaded->getSampleData())[3] == short_to_float(6));
+}
+
 TEST_CASE("Kaitai MPC60 SND parses native MPC60 2.14 ROCK exports through the production loader", "[kaitai-snd][real-mpc60]")
 {
     struct NativeMpc60SndCase
@@ -782,7 +842,7 @@ TEST_CASE("SndIo rejects too-short and unsupported SND data", "[kaitai-snd]")
     REQUIRE(tooShort.error() == "SND file is too short");
 
     auto unsupported = SndIo::loadBytes(
-        {static_cast<char>(0x01), static_cast<char>(0x02)}, sound,
+        {static_cast<char>(0x01), static_cast<char>(0x03)}, sound,
         "bad");
     REQUIRE_FALSE(unsupported);
     REQUIRE(unsupported.error() == "Unsupported SND file format");

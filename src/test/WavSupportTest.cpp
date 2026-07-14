@@ -184,3 +184,35 @@ TEST_CASE("MPC60 SND preview decodes packed 12-bit samples", "[snd][preview]")
     REQUIRE(std::fabs(buffer.getChannel(1)[3] - buffer.getChannel(0)[3]) <
             0.0001f);
 }
+
+TEST_CASE("MPC3000 SND preview streams mono 16-bit PCM", "[snd][preview]")
+{
+    const auto bytes = resourceBytes("test/RealMpc3000/Snd/SOUND017.SND");
+    auto stream = std::make_shared<std::stringstream>(
+        std::string(bytes.begin(), bytes.end()),
+        std::ios::in | std::ios::out | std::ios::binary);
+
+    SoundPlayer soundPlayer;
+    REQUIRE(soundPlayer.start(stream, SoundPlayerFileFormat::SND, 44100));
+
+    AudioBuffer buffer("preview", 2, 4, 44100);
+
+    for (int i = 0; i < 20; i++)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        soundPlayer.processAudio(&buffer, 4);
+        if (!buffer.isSilent())
+        {
+            break;
+        }
+    }
+
+    REQUIRE(std::fabs(buffer.getChannel(0)[0] - short_to_float(5)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[1] - short_to_float(6)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[2] - short_to_float(7)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[3] - short_to_float(6)) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(1)[0] - buffer.getChannel(0)[0]) <
+            0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(1)[3] - buffer.getChannel(0)[3]) <
+            0.0001f);
+}
