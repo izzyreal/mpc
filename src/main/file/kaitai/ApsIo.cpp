@@ -61,6 +61,14 @@ constexpr char kPadTailFxBoardSettingsHex[] =
     "04000C000000320023003E335A3214000000320023003E335A3214000000320023003E335A"
     "3214000000320023003E335A321400";
 
+void selectFirstSoundIfAnyWereLoaded(mpc::Mpc& mpc, const bool withoutSounds)
+{
+    if (!withoutSounds && mpc.getSampler()->getSoundCount() > 0)
+    {
+        mpc.getSampler()->setSoundIndex(0);
+    }
+}
+
 std::string stripNullTerminatedField(const std::string& raw)
 {
     const auto terminator = raw.find('\0');
@@ -772,6 +780,19 @@ void loadGlobals(mpc3000_aps_v3_t& parsed, mpc::Mpc& mpc)
             std::clamp<int>(parsed.center_pad_16_levels_if_param_tuning(), 4, 13) - 1
         )
     );
+
+    const auto activeProgramIndex = std::clamp<int>(
+        parsed.active_program_number(),
+        0,
+        std::max(0, static_cast<int>(parsed.programs()->size()) - 1)
+    );
+    auto performanceManager = mpc.getPerformanceManager().lock();
+    for (int drumBusIndex = 0; drumBusIndex < mpc::Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
+    {
+        auto drum = performanceManager->getSnapshot().getDrum(mpc::DrumBusIndex(drumBusIndex));
+        drum.programIndex = mpc::ProgramIndex(activeProgramIndex);
+        performanceManager->enqueue(mpc::performance::UpdateDrumBulk{drum});
+    }
 }
 
 } // namespace
@@ -808,7 +829,7 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
         }
         loadPrograms(parsed, mpc, unavailableSoundIndices, finalSoundIndices);
         loadGlobals(parsed, mpc);
-        mpc.getSampler()->setSoundIndex(0);
+        selectFirstSoundIfAnyWereLoaded(mpc, withoutSounds);
         return;
     }
 
@@ -835,7 +856,7 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
     loadPrograms(parsed, mpc, unavailableSoundIndices, finalSoundIndices);
     loadDrums(parsed, mpc);
     loadGlobals(parsed, mpc);
-    mpc.getSampler()->setSoundIndex(0);
+    selectFirstSoundIfAnyWereLoaded(mpc, withoutSounds);
 }
 
 void ApsIo::load(mpc::Mpc& mpc, const std::shared_ptr<mpc::disk::MpcFile>& file, bool headless)
