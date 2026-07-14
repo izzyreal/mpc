@@ -163,7 +163,7 @@ void DrumScreen::displayPadToInternalSound() const
 void DrumScreen::displayPgm() const
 {
     const auto pn = getActiveDrumBus()->getProgramIndex();
-    findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
+    findField("pgm")->setText(StrUtil::padLeft(std::to_string(static_cast<int>(pn) + 1), " ", 2) +
                               "-" + sampler.lock()->getProgram(pn)->getName());
 }
 

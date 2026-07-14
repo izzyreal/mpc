@@ -665,6 +665,44 @@ TEST_CASE("Kaitai MPC3000 APS maps active program to all 2000XL drum buses", "[k
     }
 }
 
+TEST_CASE("Program screens display program 24 correctly at upper bound after real MPC3000 APS load", "[kaitai-aps][real-mpc3000]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto apsFile = installApsResourceFile(
+        mpc,
+        "test/RealMpc3000/Aps/ALL_PGMS.APS",
+        "ALL_PGMS.APS"
+    );
+    REQUIRE(apsFile);
+
+    constexpr bool headless = true;
+    mpc::file::kaitai::ApsIo::load(mpc, apsFile, headless);
+    mpc.getEngineHost()->prepareProcessBlock(512);
+
+    auto drumBus = mpc.getSequencer()->getDrumBus(mpc::DrumBusIndex(0));
+    drumBus->setProgramIndex(mpc::ProgramIndex(22));
+    mpc.getPerformanceManager().lock()->drainQueue();
+
+    auto layeredScreen = mpc.getLayeredScreen();
+
+    layeredScreen->openScreenById(mpc::lcdgui::ScreenId::PgmAssignScreen);
+    REQUIRE(layeredScreen->setFocus("pgm"));
+    mpc.getScreen()->turnWheel(1);
+    mpc.getPerformanceManager().lock()->drainQueue();
+    mpc.getLayeredScreen()->timerCallback();
+    REQUIRE(mpc.getScreen()->findField("pgm")->getText() == "24-PROGRAM_24");
+
+    layeredScreen->openScreenById(mpc::lcdgui::ScreenId::PgmParamsScreen);
+    mpc.getLayeredScreen()->timerCallback();
+    REQUIRE(mpc.getScreen()->findField("pgm")->getText() == "24");
+
+    layeredScreen->openScreenById(mpc::lcdgui::ScreenId::CopyProgramScreen);
+    mpc.getLayeredScreen()->timerCallback();
+    REQUIRE(mpc.getScreen()->findField("pgm0")->getText() == "24-PROGRAM_24");
+}
+
 TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
 {
     auto fs = cmrc::mpctest::get_filesystem();

@@ -81,7 +81,7 @@ void CopyNoteParametersScreen::displayProg0() const
 {
     const auto program = sampler.lock()->getProgram(prog0);
     findField("prog0")->setText(
-        StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" +
+        StrUtil::padLeft(std::to_string(static_cast<int>(prog0) + 1), " ", 2) + "-" +
         program->getName());
 }
 
@@ -114,7 +114,7 @@ void CopyNoteParametersScreen::displayProg1() const
 {
     const auto program = sampler.lock()->getProgram(prog1);
     findField("prog1")->setText(
-        StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" +
+        StrUtil::padLeft(std::to_string(static_cast<int>(prog1) + 1), " ", 2) + "-" +
         program->getName());
 }
 
