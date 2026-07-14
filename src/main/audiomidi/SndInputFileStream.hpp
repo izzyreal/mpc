@@ -15,10 +15,12 @@
 enum class SndInputEncoding
 {
     Mpc2000XlPcm16,
+    Mpc3000Pcm16,
     Mpc60Packed12,
 };
 
 const char MPC2000XL_SND_ID[] = {0x01, 0x04, '\0'};
+const char MPC3000_SND_ID[] = {0x01, 0x02, '\0'};
 const char MPC60_SND_ID[] = {0x01, 0x01, '\0'};
 
 const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and
@@ -36,6 +38,7 @@ const int LOOP_ENABLED_INDEX = 38;    // 1 byte, 1 if true
 const int BEAT_COUNT_INDEX = 39;      // 1 byte
 const int SAMPLE_RATE_INDEX = 40;     // 2 byte unsigned short
 const int MPC2000XL_SND_HEADER_SIZE = 42;
+const int MPC3000_SND_HEADER_SIZE = 38;
 const int MPC60_SND_HEADER_SIZE = 39;
 
 inline void snd_read_bytes(const std::shared_ptr<std::istream> &stream,
@@ -188,6 +191,41 @@ inline bool snd_read_mpc60_header(const std::shared_ptr<std::istream> &stream,
     return true;
 }
 
+inline bool snd_read_mpc3000_header(const std::shared_ptr<std::istream> &stream,
+                                    int &sampleRate, int &validBits,
+                                    int &numChannels, int &numFrames)
+{
+    stream->seekg(0, std::ios::end);
+    const auto fileSize = stream->tellg();
+
+    if (fileSize < MPC3000_SND_HEADER_SIZE)
+    {
+        return false;
+    }
+
+    stream->seekg(2, std::ios::beg);
+
+    auto name = snd_get_string(stream, 17);
+    /*auto level =*/snd_get_char(stream);
+    stream->ignore(2);
+    /*auto start =*/snd_get_unsigned_LE(stream, 4);
+    /*auto end =*/snd_get_unsigned_LE(stream, 4);
+    numFrames = static_cast<int>(snd_get_unsigned_LE(stream, 4));
+    /*auto unknown2 =*/snd_get_unsigned_LE(stream, 4);
+
+    if (numFrames <= 0 ||
+        fileSize != MPC3000_SND_HEADER_SIZE + static_cast<std::streamoff>(numFrames * 2))
+    {
+        return false;
+    }
+
+    sampleRate = 44100;
+    validBits = 16;
+    numChannels = 1;
+    stream->seekg(MPC3000_SND_HEADER_SIZE, std::ios::beg);
+    return true;
+}
+
 inline bool snd_read_header(const std::shared_ptr<std::istream> &stream,
                             int &sampleRate, int &validBits,
                             int &numChannels, int &numFrames,
@@ -203,6 +241,13 @@ inline bool snd_read_header(const std::shared_ptr<std::istream> &stream,
         encoding = SndInputEncoding::Mpc2000XlPcm16;
         return snd_read_mpc2000xl_header(stream, sampleRate, validBits,
                                          numChannels, numFrames);
+    }
+
+    if (strcmp(sndId.c_str(), MPC3000_SND_ID) == 0)
+    {
+        encoding = SndInputEncoding::Mpc3000Pcm16;
+        return snd_read_mpc3000_header(stream, sampleRate, validBits,
+                                       numChannels, numFrames);
     }
 
     if (strcmp(sndId.c_str(), MPC60_SND_ID) == 0)
