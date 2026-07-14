@@ -80,7 +80,7 @@ void CopyProgramScreen::displayPgm0() const
 {
     const auto programName = sampler.lock()->getProgram(pgm0)->getName();
     findField("pgm0")->setText(
-        StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
+        StrUtil::padLeft(std::to_string(static_cast<int>(pgm0) + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1() const
@@ -90,7 +90,7 @@ void CopyProgramScreen::displayPgm1() const
     const auto programName =
         program1->isUsed() ? program1->getName() : "(no program)";
     findField("pgm1")->setText(
-        StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
+        StrUtil::padLeft(std::to_string(static_cast<int>(pgm1) + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayFunctionKeys()

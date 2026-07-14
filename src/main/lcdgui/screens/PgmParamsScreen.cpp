@@ -324,7 +324,7 @@ void PgmParamsScreen::displayNote() const
 
 void PgmParamsScreen::displayPgm() const
 {
-    findField("pgm")->setTextPadded(getActiveDrumBus()->getProgramIndex() + 1,
+    findField("pgm")->setTextPadded(static_cast<int>(getActiveDrumBus()->getProgramIndex()) + 1,
                                     " ");
 }
 

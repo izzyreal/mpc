@@ -383,7 +383,7 @@ void PgmAssignScreen::displayPgm() const
     const auto program = getProgramOrThrow();
     findField("pgm")->setText(
         StrUtil::padLeft(
-            std::to_string(getActiveDrumBus()->getProgramIndex() + 1), " ", 2) +
+            std::to_string(static_cast<int>(getActiveDrumBus()->getProgramIndex()) + 1), " ", 2) +
         "-" + program->getName());
 }
 
