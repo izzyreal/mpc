@@ -14,6 +14,7 @@
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/PgmAssignScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
@@ -563,9 +564,54 @@ TEST_CASE("Kaitai MPC3000 APS loads real hardware ALL_PGMS through production se
     REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::POLY);
 
     auto mixerSetupScreen = mpc.screens->get<mpc::lcdgui::ScreenId::MixerSetupScreen>();
+    auto assign16LevelsScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::Assign16LevelsScreen>();
     REQUIRE_FALSE(mixerSetupScreen->isRecordMixChangesEnabled());
     REQUIRE_FALSE(mixerSetupScreen->isStereoMixSourceDrum());
     REQUIRE_FALSE(mixerSetupScreen->isIndivFxSourceDrum());
+    REQUIRE(assign16LevelsScreen->getOriginalKeyPad() == 12);
+}
+
+TEST_CASE("Kaitai MPC3000 APS maps center pad anchors into 2000XL original key pad", "[kaitai-aps][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    auto loadOriginalKeyPad = [](const std::string& bytes) {
+        mpc::Mpc mpc;
+        mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+        std::vector<char> payload(bytes.begin(), bytes.end());
+        constexpr bool withoutSounds = true;
+        constexpr bool headless = true;
+        mpc::file::kaitai::ApsIo::loadBytes(mpc, payload, withoutSounds, headless);
+
+        return mpc.screens
+            ->get<mpc::lcdgui::ScreenId::Assign16LevelsScreen>()
+            ->getOriginalKeyPad();
+    };
+
+    REQUIRE(loadOriginalKeyPad(originalBytes) == 12);
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_aps_v3_t parsed(&parseIo);
+    parsed._read();
+    parsed.set_center_pad_16_levels_if_param_tuning(4);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    REQUIRE(loadOriginalKeyPad(writeStream.str()) == 3);
 }
 
 TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
