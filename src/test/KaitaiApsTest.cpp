@@ -614,6 +614,57 @@ TEST_CASE("Kaitai MPC3000 APS maps center pad anchors into 2000XL original key p
     REQUIRE(loadOriginalKeyPad(writeStream.str()) == 3);
 }
 
+TEST_CASE("Kaitai MPC3000 APS maps active program to all 2000XL drum buses", "[kaitai-aps][real-mpc3000]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
+    const std::string originalBytes(
+        std::string_view(file.begin(), file.end() - file.begin())
+    );
+
+    std::stringstream parseStream(
+        originalBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream parseIo(&parseStream);
+    mpc3000_aps_v3_t parsed(&parseIo);
+    parsed._read();
+    parsed.set_active_program_number(1);
+
+    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&writeStream);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+
+    const auto rewrittenBytes = writeStream.str();
+    std::vector<char> payload(rewrittenBytes.begin(), rewrittenBytes.end());
+
+    std::stringstream verifyStream(
+        rewrittenBytes,
+        std::ios::in | std::ios::out | std::ios::binary
+    );
+    kaitai::kstream verifyIo(&verifyStream);
+    mpc3000_aps_v3_t reparsed(&verifyIo);
+    reparsed._read();
+    REQUIRE(reparsed.active_program_number() == 1U);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    constexpr bool headless = true;
+    constexpr bool withoutSounds = true;
+    mpc::file::kaitai::ApsIo::loadBytes(mpc, payload, withoutSounds, headless);
+    mpc.getPerformanceManager().lock()->drainQueue();
+
+    for (const auto busType : {mpc::sequencer::BusType::DRUM1,
+                               mpc::sequencer::BusType::DRUM2,
+                               mpc::sequencer::BusType::DRUM3,
+                               mpc::sequencer::BusType::DRUM4})
+    {
+        REQUIRE(mpc.getSequencer()->getDrumBus(busType)->getProgramIndex() == 1);
+    }
+}
+
 TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
