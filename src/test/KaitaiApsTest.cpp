@@ -509,6 +509,65 @@ TEST_CASE("Kaitai MPC2000 APS loads real 2KXL ALL_PGMS through production seam",
     REQUIRE(p1->getNoteParameters(36)->getSoundIndex() == -1);
 }
 
+TEST_CASE("Kaitai MPC3000 APS loads real hardware ALL_PGMS through production seam", "[kaitai-aps][real-mpc3000]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    auto apsFile = installApsResourceFile(
+        mpc,
+        "test/RealMpc3000/Aps/ALL_PGMS.APS",
+        "ALL_PGMS.APS"
+    );
+    REQUIRE(apsFile);
+
+    constexpr bool headless = true;
+    mpc::file::kaitai::ApsIo::load(mpc, apsFile, headless);
+    mpc.getEngineHost()->prepareProcessBlock(512);
+
+    auto sampler = mpc.getSampler();
+    REQUIRE(sampler->getProgramCount() == 24);
+    REQUIRE(sampler->getSoundCount() == 0);
+
+    auto p1 = sampler->getProgram(0);
+    auto p2 = sampler->getProgram(1);
+    auto p24 = sampler->getProgram(23);
+    REQUIRE(p1 != nullptr);
+    REQUIRE(p2 != nullptr);
+    REQUIRE(p24 != nullptr);
+
+    REQUIRE(p1->getName() == "PROGRAM_01");
+    REQUIRE(p2->getName() == "PROGRAM_02");
+    REQUIRE(p24->getName() == "PROGRAM_24");
+
+    REQUIRE(p1->getPad(0)->getNote() == mpc::DrumNoteNumber(37));
+    REQUIRE(p1->getPad(1)->getNote() == mpc::DrumNoteNumber(36));
+    REQUIRE(p1->getPad(2)->getNote() == mpc::DrumNoteNumber(42));
+    REQUIRE(p1->getPad(3)->getNote() == mpc::DrumNoteNumber(82));
+
+    auto* note35 = p1->getNoteParameters(35);
+    REQUIRE(note35 != nullptr);
+    REQUIRE(note35->getSoundIndex() == -1);
+    REQUIRE(note35->getSoundGenerationMode() == mpc::sampler::SoundGenerationMode::Normal);
+    REQUIRE(note35->getVelocityRangeLower() == 44);
+    REQUIRE(note35->getVelocityRangeUpper() == 88);
+    REQUIRE(note35->getOptionalNoteA() == mpc::DrumNoteNumber(34));
+    REQUIRE(note35->getOptionalNoteB() == mpc::DrumNoteNumber(34));
+    REQUIRE(note35->getMuteAssignA() == mpc::DrumNoteNumber(34));
+    REQUIRE(note35->getMuteAssignB() == mpc::DrumNoteNumber(34));
+    REQUIRE(note35->getTune() == 0);
+    REQUIRE(note35->getAttack() == 0);
+    REQUIRE(note35->getDecay() == 6);
+    REQUIRE(note35->getDecayMode() == 0);
+    REQUIRE(note35->getFilterFrequency() == 100);
+    REQUIRE(note35->getVoiceOverlapMode() == mpc::sampler::VoiceOverlapMode::POLY);
+
+    auto mixerSetupScreen = mpc.screens->get<mpc::lcdgui::ScreenId::MixerSetupScreen>();
+    REQUIRE_FALSE(mixerSetupScreen->isRecordMixChangesEnabled());
+    REQUIRE_FALSE(mixerSetupScreen->isStereoMixSourceDrum());
+    REQUIRE_FALSE(mixerSetupScreen->isIndivFxSourceDrum());
+}
+
 TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
 {
     auto fs = cmrc::mpctest::get_filesystem();
