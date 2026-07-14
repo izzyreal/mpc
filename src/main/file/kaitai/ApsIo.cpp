@@ -11,6 +11,7 @@
 #include "file/ByteUtil.hpp"
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/generated/mpc2000xl_aps.h"
+#include "file/kaitai/generated/mpc3000_aps_v3.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/PgmAssignScreen.hpp"
@@ -38,6 +39,8 @@ constexpr uint8_t kUnassignedSoundIndex = 0xFF;
 constexpr int kOffNoteNumber = 34;
 constexpr int kVisibleNameLength = 16;
 constexpr int kProgramPadCount = 64;
+constexpr int kMpc3000SoundTableSize = 128;
+constexpr int kMpc3000EffectsGeneratorFxPath = 1;
 constexpr char kApsProgramUnknownBytes[] = {0, 7, 4, 30, 0};
 constexpr char kApsProgramSliderPadding[] = {35, 64, 0, 26, 0};
 constexpr char kApsProgramNoteTerminator = 6;
@@ -73,6 +76,11 @@ int normalizeOffNote(const uint8_t raw)
     return raw == 0 ? kOffNoteNumber : raw;
 }
 
+int decodeSignedByte(const uint8_t raw)
+{
+    return static_cast<int8_t>(raw);
+}
+
 void copyMixer(mpc::performance::StereoMixer& stereoDest,
                mpc::performance::IndivFxMixer& indivDest,
                const mpc2000xl_pgm_t::pad_mixer_t& mixer)
@@ -83,6 +91,20 @@ void copyMixer(mpc::performance::StereoMixer& stereoDest,
     indivDest.individualOutput = mpc::DrumMixerIndividualOutput(mixer.output());
     indivDest.fxSendLevel = mpc::DrumMixerLevel(mixer.effects_send_level());
     indivDest.fxPath = mpc::DrumMixerIndividualFxPath(mixer.fx_output());
+}
+
+void copyMixer(mpc::performance::StereoMixer& stereoDest,
+               mpc::performance::IndivFxMixer& indivDest,
+               const mpc3000_aps_v3_t::mixer_settings_t& mixer)
+{
+    stereoDest.level = mpc::DrumMixerLevel(mixer.stereo_mix_volume());
+    stereoDest.panning = mpc::DrumMixerPanning(mixer.stereo_mix_pan());
+    indivDest.fxSendLevel = mpc::DrumMixerLevel(mixer.echo_volume());
+    indivDest.followStereo = mixer.out_assign_fol_ster() != 0;
+    if (!indivDest.followStereo)
+    {
+        indivDest.fxPath = mpc::DrumMixerIndividualFxPath(kMpc3000EffectsGeneratorFxPath);
+    }
 }
 
 void appendBytes(std::vector<char>& dest, const std::vector<char>& src)
@@ -384,6 +406,73 @@ void loadReferencedSounds(mpc2000xl_aps_t& parsed,
     }
 }
 
+void loadReferencedSounds(mpc3000_aps_v3_t& parsed,
+                          mpc::Mpc& mpc,
+                          const bool headless,
+                          std::vector<int>& unavailableSoundIndices,
+                          std::map<int, int>& finalSoundIndices)
+{
+    auto sampler = mpc.getSampler();
+    auto disk = mpc.getDisk();
+
+    sampler->deleteAllSamples();
+
+    for (int i = 0; i < kMpc3000SoundTableSize; ++i)
+    {
+        const auto soundFileName =
+            trimNullTerminatedField(parsed.sound_names()->at(i));
+
+        if (soundFileName.empty())
+        {
+            continue;
+        }
+
+        auto ext = std::string("snd");
+        std::shared_ptr<mpc::disk::MpcFile> soundFile;
+
+        for (auto& f : disk->getAllFiles())
+        {
+            if (mpc::StrUtil::eqIgnoreCase(
+                    mpc::StrUtil::replaceAll(f->getName(), ' ', ""),
+                    soundFileName + ".SND"))
+            {
+                soundFile = f;
+                break;
+            }
+        }
+
+        if (!soundFile || !soundFile->exists())
+        {
+            for (auto& f : disk->getAllFiles())
+            {
+                if (mpc::StrUtil::eqIgnoreCase(
+                        mpc::StrUtil::replaceAll(f->getName(), ' ', ""),
+                        soundFileName + ".WAV"))
+                {
+                    soundFile = f;
+                    ext = "wav";
+                    break;
+                }
+            }
+        }
+
+        if (!soundFile || !soundFile->exists())
+        {
+            unavailableSoundIndices.push_back(i);
+
+            if (!headless)
+            {
+                handleSoundNotFound(mpc, soundFileName);
+            }
+
+            continue;
+        }
+
+        finalSoundIndices[i] = sampler->getSoundCount();
+        loadSound(mpc, soundFileName, ext, soundFile, headless);
+    }
+}
+
 void loadPrograms(mpc2000xl_aps_t& parsed,
                   mpc::Mpc& mpc,
                   const std::vector<int>& unavailableSoundIndices,
@@ -500,6 +589,99 @@ void loadPrograms(mpc2000xl_aps_t& parsed,
     }
 }
 
+void loadPrograms(mpc3000_aps_v3_t& parsed,
+                  mpc::Mpc& mpc,
+                  const std::vector<int>& unavailableSoundIndices,
+                  const std::map<int, int>& finalSoundIndices)
+{
+    auto sampler = mpc.getSampler();
+
+    for (int programIndex = 0; programIndex < static_cast<int>(parsed.programs()->size()); ++programIndex)
+    {
+        const auto& sourceProgram = parsed.programs()->at(programIndex);
+        auto program = sampler->getProgram(programIndex);
+        program->setName(trimNullTerminatedField(sourceProgram->program_name()));
+
+        mpc::performance::UpdateProgramBulk msg;
+        auto& perfProgram = msg.program;
+        msg.programIndex = mpc::ProgramIndex(programIndex);
+        perfProgram.used = true;
+
+        for (int noteIndex = 0; noteIndex < kProgramPadCount; ++noteIndex)
+        {
+            const auto noteNumber =
+                sourceProgram->pad_note_number_assignments()->at(noteIndex)->note_number();
+            perfProgram.pads[noteIndex].note = mpc::DrumNoteNumber(noteNumber);
+
+            auto& destNoteParams = perfProgram.noteParameters[noteIndex];
+            const auto* sourceMixer = sourceProgram->mixer_settings()->at(noteIndex).get();
+            copyMixer(destNoteParams.stereoMixer, destNoteParams.indivFxMixer, *sourceMixer);
+
+            const auto* srcNoteParams = sourceProgram->sound_assignments()->at(noteIndex).get();
+            auto soundIndex = -1;
+            const auto rawSoundNumber = srcNoteParams->sound_number();
+            if (rawSoundNumber != kUnassignedSoundIndex &&
+                std::find(begin(unavailableSoundIndices),
+                          end(unavailableSoundIndices),
+                          rawSoundNumber) == end(unavailableSoundIndices))
+            {
+                const auto finalSoundIndex = finalSoundIndices.find(rawSoundNumber);
+                if (finalSoundIndex != end(finalSoundIndices))
+                {
+                    soundIndex = finalSoundIndex->second;
+                }
+            }
+
+            destNoteParams.soundIndex = soundIndex;
+            destNoteParams.tune = srcNoteParams->tune();
+            destNoteParams.voiceOverlapMode =
+                static_cast<mpc::sampler::VoiceOverlapMode>(srcNoteParams->poly());
+            destNoteParams.decayMode = static_cast<int>(srcNoteParams->decay_mode());
+            destNoteParams.attack = srcNoteParams->attack();
+            destNoteParams.decay = srcNoteParams->decay();
+            destNoteParams.filterAttack = srcNoteParams->filter_envel_attack();
+            destNoteParams.filterDecay = srcNoteParams->filter_envel_decay();
+            destNoteParams.filterEnvelopeAmount = srcNoteParams->filter_envel_amount();
+            destNoteParams.filterFrequency = srcNoteParams->filter_frequency();
+            destNoteParams.filterResonance = srcNoteParams->filter_resonance();
+            destNoteParams.muteAssignA =
+                mpc::DrumNoteNumber(normalizeOffNote(srcNoteParams->cutoff_note_1()));
+            destNoteParams.muteAssignB =
+                mpc::DrumNoteNumber(normalizeOffNote(srcNoteParams->cutoff_note_2()));
+            destNoteParams.optionalNoteA =
+                mpc::DrumNoteNumber(normalizeOffNote(srcNoteParams->use_also_plays1()));
+            destNoteParams.optionalNoteB =
+                mpc::DrumNoteNumber(normalizeOffNote(srcNoteParams->use_also_plays2()));
+            destNoteParams.sliderParameterNumber =
+                static_cast<int>(srcNoteParams->param());
+            destNoteParams.soundGenerationMode =
+                static_cast<int>(srcNoteParams->sound_generator_mode());
+            destNoteParams.velocityToStart = srcNoteParams->veloc_mod_of_soft_start();
+            destNoteParams.velocityToAttack = srcNoteParams->veloc_mod_of_attack();
+            destNoteParams.velocityToFilterFrequency = srcNoteParams->veloc_mod_of_filter_freq();
+            destNoteParams.velocityToLevel = srcNoteParams->veloc_mod_of_volume();
+            destNoteParams.velocityRangeLower = srcNoteParams->if_over1();
+            destNoteParams.velocityRangeUpper = srcNoteParams->if_over2();
+            destNoteParams.velocityToPitch = 0;
+        }
+
+        const auto* slider = sourceProgram->note_variation();
+        perfProgram.slider.attackHighRange = slider->attack_hi_range();
+        perfProgram.slider.attackLowRange = slider->attack_low_range();
+        perfProgram.slider.decayHighRange = slider->decay_hi_range();
+        perfProgram.slider.decayLowRange = slider->decay_low_range();
+        perfProgram.slider.filterHighRange = slider->filter_hi_range();
+        perfProgram.slider.filterLowRange = decodeSignedByte(slider->filter_low_range());
+        perfProgram.slider.assignNote =
+            mpc::DrumNoteNumber(normalizeOffNote(slider->note_number_assignment()));
+        perfProgram.slider.tuneHighRange = decodeSignedByte(slider->tuning_hi_range());
+        perfProgram.slider.tuneLowRange = decodeSignedByte(slider->tuning_low_range());
+
+        mpc.getPerformanceManager().lock()->enqueue(
+            mpc::performance::PerformanceMessage{std::move(msg)});
+    }
+}
+
 void loadDrums(mpc2000xl_aps_t& parsed, mpc::Mpc& mpc)
 {
     for (int i = 0; i < mpc::Mpc2000XlSpecs::DRUM_BUS_COUNT; ++i)
@@ -562,6 +744,19 @@ void loadGlobals(mpc2000xl_aps_t& parsed, mpc::Mpc& mpc)
         globals->pad_assign() == mpc2000xl_aps_t::PAD_ASSIGN_MASTERS);
 }
 
+void loadGlobals(mpc3000_aps_v3_t& parsed, mpc::Mpc& mpc)
+{
+    auto mixerSetupScreen = mpc.screens->get<mpc::lcdgui::ScreenId::MixerSetupScreen>();
+
+    mixerSetupScreen->setRecordMixChangesEnabled(parsed.record_live_mix_changes() != 0);
+
+    // MPC3000 APS has MASTER / SEQUENCE / PROGRAM mix-source selectors while the
+    // 2000XL consumer model only exposes DRUM / PROGRAM. Preserve exact PROGRAM
+    // imports and degrade unsupported MPC3000-only sources to PROGRAM.
+    mixerSetupScreen->setStereoMixSourceDrum(false);
+    mixerSetupScreen->setIndivFxSourceDrum(false);
+}
+
 } // namespace
 
 using namespace mpc::file::kaitai;
@@ -571,6 +766,35 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
                       const bool withoutSounds,
                       bool headless)
 {
+    if (bytes.size() < 2)
+    {
+        throw std::runtime_error("Invalid APS header");
+    }
+
+    if (static_cast<uint8_t>(bytes[0]) == 0x0A &&
+        static_cast<uint8_t>(bytes[1]) == 0x00)
+    {
+        const auto canonicalBytes = parseRewrite<mpc3000_aps_v3_t>(bytes);
+        std::stringstream parseStream(
+            std::string(canonicalBytes.begin(), canonicalBytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary
+        );
+        ::kaitai::kstream parseIo(&parseStream);
+        mpc3000_aps_v3_t parsed(&parseIo);
+        parsed._read();
+
+        std::vector<int> unavailableSoundIndices;
+        std::map<int, int> finalSoundIndices;
+        if (!withoutSounds)
+        {
+            loadReferencedSounds(parsed, mpc, headless, unavailableSoundIndices, finalSoundIndices);
+        }
+        loadPrograms(parsed, mpc, unavailableSoundIndices, finalSoundIndices);
+        loadGlobals(parsed, mpc);
+        mpc.getSampler()->setSoundIndex(0);
+        return;
+    }
+
     const auto canonicalBytes = parseRewrite<mpc2000xl_aps_t>(bytes);
     std::stringstream parseStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
