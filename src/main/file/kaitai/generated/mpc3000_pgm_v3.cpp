@@ -5,8 +5,8 @@
 #include <cstddef>
 #include <stdexcept>
 const std::set<mpc3000_pgm_v3_t::decay_mode_t> mpc3000_pgm_v3_t::_values_decay_mode_t{
-    mpc3000_pgm_v3_t::DECAY_MODE_START,
     mpc3000_pgm_v3_t::DECAY_MODE_END,
+    mpc3000_pgm_v3_t::DECAY_MODE_START,
 };
 bool mpc3000_pgm_v3_t::_is_defined_decay_mode_t(mpc3000_pgm_v3_t::decay_mode_t v) {
     return mpc3000_pgm_v3_t::_values_decay_mode_t.find(v) != mpc3000_pgm_v3_t::_values_decay_mode_t.end();
@@ -507,9 +507,9 @@ void mpc3000_pgm_v3_t::sound_assignment_t::_read() {
     m_if_over2 = m__io->read_u1();
     m_use_also_plays2 = m__io->read_u1();
     m_poly = static_cast<mpc3000_pgm_v3_t::poly_mode_t>(m__io->read_u1());
-    m_cutoff1 = m__io->read_u1();
-    m_cutoff2 = m__io->read_u1();
-    m_tune = m__io->read_u2le();
+    m_cutoff_note_1 = m__io->read_u1();
+    m_cutoff_note_2 = m__io->read_u1();
+    m_tune = m__io->read_s2le();
     m_attack = m__io->read_u1();
     m_decay = m__io->read_u1();
     m_decay_mode = static_cast<mpc3000_pgm_v3_t::decay_mode_t>(m__io->read_u1());
@@ -537,9 +537,9 @@ void mpc3000_pgm_v3_t::sound_assignment_t::_write() {
     m__io->write_u1(m_if_over2);
     m__io->write_u1(m_use_also_plays2);
     m__io->write_u1(static_cast<uint8_t>(m_poly));
-    m__io->write_u1(m_cutoff1);
-    m__io->write_u1(m_cutoff2);
-    m__io->write_u2le(m_tune);
+    m__io->write_u1(m_cutoff_note_1);
+    m__io->write_u1(m_cutoff_note_2);
+    m__io->write_s2le(m_tune);
     m__io->write_u1(m_attack);
     m__io->write_u1(m_decay);
     m__io->write_u1(static_cast<uint8_t>(m_decay_mode));
