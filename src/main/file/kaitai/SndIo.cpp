@@ -6,6 +6,7 @@
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
+#include "file/kaitai/generated/mpc3000_snd_v2.h"
 #include "file/kaitai/generated/mpc60_snd_v1.h"
 #include "sampler/Sound.hpp"
 
@@ -126,6 +127,37 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
 
         sound->setStart(0);
         sound->setEnd(sound->getLastFrameIndex());
+        sound->setLoopTo(0);
+
+        return sound;
+    }
+
+    if (firstByte == 0x01 && secondByte == 0x02)
+    {
+        mpc3000_snd_v2_t parsed(&parseIo);
+        parsed._read();
+
+        sound->setName(parsedSoundName(parsed.name(), nameWithoutExtension));
+        sound->setMono(true);
+        sound->setSampleRate(parsed.sample_rate());
+        sound->setLevel(parsed.level());
+        sound->setTune(0);
+        sound->setBeatCount(4);
+        sound->setLoopEnabled(false);
+
+        auto sampleData = sound->getMutableSampleData();
+        sampleData->clear();
+        if (parsed.sample_data() != nullptr)
+        {
+            sampleData->reserve(parsed.sample_data()->size());
+            for (const auto sample : *parsed.sample_data())
+            {
+                sampleData->push_back(short_to_float(sample));
+            }
+        }
+
+        sound->setStart(parsed.start());
+        sound->setEnd(parsed.end());
         sound->setLoopTo(0);
 
         return sound;
