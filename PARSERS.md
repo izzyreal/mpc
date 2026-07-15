@@ -20,13 +20,13 @@ The generator we use is the C++ write-capable compiler from:
 - `mpc2000xl.aps.ksy`
 - `standard_midi_file_with_running_status.ksy`
 - `mpc2000xl.mid.ksy`
-- `mpc2000xl.all.ksy`
+- `mpc2000xl.all.v1.ksy`
 - `mpc60.set.v1.ksy`
 - `mpc60.snd.v1.ksy`
 - `mpc3000.snd.v2.ksy`
 - `mpc3000.pgm.v3.ksy`
 - `mpc3000.aps.v3.ksy`
-- `mpc3000.seq.v3.ksy`
+- `seq.v3.ksy`
 - `all.v3.ksy`
 - `mpc60.seq.body.ksy`
 - `mpc60.seq.v2.ksy`
@@ -49,13 +49,13 @@ From anywhere:
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.aps.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/standard_midi_file_with_running_status.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.mid.ksy \
-  /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/mpc2000xl.all.v1.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.set.v1.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.snd.v1.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.snd.v2.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.pgm.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc3000.aps.v3.ksy \
-  /Users/izmar/git/mpc2000xl_kaitai/mpc3000.seq.v3.ksy \
+  /Users/izmar/git/mpc2000xl_kaitai/seq.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/all.v3.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.seq.body.ksy \
   /Users/izmar/git/mpc2000xl_kaitai/mpc60.seq.v2.ksy \
