@@ -3,6 +3,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
 #include "file/kaitai/generated/mpc60_set_v0.h"
+#include "file/kaitai/generated/mpc60_set_v1.h"
 #include "sampler/Sound.hpp"
 
 #include <kaitai/kaitaistream.h>
@@ -19,7 +20,8 @@ namespace
         }
         return value;
     }
-    sound_or_error loadEntry(mpc60_set_v0_t &parsed,
+    template <typename ParsedSet>
+    sound_or_error loadEntry(ParsedSet &parsed,
                              const size_t soundDirectoryEntryIndex,
                              const std::shared_ptr<mpc::sampler::Sound> &sound)
     {
@@ -65,6 +67,38 @@ namespace
 
         return sound;
     }
+
+    template <typename Callback>
+    sound_or_error parseSetAndLoad(const std::vector<char> &bytes,
+                                   Callback &&callback)
+    {
+        if (bytes.size() < 2 || static_cast<uint8_t>(bytes[0]) != 0x02)
+        {
+            return tl::make_unexpected("unsupported MPC60 SET file signature");
+        }
+
+        std::stringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                      std::ios::in | std::ios::out |
+                                          std::ios::binary);
+        ::kaitai::kstream parseIo(&parseStream);
+
+        const auto version = static_cast<uint8_t>(bytes[1]);
+        if (version == 0x00)
+        {
+            mpc60_set_v0_t parsed(&parseIo);
+            parsed._read();
+            return callback(parsed);
+        }
+
+        if (version == 0x01)
+        {
+            mpc60_set_v1_t parsed(&parseIo);
+            parsed._read();
+            return callback(parsed);
+        }
+
+        return tl::make_unexpected("unsupported MPC60 SET file version");
+    }
 } // namespace
 
 sound_or_error mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
@@ -80,14 +114,9 @@ sound_or_error mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
     const std::vector<char> &bytes, const size_t soundDirectoryEntryIndex,
     const std::shared_ptr<mpc::sampler::Sound> &sound)
 {
-    std::stringstream parseStream(std::string(bytes.begin(), bytes.end()),
-                                  std::ios::in | std::ios::out |
-                                      std::ios::binary);
-    ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v0_t parsed(&parseIo);
-    parsed._read();
-
-    return loadEntry(parsed, soundDirectoryEntryIndex, sound);
+    return parseSetAndLoad(bytes, [&](auto &parsed)
+                           { return loadEntry(parsed, soundDirectoryEntryIndex,
+                                              sound); });
 }
 
 sound_or_error
@@ -103,25 +132,23 @@ mpc::file::kaitai::Mpc60SetSoundLoader::loadAssignedSoundAtMpc60Pad(
     const std::vector<char> &bytes, const size_t mpc60PadIndex,
     const std::shared_ptr<mpc::sampler::Sound> &sound)
 {
-    std::stringstream parseStream(std::string(bytes.begin(), bytes.end()),
-                                  std::ios::in | std::ios::out |
-                                      std::ios::binary);
-    ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v0_t parsed(&parseIo);
-    parsed._read();
+    return parseSetAndLoad(bytes, [&](auto &parsed) -> sound_or_error
+                           {
+                               const auto *soundMap = parsed.sound_map();
+                               if (mpc60PadIndex >= soundMap->size())
+                               {
+                                   return tl::make_unexpected(
+                                       "SET MPC60 pad index out of range");
+                               }
 
-    const auto *soundMap = parsed.sound_map();
-    if (mpc60PadIndex >= soundMap->size())
-    {
-        return tl::make_unexpected("SET MPC60 pad index out of range");
-    }
+                               const auto entryIndex = soundMap->at(mpc60PadIndex);
+                               const auto *entries = parsed.sound_directory_entry();
+                               if (entryIndex >= entries->size())
+                               {
+                                   return tl::make_unexpected(
+                                       "SET sound entry index out of range");
+                               }
 
-    const auto entryIndex = soundMap->at(mpc60PadIndex);
-    const auto *entries = parsed.sound_directory_entry();
-    if (entryIndex >= entries->size())
-    {
-        return tl::make_unexpected("SET sound entry index out of range");
-    }
-
-    return loadEntry(parsed, entryIndex, sound);
+                               return loadEntry(parsed, entryIndex, sound);
+                           });
 }

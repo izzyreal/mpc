@@ -21,6 +21,7 @@
 #include "sampler/SoundGenerationMode.hpp"
 #include "engine/Voice.hpp"
 #include "engine/IndivFxMixer.hpp"
+#include "Util.hpp"
 
 #include <optional>
 #include <memory>
@@ -269,6 +270,21 @@ TEST_CASE("Stereo sound routed to main keeps both channels and no individual AUX
     REQUIRE(getAuxLevelControl(mixer, "1", "AUX#4")->getValue() == 0.f);
 }
 
+TEST_CASE("Velocity switch mode keeps the original note at or below lower threshold",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::VelocitySwitch);
+    triggerUnfinalizedDrumNoteOn(mpc, 44, mpc::NoteVariationTypeTune, 64);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kTestNote.get());
+}
+
 TEST_CASE("Velocity switch mode selects the configured alternate notes",
           "[drum-note-routing]")
 {
@@ -299,6 +315,38 @@ TEST_CASE("Velocity switch mode uses the second alternate note above the upper t
     REQUIRE(activeNotes.front() == kSwitchNoteB.get());
 }
 
+TEST_CASE("Decay switch mode keeps the original note at or below lower threshold",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::DecaySwitch);
+    triggerUnfinalizedDrumNoteOn(
+        mpc, 64, mpc::NoteVariationTypeDecay, 44);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kTestNote.get());
+}
+
+TEST_CASE("Decay switch mode selects the first alternate note above lower threshold",
+          "[drum-note-routing]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    configureSwitchingProgramNote(
+        mpc, mpc::sampler::SoundGenerationMode::DecaySwitch);
+    triggerUnfinalizedDrumNoteOn(
+        mpc, 64, mpc::NoteVariationTypeDecay, 45);
+
+    const auto activeNotes = getActiveVoiceNotes(mpc);
+    REQUIRE(activeNotes.size() == 1U);
+    REQUIRE(activeNotes.front() == kSwitchNoteA.get());
+}
+
 TEST_CASE("Decay switch mode uses note variation decay when selecting the target note",
           "[drum-note-routing]")
 {
@@ -313,4 +361,22 @@ TEST_CASE("Decay switch mode uses note variation decay when selecting the target
     const auto activeNotes = getActiveVoiceNotes(mpc);
     REQUIRE(activeNotes.size() == 1U);
     REQUIRE(activeNotes.front() == kSwitchNoteB.get());
+}
+
+TEST_CASE("Slider decay note variation includes configured low range",
+          "[drum-note-routing]")
+{
+    const Util::SliderNoteVariationContext lowContext{
+        0, mpc::NoteVariationTypeDecay, -120, 120, 12, 45, 0, 20, -50, 50};
+    const auto [lowType, lowValue] =
+        Util::getSliderNoteVariationTypeAndValue(lowContext);
+    REQUIRE(lowType == mpc::NoteVariationTypeDecay);
+    REQUIRE(lowValue == 12);
+
+    const Util::SliderNoteVariationContext highContext{
+        127, mpc::NoteVariationTypeDecay, -120, 120, 12, 45, 0, 20, -50, 50};
+    const auto [highType, highValue] =
+        Util::getSliderNoteVariationTypeAndValue(highContext);
+    REQUIRE(highType == mpc::NoteVariationTypeDecay);
+    REQUIRE(highValue == 44);
 }

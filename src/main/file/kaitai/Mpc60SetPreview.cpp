@@ -2,6 +2,7 @@
 
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/generated/mpc60_set_v0.h"
+#include "file/kaitai/generated/mpc60_set_v1.h"
 
 #include <kaitai/kaitaistream.h>
 
@@ -38,6 +39,62 @@ namespace
         std::ostringstream oss;
         oss << bank << std::setw(2) << std::setfill('0') << slotNumber;
         return oss.str();
+    }
+
+    template <typename ParsedSet>
+    mpc::file::kaitai::Mpc60SetPreview loadParsedPreview(ParsedSet &parsed)
+    {
+        using mpc::file::kaitai::Mpc60SetPreview;
+        using mpc::file::kaitai::Mpc60SetPreviewEntry;
+
+        Mpc60SetPreview result;
+        result.totalNumberOfSampleWords =
+            parsed.total_number_of_sample_words()->value();
+        result.useMasterMixData =
+            static_cast<int>(parsed.use_master_mix_data()) == 1;
+        const auto masterStereoMix = parsed.master_stereo_mix();
+        const auto masterStereoPan = parsed.master_stereo_pan();
+        result.masterStereoMix.assign(masterStereoMix.begin(),
+                                      masterStereoMix.end());
+        result.masterStereoPan.assign(masterStereoPan.begin(),
+                                      masterStereoPan.end());
+
+        result.soundDirectoryEntries.reserve(
+            parsed.sound_directory_entry()->size());
+        for (const auto &entry : *parsed.sound_directory_entry())
+        {
+            Mpc60SetPreviewEntry previewEntry;
+            previewEntry.name = trimRightSpaces(entry->name());
+            previewEntry.sharedSoundLink = entry->shared_sound_link();
+            previewEntry.lengthInSamples = entry->length_in_samples();
+            previewEntry.startAddressForPlaying =
+                entry->start_address_for_playing();
+            previewEntry.soundDuration = entry->sound_duration();
+            previewEntry.requestedStereoMixVolume =
+                entry->requested_stereo_mix_volume();
+            previewEntry.requestedStereoMixPan = entry->requested_stereo_mix_pan();
+            previewEntry.pitchFactor = entry->pitch_factor();
+            previewEntry.isHihat =
+                static_cast<int>(
+                    entry->sound_characteristics()->normal_or_hihat_sound()) ==
+                1;
+            result.soundDirectoryEntries.push_back(std::move(previewEntry));
+        }
+
+        result.soundDirectoryEntryIndexByMpc60Pad.reserve(
+            parsed.sound_map()->size());
+        for (const auto entryIndex : *parsed.sound_map())
+        {
+            if (entryIndex != kNoSoundDirectoryEntry &&
+                entryIndex >= result.soundDirectoryEntries.size())
+            {
+                throw std::runtime_error(
+                    "MPC60 SET sound_map entry index out of range");
+            }
+            result.soundDirectoryEntryIndexByMpc60Pad.push_back(entryIndex);
+        }
+
+        return result;
     }
 }
 
@@ -103,54 +160,30 @@ mpc::file::kaitai::Mpc60SetPreview
 mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
     const std::vector<char> &bytes)
 {
-    std::stringstream parseStream(
-        std::string(bytes.begin(), bytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary
-    );
+    if (bytes.size() < 2 || static_cast<uint8_t>(bytes[0]) != 0x02)
+    {
+        throw std::runtime_error("unsupported MPC60 SET file signature");
+    }
+
+    std::stringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                  std::ios::in | std::ios::out |
+                                      std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v0_t parsed(&parseIo);
-    parsed._read();
 
-    Mpc60SetPreview result;
-    result.totalNumberOfSampleWords = parsed.total_number_of_sample_words()->value();
-    result.useMasterMixData =
-        parsed.use_master_mix_data() == mpc60_set_v0_t::USE_MASTER_MIX_DATA_USE;
-    const auto masterStereoMix = parsed.master_stereo_mix();
-    const auto masterStereoPan = parsed.master_stereo_pan();
-    result.masterStereoMix.assign(masterStereoMix.begin(), masterStereoMix.end());
-    result.masterStereoPan.assign(masterStereoPan.begin(), masterStereoPan.end());
-
-    result.soundDirectoryEntries.reserve(parsed.sound_directory_entry()->size());
-    for (const auto &entry : *parsed.sound_directory_entry())
+    const auto version = static_cast<uint8_t>(bytes[1]);
+    if (version == 0x00)
     {
-        Mpc60SetPreviewEntry previewEntry;
-        previewEntry.name = trimRightSpaces(entry->name());
-        previewEntry.sharedSoundLink = entry->shared_sound_link();
-        previewEntry.lengthInSamples = entry->length_in_samples();
-        previewEntry.startAddressForPlaying = entry->start_address_for_playing();
-        previewEntry.soundDuration = entry->sound_duration();
-        previewEntry.requestedStereoMixVolume =
-            entry->requested_stereo_mix_volume();
-        previewEntry.requestedStereoMixPan = entry->requested_stereo_mix_pan();
-        previewEntry.pitchFactor = entry->pitch_factor();
-        previewEntry.isHihat =
-            entry->sound_characteristics()->normal_or_hihat_sound() ==
-            mpc60_set_v0_t::NORMAL_OR_HIHAT_HIHAT;
-        result.soundDirectoryEntries.push_back(std::move(previewEntry));
+        mpc60_set_v0_t parsed(&parseIo);
+        parsed._read();
+        return loadParsedPreview(parsed);
     }
 
-    result.soundDirectoryEntryIndexByMpc60Pad.reserve(
-        parsed.sound_map()->size()
-    );
-    for (const auto entryIndex : *parsed.sound_map())
+    if (version == 0x01)
     {
-        if (entryIndex != kNoSoundDirectoryEntry &&
-            entryIndex >= result.soundDirectoryEntries.size())
-        {
-            throw std::runtime_error("MPC60 SET sound_map entry index out of range");
-        }
-        result.soundDirectoryEntryIndexByMpc60Pad.push_back(entryIndex);
+        mpc60_set_v1_t parsed(&parseIo);
+        parsed._read();
+        return loadParsedPreview(parsed);
     }
 
-    return result;
+    throw std::runtime_error("unsupported MPC60 SET file version");
 }
