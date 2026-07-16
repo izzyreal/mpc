@@ -30,21 +30,27 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
         readResource("test/RealMpc60/SetV0/STUDIO.SET"));
     const auto uk8Preview = Mpc60SetPreviewLoader::loadPreview(
         readResource("test/RealMpc60/SetV0/UK-8.SET"));
+    const auto studioV1Preview = Mpc60SetPreviewLoader::loadPreview(
+        readResource("test/RealMpc60/SetV1/STUDIO.SET"));
 
     REQUIRE(rockPreview.totalNumberOfSampleWords == 510936U);
     REQUIRE(studioPreview.totalNumberOfSampleWords == 519560U);
     REQUIRE(uk8Preview.totalNumberOfSampleWords == 517520U);
+    REQUIRE(studioV1Preview.totalNumberOfSampleWords == 519560U);
 
     REQUIRE(rockPreview.useMasterMixData);
     REQUIRE(studioPreview.useMasterMixData);
     REQUIRE(uk8Preview.useMasterMixData);
+    REQUIRE(studioV1Preview.useMasterMixData);
 
     REQUIRE(rockPreview.soundDirectoryEntries.size() == 34U);
     REQUIRE(studioPreview.soundDirectoryEntries.size() == 34U);
     REQUIRE(uk8Preview.soundDirectoryEntries.size() == 34U);
+    REQUIRE(studioV1Preview.soundDirectoryEntries.size() == 34U);
     REQUIRE(rockPreview.soundDirectoryEntryIndexByMpc60Pad.size() == 34U);
     REQUIRE(studioPreview.soundDirectoryEntryIndexByMpc60Pad.size() == 34U);
     REQUIRE(uk8Preview.soundDirectoryEntryIndexByMpc60Pad.size() == 34U);
+    REQUIRE(studioV1Preview.soundDirectoryEntryIndexByMpc60Pad.size() == 34U);
 
     REQUIRE(rockPreview.soundDirectoryEntryIndexByMpc60Pad[0] == 19);
     REQUIRE(rockPreview.soundDirectoryEntryIndexByMpc60Pad[1] == 20);
@@ -55,6 +61,11 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
     REQUIRE(studioPreview.soundDirectoryEntryIndexByMpc60Pad[1] == 20);
     REQUIRE(studioPreview.soundDirectoryEntryIndexByMpc60Pad[2] == 21);
     REQUIRE(studioPreview.soundDirectoryEntryIndexByMpc60Pad[10] == 23);
+
+    REQUIRE(studioV1Preview.soundDirectoryEntryIndexByMpc60Pad[0] == 19);
+    REQUIRE(studioV1Preview.soundDirectoryEntryIndexByMpc60Pad[1] == 20);
+    REQUIRE(studioV1Preview.soundDirectoryEntryIndexByMpc60Pad[2] == 21);
+    REQUIRE(studioV1Preview.soundDirectoryEntryIndexByMpc60Pad[10] == 23);
 
     REQUIRE(uk8Preview.soundDirectoryEntryIndexByMpc60Pad[0] == 0);
     REQUIRE(uk8Preview.soundDirectoryEntryIndexByMpc60Pad[18] == 255);
@@ -70,6 +81,11 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
     REQUIRE(studioPreview.assignedSoundAtMpc60Pad(1)->name == "HAT1MED");
     REQUIRE(studioPreview.assignedSoundAtMpc60Pad(2)->name == "HAT1OPN");
     REQUIRE(studioPreview.assignedSoundAtMpc60Pad(10)->name == "RIDE_#1");
+
+    REQUIRE(studioV1Preview.assignedSoundAtMpc60Pad(0)->name == "HAT1CLSD");
+    REQUIRE(studioV1Preview.assignedSoundAtMpc60Pad(1)->name == "HAT1MED");
+    REQUIRE(studioV1Preview.assignedSoundAtMpc60Pad(2)->name == "HAT1OPN");
+    REQUIRE(studioV1Preview.assignedSoundAtMpc60Pad(10)->name == "RIDE_#1");
 
     REQUIRE(uk8Preview.assignedSoundAtMpc60Pad(0)->name == "S7_HH_CL");
     REQUIRE(uk8Preview.assignedSoundAtMpc60Pad(10)->name == "S7_RIDE1");
