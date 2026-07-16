@@ -34,7 +34,7 @@ namespace
     void prepareSetFile(Mpc &mpc)
     {
         auto fs = cmrc::mpctest::get_filesystem();
-        auto file = fs.open("test/RealMpc60/Set/ROCK.SET");
+        auto file = fs.open("test/RealMpc60/SetV0/ROCK.SET");
         std::vector<char> data(file.begin(), file.end());
         auto newFile = mpc.getDisk()->newFile(kSetFileName);
         newFile->setFileData(data);
@@ -167,7 +167,8 @@ TEST_CASE(".SET file opens discovered UI flow", "[load-set][ui]")
     layeredScreen->timerCallback();
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sound");
     REQUIRE(mpc.getSampler()->getPreviewSound()->getName() == "BIG_CLAP");
-    REQUIRE(mpc.getSampler()->getPreviewSound()->getSampleRate() == 40000);
+    REQUIRE(mpc.getSampler()->getPreviewSound()->getSampleRate() == 44100);
+    REQUIRE(mpc.getSampler()->getPreviewSound()->getTune() == -17);
 }
 
 TEST_CASE("Unreadable .SET file reports error and returns to LOAD",
@@ -264,7 +265,7 @@ TEST_CASE(".SET single-sound browser keeps unassigned UK-8 pads visible",
     TestMpc::initializeTestMpc(mpc);
 
     auto fs = cmrc::mpctest::get_filesystem();
-    auto file = fs.open("test/RealMpc60/Set/UK-8.SET");
+    auto file = fs.open("test/RealMpc60/SetV0/UK-8.SET");
     std::vector<char> data(file.begin(), file.end());
     auto newFile = mpc.getDisk()->newFile("UK-8.SET");
     newFile->setFileData(data);

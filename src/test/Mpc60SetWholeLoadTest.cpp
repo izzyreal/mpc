@@ -5,6 +5,7 @@
 #include "StrUtil.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "engine/StereoMixer.hpp"
 #include "engine/EngineHost.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/ScreenId.hpp"
@@ -28,7 +29,7 @@ namespace
     void prepareSetFile(mpc::Mpc &mpc, const std::string &setFileName)
     {
         auto fs = cmrc::mpctest::get_filesystem();
-        auto file = fs.open("test/RealMpc60/Set/" + setFileName);
+        auto file = fs.open("test/RealMpc60/SetV0/" + setFileName);
         std::vector<char> data(file.begin(), file.end());
         auto newFile = mpc.getDisk()->newFile(setFileName);
         newFile->setFileData(data);
@@ -236,11 +237,26 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
     REQUIRE(mpc.getSampler()->getProgram(0)->getName() == "STUDIO");
     REQUIRE(mpc.getSampler()->getSoundName(19) == "HAT1CLSD");
     REQUIRE(mpc.getSampler()->getSoundName(23) == "RIDE_#1");
-    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
-    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(rideNote)->getSoundIndex() == 23);
+    const auto program = mpc.getSampler()->getProgram(0);
+    REQUIRE(program->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
+    REQUIRE(program->getNoteParameters(rideNote)->getSoundIndex() == 23);
+
+    const auto tomHighNote = setScreen->getConversionTargetNote(6);
+    const auto tomLowNote = setScreen->getConversionTargetNote(8);
+    const auto crashTunedNote = setScreen->getConversionTargetNote(13);
+    REQUIRE(program->getNoteParameters(tomHighNote)->getTune() == 39);
+    REQUIRE(program->getNoteParameters(tomLowNote)->getTune() == 36);
+    REQUIRE(program->getNoteParameters(crashTunedNote)->getTune() == 21);
+
+    const auto hiHatMixer = program->getNoteParameters(hiHatNote)->getStereoMixer();
+    REQUIRE(hiHatMixer->getLevel() == 61);
+    REQUIRE(hiHatMixer->getPanning() == 26);
+    const auto tomHighMixer = program->getNoteParameters(tomHighNote)->getStereoMixer();
+    REQUIRE(tomHighMixer->getLevel() == 71);
+    REQUIRE(tomHighMixer->getPanning() == 0);
+
     requireImportedHihatVelocitySwitch(
-        mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
-        hiHatOpenNote);
+        program, hiHatNote, hiHatMediumNote, hiHatOpenNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
 }
 

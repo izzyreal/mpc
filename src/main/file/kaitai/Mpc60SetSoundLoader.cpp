@@ -2,7 +2,7 @@
 
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
-#include "file/kaitai/generated/mpc60_set_v1.h"
+#include "file/kaitai/generated/mpc60_set_v0.h"
 #include "sampler/Sound.hpp"
 
 #include <kaitai/kaitaistream.h>
@@ -19,7 +19,7 @@ namespace
         }
         return value;
     }
-    sound_or_error loadEntry(mpc60_set_v1_t &parsed,
+    sound_or_error loadEntry(mpc60_set_v0_t &parsed,
                              const size_t soundDirectoryEntryIndex,
                              const std::shared_ptr<mpc::sampler::Sound> &sound)
     {
@@ -41,10 +41,10 @@ namespace
         }
 
         sound->setName(trimRightSpaces(entry->name()));
-        sound->setSampleRate(mpc::file::kaitai::kMpc60SampleRate);
+        sound->setSampleRate(44100);
         sound->setMono(true);
         sound->setLevel(100);
-        sound->setTune(0);
+        sound->setTune(-17);
         sound->setLoopEnabled(false);
 
         auto sampleData = sound->getMutableSampleData();
@@ -84,7 +84,7 @@ sound_or_error mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
                                   std::ios::in | std::ios::out |
                                       std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v1_t parsed(&parseIo);
+    mpc60_set_v0_t parsed(&parseIo);
     parsed._read();
 
     return loadEntry(parsed, soundDirectoryEntryIndex, sound);
@@ -107,7 +107,7 @@ mpc::file::kaitai::Mpc60SetSoundLoader::loadAssignedSoundAtMpc60Pad(
                                   std::ios::in | std::ios::out |
                                       std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v1_t parsed(&parseIo);
+    mpc60_set_v0_t parsed(&parseIo);
     parsed._read();
 
     const auto *soundMap = parsed.sound_map();

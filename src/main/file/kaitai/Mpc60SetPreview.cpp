@@ -1,7 +1,7 @@
 #include "Mpc60SetPreview.hpp"
 
 #include "disk/MpcFile.hpp"
-#include "file/kaitai/generated/mpc60_set_v1.h"
+#include "file/kaitai/generated/mpc60_set_v0.h"
 
 #include <kaitai/kaitaistream.h>
 
@@ -108,13 +108,17 @@ mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
         std::ios::in | std::ios::out | std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
-    mpc60_set_v1_t parsed(&parseIo);
+    mpc60_set_v0_t parsed(&parseIo);
     parsed._read();
 
     Mpc60SetPreview result;
     result.totalNumberOfSampleWords = parsed.total_number_of_sample_words()->value();
     result.useMasterMixData =
-        parsed.use_master_mix_data() == mpc60_set_v1_t::USE_MASTER_MIX_DATA_USE;
+        parsed.use_master_mix_data() == mpc60_set_v0_t::USE_MASTER_MIX_DATA_USE;
+    const auto masterStereoMix = parsed.master_stereo_mix();
+    const auto masterStereoPan = parsed.master_stereo_pan();
+    result.masterStereoMix.assign(masterStereoMix.begin(), masterStereoMix.end());
+    result.masterStereoPan.assign(masterStereoPan.begin(), masterStereoPan.end());
 
     result.soundDirectoryEntries.reserve(parsed.sound_directory_entry()->size());
     for (const auto &entry : *parsed.sound_directory_entry())
@@ -128,9 +132,10 @@ mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
         previewEntry.requestedStereoMixVolume =
             entry->requested_stereo_mix_volume();
         previewEntry.requestedStereoMixPan = entry->requested_stereo_mix_pan();
+        previewEntry.pitchFactor = entry->pitch_factor();
         previewEntry.isHihat =
             entry->sound_characteristics()->normal_or_hihat_sound() ==
-            mpc60_set_v1_t::NORMAL_OR_HIHAT_HIHAT;
+            mpc60_set_v0_t::NORMAL_OR_HIHAT_HIHAT;
         result.soundDirectoryEntries.push_back(std::move(previewEntry));
     }
 
