@@ -2,7 +2,7 @@
 
 // This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-class mpc60_set_v1_t;
+class mpc60_set_v0_t;
 
 #include "kaitai/kaitaistruct.h"
 #include <stdint.h>
@@ -14,7 +14,7 @@ class mpc60_set_v1_t;
 #error "Incompatible Kaitai Struct C++/STL API: version 0.11 or later is required"
 #endif
 
-class mpc60_set_v1_t : public kaitai::kstruct {
+class mpc60_set_v0_t : public kaitai::kstruct {
 
 public:
     class sound_directory_entry_t;
@@ -119,12 +119,12 @@ private:
 
 public:
 
-    mpc60_set_v1_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_set_v1_t* p__root = nullptr);
+    mpc60_set_v0_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc60_set_v0_t* p__root = nullptr);
     void _read();
     void _fetch_instances();
     void _write();
     void _check();
-    ~mpc60_set_v1_t();
+    ~mpc60_set_v0_t();
 
     class sound_directory_entry_t : public kaitai::kstruct {
 
@@ -136,7 +136,7 @@ public:
 
     public:
 
-        sound_directory_entry_t(kaitai::kstream* p__io, mpc60_set_v1_t* p__parent = nullptr, mpc60_set_v1_t* p__root = nullptr);
+        sound_directory_entry_t(kaitai::kstream* p__io, mpc60_set_v0_t* p__parent = nullptr, mpc60_set_v0_t* p__root = nullptr);
         void _read();
         void _fetch_instances();
         void _write();
@@ -152,7 +152,7 @@ public:
 
         public:
 
-            sound_characteristics_t(kaitai::kstream* p__io, mpc60_set_v1_t::sound_directory_entry_t* p__parent = nullptr, mpc60_set_v1_t* p__root = nullptr);
+            sound_characteristics_t(kaitai::kstream* p__io, mpc60_set_v0_t::sound_directory_entry_t* p__parent = nullptr, mpc60_set_v0_t* p__root = nullptr);
             void _read();
             void _fetch_instances();
             void _write();
@@ -166,18 +166,18 @@ public:
             void set__unnamed2(uint64_t _v) { m__dirty = true; m__unnamed2 = std::move(_v); }
             filter_range_t filter() const { return m_filter; }
             void set_filter(filter_range_t _v) { m__dirty = true; m_filter = std::move(_v); }
-            mpc60_set_v1_t* _root() const { return m__root; }
-            void set__root(mpc60_set_v1_t* _v) { m__dirty = true; m__root = std::move(_v); }
+            mpc60_set_v0_t* _root() const { return m__root; }
+            void set__root(mpc60_set_v0_t* _v) { m__dirty = true; m__root = std::move(_v); }
             kaitai::kstruct* _parent() const { return m__parent; }
-            void set__parent(mpc60_set_v1_t::sound_directory_entry_t* _v) { m__dirty = true; m__parent = std::move(_v); }
+            void set__parent(mpc60_set_v0_t::sound_directory_entry_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
         private:
             normal_or_hihat_t m_normal_or_hihat_sound;
             bool m_save_required;
             uint64_t m__unnamed2;
             filter_range_t m_filter;
-            mpc60_set_v1_t* m__root;
-            mpc60_set_v1_t::sound_directory_entry_t* m__parent;
+            mpc60_set_v0_t* m__root;
+            mpc60_set_v0_t::sound_directory_entry_t* m__parent;
         };
 
     public:
@@ -225,10 +225,10 @@ public:
         void set_echo_level_sent_to_sound_generator(uint8_t _v) { m__dirty = true; m_echo_level_sent_to_sound_generator = std::move(_v); }
         sound_characteristics_t* sound_characteristics() const { return m_sound_characteristics.get(); }
         void set_sound_characteristics(std::unique_ptr<sound_characteristics_t> _v) { m__dirty = true; m_sound_characteristics = std::move(_v); }
-        mpc60_set_v1_t* _root() const { return m__root; }
-        void set__root(mpc60_set_v1_t* _v) { m__dirty = true; m__root = std::move(_v); }
+        mpc60_set_v0_t* _root() const { return m__root; }
+        void set__root(mpc60_set_v0_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
-        void set__parent(mpc60_set_v1_t* _v) { m__dirty = true; m__parent = std::move(_v); }
+        void set__parent(mpc60_set_v0_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         std::string m_name;
@@ -253,8 +253,8 @@ public:
         uint8_t m_right_level_sent_to_sound_generator;
         uint8_t m_echo_level_sent_to_sound_generator;
         std::unique_ptr<sound_characteristics_t> m_sound_characteristics;
-        mpc60_set_v1_t* m__root;
-        mpc60_set_v1_t* m__parent;
+        mpc60_set_v0_t* m__root;
+        mpc60_set_v0_t* m__parent;
     };
 
     class u3le_t : public kaitai::kstruct {
@@ -266,7 +266,7 @@ public:
 
     public:
 
-        u3le_t(kaitai::kstream* p__io, mpc60_set_v1_t* p__parent = nullptr, mpc60_set_v1_t* p__root = nullptr);
+        u3le_t(kaitai::kstream* p__io, mpc60_set_v0_t* p__parent = nullptr, mpc60_set_v0_t* p__root = nullptr);
         void _read();
         void _fetch_instances();
         void _write();
@@ -278,18 +278,18 @@ public:
         void set_b12(uint16_t _v) { m__dirty = true; f_value = false; m_b12 = std::move(_v); }
         uint8_t b3() const { return m_b3; }
         void set_b3(uint8_t _v) { m__dirty = true; f_value = false; m_b3 = std::move(_v); }
-        mpc60_set_v1_t* _root() const { return m__root; }
-        void set__root(mpc60_set_v1_t* _v) { m__dirty = true; f_value = false; m__root = std::move(_v); }
+        mpc60_set_v0_t* _root() const { return m__root; }
+        void set__root(mpc60_set_v0_t* _v) { m__dirty = true; f_value = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
-        void set__parent(mpc60_set_v1_t* _v) { m__dirty = true; f_value = false; m__parent = std::move(_v); }
+        void set__parent(mpc60_set_v0_t* _v) { m__dirty = true; f_value = false; m__parent = std::move(_v); }
 
     private:
         bool f_value;
         int32_t m_value;
         uint16_t m_b12;
         uint8_t m_b3;
-        mpc60_set_v1_t* m__root;
-        mpc60_set_v1_t* m__parent;
+        mpc60_set_v0_t* m__root;
+        mpc60_set_v0_t* m__parent;
     };
 
 public:
@@ -323,8 +323,8 @@ public:
     void set__unnamed13(std::string _v) { m__dirty = true; m__unnamed13 = std::move(_v); }
     std::vector<uint64_t>* sound_samples() const { return m_sound_samples.get(); }
     void set_sound_samples(std::unique_ptr<std::vector<uint64_t>> _v) { m__dirty = true; m_sound_samples = std::move(_v); }
-    mpc60_set_v1_t* _root() const { return m__root; }
-    void set__root(mpc60_set_v1_t* _v) { m__dirty = true; m__root = std::move(_v); }
+    mpc60_set_v0_t* _root() const { return m__root; }
+    void set__root(mpc60_set_v0_t* _v) { m__dirty = true; m__root = std::move(_v); }
     kaitai::kstruct* _parent() const { return m__parent; }
     void set__parent(kaitai::kstruct* _v) { m__dirty = true; m__parent = std::move(_v); }
 
@@ -344,6 +344,6 @@ private:
     std::string m_velocity_switch_threshold_value_for_each_double_play_assign;
     std::string m__unnamed13;
     std::unique_ptr<std::vector<uint64_t>> m_sound_samples;
-    mpc60_set_v1_t* m__root;
+    mpc60_set_v0_t* m__root;
     kaitai::kstruct* m__parent;
 };

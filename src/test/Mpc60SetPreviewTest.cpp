@@ -25,11 +25,11 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
     using mpc::file::kaitai::Mpc60SetPreviewLoader;
 
     const auto rockPreview = Mpc60SetPreviewLoader::loadPreview(
-        readResource("test/RealMpc60/Set/ROCK.SET"));
+        readResource("test/RealMpc60/SetV0/ROCK.SET"));
     const auto studioPreview = Mpc60SetPreviewLoader::loadPreview(
-        readResource("test/RealMpc60/Set/STUDIO.SET"));
+        readResource("test/RealMpc60/SetV0/STUDIO.SET"));
     const auto uk8Preview = Mpc60SetPreviewLoader::loadPreview(
-        readResource("test/RealMpc60/Set/UK-8.SET"));
+        readResource("test/RealMpc60/SetV0/UK-8.SET"));
 
     REQUIRE(rockPreview.totalNumberOfSampleWords == 510936U);
     REQUIRE(studioPreview.totalNumberOfSampleWords == 519560U);

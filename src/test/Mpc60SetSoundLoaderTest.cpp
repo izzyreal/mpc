@@ -77,16 +77,17 @@ namespace
 TEST_CASE("MPC60 SET single-sound loader decodes the default assigned sound",
           "[kaitai-set][real-mpc60]")
 {
-    auto sound = std::make_shared<mpc::sampler::Sound>(40000);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
 
     const auto result =
         mpc::file::kaitai::Mpc60SetSoundLoader::loadAssignedSoundAtMpc60Pad(
-            readResource("test/RealMpc60/Set/ROCK.SET"), 0, sound);
+            readResource("test/RealMpc60/SetV0/ROCK.SET"), 0, sound);
 
     REQUIRE(result.has_value());
     REQUIRE(sound->getName() == "HAT2CLSD");
     REQUIRE(sound->isMono());
-    REQUIRE(sound->getSampleRate() == 40000);
+    REQUIRE(sound->getSampleRate() == 44100);
+    REQUIRE(sound->getTune() == -17);
     REQUIRE(sound->getFrameCount() == 16000);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getEnd() == 15999);
@@ -111,11 +112,11 @@ TEST_CASE("MPC60 SET single-sound loader decodes the default assigned sound",
 TEST_CASE("MPC60 SET single-sound loader decodes a selected directory entry",
           "[kaitai-set][real-mpc60]")
 {
-    auto sound = std::make_shared<mpc::sampler::Sound>(40000);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
 
     const auto result =
         mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
-            readResource("test/RealMpc60/Set/ROCK.SET"), 17, sound);
+            readResource("test/RealMpc60/SetV0/ROCK.SET"), 17, sound);
 
     REQUIRE(result.has_value());
     REQUIRE(sound->getName() == "BIG_CLAP");
