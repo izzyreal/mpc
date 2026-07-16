@@ -29,6 +29,8 @@ namespace
 {
 constexpr int kImportedMpc60HihatVelocityThreshold1 = 14;
 constexpr int kImportedMpc60HihatVelocityThreshold2 = 42;
+constexpr int kImportedMpc60HihatSliderDecayLow = 12;
+constexpr int kImportedMpc60HihatSliderDecayHigh = 45;
 
 
 mpc::DrumMixerLevel toMixerPercent(const uint8_t value)
@@ -55,6 +57,7 @@ int8_t tuneFromPitchFactor(const uint16_t pitchFactor)
 void configureImportedHihatSwitching(
     const Mpc60SetPreview &preview,
     const Mpc60SetProgramLoader::ConversionTable &conversionTable,
+    const std::shared_ptr<mpc::sampler::Program> &program,
     mpc::performance::Program &perfProgram)
 {
     if (preview.soundDirectoryEntryIndexByMpc60Pad.size() < 3 ||
@@ -77,13 +80,36 @@ void configureImportedHihatSwitching(
         perfProgram.noteParameters[conversionTable[0].get() -
                                    mpc::MinDrumNoteNumber.get()];
     closedHatNoteParams.soundGenerationMode = mpc::sampler::toRaw(
-        mpc::sampler::SoundGenerationMode::VelocitySwitch);
+        mpc::sampler::SoundGenerationMode::DecaySwitch);
     closedHatNoteParams.velocityRangeLower =
         kImportedMpc60HihatVelocityThreshold1;
     closedHatNoteParams.velocityRangeUpper =
         kImportedMpc60HihatVelocityThreshold2;
     closedHatNoteParams.optionalNoteA = conversionTable[1];
     closedHatNoteParams.optionalNoteB = conversionTable[2];
+    closedHatNoteParams.muteAssignA = conversionTable[1];
+    closedHatNoteParams.muteAssignB = conversionTable[2];
+    closedHatNoteParams.sliderParameterNumber = mpc::NoteVariationTypeDecay;
+
+    perfProgram.slider.assignNote = conversionTable[0];
+    perfProgram.slider.parameter = mpc::NoteVariationTypeDecay;
+    perfProgram.slider.decayLowRange = kImportedMpc60HihatSliderDecayLow;
+    perfProgram.slider.decayHighRange = kImportedMpc60HihatSliderDecayHigh;
+
+    if (program != nullptr)
+    {
+        auto *slider = program->getSlider();
+        slider->setAssignNote(conversionTable[0]);
+        slider->setParameter(mpc::NoteVariationTypeDecay);
+        slider->setDecayLowRange(kImportedMpc60HihatSliderDecayLow);
+        slider->setDecayHighRange(kImportedMpc60HihatSliderDecayHigh);
+        const auto closedHatNoteParameters =
+            program->getNoteParameters(conversionTable[0]);
+        closedHatNoteParameters->setMuteAssignA(conversionTable[1]);
+        closedHatNoteParameters->setMuteAssignB(conversionTable[2]);
+        closedHatNoteParameters->setSliderParameterNumber(
+            mpc::NoteVariationTypeDecay);
+    }
 }
 
 bool loadIntoProgram(
@@ -178,7 +204,7 @@ bool loadIntoProgram(
             toMixerPercent(entry.requestedStereoMixPan);
     }
 
-    configureImportedHihatSwitching(preview, conversionTable, perfProgram);
+    configureImportedHihatSwitching(preview, conversionTable, program, perfProgram);
 
     if (const auto track = mpc.getSequencer()->getSelectedTrack();
         mpc::sequencer::isDrumBusType(track->getBusType()))

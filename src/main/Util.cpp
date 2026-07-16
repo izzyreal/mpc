@@ -295,7 +295,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.decayHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto decayValue = static_cast<int>(sliderValue * sliderRangeRatio);
+            auto decayValue = rangeLow + static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, decayValue};
         }
         case 2:
@@ -304,7 +304,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.attackHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto attackValue = static_cast<int>(sliderValue * sliderRangeRatio);
+            auto attackValue = rangeLow + static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, attackValue};
         }
         case 3:
@@ -313,7 +313,7 @@ Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
             const auto rangeHigh = ctx.filterHighRange;
             const auto sliderRange = rangeHigh - rangeLow;
             const auto sliderRangeRatio = sliderRange / 128.0;
-            auto filterValue = static_cast<int>(sliderValue * sliderRangeRatio);
+            auto filterValue = rangeLow + static_cast<int>(sliderValue * sliderRangeRatio);
             return {variationType, filterValue};
         }
         default:;
