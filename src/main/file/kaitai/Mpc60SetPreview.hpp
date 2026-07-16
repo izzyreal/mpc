@@ -21,6 +21,7 @@ namespace mpc::file::kaitai
         uint16_t soundDuration = 0;
         uint8_t requestedStereoMixVolume = 0;
         uint8_t requestedStereoMixPan = 0;
+        uint16_t pitchFactor = 4096;
         bool isHihat = false;
     };
 
@@ -28,6 +29,8 @@ namespace mpc::file::kaitai
     {
         uint32_t totalNumberOfSampleWords = 0;
         bool useMasterMixData = false;
+        std::vector<uint8_t> masterStereoMix;
+        std::vector<uint8_t> masterStereoPan;
         std::vector<Mpc60SetPreviewEntry> soundDirectoryEntries;
         std::vector<uint8_t> soundDirectoryEntryIndexByMpc60Pad;
 

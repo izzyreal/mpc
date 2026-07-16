@@ -163,7 +163,7 @@ void LoadASetSoundScreen::function(const int i)
                 break;
             }
 
-            auto sound = sampler.lock()->addSound(40000);
+            auto sound = sampler.lock()->addSound(44100);
             if (sound == nullptr)
             {
                 break;

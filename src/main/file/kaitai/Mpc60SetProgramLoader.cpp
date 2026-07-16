@@ -16,7 +16,10 @@
 #include "sequencer/Track.hpp"
 #include "StrUtil.hpp"
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
+#include <cstdint>
 #include <thread>
 #include <vector>
 
@@ -26,6 +29,28 @@ namespace
 {
 constexpr int kImportedMpc60HihatVelocityThreshold1 = 14;
 constexpr int kImportedMpc60HihatVelocityThreshold2 = 42;
+
+
+mpc::DrumMixerLevel toMixerPercent(const uint8_t value)
+{
+    return mpc::DrumMixerLevel(std::clamp(
+        static_cast<int>(std::lround(static_cast<double>(value) * 100.0 /
+                                     127.0)),
+        0, 100));
+}
+
+int8_t tuneFromPitchFactor(const uint16_t pitchFactor)
+{
+    if (pitchFactor == 0)
+    {
+        return 0;
+    }
+
+    return static_cast<int8_t>(std::clamp(
+        static_cast<int>(std::lround(
+            120.0 * std::log2(static_cast<double>(pitchFactor) / 4096.0))),
+        -120, 120));
+}
 
 void configureImportedHihatSwitching(
     const Mpc60SetPreview &preview,
@@ -93,7 +118,7 @@ bool loadIntoProgram(
             }));
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-        auto sound = sampler->addSound(40000);
+        auto sound = sampler->addSound(44100);
         if (sound == nullptr)
         {
             return false;
@@ -141,10 +166,16 @@ bool loadIntoProgram(
             continue;
         }
 
-        perfProgram
-            .noteParameters[conversionTable[mpc60PadIndex].get() -
-                            mpc::MinDrumNoteNumber.get()]
-            .soundIndex = soundIndex;
+        const auto &entry = preview.soundDirectoryEntries[entryIndex];
+        auto &noteParameters =
+            perfProgram.noteParameters[conversionTable[mpc60PadIndex].get() -
+                                       mpc::MinDrumNoteNumber.get()];
+        noteParameters.soundIndex = soundIndex;
+        noteParameters.tune = tuneFromPitchFactor(entry.pitchFactor);
+        noteParameters.stereoMixer.level =
+            toMixerPercent(entry.requestedStereoMixVolume);
+        noteParameters.stereoMixer.panning =
+            toMixerPercent(entry.requestedStereoMixPan);
     }
 
     configureImportedHihatSwitching(preview, conversionTable, perfProgram);
