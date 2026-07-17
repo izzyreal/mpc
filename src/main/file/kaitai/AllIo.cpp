@@ -86,7 +86,7 @@ std::unique_ptr<T> parseSection(const std::vector<char>& bytes, all_t& root)
 {
     std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
     auto parsed = std::make_unique<T>(&parseIo, &root, &root);
@@ -1008,7 +1008,7 @@ sequence_meta_infos_or_error AllIo::loadSequenceMetaInfos(mpc::Mpc &mpc, mpc::di
     const auto canonicalBytes = parseRewrite<mpc2000xl_all_t>(file->getBytes());
     std::istringstream parseStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
     mpc2000xl_all_t parsed(&parseIo);

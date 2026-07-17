@@ -45,7 +45,7 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
 
     std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
 

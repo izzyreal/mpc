@@ -1469,7 +1469,7 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
 
     std::istringstream kaitaiStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     ::kaitai::kstream kaitaiIo(&kaitaiStream);
     midi_t parsed(&kaitaiIo);
