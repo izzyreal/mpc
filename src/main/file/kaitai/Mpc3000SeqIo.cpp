@@ -764,7 +764,7 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
 
     std::istringstream kaitaiStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary);
+        std::ios::in | std::ios::binary);
     ::kaitai::kstream kaitaiIo(&kaitaiStream);
 
     const auto fileId = static_cast<unsigned char>(bytes[0]);

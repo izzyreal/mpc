@@ -154,7 +154,7 @@ std::vector<MidiTimelineEventSnapshot> collectKaitaiTimeline(const std::vector<c
 {
     std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     midi_t parsed(&parseIo);
@@ -321,7 +321,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadSequenceWithDirectGenericKaitai(
 
     std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     midi_t parsed(&parseIo);
@@ -746,7 +746,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites FRUTZLE", "[kaitai-mid]")
 
     std::istringstream parseStream(
         originalBytes,
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);
@@ -886,7 +886,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF6-0V2", "[.][kaitai-mid-
 
     std::istringstream parseStream(
         originalBytes,
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);
@@ -913,7 +913,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF316", "[.][kaitai-mid-di
 
     std::istringstream parseStream(
         originalBytes,
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);
@@ -969,7 +969,7 @@ TEST_CASE("Kaitai first raw event on HWIF316 track 0 is a meta event", "[.][kait
 
     std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     midi_t parsed(&parseIo);
@@ -1016,7 +1016,7 @@ TEST_CASE("Kaitai standard MIDI saves and loads explicit sequence semantics", "[
 
     std::istringstream parseStream(
         std::string(savedBytes.begin(), savedBytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);
@@ -1085,7 +1085,7 @@ TEST_CASE("Kaitai standard MIDI roundtrips broad sequence semantics", "[kaitai-m
 
     std::istringstream parseStream(
         std::string(savedBytes.begin(), savedBytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);
@@ -1414,7 +1414,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid
 
     std::istringstream parseStream(
         originalBytes,
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     kaitai::kstream parseIo(&parseStream);
     standard_midi_file_with_running_status_t parsed(&parseIo);

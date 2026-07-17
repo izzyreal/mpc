@@ -815,7 +815,7 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
         const auto canonicalBytes = parseRewrite<mpc3000_aps_v3_t>(bytes);
         std::istringstream parseStream(
             std::string(canonicalBytes.begin(), canonicalBytes.end()),
-            std::ios::binary
+            std::ios::in | std::ios::binary
         );
         ::kaitai::kstream parseIo(&parseStream);
         mpc3000_aps_v3_t parsed(&parseIo);
@@ -836,7 +836,7 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
     const auto canonicalBytes = parseRewrite<mpc2000xl_aps_t>(bytes);
     std::istringstream parseStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::binary
+        std::ios::in | std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
     mpc2000xl_aps_t parsed(&parseIo);

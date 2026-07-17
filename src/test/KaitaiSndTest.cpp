@@ -67,7 +67,7 @@ namespace
     {
         std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::binary
+            std::ios::in | std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc2000snd_t parsed(&parseIo);
@@ -80,7 +80,7 @@ namespace
     {
         std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::binary
+            std::ios::in | std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc3000_snd_v2_t parsed(&parseIo);
@@ -93,7 +93,7 @@ namespace
     {
         std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::binary
+            std::ios::in | std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc60_snd_v1_t parsed(&parseIo);

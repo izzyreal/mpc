@@ -166,7 +166,7 @@ mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
     }
 
     std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
-                                   std::ios::binary);
+                                   std::ios::in | std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
 
     const auto version = static_cast<uint8_t>(bytes[1]);
