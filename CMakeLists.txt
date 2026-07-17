@@ -108,6 +108,9 @@ target_include_directories(platform_folders INTERFACE
 
 message(STATUS "Downloading kaitai runtime...")
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+if(WIN32)
+    set(STRING_ENCODING_TYPE "WIN32API" CACHE STRING "Kaitai runtime string encoding backend" FORCE)
+endif()
 FetchContent_MakeAvailable(kaitai_runtime)
 unset(BUILD_TESTS CACHE)
 
