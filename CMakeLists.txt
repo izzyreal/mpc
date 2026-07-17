@@ -108,6 +108,7 @@ target_include_directories(platform_folders INTERFACE
 
 message(STATUS "Downloading kaitai runtime...")
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 if(WIN32)
     set(STRING_ENCODING_TYPE "WIN32API" CACHE STRING "Kaitai runtime string encoding backend" FORCE)
 endif()
