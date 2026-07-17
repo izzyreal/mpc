@@ -44,7 +44,7 @@ const int MPC60_SND_HEADER_SIZE = 39;
 inline void snd_read_bytes(const std::shared_ptr<std::istream> &stream,
                            const std::vector<char> &bytes, const int maxLength)
 {
-    auto byteCountToRead = std::min((int)bytes.size(), maxLength);
+    auto byteCountToRead = (std::min)((int)bytes.size(), maxLength);
     stream->read((char *)&bytes[0], byteCountToRead);
 }
 
