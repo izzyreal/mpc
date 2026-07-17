@@ -18,7 +18,10 @@ void mpc::TestMpc::resetTestDataRoot(Mpc &mpc)
 void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
 {
     resetTestDataRoot(mpc);
-    mpc.init();
+    MpcInitOptions options;
+    options.detectRawUsbVolumes = false;
+    options.installDemoFiles = false;
+    mpc.init(options);
 }
 
 void mpc::TestMpc::initializeTestMpcWithoutMidiServices(Mpc &mpc)
@@ -27,6 +30,8 @@ void mpc::TestMpc::initializeTestMpcWithoutMidiServices(Mpc &mpc)
     MpcInitOptions options;
     options.startMidiDeviceDetector = false;
     options.startAudioServer = true;
+    options.detectRawUsbVolumes = false;
+    options.installDemoFiles = false;
     mpc.init(options);
 }
 
@@ -36,5 +41,7 @@ void mpc::TestMpc::initializeTestMpcWithoutIoServices(Mpc &mpc)
     MpcInitOptions options;
     options.startMidiDeviceDetector = false;
     options.startAudioServer = false;
+    options.detectRawUsbVolumes = false;
+    options.installDemoFiles = false;
     mpc.init(options);
 }

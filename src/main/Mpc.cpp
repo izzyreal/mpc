@@ -97,41 +97,44 @@ void Mpc::init(const MpcInitOptions &options)
         }
     }
 
-    for (const auto &dir : {mpc_fs::path{"TEST1"}, mpc_fs::path{"TEST2"},
-                            mpc_fs::path{"TRAIN1"}, mpc_fs::path{"RESIST"}})
+    if (options.installDemoFiles)
     {
-        const auto createRes =
-            mpc_fs::create_directories(paths->getDocuments()->demoDataPath() / dir);
-        if (!createRes)
+        for (const auto &dir : {mpc_fs::path{"TEST1"}, mpc_fs::path{"TEST2"},
+                                mpc_fs::path{"TRAIN1"}, mpc_fs::path{"RESIST"}})
         {
-            logFsError(createRes.error());
-        }
-    }
-
-    for (const auto &demo_file : demo_files)
-    {
-        const auto dst = paths->getDocuments()->demoDataPath() / demo_file;
-        const auto existsRes = mpc_fs::exists(dst);
-        if (!existsRes)
-        {
-            logFsError(existsRes.error());
-            continue;
-        }
-
-        const bool should_update =
-            !*existsRes ||
-            std::find(always_update_demo_files.begin(),
-                      always_update_demo_files.end(),
-                      demo_file) != always_update_demo_files.end();
-
-        if (should_update)
-        {
-            const auto data =
-                MpcResourceUtil::get_resource_data("demodata/" + demo_file);
-            const auto writeRes = set_file_data(dst, data);
-            if (!writeRes)
+            const auto createRes = mpc_fs::create_directories(
+                paths->getDocuments()->demoDataPath() / dir);
+            if (!createRes)
             {
-                logFsError(writeRes.error());
+                logFsError(createRes.error());
+            }
+        }
+
+        for (const auto &demo_file : demo_files)
+        {
+            const auto dst = paths->getDocuments()->demoDataPath() / demo_file;
+            const auto existsRes = mpc_fs::exists(dst);
+            if (!existsRes)
+            {
+                logFsError(existsRes.error());
+                continue;
+            }
+
+            const bool should_update =
+                !*existsRes ||
+                std::find(always_update_demo_files.begin(),
+                          always_update_demo_files.end(),
+                          demo_file) != always_update_demo_files.end();
+
+            if (should_update)
+            {
+                const auto data =
+                    MpcResourceUtil::get_resource_data("demodata/" + demo_file);
+                const auto writeRes = set_file_data(dst, data);
+                if (!writeRes)
+                {
+                    logFsError(writeRes.error());
+                }
             }
         }
     }
@@ -193,7 +196,9 @@ void Mpc::init(const MpcInitOptions &options)
 
     padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
-    diskController = std::make_unique<disk::DiskController>(*this);
+    diskController = std::make_unique<disk::DiskController>(
+        *this,
+        options.detectRawUsbVolumes);
 
     hardware = std::make_shared<Hardware>();
 

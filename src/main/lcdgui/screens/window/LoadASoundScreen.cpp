@@ -28,9 +28,16 @@ LoadASoundScreen::LoadASoundScreen(Mpc &mpc, const int layerIndex)
 void LoadASoundScreen::open()
 {
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto selectedFile = loadScreen->getSelectedFile();
+
+    if (!selectedFile)
+    {
+        findLabel("filename")->setText("File:");
+        return;
+    }
+
     findLabel("filename")
-        ->setText("File:" +
-                  loadScreen->getSelectedFile()->getNameWithoutExtension());
+        ->setText("File:" + selectedFile->getNameWithoutExtension());
     assignToNote = mpc.clientEventController->getSelectedNote();
     displayAssignToNote();
     mpc.clientEventController->addObserver(

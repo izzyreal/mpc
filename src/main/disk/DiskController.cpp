@@ -19,7 +19,12 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(Mpc &_mpc) : mpc(_mpc) {}
+DiskController::DiskController(Mpc &_mpc,
+                               bool _rawUsbVolumeDetectionEnabled)
+    : mpc(_mpc),
+      rawUsbVolumeDetectionEnabled(_rawUsbVolumeDetectionEnabled)
+{
+}
 
 void DiskController::initDisks()
 {
@@ -37,7 +42,10 @@ void DiskController::initDisks()
 
     MLOG("Disk root initialized");
 
-    detectRawUsbVolumes();
+    if (rawUsbVolumeDetectionEnabled)
+    {
+        detectRawUsbVolumes();
+    }
 
     auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID(mpc);
     MLOG("Persisted UUID: " + persistedActiveUUID);
@@ -111,6 +119,11 @@ void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 void DiskController::detectRawUsbVolumes()
 {
 #ifndef VMPC2000XL_WIN7
+    if (!rawUsbVolumeDetectionEnabled)
+    {
+        return;
+    }
+
     RemovableVolumes removableVolumes;
 
     MLOG("RemovableVolumes instantiated");

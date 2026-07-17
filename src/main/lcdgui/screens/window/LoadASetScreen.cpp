@@ -21,12 +21,19 @@ void LoadASetScreen::open()
 {
     preview.reset();
     conversionTable = file::kaitai::Mpc60SetProgramLoader::defaultConversionTable();
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto selectedFile = loadScreen->getSelectedFile();
+
+    if (!selectedFile)
+    {
+        return;
+    }
 
     try
     {
         preview = std::make_unique<file::kaitai::Mpc60SetPreview>(
             file::kaitai::Mpc60SetPreviewLoader::loadPreview(
-                mpc.screens->get<ScreenId::LoadScreen>()->getSelectedFile()));
+                selectedFile));
     }
     catch (const std::exception &)
     {
