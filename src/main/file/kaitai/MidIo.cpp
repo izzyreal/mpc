@@ -1467,9 +1467,9 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
     newSeq->init(0);
     mpc.getSequencer()->getStateManager()->drainQueue();
 
-    std::stringstream kaitaiStream(
+    std::istringstream kaitaiStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary
+        std::ios::binary
     );
     ::kaitai::kstream kaitaiIo(&kaitaiStream);
     midi_t parsed(&kaitaiIo);

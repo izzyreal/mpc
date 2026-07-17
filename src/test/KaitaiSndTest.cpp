@@ -65,9 +65,9 @@ namespace
     template <typename Assertions>
     void withParsedSndBytes(const std::vector<char> &bytes, Assertions &&assertions)
     {
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc2000snd_t parsed(&parseIo);
@@ -78,9 +78,9 @@ namespace
     template <typename Assertions>
     void withParsedMpc3000SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
     {
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc3000_snd_v2_t parsed(&parseIo);
@@ -91,9 +91,9 @@ namespace
     template <typename Assertions>
     void withParsedMpc60SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
     {
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         kaitai::kstream parseIo(&parseStream);
         mpc60_snd_v1_t parsed(&parseIo);

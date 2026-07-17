@@ -165,9 +165,8 @@ mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
         throw std::runtime_error("unsupported MPC60 SET file signature");
     }
 
-    std::stringstream parseStream(std::string(bytes.begin(), bytes.end()),
-                                  std::ios::in | std::ios::out |
-                                      std::ios::binary);
+    std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                   std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
 
     const auto version = static_cast<uint8_t>(bytes[1]);

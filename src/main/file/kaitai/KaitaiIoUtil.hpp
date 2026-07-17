@@ -11,9 +11,9 @@ namespace mpc::file::kaitai
     template <typename T>
     inline std::vector<char> parseRewrite(const std::vector<char> &bytes)
     {
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         ::kaitai::kstream parseIo(&parseStream);
         T parsed(&parseIo);

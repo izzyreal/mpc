@@ -496,9 +496,9 @@ program_or_error PgmIo::loadProgram(mpc::Mpc &mpc,
         static_cast<uint8_t>(fileBytes[1]) == 0x04)
     {
         const auto canonicalBytes = parseRewrite<mpc2000xl_pgm_t>(fileBytes);
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(canonicalBytes.begin(), canonicalBytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         ::kaitai::kstream parseIo(&parseStream);
         mpc2000xl_pgm_t parsed(&parseIo);
@@ -532,9 +532,9 @@ program_or_error PgmIo::loadProgram(mpc::Mpc &mpc,
         static_cast<uint8_t>(fileBytes[1]) == 0x00)
     {
         const auto canonicalBytes = parseRewrite<mpc3000_pgm_v3_t>(fileBytes);
-        std::stringstream parseStream(
+        std::istringstream parseStream(
             std::string(canonicalBytes.begin(), canonicalBytes.end()),
-            std::ios::in | std::ios::out | std::ios::binary
+            std::ios::binary
         );
         ::kaitai::kstream parseIo(&parseStream);
         mpc3000_pgm_v3_t parsed(&parseIo);

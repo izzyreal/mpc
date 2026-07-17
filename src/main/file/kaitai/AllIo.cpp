@@ -84,9 +84,9 @@ std::vector<char> slice(const std::vector<char>& bytes, const size_t offset, con
 template <typename T>
 std::unique_ptr<T> parseSection(const std::vector<char>& bytes, all_t& root)
 {
-    std::stringstream parseStream(
+    std::istringstream parseStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary
+        std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
     auto parsed = std::make_unique<T>(&parseIo, &root, &root);
@@ -1006,9 +1006,9 @@ void AllIo::loadEverything(mpc::Mpc &mpc, mpc::disk::MpcFile *file)
 sequence_meta_infos_or_error AllIo::loadSequenceMetaInfos(mpc::Mpc &mpc, mpc::disk::MpcFile *file)
 {
     const auto canonicalBytes = parseRewrite<mpc2000xl_all_t>(file->getBytes());
-    std::stringstream parseStream(
+    std::istringstream parseStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary
+        std::ios::binary
     );
     ::kaitai::kstream parseIo(&parseStream);
     mpc2000xl_all_t parsed(&parseIo);
