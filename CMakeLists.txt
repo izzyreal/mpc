@@ -127,6 +127,9 @@ else()
 endif()
 
 message(STATUS "Downloading json-schema-validator...")
+set(JSON_VALIDATOR_SHARED_LIBS OFF CACHE BOOL "JsonValidator: Build as shared library" FORCE)
+set(nlohmann_json_schema_validator_SHARED_LIBS OFF CACHE BOOL "Build nlohmann_json_schema_validator as shared library" FORCE)
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_MakeAvailable(json-schema-validator)
 
 message(STATUS "Downloading readerwriterqueue...")
