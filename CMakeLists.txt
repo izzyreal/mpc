@@ -75,6 +75,7 @@ FetchContent_Declare(readerwriterqueue
 FetchContent_Declare(kaitai_runtime
     GIT_REPOSITORY https://github.com/izzyreal/kaitai_struct_cpp_stl_runtime
     GIT_TAG        cpp-serialization
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/kaitai_runtime
 )
 
 FetchContent_Declare(json-schema-validator
