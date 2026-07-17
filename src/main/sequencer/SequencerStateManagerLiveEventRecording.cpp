@@ -58,7 +58,9 @@ bool SequencerStateManager::applyNoteOffAdjustmentForNoteOn(
     {
         auto &noteOff = tempLiveNoteOffRecordingEvents[i];
 
-        if (noteOff.noteNumber != noteOn->noteNumber)
+        if (noteOff.sequenceIndex != noteOn->sequenceIndex ||
+            noteOff.trackIndex != noteOn->trackIndex ||
+            noteOff.noteNumber != noteOn->noteNumber)
         {
             continue;
         }
@@ -162,6 +164,8 @@ void SequencerStateManager::finalizeNoteEventLive(
 {
     EventData noteOff;
     noteOff.type = EventType::NoteOff;
+    noteOff.sequenceIndex = e->sequenceIndex;
+    noteOff.trackIndex = e->trackIndex;
     noteOff.noteNumber = e->noteNumber;
     noteOff.tick = noteOffPositionTicks;
     liveNoteOffEventRecordingQueue.enqueue(noteOff);

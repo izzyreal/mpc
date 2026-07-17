@@ -772,6 +772,59 @@ TEST_CASE("Live recording quantizes loop-boundary notes deterministically",
     }
 }
 
+TEST_CASE("Live recording matches note-offs by track",
+          "[sequencer-multithread]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+    timingCorrectScreen->setNoteValue(0);
+
+    auto track0 = seq->getTrack(0);
+    auto track1 = seq->getTrack(1);
+    track0->setUsedIfCurrentlyUnused();
+    track1->setUsedIfCurrentlyUnused();
+    stateManager->drainQueue();
+
+    const auto note = mpc::NoteNumber(35);
+    const auto *track0NoteOn = stateManager->recordNoteEventLive(
+        seq->getSequenceIndex(), track0->getIndex(), note, mpc::Velocity(100));
+    auto *track1NoteOn = stateManager->recordNoteEventLive(
+        seq->getSequenceIndex(), track1->getIndex(), note, mpc::Velocity(100));
+
+    stateManager->finalizeNoteEventLive(track1NoteOn,
+                                        mpc::NoTickAssignedWhileRecording);
+
+    const auto sequenceState =
+        stateManager->getSnapshot().getSequenceState(seq->getSequenceIndex());
+    stateManager->processLiveNoteEventRecordingQueues(12, sequenceState);
+    track0->setOn(track0->isOn(), false);
+    track1->setOn(track1->isOn(), false);
+    stateManager->drainQueue();
+
+    REQUIRE(track0->getEvents().empty());
+
+    const auto track1Events = track1->getEvents();
+    REQUIRE(track1Events.size() == 1);
+    REQUIRE(track1Events[0]->getTick() == 12);
+
+    REQUIRE(stateManager->findRecordingNoteOnEvent(
+                seq->getSequenceIndex(), track0->getIndex(), note) ==
+            track0NoteOn);
+    REQUIRE(stateManager->findRecordingNoteOnEvent(
+                seq->getSequenceIndex(), track1->getIndex(), note) == nullptr);
+
+    sequencer->flushTrackNoteCache();
+}
+
 TEST_CASE("Copy sequence", "[sequencer]")
 {
     mpc::Mpc mpc;

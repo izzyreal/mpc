@@ -403,6 +403,7 @@ EventData *SequencerStateManager::findRecordingNoteOnEvent(
     for (size_t i = 0; i < liveNoteOnCount; ++i)
     {
         if (const auto e = tempLiveNoteOnRecordingEvents[i];
+            e->sequenceIndex == sequenceIndex && e->trackIndex == trackIndex &&
             e->noteNumber == noteNumber)
         {
             found = e;
