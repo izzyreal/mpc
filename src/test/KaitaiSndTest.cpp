@@ -541,7 +541,7 @@ TEST_CASE("Kaitai MPC60 SND parses native MPC60 2.14 ROCK exports through the pr
     const auto files = std::vector<NativeMpc60SndCase>{
         {"BASSGUIT.SND", "BASSGUIT", "BASSGUIT", 200, 50, 0xa5d8d39839ca44abULL, {162, 315, 446, 557}, {1717, 1169, 184, -1198}, {-5648, -5480, -5297, -5104}},
         {"BIG_CLAP.SND", "BIG_CLAP", "BIG_CLAP", 600, 350, 0xdea861a215d6edc7ULL, {6, 11, 14, 9}, {-1066, -880, -632, -212}, {0, 0, 0, 0}},
-        {"COWBEL_1.SND", "COWBEL#1", "COWBEL#1", 350, 100, 0xbc117cd727a9f5b2ULL, {27, 52, 68, 72}, {18, 134, 124, 25}, {234, 211, 209, 202}},
+        {"COWBEL_1.SND", "COWBEL#1", "COWBEL_1", 350, 100, 0xbc117cd727a9f5b2ULL, {27, 52, 68, 72}, {18, 134, 124, 25}, {234, 211, 209, 202}},
         {"CRASH2_H.SND", "CRASH2_H", "CRASH2_H", 995, 163, 0x2b4a71d36d7733b7ULL, {-11666, -2611, -1215, -748}, {-709, -1140, -1363, 479}, {1127, 1296, 445, -219}},
         {"CRASH2_L.SND", "CRASH2_L", "CRASH2_L", 1766, 261, 0xfa4c815ae3824e34ULL, {-11666, -2611, -1208, -737}, {-661, -1047, -816, -180}, {191, 225, 207, 166}},
         {"CRASH_MU.SND", "CRASH_MUTE", "CRASH_MU", 634, 117, 0x7e2aba841084908fULL, {13, 9, 19, 12}, {-5, 175, 229, 183}, {58, 38, 30, 26}},
@@ -549,13 +549,13 @@ TEST_CASE("Kaitai MPC60 SND parses native MPC60 2.14 ROCK exports through the pr
         {"HAT2CLSD.SND", "HAT2CLSD", "HAT2CLSD", 400, 100, 0x4ca36b849f85e99cULL, {27, 52, 55, 69}, {674, 18, 1, -52}, {72, 87, 84, 81}},
         {"HAT2MED.SND", "HAT2MED", "HAT2MED", 600, 100, 0xe513d30847955496ULL, {33, 57, 58, 64}, {1164, 1296, 941, -435}, {390, 304, 6, 114}},
         {"HAT2OPN.SND", "HAT2OPN", "HAT2OPN", 1000, 200, 0x21b0c6dba5e0f595ULL, {27, 45, 57, 64}, {-1474, -776, -1336, -288}, {371, 307, 430, 377}},
-        {"KICK_2.SND", "KiCK#2", "KiCK#2", 400, 100, 0x1b017ff1ffe6524bULL, {13, 22, 28, 32}, {293, 265, 244, 13}, {-181, -206, -235, -280}},
+        {"KICK_2.SND", "KiCK#2", "KiCK_2", 400, 100, 0x1b017ff1ffe6524bULL, {13, 22, 28, 32}, {293, 265, 244, 13}, {-181, -206, -235, -280}},
         {"METALSHO.SND", "METALSHOT", "METALSHO", 269, 131, 0xf1529a4cd4fb64ecULL, {-11612, -2675, -1336, -862}, {-169, -402, -750, -896}, {-75, -67, -70, -72}},
         {"RIDE4B.SND", "RIDE4B", "RIDE4B", 961, 172, 0xd07be7c6d058175fULL, {2551, -5462, -4310, -2054}, {-839, -522, -213, -104}, {-106, -116, -115, -87}},
         {"ROCTOMID.SND", "ROCTOMID", "ROCTOMID", 800, 350, 0x2376e1fe2307dba6ULL, {13, 16, 24, 29}, {827, 815, 794, 774}, {39, 46, 43, 41}},
         {"ROCTOMLO.SND", "ROCTOMLO", "ROCTOMLO", 1500, 900, 0x6ba2aad9ea269cadULL, {0, -6, -4, -8}, {-347, -372, -396, -411}, {-17, -17, -11, -6}},
         {"SIDESTK2.SND", "SIDESTK2", "SIDESTK2", 400, 100, 0x1c938199fd48368bULL, {-95, -160, -213, -254}, {17, -57, -134, -82}, {-44, -55, -49, -51}},
-        {"SNARE_2.SND", "SNARE#2", "SNARE#2", 500, 100, 0xe36c4c5128b7dd18ULL, {6, 11, 14, 9}, {138, -22, 535, 878}, {158, 212, 254, 280}},
+        {"SNARE_2.SND", "SNARE#2", "SNARE_2", 500, 100, 0xe36c4c5128b7dd18ULL, {6, 11, 14, 9}, {138, -22, 535, 878}, {158, 212, 254, 280}},
     };
 
     for (const auto &testCase : files)

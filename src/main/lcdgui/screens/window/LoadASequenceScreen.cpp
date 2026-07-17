@@ -33,6 +33,12 @@ void LoadASequenceScreen::open()
 
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     const auto sequenceFile = loadScreen->getSelectedFile();
+
+    if (!sequenceFile)
+    {
+        return;
+    }
+
     const auto extension = sequenceFile->getExtension();
 
     if (!StrUtil::eqIgnoreCase(extension, ".mid") &&
