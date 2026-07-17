@@ -762,9 +762,9 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
         return tl::make_unexpected("SEQ file is too short");
     }
 
-    std::stringstream kaitaiStream(
+    std::istringstream kaitaiStream(
         std::string(bytes.begin(), bytes.end()),
-        std::ios::in | std::ios::out | std::ios::binary);
+        std::ios::binary);
     ::kaitai::kstream kaitaiIo(&kaitaiStream);
 
     const auto fileId = static_cast<unsigned char>(bytes[0]);

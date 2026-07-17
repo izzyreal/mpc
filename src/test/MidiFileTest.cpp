@@ -110,6 +110,8 @@ SCENARIO("A MidiFile can be written", "[file]")
         track0->acquireAndInsertEvent(eventData);
         stateManager->drainQueue();
 
+        const auto savedBytes = saveSequenceWithMidIo(sequence);
+
         sequence->init(1);
         stateManager->drainQueue();
         track0->removeEvents();
@@ -118,7 +120,7 @@ SCENARIO("A MidiFile can be written", "[file]")
 
         auto loaded = loadSequenceWithMidIo(
             mpc,
-            saveSequenceWithMidIo(sequence),
+            savedBytes,
             "ROUNDTRIP.MID");
 
         REQUIRE(loaded->getTrack(0)->getEvents().size() == 1);
