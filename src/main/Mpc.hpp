@@ -75,6 +75,8 @@ namespace mpc
     {
         bool startMidiDeviceDetector = true;
         bool startAudioServer = true;
+        bool detectRawUsbVolumes = true;
+        bool installDemoFiles = true;
     };
 
     class Mpc
