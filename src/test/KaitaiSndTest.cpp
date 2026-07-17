@@ -383,7 +383,9 @@ TEST_CASE("Kaitai MPC2000 SND save/load covers prod-used sound properties", "[ka
             mpc::Mpc mpc;
             mpc::TestMpc::initializeTestMpc(mpc);
             const auto loaded = loadWithSoundLoader(mpc, bytes, testCase.fileStem + ".SND");
-            requireSoundMatches(loaded, testCase.expected);
+            auto expectedLoaded = testCase.expected;
+            expectedLoaded.name = expectedLoaded.name.substr(0, 16);
+            requireSoundMatches(loaded, expectedLoaded);
         }
     }
 }
@@ -396,7 +398,7 @@ TEST_CASE("Kaitai MPC2000 SND parses real 2KXL mono and stereo files through the
     const auto monoBytes = resourceBytes("test/RealMpc2000xl/Snd/mono_loop_off.SND");
     const auto mono = loadWithSoundLoader(mpc, monoBytes, "mono_loop_off.SND");
 
-    REQUIRE(mono->getName() == "mono_loop_off");
+    REQUIRE(mono->getName() == "M");
     REQUIRE(mono->isMono());
     REQUIRE(mono->getSampleRate() == 44100);
     REQUIRE(mono->getSndLevel() == 100);
@@ -415,7 +417,7 @@ TEST_CASE("Kaitai MPC2000 SND parses real 2KXL mono and stereo files through the
     const auto stereoBytes = resourceBytes("test/RealMpc2000xl/Snd/stereo_loop_off.SND");
     const auto stereo = loadWithSoundLoader(mpc, stereoBytes, "stereo_loop_off.SND");
 
-    REQUIRE(stereo->getName() == "stereo_loop_off");
+    REQUIRE(stereo->getName() == "S");
     REQUIRE(!stereo->isMono());
     REQUIRE(stereo->getSampleRate() == 44100);
     REQUIRE(stereo->getSndLevel() == 100);

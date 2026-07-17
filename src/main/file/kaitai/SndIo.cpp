@@ -25,19 +25,15 @@ namespace
         return value;
     }
 
-    std::string parsedSoundName(const std::string &parsedName,
-                                const std::string &nameWithoutExtension)
+    std::string parsedSoundName(const std::string &parsedName)
     {
-        const auto trimmed = trimRightSpaces(parsedName);
-        return mpc::StrUtil::eqIgnoreCase(trimmed, nameWithoutExtension)
-                   ? trimmed
-                   : nameWithoutExtension;
+        return trimRightSpaces(parsedName);
     }
 }
 
 sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
                                 const std::shared_ptr<mpc::sampler::Sound> &sound,
-                                const std::string &nameWithoutExtension)
+                                const std::string &)
 {
     if (bytes.size() < 2)
     {
@@ -65,7 +61,7 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
             parsedName.erase(nulPos);
         }
 
-        sound->setName(parsedSoundName(parsedName, nameWithoutExtension));
+        sound->setName(parsedSoundName(parsedName));
         sound->setMono(!parsed.stereo());
         sound->setSampleRate(parsed.sample_rate());
         sound->setLevel(parsed.level());
@@ -94,7 +90,7 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
     {
         mpc60_snd_v1_t parsed(&parseIo);
 
-        sound->setName(parsedSoundName(parsed.name(), nameWithoutExtension));
+        sound->setName(parsedSoundName(parsed.name()));
         sound->setMono(true);
         sound->setSampleRate(parsed.sample_rate());
         sound->setLevel(parsed.volume_percent());
@@ -137,7 +133,7 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
         mpc3000_snd_v2_t parsed(&parseIo);
         parsed._read();
 
-        sound->setName(parsedSoundName(parsed.name(), nameWithoutExtension));
+        sound->setName(parsedSoundName(parsed.name()));
         sound->setMono(true);
         sound->setSampleRate(parsed.sample_rate());
         sound->setLevel(parsed.level());
