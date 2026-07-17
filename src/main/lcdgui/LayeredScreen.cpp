@@ -309,6 +309,7 @@ void LayeredScreen::openScreenInternal(
     const auto oldScreenComponent = history.empty()
                                         ? std::shared_ptr<ScreenComponent>()
                                         : getCurrentScreen();
+    bool oldScreenComponentWasClosed = false;
 
     const auto controller =
         mpc.clientEventController->clientHardwareEventController;
@@ -361,7 +362,26 @@ void LayeredScreen::openScreenInternal(
     while (getFocusedLayerIndex() != -1 &&
            getFocusedLayerIndex() > newScreen->getLayerIndex())
     {
-        closeCurrentScreen();
+        const auto focusedLayer = getFocusedLayer();
+        const auto screenToClose = focusedLayer->findChild<ScreenComponent>();
+
+        if (!screenToClose)
+        {
+            break;
+        }
+
+        if (const auto focusedField = screenToClose->findFocus(); focusedField)
+        {
+            setLastFocus(screenToClose->getName(), focusedField->getName());
+        }
+
+        focusedLayer->removeChild(screenToClose);
+        screenToClose->close();
+
+        if (screenToClose == oldScreenComponent)
+        {
+            oldScreenComponentWasClosed = true;
+        }
     }
 
     if (const auto sampleScreen =
@@ -414,7 +434,7 @@ void LayeredScreen::openScreenInternal(
     previousScreenId.store(currentScreenId.load());
     currentScreenId.store(getScreenId(newScreen));
 
-    if (oldScreenComponent)
+    if (oldScreenComponent && !oldScreenComponentWasClosed)
     {
         oldScreenComponent->close();
     }
