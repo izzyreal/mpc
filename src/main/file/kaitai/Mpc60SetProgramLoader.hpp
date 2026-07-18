@@ -26,6 +26,7 @@ namespace mpc::file::kaitai
         using ConversionTable = std::array<DrumNoteNumber, kMpc60PadCount>;
 
         static ConversionTable defaultConversionTable();
+        static ConversionTable defaultConversionTable(const Mpc &mpc);
 
         static bool load(
             Mpc &mpc,

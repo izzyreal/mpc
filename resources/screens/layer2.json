@@ -186,8 +186,8 @@
  "infosize" : [ 102, 102 ],  
  "infox" : [ 85, 115 ],
  "infoy" : [ 16, 32 ],  	
- "fblabels" : [ null, null, "PLAY", "DSCARD", "KEEP", null ],
- "fbtypes" : [ null, null, 1, 0, 1, null ]
+ "fblabels" : [[ null, null, "PLAY", "DSCARD", "KEEP", null ], [ null, null, "PLAY", "DSCARD", null, null ]],
+ "fbtypes" : [[ null, null, 1, 0, 1, null ], [ null, null, 1, 0, null, null ]]
 },
 "save-a-sequence":
 {

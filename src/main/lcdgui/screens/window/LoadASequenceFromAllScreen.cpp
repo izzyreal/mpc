@@ -100,6 +100,7 @@ void LoadASequenceFromAllScreen::displayFile() const
     const auto name = sequenceMetaInfos[sourceSeqIndex].name;
 
     findLabel("file0")->setText("-" + name);
+    setFunctionKeysArrangement(sequenceMetaInfos[sourceSeqIndex].used ? 0 : 1);
 }
 
 void LoadASequenceFromAllScreen::displayLoadInto() const

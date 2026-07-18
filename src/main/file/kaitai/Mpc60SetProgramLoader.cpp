@@ -247,6 +247,36 @@ Mpc60SetProgramLoader::defaultConversionTable()
         DrumNoteNumber(73)};
 }
 
+Mpc60SetProgramLoader::ConversionTable
+Mpc60SetProgramLoader::defaultConversionTable(const mpc::Mpc &mpc)
+{
+    auto result = defaultConversionTable();
+    const auto &originalPadNotes = mpc::sampler::Pad::getOriginalPadNotes();
+    const auto &activePadNotes = mpc::sampler::Pad::getPadNotes(mpc);
+
+    for (auto &note : result)
+    {
+        const auto originalPadIt =
+            std::find(originalPadNotes.begin(), originalPadNotes.end(), note);
+
+        if (originalPadIt == originalPadNotes.end())
+        {
+            continue;
+        }
+
+        const auto padIndex =
+            static_cast<size_t>(std::distance(originalPadNotes.begin(),
+                                              originalPadIt));
+
+        if (padIndex < activePadNotes.size())
+        {
+            note = activePadNotes[padIndex];
+        }
+    }
+
+    return result;
+}
+
 bool Mpc60SetProgramLoader::load(
     mpc::Mpc &mpc,
     const std::shared_ptr<mpc::disk::MpcFile> &file,
