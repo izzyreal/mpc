@@ -66,6 +66,8 @@ void DiskController::initDisks()
         }
     }
 
+    ensureActiveDiskIsEnabled();
+
     auto activeDisk = getActiveDisk();
 
     MLOG("Active disk is set to the one with absolute path: " +
@@ -114,6 +116,48 @@ int DiskController::getActiveDiskIndex() const
 void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 {
     activeDiskIndex = newActiveDiskIndex;
+}
+
+bool DiskController::ensureActiveDiskIsEnabled()
+{
+    if (disks.empty())
+    {
+        return false;
+    }
+
+    if (activeDiskIndex < 0 || activeDiskIndex >= disks.size())
+    {
+        activeDiskIndex = 0;
+        return true;
+    }
+
+    auto activeDisk = disks[activeDiskIndex];
+
+    if (activeDisk->getVolume().mode != DISABLED)
+    {
+        return false;
+    }
+
+    try
+    {
+        activeDisk->close();
+    }
+    catch (const std::exception &e)
+    {
+        MLOG("Failed to close disabled active disk: " + std::string(e.what()));
+    }
+
+    for (int i = 0; i < disks.size(); i++)
+    {
+        if (disks[i]->getVolume().mode != DISABLED)
+        {
+            activeDiskIndex = i;
+            return true;
+        }
+    }
+
+    activeDiskIndex = 0;
+    return true;
 }
 
 void DiskController::detectRawUsbVolumes()
@@ -231,6 +275,8 @@ void DiskController::detectRawUsbVolumes()
         volume.volumeSize = v.mediaSize;
         volume.volumeUUID = v.volumeUUID;
     }
+
+    ensureActiveDiskIsEnabled();
 
 #endif
 }

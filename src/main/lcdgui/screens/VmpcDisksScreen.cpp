@@ -88,6 +88,7 @@ void VmpcDisksScreen::function(const int i)
                     }
                 }
 
+                mpc.getDiskController()->ensureActiveDiskIsEnabled();
                 VolumesPersistence::save(mpc);
                 popupMsg = "Volume configurations saved";
             }
