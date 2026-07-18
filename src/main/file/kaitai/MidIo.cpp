@@ -7,6 +7,7 @@
 #include "sequencer/BusType.hpp"
 #include "sequencer/EventData.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequenceMessage.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
@@ -975,8 +976,20 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
 
     auto sequencer = mpc.getSequencer();
     auto transport = sequencer->getTransport();
+    auto stateManager = sequencer->getStateManager();
 
     sequence->setUsed(true);
+    const auto sequenceIndex = sequence->getSequenceIndex();
+    mpc::sequencer::UpdateSequenceEvents updateSequenceEvents{sequenceIndex};
+    updateSequenceEvents.trackSnapshots =
+        &stateManager->trackEventsSnapshots[sequenceIndex];
+    updateSequenceEvents.trackSnapshots->clear();
+
+    mpc::sequencer::UpdateSequenceTracks updateSequenceTracks{sequenceIndex};
+    updateSequenceTracks.trackStates =
+        &stateManager->trackStatesSnapshots[sequenceIndex];
+    *updateSequenceTracks.trackStates =
+        mpc::sequencer::SequenceTrackStatesSnapshot();
 
     struct TimedMetaEvent
     {
@@ -1129,7 +1142,43 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
         auto trackIndex = static_cast<int>(trackContainerIndex - 1);
         auto deviceIndex = 0;
         auto busType = mpc::sequencer::BusType::DRUM1;
-        auto track = sequence->getTrack(trackIndex);
+
+        for (const auto& eventPtr : *midiTrack->events()->event())
+        {
+            const auto* meta = eventPtr->meta_event_body();
+            if (meta == nullptr ||
+                meta->meta_type() != meta_type_t::META_TYPE_ENUM_TEXT_EVENT)
+            {
+                continue;
+            }
+
+            const auto body = asciiBody(meta->body());
+            if (body.find("TRACK DATA:") == std::string::npos)
+            {
+                continue;
+            }
+
+            const auto payload = body.substr(std::string("TRACK DATA:").length());
+            trackIndex = std::stoi(payload.substr(0, 2));
+            if (payload.substr(2, 2) != "C0")
+            {
+                deviceIndex =
+                    std::stoi(payload.substr(2, 2), nullptr, 16) -
+                    std::stoi(std::string("E0"), nullptr, 16) + 1;
+            }
+            if (payload.size() >= 16)
+            {
+                busType = mpc::sequencer::busIndexToBusType(
+                    std::stoi(payload.substr(14, 2), nullptr, 16));
+            }
+            break;
+        }
+
+        if (trackIndex < 0 ||
+            trackIndex > mpc::Mpc2000XlSpecs::LAST_TRACK_INDEX)
+        {
+            continue;
+        }
 
         struct OpenNote
         {
@@ -1152,29 +1201,9 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
             if (const auto* meta = eventPtr->meta_event_body(); meta != nullptr)
             {
                 const auto body = asciiBody(meta->body());
-                if (meta->meta_type() == meta_type_t::META_TYPE_ENUM_TEXT_EVENT &&
-                    body.find("TRACK DATA:") != std::string::npos)
-                {
-                    const auto payload = body.substr(std::string("TRACK DATA:").length());
-                    trackIndex = std::stoi(payload.substr(0, 2));
-                    if (payload.substr(2, 2) != "C0")
-                    {
-                        deviceIndex =
-                            std::stoi(payload.substr(2, 2), nullptr, 16) -
-                            std::stoi(std::string("E0"), nullptr, 16) + 1;
-                    }
-                    if (payload.size() >= 16)
-                    {
-                        busType = mpc::sequencer::busIndexToBusType(
-                            std::stoi(payload.substr(14, 2), nullptr, 16));
-                    }
-                    track = sequence->getTrack(trackIndex);
-                    track->setBusType(busType, false);
-                    track->setDeviceIndex(deviceIndex, false);
-                }
-                else if (meta->meta_type() ==
-                             meta_type_t::META_TYPE_ENUM_SEQUENCE_TRACK_NAME &&
-                         !body.empty())
+                if (meta->meta_type() ==
+                        meta_type_t::META_TYPE_ENUM_SEQUENCE_TRACK_NAME &&
+                    !body.empty())
                 {
                     pendingTrackName =
                         body.substr(0, mpc::Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH);
@@ -1327,7 +1356,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(noteAftertouch->note());
                     e.amount = noteAftertouch->pressure();
-                    track->acquireAndInsertEvent(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     hasImportedEvents = true;
                     break;
                 }
@@ -1344,7 +1373,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.controllerNumber = controller->controller();
                     e.controllerValue = controller->value();
-                    track->acquireAndInsertEvent(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     hasImportedEvents = true;
                     break;
                 }
@@ -1361,7 +1390,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.programChangeProgramIndex =
                         mpc::ProgramIndex(programChange->program());
-                    track->acquireAndInsertEvent(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     hasImportedEvents = true;
                     break;
                 }
@@ -1377,7 +1406,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::ChannelPressure;
                     e.tick = absoluteTick;
                     e.amount = channelPressure->pressure();
-                    track->acquireAndInsertEvent(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     hasImportedEvents = true;
                     break;
                 }
@@ -1393,7 +1422,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::PitchBend;
                     e.tick = absoluteTick;
                     e.amount = pitchBend->bend_value();
-                    track->acquireAndInsertEvent(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     hasImportedEvents = true;
                     break;
                 }
@@ -1418,7 +1447,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                         e.mixerParameter = static_cast<unsigned char>(data[4]) - 1;
                         e.mixerPad = static_cast<unsigned char>(data[5]);
                         e.mixerValue = static_cast<unsigned char>(data[6]);
-                        track->acquireAndInsertEvent(e);
+                        (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     }
                     else if (data.size() >= 2)
                     {
@@ -1427,7 +1456,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                         e.tick = absoluteTick;
                         e.sysExByteA = static_cast<unsigned char>(data[0]);
                         e.sysExByteB = static_cast<unsigned char>(data[1]);
-                        track->acquireAndInsertEvent(e);
+                        (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
                     }
                     hasImportedEvents = true;
                     break;
@@ -1437,20 +1466,23 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
 
         for (const auto& openNote : openNotes)
         {
-            track->acquireAndInsertEvent(openNote.event);
+            (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(openNote.event);
             hasImportedEvents = true;
         }
 
-        if (hasImportedEvents)
-        {
-            track->setUsedIfCurrentlyUnused();
-        }
+        auto& trackState = (*updateSequenceTracks.trackStates)[trackIndex];
+        trackState.busType = busType;
+        trackState.deviceIndex = deviceIndex;
+        trackState.used = hasImportedEvents;
 
         if (hasPendingTrackName)
         {
-            track->setName(pendingTrackName);
+            trackState.name = pendingTrackName;
         }
     }
+
+    stateManager->enqueue(updateSequenceTracks);
+    stateManager->enqueue(updateSequenceEvents);
 
     return true;
 }
