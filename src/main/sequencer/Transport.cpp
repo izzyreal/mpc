@@ -13,6 +13,7 @@
 #include "sequencer/TempoChangeEvent.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
@@ -411,7 +412,11 @@ mpc::Tick Transport::getTickPositionGuiPresentation() const
         return getCountInStartPosTicks();
     }
 
-    return getTickPosition();
+    const auto snapshot = sequencer.getStateManager()->getSnapshot();
+    const auto transportState = snapshot.getTransportStateView();
+    return static_cast<Tick>(
+        std::llround(transportState.getPositionQuarterNotes() *
+                     static_cast<double>(Sequencer::TICKS_PER_QUARTER_NOTE)));
 }
 
 double Transport::getPositionQuarterNotes() const
@@ -654,8 +659,6 @@ int Transport::getCurrentBeatIndex() const
 
     if (isPlaying() && !isCountingIn())
     {
-        index = getTickPosition();
-
         if (index > seq->getLastTick())
         {
             index %= seq->getLastTick();

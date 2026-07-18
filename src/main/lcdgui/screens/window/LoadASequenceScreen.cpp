@@ -28,7 +28,8 @@ void LoadASequenceScreen::open()
         return;
     }
 
-    originalSelectedSequenceIndex = sequencer.lock()->getSelectedSequenceIndex();
+    originalSelectedSequenceIndex =
+        sequencer.lock()->getSelectedSequenceIndex();
     previewingTempSequence = false;
 
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
@@ -116,6 +117,12 @@ void LoadASequenceScreen::startTempPreview()
     auto stateManager = lockedSequencer->getStateManager();
     auto transport = lockedSequencer->getTransport();
 
+    if (!previewingTempSequence)
+    {
+        originalSelectedSequenceIndex =
+            lockedSequencer->getSelectedSequenceIndex();
+    }
+
     if (transport->isPlaying())
     {
         transport->stop();
@@ -144,8 +151,8 @@ void LoadASequenceScreen::stopTempPreviewAndRestoreSelection()
     }
 
     lockedSequencer->getStateManager()->enqueue(
-        mpc::sequencer::SetSelectedSequenceIndex{
-            originalSelectedSequenceIndex, true});
+        mpc::sequencer::SetSelectedSequenceIndex{originalSelectedSequenceIndex,
+                                                 true});
     previewingTempSequence = false;
 }
 
@@ -174,7 +181,7 @@ void LoadASequenceScreen::displayFile() const
     findLabel("file")->setText(
         "File:" +
         StrUtil::padRight(
-            StrUtil::toUpper(sequenceFile->getNameWithoutExtension()),
-                          " ", 16) +
+            StrUtil::toUpper(sequenceFile->getNameWithoutExtension()), " ",
+            16) +
         StrUtil::toUpper(sequenceFile->getExtension()));
 }

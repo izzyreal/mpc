@@ -45,7 +45,27 @@ void LoadASequenceFromAllScreen::turnWheel(const int i)
 
 void LoadASequenceFromAllScreen::function(const int i)
 {
-    if (i == 3)
+    if (i == 2)
+    {
+        if (!sequenceMetaInfos[sourceSeqIndex].used)
+        {
+            return;
+        }
+
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadASequenceScreen =
+            mpc.screens->get<ScreenId::LoadASequenceScreen>();
+
+        const auto loaded = mpc.getDisk()->loadOneSequenceFromAllFile(
+            loadScreen->getSelectedFile(), SequenceIndex(sourceSeqIndex),
+            TempSequenceIndex);
+
+        if (loaded.has_value())
+        {
+            loadASequenceScreen->startTempPreview();
+        }
+    }
+    else if (i == 3)
     {
         openScreenById(ScreenId::LoadScreen);
     }
