@@ -290,7 +290,10 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
         const auto eventSnapshot = *eventHandle;
         auto event =
             mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent);
-        result.emplace_back(event);
+        if (event)
+        {
+            result.emplace_back(event);
+        }
     }
 
     lock.release();
@@ -319,8 +322,12 @@ Track::getEventRange(const int startTick, const int endTick) const
          getSnapshot(getIndex()).getEventRange(startTick, endTick))
     {
         const auto eventSnapshot = *eventHandle;
-        result.emplace_back(
-            mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent));
+        auto event =
+            mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent);
+        if (event)
+        {
+            result.emplace_back(event);
+        }
     }
 
     lock.release();

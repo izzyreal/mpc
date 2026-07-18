@@ -12,10 +12,65 @@
 #include "sequencer/TransportStateHandler.hpp"
 #include "utils/VariantUtils.hpp"
 
+#include <algorithm>
 #include <cstring>
+#include <vector>
 
 using namespace mpc::sequencer;
 using namespace mpc::concurrency;
+using namespace mpc;
+
+namespace
+{
+std::vector<std::pair<SequenceIndex, TrackIndex>> allTrackLockTargets(
+    const SequenceIndex sequenceIndex)
+{
+    std::vector<std::pair<SequenceIndex, TrackIndex>> result;
+    result.reserve(Mpc2000XlSpecs::TOTAL_TRACK_COUNT);
+    for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
+    {
+        result.emplace_back(sequenceIndex, TrackIndex(i));
+    }
+    return result;
+}
+
+bool tryAcquireTrackLocks(
+    SequencerStateManager *const manager,
+    std::vector<std::pair<SequenceIndex, TrackIndex>> targets,
+    std::vector<std::pair<SequenceIndex, TrackIndex>> &acquired)
+{
+    std::sort(targets.begin(), targets.end());
+    targets.erase(std::unique(targets.begin(), targets.end()), targets.end());
+
+    for (const auto &[sequenceIndex, trackIndex] : targets)
+    {
+        auto &lock = manager->trackLocks[sequenceIndex][trackIndex];
+        if (!lock.try_acquire())
+        {
+            for (auto it = acquired.rbegin(); it != acquired.rend(); ++it)
+            {
+                manager->trackLocks[it->first][it->second].release();
+            }
+            acquired.clear();
+            return false;
+        }
+
+        acquired.emplace_back(sequenceIndex, trackIndex);
+    }
+
+    return true;
+}
+
+void releaseTrackLocks(
+    SequencerStateManager *const manager,
+    const std::vector<std::pair<SequenceIndex, TrackIndex>> &acquired)
+{
+    for (auto it = acquired.rbegin(); it != acquired.rend(); ++it)
+    {
+        manager->trackLocks[it->first][it->second].release();
+    }
+}
+}
 
 SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     : AtomicStateExchange([](SequencerState &) {}), sequencer(sequencer)
@@ -154,22 +209,87 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         },
         [&](const DeleteSequence &m)
         {
+            std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
+            if (!tryAcquireTrackLocks(
+                    this, allTrackLockTargets(m.sequenceIndex), acquired))
+            {
+                enqueue(m);
+                return;
+            }
+
+            for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
+            {
+                trackStateHandler->removeEventsLocked(
+                    activeState.sequences[m.sequenceIndex].tracks[i]);
+            }
             activeState.sequences[m.sequenceIndex].initializeDefaults();
+
+            releaseTrackLocks(this, acquired);
         },
         [&](const DeleteAllSequences &)
         {
+            std::vector<std::pair<SequenceIndex, TrackIndex>> targets;
+            targets.reserve(Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT *
+                            Mpc2000XlSpecs::TOTAL_TRACK_COUNT);
+            for (int sequenceIndex = 0;
+                 sequenceIndex < Mpc2000XlSpecs::TOTAL_SEQUENCE_COUNT;
+                 ++sequenceIndex)
+            {
+                auto sequenceTargets =
+                    allTrackLockTargets(SequenceIndex(sequenceIndex));
+                targets.insert(
+                    targets.end(), sequenceTargets.begin(), sequenceTargets.end());
+            }
+
+            std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
+            if (!tryAcquireTrackLocks(this, targets, acquired))
+            {
+                enqueue(DeleteAllSequences{});
+                return;
+            }
+
             for (auto &seq : activeState.sequences)
             {
+                for (auto &track : seq.tracks)
+                {
+                    trackStateHandler->removeEventsLocked(track);
+                }
                 seq.initializeDefaults();
             }
+
+            releaseTrackLocks(this, acquired);
         },
         [&](const CopySequence &m)
         {
+            if (m.sourceIndex == m.destIndex)
+            {
+                return;
+            }
+
             auto &seqLock1 = sequenceLocks[m.sourceIndex];
             auto &seqLock2 = sequenceLocks[m.destIndex];
 
-            if (!seqLock1.try_acquire() || !seqLock2.try_acquire())
+            if (!seqLock1.try_acquire())
             {
+                enqueue(m);
+                return;
+            }
+
+            if (!seqLock2.try_acquire())
+            {
+                seqLock1.release();
+                enqueue(m);
+                return;
+            }
+
+            auto targets = allTrackLockTargets(m.sourceIndex);
+            auto destTargets = allTrackLockTargets(m.destIndex);
+            targets.insert(targets.end(), destTargets.begin(), destTargets.end());
+            std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
+            if (!tryAcquireTrackLocks(this, targets, acquired))
+            {
+                seqLock1.release();
+                seqLock2.release();
                 enqueue(m);
                 return;
             }
@@ -195,8 +315,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 auto &t2 =
                     activeState.sequences[m.destIndex].tracks[idx];
 
-                RemoveEvents removeEvents{m.destIndex, TrackIndex(idx)};
-                trackStateHandler->applyRemoveEvents(removeEvents, activeState);
+                trackStateHandler->removeEventsLocked(t2);
 
                 t2.used = t1.used;
                 t2.name.assign(t1.name.data(), t1.name.size());
@@ -221,6 +340,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 }
             }
 
+            releaseTrackLocks(this, acquired);
             seqLock1.release();
 
 
@@ -291,13 +411,26 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         },
         [&](const CopyTrack &m)
         {
+            if (m.sourceSequenceIndex == m.destSequenceIndex &&
+                m.sourceTrackIndex == m.destTrackIndex)
+            {
+                return;
+            }
+
             auto &trackLock1 =
                 trackLocks[m.sourceSequenceIndex][m.sourceTrackIndex];
             auto &trackLock2 =
                 trackLocks[m.destSequenceIndex][m.destTrackIndex];
 
-            if (!trackLock1.try_acquire() || !trackLock2.try_acquire())
+            if (!trackLock1.try_acquire())
             {
+                enqueue(m);
+                return;
+            }
+
+            if (!trackLock2.try_acquire())
+            {
+                trackLock1.release();
                 enqueue(m);
                 return;
             }
@@ -312,8 +445,27 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             auto &seqLock1 = sequenceLocks[activeState.selectedSequenceIndex];
             auto &seqLock2 = sequenceLocks[UndoSequenceIndex];
 
-            if (!seqLock1.try_acquire() || !seqLock2.try_acquire())
+            if (!seqLock1.try_acquire())
             {
+                enqueue(m);
+                return;
+            }
+
+            if (!seqLock2.try_acquire())
+            {
+                seqLock1.release();
+                enqueue(m);
+                return;
+            }
+
+            auto targets = allTrackLockTargets(activeState.selectedSequenceIndex);
+            auto undoTargets = allTrackLockTargets(UndoSequenceIndex);
+            targets.insert(targets.end(), undoTargets.begin(), undoTargets.end());
+            std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
+            if (!tryAcquireTrackLocks(this, targets, acquired))
+            {
+                seqLock1.release();
+                seqLock2.release();
                 enqueue(m);
                 return;
             }
@@ -326,6 +478,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             activeState.undoSequenceAvailable =
                 !activeState.undoSequenceAvailable;
 
+            releaseTrackLocks(this, acquired);
             seqLock1.release();
             seqLock2.release();
         },
@@ -516,7 +669,7 @@ void SequencerStateManager::applyCopyTrack(const CopyTrack &m)
     t2.transmitProgramChangesEnabled = t1.transmitProgramChangesEnabled;
     t2.velocityRatio = t1.velocityRatio;
 
-    applyMessageImmediate(RemoveEvents{m.destSequenceIndex, m.destTrackIndex});
+    trackStateHandler->removeEventsLocked(t2);
 
     const EventData *it = t1.eventsHead;
 

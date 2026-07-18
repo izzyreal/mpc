@@ -126,17 +126,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
         },
         [&](const RemoveEvents &m)
         {
-            auto &lock = manager->trackLocks[m.sequence][m.track];
-
-            if (!lock.try_acquire())
-            {
-                manager->enqueue(m);
-                return;
-            }
-
             applyRemoveEvents(m, state);
-
-            lock.release();
         },
         [&](const RemoveDoubles &m)
         {
