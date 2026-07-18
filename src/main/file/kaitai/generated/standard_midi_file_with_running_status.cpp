@@ -503,13 +503,14 @@ void standard_midi_file_with_running_status_t::track_t::_check() {
 
 standard_midi_file_with_running_status_t::track_t::~track_t() {}
 
-standard_midi_file_with_running_status_t::track_event_t::track_event_t(uint8_t p_previous_event_type, kaitai::kstream* p__io, standard_midi_file_with_running_status_t::track_events_t* p__parent, standard_midi_file_with_running_status_t* p__root) : kaitai::kstruct(p__io) {
+standard_midi_file_with_running_status_t::track_event_t::track_event_t(uint8_t p_previous_status, kaitai::kstream* p__io, standard_midi_file_with_running_status_t::track_events_t* p__parent, standard_midi_file_with_running_status_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = p__root;
-    m_previous_event_type = p_previous_event_type;
+    m_previous_status = p_previous_status;
     m__dirty = false;
     n_event_header = true;
     f_channel = false;
+    f_effective_status = false;
     f_event_type = false;
     f_status_byte_lookahead = false;
     f_using_running_status = false;
@@ -525,11 +526,11 @@ void standard_midi_file_with_running_status_t::track_event_t::_read() {
         n_event_header = false;
         m_event_header = m__io->read_u1();
     }
-    if (event_header() == 255) {
+    if ( ((!(using_running_status())) && (event_header() == 255)) ) {
         m_meta_event_body = std::unique_ptr<meta_event_body_t>(new meta_event_body_t(m__io, this, m__root));
         m_meta_event_body->_read();
     }
-    if (event_header() == 240) {
+    if ( ((!(using_running_status())) && (event_header() == 240)) ) {
         m_sysex_body = std::unique_ptr<sysex_event_body_t>(new sysex_event_body_t(m__io, this, m__root));
         m_sysex_body->_read();
     }
@@ -579,10 +580,10 @@ void standard_midi_file_with_running_status_t::track_event_t::_fetch_instances()
     if (!(using_running_status())) {
         n_event_header = false;
     }
-    if (event_header() == 255) {
+    if ( ((!(using_running_status())) && (event_header() == 255)) ) {
         m_meta_event_body.get()->_fetch_instances();
     }
-    if (event_header() == 240) {
+    if ( ((!(using_running_status())) && (event_header() == 240)) ) {
         m_sysex_body.get()->_fetch_instances();
     }
     switch (event_type()) {
@@ -672,14 +673,14 @@ void standard_midi_file_with_running_status_t::track_event_t::_write() {
     if (!(using_running_status())) {
         m__io->write_u1(m_event_header);
     }
-    if (event_header() == 255) {
+    if ( ((!(using_running_status())) && (event_header() == 255)) ) {
         if (m_meta_event_body.get() == nullptr) {
             throw std::runtime_error("/types/track_event/seq/2: nested object is not set");
         }
         m_meta_event_body.get()->_set_io(m__io);
         m_meta_event_body.get()->_write();
     }
-    if (event_header() == 240) {
+    if ( ((!(using_running_status())) && (event_header() == 240)) ) {
         if (m_sysex_body.get() == nullptr) {
             throw std::runtime_error("/types/track_event/seq/3: nested object is not set");
         }
@@ -805,7 +806,7 @@ void standard_midi_file_with_running_status_t::track_event_t::_check() {
             throw std::runtime_error("/types/track_event/seq/1: conditional field should be absent");
         }
     }
-    if (event_header() == 255) {
+    if ( ((!(using_running_status())) && (event_header() == 255)) ) {
         if (!(m_meta_event_body.get() != nullptr)) {
             throw std::runtime_error("/types/track_event/seq/2: conditional field is not set");
         }
@@ -819,7 +820,7 @@ void standard_midi_file_with_running_status_t::track_event_t::_check() {
             throw std::runtime_error("/types/track_event/seq/2: conditional field should be absent");
         }
     }
-    if (event_header() == 240) {
+    if ( ((!(using_running_status())) && (event_header() == 240)) ) {
         if (!(m_sysex_body.get() != nullptr)) {
             throw std::runtime_error("/types/track_event/seq/3: conditional field is not set");
         }
@@ -947,16 +948,24 @@ int32_t standard_midi_file_with_running_status_t::track_event_t::channel() {
     n_channel = true;
     if (event_type() != 240) {
         n_channel = false;
-        m_channel = event_header() & 15;
+        m_channel = effective_status() & 15;
     }
     return m_channel;
+}
+
+uint8_t standard_midi_file_with_running_status_t::track_event_t::effective_status() {
+    if (f_effective_status)
+        return m_effective_status;
+    f_effective_status = true;
+    m_effective_status = ((using_running_status()) ? (previous_status()) : (event_header()));
+    return m_effective_status;
 }
 
 int32_t standard_midi_file_with_running_status_t::track_event_t::event_type() {
     if (f_event_type)
         return m_event_type;
     f_event_type = true;
-    m_event_type = ((using_running_status()) ? (previous_event_type()) : (event_header() & 240));
+    m_event_type = effective_status() & 240;
     return m_event_type;
 }
 
@@ -1002,7 +1011,7 @@ void standard_midi_file_with_running_status_t::track_events_t::_read() {
     {
         int i = 0;
         while (!m__io->is_eof()) {
-            std::unique_ptr<track_event_t> _t_event = std::unique_ptr<track_event_t>(new track_event_t(((i != 0) ? (event()->at(i - 1)->event_type()) : (255)), m__io, this, m__root));
+            std::unique_ptr<track_event_t> _t_event = std::unique_ptr<track_event_t>(new track_event_t(((i != 0) ? (event()->at(i - 1)->effective_status()) : (255)), m__io, this, m__root));
             try {
                 _t_event->_read();
             } catch(...) {

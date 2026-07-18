@@ -458,7 +458,7 @@ public:
 
     public:
 
-        track_event_t(uint8_t p_previous_event_type, kaitai::kstream* p__io, standard_midi_file_with_running_status_t::track_events_t* p__parent = nullptr, standard_midi_file_with_running_status_t* p__root = nullptr);
+        track_event_t(uint8_t p_previous_status, kaitai::kstream* p__io, standard_midi_file_with_running_status_t::track_events_t* p__parent = nullptr, standard_midi_file_with_running_status_t* p__root = nullptr);
         void _read();
         void _fetch_instances();
         void _write();
@@ -466,10 +466,12 @@ public:
         ~track_event_t();
         int32_t channel();
         void _invalidate_channel() { f_channel = false; }
+        uint8_t effective_status();
+        void _invalidate_effective_status() { f_effective_status = false; }
         int32_t event_type();
         void _invalidate_event_type() { f_event_type = false; }
         uint8_t status_byte_lookahead();
-        void set_status_byte_lookahead(uint8_t _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; e_status_byte_lookahead = false; f_status_byte_lookahead = true; m_status_byte_lookahead = std::move(_v); }
+        void set_status_byte_lookahead(uint8_t _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; e_status_byte_lookahead = false; f_status_byte_lookahead = true; m_status_byte_lookahead = std::move(_v); }
         void set_status_byte_lookahead_enabled(bool _v) { m__dirty = true; e_status_byte_lookahead = _v; }
 
     private:
@@ -479,21 +481,21 @@ public:
         bool using_running_status();
         void _invalidate_using_running_status() { f_using_running_status = false; }
         vlq_base128_be_t* v_time() const { return m_v_time.get(); }
-        void set_v_time(std::unique_ptr<vlq_base128_be_t> _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_v_time = std::move(_v); }
+        void set_v_time(std::unique_ptr<vlq_base128_be_t> _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_v_time = std::move(_v); }
         uint8_t event_header() const { return m_event_header; }
-        void set_event_header(uint8_t _v) { m__dirty = true; n_event_header = false; f_channel = false; f_event_type = false; f_using_running_status = false; m_event_header = std::move(_v); }
+        void set_event_header(uint8_t _v) { m__dirty = true; n_event_header = false; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_event_header = std::move(_v); }
         meta_event_body_t* meta_event_body() const { return m_meta_event_body.get(); }
-        void set_meta_event_body(std::unique_ptr<meta_event_body_t> _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_meta_event_body = std::move(_v); }
+        void set_meta_event_body(std::unique_ptr<meta_event_body_t> _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_meta_event_body = std::move(_v); }
         sysex_event_body_t* sysex_body() const { return m_sysex_body.get(); }
-        void set_sysex_body(std::unique_ptr<sysex_event_body_t> _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_sysex_body = std::move(_v); }
+        void set_sysex_body(std::unique_ptr<sysex_event_body_t> _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_sysex_body = std::move(_v); }
         kaitai::kstruct* event_body() const { return m_event_body.get(); }
-        void set_event_body(std::unique_ptr<kaitai::kstruct> _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_event_body = std::move(_v); }
-        uint8_t previous_event_type() const { return m_previous_event_type; }
-        void set_previous_event_type(uint8_t _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m_previous_event_type = std::move(_v); }
+        void set_event_body(std::unique_ptr<kaitai::kstruct> _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_event_body = std::move(_v); }
+        uint8_t previous_status() const { return m_previous_status; }
+        void set_previous_status(uint8_t _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m_previous_status = std::move(_v); }
         standard_midi_file_with_running_status_t* _root() const { return m__root; }
-        void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m__root = std::move(_v); }
+        void set__root(standard_midi_file_with_running_status_t* _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
-        void set__parent(standard_midi_file_with_running_status_t::track_events_t* _v) { m__dirty = true; f_channel = false; f_event_type = false; f_using_running_status = false; m__parent = std::move(_v); }
+        void set__parent(standard_midi_file_with_running_status_t::track_events_t* _v) { m__dirty = true; f_channel = false; f_effective_status = false; f_event_type = false; f_using_running_status = false; m__parent = std::move(_v); }
 
     private:
         bool f_channel;
@@ -504,6 +506,8 @@ public:
         bool _is_null_channel() { channel(); return n_channel; };
 
     private:
+        bool f_effective_status;
+        uint8_t m_effective_status;
         bool f_event_type;
         int32_t m_event_type;
         bool f_status_byte_lookahead;
@@ -538,7 +542,7 @@ public:
         bool _is_null_event_body() { return !event_body(); };
 
     private:
-        uint8_t m_previous_event_type;
+        uint8_t m_previous_status;
         standard_midi_file_with_running_status_t* m__root;
         standard_midi_file_with_running_status_t::track_events_t* m__parent;
     };
