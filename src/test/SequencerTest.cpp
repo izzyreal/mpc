@@ -45,6 +45,17 @@ using namespace mpc::client::event;
 using namespace mpc::hardware;
 using namespace mpc::lcdgui;
 
+TEST_CASE("Song step constants distinguish last step from end cursor",
+          "[sequencer]")
+{
+    REQUIRE(static_cast<int>(LastSongStepIndex) ==
+            Mpc2000XlSpecs::MAX_SONG_STEP_COUNT - 1);
+    REQUIRE(static_cast<int>(EndOfFullSongStepIndex) ==
+            Mpc2000XlSpecs::MAX_SONG_STEP_COUNT);
+    REQUIRE(static_cast<int>(MaxSongStepIndex) ==
+            static_cast<int>(EndOfFullSongStepIndex));
+}
+
 namespace
 {
 constexpr int kPlaybackBufferSize = 512;
