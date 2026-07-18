@@ -1,7 +1,6 @@
 #include "DeleteAllSequencesScreen.hpp"
 
 #include "Mpc.hpp"
-#include "engine/EngineHost.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
@@ -24,16 +23,24 @@ void DeleteAllSequencesScreen::function(const int i)
     {
         const auto lockedSequencer = sequencer.lock();
         lockedSequencer->getTransport()->setPosition(0);
-        mpc.getEngineHost()->postToAudioThread(utils::Task(
-            [this, lockedSequencer]
+        lockedSequencer->deleteAllSequences();
+        lockedSequencer->getStateManager()->enqueueCallback(
+            utils::SimpleAction(
+                [layeredScreen = ls]
             {
-                lockedSequencer->deleteAllSequences();
-                lockedSequencer->getStateManager()->drainQueue();
-                ls.lock()->postToUiThread(utils::Task(
-                    [this]
+                if (const auto lockedLayeredScreen = layeredScreen.lock())
+                {
+                    lockedLayeredScreen->postToUiThread(utils::Task(
+                        [layeredScreen]
                     {
-                        openScreenById(ScreenId::SequencerScreen);
+                        if (const auto lockedLayeredScreen =
+                                layeredScreen.lock())
+                        {
+                            lockedLayeredScreen->openScreenById(
+                                ScreenId::SequencerScreen);
+                        }
                     }));
+                }
             }));
     }
 }

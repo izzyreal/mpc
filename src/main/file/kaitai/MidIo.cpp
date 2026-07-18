@@ -960,7 +960,6 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
 
     stateManager->enqueue(updateSequenceTracks);
     stateManager->enqueue(updateSequenceEvents);
-    stateManager->drainQueue();
 
     return true;
 }
@@ -1465,7 +1464,6 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
 
     auto newSeq = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
     newSeq->init(0);
-    mpc.getSequencer()->getStateManager()->drainQueue();
 
     std::istringstream kaitaiStream(
         std::string(canonicalBytes.begin(), canonicalBytes.end()),
