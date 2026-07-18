@@ -51,7 +51,7 @@ namespace
 
     void waitForLoadScreen(Mpc &mpc)
     {
-        constexpr auto timeout = std::chrono::seconds(30);
+        constexpr auto timeout = std::chrono::seconds(5);
         const auto start = std::chrono::steady_clock::now();
 
         while (mpc.getLayeredScreen()->getCurrentScreenName() != "load")
