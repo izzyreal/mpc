@@ -48,12 +48,12 @@ using namespace mpc::lcdgui;
 TEST_CASE("Song step constants distinguish last step from end cursor",
           "[sequencer]")
 {
-    REQUIRE(static_cast<int>(LastSongStepIndex) ==
-            Mpc2000XlSpecs::MAX_SONG_STEP_COUNT - 1);
-    REQUIRE(static_cast<int>(EndOfFullSongStepIndex) ==
-            Mpc2000XlSpecs::MAX_SONG_STEP_COUNT);
-    REQUIRE(static_cast<int>(MaxSongStepIndex) ==
-            static_cast<int>(EndOfFullSongStepIndex));
+    REQUIRE(static_cast<int>(mpc::LastSongStepIndex) ==
+            mpc::Mpc2000XlSpecs::MAX_SONG_STEP_COUNT - 1);
+    REQUIRE(static_cast<int>(mpc::EndOfFullSongStepIndex) ==
+            mpc::Mpc2000XlSpecs::MAX_SONG_STEP_COUNT);
+    REQUIRE(static_cast<int>(mpc::MaxSongStepIndex) ==
+            static_cast<int>(mpc::EndOfFullSongStepIndex));
 }
 
 namespace

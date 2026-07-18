@@ -6,6 +6,9 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "performance/PerformanceManager.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc;
 using namespace mpc::client::event;
@@ -40,6 +43,8 @@ TEST_CASE("Sixteen levels", "[16-levels]")
     TestMpc::initializeTestMpc(mpc);
     auto manager = mpc.getPerformanceManager().lock();
 
+    mpc.getSequencer()->getSelectedSequence()->init(1);
+    mpc.getSequencer()->getStateManager()->drainQueue();
     manager->drainQueue();
 
     const auto controller = mpc.clientEventController;

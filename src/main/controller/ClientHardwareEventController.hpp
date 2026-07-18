@@ -91,6 +91,8 @@ namespace mpc::controller
         std::atomic<TimeInMilliseconds> mostRecentPhysicalPadPressTimeMs{0};
 
         void updateMostRecentPhysicalPadPressVelocity(Velocity);
+        bool isPadNoteGenerationSuppressedForCurrentScreen() const;
+        bool isPadNoteGenerationSuppressedForCurrentSequence() const;
 
         void handlePadPress(const client::event::ClientHardwareEvent &);
         void
