@@ -1187,7 +1187,7 @@ TEST_CASE("Load a sequence PLAY shows held preview overlay and release restores 
         mpc.screens->get<mpc::lcdgui::ScreenId::LoadASequenceScreen>();
 
     layeredScreen->getCurrentScreen()->function(2);
-    stateManager->drainQueue();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-play");
     REQUIRE(sequencer->getSelectedSequenceIndex() == mpc::TempSequenceIndex);
@@ -1242,7 +1242,7 @@ TEST_CASE("Load a sequence KEEP copies temp sequence into chosen slot and stops 
     loadSequenceScreen->setLoadInto(mpc::SequenceIndex(7));
 
     layeredScreen->getCurrentScreen()->function(2);
-    stateManager->drainQueue();
+    mpc.getEngineHost()->prepareProcessBlock(512);
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-play");
     REQUIRE(sequencer->getSelectedSequenceIndex() == mpc::TempSequenceIndex);
     REQUIRE(sequencer->getTransport()->isPlaying());
