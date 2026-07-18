@@ -130,6 +130,7 @@ void LoadASequenceScreen::startTempPreview()
 
     stateManager->enqueue(
         mpc::sequencer::SetSelectedSequenceIndex{TempSequenceIndex, true});
+    stateManager->drainQueue();
     transport->play(true);
     previewingTempSequence = true;
     openScreenById(ScreenId::LoadASequencePlayScreen);
