@@ -14,6 +14,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/Transport.hpp"
 #include "StrUtil.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -227,6 +228,39 @@ TEST_CASE("MPC3000 ALL <SEQ> KEEP loads the chosen embedded sequence into the ch
     REQUIRE(loadedSequence->getTrack(0)->getEvents().size() == 4);
 }
 
+TEST_CASE("MPC3000 ALL <SEQ> PLAY previews the chosen embedded sequence from temp",
+          "[load-all][ui][real-mpc3000]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAllResources(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+    sequencer->getSequence(5)->init(0);
+    stateManager->drainQueue();
+    sequencer->setSelectedSequenceIndex(SequenceIndex(5), true);
+    stateManager->drainQueue();
+
+    openAllWindowFor(mpc, kMpc3000AllFileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->getCurrentScreen()->function(2);
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-from-all");
+
+    const auto seqFromAllScreen =
+        mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+    seqFromAllScreen->turnWheel(1);
+    seqFromAllScreen->function(2);
+    stateManager->drainQueue();
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-play");
+    REQUIRE(sequencer->getSelectedSequenceIndex() == TempSequenceIndex);
+    REQUIRE(sequencer->getSequence(TempSequenceIndex)->getName() == "SEQ02");
+    REQUIRE(sequencer->getTransport()->isPlaying());
+}
+
 TEST_CASE("MPC3000 ALL <SEQ> KEEP loads empty embedded sequences without phantom events",
           "[load-all][ui][real-mpc3000]")
 {
@@ -324,6 +358,38 @@ TEST_CASE("MPC60 v2 ALL <SEQ> branch lets the user browse embedded sequences and
     auto loadedSequence = sequencer->getSequence(0);
     REQUIRE(loadedSequence->isUsed());
     REQUIRE(loadedSequence->getName() == "SEQ01");
+}
+
+TEST_CASE("MPC60 v2 ALL <SEQ> PLAY previews the chosen embedded sequence from temp",
+          "[load-all][ui][real-mpc60]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAllResources(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    sequencer->getTransport()->setCountEnabled(false);
+    sequencer->getSequence(5)->init(0);
+    stateManager->drainQueue();
+    sequencer->setSelectedSequenceIndex(SequenceIndex(5), true);
+    stateManager->drainQueue();
+
+    openAllWindowFor(mpc, kMpc60AllFileName);
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->getCurrentScreen()->function(2);
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-from-all");
+
+    const auto seqFromAllScreen =
+        mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+    seqFromAllScreen->function(2);
+    stateManager->drainQueue();
+
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-play");
+    REQUIRE(sequencer->getSelectedSequenceIndex() == TempSequenceIndex);
+    REQUIRE(sequencer->getSequence(TempSequenceIndex)->getName() == "SEQ01");
+    REQUIRE(sequencer->getTransport()->isPlaying());
 }
 
 TEST_CASE("MPC60 v2 ALL LOAD imports sequences and songs through the real UI path",
