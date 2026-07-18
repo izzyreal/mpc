@@ -5,9 +5,11 @@
 #include "sequencer/Sequencer.hpp"
 #include "StrUtil.hpp"
 
+#include <algorithm>
 #include <vector>
 
 using namespace mpc::sequencer;
+using namespace mpc;
 
 namespace
 {
@@ -122,13 +124,55 @@ void initializeUnusedDestinationSequence(SequencerStateManager *manager,
                                      tempoEvent);
     }
 }
+
+bool tryAcquireCopyEventLocks(
+    SequencerStateManager *const manager,
+    std::vector<std::pair<SequenceIndex, TrackIndex>> targets,
+    std::vector<std::pair<SequenceIndex, TrackIndex>> &acquired)
+{
+    std::sort(targets.begin(), targets.end());
+    targets.erase(std::unique(targets.begin(), targets.end()), targets.end());
+
+    for (const auto &[sequenceIndex, trackIndex] : targets)
+    {
+        auto &lock = manager->trackLocks[sequenceIndex][trackIndex];
+        if (!lock.try_acquire())
+        {
+            for (auto it = acquired.rbegin(); it != acquired.rend(); ++it)
+            {
+                manager->trackLocks[it->first][it->second].release();
+            }
+            acquired.clear();
+            return false;
+        }
+
+        acquired.emplace_back(sequenceIndex, trackIndex);
+    }
+
+    return true;
+}
+
+void releaseCopyEventLocks(
+    SequencerStateManager *const manager,
+    const std::vector<std::pair<SequenceIndex, TrackIndex>> &acquired)
+{
+    for (auto it = acquired.rbegin(); it != acquired.rend(); ++it)
+    {
+        manager->trackLocks[it->first][it->second].release();
+    }
+}
 } // namespace
 
 void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 {
-    auto &lock = trackLocks[m.destSequenceIndex][m.destTrackIndex];
+    const SequenceIndex sourceSequenceIndexToUse =
+        m.sourceSequenceIndex >= MinSequenceIndex
+            ? m.sourceSequenceIndex
+            : activeState.selectedSequenceIndex;
 
-    if (!lock.try_acquire())
+    std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
+    if (!tryAcquireCopyEventLocks(
+            this, {{sourceSequenceIndexToUse, m.sourceTrackIndex}}, acquired))
     {
         enqueue(m);
         return;
@@ -141,14 +185,8 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     int destDenominator = -1;
     int destBarLength = -1;
 
-    const SequenceIndex sourceSequenceIndexToUse =
-        m.sourceSequenceIndex >= MinSequenceIndex
-            ? m.sourceSequenceIndex
-            : activeState.selectedSequenceIndex;
-
     const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
     auto &destSeq = activeState.sequences[m.destSequenceIndex];
-    auto &destTrack = destSeq.tracks[m.destTrackIndex];
 
     std::vector<EventData> sourceEvents;
     const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].eventsHead;
@@ -168,12 +206,29 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
         src = src->next;
     }
+    releaseCopyEventLocks(this, acquired);
+    acquired.clear();
 
     if (!destSeq.used)
     {
+        std::vector<std::pair<SequenceIndex, TrackIndex>> initTargets;
+        initTargets.reserve(Mpc2000XlSpecs::TOTAL_TRACK_COUNT);
+        for (int i = 0; i < Mpc2000XlSpecs::TOTAL_TRACK_COUNT; ++i)
+        {
+            initTargets.emplace_back(m.destSequenceIndex, TrackIndex(i));
+        }
+
+        if (!tryAcquireCopyEventLocks(this, std::move(initTargets), acquired))
+        {
+            enqueue(m);
+            return;
+        }
+
         initializeUnusedDestinationSequence(this, sequencer, destSeq,
                                             m.destSequenceIndex,
                                             sourceSeq.lastBarIndex);
+        releaseCopyEventLocks(this, acquired);
+        acquired.clear();
     }
 
     const SequenceStateView destSeqView(destSeq);
@@ -205,7 +260,6 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
     if (destBarLength <= 0)
     {
-        lock.release();
         return;
     }
 
@@ -232,9 +286,13 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
         applyMessage(SetTimeSignature{m.destSequenceIndex, afterBar, ts});
     }
 
+    trackLocks[m.destSequenceIndex][m.destTrackIndex].acquire();
+    acquired.emplace_back(m.destSequenceIndex, m.destTrackIndex);
+
+    auto &destTrack = destSeq.tracks[m.destTrackIndex];
+
     if (!m.copyModeMerge)
     {
-        EventData *prev = nullptr;
         EventData *cur = destTrack.eventsHead;
 
         while (cur)
@@ -248,10 +306,6 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
             if (inRange)
             {
                 removeEventWithoutLock(this, destTrack, cur);
-            }
-            else
-            {
-                prev = cur;
             }
 
             cur = next;
@@ -286,7 +340,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
         }
     }
 
-    lock.release();
+    releaseCopyEventLocks(this, acquired);
 
     applyMessage(SetSelectedSequenceIndex{m.destSequenceIndex});
 }

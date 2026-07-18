@@ -4,21 +4,9 @@
 
 using namespace mpc::sequencer;
 
-void TrackStateHandler::applyRemoveEvent(const RemoveEvent &m,
-                                         SequencerState &state) const
+void TrackStateHandler::removeEventLocked(TrackState &track,
+                                          EventData *const e) const
 {
-    EventData *e = m.handle;
-
-    auto &lock = manager->trackLocks[e->sequenceIndex][e->trackIndex];
-
-    if (!lock.try_acquire())
-    {
-        manager->enqueue(m);
-        return;
-    }
-
-    auto &track = state.sequences[e->sequenceIndex].tracks[e->trackIndex];
-
     const EventData *head = track.eventsHead;
 
     int removedIndex = 0;
@@ -62,5 +50,24 @@ void TrackStateHandler::applyRemoveEvent(const RemoveEvent &m,
     e->next = nullptr;
 
     manager->returnEventToPool(e);
+}
+
+void TrackStateHandler::applyRemoveEvent(const RemoveEvent &m,
+                                         SequencerState &state) const
+{
+    EventData *e = m.handle;
+
+    auto &lock = manager->trackLocks[e->sequenceIndex][e->trackIndex];
+
+    if (!lock.try_acquire())
+    {
+        manager->enqueue(m);
+        return;
+    }
+
+    auto &track = state.sequences[e->sequenceIndex].tracks[e->trackIndex];
+
+    removeEventLocked(track, e);
+
     lock.release();
 }

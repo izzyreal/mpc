@@ -92,6 +92,9 @@ void SequencerStateManager::finalizeRecordedNote(EventData *noteOn,
     noteOn->duration = Duration(duration);
     noteOn->beingRecorded = false;
 
+    auto &lock = trackLocks[noteOn->sequenceIndex][noteOn->trackIndex];
+    lock.acquire();
+
     auto &track =
         activeState.sequences[noteOn->sequenceIndex].tracks[noteOn->trackIndex];
     const TrackStateView trackStateView(track);
@@ -107,6 +110,8 @@ void SequencerStateManager::finalizeRecordedNote(EventData *noteOn,
     {
         returnEventToPool(noteOn);
     }
+
+    lock.release();
 }
 
 void SequencerStateManager::processLiveNoteEventRecordingQueues(

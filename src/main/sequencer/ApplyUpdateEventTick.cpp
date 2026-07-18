@@ -19,13 +19,20 @@ void TrackStateHandler::applyUpdateEventTick(const UpdateEventTick &m,
     auto &track =
         state.sequences[m.handle->sequenceIndex].tracks[m.handle->trackIndex];
 
-    EventData *e = m.handle;
-    const Tick newTick = m.newTick;
+    updateEventTickLocked(track, m.handle, m.newTick);
+
+    lock.release();
+}
+
+void TrackStateHandler::updateEventTickLocked(
+    TrackState &track,
+    EventData *const e,
+    const Tick newTick) const
+{
     const Tick oldTick = e->tick;
 
     if (newTick == oldTick)
     {
-        lock.release();
         return;
     }
 
@@ -51,7 +58,6 @@ void TrackStateHandler::applyUpdateEventTick(const UpdateEventTick &m,
     if (!head)
     {
         head = e;
-        lock.release();
         return;
     }
 
@@ -69,7 +75,6 @@ void TrackStateHandler::applyUpdateEventTick(const UpdateEventTick &m,
         e->next = head;
         head->prev = e;
         head = e;
-        lock.release();
         return;
     }
 
@@ -80,6 +85,4 @@ void TrackStateHandler::applyUpdateEventTick(const UpdateEventTick &m,
     {
         cur->prev = e;
     }
-
-    lock.release();
 }

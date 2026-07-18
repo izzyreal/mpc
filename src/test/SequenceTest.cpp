@@ -8,6 +8,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 #include "sequencer/EventRef.hpp"
+#include "sequencer/SequenceMessage.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::sequencer;
@@ -90,4 +91,45 @@ TEST_CASE("SeqUtil beat and clock are local to each bar", "[sequence]")
     REQUIRE(SeqUtil::getBeat(seq.get(), 384 + 96) == 1);
     REQUIRE(SeqUtil::getBeat(seq.get(), 384 + 192) == 2);
     REQUIRE(SeqUtil::getClock(seq.get(), 384 + 192 + 23) == 23);
+}
+
+TEST_CASE("UpdateSequenceTracks preserves existing events", "[sequence]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    const auto sequencer = mpc.getSequencer();
+    const auto stateManager = sequencer->getStateManager();
+    const auto seq = sequencer->getSelectedSequence();
+    seq->init(0);
+    stateManager->drainQueue();
+
+    auto track = seq->getTrack(0);
+    EventData eventData;
+    eventData.type = EventType::NoteOn;
+    eventData.tick = 12;
+    eventData.noteNumber = mpc::MinDrumNoteNumber;
+    eventData.velocity = mpc::MaxVelocity;
+    eventData.duration = mpc::Duration(24);
+    track->acquireAndInsertEvent(eventData);
+    stateManager->drainQueue();
+
+    auto &trackStates =
+        stateManager->trackStatesSnapshots[seq->getSequenceIndex()];
+    trackStates = SequenceTrackStatesSnapshot();
+    trackStates[0].name = "BulkMeta";
+    trackStates[0].used = true;
+    trackStates[0].busType = BusType::MIDI;
+    trackStates[0].deviceIndex = 3;
+
+    UpdateSequenceTracks update{seq->getSequenceIndex()};
+    update.trackStates = &trackStates;
+    stateManager->enqueue(update);
+    stateManager->drainQueue();
+
+    REQUIRE(track->getEvents().size() == 1);
+    REQUIRE(track->getEvent(0)->getTick() == 12);
+    REQUIRE(track->getName() == "BulkMeta");
+    REQUIRE(track->getBusType() == BusType::MIDI);
+    REQUIRE(track->getDeviceIndex() == 3);
 }
