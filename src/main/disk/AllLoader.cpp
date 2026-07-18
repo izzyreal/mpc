@@ -608,6 +608,11 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc3000AllBytes(
         throw std::runtime_error(loaded.error());
     }
 
+    if (destIndexInMpcMemory == mpc::TempSequenceIndex)
+    {
+        return destination;
+    }
+
     mpc.getSequencer()->copySequence(mpc::TempSequenceIndex, destIndexInMpcMemory);
     mpc.getSequencer()->getStateManager()->drainQueue();
     return destination;
@@ -641,6 +646,11 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc60AllBytes(
     if (!loaded)
     {
         throw std::runtime_error(loaded.error());
+    }
+
+    if (destIndexInMpcMemory == mpc::TempSequenceIndex)
+    {
+        return destination;
     }
 
     mpc.getSequencer()->copySequence(mpc::TempSequenceIndex, destIndexInMpcMemory);
@@ -1021,6 +1031,7 @@ AllLoader::loadOneSequenceFromCanonicalBytes(
         sequence,
         mpc.getSequencer()->getStateManager().get()
     );
+    mpc.getSequencer()->getStateManager()->drainQueue();
 
     return sequence;
 }
