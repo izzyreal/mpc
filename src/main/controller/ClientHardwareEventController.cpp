@@ -172,6 +172,23 @@ void ClientHardwareEventController::updateMostRecentPhysicalPadPressVelocity(
     mostRecentPhysicalPadPressTimeMs.store(utils::nowInMilliseconds());
 }
 
+bool ClientHardwareEventController::
+    isPadNoteGenerationSuppressedForCurrentScreen() const
+{
+    const auto layeredScreen = mpc.getLayeredScreen();
+    return layeredScreen->isCurrentScreenOrChildOf(ScreenId::TrimScreen) ||
+           layeredScreen->isCurrentScreenOrChildOf(ScreenId::LoopScreen) ||
+           layeredScreen->isCurrentScreenOrChildOf(ScreenId::ZoneScreen) ||
+           layeredScreen->isCurrentScreenOrChildOf(ScreenId::SndParamsScreen);
+}
+
+bool ClientHardwareEventController::
+    isPadNoteGenerationSuppressedForCurrentSequence() const
+{
+    const auto selectedSequence = mpc.getSequencer()->getSelectedSequence();
+    return !selectedSequence || !selectedSequence->isUsed();
+}
+
 void ClientHardwareEventController::handlePadPress(
     const ClientHardwareEvent &event)
 {
@@ -309,7 +326,11 @@ void ClientHardwareEventController::handlePadPress(
 
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, note).execute();
 
-    if (note != NoDrumNoteAssigned)
+    const bool isPadNoteGenerationSuppressed =
+        isPadNoteGenerationSuppressedForCurrentScreen() ||
+        isPadNoteGenerationSuppressedForCurrentSequence();
+
+    if (note != NoDrumNoteAssigned && !isPadNoteGenerationSuppressed)
     {
         registryNoteOnEvent =
             mpc.getPerformanceManager().lock()->registerNoteOn(
@@ -331,7 +352,8 @@ void ClientHardwareEventController::handlePadPress(
         mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             sampler::PLAYX_SOUND, 127, 0);
     }
-    else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
+    else if (!isPadNoteGenerationSuppressed &&
+             !screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
         const auto transport = mpc.getSequencer()
                                    ->getStateManager()
@@ -437,11 +459,15 @@ void ClientHardwareEventController::handlePadRelease(
         transport.isRecordingOrOverdubbing() &&
         mpc.clientEventController->isEraseButtonPressed();
 
+    const bool isPadNoteGenerationSuppressed =
+        isPadNoteGenerationSuppressedForCurrentScreen();
+
     auto performanceManager = mpc.getPerformanceManager().lock().get();
 
     utils::SimpleAction action(
         [this, metronomeOnlyPositionTicks, positionTicks, isNoteRepeatMode,
-         isLiveEraseMode, physicalPadIndex, performanceManager]
+         isLiveEraseMode, physicalPadIndex, performanceManager,
+         isPadNoteGenerationSuppressed]
         {
             const std::optional<PhysicalPadPressEvent> physicalPadPressEvent =
                 performanceManager->getSnapshot().findPhysicalPadPress(
@@ -475,7 +501,8 @@ void ClientHardwareEventController::handlePadRelease(
             const auto programPadIndex =
                 program->getPadIndexFromNote(p.drumNoteNumber);
 
-            if (!screengroups::isPadDoesNotTriggerNoteEventScreen(p.screenId))
+            if (!isPadNoteGenerationSuppressed &&
+                !screengroups::isPadDoesNotTriggerNoteEventScreen(p.screenId))
             {
                 const auto programPadPressEvent =
                     performanceManager->getSnapshot().findProgramPadPress(
@@ -486,7 +513,19 @@ void ClientHardwareEventController::handlePadRelease(
                     programPadPressEvent.has_value() &&
                     programPadPressEvent->quantizedLockActivated;
 
+                std::optional<NoteOnEvent> registeredNoteOnEvent;
+
                 if (p.drumNoteNumber != NoDrumNoteAssigned)
+                {
+                    registeredNoteOnEvent =
+                        performanceManager->getSnapshot().findNoteOnEvent(
+                            PerformanceEventSource::VirtualMpcHardware,
+                            p.drumNoteNumber, NoMidiChannel);
+                }
+
+                if (registeredNoteOnEvent &&
+                    registeredNoteOnEvent->physicalPadIndex ==
+                        PhysicalPadIndex(physicalPadIndex))
                 {
                     const auto selectedSequence =
                         sequencer->getSelectedSequence();
@@ -581,6 +620,9 @@ void ClientHardwareEventController::handlePadAftertouch(
             PhysicalPadIndex(padIndex));
 
     std::optional<utils::SimpleAction> action = std::nullopt;
+    const bool isPadNoteGenerationSuppressed =
+        isPadNoteGenerationSuppressedForCurrentScreen() ||
+        isPadNoteGenerationSuppressedForCurrentSequence();
 
     if (padPressEvent)
     {
@@ -592,7 +634,8 @@ void ClientHardwareEventController::handlePadAftertouch(
 
         action = utils::SimpleAction(
             [performanceManager = mpc.getPerformanceManager(), pressureToUse,
-             padPress = *padPressEvent, programPadIndex]
+             padPress = *padPressEvent, programPadIndex,
+             isPadNoteGenerationSuppressed]
             {
                 assert(padPress.programIndex != NoProgramIndex);
 
@@ -600,9 +643,30 @@ void ClientHardwareEventController::handlePadAftertouch(
                     PerformanceEventSource::VirtualMpcHardware, programPadIndex,
                     padPress.programIndex, Pressure(pressureToUse));
 
-                if (padPress.drumNoteNumber != NoDrumNoteAssigned)
+                if (padPress.drumNoteNumber != NoDrumNoteAssigned &&
+                    !isPadNoteGenerationSuppressed &&
+                    !screengroups::isPadDoesNotTriggerNoteEventScreen(
+                        padPress.screenId))
                 {
-                    performanceManager.lock()->registerNoteAftertouch(
+                    const auto lockedPerformanceManager =
+                        performanceManager.lock();
+                    const auto registeredNoteOnEvent =
+                        lockedPerformanceManager->getSnapshot().findNoteOnEvent(
+                            PerformanceEventSource::VirtualMpcHardware,
+                            padPress.drumNoteNumber, NoMidiChannel);
+
+                    if (!registeredNoteOnEvent)
+                    {
+                        return;
+                    }
+
+                    if (registeredNoteOnEvent->physicalPadIndex !=
+                        padPress.padIndex)
+                    {
+                        return;
+                    }
+
+                    lockedPerformanceManager->registerNoteAftertouch(
                         PerformanceEventSource::VirtualMpcHardware,
                         padPress.drumNoteNumber, Pressure(pressureToUse),
                         std::nullopt);
