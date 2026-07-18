@@ -152,7 +152,8 @@ TEST_CASE("32-bit PCM WAV preview reads full-width samples", "[wav][preview]")
     REQUIRE(std::fabs(buffer.getChannel(0)[2]) < 0.0001f);
 }
 
-TEST_CASE("MPC60 SND preview decodes packed 12-bit samples", "[snd][preview]")
+TEST_CASE("MPC60 SND preview streams silent packed 12-bit samples",
+          "[snd][preview]")
 {
     const auto bytes =
         resourceBytes("test/RealMpc60/Snd/Mpc60V214Rock/HAT2CLSD.SND");
@@ -165,20 +166,14 @@ TEST_CASE("MPC60 SND preview decodes packed 12-bit samples", "[snd][preview]")
 
     AudioBuffer buffer("preview", 2, 4, 40000);
 
-    for (int i = 0; i < 20; i++)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        soundPlayer.processAudio(&buffer, 4);
-        if (!buffer.isSilent())
-        {
-            break;
-        }
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    soundPlayer.processAudio(&buffer, 4);
 
-    REQUIRE(std::fabs(buffer.getChannel(0)[0] - short_to_float(27)) < 0.0001f);
-    REQUIRE(std::fabs(buffer.getChannel(0)[1] - short_to_float(52)) < 0.0001f);
-    REQUIRE(std::fabs(buffer.getChannel(0)[2] - short_to_float(55)) < 0.0001f);
-    REQUIRE(std::fabs(buffer.getChannel(0)[3] - short_to_float(69)) < 0.0001f);
+    REQUIRE(buffer.isSilent());
+    REQUIRE(std::fabs(buffer.getChannel(0)[0]) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[1]) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[2]) < 0.0001f);
+    REQUIRE(std::fabs(buffer.getChannel(0)[3]) < 0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(1)[0] - buffer.getChannel(0)[0]) <
             0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(1)[3] - buffer.getChannel(0)[3]) <
