@@ -238,10 +238,10 @@ TEST_CASE("MPC3000 ALL <SEQ> PLAY previews the chosen embedded sequence from tem
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
     sequencer->getTransport()->setCountEnabled(false);
-    sequencer->getSequence(5)->init(0);
     stateManager->drainQueue();
     sequencer->setSelectedSequenceIndex(SequenceIndex(5), true);
     stateManager->drainQueue();
+    REQUIRE_FALSE(sequencer->getSelectedSequence()->isUsed());
 
     openAllWindowFor(mpc, kMpc3000AllFileName);
 
@@ -370,10 +370,10 @@ TEST_CASE("MPC60 v2 ALL <SEQ> PLAY previews the chosen embedded sequence from te
     auto sequencer = mpc.getSequencer();
     auto stateManager = sequencer->getStateManager();
     sequencer->getTransport()->setCountEnabled(false);
-    sequencer->getSequence(5)->init(0);
     stateManager->drainQueue();
     sequencer->setSelectedSequenceIndex(SequenceIndex(5), true);
     stateManager->drainQueue();
+    REQUIRE_FALSE(sequencer->getSelectedSequence()->isUsed());
 
     openAllWindowFor(mpc, kMpc60AllFileName);
 
