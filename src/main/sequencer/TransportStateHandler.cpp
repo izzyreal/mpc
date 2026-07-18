@@ -315,6 +315,6 @@ void TransportStateHandler::applyStopSong(TransportState &state) const noexcept
 
     if (state.endOfSong)
     {
-        sequencer->setSelectedSongStepIndex(MaxSongStepIndex);
+        sequencer->setSelectedSongStepIndex(EndOfFullSongStepIndex);
     }
 }

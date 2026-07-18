@@ -121,8 +121,12 @@ namespace mpc
     using SongStepIndex =
         ConstrainedInt<uint8_t, 0, Mpc2000XlSpecs::MAX_SONG_STEP_COUNT>;
     constexpr SongStepIndex MinSongStepIndex{0};
-    constexpr SongStepIndex MaxSongStepIndex{
+    constexpr SongStepIndex LastSongStepIndex{
+        Mpc2000XlSpecs::MAX_SONG_STEP_COUNT - 1};
+    constexpr SongStepIndex EndOfFullSongStepIndex{
         Mpc2000XlSpecs::MAX_SONG_STEP_COUNT};
+    constexpr SongStepIndex MaxSongStepIndex{
+        EndOfFullSongStepIndex};
 
     /////////
 
