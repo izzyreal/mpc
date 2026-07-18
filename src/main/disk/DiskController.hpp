@@ -29,6 +29,7 @@ namespace mpc::disk
         std::shared_ptr<AbstractDisk> getActiveDisk();
         int getActiveDiskIndex() const;
         void setActiveDiskIndex(int newActiveDiskIndex);
+        bool ensureActiveDiskIsEnabled();
 
         void detectRawUsbVolumes();
     };

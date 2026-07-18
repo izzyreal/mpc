@@ -218,7 +218,33 @@ std::string RawDisk::getAbsolutePath()
 
 void RawDisk::close()
 {
-    volume.close();
+    const bool shouldUnmount = root != nullptr;
+
+    if (volume.volumeStream.is_open())
+    {
+        volume.close();
+        volume.volumeFs = nullptr;
+        volume.volumeDevice = {};
+    }
+
+    if (shouldUnmount)
+    {
+        try
+        {
+            VolumeMounter::unmount(volume.volumePath);
+        }
+        catch (const std::exception &)
+        {
+            MLOG("Failed to unmount " + volume.volumePath +
+                 " from VMPC2000XL and mount it back to the host OS!");
+        }
+    }
+
+    root = {};
+    path.clear();
+    files.clear();
+    allFiles.clear();
+    parentFiles.clear();
 }
 
 void RawDisk::flush()
