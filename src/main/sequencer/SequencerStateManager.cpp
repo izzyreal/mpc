@@ -98,6 +98,27 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                     SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
+        [&](const PreviewSequenceFromStart &m)
+        {
+            transportStateHandler->applyStopSequence(activeState.transport);
+            sequencer->flushMidiNoteOffs();
+
+            activeState.selectedSequenceIndex = m.sequenceIndex;
+            activeState.transport.positionQuarterNotes = 0;
+            sequenceStateHandler->applyMessage(
+                activeState, actions, SyncTrackEventIndices{m.sequenceIndex});
+
+            if (!activeState.sequences[m.sequenceIndex].used)
+            {
+                return;
+            }
+
+            transportStateHandler->installCountIn(
+                activeState.transport, true,
+                SequenceStateView(activeState.sequences[m.sequenceIndex]));
+            transportStateHandler->applyPlaySequence(activeState.transport,
+                                                     m.sequenceIndex);
+        },
         [&](const SetSelectedSongIndex &m)
         {
             activeState.selectedSongIndex = m.songIndex;

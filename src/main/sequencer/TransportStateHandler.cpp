@@ -2,6 +2,7 @@
 
 #include "Clock.hpp"
 #include "Sequence.hpp"
+#include "SequenceStateView.hpp"
 #include "Sequencer.hpp"
 #include "SequencerStateManager.hpp"
 #include "lcdgui/ScreenId.hpp"
@@ -25,6 +26,14 @@ TransportStateHandler::~TransportStateHandler() {}
 void TransportStateHandler::installCountIn(TransportState &state,
                                            const bool fromStart) const
 {
+    installCountIn(state, fromStart,
+                   manager->getSnapshot().getSelectedSequenceStateView());
+}
+
+void TransportStateHandler::installCountIn(TransportState &state,
+                                           const bool fromStart,
+                                           const SequenceStateView &activeSequence) const
+{
     if (!state.countEnabled)
     {
         return;
@@ -43,26 +52,45 @@ void TransportStateHandler::installCountIn(TransportState &state,
         return;
     }
 
-    const auto activeSequence = sequencer->getSelectedSequence();
-
     if (fromStart)
     {
         state.countInStartPos = state.positionQuarterNotes;
-        state.countInEndPos = activeSequence->getLastTickOfBar(0);
+        state.countInEndPos =
+            activeSequence.getFirstTickOfBar(BarIndex(0)) +
+            activeSequence.getBarLength(0) - 1;
         state.countingIn = true;
         return;
     }
 
     const auto currentBarIndex =
-        activeSequence->getBarIndexForPositionQN(state.positionQuarterNotes);
+        [&activeSequence, &state]
+        {
+            const auto posTicks =
+                Sequencer::quarterNotesToTicks(state.positionQuarterNotes);
+            Tick tickCounter = 0;
+
+            for (int i = 0; i < activeSequence.getBarCount(); i++)
+            {
+                tickCounter += activeSequence.getBarLength(i);
+
+                if (tickCounter > posTicks)
+                {
+                    return BarIndex(i);
+                }
+            }
+
+            return BarIndex(0);
+        }();
 
     const Tick posToStartPlayingFrom =
-        activeSequence->getFirstTickOfBar(currentBarIndex);
+        activeSequence.getFirstTickOfBar(currentBarIndex);
 
     state.positionQuarterNotes =
         Sequencer::ticksToQuarterNotes(posToStartPlayingFrom);
     state.countInStartPos = posToStartPlayingFrom;
-    state.countInEndPos = activeSequence->getLastTickOfBar(currentBarIndex);
+    state.countInEndPos =
+        activeSequence.getFirstTickOfBar(currentBarIndex) +
+        activeSequence.getBarLength(currentBarIndex) - 1;
     state.countingIn = true;
 }
 
@@ -205,6 +233,13 @@ void TransportStateHandler::applyMessage(TransportState &state,
 void TransportStateHandler::applyPlaySequence(
     TransportState &state) const noexcept
 {
+    applyPlaySequence(
+        state, manager->getSnapshot().getSelectedSequenceIndex());
+}
+
+void TransportStateHandler::applyPlaySequence(
+    TransportState &state, const SequenceIndex sequenceIndex) const noexcept
+{
     state.positionTicksToReturnToWhenReleasingRec = NoTick;
 
     const TransportStateView transport(state);
@@ -217,8 +252,7 @@ void TransportStateHandler::applyPlaySequence(
     sequencer->clock->reset();
 
     state.playStartPositionQuarterNotes = state.positionQuarterNotes;
-    manager->applyMessage(SyncTrackEventIndices{
-        manager->getSnapshot().getSelectedSequenceIndex()});
+    manager->applyMessage(SyncTrackEventIndices{sequenceIndex});
 
     if (sequencer->getScreens()->get<lcdgui::ScreenId::SyncScreen>()->modeOut !=
         0)

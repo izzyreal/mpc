@@ -115,7 +115,6 @@ void LoadASequenceScreen::startTempPreview()
 {
     auto lockedSequencer = sequencer.lock();
     auto stateManager = lockedSequencer->getStateManager();
-    auto transport = lockedSequencer->getTransport();
 
     if (!previewingTempSequence)
     {
@@ -123,15 +122,8 @@ void LoadASequenceScreen::startTempPreview()
             lockedSequencer->getSelectedSequenceIndex();
     }
 
-    if (transport->isPlaying())
-    {
-        transport->stop();
-    }
-
     stateManager->enqueue(
-        mpc::sequencer::SetSelectedSequenceIndex{TempSequenceIndex, true});
-    stateManager->drainQueue();
-    transport->play(true);
+        mpc::sequencer::PreviewSequenceFromStart{TempSequenceIndex});
     previewingTempSequence = true;
     openScreenById(ScreenId::LoadASequencePlayScreen);
 }

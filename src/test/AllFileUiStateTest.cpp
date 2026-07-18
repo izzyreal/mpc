@@ -4,6 +4,7 @@
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "engine/EngineHost.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceFromAllScreen.hpp"
 #include "lcdgui/screens/window/Mpc2000XlAllFileScreen.hpp"
@@ -247,7 +248,7 @@ TEST_CASE("MPC3000 ALL <SEQ> PLAY previews the chosen embedded sequence from tem
         mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
     seqFromAllScreen->turnWheel(1);
     seqFromAllScreen->function(2);
-    stateManager->drainQueue();
+    mpc.getEngineHost()->prepareProcessBlock(512);
 
     REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-play");
     REQUIRE(sequencer->getSelectedSequenceIndex() == TempSequenceIndex);
