@@ -121,8 +121,8 @@ bool loadIntoProgram(
     mpc::performance::Program &perfProgram)
 {
     auto sampler = mpc.getSampler();
-    const auto existingSoundCount = sampler->getSoundCount();
     std::vector<int> soundIndexByEntry(preview.soundDirectoryEntries.size(), -1);
+    std::vector<std::pair<std::string, int>> loadedSoundIndexByName;
 
     for (size_t entryIndex = 0; entryIndex < preview.soundDirectoryEntries.size();
          ++entryIndex)
@@ -130,6 +130,21 @@ bool loadIntoProgram(
         const auto soundName = preview.soundDirectoryEntries[entryIndex].name;
         if (preview.soundDirectoryEntries[entryIndex].lengthInSamples == 0)
         {
+            continue;
+        }
+
+        const auto duplicateSoundIt =
+            std::find_if(loadedSoundIndexByName.begin(),
+                         loadedSoundIndexByName.end(),
+                         [&soundName](const auto &loaded)
+                         {
+                             return mpc::StrUtil::eqIgnoreCase(
+                                 loaded.first, soundName);
+                         });
+
+        if (duplicateSoundIt != loadedSoundIndexByName.end())
+        {
+            soundIndexByEntry[entryIndex] = duplicateSoundIt->second;
             continue;
         }
 
@@ -160,8 +175,9 @@ bool loadIntoProgram(
             return false;
         }
 
-        soundIndexByEntry[entryIndex] =
-            existingSoundCount + static_cast<int>(entryIndex);
+        const auto soundIndex = sampler->getSoundCount() - 1;
+        soundIndexByEntry[entryIndex] = soundIndex;
+        loadedSoundIndexByName.emplace_back(soundName, soundIndex);
     }
 
     program->setName(file->getNameWithoutExtension());
