@@ -17,6 +17,7 @@ namespace mpc::file::kaitai
         std::string name;
         uint8_t sharedSoundLink = 0;
         uint32_t lengthInSamples = 0;
+        uint32_t startAddressInMemory = 0;
         uint32_t startAddressForPlaying = 0;
         uint16_t soundDuration = 0;
         uint8_t requestedStereoMixVolume = 0;
@@ -33,6 +34,7 @@ namespace mpc::file::kaitai
         std::vector<uint8_t> masterStereoPan;
         std::vector<Mpc60SetPreviewEntry> soundDirectoryEntries;
         std::vector<uint8_t> soundDirectoryEntryIndexByMpc60Pad;
+        std::shared_ptr<const std::vector<uint16_t>> soundSampleWords;
 
         const Mpc60SetPreviewEntry *assignedSoundAtMpc60Pad(size_t padIndex) const;
 

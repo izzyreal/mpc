@@ -67,7 +67,8 @@ void SoundSaver::saveSounds() const
             disk->writeSnd(s, "");
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(
+            mpc.getFileOperationTimings().progressDisplay);
     }
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::SaveScreen);

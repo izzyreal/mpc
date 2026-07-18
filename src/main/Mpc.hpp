@@ -9,6 +9,7 @@
 #include "AutoSave.hpp"
 #include "Paths.hpp"
 
+#include <chrono>
 #include <vector>
 #include <string>
 #include <memory>
@@ -71,12 +72,30 @@ namespace mpc::sampler
 
 namespace mpc
 {
+    struct FileOperationTimings
+    {
+        std::chrono::milliseconds progressDisplay{50};
+        std::chrono::milliseconds singleSoundLoadTransition{300};
+        std::chrono::milliseconds saveTransition{700};
+        std::chrono::milliseconds shortOperationFeedback{400};
+        std::chrono::milliseconds ioErrorFeedback{1000};
+        std::chrono::milliseconds busyDeviceFeedback{2000};
+        std::chrono::milliseconds programMissingSoundPoll{25};
+        std::chrono::milliseconds apsMissingSoundPoll{50};
+
+        static FileOperationTimings uniform(std::chrono::milliseconds value)
+        {
+            return {value, value, value, value, value, value, value, value};
+        }
+    };
+
     struct MpcInitOptions
     {
         bool startMidiDeviceDetector = true;
         bool startAudioServer = true;
         bool detectRawUsbVolumes = true;
         bool installDemoFiles = true;
+        FileOperationTimings fileOperationTimings;
     };
 
     class Mpc
@@ -94,6 +113,7 @@ namespace mpc
         std::shared_ptr<performance::PerformanceManager> performanceManager;
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::unique_ptr<AutoSave> autoSave;
+        FileOperationTimings fileOperationTimings;
 
     public:
         std::shared_ptr<lcdgui::Screens> screens;
@@ -108,6 +128,7 @@ namespace mpc
         void panic() const;
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled() const;
+        const FileOperationTimings &getFileOperationTimings() const;
 
         std::weak_ptr<performance::PerformanceManager> getPerformanceManager();
 

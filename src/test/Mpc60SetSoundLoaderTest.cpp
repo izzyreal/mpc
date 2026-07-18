@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "SampleOps.hpp"
+#include "file/kaitai/Mpc60SetPreview.hpp"
 #include "file/kaitai/Mpc60SetSoundLoader.hpp"
 #include "sampler/Sound.hpp"
 
@@ -124,4 +125,43 @@ TEST_CASE("MPC60 SET single-sound loader decodes a selected directory entry",
     REQUIRE(sound->getEnd() == 23999);
     requireMatchesMpc2000xlSnd(
         *sound, "test/RealMpc60/SetImportedSnd/Rock/BIG_CLAP.SND");
+}
+
+TEST_CASE("MPC60 SET preview supports multiple sound loads without reparsing",
+          "[kaitai-set][real-mpc60]")
+{
+    const auto preview = mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
+        readResource("test/RealMpc60/SetV0/ROCK.SET"));
+    const auto previewCopy = preview;
+    REQUIRE(previewCopy.soundSampleWords == preview.soundSampleWords);
+
+    auto closedHat = std::make_shared<mpc::sampler::Sound>(44100);
+    auto clap = std::make_shared<mpc::sampler::Sound>(44100);
+    REQUIRE(mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
+                preview, 19, closedHat)
+                .has_value());
+    REQUIRE(mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
+                preview, 17, clap)
+                .has_value());
+    REQUIRE(closedHat->getName() == "HAT2CLSD");
+    REQUIRE(closedHat->getFrameCount() == 16000U);
+    REQUIRE(clap->getName() == "BIG_CLAP");
+    REQUIRE(clap->getFrameCount() == 24000U);
+}
+
+TEST_CASE("MPC60 SET preview loader rejects an invalid sound sample range",
+          "[kaitai-set]")
+{
+    auto preview = mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(
+        readResource("test/RealMpc60/SetV0/ROCK.SET"));
+    preview.soundDirectoryEntries[0].startAddressInMemory =
+        preview.totalNumberOfSampleWords;
+    preview.soundDirectoryEntries[0].lengthInSamples = 1;
+
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    const auto result =
+        mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
+            preview, 0, sound);
+    REQUIRE_FALSE(result.has_value());
+    REQUIRE(result.error() == "SET sound sample range out of bounds");
 }

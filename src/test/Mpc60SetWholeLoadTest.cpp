@@ -62,15 +62,17 @@ namespace
     void waitForLoadScreen(mpc::Mpc &mpc)
     {
         constexpr auto timeout = std::chrono::seconds(5);
-        const auto start = std::chrono::steady_clock::now();
+        const auto deadline = std::chrono::steady_clock::now() + timeout;
 
-        while (mpc.getLayeredScreen()->getCurrentScreenName() != "load")
+        while (mpc.getLayeredScreen()->getCurrentScreenName() != "load" &&
+               std::chrono::steady_clock::now() < deadline)
         {
-            REQUIRE(std::chrono::steady_clock::now() - start < timeout);
             mpc.getEngineHost()->prepareProcessBlock(512);
             mpc.getLayeredScreen()->timerCallback();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+
+        REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     }
 
     void requireSelectedDrumProgramIsUsed(mpc::Mpc &mpc,

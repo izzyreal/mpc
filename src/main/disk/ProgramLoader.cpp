@@ -216,7 +216,7 @@ void ProgramLoader::showLoadingSoundNamePopup(Mpc &mpc, const std::string &name,
         {
             ls->showPopup(msg);
         }));
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(mpc.getFileOperationTimings().progressDisplay);
 }
 
 void ProgramLoader::notFound(Mpc &mpc, const std::string &soundFileName)
@@ -234,7 +234,8 @@ void ProgramLoader::notFound(Mpc &mpc, const std::string &soundFileName)
 
         while (cantFindFileScreen->waitingForUser)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            std::this_thread::sleep_for(
+                mpc.getFileOperationTimings().programMissingSoundPoll);
         }
     }
 }

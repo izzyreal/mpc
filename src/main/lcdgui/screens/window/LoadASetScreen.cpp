@@ -38,11 +38,13 @@ void LoadASetScreen::open()
     catch (const std::exception &)
     {
         const auto layeredScreen = ls.lock();
+        const auto delayMs = static_cast<int>(
+            mpc.getFileOperationTimings().ioErrorFeedback.count());
         layeredScreen->postToUiThread(utils::Task(
-            [layeredScreen]
+            [layeredScreen, delayMs]
             {
                 layeredScreen->showPopupAndThenOpen(ScreenId::LoadScreen,
-                                                    "Can't read SET", 1000);
+                                                    "Can't read SET", delayMs);
             }));
     }
 }

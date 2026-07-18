@@ -117,8 +117,10 @@ void SaveScreen::function(const int i)
 
                 if (candidateVolume.mode == disk::MountMode::DISABLED)
                 {
-                    ls.lock()->showPopupForMs("Device is disabled in DISKS",
-                                              1000);
+                    ls.lock()->showPopupForMs(
+                        "Device is disabled in DISKS",
+                        static_cast<int>(mpc.getFileOperationTimings()
+                                             .ioErrorFeedback.count()));
                     return;
                 }
 
@@ -136,8 +138,10 @@ void SaveScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls.lock()->showPopupForMs("Error! Device seems in use",
-                                                  2000);
+                        ls.lock()->showPopupForMs(
+                            "Error! Device seems in use",
+                            static_cast<int>(mpc.getFileOperationTimings()
+                                                 .busyDeviceFeedback.count()));
                         return;
                     }
                 }

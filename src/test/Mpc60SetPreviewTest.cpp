@@ -37,6 +37,18 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
     REQUIRE(studioPreview.totalNumberOfSampleWords == 519560U);
     REQUIRE(uk8Preview.totalNumberOfSampleWords == 517520U);
     REQUIRE(studioV1Preview.totalNumberOfSampleWords == 519560U);
+    REQUIRE(rockPreview.soundSampleWords != nullptr);
+    REQUIRE(studioPreview.soundSampleWords != nullptr);
+    REQUIRE(uk8Preview.soundSampleWords != nullptr);
+    REQUIRE(studioV1Preview.soundSampleWords != nullptr);
+    REQUIRE(rockPreview.soundSampleWords->size() ==
+            rockPreview.totalNumberOfSampleWords);
+    REQUIRE(studioPreview.soundSampleWords->size() ==
+            studioPreview.totalNumberOfSampleWords);
+    REQUIRE(uk8Preview.soundSampleWords->size() ==
+            uk8Preview.totalNumberOfSampleWords);
+    REQUIRE(studioV1Preview.soundSampleWords->size() ==
+            studioV1Preview.totalNumberOfSampleWords);
 
     REQUIRE(rockPreview.useMasterMixData);
     REQUIRE(studioPreview.useMasterMixData);
@@ -76,6 +88,8 @@ TEST_CASE("MPC60 SET preview maps MPC60 pads to directory entries",
     REQUIRE(rockPreview.assignedSoundAtMpc60Pad(1)->name == "HAT2MED");
     REQUIRE(rockPreview.assignedSoundAtMpc60Pad(2)->name == "HAT2OPN");
     REQUIRE(rockPreview.assignedSoundAtMpc60Pad(10)->name == "RIDE4B");
+    REQUIRE(rockPreview.assignedSoundAtMpc60Pad(0)->startAddressInMemory ==
+            172000U);
 
     REQUIRE(studioPreview.assignedSoundAtMpc60Pad(0)->name == "HAT1CLSD");
     REQUIRE(studioPreview.assignedSoundAtMpc60Pad(1)->name == "HAT1MED");

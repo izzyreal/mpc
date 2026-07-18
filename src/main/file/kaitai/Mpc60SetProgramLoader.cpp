@@ -142,7 +142,8 @@ bool loadIntoProgram(
             {
                 ls->showPopup(msg);
             }));
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(
+            mpc.getFileOperationTimings().progressDisplay);
 
         auto sound = sampler->addSound(44100);
         if (sound == nullptr)
@@ -150,8 +151,8 @@ bool loadIntoProgram(
             return false;
         }
 
-        const auto result =
-            Mpc60SetSoundLoader::loadSoundDirectoryEntry(file, entryIndex, sound);
+        const auto result = Mpc60SetSoundLoader::loadSoundDirectoryEntry(
+            preview, entryIndex, sound);
 
         if (!result.has_value())
         {

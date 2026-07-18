@@ -232,7 +232,10 @@ void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
         flush();
         initFiles();
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-            "Saving " + fileName, 400, 0);
+            "Saving " + fileName,
+            static_cast<int>(
+                mpc.getFileOperationTimings().shortOperationFeedback.count()),
+            0);
         return f;
     };
 
@@ -352,21 +355,27 @@ void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
                     [this, isWav = saveAProgramScreen->save == 2, sounds]
                     {
                         std::this_thread::sleep_for(
-                            std::chrono::milliseconds(700));
+                            mpc.getFileOperationTimings().saveTransition);
                         soundSaver =
                             std::make_unique<SoundSaver>(mpc, sounds, isWav);
                     });
             }
             else
             {
-                mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg,
-                                                                      700, 0);
+                mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
+                    popupMsg,
+                    static_cast<int>(
+                        mpc.getFileOperationTimings().saveTransition.count()),
+                    0);
             }
         }
         else
         {
-            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg, 700,
-                                                                  0);
+            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
+                popupMsg,
+                static_cast<int>(
+                    mpc.getFileOperationTimings().saveTransition.count()),
+                0);
         }
 
         flush();
@@ -400,7 +409,8 @@ void AbstractDisk::writeAps(const std::string &fileName)
             programSoundsSaveThread = std::thread(
                 [this, saveAProgramScreen]
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(700));
+                    std::this_thread::sleep_for(
+                        mpc.getFileOperationTimings().saveTransition);
                     soundSaver = std::make_unique<SoundSaver>(
                         mpc, mpc.getSampler()->getSounds(),
                         saveAProgramScreen->save == 2);
@@ -409,8 +419,11 @@ void AbstractDisk::writeAps(const std::string &fileName)
         else
         {
             const std::string popupMsg = "Saving " + fileName;
-            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg, 700,
-                                                                  0);
+            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
+                popupMsg,
+                static_cast<int>(
+                    mpc.getFileOperationTimings().saveTransition.count()),
+                0);
         }
 
         flush();
@@ -434,7 +447,10 @@ void AbstractDisk::writeAll(const std::string &fileName)
         initFiles();
 
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-            "         Saving ...", 400, 0);
+            "         Saving ...",
+            static_cast<int>(
+                mpc.getFileOperationTimings().shortOperationFeedback.count()),
+            0);
         return f;
     };
 
@@ -686,10 +702,12 @@ AbstractDisk::performIoOrOpenErrorPopup(
     auto showPopup = [this](const std::string &msg)
     {
         auto ls = mpc.getLayeredScreen();
+        const auto delayMs = static_cast<int>(
+            mpc.getFileOperationTimings().ioErrorFeedback.count());
         ls->postToUiThread(utils::Task(
-            [ls, msg]
+            [ls, msg, delayMs]
             {
-                ls->showPopupAndThenReturnToLayer(msg, 1000, 0);
+                ls->showPopupAndThenReturnToLayer(msg, delayMs, 0);
             }));
     };
 
