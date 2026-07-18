@@ -1,7 +1,6 @@
 #include "SaveScreen.hpp"
 
 #include "Mpc.hpp"
-#include "Logger.hpp"
 #include "StrUtil.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -373,7 +372,16 @@ void SaveScreen::displayFile() const
         default:;
     }
 
-    findField("file")->setText(fileName);
+    const auto fileField = findField("file");
+    // This avoids a redundant redraw that can disturb the focused Type: field.
+    // If TextComp::setText ever returns early when the text is unchanged
+    // instead of always marking the component dirty, this guard can be removed.
+    if (fileField->getText() == fileName)
+    {
+        return;
+    }
+
+    fileField->setText(fileName);
 }
 
 void SaveScreen::displaySize() const
