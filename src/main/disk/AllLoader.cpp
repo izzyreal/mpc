@@ -9,10 +9,10 @@
 #include "controller/MidiFootswitchFunctionMap.hpp"
 #include "file/kaitai/AllIo.hpp"
 #include "file/kaitai/KaitaiIoUtil.hpp"
-#include "file/kaitai/Mpc3000SeqIo.hpp"
 #include "file/kaitai/generated/mpc2000xl_all.h"
 #include "file/kaitai/generated/mpc60_all_v2.h"
 #include "file/kaitai/generated/mpc3000_all_v3.h"
+#include "file/kaitai/generated/mpc3000_seq_v3.h"
 
 #include "disk/MpcFile.hpp"
 
@@ -20,6 +20,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Transport.hpp"
 #include "sequencer/Song.hpp"
+#include "sequencer/TrackState.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -41,11 +42,37 @@
 
 #include <kaitai/kaitaistream.h>
 #include <algorithm>
+#include <cmath>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string_view>
 
 namespace {
+using legacy_event_t = mpc3000_seq_v3_t::event_t;
+using legacy_track_header_t = mpc3000_seq_v3_t::track_header_t;
+using legacy_tempo_change_t = mpc3000_seq_v3_t::tempo_change_t;
+
+struct LegacyParsedSequenceView
+{
+    std::string sequenceName;
+    int barCount;
+    double headerTempo;
+    bool loopEnabled;
+    int loopToBarNumber;
+    int numberOfTrackHeaders;
+    int numberOfTempoChanges;
+    std::optional<size_t> eventsStartOffset;
+    const std::vector<std::unique_ptr<legacy_track_header_t>> *trackHeaders;
+    const std::vector<std::unique_ptr<legacy_tempo_change_t>> *tempoChanges;
+    const std::vector<std::unique_ptr<legacy_event_t>> *parsedEvents;
+};
+
+struct LegacyTempoChangeData
+{
+    int tick;
+    double tempo;
+};
 
 enum class all_variant_t
 {
@@ -58,6 +85,8 @@ enum class all_variant_t
 constexpr size_t kLegacyAllHeaderSize = 6;
 constexpr size_t kLegacyAllEmbeddedPreludeSize =
     37 + 5 + (64 * 4) + 2 + 15 + 3 + 16 + 1 + 1 + 1;
+constexpr size_t kLegacyStandalonePreludeSize =
+    2 + kLegacyAllEmbeddedPreludeSize;
 constexpr size_t kMpc3000TrackHeaderSize = 24;
 constexpr size_t kMpc3000TempoChangeSize = 6;
 
@@ -95,6 +124,692 @@ std::string bytesUntilNull(const std::string& value)
 {
     const auto pos = value.find('\0');
     return pos == std::string::npos ? value : value.substr(0, pos);
+}
+
+uint16_t readU2Le(const std::vector<char> &bytes, const size_t pos)
+{
+    return static_cast<uint16_t>(
+        static_cast<unsigned char>(bytes.at(pos)) |
+        (static_cast<unsigned char>(bytes.at(pos + 1)) << 8));
+}
+
+std::vector<uint8_t> payloadWithoutLookahead(
+    const std::vector<char> &bytes,
+    size_t &pos)
+{
+    std::vector<uint8_t> payload;
+
+    while (pos < bytes.size())
+    {
+        const auto byte = static_cast<uint8_t>(bytes[pos++]);
+        if (byte > 0x7F)
+        {
+            if (!payload.empty())
+            {
+                --pos;
+                break;
+            }
+
+            payload.push_back(byte);
+            break;
+        }
+
+        payload.push_back(byte);
+    }
+
+    return payload;
+}
+
+bool isLegacyMixerSysex(const std::vector<uint8_t> &payload)
+{
+    return payload.size() >= 7 && payload[0] == 71 && payload[1] == 0 &&
+           payload[2] == 68 && payload[3] == 69;
+}
+
+mpc::TrackIndex resolveLegacyTrackIndex(const uint8_t rawTrackNumber)
+{
+    return mpc::TrackIndex(std::clamp(static_cast<int>(rawTrackNumber) - 1, 0,
+                                      mpc::Mpc2000XlSpecs::TRACK_COUNT - 1));
+}
+
+bool isKnownLegacyEventStatus(const uint8_t status)
+{
+    switch (status)
+    {
+        case 0x88:
+        case 0x90:
+        case 0x98:
+        case 0xA0:
+        case 0xA8:
+        case 0xB0:
+        case 0xC0:
+        case 0xD0:
+        case 0xE0:
+        case 0xE8:
+        case 0xF0:
+        case 0xFF:
+            return true;
+        default:
+            return false;
+    }
+}
+
+size_t legacyEventStreamStartOffset(
+    const LegacyParsedSequenceView &parsed,
+    const std::vector<char> &bytes)
+{
+    if (parsed.eventsStartOffset.has_value())
+    {
+        return std::min(*parsed.eventsStartOffset, bytes.size());
+    }
+
+    const auto start = kLegacyStandalonePreludeSize +
+                       (parsed.numberOfTrackHeaders * kMpc3000TrackHeaderSize) +
+                       (parsed.numberOfTempoChanges * kMpc3000TempoChangeSize);
+    return std::min(start, bytes.size());
+}
+
+std::vector<LegacyTempoChangeData>
+decodeLegacyTempoChanges(const LegacyParsedSequenceView &parsed)
+{
+    std::vector<LegacyTempoChangeData> result;
+    if (parsed.tempoChanges == nullptr)
+    {
+        return result;
+    }
+
+    result.reserve(parsed.tempoChanges->size());
+    for (const auto &tempoChangePtr : *parsed.tempoChanges)
+    {
+        if (!tempoChangePtr)
+        {
+            continue;
+        }
+
+        result.push_back(LegacyTempoChangeData{
+            static_cast<int>(tempoChangePtr->ticks_from_sequence_start()),
+            parsed.headerTempo *
+                (tempoChangePtr->factor_percentage() / 100.0)});
+    }
+
+    return result;
+}
+
+LegacyParsedSequenceView makeLegacyParsedSequenceView(
+    const mpc3000_seq_v3_t &parsed)
+{
+    return LegacyParsedSequenceView{
+        mpc::StrUtil::trim(parsed.sequence_header()->sequence_name()),
+        std::max(1, static_cast<int>(
+                        parsed.sequence_header()->number_of_bars())),
+        static_cast<double>(parsed.sequence_header()->tempo()) / 10.0,
+        parsed.sequence_header()->loop_to_bar() ==
+            mpc3000_seq_v3_t::OFF_ON_TRUE,
+        std::max(0, static_cast<int>(
+                        parsed.sequence_header()->loop_to_bar_number())),
+        static_cast<int>(parsed.num_track_headers()),
+        static_cast<int>(parsed.num_tempo_changes()),
+        std::nullopt,
+        parsed.track_headers(),
+        parsed.tempo_changes(),
+        nullptr,
+    };
+}
+
+LegacyParsedSequenceView makeLegacyParsedSequenceView(
+    mpc60_seq_body_t::sequence_t &sequence)
+{
+    const auto *header = sequence.sequence_header();
+    return LegacyParsedSequenceView{
+        mpc::StrUtil::trim(header->sequence_name()),
+        std::max(1, static_cast<int>(header->number_of_bars())),
+        static_cast<double>(header->tempo()) / 10.0,
+        header->loop_to_bar() == mpc60_seq_body_t::OFF_ON_TRUE,
+        std::max(0, static_cast<int>(header->loop_to_bar_number())),
+        static_cast<int>(header->num_track_headers()),
+        static_cast<int>(header->num_tempo_changes()),
+        static_cast<size_t>(sequence.events_start()),
+        sequence.track_headers(),
+        sequence.tempo_changes(),
+        sequence.events(),
+    };
+}
+
+void addLegacyImportedEvent(
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    const mpc::TrackIndex trackIndex,
+    const mpc::sequencer::EventData &event,
+    const std::string &defaultTrackName)
+{
+    events[trackIndex].push_back(event);
+
+    auto &trackState = trackStates[trackIndex];
+    trackState.used = true;
+    if (trackState.name == "(Unused)")
+    {
+        trackState.name = defaultTrackName;
+    }
+}
+
+void applyLegacyTrackHeader(
+    const legacy_track_header_t &header,
+    mpc::sequencer::TrackState &trackState,
+    const std::string &defaultTrackName)
+{
+    trackState.on = !header.track_mute();
+    trackState.busType = header.drum_track()
+                             ? mpc::sequencer::BusType::DRUM1
+                             : mpc::sequencer::BusType::MIDI;
+
+    if (!header.drum_track())
+    {
+        trackState.deviceIndex =
+            std::clamp(static_cast<int>(
+                           header.primary_port_channel_assignment()),
+                       0, 31);
+    }
+
+    trackState.programChange = header.program_change_number();
+
+    const auto trackName =
+        mpc::StrUtil::trim(header.track_name());
+    if (header.track_in_use())
+    {
+        trackState.used = true;
+        if (trackName.empty() && trackState.name == "(Unused)")
+        {
+            trackState.name = defaultTrackName;
+        }
+        else if (!trackName.empty())
+        {
+            trackState.name = trackName;
+        }
+    }
+    else if (!trackName.empty())
+    {
+        trackState.name = trackName;
+    }
+}
+
+void loadLegacyEventsFromParsedObjects(
+    const LegacyParsedSequenceView &parsed,
+    const std::shared_ptr<mpc::sequencer::Sequence> &sequence,
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    mpc::sequencer::Sequencer &sequencer)
+{
+    int absoluteTick = 0;
+
+    for (const auto &eventPtr : *parsed.parsedEvents)
+    {
+        auto &event = *eventPtr;
+        const auto status = event.status();
+
+        if (status == 0x88)
+        {
+            auto *deltaTime =
+                dynamic_cast<mpc3000_seq_v3_t::delta_time_event_t *>(
+                    event.event_body());
+            if (deltaTime != nullptr)
+            {
+                absoluteTick += deltaTime->delta_time();
+            }
+            continue;
+        }
+
+        if (status == 0xA8)
+        {
+            if (auto *barEvent =
+                    dynamic_cast<mpc3000_seq_v3_t::bar_event_t *>(
+                        event.event_body()))
+            {
+                const auto barIndex = std::max(0, barEvent->bar_number() - 1);
+                sequence->setTimeSignature(
+                    barIndex, barEvent->numerator(), barEvent->denominator());
+            }
+            continue;
+        }
+
+        if (status == 0xE8)
+        {
+            continue;
+        }
+
+        const auto trackIndex = resolveLegacyTrackIndex(event.track_number());
+        mpc::sequencer::EventData e;
+        e.tick = absoluteTick;
+
+        switch (status)
+        {
+            case 0xA0:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::poly_pressure_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::PolyPressure;
+                    e.noteNumber = mpc::NoteNumber(body->note());
+                    e.amount = body->pressure();
+                }
+                break;
+            case 0xB0:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::control_change_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::ControlChange;
+                    e.controllerNumber = static_cast<uint8_t>(body->controller());
+                    e.controllerValue = body->value();
+                }
+                break;
+            case 0xC0:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::program_change_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::ProgramChange;
+                    e.programChangeProgramIndex =
+                        mpc::ProgramIndex(body->program());
+                }
+                break;
+            case 0xD0:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::ch_pressure_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::ChannelPressure;
+                    e.amount = body->pressure();
+                }
+                break;
+            case 0xE0:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::pitch_bend_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::PitchBend;
+                    e.amount = body->corrected_pitch_bend_amount();
+                }
+                break;
+            case 0xF0:
+                if (event.mixer_event() != nullptr)
+                {
+                    e.type = mpc::sequencer::EventType::Mixer;
+                    e.mixerParameter =
+                        static_cast<int8_t>(event.mixer_event()->param() - 1);
+                    e.mixerPad = event.mixer_event()->pad_index();
+                    e.mixerValue = event.mixer_event()->value();
+                }
+                else if (event.system_exclusive_body() != nullptr &&
+                         !event.system_exclusive_body()->empty())
+                {
+                    e.type = mpc::sequencer::EventType::SystemExclusive;
+                    e.sysExByteA = event.system_exclusive_body()->at(0);
+                    e.sysExByteB =
+                        event.system_exclusive_body()->size() > 1
+                            ? event.system_exclusive_body()->at(1)
+                            : 0;
+                }
+                break;
+            case 0x90:
+            case 0x98:
+                if (auto *body =
+                        dynamic_cast<mpc3000_seq_v3_t::note_event_t *>(
+                            event.event_body()))
+                {
+                    e.type = mpc::sequencer::EventType::NoteOn;
+                    e.noteNumber = mpc::NoteNumber(body->note_number());
+                    e.velocity = mpc::Velocity(body->velocity());
+                    e.noteVariationValue =
+                        mpc::NoteVariationValue(body->note_variation_value());
+                    e.duration = mpc::Duration(body->duration());
+                    e.noteVariationType =
+                        status == 0x90
+                            ? mpc::NoteVariationTypeTune
+                            : mpc::NoteVariationType(status - 0x98);
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (e.type != mpc::sequencer::EventType::Unknown)
+        {
+            addLegacyImportedEvent(
+                events, trackStates, trackIndex, e,
+                sequencer.getDefaultTrackName(trackIndex));
+        }
+    }
+}
+
+void loadLegacyEventsFromRawBytes(
+    const LegacyParsedSequenceView &parsed,
+    const std::vector<char> &bytes,
+    const std::shared_ptr<mpc::sequencer::Sequence> &sequence,
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    mpc::sequencer::Sequencer &sequencer)
+{
+    int absoluteTick = 0;
+    size_t pos = legacyEventStreamStartOffset(parsed, bytes);
+
+    if (pos >= bytes.size())
+    {
+        return;
+    }
+
+    uint8_t status = static_cast<uint8_t>(bytes[pos++]);
+    if (status == 0xFF && pos < bytes.size() &&
+        isKnownLegacyEventStatus(static_cast<uint8_t>(bytes[pos])))
+    {
+        status = static_cast<uint8_t>(bytes[pos++]);
+    }
+
+    while (true)
+    {
+        if (!isKnownLegacyEventStatus(status) || status == 0xFF)
+        {
+            break;
+        }
+
+        auto readTrack = [&]() -> mpc::TrackIndex
+        {
+            return resolveLegacyTrackIndex(static_cast<uint8_t>(bytes.at(pos++)));
+        };
+
+        switch (status)
+        {
+            case 0x88:
+                absoluteTick += readU2Le(bytes, pos);
+                pos += 2;
+                break;
+            case 0xA8:
+            {
+                const auto barNumber =
+                    static_cast<int>(bytes.at(pos)) |
+                    (static_cast<int>(bytes.at(pos + 1)) << 7);
+                const auto numerator =
+                    static_cast<unsigned char>(bytes.at(pos + 2));
+                const auto denominator =
+                    static_cast<unsigned char>(bytes.at(pos + 3));
+                pos += 4;
+                const auto barIndex = std::max(0, barNumber - 1);
+                sequence->setTimeSignature(barIndex, numerator, denominator);
+                break;
+            }
+            case 0xA0:
+            {
+                const auto trackIndex = readTrack();
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::PolyPressure;
+                e.tick = absoluteTick;
+                e.noteNumber =
+                    mpc::NoteNumber(static_cast<unsigned char>(bytes.at(pos++)));
+                e.amount = static_cast<unsigned char>(bytes.at(pos++));
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            case 0xB0:
+            {
+                const auto trackIndex = readTrack();
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::ControlChange;
+                e.tick = absoluteTick;
+                e.controllerNumber = static_cast<unsigned char>(bytes.at(pos++));
+                e.controllerValue = static_cast<unsigned char>(bytes.at(pos++));
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            case 0xC0:
+            {
+                const auto trackIndex = readTrack();
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::ProgramChange;
+                e.tick = absoluteTick;
+                e.programChangeProgramIndex =
+                    mpc::ProgramIndex(static_cast<unsigned char>(bytes.at(pos++)));
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            case 0xD0:
+            {
+                const auto trackIndex = readTrack();
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::ChannelPressure;
+                e.tick = absoluteTick;
+                e.amount = static_cast<unsigned char>(bytes.at(pos++));
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            case 0xE0:
+            {
+                const auto trackIndex = readTrack();
+                const auto bits1 = static_cast<unsigned char>(bytes.at(pos++));
+                const auto bits2 = static_cast<unsigned char>(bytes.at(pos++));
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::PitchBend;
+                e.tick = absoluteTick;
+                e.amount = static_cast<int16_t>((bits1 + (bits2 << 7)) - 8192);
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            case 0xF0:
+            {
+                const auto trackIndex = readTrack();
+                const auto payload = payloadWithoutLookahead(bytes, pos);
+                mpc::sequencer::EventData e;
+                e.tick = absoluteTick;
+
+                if (isLegacyMixerSysex(payload))
+                {
+                    e.type = mpc::sequencer::EventType::Mixer;
+                    e.mixerParameter = static_cast<int8_t>(payload.at(4) - 1);
+                    e.mixerPad = payload.at(5);
+                    e.mixerValue = payload.at(6);
+                }
+                else if (!payload.empty())
+                {
+                    e.type = mpc::sequencer::EventType::SystemExclusive;
+                    e.sysExByteA = payload[0];
+                    e.sysExByteB = payload.size() > 1 ? payload[1] : 0;
+                }
+
+                if (e.type != mpc::sequencer::EventType::Unknown)
+                {
+                    addLegacyImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
+                }
+                break;
+            }
+            case 0xE8:
+                (void)readTrack();
+                break;
+            case 0x90:
+            case 0x98:
+            {
+                const auto trackIndex = readTrack();
+                mpc::sequencer::EventData e;
+                e.type = mpc::sequencer::EventType::NoteOn;
+                e.tick = absoluteTick;
+                e.noteNumber =
+                    mpc::NoteNumber(static_cast<unsigned char>(bytes.at(pos++)));
+                e.velocity =
+                    mpc::Velocity(static_cast<unsigned char>(bytes.at(pos++)));
+                e.noteVariationValue = mpc::NoteVariationValue(
+                    static_cast<unsigned char>(bytes.at(pos++)));
+                e.duration = mpc::Duration(
+                    static_cast<unsigned char>(bytes.at(pos)) |
+                    (static_cast<unsigned char>(bytes.at(pos + 1)) << 7));
+                pos += 2;
+                e.noteVariationType =
+                    status == 0x90
+                        ? mpc::NoteVariationTypeTune
+                        : mpc::NoteVariationType(status - 0x98);
+                addLegacyImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
+                break;
+            }
+            default:
+                break;
+        }
+
+        if (pos >= bytes.size())
+        {
+            break;
+        }
+
+        status = static_cast<uint8_t>(bytes[pos++]);
+        if (status == 0xFF && pos < bytes.size() &&
+            isKnownLegacyEventStatus(static_cast<uint8_t>(bytes[pos])))
+        {
+            status = static_cast<uint8_t>(bytes[pos++]);
+        }
+
+        if ((status == 0xFF || status == 0x00) && pos >= bytes.size())
+        {
+            break;
+        }
+    }
+}
+
+void applyLegacyParsedSequenceToInMemorySequence(
+    const LegacyParsedSequenceView &parsed,
+    const std::vector<char> &bytes,
+    const std::shared_ptr<mpc::sequencer::Sequence> &sequence,
+    mpc::sequencer::Sequencer &sequencer,
+    mpc::sequencer::SequencerStateManager &stateManager)
+{
+    sequence->init(parsed.barCount - 1);
+
+    const auto tempoChanges = decodeLegacyTempoChanges(parsed);
+    auto initialTempo = parsed.headerTempo;
+    bool consumedInitialTempoChange = false;
+    for (const auto &tempoChange : tempoChanges)
+    {
+        if (tempoChange.tick == 0)
+        {
+            initialTempo = tempoChange.tempo;
+            consumedInitialTempoChange = true;
+            break;
+        }
+    }
+
+    sequence->setInitialTempo(initialTempo);
+    for (const auto &tempoChange : tempoChanges)
+    {
+        if (consumedInitialTempoChange && tempoChange.tick == 0)
+        {
+            consumedInitialTempoChange = false;
+            continue;
+        }
+
+        if (tempoChange.tick <= 0)
+        {
+            continue;
+        }
+
+        const auto ratio = static_cast<int>(
+            std::round((tempoChange.tempo / initialTempo) * 1000.0));
+        sequence->addTempoChangeEvent(tempoChange.tick, ratio);
+    }
+
+    sequence->setName(parsed.sequenceName);
+    stateManager.enqueue(mpc::sequencer::SetFirstLoopBarIndex{
+        sequence->getSequenceIndex(), mpc::BarIndex(0)});
+    stateManager.enqueue(mpc::sequencer::SetLoopEnabled{
+        sequence->getSequenceIndex(), parsed.loopEnabled});
+    stateManager.enqueue(mpc::sequencer::SetLastLoopBarIndex{
+        sequence->getSequenceIndex(),
+        parsed.loopEnabled
+            ? mpc::BarIndex(std::max(0, parsed.loopToBarNumber - 1))
+            : mpc::EndOfSequence});
+
+    const auto sequenceIndex = sequence->getSequenceIndex();
+    mpc::sequencer::UpdateSequenceTracks updateSequenceTracks{sequenceIndex};
+    stateManager.trackStatesSnapshots[sequenceIndex] =
+        mpc::sequencer::SequenceTrackStatesSnapshot();
+    updateSequenceTracks.trackStates =
+        &stateManager.trackStatesSnapshots[sequenceIndex];
+
+    mpc::sequencer::UpdateSequenceEvents updateSequenceEvents{sequenceIndex};
+    updateSequenceEvents.trackSnapshots =
+        &stateManager.trackEventsSnapshots[sequenceIndex];
+    updateSequenceEvents.trackSnapshots->clear();
+
+    if (parsed.parsedEvents != nullptr)
+    {
+        loadLegacyEventsFromParsedObjects(
+            parsed, sequence, *updateSequenceEvents.trackSnapshots,
+            *updateSequenceTracks.trackStates, sequencer);
+    }
+    else
+    {
+        loadLegacyEventsFromRawBytes(
+            parsed, bytes, sequence, *updateSequenceEvents.trackSnapshots,
+            *updateSequenceTracks.trackStates, sequencer);
+    }
+
+    for (const auto &headerPtr : *parsed.trackHeaders)
+    {
+        if (!headerPtr || headerPtr->absolute_recorded_track_number() == -1)
+        {
+            continue;
+        }
+
+        const auto trackIndex = mpc::TrackIndex(std::clamp(
+            static_cast<int>(headerPtr->user_track_number()) - 1, 0,
+            mpc::Mpc2000XlSpecs::TRACK_COUNT - 1));
+        applyLegacyTrackHeader(
+            *headerPtr, (*updateSequenceTracks.trackStates)[trackIndex],
+            sequencer.getDefaultTrackName(trackIndex));
+    }
+
+    stateManager.enqueue(updateSequenceTracks);
+    stateManager.enqueue(updateSequenceEvents);
+}
+
+void loadLegacyMpc3000AllSequenceIntoSlot(
+    mpc::Mpc &mpc,
+    const std::vector<char> &seqBytes,
+    const mpc::SequenceIndex destinationIndex)
+{
+    std::istringstream kaitaiStream(
+        std::string(seqBytes.begin(), seqBytes.end()),
+        std::ios::in | std::ios::binary);
+    ::kaitai::kstream kaitaiIo(&kaitaiStream);
+    mpc3000_seq_v3_t parsed(&kaitaiIo);
+    parsed._read();
+
+    auto sequencer = mpc.getSequencer();
+    applyLegacyParsedSequenceToInMemorySequence(
+        makeLegacyParsedSequenceView(parsed), seqBytes,
+        sequencer->getSequence(destinationIndex), *sequencer,
+        *sequencer->getStateManager());
+}
+
+void loadLegacyMpc60AllSequenceIntoSlot(
+    mpc::Mpc &mpc,
+    const mpc60_seq_body_t::sequence_t &sourceSequence,
+    const mpc::SequenceIndex destinationIndex)
+{
+    auto *mutableSequence =
+        const_cast<mpc60_seq_body_t::sequence_t *>(&sourceSequence);
+    auto sequencer = mpc.getSequencer();
+    applyLegacyParsedSequenceToInMemorySequence(
+        makeLegacyParsedSequenceView(*mutableSequence), {},
+        sequencer->getSequence(destinationIndex), *sequencer,
+        *sequencer->getStateManager());
 }
 
 mpc::sequencer::EventData
@@ -353,7 +1068,6 @@ void loadEverythingFromMpc3000AllBytes(
     {
         sequencer->getSong(i)->setUsed(false);
     }
-    stateManager->drainQueue();
 
     size_t sequenceOffset = kLegacyAllHeaderSize;
     for (size_t i = 0; i < parsed.sequences()->size(); ++i)
@@ -365,19 +1079,8 @@ void loadEverythingFromMpc3000AllBytes(
         );
         sequenceOffset += embeddedMpc3000SequenceByteCount(*parsed.sequences()->at(i));
 
-        const auto name = mpc::StrUtil::trim(
-            parsed.sequences()->at(i)->misc_chunks()->sequence_header()->sequence_name());
-        const auto loaded = mpc::file::kaitai::Mpc3000SeqIo::loadBytes(mpc, seqBytes, name);
-        if (!loaded)
-        {
-            throw std::runtime_error(loaded.error());
-        }
-
-        sequencer->copySequence(
-            mpc::TempSequenceIndex,
-            mpc::SequenceIndex(static_cast<int>(i))
-        );
-        stateManager->drainQueue();
+        loadLegacyMpc3000AllSequenceIntoSlot(
+            mpc, seqBytes, mpc::SequenceIndex(static_cast<int>(i)));
     }
 
     for (const auto& parsedSongPtr : *parsed.songs())
@@ -451,24 +1154,12 @@ void loadEverythingFromMpc60AllBytes(
     {
         sequencer->getSong(i)->setUsed(false);
     }
-    stateManager->drainQueue();
 
     for (size_t i = 0; i < parsed.body()->sequences()->size(); ++i)
     {
         const auto& sequence = *parsed.body()->sequences()->at(i);
-        const auto name = mpc::StrUtil::trim(sequence.sequence_header()->sequence_name());
-        const auto loaded =
-            mpc::file::kaitai::Mpc3000SeqIo::loadMpc60Sequence(mpc, sequence, name);
-        if (!loaded)
-        {
-            throw std::runtime_error(loaded.error());
-        }
-
-        sequencer->copySequence(
-            mpc::TempSequenceIndex,
-            mpc::SequenceIndex(static_cast<int>(i))
-        );
-        stateManager->drainQueue();
+        loadLegacyMpc60AllSequenceIntoSlot(
+            mpc, sequence, mpc::SequenceIndex(static_cast<int>(i)));
     }
 
     for (const auto& parsedSongPtr : *parsed.body()->songs())
@@ -600,21 +1291,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc3000AllBytes(
         sequenceOffset,
         *parsed.sequences()->at(sourceIndex)
     );
-    const auto name = mpc::StrUtil::trim(
-        parsed.sequences()->at(sourceIndex)->misc_chunks()->sequence_header()->sequence_name());
-    const auto loaded = mpc::file::kaitai::Mpc3000SeqIo::loadBytes(mpc, seqBytes, name);
-    if (!loaded)
-    {
-        throw std::runtime_error(loaded.error());
-    }
-
-    if (destIndexInMpcMemory == mpc::TempSequenceIndex)
-    {
-        return destination;
-    }
-
-    mpc.getSequencer()->copySequence(mpc::TempSequenceIndex, destIndexInMpcMemory);
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    loadLegacyMpc3000AllSequenceIntoSlot(mpc, seqBytes, destIndexInMpcMemory);
     return destination;
 }
 
@@ -640,21 +1317,7 @@ std::shared_ptr<mpc::sequencer::Sequence> loadOneSequenceFromMpc60AllBytes(
     }
 
     const auto& sequence = *parsed.body()->sequences()->at(sourceIndex);
-    const auto name = mpc::StrUtil::trim(sequence.sequence_header()->sequence_name());
-    const auto loaded =
-        mpc::file::kaitai::Mpc3000SeqIo::loadMpc60Sequence(mpc, sequence, name);
-    if (!loaded)
-    {
-        throw std::runtime_error(loaded.error());
-    }
-
-    if (destIndexInMpcMemory == mpc::TempSequenceIndex)
-    {
-        return destination;
-    }
-
-    mpc.getSequencer()->copySequence(mpc::TempSequenceIndex, destIndexInMpcMemory);
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    loadLegacyMpc60AllSequenceIntoSlot(mpc, sequence, destIndexInMpcMemory);
     return destination;
 }
 
@@ -1031,7 +1694,6 @@ AllLoader::loadOneSequenceFromCanonicalBytes(
         sequence,
         mpc.getSequencer()->getStateManager().get()
     );
-    mpc.getSequencer()->getStateManager()->drainQueue();
 
     return sequence;
 }

@@ -954,15 +954,23 @@ void SequencerScreen::openWindow()
         focusedFieldName == "sq")
     {
         Util::ensureSelectedSequenceInitialized(mpc);
-        mpc.getEngineHost()->postToAudioThread(utils::Task(
-            [this]
+        sequencer.lock()->getStateManager()->enqueueCallback(
+            utils::SimpleAction(
+                [layeredScreen = ls]
             {
-                sequencer.lock()->getStateManager()->drainQueue();
-                ls.lock()->postToUiThread(utils::Task(
-                    [this]
+                if (const auto lockedLayeredScreen = layeredScreen.lock())
+                {
+                    lockedLayeredScreen->postToUiThread(utils::Task(
+                        [layeredScreen]
                     {
-                        openScreenById(ScreenId::SequenceScreen);
+                        if (const auto lockedLayeredScreen =
+                                layeredScreen.lock())
+                        {
+                            lockedLayeredScreen->openScreenById(
+                                ScreenId::SequenceScreen);
+                        }
                     }));
+                }
             }));
     }
     else if (focusedFieldName.find("now") != std::string::npos)

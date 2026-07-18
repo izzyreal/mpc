@@ -6,7 +6,6 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
-#include "engine/EngineHost.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
@@ -47,18 +46,25 @@ void DeleteSequenceScreen::function(const int i)
         {
             const auto lockedSequencer = sequencer.lock();
             lockedSequencer->getTransport()->setPosition(0);
-
-            mpc.getEngineHost()->postToAudioThread(utils::Task(
-                [this, lockedSequencer]
+            lockedSequencer->deleteSequence(
+                lockedSequencer->getSelectedSequenceIndex());
+            lockedSequencer->getStateManager()->enqueueCallback(
+                utils::SimpleAction(
+                    [layeredScreen = ls]
                 {
-                    lockedSequencer->deleteSequence(
-                        lockedSequencer->getSelectedSequenceIndex());
-                    lockedSequencer->getStateManager()->drainQueue();
-                    ls.lock()->postToUiThread(utils::Task(
-                        [this]
+                    if (const auto lockedLayeredScreen = layeredScreen.lock())
+                    {
+                        lockedLayeredScreen->postToUiThread(utils::Task(
+                            [layeredScreen]
                         {
-                            openScreenById(ScreenId::SequencerScreen);
+                            if (const auto lockedLayeredScreen =
+                                    layeredScreen.lock())
+                            {
+                                lockedLayeredScreen->openScreenById(
+                                    ScreenId::SequencerScreen);
+                            }
                         }));
+                    }
                 }));
             break;
         }

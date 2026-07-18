@@ -9,11 +9,11 @@
 #include "sequencer/BusType.hpp"
 #include "sequencer/EventData.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequenceMessage.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/SequencerStateManager.hpp"
-#include "sequencer/Track.hpp"
+#include "sequencer/TrackState.hpp"
 #include "sequencer/Transport.hpp"
-#include "utils/SimpleAction.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -110,40 +110,39 @@ mpc::TrackIndex resolveTrackIndex(const uint8_t rawTrackNumber)
 
 void applyTrackHeader(
     const legacy_track_header_t &header,
-    const std::shared_ptr<mpc::sequencer::Track> &track)
+    mpc::sequencer::TrackState &trackState,
+    const std::string &defaultTrackName)
 {
     using mpc::sequencer::BusType;
 
-    track->setOn(!header.track_mute(), false);
-    track->setBusType(header.drum_track() ? BusType::DRUM1 : BusType::MIDI,
-                      false);
+    trackState.on = !header.track_mute();
+    trackState.busType = header.drum_track() ? BusType::DRUM1 : BusType::MIDI;
 
     if (!header.drum_track())
     {
-        track->setDeviceIndex(
+        trackState.deviceIndex =
             std::clamp(static_cast<int>(header.primary_port_channel_assignment()),
-                       0, 31),
-            false);
+                       0, 31);
     }
 
-    track->setProgramChange(header.program_change_number(), false);
+    trackState.programChange = header.program_change_number();
 
     const auto trackName = trimAscii(header.track_name());
     if (header.track_in_use())
     {
-        track->setUsedIfCurrentlyUnused(
-            mpc::utils::SimpleAction(
-                [track, trackName]
-                {
-                    if (!trackName.empty())
-                    {
-                        track->setName(trackName);
-                    }
-                }));
+        trackState.used = true;
+        if (trackName.empty() && trackState.name == "(Unused)")
+        {
+            trackState.name = defaultTrackName;
+        }
+        else if (!trackName.empty())
+        {
+            trackState.name = trackName;
+        }
     }
     else if (!trackName.empty())
     {
-        track->setName(trackName);
+        trackState.name = trackName;
     }
 }
 
@@ -254,9 +253,29 @@ ParsedSequenceView makeParsedSequenceView(const mpc60_seq_v2_t &parsed)
     return makeParsedSequenceView(*sequence);
 }
 
+void addImportedEvent(
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    const mpc::TrackIndex trackIndex,
+    const mpc::sequencer::EventData &event,
+    const std::string &defaultTrackName)
+{
+    events[trackIndex].push_back(event);
+
+    auto &trackState = trackStates[trackIndex];
+    trackState.used = true;
+    if (trackState.name == "(Unused)")
+    {
+        trackState.name = defaultTrackName;
+    }
+}
+
 void loadEventsFromParsedObjects(
     const ParsedSequenceView &parsed,
-    const std::shared_ptr<mpc::sequencer::Sequence> &newSeq)
+    const std::shared_ptr<mpc::sequencer::Sequence> &newSeq,
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    mpc::sequencer::Sequencer &sequencer)
 {
     int absoluteTick = 0;
 
@@ -304,7 +323,9 @@ void loadEventsFromParsedObjects(
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(polyPressure->note());
                     e.amount = polyPressure->pressure();
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -322,7 +343,9 @@ void loadEventsFromParsedObjects(
                     e.controllerNumber =
                         static_cast<uint8_t>(controlChange->controller());
                     e.controllerValue = controlChange->value();
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -339,7 +362,9 @@ void loadEventsFromParsedObjects(
                     e.tick = absoluteTick;
                     e.programChangeProgramIndex =
                         mpc::ProgramIndex(programChange->program());
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -355,7 +380,9 @@ void loadEventsFromParsedObjects(
                     e.type = mpc::sequencer::EventType::ChannelPressure;
                     e.tick = absoluteTick;
                     e.amount = chPressure->pressure();
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -371,14 +398,15 @@ void loadEventsFromParsedObjects(
                     e.type = mpc::sequencer::EventType::PitchBend;
                     e.tick = absoluteTick;
                     e.amount = pitchBend->corrected_pitch_bend_amount();
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
             case 0xF0:
             {
                 const auto trackIndex = resolveTrackIndex(event.track_number());
-                auto track = newSeq->getTrack(trackIndex);
 
                 if (event.mixer_event() != nullptr)
                 {
@@ -389,7 +417,9 @@ void loadEventsFromParsedObjects(
                         static_cast<int8_t>(event.mixer_event()->param() - 1);
                     e.mixerPad = event.mixer_event()->pad_index();
                     e.mixerValue = event.mixer_event()->value();
-                    track->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 else if (event.system_exclusive_body() != nullptr &&
                          !event.system_exclusive_body()->empty())
@@ -402,7 +432,9 @@ void loadEventsFromParsedObjects(
                         event.system_exclusive_body()->size() > 1
                             ? event.system_exclusive_body()->at(1)
                             : 0;
-                    track->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -429,7 +461,9 @@ void loadEventsFromParsedObjects(
                         status == 0x90
                             ? mpc::NoteVariationTypeTune
                             : mpc::NoteVariationType(status - 0x98);
-                    newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -442,7 +476,10 @@ void loadEventsFromParsedObjects(
 void loadEventsFromRawBytes(
     const ParsedSequenceView &parsed,
     const std::vector<char> &bytes,
-    const std::shared_ptr<mpc::sequencer::Sequence> &newSeq)
+    const std::shared_ptr<mpc::sequencer::Sequence> &newSeq,
+    mpc::sequencer::SequenceTrackEventsSnapshot &events,
+    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+    mpc::sequencer::Sequencer &sequencer)
 {
     int absoluteTick = 0;
     size_t pos = eventStreamStartOffset(parsed, bytes);
@@ -505,7 +542,9 @@ void loadEventsFromRawBytes(
                 e.noteNumber =
                     mpc::NoteNumber(static_cast<unsigned char>(bytes.at(pos++)));
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xB0:
@@ -516,7 +555,9 @@ void loadEventsFromRawBytes(
                 e.tick = absoluteTick;
                 e.controllerNumber = static_cast<unsigned char>(bytes.at(pos++));
                 e.controllerValue = static_cast<unsigned char>(bytes.at(pos++));
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xC0:
@@ -527,7 +568,9 @@ void loadEventsFromRawBytes(
                 e.tick = absoluteTick;
                 e.programChangeProgramIndex =
                     mpc::ProgramIndex(static_cast<unsigned char>(bytes.at(pos++)));
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xD0:
@@ -537,7 +580,9 @@ void loadEventsFromRawBytes(
                 e.type = mpc::sequencer::EventType::ChannelPressure;
                 e.tick = absoluteTick;
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xE0:
@@ -549,14 +594,15 @@ void loadEventsFromRawBytes(
                 e.type = mpc::sequencer::EventType::PitchBend;
                 e.tick = absoluteTick;
                 e.amount = static_cast<int16_t>((bits1 + (bits2 << 7)) - 8192);
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xF0:
             {
                 const auto trackIndex = readTrack();
                 const auto payload = payloadWithoutLookahead(bytes, pos);
-                auto track = newSeq->getTrack(trackIndex);
 
                 if (isMixerSysex(payload))
                 {
@@ -566,7 +612,9 @@ void loadEventsFromRawBytes(
                     e.mixerParameter = static_cast<int8_t>(payload.at(4) - 1);
                     e.mixerPad = payload.at(5);
                     e.mixerValue = payload.at(6);
-                    track->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 else if (!payload.empty())
                 {
@@ -575,7 +623,9 @@ void loadEventsFromRawBytes(
                     e.tick = absoluteTick;
                     e.sysExByteA = payload[0];
                     e.sysExByteB = payload.size() > 1 ? payload[1] : 0;
-                    track->acquireAndInsertEvent(e);
+                    addImportedEvent(
+                        events, trackStates, trackIndex, e,
+                        sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -603,7 +653,9 @@ void loadEventsFromRawBytes(
                     status == 0x90
                         ? mpc::NoteVariationTypeTune
                         : mpc::NoteVariationType(status - 0x98);
-                newSeq->getTrack(trackIndex)->acquireAndInsertEvent(e);
+                addImportedEvent(
+                    events, trackStates, trackIndex, e,
+                    sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             default:
@@ -639,10 +691,11 @@ sequence_or_error loadParsedSequence(
     const std::string &fileNameWithoutExtension,
     const ParsedSequenceView &parsed)
 {
-    auto newSeq = mpc.getSequencer()->getSequence(mpc::TempSequenceIndex);
+    auto sequencer = mpc.getSequencer();
+    auto stateManager = sequencer->getStateManager();
+    auto newSeq = sequencer->getSequence(mpc::TempSequenceIndex);
 
     newSeq->init(parsed.barCount - 1);
-    mpc.getSequencer()->getStateManager()->drainQueue();
 
     const auto tempoChanges = decodeTempoChanges(parsed);
 
@@ -659,7 +712,7 @@ sequence_or_error loadParsedSequence(
     }
 
     newSeq->setInitialTempo(initialTempo);
-    const auto transport = mpc.getSequencer()->getTransport();
+    const auto transport = sequencer->getTransport();
     if (!transport->isTempoSourceSequence())
     {
         transport->setTempo(initialTempo);
@@ -686,17 +739,32 @@ sequence_or_error loadParsedSequence(
     newSeq->setName(
         parsed.sequenceName.empty() ? fileNameWithoutExtension : parsed.sequenceName);
 
-    newSeq->setFirstLoopBarIndex(mpc::BarIndex(0));
-    newSeq->setLoopEnabled(parsed.loopEnabled);
+    stateManager->enqueue(mpc::sequencer::SetFirstLoopBarIndex{
+        mpc::TempSequenceIndex, mpc::BarIndex(0)});
+    stateManager->enqueue(mpc::sequencer::SetLoopEnabled{
+        mpc::TempSequenceIndex, parsed.loopEnabled});
     if (parsed.loopEnabled)
     {
-        newSeq->setLastLoopBarIndex(
-            mpc::BarIndex(std::max(0, parsed.loopToBarNumber - 1)));
+        stateManager->enqueue(mpc::sequencer::SetLastLoopBarIndex{
+            mpc::TempSequenceIndex,
+            mpc::BarIndex(std::max(0, parsed.loopToBarNumber - 1))});
     }
     else
     {
-        newSeq->setLastLoopBarIndex(mpc::EndOfSequence);
+        stateManager->enqueue(mpc::sequencer::SetLastLoopBarIndex{
+            mpc::TempSequenceIndex, mpc::EndOfSequence});
     }
+
+    mpc::sequencer::UpdateSequenceTracks updateSequenceTracks{mpc::TempSequenceIndex};
+    updateSequenceTracks.trackStates =
+        &stateManager->trackStatesSnapshots[mpc::TempSequenceIndex];
+    *updateSequenceTracks.trackStates =
+        mpc::sequencer::SequenceTrackStatesSnapshot();
+
+    mpc::sequencer::UpdateSequenceEvents updateSequenceEvents{mpc::TempSequenceIndex};
+    updateSequenceEvents.trackSnapshots =
+        &stateManager->trackEventsSnapshots[mpc::TempSequenceIndex];
+    updateSequenceEvents.trackSnapshots->clear();
 
     std::vector<const legacy_track_header_t *> trackHeaders(
         mpc::Mpc2000XlSpecs::TRACK_COUNT, nullptr);
@@ -716,14 +784,16 @@ sequence_or_error loadParsedSequence(
 
     if (parsed.parsedEvents != nullptr)
     {
-        loadEventsFromParsedObjects(parsed, newSeq);
+        loadEventsFromParsedObjects(
+            parsed, newSeq, *updateSequenceEvents.trackSnapshots,
+            *updateSequenceTracks.trackStates, *sequencer);
     }
     else
     {
-        loadEventsFromRawBytes(parsed, bytes, newSeq);
+        loadEventsFromRawBytes(
+            parsed, bytes, newSeq, *updateSequenceEvents.trackSnapshots,
+            *updateSequenceTracks.trackStates, *sequencer);
     }
-
-    mpc.getSequencer()->getStateManager()->drainQueue();
 
     for (size_t trackIndex = 0; trackIndex < trackHeaders.size(); ++trackIndex)
     {
@@ -732,10 +802,14 @@ sequence_or_error loadParsedSequence(
             continue;
         }
 
-        applyTrackHeader(*trackHeaders[trackIndex], newSeq->getTrack(trackIndex));
+        applyTrackHeader(
+            *trackHeaders[trackIndex],
+            (*updateSequenceTracks.trackStates)[mpc::TrackIndex(trackIndex)],
+            sequencer->getDefaultTrackName(mpc::TrackIndex(trackIndex)));
     }
 
-    mpc.getSequencer()->getStateManager()->drainQueue();
+    stateManager->enqueue(updateSequenceTracks);
+    stateManager->enqueue(updateSequenceEvents);
 
     return newSeq;
 }

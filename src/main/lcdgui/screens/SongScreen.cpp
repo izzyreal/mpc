@@ -11,7 +11,7 @@
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
-#include "engine/EngineHost.hpp"
+#include "sequencer/SequencerMessage.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -349,15 +349,23 @@ void SongScreen::openWindow()
     }
     else if (focusedFieldName == "song")
     {
-        mpc.getEngineHost()->postToAudioThread(utils::Task(
-            [this]
+        sequencer.lock()->getStateManager()->enqueueCallback(
+            utils::SimpleAction(
+                [layeredScreen = ls]
             {
-                sequencer.lock()->getStateManager()->drainQueue();
-                ls.lock()->postToUiThread(utils::Task(
-                    [this]
+                if (const auto lockedLayeredScreen = layeredScreen.lock())
+                {
+                    lockedLayeredScreen->postToUiThread(utils::Task(
+                        [layeredScreen]
                     {
-                        openScreenById(ScreenId::SongWindow);
+                        if (const auto lockedLayeredScreen =
+                                layeredScreen.lock())
+                        {
+                            lockedLayeredScreen->openScreenById(
+                                ScreenId::SongWindow);
+                        }
                     }));
+                }
             }));
     }
     else if (focusedFieldName == "tempo" || focusedFieldName == "tempo-source")
@@ -533,14 +541,12 @@ void SongScreen::turnWheel(const int increment)
 
         if (newGlobalBar >= totalBars)
         {
-            mpc.getEngineHost()->postToAudioThread(utils::Task(
-                [transport, lockedSequencer, stepCount = song->getStepCount()]
-                {
-                    transport->setPosition(0);
-                    lockedSequencer->getStateManager()->drainQueue();
-                    lockedSequencer->setSelectedSongStepIndex(
-                        SongStepIndex(stepCount));
-                }));
+            const auto stateManager = lockedSequencer->getStateManager();
+            stateManager->enqueue(sequencer::SetPositionQuarterNotes{0});
+            stateManager->enqueue(sequencer::SyncTrackEventIndices{
+                lockedSequencer->getSelectedSequenceIndex()});
+            stateManager->enqueue(sequencer::SetSelectedSongStepIndex{
+                SongStepIndex(song->getStepCount()), NoSequenceIndex});
             return;
         }
 
@@ -570,23 +576,28 @@ void SongScreen::turnWheel(const int increment)
 
         const int flatBarInStep = remaining;
 
-        mpc.getEngineHost()->postToAudioThread(utils::Task(
-            [targetStep, flatBarInStep, song, lockedSequencer, transport]
-            {
-                const auto step = song->getStep(targetStep);
-                const auto seq =
-                    lockedSequencer->getSequence(step.sequenceIndex);
-                const int barsPerSeq = seq->getLastBarIndex() + 1;
+        const auto step = song->getStep(targetStep);
+        const auto seq = lockedSequencer->getSequence(step.sequenceIndex);
+        const int barsPerSeq = seq->getLastBarIndex() + 1;
 
-                const int repetition = flatBarInStep / barsPerSeq;
-                const int barInSeq = flatBarInStep % barsPerSeq;
+        const int repetition = flatBarInStep / barsPerSeq;
+        const int barInSeq = flatBarInStep % barsPerSeq;
 
-                lockedSequencer->setSelectedSongStepIndex(targetStep);
-                lockedSequencer->getStateManager()->drainQueue();
-                lockedSequencer->getStateManager()->enqueue(
-                    sequencer::SetPlayedSongStepRepetitionCount{repetition});
-                transport->setBar(barInSeq);
-            }));
+        Tick position = 0;
+        for (int b = 0; b < barInSeq; ++b)
+        {
+            position += seq->getBarLength(b);
+        }
+
+        const auto stateManager = lockedSequencer->getStateManager();
+        stateManager->enqueue(sequencer::SetSelectedSongStepIndex{
+            targetStep, step.sequenceIndex});
+        stateManager->enqueue(
+            sequencer::SetPlayedSongStepRepetitionCount{repetition});
+        stateManager->enqueue(sequencer::SetPositionQuarterNotes{
+            mpc::sequencer::Sequencer::ticksToQuarterNotes(position)});
+        stateManager->enqueue(
+            sequencer::SyncTrackEventIndices{step.sequenceIndex});
     }
     else if (focusedFieldName == "now1")
     {
