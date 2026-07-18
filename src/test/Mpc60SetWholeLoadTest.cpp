@@ -7,6 +7,7 @@
 #include "disk/MpcFile.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/kaitai/Mpc60SetPreview.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -119,6 +120,50 @@ namespace
                 mpc::NoteVariationTypeDecay);
     }
 
+    int countLoadedSoundsNamed(mpc::Mpc &mpc, const std::string &name)
+    {
+        int result = 0;
+        for (int i = 0; i < mpc.getSampler()->getSoundCount(); ++i)
+        {
+            if (mpc::StrUtil::eqIgnoreCase(mpc.getSampler()->getSoundName(i),
+                                           name))
+            {
+                ++result;
+            }
+        }
+        return result;
+    }
+
+    int findLoadedSoundIndexNamed(mpc::Mpc &mpc, const std::string &name)
+    {
+        for (int i = 0; i < mpc.getSampler()->getSoundCount(); ++i)
+        {
+            if (mpc::StrUtil::eqIgnoreCase(mpc.getSampler()->getSoundName(i),
+                                           name))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    int countNotesUsingSoundIndex(
+        const std::shared_ptr<mpc::sampler::Program> &program,
+        const int soundIndex)
+    {
+        int result = 0;
+        for (int note = mpc::MinDrumNoteNumber.get();
+             note <= mpc::MaxDrumNoteNumber.get(); ++note)
+        {
+            if (program->getNoteParameters(mpc::DrumNoteNumber(note))
+                    ->getSoundIndex() == soundIndex)
+            {
+                ++result;
+            }
+        }
+        return result;
+    }
+
     void setInitialPadMappingToOriginal(mpc::Mpc &mpc)
     {
         auto layeredScreen = mpc.getLayeredScreen();
@@ -162,12 +207,14 @@ TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
 
     REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
-    REQUIRE(mpc.getSampler()->getSoundCount() == 34);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 34);
     REQUIRE(mpc.getSampler()->getProgram(0)->getName() == "ROCK");
-    REQUIRE(mpc.getSampler()->getSoundName(19) == "HAT2CLSD");
-    REQUIRE(mpc.getSampler()->getSoundName(16) == "RIDE4B");
-    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
-    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(rideNote)->getSoundIndex() == 16);
+    const auto hiHatSoundIndex = findLoadedSoundIndexNamed(mpc, "HAT2CLSD");
+    const auto rideSoundIndex = findLoadedSoundIndexNamed(mpc, "RIDE4B");
+    REQUIRE(hiHatSoundIndex >= 0);
+    REQUIRE(rideSoundIndex >= 0);
+    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == hiHatSoundIndex);
+    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(rideNote)->getSoundIndex() == rideSoundIndex);
     requireImportedHihatDecaySwitch(
         mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
         hiHatOpenNote);
@@ -254,10 +301,12 @@ TEST_CASE("MPC60 SET LOAD adds imported program and offsets sound indices",
 
     REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     REQUIRE(mpc.getSampler()->getProgramCount() == 2);
-    REQUIRE(mpc.getSampler()->getSoundCount() == 35);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 35);
     REQUIRE(mpc.getSampler()->getSoundName(0) == "dummy");
     REQUIRE(mpc.getSampler()->getProgram(1)->getName() == "ROCK");
-    REQUIRE(mpc.getSampler()->getProgram(1)->getNoteParameters(hiHatNote)->getSoundIndex() == 20);
+    const auto hiHatSoundIndex = findLoadedSoundIndexNamed(mpc, "HAT2CLSD");
+    REQUIRE(hiHatSoundIndex > 0);
+    REQUIRE(mpc.getSampler()->getProgram(1)->getNoteParameters(hiHatNote)->getSoundIndex() == hiHatSoundIndex);
     requireImportedHihatDecaySwitch(
         mpc.getSampler()->getProgram(1), hiHatNote, hiHatMediumNote,
         hiHatOpenNote);
@@ -292,13 +341,17 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
 
     REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
-    REQUIRE(mpc.getSampler()->getSoundCount() == 34);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 34);
     REQUIRE(mpc.getSampler()->getProgram(0)->getName() == "STUDIO");
-    REQUIRE(mpc.getSampler()->getSoundName(19) == "HAT1CLSD");
-    REQUIRE(mpc.getSampler()->getSoundName(23) == "RIDE_#1");
     const auto program = mpc.getSampler()->getProgram(0);
-    REQUIRE(program->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
-    REQUIRE(program->getNoteParameters(rideNote)->getSoundIndex() == 23);
+    const auto hiHatSoundIndex = findLoadedSoundIndexNamed(mpc, "HAT1CLSD");
+    const auto rideSoundIndex = findLoadedSoundIndexNamed(mpc, "RIDE_#1");
+    REQUIRE(hiHatSoundIndex >= 0);
+    REQUIRE(rideSoundIndex >= 0);
+    REQUIRE(program->getNoteParameters(hiHatNote)->getSoundIndex() ==
+            hiHatSoundIndex);
+    REQUIRE(program->getNoteParameters(rideNote)->getSoundIndex() ==
+            rideSoundIndex);
 
     const auto tomHighNote = setScreen->getConversionTargetNote(6);
     const auto tomLowNote = setScreen->getConversionTargetNote(8);
@@ -318,6 +371,36 @@ TEST_CASE("MPC60 STUDIO SET CLEAR load imports sounds and assigns converted note
         program, hiHatNote, hiHatMediumNote, hiHatOpenNote);
     requireImportedHihatSlider(program, hiHatNote);
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
+}
+
+TEST_CASE("MPC60 STUDIO SET load deduplicates sound directory names",
+          "[kaitai-set][load-set]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    mpc.getEngineHost()->prepareProcessBlock(512);
+    prepareSetFile(mpc, "STUDIO.SET");
+
+    selectSetFile(mpc, "STUDIO.SET");
+
+    const auto setScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
+
+    mpc.getLayeredScreen()->getCurrentScreen()->function(4);
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "conversion-table");
+    mpc.getLayeredScreen()->getCurrentScreen()->function(4);
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load-a-set-replace-add");
+    mpc.getLayeredScreen()->getCurrentScreen()->function(2);
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "popup");
+    waitForLoadScreen(mpc);
+
+    const auto bassGuitIndex = findLoadedSoundIndexNamed(mpc, "BASSGUIT");
+    REQUIRE(bassGuitIndex >= 0);
+    REQUIRE(countLoadedSoundsNamed(mpc, "BASSGUIT") == 1);
+    REQUIRE(countNotesUsingSoundIndex(mpc.getSampler()->getProgram(0),
+                                      bassGuitIndex) > 1);
+    REQUIRE(setScreen->getPreview()->soundDirectoryEntries.size() == 34U);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 34);
 }
 
 
@@ -348,13 +431,17 @@ TEST_CASE("MPC60 SET v1 STUDIO CLEAR load imports like v0",
 
     REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
-    REQUIRE(mpc.getSampler()->getSoundCount() == 34);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 34);
     REQUIRE(mpc.getSampler()->getProgram(0)->getName() == "STUDIO");
-    REQUIRE(mpc.getSampler()->getSoundName(19) == "HAT1CLSD");
-    REQUIRE(mpc.getSampler()->getSoundName(23) == "RIDE_#1");
     const auto program = mpc.getSampler()->getProgram(0);
-    REQUIRE(program->getNoteParameters(hiHatNote)->getSoundIndex() == 19);
-    REQUIRE(program->getNoteParameters(rideNote)->getSoundIndex() == 23);
+    const auto hiHatSoundIndex = findLoadedSoundIndexNamed(mpc, "HAT1CLSD");
+    const auto rideSoundIndex = findLoadedSoundIndexNamed(mpc, "RIDE_#1");
+    REQUIRE(hiHatSoundIndex >= 0);
+    REQUIRE(rideSoundIndex >= 0);
+    REQUIRE(program->getNoteParameters(hiHatNote)->getSoundIndex() ==
+            hiHatSoundIndex);
+    REQUIRE(program->getNoteParameters(rideNote)->getSoundIndex() ==
+            rideSoundIndex);
 
     const auto tomHighNote = setScreen->getConversionTargetNote(6);
     const auto tomLowNote = setScreen->getConversionTargetNote(8);
@@ -404,13 +491,14 @@ TEST_CASE("MPC60 UK-8 SET load skips unassigned source pads and blank entries",
 
     REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load");
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
-    REQUIRE(mpc.getSampler()->getSoundCount() == 26);
+    REQUIRE(mpc.getSampler()->getSoundCount() < 26);
     REQUIRE(mpc.getSampler()->getProgram(0)->getName() == "UK-8");
     REQUIRE(mpc.getSampler()->getSoundName(0) == "S7_HH_CL");
-    REQUIRE(mpc.getSampler()->getSoundName(20) == "SCRATCH4");
+    const auto scratchSoundIndex = findLoadedSoundIndexNamed(mpc, "SCRATCH4");
+    REQUIRE(scratchSoundIndex >= 0);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(hiHatNote)->getSoundIndex() == 0);
     REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(unassignedNote)->getSoundIndex() == -1);
-    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(scratchNote)->getSoundIndex() == 20);
+    REQUIRE(mpc.getSampler()->getProgram(0)->getNoteParameters(scratchNote)->getSoundIndex() == scratchSoundIndex);
     requireImportedHihatDecaySwitch(
         mpc.getSampler()->getProgram(0), hiHatNote, hiHatMediumNote,
         hiHatOpenNote);
