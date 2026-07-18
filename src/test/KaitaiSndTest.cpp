@@ -15,7 +15,6 @@
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
 
-#include <array>
 #include <cstdint>
 #include <fstream>
 #include <memory>
@@ -176,32 +175,6 @@ namespace
         truncated.append(16 - truncated.size(), ' ');
         truncated.push_back('\0');
         return truncated;
-    }
-
-    uint64_t fnv1aPcmHash(const std::vector<float> &samples)
-    {
-        uint64_t hash = 1469598103934665603ULL;
-        for (const auto sample : samples)
-        {
-            const auto pcm = static_cast<uint16_t>(mean_normalized_float_to_short(sample));
-            hash ^= (pcm & 0xffU);
-            hash *= 1099511628211ULL;
-            hash ^= ((pcm >> 8U) & 0xffU);
-            hash *= 1099511628211ULL;
-        }
-        return hash;
-    }
-
-    void requirePcmWindow(const std::vector<float> &samples,
-                          const std::size_t offset,
-                          const std::array<int16_t, 4> &expected)
-    {
-        REQUIRE(samples.size() >= offset + expected.size());
-        for (std::size_t i = 0; i < expected.size(); ++i)
-        {
-            REQUIRE(mean_normalized_float_to_short(samples[offset + i]) ==
-                    expected[i]);
-        }
     }
 
 }
