@@ -118,6 +118,17 @@ namespace
                     ->getSliderParameterNumber() ==
                 mpc::NoteVariationTypeDecay);
     }
+
+    void setInitialPadMappingToOriginal(mpc::Mpc &mpc)
+    {
+        auto layeredScreen = mpc.getLayeredScreen();
+        layeredScreen->openScreen("vmpc-settings");
+        REQUIRE(layeredScreen->setFocus("initial-pad-mapping"));
+        layeredScreen->getCurrentScreen()->turnWheel(1);
+        REQUIRE(layeredScreen->getCurrentScreen()
+                    ->findField("initial-pad-mapping")
+                    ->getText() == "ORIGINAL");
+    }
 }
 
 TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
@@ -164,11 +175,37 @@ TEST_CASE("MPC60 SET CLEAR load imports sounds and assigns converted notes",
     requireSelectedDrumProgramIsUsed(mpc, mpc::ProgramIndex(0));
 }
 
-TEST_CASE("MPC60 SET default conversion table matches MPC2000XL",
+TEST_CASE("MPC60 SET default conversion table follows VMPC2000XL initial pad mapping",
           "[kaitai-set][load-set]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareSetFile(mpc, "ROCK.SET");
+    selectSetFile(mpc, "ROCK.SET");
+
+    const auto setScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::LoadASetScreen>();
+
+    const std::vector<int> expectedNotes{
+        37, 38, 41, 40, 35, 36, 43, 44, 45, 46, 49, 50, 47, 48, 52, 51, 59,
+        66, 68, 69, 70, 71, 72, 60, 61, 62, 55, 56, 73, 74, 75, 65, 76, 63};
+
+    REQUIRE(expectedNotes.size() == 34);
+
+    for (size_t i = 0; i < expectedNotes.size(); ++i)
+    {
+        REQUIRE(static_cast<int>(
+                    setScreen->getConversionTargetNote(static_cast<int>(i))) ==
+                expectedNotes[i]);
+    }
+}
+
+TEST_CASE("MPC60 SET default conversion table keeps original mapping when configured",
+          "[kaitai-set][load-set]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    setInitialPadMappingToOriginal(mpc);
     prepareSetFile(mpc, "ROCK.SET");
     selectSetFile(mpc, "ROCK.SET");
 

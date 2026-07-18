@@ -30,6 +30,7 @@ namespace mpc::sampler
         ProgramPadIndex getIndex() const;
 
         static std::vector<DrumNoteNumber> &getPadNotes(const Mpc &mpcToUse);
+        static const std::vector<DrumNoteNumber> &getOriginalPadNotes();
 
     private:
         static std::vector<DrumNoteNumber> originalPadNotes;

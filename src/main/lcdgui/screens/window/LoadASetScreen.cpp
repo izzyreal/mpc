@@ -20,7 +20,8 @@ LoadASetScreen::~LoadASetScreen() = default;
 void LoadASetScreen::open()
 {
     preview.reset();
-    conversionTable = file::kaitai::Mpc60SetProgramLoader::defaultConversionTable();
+    conversionTable =
+        file::kaitai::Mpc60SetProgramLoader::defaultConversionTable(mpc);
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     const auto selectedFile = loadScreen->getSelectedFile();
 

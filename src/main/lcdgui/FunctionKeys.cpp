@@ -28,6 +28,11 @@ void FunctionKey::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
+    if (type == -1)
+    {
+        return;
+    }
+
     bool border;
     bool bg;
 

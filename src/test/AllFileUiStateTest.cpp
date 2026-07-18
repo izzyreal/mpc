@@ -299,6 +299,43 @@ TEST_CASE("MPC3000 ALL <SEQ> KEEP loads empty embedded sequences without phantom
     REQUIRE(loadedSequence->getTrack(0)->getEvents().empty());
 }
 
+TEST_CASE("MPC3000 ALL <SEQ> hides KEEP for unused embedded sequences",
+          "[load-all][ui]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    const auto seqFromAllScreen =
+        mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
+    seqFromAllScreen->sequenceMetaInfos = {
+        sequencer::SequenceMetaInfo{true, "SEQ01"},
+        sequencer::SequenceMetaInfo{false, "SEQ02"}};
+
+    auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("load-a-sequence-from-all");
+    REQUIRE(layeredScreen->getCurrentScreenName() == "load-a-sequence-from-all");
+    REQUIRE(layeredScreen->setFocus("file"));
+    seqFromAllScreen->turnWheel(1);
+    REQUIRE(seqFromAllScreen->findField("file")->getText() == "02");
+
+    std::vector pixels(248, std::vector<bool>(60));
+    seqFromAllScreen->drawRecursive(&pixels);
+
+    int keepPixels = 0;
+    for (int x = 166; x < 205; ++x)
+    {
+        for (int y = 51; y < 60; ++y)
+        {
+            if (pixels[x][y])
+            {
+                ++keepPixels;
+            }
+        }
+    }
+
+    REQUIRE(keepPixels == 0);
+}
+
 TEST_CASE("MPC3000 ALL LOAD imports sequences and songs through the real UI path",
           "[load-all][ui][real-mpc3000]")
 {

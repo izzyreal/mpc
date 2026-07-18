@@ -62,6 +62,11 @@ std::vector<mpc::DrumNoteNumber> &Pad::getPadNotes(const Mpc &mpcToUse)
     return originalPadNotes;
 }
 
+const std::vector<mpc::DrumNoteNumber> &Pad::getOriginalPadNotes()
+{
+    return originalPadNotes;
+}
+
 Pad::Pad(
     Mpc &mpc, const ProgramIndex programIndex, const ProgramPadIndex indexToUse,
     GetPadFn &getSnapshot,
