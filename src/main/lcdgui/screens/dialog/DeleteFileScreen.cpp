@@ -48,7 +48,8 @@ void DeleteFileScreen::function(const int i)
 
 void DeleteFileScreen::deleteFile()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    std::this_thread::sleep_for(
+        mpc.getFileOperationTimings().shortOperationFeedback);
 
     const auto disk = mpc.getDisk();
 

@@ -21,6 +21,8 @@ void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
     MpcInitOptions options;
     options.detectRawUsbVolumes = false;
     options.installDemoFiles = false;
+    options.fileOperationTimings =
+        FileOperationTimings::uniform(std::chrono::milliseconds(10));
     mpc.init(options);
 }
 
@@ -32,6 +34,8 @@ void mpc::TestMpc::initializeTestMpcWithoutMidiServices(Mpc &mpc)
     options.startAudioServer = true;
     options.detectRawUsbVolumes = false;
     options.installDemoFiles = false;
+    options.fileOperationTimings =
+        FileOperationTimings::uniform(std::chrono::milliseconds(10));
     mpc.init(options);
 }
 
@@ -43,5 +47,7 @@ void mpc::TestMpc::initializeTestMpcWithoutIoServices(Mpc &mpc)
     options.startAudioServer = false;
     options.detectRawUsbVolumes = false;
     options.installDemoFiles = false;
+    options.fileOperationTimings =
+        FileOperationTimings::uniform(std::chrono::milliseconds(10));
     mpc.init(options);
 }

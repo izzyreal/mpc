@@ -295,7 +295,7 @@ void showPopup(mpc::Mpc& mpc, const std::string& name, const std::string& ext)
         {
             ls->showPopup(msg);
         }));
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(mpc.getFileOperationTimings().progressDisplay);
 }
 
 void handleSoundNotFound(mpc::Mpc& mpc, const std::string& soundFileName)
@@ -316,7 +316,8 @@ void handleSoundNotFound(mpc::Mpc& mpc, const std::string& soundFileName)
 
         while (cantFindFileScreen->waitingForUser)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(
+                mpc.getFileOperationTimings().apsMissingSoundPoll);
         }
     }
 }

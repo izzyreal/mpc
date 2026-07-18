@@ -94,8 +94,10 @@ void LoadScreen::function(const int i)
                         mpc.getDisks()[device]->getVolume();
                     candidateVolume.mode == DISABLED)
                 {
-                    ls.lock()->showPopupForMs("Device is disabled in DISKS",
-                                              1000);
+                    ls.lock()->showPopupForMs(
+                        "Device is disabled in DISKS",
+                        static_cast<int>(mpc.getFileOperationTimings()
+                                             .ioErrorFeedback.count()));
                     return;
                 }
 
@@ -114,8 +116,10 @@ void LoadScreen::function(const int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls.lock()->showPopupForMs("Error! Device seems in use",
-                                                  2000);
+                        ls.lock()->showPopupForMs(
+                            "Error! Device seems in use",
+                            static_cast<int>(mpc.getFileOperationTimings()
+                                                 .busyDeviceFeedback.count()));
                         return;
                     }
                 }
@@ -520,7 +524,10 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         const auto ext = path.extension().string();
         const std::string msg =
             "LOADING " + StrUtil::padRight(name, " ", 16) + ext;
-        ls.lock()->showPopupAndThenOpen(ScreenId::LoadASoundScreen, msg, 300);
+        ls.lock()->showPopupAndThenOpen(
+            ScreenId::LoadASoundScreen, msg,
+            static_cast<int>(mpc.getFileOperationTimings()
+                                 .singleSoundLoadTransition.count()));
         return;
     }
 

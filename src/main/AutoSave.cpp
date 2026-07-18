@@ -209,7 +209,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
                         layeredScreen->showPopup(msg);
                     }));
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                std::this_thread::sleep_for(
+                    mpc.getFileOperationTimings().progressDisplay);
             };
 
             for (const auto &f : availableFiles)

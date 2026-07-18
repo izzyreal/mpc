@@ -67,6 +67,8 @@ namespace
             previewEntry.name = trimRightSpaces(entry->name());
             previewEntry.sharedSoundLink = entry->shared_sound_link();
             previewEntry.lengthInSamples = entry->length_in_samples();
+            previewEntry.startAddressInMemory =
+                entry->start_address_in_memory();
             previewEntry.startAddressForPlaying =
                 entry->start_address_for_playing();
             previewEntry.soundDuration = entry->sound_duration();
@@ -93,6 +95,26 @@ namespace
             }
             result.soundDirectoryEntryIndexByMpc60Pad.push_back(entryIndex);
         }
+
+        const auto parsedSampleWords = parsed.sound_samples();
+        if (parsedSampleWords->size() < result.totalNumberOfSampleWords)
+        {
+            throw std::runtime_error("MPC60 SET sample data is truncated");
+        }
+
+        auto sampleWords = std::make_shared<std::vector<uint16_t>>();
+        sampleWords->reserve(result.totalNumberOfSampleWords);
+        for (size_t i = 0; i < result.totalNumberOfSampleWords; ++i)
+        {
+            const auto value = parsedSampleWords->at(i);
+            if (value > 0x0fffU)
+            {
+                throw std::runtime_error(
+                    "MPC60 SET sample word is out of range");
+            }
+            sampleWords->push_back(static_cast<uint16_t>(value));
+        }
+        result.soundSampleWords = std::move(sampleWords);
 
         return result;
     }

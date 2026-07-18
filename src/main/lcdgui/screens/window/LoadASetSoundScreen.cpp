@@ -158,7 +158,9 @@ void LoadASetSoundScreen::function(const int i)
             }
 
             const auto entryIndex = getSelectedSoundDirectoryEntryIndex();
-            if (!entryIndex)
+            const auto setScreen = mpc.screens->get<ScreenId::LoadASetScreen>();
+            const auto preview = setScreen->getPreview();
+            if (!entryIndex || preview == nullptr)
             {
                 break;
             }
@@ -171,7 +173,7 @@ void LoadASetSoundScreen::function(const int i)
 
             const auto soundOrError =
                 file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
-                    file, *entryIndex, sound);
+                    *preview, *entryIndex, sound);
 
             if (!soundOrError.has_value())
             {
@@ -181,7 +183,10 @@ void LoadASetSoundScreen::function(const int i)
             }
 
             const auto msg = "LOADING " + sound->getName();
-            ls.lock()->showPopupAndThenOpen(ScreenId::LoadASoundScreen, msg, 300);
+            ls.lock()->showPopupAndThenOpen(
+                ScreenId::LoadASoundScreen, msg,
+                static_cast<int>(mpc.getFileOperationTimings()
+                                     .singleSoundLoadTransition.count()));
             break;
         }
         default:;

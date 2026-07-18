@@ -55,6 +55,8 @@ Mpc::Mpc()
 
 void Mpc::init(const MpcInitOptions &options)
 {
+    fileOperationTimings = options.fileOperationTimings;
+
     const auto logFsError = [](const mpc_fs::fs_error &error)
     {
         auto msg = "Filesystem error during " + error.operation;
@@ -333,6 +335,11 @@ void Mpc::init(const MpcInitOptions &options)
     }
 
     autoSave = std::make_unique<AutoSave>();
+}
+
+const FileOperationTimings &Mpc::getFileOperationTimings() const
+{
+    return fileOperationTimings;
 }
 
 std::shared_ptr<Hardware> Mpc::getHardware()

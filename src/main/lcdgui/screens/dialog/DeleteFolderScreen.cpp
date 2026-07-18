@@ -84,7 +84,8 @@ void DeleteFolderScreen::deleteFolder()
         }
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    std::this_thread::sleep_for(
+        mpc.getFileOperationTimings().shortOperationFeedback);
     openScreenById(ScreenId::DirectoryScreen);
 }
 
