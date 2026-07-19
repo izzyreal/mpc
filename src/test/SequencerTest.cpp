@@ -56,6 +56,42 @@ TEST_CASE("Song step constants distinguish last step from end cursor",
             static_cast<int>(mpc::EndOfFullSongStepIndex));
 }
 
+TEST_CASE("Immediate host record starts recording without draining queue",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto transport = sequencer->getTransport();
+    sequencer->getSelectedSequence()->init(0);
+    sequencer->getStateManager()->drainQueue();
+
+    transport->recImmediately();
+
+    REQUIRE(transport->isPlaying());
+    REQUIRE(transport->isRecording());
+    REQUIRE_FALSE(transport->isOverdubbing());
+}
+
+TEST_CASE("Immediate host overdub starts overdubbing without draining queue",
+          "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    auto sequencer = mpc.getSequencer();
+    auto transport = sequencer->getTransport();
+    sequencer->getSelectedSequence()->init(0);
+    sequencer->getStateManager()->drainQueue();
+
+    transport->overdubImmediately();
+
+    REQUIRE(transport->isPlaying());
+    REQUIRE(transport->isOverdubbing());
+    REQUIRE_FALSE(transport->isRecording());
+}
+
 namespace
 {
 constexpr int kPlaybackBufferSize = 512;
