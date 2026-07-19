@@ -122,6 +122,26 @@ void Transport::playImmediately() const
     }
 }
 
+void Transport::recImmediately() const
+{
+    if (isPlaying())
+    {
+        return;
+    }
+
+    sequencer.getStateManager()->applyMessageImmediate(Record{});
+}
+
+void Transport::overdubImmediately() const
+{
+    if (isPlaying())
+    {
+        return;
+    }
+
+    sequencer.getStateManager()->applyMessageImmediate(Overdub{});
+}
+
 void Transport::rec() const
 {
     if (isPlaying())
