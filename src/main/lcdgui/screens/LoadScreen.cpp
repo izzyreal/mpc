@@ -9,6 +9,7 @@
 #include "disk/SoundLoader.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
@@ -151,6 +152,17 @@ void LoadScreen::function(const int i)
                     return;
                 }
 
+                if (isSnd &&
+                    !mpc::file::kaitai::kMpc60SampleImportEnabled &&
+                    mpc::file::kaitai::isMpc60SndBytes(file->getBytes()))
+                {
+                    ls.lock()->showPopupForMs(
+                        mpc::file::kaitai::kMpc60SndLoadingDisabledMessage,
+                        static_cast<int>(mpc.getFileOperationTimings()
+                                             .ioErrorFeedback.count()));
+                    return;
+                }
+
                 utils::Task audioTask;
                 audioTask.set(
                     [engineHost = mpc.getEngineHost(), file, isSnd, ls = ls]
@@ -234,6 +246,16 @@ void LoadScreen::function(const int i)
             }
             else if (StrUtil::eqIgnoreCase(ext, ".set"))
             {
+                if (!mpc::file::kaitai::kMpc60SampleImportEnabled &&
+                    mpc::file::kaitai::isMpc60SetBytes(selectedFile->getBytes()))
+                {
+                    ls.lock()->showPopupForMs(
+                        mpc::file::kaitai::kMpc60SetLoadingDisabledMessage,
+                        static_cast<int>(mpc.getFileOperationTimings()
+                                             .ioErrorFeedback.count()));
+                    return;
+                }
+
                 openScreenById(ScreenId::LoadASetScreen);
             }
             else if (StrUtil::eqIgnoreCase(ext, ".mid") ||
@@ -545,6 +567,13 @@ void LoadScreen::loadSound(bool shouldBeConverted)
             mpc.screens->get<ScreenId::VmpcConvertAndLoadWavScreen>();
         convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
         openScreenById(ScreenId::VmpcConvertAndLoadWavScreen);
+    }
+    else if (!result.errorMessage.empty())
+    {
+        ls.lock()->showPopupForMs(
+            result.errorMessage,
+            static_cast<int>(
+                mpc.getFileOperationTimings().ioErrorFeedback.count()));
     }
 }
 

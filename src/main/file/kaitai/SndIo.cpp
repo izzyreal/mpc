@@ -5,6 +5,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
 #include "file/kaitai/generated/mpc3000_snd_v2.h"
 #include "file/kaitai/generated/mpc60_snd_v1.h"
@@ -88,6 +89,11 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
 
     if (firstByte == 0x01 && secondByte == 0x01)
     {
+        if (!kMpc60SampleImportEnabled)
+        {
+            return tl::make_unexpected(kMpc60SndLoadingDisabledMessage);
+        }
+
         mpc60_snd_v1_t parsed(&parseIo);
 
         sound->setName(parsedSoundName(parsed.name()));

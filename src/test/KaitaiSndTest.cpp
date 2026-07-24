@@ -5,6 +5,7 @@
 #include "TestMpc.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/SoundLoader.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "file/kaitai/SndIo.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
 #include "file/kaitai/generated/mpc3000_snd_v2.h"
@@ -123,6 +124,35 @@ namespace
         loader.loadSound(file, result, sound, false);
         REQUIRE(result.success);
         return sound;
+    }
+
+    SoundLoaderResult loadWithSoundLoaderResult(
+        mpc::Mpc &mpc,
+        const std::vector<char> &bytes,
+        const std::string &fileName,
+        std::shared_ptr<mpc::sampler::Sound> &sound)
+    {
+        auto file = writeTempSndFile(mpc, bytes, fileName);
+        sound = mpc.getSampler()->addSound();
+        SoundLoaderResult result;
+        SoundLoader loader(mpc, false);
+        loader.loadSound(file, result, sound, false);
+        return result;
+    }
+
+    void requireMpc60SndLoadingDisabled(mpc::Mpc &mpc,
+                                        const std::vector<char> &bytes,
+                                        const std::string &fileName)
+    {
+        std::shared_ptr<mpc::sampler::Sound> sound;
+        const auto result =
+            loadWithSoundLoaderResult(mpc, bytes, fileName, sound);
+
+        REQUIRE_FALSE(result.success);
+        REQUIRE(result.errorMessage ==
+                ::mpc::file::kaitai::kMpc60SndLoadingDisabledMessage);
+        REQUIRE(sound != nullptr);
+        REQUIRE(sound->getSampleData()->empty());
     }
 
     void requireSoundMatches(const std::shared_ptr<mpc::sampler::Sound> &sound,
@@ -452,6 +482,20 @@ TEST_CASE("Kaitai MPC3000 SND parses a real hardware 01 02 file through the prod
     REQUIRE((*loaded->getSampleData())[1] == short_to_float(6));
     REQUIRE((*loaded->getSampleData())[2] == short_to_float(7));
     REQUIRE((*loaded->getSampleData())[3] == short_to_float(6));
+}
+
+TEST_CASE("SoundLoader uses the SND header name at byte offset 0x02", "[kaitai-snd]")
+{
+    auto bytes =
+        resourceBytes("test/RealMpc3000/Snd/SOUND017.SND");
+    const auto headerName = expectedHeaderName("HeaderName");
+    std::copy(headerName.begin(), headerName.end(), bytes.begin() + 0x02);
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    const auto loaded = loadWithSoundLoader(mpc, bytes, "UNRELATED.SND");
+
+    REQUIRE(loaded->getName() == "HeaderName");
 }
 
 TEST_CASE("Generated MPC2000XL SND corpus loads through the production loader", "[kaitai-snd][generated-corpus]")

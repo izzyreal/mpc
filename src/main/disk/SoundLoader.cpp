@@ -88,6 +88,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
 
     if (!soundOrError.has_value())
     {
+        r.errorMessage = soundOrError.error();
         return;
     }
 

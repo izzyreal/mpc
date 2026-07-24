@@ -7,6 +7,7 @@
 
 #include "WavInputFileStream.hpp"
 #include "SndInputFileStream.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 
 #include <readerwriterqueue.h>
 
@@ -76,6 +77,12 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
         valid = snd_read_header(stream, sourceSampleRate, validBits,
                                 sourceNumChannels, sourceFrameCount,
                                 sndInputEncoding);
+        if (valid &&
+            sndInputEncoding == SndInputEncoding::Mpc60Packed12 &&
+            !mpc::file::kaitai::kMpc60SampleImportEnabled)
+        {
+            return false;
+        }
         wavSamplesAreFloat32 = false;
     }
 

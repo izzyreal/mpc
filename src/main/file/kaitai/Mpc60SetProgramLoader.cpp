@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "disk/MpcFile.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "file/kaitai/Mpc60SetPreview.hpp"
 #include "file/kaitai/Mpc60SetSoundLoader.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -300,6 +301,11 @@ bool Mpc60SetProgramLoader::load(
     const ConversionTable &conversionTable,
     const bool clearExisting)
 {
+    if (!kMpc60SampleImportEnabled)
+    {
+        return false;
+    }
+
     auto sampler = mpc.getSampler();
 
     if (clearExisting)

@@ -1,6 +1,8 @@
 #include "LoadASetScreen.hpp"
 
 #include "Mpc.hpp"
+#include "disk/MpcFile.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "file/kaitai/Mpc60SetPreview.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -27,6 +29,23 @@ void LoadASetScreen::open()
 
     if (!selectedFile)
     {
+        return;
+    }
+
+    if (!mpc::file::kaitai::kMpc60SampleImportEnabled &&
+        mpc::file::kaitai::isMpc60SetBytes(selectedFile->getBytes()))
+    {
+        const auto layeredScreen = ls.lock();
+        const auto delayMs = static_cast<int>(
+            mpc.getFileOperationTimings().ioErrorFeedback.count());
+        layeredScreen->postToUiThread(utils::Task(
+            [layeredScreen, delayMs]
+            {
+                layeredScreen->showPopupAndThenOpen(
+                    ScreenId::LoadScreen,
+                    mpc::file::kaitai::kMpc60SetLoadingDisabledMessage,
+                    delayMs);
+            }));
         return;
     }
 

@@ -2,6 +2,7 @@
 
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "file/kaitai/Mpc60SetPreview.hpp"
 #include "sampler/Sound.hpp"
 
@@ -35,6 +36,12 @@ namespace
                              const size_t soundDirectoryEntryIndex,
                              const std::shared_ptr<mpc::sampler::Sound> &sound)
     {
+        if (!mpc::file::kaitai::kMpc60SampleImportEnabled)
+        {
+            return tl::make_unexpected(
+                mpc::file::kaitai::kMpc60SetLoadingDisabledMessage);
+        }
+
         if (soundDirectoryEntryIndex >= preview.soundDirectoryEntries.size())
         {
             return tl::make_unexpected("SET sound entry index out of range");

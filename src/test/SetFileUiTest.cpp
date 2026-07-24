@@ -5,6 +5,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
+#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
