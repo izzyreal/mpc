@@ -12,8 +12,6 @@ namespace mpc::engine
         static const int AMPENV_OFFSET = 64;
         static constexpr float STATIC_ATTACK_LENGTH = 10.92f;
         static constexpr float STATIC_DECAY_LENGTH = 109.2f;
-        static const int MAX_ATTACK_LENGTH_MS = 3000;
-        static const int MAX_DECAY_LENGTH_MS = 2600;
         static const int MAX_ATTACK_LENGTH_SAMPLES = 132300;
         static const int MAX_DECAY_LENGTH_SAMPLES = 114660;
         static const int ATTACK_INDEX = 0;

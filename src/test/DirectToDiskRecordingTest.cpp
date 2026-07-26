@@ -24,6 +24,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
 {
     constexpr int BUFFER_SIZE = 512;
     constexpr int SAMPLE_RATE = 44100;
+    constexpr int SOUND_FRAME_COUNT = 4410;
     constexpr int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
     constexpr int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
 
@@ -44,11 +45,11 @@ TEST_CASE("Direct to disk recording does not start with silence",
     assert(sound != nullptr);
     sound->setMono(true);
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < SOUND_FRAME_COUNT; i++)
         sound->insertFrame({1.f}, i);
 
     sound->setStart(0);
-    sound->setEnd(1000);
+    sound->setEnd(SOUND_FRAME_COUNT);
 
     mpc.getSampler()
         ->getProgram(0)
@@ -214,6 +215,7 @@ TEST_CASE(
 {
     constexpr int BUFFER_SIZE = 512;
     constexpr int SAMPLE_RATE = 44100;
+    constexpr int SOUND_FRAME_COUNT = 4410;
     constexpr int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
     constexpr int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
     constexpr int RUN_COUNT = 3;
@@ -225,13 +227,13 @@ TEST_CASE(
     assert(sound != nullptr);
     sound->setMono(true);
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < SOUND_FRAME_COUNT; i++)
     {
         sound->insertFrame({.5f}, i);
     }
 
     sound->setStart(0);
-    sound->setEnd(1000);
+    sound->setEnd(SOUND_FRAME_COUNT);
 
     mpc.getSampler()
         ->getProgram(0)

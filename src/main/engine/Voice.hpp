@@ -32,6 +32,8 @@ namespace mpc::engine
 
     class EnvelopeControls;
 
+    class Mpc2000XlAmpEnvelope;
+
     class MuteInfo;
 
     class VoiceState
@@ -56,7 +58,6 @@ namespace mpc::engine
         bool staticDecay = false;
         int noteNumber = -1;
         int velocity = 0;
-        float amplitude = 0;
         int start = 0;
         int end = 0;
         int loopTo = 0;
@@ -76,10 +77,7 @@ namespace mpc::engine
         int veloToAttack = 0;
         int decayMode = 0;
         int veloToLevel = 0;
-        float attackMs = 0;
-        int finalDecayValue = 0;
-        float decayMs = 0;
-        float veloToLevelFactor = 0;
+        int soundLevel = 100;
         int filtParam = 0;
         float envAmplitude = 0;
         float staticEnvAmp = 0;
@@ -123,19 +121,15 @@ namespace mpc::engine
         std::atomic<VoiceState *> active{&stateA};
 
         EnvelopeGenerator *staticEnv = nullptr;
-        EnvelopeGenerator *ampEnv = nullptr;
+        Mpc2000XlAmpEnvelope *ampEnv = nullptr;
         EnvelopeGenerator *filterEnv = nullptr;
         filter::StateVariableFilter *svfLeft = nullptr;
         filter::StateVariableFilter *svfRight = nullptr;
-        control::LawControl *attack = nullptr;
-        control::LawControl *hold = nullptr;
-        control::LawControl *decay = nullptr;
         control::LawControl *fattack = nullptr;
         control::LawControl *fhold = nullptr;
         control::LawControl *fdecay = nullptr;
         control::LawControl *shold = nullptr;
         control::LawControl *reso = nullptr;
-        EnvelopeControls *ampEnvControls = nullptr;
         EnvelopeControls *staticEnvControls = nullptr;
         EnvelopeControls *filterEnvControls = nullptr;
         filter::StateVariableFilterControls *svfControls = nullptr;
@@ -146,7 +140,7 @@ namespace mpc::engine
         std::atomic_int8_t masterLevel{0};
 
         void readFrame();
-        void initializeSamplerateDependents();
+        void initializeSamplerateDependents(VoiceState *, bool resetEnvelope);
         const std::vector<float> &getFrame();
 
     public:

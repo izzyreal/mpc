@@ -6,12 +6,14 @@
 
 #include "EnvelopeControls.hpp"
 #include "EnvelopeGenerator.hpp"
+#include "Mpc2000XlAmpEnvelope.hpp"
 
 #include "engine/audio/core/AudioBuffer.hpp"
 #include "engine/control/LawControl.hpp"
 #include "engine/filter/StateVariableFilter.hpp"
 #include "engine/filter/StateVariableFilterControls.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -50,10 +52,9 @@ Voice::Voice(const int stripNumber, const bool isBasicVoice)
 
     if (!isBasicVoice)
     {
-        ampEnvControls = new EnvelopeControls(0, "AmpEnv", C::AMPENV_OFFSET);
         filterEnvControls =
             new EnvelopeControls(0, "StaticAmpEnv", C::AMPENV_OFFSET);
-        ampEnv = new EnvelopeGenerator(ampEnvControls);
+        ampEnv = new Mpc2000XlAmpEnvelope();
         filterEnv = new EnvelopeGenerator(filterEnvControls);
         svfControls = new StateVariableFilterControls("Filter", C::SVF_OFFSET);
         svfControls->createControls();
@@ -68,15 +69,6 @@ Voice::Voice(const int stripNumber, const bool isBasicVoice)
         fdecay = std::dynamic_pointer_cast<LawControl>(
                      filterEnvControls->getControls()[C::DECAY_INDEX])
                      .get();
-        attack = std::dynamic_pointer_cast<LawControl>(
-                     ampEnvControls->getControls()[C::ATTACK_INDEX])
-                     .get();
-        hold = std::dynamic_pointer_cast<LawControl>(
-                   ampEnvControls->getControls()[C::HOLD_INDEX])
-                   .get();
-        decay = std::dynamic_pointer_cast<LawControl>(
-                    ampEnvControls->getControls()[C::DECAY_INDEX])
-                    .get();
         reso = std::dynamic_pointer_cast<LawControl>(
                    svfControls->getControls()[C::RESO_INDEX])
                    .get();
@@ -90,7 +82,6 @@ Voice::~Voice()
 
     if (!isBasicVoice)
     {
-        delete ampEnvControls;
         delete filterEnvControls;
         delete ampEnv;
         delete filterEnv;
@@ -167,9 +158,6 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
         default:;
     }
 
-    const auto veloFactor = state->velocity / 127.f;
-    const auto inverseVeloFactor = 1.f - veloFactor;
-
     state->start = sound->getStart();
     state->end = sound->getEnd();
     state->loopTo = sound->getLoopTo();
@@ -177,26 +165,13 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
     state->loopEnabled = sound->isLoopEnabled();
     state->isMono = sound->isMono();
     state->sampleData = sound->getSampleData();
+    state->soundLevel = sound->getSndLevel();
 
-    state->position = sound->getStart() + inverseVeloFactor *
-                                              (state->veloToStart / 100.0) *
-                                              sound->getLastFrameIndex();
-    state->attackMs = static_cast<float>(state->attackValue / 100.0 *
-                                         C::MAX_ATTACK_LENGTH_MS);
-    state->attackMs += static_cast<float>(state->veloToAttack / 100.0 *
-                                          C::MAX_ATTACK_LENGTH_MS * veloFactor);
-    state->finalDecayValue = state->decayValue < 2 ? 2 : state->decayValue;
-    state->decayMs = static_cast<float>(state->finalDecayValue / 100.0 *
-                                        C::MAX_DECAY_LENGTH_MS);
     staticEnv->reset();
-    state->veloToLevelFactor = static_cast<float>(state->veloToLevel * 0.01);
-    state->amplitude =
-        veloFactor * state->veloToLevelFactor + 1.0f - state->veloToLevelFactor;
-    state->amplitude *= sound->getSndLevel() * 0.01;
 
     if (!isBasicVoice)
     {
-        ampEnv->reset();
+        const auto veloFactor = state->velocity / 127.f;
         state->filtParam = noteParameters.filterFrequency;
 
         if (state->varType == 3)
@@ -228,50 +203,43 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
 
     state->sampleRate = engineSampleRate;
 
-    initializeSamplerateDependents();
+    initializeSamplerateDependents(state, true);
 
     swapStates();
 }
 
-void Voice::initializeSamplerateDependents()
+void Voice::initializeSamplerateDependents(VoiceState *state,
+                                           const bool resetEnvelope)
 {
-    VoiceState *state = getInactiveState();
-
     staticEnvControls->setSampleRate(state->sampleRate);
 
     if (!isBasicVoice)
     {
-        ampEnvControls->setSampleRate(state->sampleRate);
         filterEnvControls->setSampleRate(state->sampleRate);
     }
 
-    state->increment = pow(2.0, static_cast<double>(state->tune) / 120.0) *
+    const auto pitchStep = std::clamp(
+        static_cast<int>(std::lround(
+            pow(2.0, static_cast<double>(state->tune) / 120.0) * 0x1000)),
+        1, 0xffff);
+    state->increment = static_cast<double>(pitchStep) / 0x1000 *
                        (44100.0 / state->sampleRate);
 
-    const auto veloFactor = 1.f - state->velocity / 127.f;
-    const auto start = state->start + veloFactor *
-                                          (state->veloToStart / 100.0) *
-                                          state->lastFrameIndex;
+    if (resetEnvelope)
+    {
+        state->position =
+            state->start +
+            (isBasicVoice
+                 ? 0
+                 : Mpc2000XlAmpEnvelope::startOffsetFrames(
+                       state->velocity, state->veloToStart));
+    }
 
     const auto playableSampleLength =
         state->loopEnabled
             ? INT_MAX
-            : static_cast<int>((state->end - start) / state->increment);
-
-    auto attackLengthSamples =
-        static_cast<int>(state->attackMs * state->sampleRate * 0.001);
-    auto decayLengthSamples =
-        static_cast<int>(state->decayMs * state->sampleRate * 0.001);
-
-    if (attackLengthSamples > C::MAX_ATTACK_LENGTH_SAMPLES)
-    {
-        attackLengthSamples = C::MAX_ATTACK_LENGTH_SAMPLES;
-    }
-
-    if (decayLengthSamples > C::MAX_DECAY_LENGTH_SAMPLES)
-    {
-        decayLengthSamples = C::MAX_DECAY_LENGTH_SAMPLES;
-    }
+            : static_cast<int>((state->end - state->position) /
+                               state->increment);
 
     const auto staticEnvHoldSamples =
         static_cast<int>(playableSampleLength -
@@ -282,11 +250,29 @@ void Voice::initializeSamplerateDependents()
 
     if (!isBasicVoice)
     {
-        attack->setValue(state->attackMs * C::ENV_TIME_RATIO);
-        const auto holdLengthSamples =
-            playableSampleLength - attackLengthSamples - decayLengthSamples;
-        hold->setValue(state->decayMode == 1 ? 0 : holdLengthSamples);
-        decay->setValue(state->decayMs * C::ENV_TIME_RATIO);
+        if (resetEnvelope)
+        {
+            Mpc2000XlAmpEnvelope::Parameters parameters;
+            parameters.attack = state->attackValue;
+            parameters.decay = state->decayValue;
+            parameters.velocity = state->velocity;
+            parameters.velocityToLevel = state->veloToLevel;
+            parameters.velocityToAttack = state->veloToAttack;
+            parameters.velocityToStart = state->veloToStart;
+            parameters.soundLevel = state->soundLevel;
+            parameters.pitchStep = pitchStep;
+            parameters.startFrame = state->start;
+            parameters.endFrame = state->end;
+            parameters.looping = state->loopEnabled;
+            parameters.decayModeStart = state->decayMode == 1;
+            parameters.outputSampleRate = state->sampleRate;
+            ampEnv->configure(parameters);
+        }
+        else
+        {
+            ampEnv->setOutputSampleRate(state->sampleRate);
+        }
+
         state->inverseNyquist = VoiceUtil::getInverseNyquist(state->sampleRate);
     }
 }
@@ -306,7 +292,7 @@ const std::vector<float> &Voice::getFrame()
         return C::EMPTY_FRAME;
     }
 
-    state->envAmplitude = isBasicVoice ? 1.0f : ampEnv->getEnvelope(false);
+    state->envAmplitude = isBasicVoice ? 1.0f : ampEnv->next();
     state->staticEnvAmp =
         state->enableEnvs ? staticEnv->getEnvelope(state->staticDecay) : 1.0f;
     state->envAmplitude *= state->staticEnvAmp;
@@ -328,7 +314,7 @@ const std::vector<float> &Voice::getFrame()
 
     if (state->isMono)
     {
-        frame[0] *= state->envAmplitude * state->amplitude;
+        frame[0] *= state->envAmplitude;
 
         if (!isBasicVoice)
         {
@@ -340,8 +326,8 @@ const std::vector<float> &Voice::getFrame()
     }
     else
     {
-        frame[0] *= state->envAmplitude * state->amplitude;
-        frame[1] *= state->envAmplitude * state->amplitude;
+        frame[0] *= state->envAmplitude;
+        frame[1] *= state->envAmplitude;
 
         if (!isBasicVoice)
         {
@@ -406,7 +392,7 @@ int Voice::processAudio(AudioBuffer *buffer, const int nFrames)
     if (buffer->getSampleRate() != state->sampleRate)
     {
         state->sampleRate = buffer->getSampleRate();
-        initializeSamplerateDependents();
+        initializeSamplerateDependents(state, false);
     }
 
     auto &left = buffer->getChannel(0);
