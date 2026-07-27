@@ -22,8 +22,6 @@ namespace mpc::engine::control
 namespace mpc::engine::filter
 {
     class StateVariableFilter;
-
-    class StateVariableFilterControls;
 } // namespace mpc::engine::filter
 
 namespace mpc::engine
@@ -34,14 +32,14 @@ namespace mpc::engine
 
     class Mpc2000XlAmpEnvelope;
 
+    class Mpc2000XlFilterEnvelope;
+
     class MuteInfo;
 
     class VoiceState
     {
     public:
         float sampleRate = 44100.0;
-        float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
-
         // Voice overlap mode when the voice was triggered
         sampler::VoiceOverlapMode voiceOverlapMode;
 
@@ -53,8 +51,8 @@ namespace mpc::engine
         int tune = 0;
         double increment = 0;
         double position = 0;
-        float filterCutoff = 0;
-        float filterResonance = 0;
+        int filterCutoff = 0;
+        int filterResonance = 0;
         bool staticDecay = false;
         int noteNumber = -1;
         int velocity = 0;
@@ -78,7 +76,6 @@ namespace mpc::engine
         int decayMode = 0;
         int veloToLevel = 0;
         int soundLevel = 100;
-        int filtParam = 0;
         float envAmplitude = 0;
         float staticEnvAmp = 0;
         uint64_t noteEventId = 0;
@@ -122,17 +119,11 @@ namespace mpc::engine
 
         EnvelopeGenerator *staticEnv = nullptr;
         Mpc2000XlAmpEnvelope *ampEnv = nullptr;
-        EnvelopeGenerator *filterEnv = nullptr;
+        Mpc2000XlFilterEnvelope *filterEnv = nullptr;
         filter::StateVariableFilter *svfLeft = nullptr;
         filter::StateVariableFilter *svfRight = nullptr;
-        control::LawControl *fattack = nullptr;
-        control::LawControl *fhold = nullptr;
-        control::LawControl *fdecay = nullptr;
         control::LawControl *shold = nullptr;
-        control::LawControl *reso = nullptr;
         EnvelopeControls *staticEnvControls = nullptr;
-        EnvelopeControls *filterEnvControls = nullptr;
-        filter::StateVariableFilterControls *svfControls = nullptr;
 
         // The master level that is set in the Mixer Setup screen.
         // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6

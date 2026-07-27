@@ -4,12 +4,11 @@ namespace mpc::engine::filter
 {
     class StateVariableFilterElement
     {
-        float prev, low, high, band, notch;
+        double low = 0;
+        double band = 0;
 
     public:
-        StateVariableFilterElement();
-
-        float filter(float in, float freq, float damp);
+        float filter(float input, double coefficient, double damping);
 
         void resetState();
     };

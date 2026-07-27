@@ -7,11 +7,11 @@
 #include "EnvelopeControls.hpp"
 #include "EnvelopeGenerator.hpp"
 #include "Mpc2000XlAmpEnvelope.hpp"
+#include "Mpc2000XlFilterEnvelope.hpp"
 
 #include "engine/audio/core/AudioBuffer.hpp"
 #include "engine/control/LawControl.hpp"
 #include "engine/filter/StateVariableFilter.hpp"
-#include "engine/filter/StateVariableFilterControls.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -52,26 +52,10 @@ Voice::Voice(const int stripNumber, const bool isBasicVoice)
 
     if (!isBasicVoice)
     {
-        filterEnvControls =
-            new EnvelopeControls(0, "StaticAmpEnv", C::AMPENV_OFFSET);
         ampEnv = new Mpc2000XlAmpEnvelope();
-        filterEnv = new EnvelopeGenerator(filterEnvControls);
-        svfControls = new StateVariableFilterControls("Filter", C::SVF_OFFSET);
-        svfControls->createControls();
-        svfLeft = new StateVariableFilter(svfControls);
-        svfRight = new StateVariableFilter(svfControls);
-        fattack = std::dynamic_pointer_cast<LawControl>(
-                      filterEnvControls->getControls()[C::ATTACK_INDEX])
-                      .get();
-        fhold = std::dynamic_pointer_cast<LawControl>(
-                    filterEnvControls->getControls()[C::HOLD_INDEX])
-                    .get();
-        fdecay = std::dynamic_pointer_cast<LawControl>(
-                     filterEnvControls->getControls()[C::DECAY_INDEX])
-                     .get();
-        reso = std::dynamic_pointer_cast<LawControl>(
-                   svfControls->getControls()[C::RESO_INDEX])
-                   .get();
+        filterEnv = new Mpc2000XlFilterEnvelope();
+        svfLeft = new StateVariableFilter();
+        svfRight = new StateVariableFilter();
     }
 }
 
@@ -82,10 +66,8 @@ Voice::~Voice()
 
     if (!isBasicVoice)
     {
-        delete filterEnvControls;
         delete ampEnv;
         delete filterEnv;
-        delete svfControls;
         delete svfLeft;
         delete svfRight;
     }
@@ -166,42 +148,34 @@ void Voice::init(const int velocity, const std::shared_ptr<Sound> &sound,
     state->isMono = sound->isMono();
     state->sampleData = sound->getSampleData();
     state->soundLevel = sound->getSndLevel();
+    state->sampleRate = engineSampleRate;
 
     staticEnv->reset();
 
     if (!isBasicVoice)
     {
-        const auto veloFactor = state->velocity / 127.f;
-        state->filtParam = noteParameters.filterFrequency;
+        Mpc2000XlFilterEnvelope::Parameters parameters;
+        parameters.cutoff = noteParameters.filterFrequency;
+        parameters.resonance = noteParameters.filterResonance;
+        parameters.attack = noteParameters.filterAttack;
+        parameters.decay = noteParameters.filterDecay;
+        parameters.amount = noteParameters.filterEnvelopeAmount;
+        parameters.velocityToCutoff =
+            noteParameters.velocityToFilterFrequency;
+        parameters.velocity = state->velocity;
+        parameters.filterNoteVariationEnabled = state->varType == 3;
+        parameters.filterNoteVariation = state->varValue;
+        parameters.outputSampleRate = state->sampleRate;
+        filterEnv->configure(parameters);
 
-        if (state->varType == 3)
-        {
-            state->filtParam = state->varValue;
-        }
-
-        state->filterCutoff =
-            state->filtParam +
-            veloFactor * noteParameters.velocityToFilterFrequency;
-        state->filterCutoff =
-            static_cast<float>(17.0 + state->filterCutoff * 0.75);
+        state->filterCutoff = filterEnv->getBaseIndex();
+        state->filterResonance =
+            std::clamp<int>(noteParameters.filterResonance, 0, 15);
         svfLeft->resetElementState();
         svfRight->resetElementState();
-        filterEnv->reset();
-        fattack->setValue(
-            static_cast<float>(noteParameters.filterAttack * 0.002) *
-            C::MAX_ATTACK_LENGTH_SAMPLES);
-        fhold->setValue(0);
-        fdecay->setValue(
-            static_cast<float>(noteParameters.filterDecay * 0.002) *
-            C::MAX_DECAY_LENGTH_SAMPLES);
-        reso->setValue(
-            static_cast<float>(0.0625 + noteParameters.filterResonance / 26.0));
-        state->filterResonance = svfControls->getResonance();
     }
 
     state->decayCounter = 0;
-
-    state->sampleRate = engineSampleRate;
 
     initializeSamplerateDependents(state, true);
 
@@ -215,7 +189,7 @@ void Voice::initializeSamplerateDependents(VoiceState *state,
 
     if (!isBasicVoice)
     {
-        filterEnvControls->setSampleRate(state->sampleRate);
+        filterEnv->setOutputSampleRate(state->sampleRate);
     }
 
     const auto pitchStep = std::clamp(
@@ -272,8 +246,6 @@ void Voice::initializeSamplerateDependents(VoiceState *state,
         {
             ampEnv->setOutputSampleRate(state->sampleRate);
         }
-
-        state->inverseNyquist = VoiceUtil::getInverseNyquist(state->sampleRate);
     }
 }
 
@@ -299,43 +271,32 @@ const std::vector<float> &Voice::getFrame()
 
     readFrame();
 
-    float filterFreq = 0;
-
-    if (!isBasicVoice)
-    {
-        filterFreq = VoiceUtil::midiFreq(state->filterCutoff * 1.44f) *
-                     state->inverseNyquist;
-        const auto filterEnvFactor = static_cast<float>(
-            filterEnv->getEnvelope(false) *
-            (state->noteParameters.filterEnvelopeAmount * 0.01));
-        filterFreq +=
-            VoiceUtil::midiFreq(144) * state->inverseNyquist * filterEnvFactor;
-    }
+    const auto filterCoefficient =
+        isBasicVoice ? 0.0 : filterEnv->nextCoefficient();
 
     if (state->isMono)
     {
-        frame[0] *= state->envAmplitude;
-
         if (!isBasicVoice)
         {
-            frame[0] =
-                svfLeft->filter(frame[0], filterFreq, state->filterResonance);
+            frame[0] = svfLeft->filter(frame[0], filterCoefficient,
+                                       state->filterResonance);
         }
 
+        frame[0] *= state->envAmplitude;
         frame[1] = frame[0];
     }
     else
     {
-        frame[0] *= state->envAmplitude;
-        frame[1] *= state->envAmplitude;
-
         if (!isBasicVoice)
         {
-            frame[0] =
-                svfLeft->filter(frame[0], filterFreq, state->filterResonance);
-            frame[1] =
-                svfRight->filter(frame[1], filterFreq, state->filterResonance);
+            frame[0] = svfLeft->filter(frame[0], filterCoefficient,
+                                       state->filterResonance);
+            frame[1] = svfRight->filter(frame[1], filterCoefficient,
+                                        state->filterResonance);
         }
+
+        frame[0] *= state->envAmplitude;
+        frame[1] *= state->envAmplitude;
     }
 
     return frame;

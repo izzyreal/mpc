@@ -34,7 +34,7 @@ namespace mpc::performance
         p.filterFrequency = s->getFilterFrequency();
         p.filterResonance = s->getFilterResonance();
         p.filterEnvelopeAmount = s->getFilterEnvelopeAmount();
-        p.filterEnvelopeAmount = s->getFilterAttack();
+        p.filterAttack = s->getFilterAttack();
         p.filterDecay = s->getFilterDecay();
         p.velocityRangeLower = s->getVelocityRangeLower();
         p.velocityRangeUpper = s->getVelocityRangeUpper();
