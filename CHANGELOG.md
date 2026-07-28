@@ -1,3 +1,34 @@
+## v0.9.15 (28-7-2026)
+* Fixed a regression that v0.9.14 introduced: you can now press pads to trigger drum notes even when the sequence is unused again.
+* Improved per-voice low-pass filter. With the help of Codex, I did another round of MPC2000XL filter analysis. This was done through a combination of recording my MPC2000XL, as well as by letting Codex probe MAME running MPC2000XL. Long story short, VMPC2000XL's filter now sounds much more like the real MPC2000XL's. The main issue was in how the various cutoff frequency and resonance factors were mapped to parameter values for the Chamberlin state variable filter algorithm.
+* Improved envelope authenticity. Those who make use of higher attack and decay values, especially with longer sounds, should notice that VMPC2000XL behaves much more like the real MPC2000XL than it used to in previous versions.
+* Reduced MIDI input latency. There was 1 buffer of unnecessary latency.
+* [plugin] Fixed a bug in the timing of MIDI notes that are sequenced in the host rather than VMPC2000XL's sequencer. Those who rely on host arrangements, may have noticed "arbitrary" (quantized to audio buffer) MIDI event processing. This should now be resolved, and host sequences should sound as tight as VMPC2000XL sequences.
+* Implement drum note event auditioning, i.e. "PLAY" in ASSIGN and PARAMS screens, and Velocity Modulation and similar windows. This feature was missing from VMPC2000XL for 10 years, even though it's a real MPC2000XL feature.
+* Fixed a bug in restoring the latest MIDI control mapping.
+* Fixed a UX race when restoring auto-save while a known MIDI controller is connected.
+
+## v0.9.14 (24-7-2026)
+* The pre-existing MPC2000XL file format parsers that I wrote manually 10 years ago have been replaced by Kaitai ones. See https://github.com/izzyreal/mpc2000xl_kaitai. 
+* File load support for the following MPC3000 and MPC60 formats:
+
+  - ALL: MPC3000 OS 3.10, 3.11, MPC60 OS 2.05, 2.12, 2.14
+  - APS: MPC3000 OS 3.10, 3.11, probably MPC60 3.x too
+  - SND: MPC3000 OS 3.10, 3.11, probably MCP60 3.x too
+  - PGM: MPC3000 OS 3.10, 3.11, probably MPC60 3.x too
+  - SEQ: MPC60 OS 2.05, 2.12, 2.14, MPC3000 OS 3.10, 3.11
+
+  This means VMPC2000XL is the first open source project I know of that successfully loads such an extensive collection of early MPC file formats.
+* Implement decay and velocity switch sound generation modes. I feel a little bit ashamed that it took me 10 years to finally add this to the project, because I recall decay switch mode is one of the features Roger Linn was quite excited about. The MPC60 factory SET files make extensive use of decay switch in combination with the slider, which on the MPC60 is called HIHAT DECAY. In these SET files, the slider lets you cycle between 3 different hihat sounds: closed, medium and open. This lets you build quite rich and natural sounding hihat grooves.
+* Fix multi-recording mode when recording the same note on multiple tracks simultaneously.
+* Switch pad SVG to pinched variety when physically pressed. This used to work in the first few incarnations of the vector-based UI, but it got lost when adding "sophisticated" pad glows more recently.
+* Fix rendering glitch after saving an individual sequence.
+* Sequence playback preview while loading an invidual sequence (just like on the real MPC2000XL).
+* Pad presses don't generate MIDI events when in TRIM/LOOP/ZONE/PARAMS or child screens (just like on the real MPC2000XL).
+* Pad presses only generate MIDI events when the active sequence is a used one.
+* Fall back to first enabled disk after disabling the currently active one.
+* Fix double-click REC or OVERDUB to arm record/overdub when using VMPC2000XL as a plugin.
+
 ## v0.9.13 (14-6-2026)
 * Improved MID file reading and writing.
 * Fix MID file name change when saving a MID file.
