@@ -74,6 +74,11 @@ namespace mpc::engine
         // local note events are currently active.
         void prepareProcessBlock(int nFrames);
 
+        // Drains only model queues. Unlike prepareProcessBlock(), this does not
+        // advance sample-precise tasks and is therefore safe to call again
+        // after host MIDI has been dispatched for the current block.
+        void drainAudioThreadStateQueues();
+
         utils::PostToAudioThreadFn postToAudioThread;
         void
         postSamplePreciseTaskToAudioThread(concurrency::SamplePreciseTask &);

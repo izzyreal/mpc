@@ -325,7 +325,7 @@ void EventHandler::handleUnfinalizedNoteOn(
 
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     const NoteNumber noteNumber, const std::optional<int> trackDevice,
-    const std::optional<DrumBusIndex> drumBusIndex)
+    const std::optional<DrumBusIndex> drumBusIndex, const int frameOffset)
 {
     if (drumBusIndex.has_value() && isDrumNote(noteNumber))
     {
@@ -333,9 +333,10 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
 
         assert(drumBus);
 
-        const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
+        auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
             0, drumBus, &mpc.getEngineHost()->getVoices(), noteNumber, -1);
 
+        ctx.frameOffset = frameOffset;
         DrumNoteEventHandler::noteOff(ctx);
     }
 

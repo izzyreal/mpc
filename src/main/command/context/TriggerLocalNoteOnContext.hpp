@@ -76,5 +76,6 @@ namespace mpc::command::context
         int hardwareSliderValue;
         Tick metronomeOnlyPositionTicks;
         Tick positionTicks;
+        int frameOffset;
     };
 } // namespace mpc::command::context

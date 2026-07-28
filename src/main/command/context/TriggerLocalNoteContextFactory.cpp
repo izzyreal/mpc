@@ -43,7 +43,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::shared_ptr<EventHandler> &eventHandler,
     const std::shared_ptr<Screens> &screens,
     const std::shared_ptr<Hardware> &hardware,
-    const Tick metronomeOnlyPositionTicks, const Tick positionTicks)
+    const Tick metronomeOnlyPositionTicks, const Tick positionTicks,
+    const int frameOffset)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -100,7 +101,8 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         controller->setSelectedPad,
         hardwareSliderValue,
         metronomeOnlyPositionTicks,
-        positionTicks};
+        positionTicks,
+        frameOffset};
 }
 
 TriggerLocalNoteOffContext
@@ -112,7 +114,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     Sequencer *sequencer, PerformanceManager *performanceManager,
     const ClientEventController *controller, EventHandler *eventHandler,
     Screens *screens, Hardware *hardware, const Tick metronomeOnlyPositionTicks,
-    const Tick positionTicks)
+    const Tick positionTicks, const int frameOffset)
 {
     const auto stepEditOptionsScreen =
         screens->get<ScreenId::StepEditOptionsScreen>();
@@ -163,5 +165,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
         sequencer->getTransport()->getCurrentBarIndex(),
         timingCorrectScreen->getSwing(),
         sequencer,
-        positionTicks};
+        positionTicks,
+        frameOffset};
 }

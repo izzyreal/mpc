@@ -190,6 +190,11 @@ void EngineHost::prepareProcessBlock(const int nFrames)
 {
     audioTasks.drain();
     preciseTasks.processTasks(nFrames);
+    drainAudioThreadStateQueues();
+}
+
+void EngineHost::drainAudioThreadStateQueues()
+{
     mpc.getSequencer()->getStateManager()->drainQueue();
     mpc.getPerformanceManager().lock()->drainQueue();
 }

@@ -111,7 +111,7 @@ void TriggerLocalNoteOnCommand::execute()
     }
 
     ctx.eventHandler->handleUnfinalizedNoteOn(
-        noteOnEvent, ctx.track->getDeviceIndex(), drumBusType);
+        noteOnEvent, ctx.track->getDeviceIndex(), drumBusType, ctx.frameOffset);
 
     sequencer::EventData *recordNoteOnEvent = nullptr;
 

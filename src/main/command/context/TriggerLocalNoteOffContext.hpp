@@ -58,5 +58,6 @@ namespace mpc::command::context
         const int swing;
         sequencer::Sequencer *sequencer;
         Tick positionTicks;
+        int frameOffset;
     };
 } // namespace mpc::command::context

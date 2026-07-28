@@ -298,20 +298,24 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             transport.getMetronomeOnlyPositionTicks();
 
         const auto positionTicks = transport.getPositionTicks();
+        const auto frameOffset = static_cast<int>(e.getBufferOffset());
 
         utils::SimpleAction action(
-            [track, screen, programPadIndex, program, this, positionTicks,
-             metronomeOnlyPositionTicks, noteOnEvent]
+            [track, screen, program, this, positionTicks,
+             metronomeOnlyPositionTicks, noteOnEvent, frameOffset]
             {
+                const auto programPadIndex = program->getPadIndexFromNote(
+                    DrumNoteNumber(noteOnEvent.noteNumber));
+
                 const auto ctx = TriggerLocalNoteContextFactory::
                     buildTriggerLocalNoteOnContext(
                         PerformanceEventSource::MidiInput, noteOnEvent,
                         noteOnEvent.noteNumber, noteOnEvent.velocity,
-                        track.get(), screen->getBus(), screen, NoPhysicalPadIndex,
-                        programPadIndex, program, sequencer,
+                        track.get(), screen->getBus(), screen,
+                        NoPhysicalPadIndex, programPadIndex, program, sequencer,
                         clientEventController.lock(), eventHandler.lock(),
                         screens.lock(), hardware.lock(),
-                        metronomeOnlyPositionTicks, positionTicks);
+                        metronomeOnlyPositionTicks, positionTicks, frameOffset);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();
             });
@@ -344,10 +348,12 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     const bool isSequencerRunning = transport.isSequencerRunning();
     const bool isRecordingOrOverdubbing = transport.isRecordingOrOverdubbing();
+    const auto frameOffset = static_cast<int>(e.getBufferOffset());
 
     utils::SimpleAction action(
         [this, positionTicks, metronomeOnlyPositionTicks, lockedSequencer,
-         noteNumber, midiChannel, isSequencerRunning, isRecordingOrOverdubbing]
+         noteNumber, midiChannel, isSequencerRunning, isRecordingOrOverdubbing,
+         frameOffset]
         {
             const auto manager = performanceManager.lock();
             const auto registeredNoteOnEvent =
@@ -427,7 +433,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     clientEventController.lock().get(),
                     eventHandler.lock().get(), screens.lock().get(),
                     hardware.lock().get(), metronomeOnlyPositionTicks,
-                    positionTicks);
+                    positionTicks, frameOffset);
 
             command::TriggerLocalNoteOffCommand(ctx).execute();
         });

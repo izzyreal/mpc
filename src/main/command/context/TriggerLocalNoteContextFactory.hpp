@@ -57,7 +57,8 @@ namespace mpc::command::context
             const std::shared_ptr<audiomidi::EventHandler> &,
             const std::shared_ptr<lcdgui::Screens> &,
             const std::shared_ptr<hardware::Hardware> &,
-            Tick metronomeOnlyPositionTicks, Tick positionTicks);
+            Tick metronomeOnlyPositionTicks, Tick positionTicks,
+            int frameOffset = 0);
 
         static TriggerLocalNoteOffContext buildTriggerLocalNoteOffContext(
             performance::PerformanceEventSource source, NoteNumber noteNumber,
@@ -68,6 +69,7 @@ namespace mpc::command::context
             performance::PerformanceManager *,
             const controller::ClientEventController *,
             audiomidi::EventHandler *, lcdgui::Screens *, hardware::Hardware *,
-            Tick metronomeOnlyPositionTicks, Tick positionTicks);
+            Tick metronomeOnlyPositionTicks, Tick positionTicks,
+            int frameOffset = 0);
     };
 } // namespace mpc::command::context

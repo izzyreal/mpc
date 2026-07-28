@@ -18,5 +18,6 @@ namespace mpc::engine
         std::vector<std::shared_ptr<Voice>> *voices{};
         int note{};
         int noteOnStartTick{};
+        int frameOffset{};
     };
 } // namespace mpc::engine

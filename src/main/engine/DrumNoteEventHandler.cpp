@@ -289,7 +289,7 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &ctx)
                 (ctx.noteEventId == 0 ||
                  voice->getNoteEventId() == noteEventId))
             {
-                voice->startDecay();
+                voice->startDecay(ctx.frameOffset);
                 break;
             }
         }
