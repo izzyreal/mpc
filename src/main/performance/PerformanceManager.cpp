@@ -42,7 +42,8 @@ void PerformanceManager::registerPhysicalPadPress(
     const sequencer::BusType busType, const PhysicalPadIndex padIndex,
     const Velocity velocity, const TrackIndex trackIndex,
     const std::optional<ProgramIndex> programIndex,
-    const std::optional<DrumNoteNumber> noteNumber)
+    const std::optional<DrumNoteNumber> noteNumber,
+    const std::optional<int> midiOutputTrackDevice)
 {
     PhysicalPadPressEvent e{padIndex,
                             source,
@@ -52,7 +53,8 @@ void PerformanceManager::registerPhysicalPadPress(
                             velocity,
                             programIndex.value_or(NoProgramIndex),
                             noteNumber.value_or(NoDrumNoteAssigned),
-                            NoPressure};
+                            NoPressure,
+                            midiOutputTrackDevice};
 
     enqueue(std::move(e));
 }

@@ -315,7 +315,10 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                         NoPhysicalPadIndex, programPadIndex, program, sequencer,
                         clientEventController.lock(), eventHandler.lock(),
                         screens.lock(), hardware.lock(),
-                        metronomeOnlyPositionTicks, positionTicks, frameOffset);
+                        metronomeOnlyPositionTicks, positionTicks, frameOffset,
+                        track->getDeviceIndex() > 0
+                            ? std::optional<int>{track->getDeviceIndex()}
+                            : std::nullopt);
 
                 command::TriggerLocalNoteOnCommand(ctx).execute();
             });
@@ -433,7 +436,10 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
                     clientEventController.lock().get(),
                     eventHandler.lock().get(), screens.lock().get(),
                     hardware.lock().get(), metronomeOnlyPositionTicks,
-                    positionTicks, frameOffset);
+                    positionTicks, frameOffset,
+                    track->getDeviceIndex() > 0
+                        ? std::optional<int>{track->getDeviceIndex()}
+                        : std::nullopt);
 
             command::TriggerLocalNoteOffCommand(ctx).execute();
         });

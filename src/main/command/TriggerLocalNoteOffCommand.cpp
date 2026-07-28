@@ -30,8 +30,7 @@ void TriggerLocalNoteOffCommand::execute()
     }
 
     ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-        ctx.noteNumber, ctx.track->getDeviceIndex(), drumIndex,
-        ctx.frameOffset);
+        ctx.noteNumber, ctx.midiOutputTrackDevice, drumIndex, ctx.frameOffset);
 
     if (ctx.recordOnEvent &&
         !(ctx.sequencerIsRecordingOrOverdubbing && ctx.isErasePressed))

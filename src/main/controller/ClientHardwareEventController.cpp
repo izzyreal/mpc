@@ -182,13 +182,6 @@ bool ClientHardwareEventController::
            layeredScreen->isCurrentScreenOrChildOf(ScreenId::SndParamsScreen);
 }
 
-bool ClientHardwareEventController::
-    isPadNoteGenerationSuppressedForCurrentSequence() const
-{
-    const auto selectedSequence = mpc.getSequencer()->getSelectedSequence();
-    return !selectedSequence || !selectedSequence->isUsed();
-}
-
 void ClientHardwareEventController::handlePadPress(
     const ClientHardwareEvent &event)
 {
@@ -327,8 +320,15 @@ void ClientHardwareEventController::handlePadPress(
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, note).execute();
 
     const bool isPadNoteGenerationSuppressed =
-        isPadNoteGenerationSuppressedForCurrentScreen() ||
-        isPadNoteGenerationSuppressedForCurrentSequence();
+        isPadNoteGenerationSuppressedForCurrentScreen();
+    const auto selectedSequence = mpc.getSequencer()->getSelectedSequence();
+    std::optional<int> midiOutputTrackDevice;
+
+    if (selectedSequence && selectedSequence->isUsed() &&
+        track->getDeviceIndex() > 0)
+    {
+        midiOutputTrackDevice = track->getDeviceIndex();
+    }
 
     if (note != NoDrumNoteAssigned && !isPadNoteGenerationSuppressed)
     {
@@ -379,10 +379,9 @@ void ClientHardwareEventController::handlePadPress(
             const auto positionTicks = transport.getPositionTicks();
 
             action = utils::SimpleAction(
-                [noteEventInfo = *registryNoteOnEvent, clampedVelocity,
-                 tr = track.get(), screen, program, physicalPadIndex,
-                 programPadIndex, this, metronomeOnlyPositionTicks,
-                 positionTicks]
+                [noteEventInfo = *registryNoteOnEvent, tr = track.get(), screen,
+                 program, programPadIndex, this, metronomeOnlyPositionTicks,
+                 positionTicks, midiOutputTrackDevice]
                 {
                     const DrumNoteNumber drumNoteNumber =
                         program->getNoteFromPad(
@@ -392,13 +391,13 @@ void ClientHardwareEventController::handlePadPress(
                         buildTriggerLocalNoteOnContext(
                             PerformanceEventSource::VirtualMpcHardware,
                             noteEventInfo, drumNoteNumber,
-                            Velocity(clampedVelocity), tr, screen->getBus(),
-                            screen, PhysicalPadIndex(physicalPadIndex),
+                            noteEventInfo.velocity, tr, screen->getBus(),
+                            screen, noteEventInfo.physicalPadIndex,
                             ProgramPadIndex(programPadIndex), program,
                             mpc.getSequencer(), mpc.clientEventController,
                             mpc.getEventHandler(), mpc.screens,
                             mpc.getHardware(), metronomeOnlyPositionTicks,
-                            positionTicks);
+                            positionTicks, 0, midiOutputTrackDevice);
 
                     TriggerLocalNoteOnCommand(ctx).execute();
                 });
@@ -409,7 +408,7 @@ void ClientHardwareEventController::handlePadPress(
         PerformanceEventSource::VirtualMpcHardware, screenId,
         screen->getBus()->busType, PhysicalPadIndex(physicalPadIndex),
         Velocity(clampedVelocity), track->getIndex(), screen->getProgramIndex(),
-        note);
+        note, midiOutputTrackDevice);
 
     if (action)
     {
@@ -571,7 +570,8 @@ void ClientHardwareEventController::handlePadRelease(
                                         mpc.clientEventController.get(),
                                         mpc.getEventHandler().get(),
                                         mpc.screens.get(), mpc.getHardware().get(),
-                                        metronomeOnlyPositionTicks, positionTicks);
+                                        metronomeOnlyPositionTicks, positionTicks,
+                                        0, p.midiOutputTrackDevice);
 
                                 TriggerLocalNoteOffCommand(ctx).execute();
                             });
@@ -621,8 +621,7 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     std::optional<utils::SimpleAction> action = std::nullopt;
     const bool isPadNoteGenerationSuppressed =
-        isPadNoteGenerationSuppressedForCurrentScreen() ||
-        isPadNoteGenerationSuppressedForCurrentSequence();
+        isPadNoteGenerationSuppressedForCurrentScreen();
 
     if (padPressEvent)
     {

@@ -92,7 +92,6 @@ namespace mpc::controller
 
         void updateMostRecentPhysicalPadPressVelocity(Velocity);
         bool isPadNoteGenerationSuppressedForCurrentScreen() const;
-        bool isPadNoteGenerationSuppressedForCurrentSequence() const;
 
         void handlePadPress(const client::event::ClientHardwareEvent &);
         void

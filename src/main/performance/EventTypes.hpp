@@ -6,8 +6,9 @@
 #include "lcdgui/ScreenId.hpp"
 #include "sequencer/BusType.hpp"
 
-#include <vector>
 #include <cstdint>
+#include <optional>
+#include <vector>
 
 namespace mpc::sequencer
 {
@@ -26,6 +27,7 @@ namespace mpc::performance
         ProgramIndex programIndex;
         DrumNoteNumber drumNoteNumber;
         Pressure pressure;
+        std::optional<int> midiOutputTrackDevice;
     };
 
     struct PhysicalPadAftertouchEvent

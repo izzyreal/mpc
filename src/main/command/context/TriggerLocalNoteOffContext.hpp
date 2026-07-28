@@ -59,5 +59,6 @@ namespace mpc::command::context
         sequencer::Sequencer *sequencer;
         Tick positionTicks;
         int frameOffset;
+        std::optional<int> midiOutputTrackDevice;
     };
 } // namespace mpc::command::context

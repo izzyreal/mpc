@@ -50,7 +50,8 @@ namespace mpc::performance
                                       sequencer::BusType, PhysicalPadIndex,
                                       Velocity, TrackIndex,
                                       std::optional<ProgramIndex>,
-                                      std::optional<DrumNoteNumber>);
+                                      std::optional<DrumNoteNumber>,
+                                      std::optional<int> midiOutputTrackDevice);
 
         void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure,
                                            PerformanceEventSource);

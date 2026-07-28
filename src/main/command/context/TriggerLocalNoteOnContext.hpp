@@ -77,5 +77,6 @@ namespace mpc::command::context
         Tick metronomeOnlyPositionTicks;
         Tick positionTicks;
         int frameOffset;
+        std::optional<int> midiOutputTrackDevice;
     };
 } // namespace mpc::command::context
