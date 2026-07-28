@@ -288,7 +288,7 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
 void EventHandler::handleUnfinalizedNoteOn(
     const EventData &noteOnEvent, const std::optional<int> trackDevice,
     const std::optional<BusType> drumBusType,
-    const int frameOffset)
+    const int frameOffset, const uint64_t noteEventId)
 {
     assert(noteOnEvent.type == sequencer::EventType::NoteOn &&
            noteOnEvent.duration == NoDuration);
@@ -305,7 +305,7 @@ void EventHandler::handleUnfinalizedNoteOn(
                 drumBus->getIndex());
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-            0, performanceDrum, drumBus, mpc.getSampler(),
+            noteEventId, performanceDrum, drumBus, mpc.getSampler(),
             mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(), note,
@@ -325,7 +325,8 @@ void EventHandler::handleUnfinalizedNoteOn(
 
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     const NoteNumber noteNumber, const std::optional<int> trackDevice,
-    const std::optional<DrumBusIndex> drumBusIndex, const int frameOffset)
+    const std::optional<DrumBusIndex> drumBusIndex, const int frameOffset,
+    const uint64_t noteEventId)
 {
     if (drumBusIndex.has_value() && isDrumNote(noteNumber))
     {
@@ -334,7 +335,8 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         assert(drumBus);
 
         auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-            0, drumBus, &mpc.getEngineHost()->getVoices(), noteNumber, -1);
+            noteEventId, drumBus, &mpc.getEngineHost()->getVoices(),
+            noteNumber, -1);
 
         ctx.frameOffset = frameOffset;
         DrumNoteEventHandler::noteOff(ctx);
@@ -349,6 +351,42 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         handleNoteEventMidiOut(noteOffEvent, *trackDevice, std::nullopt,
                                std::nullopt, sampleNumber);
     }
+}
+
+void EventHandler::startProgramNoteAudition(const DrumBusIndex drumBusIndex,
+                                            const DrumNoteNumber note,
+                                            const Velocity velocity)
+{
+    releaseProgramNoteAudition();
+
+    const auto noteEventIdToUse = noteEventId++;
+
+    EventData noteOnEvent;
+    noteOnEvent.type = EventType::NoteOn;
+    noteOnEvent.noteNumber = note;
+    noteOnEvent.velocity = velocity;
+
+    handleUnfinalizedNoteOn(noteOnEvent, std::nullopt,
+                            drumBusIndexToDrumBusType(drumBusIndex), 0,
+                            noteEventIdToUse);
+
+    activeProgramNoteAudition =
+        ProgramNoteAudition{drumBusIndex, note, noteEventIdToUse};
+}
+
+void EventHandler::releaseProgramNoteAudition()
+{
+    if (!activeProgramNoteAudition)
+    {
+        return;
+    }
+
+    handleNoteOffFromUnfinalizedNoteOn(activeProgramNoteAudition->note,
+                                       std::nullopt,
+                                       activeProgramNoteAudition->drumBusIndex,
+                                       0,
+                                       activeProgramNoteAudition->noteEventId);
+    activeProgramNoteAudition.reset();
 }
 
 /**

@@ -106,6 +106,14 @@ void DrumScreen::function(const int f)
     }
 }
 
+void DrumScreen::openWindow()
+{
+    if (isFocusedFieldName("pgm"))
+    {
+        openScreenById(ScreenId::ProgramScreen);
+    }
+}
+
 void DrumScreen::turnWheel(const int i)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();

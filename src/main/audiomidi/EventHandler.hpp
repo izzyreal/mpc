@@ -31,6 +31,15 @@ namespace mpc::audiomidi
     private:
         std::atomic<uint64_t> noteEventId = 1;
 
+        struct ProgramNoteAudition
+        {
+            DrumBusIndex drumBusIndex;
+            DrumNoteNumber note;
+            uint64_t noteEventId;
+        };
+
+        std::optional<ProgramNoteAudition> activeProgramNoteAudition;
+
     public:
         void handleFinalizedEvent(const sequencer::EventData &,
                                   TrackIndex trackIndex, int trackVelocityRatio,
@@ -40,18 +49,23 @@ namespace mpc::audiomidi
         handleUnfinalizedNoteOn(const sequencer::EventData &,
                                 std::optional<int> trackDevice,
                                 std::optional<sequencer::BusType> drumBusType,
-                                int frameOffset = 0);
+                                int frameOffset = 0,
+                                uint64_t noteEventId = 0);
 
         void handleNoteOffFromUnfinalizedNoteOn(NoteNumber,
                                                 std::optional<int> trackDevice,
                                                 std::optional<DrumBusIndex>,
-                                                int frameOffset = 0);
+                                                int frameOffset = 0,
+                                                uint64_t noteEventId = 0);
 
         void handleNoteEventMidiOut(const sequencer::EventData &,
                                     int trackDevice,
                                     std::optional<int> trackVelocityRatio,
                                     std::optional<int> transposeAmount,
                                     int sampleNumber);
+
+        void startProgramNoteAudition(DrumBusIndex, DrumNoteNumber, Velocity);
+        void releaseProgramNoteAudition();
 
     private:
         void handleFinalizedDrumNoteOnEvent(

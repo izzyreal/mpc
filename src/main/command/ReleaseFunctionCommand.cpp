@@ -1,4 +1,5 @@
 #include "ReleaseFunctionCommand.hpp"
+#include "ReleaseProgramNoteAuditionCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "engine/EngineHost.hpp"
@@ -19,6 +20,11 @@ ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, const int i)
 
 void ReleaseFunctionCommand::execute()
 {
+    if (i == 4 || i == 5)
+    {
+        ReleaseProgramNoteAuditionCommand(mpc).execute();
+    }
+
     const auto ls = mpc.getLayeredScreen();
     switch (i)
     {

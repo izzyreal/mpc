@@ -2,9 +2,11 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -92,6 +94,20 @@ void VelocityModulationScreen::open()
                  displayVeloLevel();
              }});
     }
+}
+
+void VelocityModulationScreen::function(const int i)
+{
+    if (i == 4)
+    {
+        command::AuditionProgramNoteCommand(
+            mpc, getActiveDrumBus()->getIndex(),
+            mpc.clientEventController->getSelectedNote(), velo)
+            .execute();
+        return;
+    }
+
+    ScreenComponent::function(i);
 }
 
 void VelocityModulationScreen::turnWheel(const int i)

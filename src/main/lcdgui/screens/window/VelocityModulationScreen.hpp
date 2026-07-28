@@ -8,6 +8,7 @@ namespace mpc::lcdgui::screens::window
     public:
         VelocityModulationScreen(Mpc &mpc, int layerIndex);
 
+        void function(int i) override;
         void turnWheel(int i) override;
 
         void open() override;

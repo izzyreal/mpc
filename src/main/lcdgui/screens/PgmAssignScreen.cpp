@@ -4,6 +4,7 @@
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
 
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "controller/ClientEventController.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
@@ -201,6 +202,12 @@ void PgmAssignScreen::function(const int i)
             openScreenById(ScreenId::AutoChromaticAssignmentScreen);
             break;
         }
+        case 5:
+            command::AuditionProgramNoteCommand(
+                mpc, getActiveDrumBus()->getIndex(),
+                mpc.clientEventController->getSelectedNote(), MaxVelocity)
+                .execute();
+            break;
         default:;
     }
 }

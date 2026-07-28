@@ -3,6 +3,7 @@
 #include "Mpc.hpp"
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "controller/ClientEventController.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
@@ -157,6 +158,10 @@ void PgmParamsScreen::function(const int i)
             break;
         }
         case 5:
+            command::AuditionProgramNoteCommand(
+                mpc, getActiveDrumBus()->getIndex(),
+                mpc.clientEventController->getSelectedNote(), MaxVelocity)
+                .execute();
             break;
         default:;
     }

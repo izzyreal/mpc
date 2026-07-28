@@ -1,5 +1,6 @@
 #pragma once
 
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "command/PushLeftCommand.hpp"
 #include "command/PushRightCommand.hpp"
 #include "command/PushUpCommand.hpp"
@@ -32,3 +33,4 @@
 #include "command/ReleaseTapCommand.hpp"
 #include "command/ReleaseFunctionCommand.hpp"
 #include "command/ReleaseGoToCommand.hpp"
+#include "command/ReleaseProgramNoteAuditionCommand.hpp"

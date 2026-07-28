@@ -429,6 +429,12 @@ int Voice::getNote() const
     return state->noteNumber;
 }
 
+int Voice::getVelocity() const
+{
+    const VoiceState *state = getActiveState();
+    return state->velocity;
+}
+
 uint64_t Voice::getNoteEventId()
 {
     const VoiceState *state = getActiveState();

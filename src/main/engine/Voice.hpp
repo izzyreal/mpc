@@ -158,6 +158,8 @@ namespace mpc::engine
 
         int getNote() const;
 
+        int getVelocity() const;
+
         bool isFinished() const;
 
         bool isPlayingDrumProgramNoteCombination(DrumBusIndex, ProgramIndex,

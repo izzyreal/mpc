@@ -2,9 +2,11 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -101,6 +103,20 @@ void VeloEnvFilterScreen::open()
 
     displayNoteProperties();
     displayVelo();
+}
+
+void VeloEnvFilterScreen::function(const int i)
+{
+    if (i == 4)
+    {
+        command::AuditionProgramNoteCommand(
+            mpc, getActiveDrumBus()->getIndex(),
+            mpc.clientEventController->getSelectedNote(), velo)
+            .execute();
+        return;
+    }
+
+    ScreenComponent::function(i);
 }
 
 void VeloEnvFilterScreen::turnWheel(const int i)

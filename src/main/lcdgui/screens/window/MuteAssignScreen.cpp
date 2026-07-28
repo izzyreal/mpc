@@ -1,7 +1,9 @@
 #include "MuteAssignScreen.hpp"
 #include "Mpc.hpp"
+#include "command/AuditionProgramNoteCommand.hpp"
 #include "controller/ClientEventController.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -69,6 +71,19 @@ void MuteAssignScreen::open()
     displayNote();
     displayNote0();
     displayNote1();
+}
+
+void MuteAssignScreen::function(const int i)
+{
+    if (i == 4)
+    {
+        command::AuditionProgramNoteCommand(mpc, getActiveDrumBus()->getIndex(),
+                                            drumNoteToEdit, MaxVelocity)
+            .execute();
+        return;
+    }
+
+    ScreenComponent::function(i);
 }
 
 void MuteAssignScreen::turnWheel(const int i)

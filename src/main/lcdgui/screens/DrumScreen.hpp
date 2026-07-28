@@ -10,6 +10,7 @@ namespace mpc::lcdgui::screens
     public:
         DrumScreen(Mpc &mpc, int layerIndex);
         void function(int f) override;
+        void openWindow() override;
         void turnWheel(int i) override;
         void open() override;
 
