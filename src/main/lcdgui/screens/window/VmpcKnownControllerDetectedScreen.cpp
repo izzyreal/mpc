@@ -56,12 +56,7 @@ void VmpcKnownControllerDetectedScreen::open()
     {
         const auto vmpcMidiScreen =
             mpc.screens->get<ScreenId::VmpcMidiScreen>();
-        mpc.getDisk()->readMidiControlPreset(
-            mpc.paths->getDocuments()->midiControlPresetsPath() /
-                (controllerName + ".json"),
-            vmpcMidiScreen->switchToPreset);
-
-        vmpcMidiScreen->shouldSwitch.store(true);
+        vmpcMidiScreen->activatePreset(preset);
         ls.lock()->openPreviousScreen();
         return;
     }
@@ -81,14 +76,18 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
             break;
         case 2:
             // YES
+        {
+            const auto switchToPreset =
+                std::make_shared<MidiControlPresetV3>();
             mpc.getDisk()->readMidiControlPreset(
                 mpc.paths->getDocuments()->midiControlPresetsPath() /
                     (controllerName + ".json"),
-                vmpcMidiScreen->switchToPreset);
+                switchToPreset);
 
-            vmpcMidiScreen->shouldSwitch.store(true);
+            vmpcMidiScreen->activatePreset(switchToPreset);
             ls.lock()->openPreviousScreen();
             break;
+        }
         case 3:
             // NEVER
             // intentional fall-through
@@ -109,8 +108,7 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
 
             if (i == 4)
             {
-                vmpcMidiScreen->switchToPreset = preset;
-                vmpcMidiScreen->shouldSwitch.store(true);
+                vmpcMidiScreen->activatePreset(preset);
             }
 
             ls.lock()->openPreviousScreen();

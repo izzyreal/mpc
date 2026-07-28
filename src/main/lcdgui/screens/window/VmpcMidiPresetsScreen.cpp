@@ -234,27 +234,30 @@ void VmpcMidiPresetsScreen::function(const int i)
             break;
         case 4:
         {
-            const auto activePreset =
-                mpc.clientEventController->getClientMidiEventController()
-                    ->getExtendedController()
-                    ->getActivePreset();
+            const auto preset = std::make_shared<MidiControlPresetV3>();
 
             const auto index = row + rowOffset - 1;
 
             if (index == -1)
             {
-                MidiControlPresetUtil::resetMidiControlPreset(activePreset);
+                MidiControlPresetUtil::resetMidiControlPreset(preset);
             }
             else
             {
                 mpc.getDisk()->readMidiControlPreset(presetMetas[index].path,
-                                                     activePreset);
+                                                     preset);
             }
+
+            const auto vmpcMidiScreen =
+                mpc.screens->get<ScreenId::VmpcMidiScreen>();
+            const bool persisted = vmpcMidiScreen->activatePreset(preset);
 
             ls.lock()->showPopupAndThenOpen(
                 ScreenId::VmpcMidiPresetsScreen,
-                "Loading " +
-                    (index == -1 ? "Default" : presetMetas[index].name),
+                persisted ? "Loading " +
+                                (index == -1 ? "Default"
+                                             : presetMetas[index].name)
+                          : "Error saving active MIDI mapping",
                 700);
             break;
         }

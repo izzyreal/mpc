@@ -3,6 +3,7 @@
 #include <memory>
 #include <thread>
 #include <atomic>
+#include <functional>
 
 namespace mpc
 {
@@ -16,7 +17,8 @@ namespace mpc
         ~AutoSave();
 
         void restoreAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>,
-                                   bool headless);
+                                   bool headless,
+                                   std::function<void()> onComplete = {});
 
         static void storeAutoSavedState(Mpc &,
                                         const std::shared_ptr<SaveTarget> &);

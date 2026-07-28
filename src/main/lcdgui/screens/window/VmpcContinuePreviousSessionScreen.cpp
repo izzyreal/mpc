@@ -36,32 +36,30 @@ void VmpcContinuePreviousSessionScreen::function(const int i)
         case 1:
             // NO
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            if (doNotRestoreAutoSavedStateAction)
+            {
+                doNotRestoreAutoSavedStateAction();
+            }
             break;
         case 2:
             // YES
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            std::thread(
-                [this]
-                {
-                    restoreAutoSavedStateAction();
-                })
-                .detach();
+            restoreAutoSavedStateAction();
             break;
         case 3:
             // NEVER
             autoSaveScreen->setAutoLoadOnStart(0);
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            if (doNotRestoreAutoSavedStateAction)
+            {
+                doNotRestoreAutoSavedStateAction();
+            }
             break;
         case 4:
             // ALWAYS
             autoSaveScreen->setAutoLoadOnStart(2);
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            std::thread(
-                [this]
-                {
-                    restoreAutoSavedStateAction();
-                })
-                .detach();
+            restoreAutoSavedStateAction();
             break;
         default:
             break;
@@ -72,4 +70,10 @@ void VmpcContinuePreviousSessionScreen::setRestoreAutoSavedStateAction(
     const std::function<void()> &action)
 {
     restoreAutoSavedStateAction = action;
+}
+
+void VmpcContinuePreviousSessionScreen::
+    setDoNotRestoreAutoSavedStateAction(const std::function<void()> &action)
+{
+    doNotRestoreAutoSavedStateAction = action;
 }

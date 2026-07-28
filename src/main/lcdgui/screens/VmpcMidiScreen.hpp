@@ -31,6 +31,9 @@ namespace mpc::lcdgui::screens
         std::shared_ptr<input::midi::MidiControlPresetV3>
         getActivePreset() const;
 
+        bool activatePreset(
+            const std::shared_ptr<input::midi::MidiControlPresetV3> &);
+
         bool hasMappingChanged() const;
 
         std::atomic_bool shouldSwitch{false};
@@ -54,6 +57,8 @@ namespace mpc::lcdgui::screens
         void setLearning(bool b);
         void setLearnCandidateToSelectedBinding();
         void acceptLearnCandidate() const;
+        bool persistPresetAsActive(
+            const std::shared_ptr<input::midi::MidiControlPresetV3> &) const;
         bool persistActivePreset() const;
         void refreshUneditedActivePresetCopy();
         void displayRows();

@@ -149,13 +149,18 @@ std::string stripExtension(const std::string &fileName)
 
 void AutoSave::restoreAutoSavedState(Mpc &mpc,
                                      std::shared_ptr<SaveTarget> saveTarget,
-                                     const bool headless)
+                                     const bool headless,
+                                     std::function<void()> onComplete)
 {
     const auto vmpcAutoSaveScreen =
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 &&
         !mpc.isPluginModeEnabled())
     {
+        if (onComplete)
+        {
+            onComplete();
+        }
         return;
     }
 
@@ -185,11 +190,15 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
     if (availableFiles.empty())
     {
+        if (onComplete)
+        {
+            onComplete();
+        }
         return;
     }
 
     const auto restoreAction =
-        [&mpc, availableFiles, saveTarget, headless, this]
+        [&mpc, availableFiles, saveTarget, headless, onComplete, this]
     {
         try
         {
@@ -524,6 +533,11 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         {
             MLOG("AutoSave restore aborted: unknown exception");
         }
+
+        if (onComplete)
+        {
+            onComplete();
+        }
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&
@@ -531,7 +545,21 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     {
         const auto confirmScreen =
             mpc.screens->get<ScreenId::VmpcContinuePreviousSessionScreen>();
-        confirmScreen->setRestoreAutoSavedStateAction(restoreAction);
+        confirmScreen->setRestoreAutoSavedStateAction(
+            [restoreAction, this]
+            {
+                if (restoreThread.joinable())
+                {
+                    restoreThread.join();
+                }
+
+                restoreThread = std::thread(
+                    [restoreAction]
+                    {
+                        restoreAction();
+                    });
+            });
+        confirmScreen->setDoNotRestoreAutoSavedStateAction(onComplete);
         mpc.getLayeredScreen()->openScreenById(
             ScreenId::VmpcContinuePreviousSessionScreen);
         return;
@@ -652,13 +680,15 @@ void AutoSave::storeAutoSavedState(
 
 void AutoSave::interruptRestorationIfStillOngoing()
 {
-    shouldStopRestore.store(false, std::memory_order_relaxed);
-}
+    shouldStopRestore.store(true, std::memory_order_relaxed);
 
-AutoSave::~AutoSave()
-{
     if (restoreThread.joinable())
     {
         restoreThread.join();
     }
+}
+
+AutoSave::~AutoSave()
+{
+    interruptRestorationIfStillOngoing();
 }

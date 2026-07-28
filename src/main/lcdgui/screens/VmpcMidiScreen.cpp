@@ -346,14 +346,28 @@ bool VmpcMidiScreen::hasMappingChanged() const
 
 bool VmpcMidiScreen::persistActivePreset() const
 {
+    return persistPresetAsActive(getActivePreset());
+}
+
+bool VmpcMidiScreen::persistPresetAsActive(
+    const std::shared_ptr<MidiControlPresetV3> &preset) const
+{
     const auto path = mpc.paths->getDocuments()->activeMidiControlPresetPath();
 
     json presetJson;
-    to_json(presetJson, *getActivePreset());
+    to_json(presetJson, *preset);
 
     return success(set_file_data(path, presetJson.dump(4)),
                    FailurePolicy::Required,
                    "active MIDI preset save for '" + path.string() + "'");
+}
+
+bool VmpcMidiScreen::activatePreset(
+    const std::shared_ptr<MidiControlPresetV3> &preset)
+{
+    switchToPreset = preset;
+    shouldSwitch.store(true);
+    return persistPresetAsActive(preset);
 }
 
 void VmpcMidiScreen::refreshUneditedActivePresetCopy()
