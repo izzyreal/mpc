@@ -32,7 +32,7 @@ void LoadASetScreen::open()
         return;
     }
 
-    if (!mpc::file::kaitai::kMpc60SampleImportEnabled &&
+    if (!mpc::file::kaitai::Mpc60SampleImportPolicy::isEnabled() &&
         mpc::file::kaitai::isMpc60SetBytes(selectedFile->getBytes()))
     {
         const auto layeredScreen = ls.lock();
@@ -52,8 +52,7 @@ void LoadASetScreen::open()
     try
     {
         preview = std::make_unique<file::kaitai::Mpc60SetPreview>(
-            file::kaitai::Mpc60SetPreviewLoader::loadPreview(
-                selectedFile));
+            file::kaitai::Mpc60SetPreviewLoader::loadPreview(selectedFile));
     }
     catch (const std::exception &)
     {
@@ -97,8 +96,8 @@ LoadASetScreen::getConversionTable() const
     return conversionTable;
 }
 
-mpc::DrumNoteNumber LoadASetScreen::getConversionTargetNote(
-    const size_t mpc60PadIndex) const
+mpc::DrumNoteNumber
+LoadASetScreen::getConversionTargetNote(const size_t mpc60PadIndex) const
 {
     return conversionTable.at(mpc60PadIndex);
 }

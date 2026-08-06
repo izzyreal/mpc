@@ -1,11 +1,11 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include "TestMpc.hpp"
+#include "TestMpc60SampleImport.hpp"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "engine/EngineHost.hpp"
-#include "file/kaitai/Mpc60SampleImport.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -40,6 +40,34 @@ namespace
         mpc.getDisk()->initFiles();
     }
 
+    void prepareGeneratedSetFile(Mpc &mpc)
+    {
+        const auto fs = cmrc::mpctest::get_filesystem();
+        const auto fixture = fs.open("test/GeneratedMpc60/Set/DEMO.SET");
+        std::vector<char> data(fixture.begin(), fixture.end());
+        auto newFile = mpc.getDisk()->newFile("DEMO.SET");
+        newFile->setFileData(data);
+        mpc.getDisk()->initFiles();
+    }
+
+    void selectAndLoad(Mpc &mpc, const std::string &name)
+    {
+        auto layeredScreen = mpc.getLayeredScreen();
+        layeredScreen->openScreen("load");
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto fileNames = mpc.getDisk()->getFileNames();
+        const auto fileIt =
+            std::find_if(fileNames.begin(), fileNames.end(),
+                         [&name](const std::string &fileName)
+                         {
+                             return StrUtil::eqIgnoreCase(fileName, name);
+                         });
+        REQUIRE(fileIt != fileNames.end());
+        loadScreen->setFileLoad(
+            static_cast<int>(std::distance(fileNames.begin(), fileIt)));
+        loadScreen->function(5);
+    }
+
     void waitForLoadScreen(Mpc &mpc)
     {
         constexpr auto timeout = std::chrono::seconds(5);
@@ -70,7 +98,7 @@ namespace
 
         REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == screenName);
     }
-}
+} // namespace
 
 TEST_CASE("Unreadable .SET file reports error and returns to LOAD",
           "[load-set][ui]")
@@ -101,3 +129,27 @@ TEST_CASE("Unreadable .SET file reports error and returns to LOAD",
     REQUIRE(layeredScreen->getCurrentScreenName() == "load");
 }
 
+TEST_CASE("Generated MPC60 SET enters load workflow when enabled",
+          "[load-set][ui][generated-mpc60]")
+{
+    mpc::test::ScopedMpc60ImportSetting importSetting(true);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    prepareGeneratedSetFile(mpc);
+
+    selectAndLoad(mpc, "DEMO.SET");
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "load-a-set");
+}
+
+TEST_CASE("Generated MPC60 SET reports disabled policy from F6",
+          "[load-set][ui][mpc60-kill-switch]")
+{
+    mpc::test::ScopedMpc60ImportSetting importSetting(false);
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    prepareGeneratedSetFile(mpc);
+
+    selectAndLoad(mpc, "DEMO.SET");
+    REQUIRE(mpc.getLayeredScreen()->getCurrentScreenName() == "popup");
+    waitForScreen(mpc, "load");
+}

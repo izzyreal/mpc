@@ -1,0 +1,111 @@
+{
+  "format_version": 1,
+  "generator": {
+    "name": "private-fixture-generator-v1",
+    "source_sha256": "b1660f84551f7fb7ec5b70910105aa3ade994b1c246991d4ec9a1aa8333a2f35",
+    "parameters": {
+      "sample_rate": 40000,
+      "channel_conversion": "integer average of planar stereo channels",
+      "resampling": "deterministic fixed-point linear interpolation",
+      "encoding": "minimum absolute decoded PCM error; lower signed code wins ties"
+    },
+    "published": false
+  },
+  "fixtures": [
+    {
+      "path": "Snd/KICK1.SND",
+      "origin": "project-distributed-demo",
+      "source": "resources/demodata/TEST1/KICK1.SND",
+      "source_sha256": "aafaa109121642dc8cdab2ca6cbc3d8886efa90bffb166ccdfa7c98cb9a75e36",
+      "samples": 14239,
+      "expected_pcm_sha256": "d3782b6a858caba9ae60a99c77aeb26384640cbd769731d77d9aba9cde377cdb",
+      "purpose": ["transient percussion", "demo-derived SND load"]
+    },
+    {
+      "path": "Snd/HAT1.SND",
+      "origin": "project-distributed-demo",
+      "source": "resources/demodata/TEST1/HAT1.SND",
+      "source_sha256": "81811ffa27a1d6adc7ab16d73ab67038499b8aaca63f691ccfbf5df0f7ce8c9b",
+      "samples": 12400,
+      "expected_pcm_sha256": "6c8d04bd571054bf4788200fe607e1562d56699316f26f5b6cda1db373c252e6",
+      "purpose": ["dense high-frequency percussion", "demo-derived SND load"]
+    },
+    {
+      "path": "Snd/SNARE4.SND",
+      "origin": "project-distributed-demo",
+      "source": "resources/demodata/TEST1/SNARE4.SND",
+      "source_sha256": "1681c8bd9c04fd85ed0fe98f2059b4148e6b5fa7b73df95d8bdf81a5dcc8f310",
+      "samples": 7215,
+      "expected_pcm_sha256": "c147a0e83f2947a3c03d8f43d6ed7797a86e37667fe0bf1fde2fe25ae447b1f1",
+      "purpose": ["short noisy transient", "demo-derived SND load"]
+    },
+    {
+      "path": "Snd/OBOE.SND",
+      "origin": "project-distributed-demo",
+      "source": "resources/demodata/TEST2/OBOE.SND",
+      "source_sha256": "45b7279e08633bdc0d20eab9ff183437caa3cea28258ecef723e2af9a6a9753f",
+      "samples": 109842,
+      "expected_pcm_sha256": "4794854bd7a6940c7f533fde409166ee938dc555eb13e7112a231701c6e680c4",
+      "purpose": ["sustained tonal material", "long state-drift regression"]
+    },
+    {
+      "path": "Set/DEMO.SET",
+      "origin": "project-distributed-demo",
+      "source": "resources/demodata/TEST1/KICK1.SND",
+      "source_sha256": "aafaa109121642dc8cdab2ca6cbc3d8886efa90bffb166ccdfa7c98cb9a75e36",
+      "samples": 14239,
+      "expected_pcm_sha256": "d3782b6a858caba9ae60a99c77aeb26384640cbd769731d77d9aba9cde377cdb",
+      "purpose": ["generated SET directory and pad assignment", "embedded sample decoding"]
+    },
+    {
+      "path": "Synthetic/one.SND",
+      "origin": "synthetic",
+      "samples": 1,
+      "expected_pcm_sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7",
+      "purpose": ["single-sample boundary", "odd sample count"]
+    },
+    {
+      "path": "Synthetic/two.SND",
+      "origin": "synthetic",
+      "samples": 2,
+      "expected_pcm_sha256": "9547a687a237421c1307f9c8376f23c596696084993cd389df505f1123ebc51c",
+      "purpose": ["positive and negative full scale", "complete packed pair"]
+    },
+    {
+      "path": "Synthetic/three.SND",
+      "origin": "synthetic",
+      "samples": 3,
+      "expected_pcm_sha256": "b0f66adc83641586656866813fd9dd0b8ebb63796075661ba45d1aa8089e1d44",
+      "purpose": ["short state sequence", "partial final pair"]
+    },
+    {
+      "path": "Synthetic/transitions.SND",
+      "origin": "synthetic",
+      "samples": 688,
+      "expected_pcm_sha256": "52508dd6623998755b35973968838253a1cca6ee8f9cef6a81129a47ce96906c",
+      "purpose": ["silence", "impulses", "repeated thresholds", "abrupt sign and magnitude changes"]
+    },
+    {
+      "path": "Synthetic/ramps.SND",
+      "origin": "synthetic",
+      "samples": 65538,
+      "expected_pcm_sha256": "d9c0cf1afceff058ee1b7b57d74c307969b30c3f1a271a44a044daddf4e1930f",
+      "purpose": ["ascending and descending ramps", "rounding boundaries", "clipping boundaries"]
+    },
+    {
+      "path": "Synthetic/boundary.SND",
+      "origin": "synthetic",
+      "samples": 1025,
+      "expected_pcm_sha256": "88788c2cd1583a9d236e6e6c3db5428bbb4ad2fad1cd74e68cc82656d4750a24",
+      "purpose": ["512- and 1024-sample boundaries", "odd final sample", "abrupt extremes"]
+    },
+    {
+      "path": "Synthetic/random.SND",
+      "origin": "synthetic",
+      "samples": 32769,
+      "expected_pcm_sha256": "becaa4c2817293e89aa2d653ae17499cf702a9cc951dfd1f303b8cf01acc4869",
+      "purpose": ["deterministic pseudorandom sequence", "long state drift", "odd sample count"]
+    }
+  ],
+  "hardware_validation": false
+}

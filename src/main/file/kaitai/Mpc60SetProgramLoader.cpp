@@ -281,9 +281,8 @@ Mpc60SetProgramLoader::defaultConversionTable(const mpc::Mpc &mpc)
             continue;
         }
 
-        const auto padIndex =
-            static_cast<size_t>(std::distance(originalPadNotes.begin(),
-                                              originalPadIt));
+        const auto padIndex = static_cast<size_t>(
+            std::distance(originalPadNotes.begin(), originalPadIt));
 
         if (padIndex < activePadNotes.size())
         {
@@ -295,13 +294,11 @@ Mpc60SetProgramLoader::defaultConversionTable(const mpc::Mpc &mpc)
 }
 
 bool Mpc60SetProgramLoader::load(
-    mpc::Mpc &mpc,
-    const std::shared_ptr<mpc::disk::MpcFile> &file,
-    const Mpc60SetPreview &preview,
-    const ConversionTable &conversionTable,
+    mpc::Mpc &mpc, const std::shared_ptr<mpc::disk::MpcFile> &file,
+    const Mpc60SetPreview &preview, const ConversionTable &conversionTable,
     const bool clearExisting)
 {
-    if (!kMpc60SampleImportEnabled)
+    if (!Mpc60SampleImportPolicy::isEnabled())
     {
         return false;
     }
@@ -315,9 +312,9 @@ bool Mpc60SetProgramLoader::load(
 
         mpc::performance::UpdateProgramBulk msg;
         msg.programIndex = mpc::ProgramIndex(0);
-        const auto loaded = loadIntoProgram(mpc, file, preview, conversionTable,
-                                            mpc.getSampler()->getProgram(0),
-                                            msg.program);
+        const auto loaded =
+            loadIntoProgram(mpc, file, preview, conversionTable,
+                            mpc.getSampler()->getProgram(0), msg.program);
         if (loaded)
         {
             mpc.getPerformanceManager().lock()->enqueue(

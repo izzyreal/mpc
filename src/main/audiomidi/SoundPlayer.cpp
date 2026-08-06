@@ -8,6 +8,7 @@
 #include "WavInputFileStream.hpp"
 #include "SndInputFileStream.hpp"
 #include "file/kaitai/Mpc60SampleImport.hpp"
+#include "file/kaitai/Mpc60SamplePacking.hpp"
 
 #include <readerwriterqueue.h>
 
@@ -77,9 +78,8 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
         valid = snd_read_header(stream, sourceSampleRate, validBits,
                                 sourceNumChannels, sourceFrameCount,
                                 sndInputEncoding);
-        if (valid &&
-            sndInputEncoding == SndInputEncoding::Mpc60Packed12 &&
-            !mpc::file::kaitai::kMpc60SampleImportEnabled)
+        if (valid && sndInputEncoding == SndInputEncoding::Mpc60Packed12 &&
+            !mpc::file::kaitai::Mpc60SampleImportPolicy::isEnabled())
         {
             return false;
         }
@@ -341,9 +341,9 @@ float SoundPlayer::readNextFrame()
 
     if (inputAudioFormat->getSampleSizeInBits() == 32)
     {
-        return wavSamplesAreFloat32 ? readNextFloat32()
-                                    : static_cast<float>(readNextInt32()) /
-                                          2147483648.0f;
+        return wavSamplesAreFloat32
+                   ? readNextFloat32()
+                   : static_cast<float>(readNextInt32()) / 2147483648.0f;
     }
 
     return sampleops::short_to_float(readNextShort());
@@ -369,15 +369,17 @@ float SoundPlayer::readNextMpc60Frame()
     const auto byte0 = static_cast<uint8_t>(buffer[0]);
     const auto byte1 = static_cast<uint8_t>(buffer[1]);
     const auto byte2 = static_cast<uint8_t>(buffer[2]);
-    const auto sample0 = static_cast<uint16_t>(
-        byte0 | ((byte1 & 0x0fU) << 8U));
-    const auto sample1 = static_cast<uint16_t>(
-        (byte2 << 4U) | ((byte1 & 0xf0U) >> 4U));
+    const auto sample0 = static_cast<uint16_t>(byte0 | ((byte1 & 0x0fU) << 8U));
+    const auto sample1 =
+        static_cast<uint16_t>((byte2 << 4U) | ((byte1 & 0xf0U) >> 4U));
 
+    const auto canonicalSample0 =
+        mpc::file::kaitai::canonicalMpc60SampleCode(sample0, false);
+    const auto canonicalSample1 =
+        mpc::file::kaitai::canonicalMpc60SampleCode(sample1, true);
     const auto decodedSample0 =
-        mpc60SampleDecoder.decodeImportedFloat(sample0, false);
-    mpc60PendingSample =
-        mpc60SampleDecoder.decodeImportedFloat(sample1, true);
+        mpc60SampleDecoder.decodeFloat(canonicalSample0);
+    mpc60PendingSample = mpc60SampleDecoder.decodeFloat(canonicalSample1);
     mpc60HasPendingSample = true;
 
     ++mpc60DecodedSampleIndex;

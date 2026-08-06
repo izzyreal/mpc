@@ -3,6 +3,7 @@
 #include "disk/MpcFile.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
 #include "file/kaitai/Mpc60SampleImport.hpp"
+#include "file/kaitai/Mpc60SamplePacking.hpp"
 #include "file/kaitai/Mpc60SetPreview.hpp"
 #include "sampler/Sound.hpp"
 
@@ -36,7 +37,7 @@ namespace
                              const size_t soundDirectoryEntryIndex,
                              const std::shared_ptr<mpc::sampler::Sound> &sound)
     {
-        if (!mpc::file::kaitai::kMpc60SampleImportEnabled)
+        if (!mpc::file::kaitai::Mpc60SampleImportPolicy::isEnabled())
         {
             return tl::make_unexpected(
                 mpc::file::kaitai::kMpc60SetLoadingDisabledMessage);
@@ -59,24 +60,26 @@ namespace
             return tl::make_unexpected("SET sound sample range out of bounds");
         }
 
+        std::vector<float> decodedSamples;
+        decodedSamples.reserve(length);
+
+        mpc::file::kaitai::Mpc60SampleDecoder converter;
+        for (size_t i = 0; i < length; ++i)
+        {
+            const auto secondInPair = ((start + i) % 2U) != 0;
+            const auto code = mpc::file::kaitai::canonicalMpc60SampleCode(
+                static_cast<uint16_t>(sampleWords->at(start + i)),
+                secondInPair);
+            decodedSamples.push_back(converter.decodeFloat(code));
+        }
+
         sound->setName(trimRightSpaces(entry.name));
         sound->setSampleRate(44100);
         sound->setMono(true);
         sound->setLevel(100);
         sound->setTune(-17);
         sound->setLoopEnabled(false);
-
-        auto sampleData = sound->getMutableSampleData();
-        sampleData->clear();
-        sampleData->reserve(length);
-
-        mpc::file::kaitai::Mpc60SampleDecoder converter;
-        for (size_t i = 0; i < length; ++i)
-        {
-            sampleData->push_back(converter.decodeImportedFloat(
-                static_cast<uint16_t>(sampleWords->at(start + i)),
-                ((start + i) % 2U) != 0));
-        }
+        *sound->getMutableSampleData() = std::move(decodedSamples);
 
         sound->setStart(0);
         sound->setEnd(sound->getLastFrameIndex());
@@ -104,9 +107,26 @@ sound_or_error mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
         return tl::make_unexpected(error);
     }
 
-    const auto preview =
-        mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(bytes);
-    return loadSoundDirectoryEntry(preview, soundDirectoryEntryIndex, sound);
+    if (!Mpc60SampleImportPolicy::isEnabled())
+    {
+        return tl::make_unexpected(kMpc60SetLoadingDisabledMessage);
+    }
+
+    try
+    {
+        const auto preview = Mpc60SetPreviewLoader::loadPreview(bytes);
+        return loadSoundDirectoryEntry(preview, soundDirectoryEntryIndex,
+                                       sound);
+    }
+    catch (const std::exception &e)
+    {
+        return tl::make_unexpected(std::string("Invalid MPC60 SET file: ") +
+                                   e.what());
+    }
+    catch (...)
+    {
+        return tl::make_unexpected("Invalid MPC60 SET file");
+    }
 }
 
 sound_or_error mpc::file::kaitai::Mpc60SetSoundLoader::loadSoundDirectoryEntry(
@@ -134,9 +154,25 @@ mpc::file::kaitai::Mpc60SetSoundLoader::loadAssignedSoundAtMpc60Pad(
         return tl::make_unexpected(error);
     }
 
-    const auto preview =
-        mpc::file::kaitai::Mpc60SetPreviewLoader::loadPreview(bytes);
-    return loadAssignedSoundAtMpc60Pad(preview, mpc60PadIndex, sound);
+    if (!Mpc60SampleImportPolicy::isEnabled())
+    {
+        return tl::make_unexpected(kMpc60SetLoadingDisabledMessage);
+    }
+
+    try
+    {
+        const auto preview = Mpc60SetPreviewLoader::loadPreview(bytes);
+        return loadAssignedSoundAtMpc60Pad(preview, mpc60PadIndex, sound);
+    }
+    catch (const std::exception &e)
+    {
+        return tl::make_unexpected(std::string("Invalid MPC60 SET file: ") +
+                                   e.what());
+    }
+    catch (...)
+    {
+        return tl::make_unexpected("Invalid MPC60 SET file");
+    }
 }
 
 sound_or_error

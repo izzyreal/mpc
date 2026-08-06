@@ -3,6 +3,7 @@
 #include "Mpc.hpp"
 #include "SampleOps.hpp"
 #include "TestMpc.hpp"
+#include "TestMpc60SampleImport.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/SoundLoader.hpp"
 #include "file/kaitai/Mpc60SampleImport.hpp"
@@ -16,9 +17,12 @@
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
 
+#include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <fstream>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -30,6 +34,7 @@ using namespace mpc::disk;
 using namespace mpc::file::kaitai;
 using namespace mpc::file::kaitai::generated;
 using namespace mpc::sampleops;
+using mpc::test::ScopedMpc60ImportSetting;
 
 namespace
 {
@@ -63,12 +68,11 @@ namespace
     }
 
     template <typename Assertions>
-    void withParsedSndBytes(const std::vector<char> &bytes, Assertions &&assertions)
+    void withParsedSndBytes(const std::vector<char> &bytes,
+                            Assertions &&assertions)
     {
-        std::istringstream parseStream(
-            std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::binary
-        );
+        std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                       std::ios::in | std::ios::binary);
         kaitai::kstream parseIo(&parseStream);
         mpc2000snd_t parsed(&parseIo);
         parsed._read();
@@ -76,12 +80,11 @@ namespace
     }
 
     template <typename Assertions>
-    void withParsedMpc3000SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
+    void withParsedMpc3000SndBytes(const std::vector<char> &bytes,
+                                   Assertions &&assertions)
     {
-        std::istringstream parseStream(
-            std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::binary
-        );
+        std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                       std::ios::in | std::ios::binary);
         kaitai::kstream parseIo(&parseStream);
         mpc3000_snd_v2_t parsed(&parseIo);
         parsed._read();
@@ -89,12 +92,11 @@ namespace
     }
 
     template <typename Assertions>
-    void withParsedMpc60SndBytes(const std::vector<char> &bytes, Assertions &&assertions)
+    void withParsedMpc60SndBytes(const std::vector<char> &bytes,
+                                 Assertions &&assertions)
     {
-        std::istringstream parseStream(
-            std::string(bytes.begin(), bytes.end()),
-            std::ios::in | std::ios::binary
-        );
+        std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                       std::ios::in | std::ios::binary);
         kaitai::kstream parseIo(&parseStream);
         mpc60_snd_v1_t parsed(&parseIo);
         assertions(parsed);
@@ -155,6 +157,40 @@ namespace
         REQUIRE(sound->getSampleData()->empty());
     }
 
+    std::vector<int16_t> pcmResource(const std::string &resourcePath)
+    {
+        const auto bytes = resourceBytes(resourcePath);
+        REQUIRE((bytes.size() % 2U) == 0);
+        std::vector<int16_t> result;
+        result.reserve(bytes.size() / 2U);
+        for (size_t i = 0; i < bytes.size(); i += 2)
+        {
+            const auto bits = static_cast<uint16_t>(
+                static_cast<uint8_t>(bytes[i]) |
+                (static_cast<uint16_t>(static_cast<uint8_t>(bytes[i + 1]))
+                 << 8U));
+            result.push_back(bits <= 0x7fffU ? static_cast<int16_t>(bits)
+                                             : static_cast<int16_t>(
+                                                   -1 - static_cast<int32_t>(
+                                                            0xffffU - bits)));
+        }
+        return result;
+    }
+
+    void requireDecodedPcm(const mpc::sampler::Sound &sound,
+                           const std::string &resourcePath)
+    {
+        const auto expected = pcmResource(resourcePath);
+        const auto actual = sound.getSampleData();
+        REQUIRE(actual->size() == expected.size());
+        for (size_t i = 0; i < expected.size(); ++i)
+        {
+            CAPTURE(resourcePath, i);
+            REQUIRE(mean_normalized_float_to_short(actual->at(i)) ==
+                    expected[i]);
+        }
+    }
+
     void requireSoundMatches(const std::shared_ptr<mpc::sampler::Sound> &sound,
                              const ExpectedSound &expected)
     {
@@ -168,7 +204,9 @@ namespace
         REQUIRE(sound->getEnd() == expected.end);
         REQUIRE(sound->getLoopTo() == expected.loopTo);
         REQUIRE(sound->isLoopEnabled() == expected.loopEnabled);
-        REQUIRE(sound->getFrameCount() == static_cast<int>(expected.sampleData.size() / (expected.mono ? 1 : 2)));
+        REQUIRE(sound->getFrameCount() ==
+                static_cast<int>(expected.sampleData.size() /
+                                 (expected.mono ? 1 : 2)));
         REQUIRE(*sound->getSampleData() == expected.sampleData);
     }
 
@@ -207,9 +245,10 @@ namespace
         return truncated;
     }
 
-}
+} // namespace
 
-TEST_CASE("Kaitai MPC2000 SND saves and loads explicit semantics", "[kaitai-snd]")
+TEST_CASE("Kaitai MPC2000 SND saves and loads explicit semantics",
+          "[kaitai-snd]")
 {
     mpc::sampler::Sound sound(44100);
     sound.setName("KICK_01");
@@ -393,12 +432,16 @@ TEST_CASE("Kaitai MPC2000 SND save/load covers prod-used sound properties", "[ka
     }
 }
 
-TEST_CASE("Kaitai MPC2000 SND parses real 2KXL mono and stereo files through the production loader", "[kaitai-snd][real-2kxl]")
+TEST_CASE(
+    "Kaitai MPC2000 SND parses real 2KXL mono and stereo files through the "
+    "production loader",
+    "[kaitai-snd][real-2kxl]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    const auto monoBytes = resourceBytes("test/RealMpc2000xl/Snd/mono_loop_off.SND");
+    const auto monoBytes =
+        resourceBytes("test/RealMpc2000xl/Snd/mono_loop_off.SND");
     const auto mono = loadWithSoundLoader(mpc, monoBytes, "mono_loop_off.SND");
 
     REQUIRE(mono->getName() == "M");
@@ -417,8 +460,10 @@ TEST_CASE("Kaitai MPC2000 SND parses real 2KXL mono and stereo files through the
     REQUIRE((*mono->getSampleData())[1] == short_to_float(-2941));
     REQUIRE((*mono->getSampleData())[2] == short_to_float(-3809));
 
-    const auto stereoBytes = resourceBytes("test/RealMpc2000xl/Snd/stereo_loop_off.SND");
-    const auto stereo = loadWithSoundLoader(mpc, stereoBytes, "stereo_loop_off.SND");
+    const auto stereoBytes =
+        resourceBytes("test/RealMpc2000xl/Snd/stereo_loop_off.SND");
+    const auto stereo =
+        loadWithSoundLoader(mpc, stereoBytes, "stereo_loop_off.SND");
 
     REQUIRE(stereo->getName() == "S");
     REQUIRE(!stereo->isMono());
@@ -484,6 +529,139 @@ TEST_CASE("Kaitai MPC3000 SND parses a real hardware 01 02 file through the prod
     REQUIRE((*loaded->getSampleData())[3] == short_to_float(6));
 }
 
+TEST_CASE("Generated MPC60 SND corpus decodes exact oracle PCM",
+          "[kaitai-snd][generated-mpc60]")
+{
+    ScopedMpc60ImportSetting enabled(true);
+    struct Fixture
+    {
+        const char *snd;
+        const char *pcm;
+        const char *name;
+        size_t samples;
+    };
+
+    constexpr std::array<Fixture, 11> fixtures{{
+        {"Snd/KICK1.SND", "KICK1.pcm", "KICK1", 14239},
+        {"Snd/HAT1.SND", "HAT1.pcm", "HAT1", 12400},
+        {"Snd/SNARE4.SND", "SNARE4.pcm", "SNARE4", 7215},
+        {"Snd/OBOE.SND", "OBOE.pcm", "OBOE", 109842},
+        {"Synthetic/one.SND", "one.pcm", "ONE", 1},
+        {"Synthetic/two.SND", "two.pcm", "TWO", 2},
+        {"Synthetic/three.SND", "three.pcm", "THREE", 3},
+        {"Synthetic/transitions.SND", "transitions.pcm", "TRANSITIONS", 688},
+        {"Synthetic/ramps.SND", "ramps.pcm", "RAMPS", 65538},
+        {"Synthetic/boundary.SND", "boundary.pcm", "BOUNDARY", 1025},
+        {"Synthetic/random.SND", "random.pcm", "RANDOM", 32769},
+    }};
+
+    for (const auto &fixture : fixtures)
+    {
+        DYNAMIC_SECTION(fixture.snd)
+        {
+            auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+            const auto result = SndIo::loadBytes(
+                resourceBytes(std::string("test/GeneratedMpc60/") +
+                              fixture.snd),
+                sound, fixture.name);
+            REQUIRE(result.has_value());
+            REQUIRE(sound->getName() == fixture.name);
+            REQUIRE(sound->isMono());
+            REQUIRE(sound->getSampleRate() == 40000);
+            REQUIRE(sound->getFrameCount() ==
+                    static_cast<int>(fixture.samples));
+            REQUIRE(sound->getStart() == 0);
+            REQUIRE(sound->getEnd() == static_cast<int>(fixture.samples - 1));
+            REQUIRE_FALSE(sound->isLoopEnabled());
+            requireDecodedPcm(*sound, std::string("test/GeneratedMpc60/Pcm/") +
+                                          fixture.pcm);
+        }
+    }
+}
+
+TEST_CASE("MPC60 SND kill switch rejects before parse and leaves sound intact",
+          "[kaitai-snd][mpc60-kill-switch]")
+{
+    ScopedMpc60ImportSetting disabled(false);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    sound->setName("unchanged");
+    sound->getMutableSampleData()->push_back(short_to_float(123));
+
+    const auto result = SndIo::loadBytes({0x01, 0x01}, sound, "TRUNCATED");
+    REQUIRE_FALSE(result.has_value());
+    REQUIRE(result.error() == kMpc60SndLoadingDisabledMessage);
+    REQUIRE(sound->getName() == "unchanged");
+    REQUIRE(sound->getSampleData()->size() == 1);
+    REQUIRE(mean_normalized_float_to_short(sound->getSampleData()->front()) ==
+            123);
+
+    auto mpc3000 = std::make_shared<mpc::sampler::Sound>(44100);
+    REQUIRE(SndIo::loadBytes(resourceBytes("test/RealMpc3000/Snd/SOUND017.SND"),
+                             mpc3000, "SOUND017")
+                .has_value());
+    REQUIRE(mpc3000->getFrameCount() == 4410);
+}
+
+TEST_CASE("MPC60 SND uses production SoundLoader in both policy states",
+          "[kaitai-snd][generated-mpc60][mpc60-kill-switch]")
+{
+    const auto bytes = resourceBytes("test/GeneratedMpc60/Snd/KICK1.SND");
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    {
+        ScopedMpc60ImportSetting enabled(true);
+        const auto loaded = loadWithSoundLoader(mpc, bytes, "KICK1.SND");
+        REQUIRE(loaded->getName() == "KICK1");
+        REQUIRE(loaded->getFrameCount() == 14239);
+        requireDecodedPcm(*loaded, "test/GeneratedMpc60/Pcm/KICK1.pcm");
+    }
+
+    {
+        ScopedMpc60ImportSetting disabled(false);
+        requireMpc60SndLoadingDisabled(mpc, bytes, "KICK1.SND");
+    }
+}
+
+TEST_CASE("MPC60 SND production load follows process environment",
+          "[kaitai-snd][mpc60-environment]")
+{
+    ScopedMpc60ImportSetting environmentSetting(std::nullopt);
+    const auto bytes = resourceBytes("test/GeneratedMpc60/Synthetic/three.SND");
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    const auto result = SndIo::loadBytes(bytes, sound, "THREE");
+
+    const auto *environment =
+        std::getenv("VMPC2000XL_DISABLE_MPC60_SAMPLE_IMPORT");
+    if (environment != nullptr && std::string_view(environment) == "1")
+    {
+        REQUIRE_FALSE(result.has_value());
+        REQUIRE(result.error() == kMpc60SndLoadingDisabledMessage);
+        REQUIRE(sound->getSampleData()->empty());
+    }
+    else
+    {
+        REQUIRE(result.has_value());
+        REQUIRE(sound->getFrameCount() == 3);
+    }
+}
+
+TEST_CASE("Malformed MPC60 SND fails transactionally when enabled",
+          "[kaitai-snd][generated-mpc60]")
+{
+    ScopedMpc60ImportSetting enabled(true);
+    auto sound = std::make_shared<mpc::sampler::Sound>(44100);
+    sound->setName("unchanged");
+    sound->getMutableSampleData()->push_back(short_to_float(-321));
+
+    const auto result = SndIo::loadBytes({0x01, 0x01}, sound, "TRUNCATED");
+    REQUIRE_FALSE(result.has_value());
+    REQUIRE(sound->getName() == "unchanged");
+    REQUIRE(sound->getSampleData()->size() == 1);
+    REQUIRE(mean_normalized_float_to_short(sound->getSampleData()->front()) ==
+            -321);
+}
+
 TEST_CASE("SoundLoader uses the SND header name at byte offset 0x02", "[kaitai-snd]")
 {
     auto bytes =
@@ -498,7 +676,8 @@ TEST_CASE("SoundLoader uses the SND header name at byte offset 0x02", "[kaitai-s
     REQUIRE(loaded->getName() == "HeaderName");
 }
 
-TEST_CASE("Generated MPC2000XL SND corpus loads through the production loader", "[kaitai-snd][generated-corpus]")
+TEST_CASE("Generated MPC2000XL SND corpus loads through the production loader",
+          "[kaitai-snd][generated-corpus]")
 {
     struct CorpusCase
     {
@@ -718,8 +897,7 @@ TEST_CASE("SndIo rejects too-short and unsupported SND data", "[kaitai-snd]")
     REQUIRE(tooShort.error() == "SND file is too short");
 
     auto unsupported = SndIo::loadBytes(
-        {static_cast<char>(0x01), static_cast<char>(0x03)}, sound,
-        "bad");
+        {static_cast<char>(0x01), static_cast<char>(0x03)}, sound, "bad");
     REQUIRE_FALSE(unsupported);
     REQUIRE(unsupported.error() == "Unsupported SND file format");
 }

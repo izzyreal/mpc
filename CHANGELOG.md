@@ -1,4 +1,5 @@
 ## v0.9.15 (28-7-2026)
+* Load and preview legacy MPC60 SND and SET sample data, with a runtime emergency disable switch and generated regression fixtures based on project-distributed demo material and synthetic stimuli.
 * Fixed a regression that v0.9.14 introduced: you can now press pads to trigger drum notes even when the sequence is unused again.
 * Improved per-voice low-pass filter. With the help of Codex, I did another round of MPC2000XL filter analysis. This was done through a combination of recording my MPC2000XL, as well as by letting Codex probe MAME running MPC2000XL. Long story short, VMPC2000XL's filter now sounds much more like the real MPC2000XL's. The main issue was in how the various cutoff frequency and resonance factors were mapped to parameter values for the Chamberlin state variable filter algorithm.
 * Improved envelope authenticity. Those who make use of higher attack and decay values, especially with longer sounds, should notice that VMPC2000XL behaves much more like the real MPC2000XL than it used to in previous versions.

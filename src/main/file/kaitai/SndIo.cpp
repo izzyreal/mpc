@@ -6,6 +6,7 @@
 #include "file/kaitai/KaitaiIoUtil.hpp"
 #include "file/kaitai/Mpc60SampleDecoder.hpp"
 #include "file/kaitai/Mpc60SampleImport.hpp"
+#include "file/kaitai/Mpc60SamplePacking.hpp"
 #include "file/kaitai/generated/mpc2000snd.h"
 #include "file/kaitai/generated/mpc3000_snd_v2.h"
 #include "file/kaitai/generated/mpc60_snd_v1.h"
@@ -44,10 +45,8 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
     const auto firstByte = static_cast<unsigned char>(bytes[0]);
     const auto secondByte = static_cast<unsigned char>(bytes[1]);
 
-    std::istringstream parseStream(
-        std::string(bytes.begin(), bytes.end()),
-        std::ios::in | std::ios::binary
-    );
+    std::istringstream parseStream(std::string(bytes.begin(), bytes.end()),
+                                   std::ios::in | std::ios::binary);
     ::kaitai::kstream parseIo(&parseStream);
 
     if (firstByte == 0x01 && secondByte == 0x04)
@@ -89,49 +88,63 @@ sound_or_error SndIo::loadBytes(const std::vector<char> &bytes,
 
     if (firstByte == 0x01 && secondByte == 0x01)
     {
-        if (!kMpc60SampleImportEnabled)
+        if (!Mpc60SampleImportPolicy::isEnabled())
         {
             return tl::make_unexpected(kMpc60SndLoadingDisabledMessage);
         }
 
-        mpc60_snd_v1_t parsed(&parseIo);
-
-        sound->setName(parsedSoundName(parsed.name()));
-        sound->setMono(true);
-        sound->setSampleRate(parsed.sample_rate());
-        sound->setLevel(parsed.volume_percent());
-        sound->setTune(parsed.tuning());
-        sound->setBeatCount(4);
-        sound->setLoopEnabled(false);
-
-        auto sampleData = sound->getMutableSampleData();
-        sampleData->clear();
-        sampleData->reserve(parsed.sample_count());
-
-        Mpc60SampleDecoder decoder;
-        size_t decodedCount = 0;
-        for (const auto &pair : *parsed.sample_data_pairs())
+        try
         {
-            if (decodedCount < parsed.sample_count())
+            mpc60_snd_v1_t parsed(&parseIo);
+
+            std::vector<float> decodedSamples;
+            decodedSamples.reserve(parsed.sample_count());
+
+            Mpc60SampleDecoder decoder;
+            size_t decodedCount = 0;
+            for (const auto &pair : *parsed.sample_data_pairs())
             {
-                sampleData->push_back(
-                    decoder.decodeImportedFloat(pair->sample0_code(), false));
-                ++decodedCount;
+                if (decodedCount < parsed.sample_count())
+                {
+                    const auto code = canonicalMpc60SampleCode(
+                        static_cast<uint16_t>(pair->sample0_code()), false);
+                    decodedSamples.push_back(decoder.decodeFloat(code));
+                    ++decodedCount;
+                }
+
+                if (decodedCount < parsed.sample_count())
+                {
+                    const auto code = canonicalMpc60SampleCode(
+                        static_cast<uint16_t>(pair->sample1_code()), true);
+                    decodedSamples.push_back(decoder.decodeFloat(code));
+                    ++decodedCount;
+                }
             }
 
-            if (decodedCount < parsed.sample_count())
-            {
-                sampleData->push_back(
-                    decoder.decodeImportedFloat(pair->sample1_code(), true));
-                ++decodedCount;
-            }
+            sound->setName(parsedSoundName(parsed.name()));
+            sound->setMono(true);
+            sound->setSampleRate(parsed.sample_rate());
+            sound->setLevel(parsed.volume_percent());
+            sound->setTune(parsed.tuning());
+            sound->setBeatCount(4);
+            sound->setLoopEnabled(false);
+            *sound->getMutableSampleData() = std::move(decodedSamples);
+
+            sound->setStart(0);
+            sound->setEnd(sound->getLastFrameIndex());
+            sound->setLoopTo(0);
+
+            return sound;
         }
-
-        sound->setStart(0);
-        sound->setEnd(sound->getLastFrameIndex());
-        sound->setLoopTo(0);
-
-        return sound;
+        catch (const std::exception &e)
+        {
+            return tl::make_unexpected(std::string("Invalid MPC60 SND file: ") +
+                                       e.what());
+        }
+        catch (...)
+        {
+            return tl::make_unexpected("Invalid MPC60 SND file");
+        }
     }
 
     if (firstByte == 0x01 && secondByte == 0x02)
@@ -179,7 +192,8 @@ std::vector<char> SndIo::saveSound(mpc::sampler::Sound &sound)
 {
     mpc2000snd_t parsed(nullptr);
     parsed.set_magic(std::string("\x01\x04", 2));
-    parsed.set_name(StrUtil::padRight(sound.getName().substr(0, 16), " ", 16) + '\0');
+    parsed.set_name(StrUtil::padRight(sound.getName().substr(0, 16), " ", 16) +
+                    '\0');
     parsed.set_level(sound.getSndLevel());
     parsed.set_tune(static_cast<int8_t>(sound.getTune()));
     parsed.set_stereo(!sound.isMono());
@@ -198,7 +212,8 @@ std::vector<char> SndIo::saveSound(mpc::sampler::Sound &sound)
     }
     parsed.set_sample_data(std::move(frames));
 
-    std::stringstream writeStream(std::ios::in | std::ios::out | std::ios::binary);
+    std::stringstream writeStream(std::ios::in | std::ios::out |
+                                  std::ios::binary);
     ::kaitai::kstream writeIo(&writeStream);
     parsed._set_io(&writeIo);
     parsed._check();

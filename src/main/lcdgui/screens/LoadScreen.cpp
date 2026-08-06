@@ -142,7 +142,8 @@ void LoadScreen::function(const int i)
 
             if (const auto file = getSelectedFile(); !file->isDirectory())
             {
-                const auto ext = mpc_fs::path(file->getName()).extension().string();
+                const auto ext =
+                    mpc_fs::path(file->getName()).extension().string();
 
                 const bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
                 const bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
@@ -153,7 +154,7 @@ void LoadScreen::function(const int i)
                 }
 
                 if (isSnd &&
-                    !mpc::file::kaitai::kMpc60SampleImportEnabled &&
+                    !mpc::file::kaitai::Mpc60SampleImportPolicy::isEnabled() &&
                     mpc::file::kaitai::isMpc60SndBytes(file->getBytes()))
                 {
                     ls.lock()->showPopupForMs(
@@ -227,8 +228,9 @@ void LoadScreen::function(const int i)
                     displayFile();
                     displaySize();
 
-                    const auto ext1 =
-                        mpc_fs::path(getSelectedFileName()).extension().string();
+                    const auto ext1 = mpc_fs::path(getSelectedFileName())
+                                          .extension()
+                                          .string();
                     const auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
                                           StrUtil::eqIgnoreCase(ext, ".wav");
                     setFunctionKeysArrangement(playable ? 1 : 0);
@@ -246,8 +248,9 @@ void LoadScreen::function(const int i)
             }
             else if (StrUtil::eqIgnoreCase(ext, ".set"))
             {
-                if (!mpc::file::kaitai::kMpc60SampleImportEnabled &&
-                    mpc::file::kaitai::isMpc60SetBytes(selectedFile->getBytes()))
+                if (!mpc::file::kaitai::Mpc60SampleImportPolicy::isEnabled() &&
+                    mpc::file::kaitai::isMpc60SetBytes(
+                        selectedFile->getBytes()))
                 {
                     ls.lock()->showPopupForMs(
                         mpc::file::kaitai::kMpc60SetLoadingDisabledMessage,
@@ -399,8 +402,8 @@ void LoadScreen::displayFile() const
     {
         findField("file")->setText(
             u8"\u00C3" +
-            StrUtil::padRight(mpc_fs::path(selectedFileName).stem().string(), " ",
-                              16));
+            StrUtil::padRight(mpc_fs::path(selectedFileName).stem().string(),
+                              " ", 16));
     }
     else
     {
@@ -597,7 +600,8 @@ void LoadScreen::up()
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
-        const auto ext = mpc_fs::path(getSelectedFileName()).extension().string();
+        const auto ext =
+            mpc_fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                               StrUtil::eqIgnoreCase(ext, ".wav");
         setFunctionKeysArrangement(playable ? 1 : 0);

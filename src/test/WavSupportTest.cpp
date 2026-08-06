@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "SampleOps.hpp"
+#include "TestMpc60SampleImport.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "audiomidi/WavInputFileStream.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
@@ -58,8 +59,8 @@ namespace
     {
         std::string bytes;
         const auto bytesPerSample = bitsPerSample / 8;
-        const auto frameCount = pcmFrames.empty() ? floatFrames.size()
-                                                  : pcmFrames.size();
+        const auto frameCount =
+            pcmFrames.empty() ? floatFrames.size() : pcmFrames.size();
         const auto dataChunkSize =
             static_cast<uint32_t>(frameCount * bytesPerSample * numChannels);
         const auto riffChunkSize = 36 + dataChunkSize;
@@ -116,8 +117,8 @@ TEST_CASE("32-bit float WAV files are accepted and decoded", "[wav]")
 
 TEST_CASE("32-bit PCM WAV preview reads full-width samples", "[wav][preview]")
 {
-    auto stream = makeWavStream(1, 1, 44100, 32,
-                                {0x40000000u, 0xC0000000u, 0x00000000u});
+    auto stream =
+        makeWavStream(1, 1, 44100, 32, {0x40000000u, 0xC0000000u, 0x00000000u});
 
     int sampleRate = 0;
     int validBits = 0;
@@ -182,4 +183,57 @@ TEST_CASE("MPC3000 SND preview streams mono 16-bit PCM", "[snd][preview]")
             0.0001f);
     REQUIRE(std::fabs(buffer.getChannel(1)[3] - buffer.getChannel(0)[3]) <
             0.0001f);
+}
+
+TEST_CASE("MPC60 SND preview honors decoding policy", "[snd][preview][mpc60]")
+{
+    const auto bytes = resourceBytes("test/GeneratedMpc60/Snd/KICK1.SND");
+    const auto expectedBytes =
+        resourceBytes("test/GeneratedMpc60/Pcm/KICK1.pcm");
+
+    mpc::test::ScopedMpc60ImportSetting importSetting(true);
+    {
+        auto stream = std::make_shared<std::stringstream>(
+            std::string(bytes.begin(), bytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary);
+        SoundPlayer soundPlayer;
+        REQUIRE(soundPlayer.start(stream, SoundPlayerFileFormat::SND, 40000));
+
+        AudioBuffer buffer("mpc60-preview", 2, 4, 40000);
+        for (int i = 0; i < 20; ++i)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            soundPlayer.processAudio(&buffer, 4);
+            if (!buffer.isSilent())
+            {
+                break;
+            }
+        }
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            const auto bits = static_cast<uint16_t>(
+                static_cast<uint8_t>(expectedBytes[i * 2]) |
+                (static_cast<uint16_t>(
+                     static_cast<uint8_t>(expectedBytes[i * 2 + 1]))
+                 << 8U));
+            const auto expected =
+                bits <= 0x7fffU
+                    ? static_cast<int16_t>(bits)
+                    : static_cast<int16_t>(
+                          -1 - static_cast<int32_t>(0xffffU - bits));
+            REQUIRE(std::fabs(buffer.getChannel(0)[i] -
+                              short_to_float(expected)) < 0.0001f);
+        }
+    }
+
+    importSetting.set(false);
+    {
+        auto stream = std::make_shared<std::stringstream>(
+            std::string(bytes.begin(), bytes.end()),
+            std::ios::in | std::ios::out | std::ios::binary);
+        SoundPlayer soundPlayer;
+        REQUIRE_FALSE(
+            soundPlayer.start(stream, SoundPlayerFileFormat::SND, 40000));
+    }
 }

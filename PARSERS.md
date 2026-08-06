@@ -109,3 +109,25 @@ Run one format only if needed:
 
 - Do not regenerate with upstream Kaitai compiler unless it has the same C++ serialization support as the `cpp-serialization` branch.
 - `generated/` is vendored on purpose. As far as `editables/mpc` is concerned, generated parsers are ordinary source files.
+
+## MPC60 sample interoperability
+
+MPC60 SND and SET sample data uses a legacy nonlinear, stateful 12-bit
+representation. The public decoder is isolated in `Mpc60SampleDecoder` and is
+described in file-format terms; it is not an official Akai implementation.
+
+Loading and preview are enabled by default. To disable all MPC60 SND and SET
+sample import for a process, launch it with:
+
+```sh
+VMPC2000XL_DISABLE_MPC60_SAMPLE_IMPORT=1
+```
+
+The environment variable is sampled once on first use and is intended as a
+launch-time control. Changing it while the process is running has no effect;
+in-process code can use `Mpc60SampleImportPolicy::setRuntimeOverride` instead.
+
+MPC2000XL and MPC3000 SND handling is unaffected. Public MPC60 regression files
+under `test-resources/GeneratedMpc60` are generated solely from
+project-distributed demo material or synthetic stimuli; their provenance and
+expected PCM hashes are recorded in `manifest.json`.

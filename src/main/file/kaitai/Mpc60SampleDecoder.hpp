@@ -9,7 +9,11 @@ namespace mpc::file::kaitai
     class Mpc60SampleDecoder
     {
     public:
-        int16_t decodeImportedPcm(uint16_t sampleWord, bool isOddWordIndex);
-        float decodeImportedFloat(uint16_t sampleWord, bool isOddWordIndex);
+        int16_t decodePcm(uint16_t canonicalCode);
+        float decodeFloat(uint16_t canonicalCode);
+        void reset();
+
+    private:
+        int32_t state = 0;
     };
-}
+} // namespace mpc::file::kaitai
