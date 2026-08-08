@@ -107,11 +107,11 @@ namespace
 
             const auto requestedSampleCount = static_cast<size_t>(nFrames * 2);
             const auto physicalSampleCount =
-                std::min(physicalOutput->localBuffer.size(),
-                         requestedSampleCount);
+                (std::min)(physicalOutput->localBuffer.size(),
+                           requestedSampleCount);
             const auto mixedSampleCount =
-                std::min(stereoOutput->localBuffer.size(),
-                         physicalSampleCount);
+                (std::min)(stereoOutput->localBuffer.size(),
+                           physicalSampleCount);
 
             for (size_t i = 0; i < mixedSampleCount; ++i)
             {
