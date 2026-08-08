@@ -24,6 +24,7 @@
 #include "engine/VoiceUtil.hpp"
 #include "engine/FaderControl.hpp"
 #include "engine/BasicSoundPlayer.hpp"
+#include "engine/PhysicalInteractionSoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "engine/audio/server/RealTimeAudioServer.hpp"
 #include "engine/audio/server/CompoundAudioClient.hpp"
@@ -46,6 +47,7 @@
 #include "sequencer/Song.hpp"
 
 #include <string>
+#include <algorithm>
 
 using namespace mpc;
 using namespace mpc::audiomidi;
@@ -61,6 +63,38 @@ using namespace mpc::engine;
 using namespace mpc::file_io;
 
 using namespace mpc::sequencer;
+
+namespace
+{
+    class PhysicalSoundsOutputRouter final : public AudioProcess
+    {
+    public:
+        PhysicalSoundsOutputRouter(
+            std::shared_ptr<IOAudioProcess> outputToUse,
+            const std::atomic<PhysicalSoundsMixMode> &mixModeToUse)
+            : output(std::move(outputToUse)), mixMode(mixModeToUse)
+        {
+        }
+
+        int processAudio(AudioBuffer *buffer, const int nFrames) override
+        {
+            if (mixMode.load(std::memory_order_relaxed) ==
+                PhysicalSoundsMixMode::Dedicated)
+            {
+                return output->processAudio(buffer, nFrames);
+            }
+
+            const auto sampleCount = std::min(output->localBuffer.size(),
+                                              static_cast<size_t>(nFrames * 2));
+            std::fill_n(output->localBuffer.begin(), sampleCount, 0.f);
+            return AUDIO_OK;
+        }
+
+    private:
+        std::shared_ptr<IOAudioProcess> output;
+        const std::atomic<PhysicalSoundsMixMode> &mixMode;
+    };
+} // namespace
 
 EngineHost::EngineHost(Mpc &mpcToUse)
     : postToAudioThread(
@@ -89,19 +123,28 @@ void EngineHost::start()
     monitorInputAdapter =
         std::make_shared<MonitorInputAdapter>(mpc, inputProcess.get());
 
-    const std::vector<std::string> outputNames{
-        "STEREO OUT", "ASSIGNABLE MIX OUT 1/2", "ASSIGNABLE MIX OUT 3/4",
-        "ASSIGNABLE MIX OUT 5/6", "ASSIGNABLE MIX OUT 7/8"};
+    const std::vector<std::string> outputNames{"STEREO OUT",
+                                               "ASSIGNABLE MIX OUT 1/2",
+                                               "ASSIGNABLE MIX OUT 3/4",
+                                               "ASSIGNABLE MIX OUT 5/6",
+                                               "ASSIGNABLE MIX OUT 7/8",
+                                               "PHYSICAL SOUNDS"};
 
-    for (int i = 0; i < 5; i++)
+    for (const auto &outputName : outputNames)
     {
         outputProcesses.push_back(
-            realTimeAudioServer->openAudioOutput(outputNames[i]));
+            realTimeAudioServer->openAudioOutput(outputName));
     }
 
     connectVoices();
 
     initializeDiskRecorders();
+
+    physicalSoundsOutputRouter = std::make_shared<PhysicalSoundsOutputRouter>(
+        outputProcesses.back(), physicalSoundsMixMode);
+    mixer->getStrip(PhysicalSoundsStrip)
+        ->setDirectOutputProcess(physicalSoundsOutputRouter);
+    applyPhysicalSoundsMixMode();
 
     mixer->getStrip(std::string(SoundRecorderInputStrip))->setDirectOutputProcess(soundRecorder);
     mixer->getStrip(std::string(QuickPreviewStrip))->setInputProcess(soundPlayer);
@@ -252,7 +295,8 @@ void EngineHost::setupMixer()
      * There's one channel for the PreviewSoundPlayer, which plays the preview
      * and playX sounds. This is strip 33. Finally, there's one channel to
      * receive and monitor sampler input, which is strip 34, one for playing
-     * quick previews, strip 35, and a metronome strip, 36.
+     * quick previews, strip 35, a metronome strip, 36, and one locally mixed
+     * physical-interaction-sounds strip, 37.
      */
     MixerControlsFactory::createChannelStrips(mixerControls, TotalMixerStripCount);
     mixer = std::make_shared<AudioMixer>(mixerControls, nonRealTimeAudioServer);
@@ -316,6 +360,12 @@ std::shared_ptr<BasicSoundPlayer> EngineHost::getMetronomePlayer() const
     return metronomePlayer;
 }
 
+std::shared_ptr<PhysicalInteractionSoundPlayer>
+EngineHost::getPhysicalInteractionSoundPlayer() const
+{
+    return physicalInteractionSoundPlayer;
+}
+
 void EngineHost::createSynth()
 {
     previewSoundPlayerVoice = std::make_shared<Voice>(PreviewSoundPlayerStripIndex, true);
@@ -332,6 +382,9 @@ void EngineHost::createSynth()
 
     metronomePlayer = std::make_shared<BasicSoundPlayer>(
         mpc.getSampler(), mixer, metronomeVoice, MetronomeStrip);
+
+    physicalInteractionSoundPlayer =
+        std::make_shared<PhysicalInteractionSoundPlayer>();
 }
 
 void EngineHost::connectVoices()
@@ -345,11 +398,14 @@ void EngineHost::connectVoices()
 
     previewSoundPlayer->connectVoice();
     metronomePlayer->connectVoice();
+    mixer->getStrip(PhysicalSoundsStrip)
+        ->setInputProcess(physicalInteractionSoundPlayer);
 }
 
 void EngineHost::initializeDiskRecorders()
 {
-    for (int i = 0; i < outputProcesses.size(); i++)
+    constexpr int recordableOutputCount = 5;
+    for (int i = 0; i < recordableOutputCount; i++)
     {
         auto diskRecorder =
             std::make_shared<DiskRecorder>(mpc, outputProcesses[i].get(), i);
@@ -365,6 +421,94 @@ void EngineHost::initializeDiskRecorders()
             mixer->getStrip(std::string("AUX#" + std::to_string(i)))
                 ->setDirectOutputProcess(diskRecorders.back());
         }
+    }
+}
+
+void EngineHost::triggerPhysicalButtonSound(
+    const hardware::ComponentId componentId, const bool isPress)
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->isEnabled())
+    {
+        return;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer, componentId, isPress]
+        {
+            player->triggerButton(componentId, isPress);
+        }));
+}
+
+void EngineHost::setPhysicalSoundsEnabled(const bool enabled)
+{
+    if (physicalInteractionSoundPlayer)
+    {
+        physicalInteractionSoundPlayer->setEnabled(enabled);
+    }
+}
+
+bool EngineHost::arePhysicalSoundsEnabled() const
+{
+    return physicalInteractionSoundPlayer &&
+           physicalInteractionSoundPlayer->isEnabled();
+}
+
+void EngineHost::setPhysicalSoundsMixMode(const PhysicalSoundsMixMode mode)
+{
+    physicalSoundsMixMode.store(mode, std::memory_order_relaxed);
+    applyPhysicalSoundsMixMode();
+}
+
+PhysicalSoundsMixMode EngineHost::getPhysicalSoundsMixMode() const
+{
+    return physicalSoundsMixMode.load(std::memory_order_relaxed);
+}
+
+void EngineHost::setPhysicalSoundsLevel(const int level)
+{
+    if (physicalInteractionSoundPlayer)
+    {
+        physicalInteractionSoundPlayer->setLevel(level);
+    }
+}
+
+int EngineHost::getPhysicalSoundsLevel() const
+{
+    return physicalInteractionSoundPlayer
+               ? physicalInteractionSoundPlayer->getLevel()
+               : 100;
+}
+
+void EngineHost::applyPhysicalSoundsMixMode() const
+{
+    if (!mixer)
+    {
+        return;
+    }
+
+    const auto stripControls =
+        mixer->getMixerControls()->getStripControls(PhysicalSoundsStrip);
+    if (!stripControls)
+    {
+        return;
+    }
+
+    const auto mainMixControls =
+        std::dynamic_pointer_cast<MainMixControls>(stripControls->find("Main"));
+    if (!mainMixControls)
+    {
+        return;
+    }
+
+    const auto fader =
+        std::dynamic_pointer_cast<FaderControl>(mainMixControls->find("Level"));
+    if (fader)
+    {
+        fader->setValue(getPhysicalSoundsMixMode() ==
+                                PhysicalSoundsMixMode::StereoOut
+                            ? 100.f
+                            : 0.f);
     }
 }
 

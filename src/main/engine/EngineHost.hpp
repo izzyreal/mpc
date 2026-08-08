@@ -2,6 +2,7 @@
 
 #include "concurrency/SamplePreciseTaskQueue.hpp"
 #include "concurrency/TaskQueue.hpp"
+#include "engine/PhysicalInteractionSoundPlayer.hpp"
 #include "utils/SimpleAction.hpp"
 
 #include <memory>
@@ -89,6 +90,8 @@ namespace mpc::engine
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
         std::shared_ptr<BasicSoundPlayer> getPreviewSoundPlayer() const;
         std::shared_ptr<BasicSoundPlayer> getMetronomePlayer() const;
+        std::shared_ptr<PhysicalInteractionSoundPlayer>
+        getPhysicalInteractionSoundPlayer() const;
         std::shared_ptr<audio::mixer::AudioMixer> getMixer();
         std::vector<std::shared_ptr<Voice>> &getVoices();
 
@@ -111,6 +114,15 @@ namespace mpc::engine
         bool startBouncing(const audiomidi::DirectToDiskSettings *settings);
 
         void finishPreviewSoundPlayerVoice() const;
+
+        void triggerPhysicalButtonSound(hardware::ComponentId componentId,
+                                        bool isPress);
+        void setPhysicalSoundsEnabled(bool enabled);
+        bool arePhysicalSoundsEnabled() const;
+        void setPhysicalSoundsMixMode(PhysicalSoundsMixMode mode);
+        PhysicalSoundsMixMode getPhysicalSoundsMixMode() const;
+        void setPhysicalSoundsLevel(int level);
+        int getPhysicalSoundsLevel() const;
 
     private:
         Mpc &mpc;
@@ -145,6 +157,8 @@ namespace mpc::engine
 
         std::shared_ptr<BasicSoundPlayer> previewSoundPlayer;
         std::shared_ptr<BasicSoundPlayer> metronomePlayer;
+        std::shared_ptr<PhysicalInteractionSoundPlayer>
+            physicalInteractionSoundPlayer;
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
         std::vector<std::shared_ptr<Voice>> voices;
@@ -162,10 +176,14 @@ namespace mpc::engine
 
         std::shared_ptr<audiomidi::SoundRecorder> soundRecorder;
         std::shared_ptr<audiomidi::SoundPlayer> soundPlayer;
+        std::atomic<PhysicalSoundsMixMode> physicalSoundsMixMode{
+            PhysicalSoundsMixMode::StereoOut};
+        std::shared_ptr<AudioProcess> physicalSoundsOutputRouter;
 
         void setupMixer();
         void setAssignableMixOutLevels() const;
         void createSynth();
         void setMonitorLevel(int8_t) const;
+        void applyPhysicalSoundsMixMode() const;
     };
 } // namespace mpc::engine

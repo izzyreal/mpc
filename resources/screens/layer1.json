@@ -593,17 +593,24 @@
 },
 "vmpc-settings":
 {
- "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "Name typing w. keybd:", "Big time shift      :" ],
- "x" : [ 3, 3, 3, 3, 3 ],
- "y" : [ 3, 12, 21, 30, 39 ],
+ "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :", "Name typing w. keybd:", "Big time shift      :", "Physical sounds     :", "Physical mix mode   :", "Physical level      :" ],
+ "x" : [ 3, 3, 3, 3, 3, 3, 3, 3 ],
+ "y" : [ 3, 12, 21, 30, 39, 48, 57, 66 ],
  "parameters" : [
   "initial-pad-mapping", [ "_", "_", "_", "16-levels-erase-mode" ],
   "16-levels-erase-mode", [ "_", "_", "initial-pad-mapping", "auto-convert-wavs" ],
   "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "name-typing-with-keyboard" ],
   "name-typing-with-keyboard", [ "_", "_", "auto-convert-wavs", "big-time-shift" ],
-  "big-time-shift", [ "_", "_", "name-typing-with-keyboard", "_" ]
+  "big-time-shift", [ "_", "_", "name-typing-with-keyboard", "physical-sounds-enabled" ],
+  "physical-sounds-enabled", [ "_", "_", "big-time-shift", "physical-sounds-mix-mode" ],
+  "physical-sounds-mix-mode", [ "_", "_", "physical-sounds-enabled", "physical-sounds-level" ],
+  "physical-sounds-level", [ "_", "_", "physical-sounds-mix-mode", "_" ]
  ],
- "tfsize" : [ 60, 108, 18, 18, 78 ],
+ "tfsize" : [ 60, 108, 18, 18, 78, 18, 72, 18 ],
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 239, 239 ],
+ "infoy" : [ 2, 38 ],
  "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI" ],
  "fbtypes" : [ 2, 0, 0, 0, 0, null ]
 },

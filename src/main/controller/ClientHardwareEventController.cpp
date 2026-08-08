@@ -795,10 +795,17 @@ void ClientHardwareEventController::handleButtonPress(
     static const auto allowRepeat = std::vector{
         CURSOR_UP, CURSOR_RIGHT_OR_DIGIT, CURSOR_DOWN, CURSOR_LEFT_OR_DIGIT};
 
-    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(),
-                                      event.componentId) == allowRepeat.end())
+    const bool isNewPress = button->press();
+    if (!isNewPress && std::find(allowRepeat.begin(), allowRepeat.end(),
+                                 event.componentId) == allowRepeat.end())
     {
         return;
+    }
+
+    if (isNewPress)
+    {
+        mpc.getEngineHost()->triggerPhysicalButtonSound(event.componentId,
+                                                        true);
     }
 
     buttonConsumptionTracker.onPress(event.componentId);
@@ -1099,6 +1106,8 @@ void ClientHardwareEventController::handleButtonRelease(
         return;
     }
 
+    mpc.getEngineHost()->triggerPhysicalButtonSound(event.componentId, false);
+
     buttonConsumptionTracker.onRelease(event.componentId);
 
     if (buttonConsumptionTracker.isConsumed(event.componentId))
@@ -1170,6 +1179,9 @@ void ClientHardwareEventController::handleButtonDoublePress(
         {
             return;
         }
+
+        mpc.getEngineHost()->triggerPhysicalButtonSound(event.componentId,
+                                                        true);
 
         if (event.componentId == REC)
         {

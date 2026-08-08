@@ -103,7 +103,10 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         0x00, // This was MIDI control mode (VMPC or ORIGINAL), but this feature
               // (configurability) was removed.
         static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled),
-        static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled)};
+        static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled),
+        static_cast<char>(vmpcSettingsScreen->physicalSoundsEnabled),
+        static_cast<char>(vmpcSettingsScreen->physicalSoundsMixMode),
+        static_cast<char>(vmpcSettingsScreen->physicalSoundsLevel)};
 
     (void) success(set_file_data(path, bytes), FailurePolicy::BestEffort,
                    "save VMPC settings for '" + path.string() + "'");
@@ -203,5 +206,20 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
     if (bytes.size() > 12)
     {
         vmpcSettingsScreen->bigTimeShiftEnabled = static_cast<bool>(bytes[12]);
+    }
+    if (bytes.size() > 13)
+    {
+        vmpcSettingsScreen->setPhysicalSoundsEnabled(
+            static_cast<bool>(bytes[13]));
+    }
+    if (bytes.size() > 14)
+    {
+        vmpcSettingsScreen->setPhysicalSoundsMixMode(
+            static_cast<unsigned char>(bytes[14]));
+    }
+    if (bytes.size() > 15)
+    {
+        vmpcSettingsScreen->setPhysicalSoundsLevel(
+            static_cast<unsigned char>(bytes[15]));
     }
 }
