@@ -123,7 +123,7 @@ namespace
 TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
 
     const auto player =
         mpc.getEngineHost()->getPhysicalInteractionSoundPlayer();
@@ -142,7 +142,7 @@ TEST_CASE(
     const auto isAudibleAtBlock = [](const int steps, const int targetBlock)
     {
         Mpc mpc;
-        TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
         prepareAudio(mpc);
         const auto engineHost = mpc.getEngineHost();
         mpc.clientEventController->clientHardwareEventController
@@ -167,11 +167,56 @@ TEST_CASE(
     REQUIRE_FALSE(isAudibleAtBlock(1000, 60));
 }
 
+TEST_CASE("Batched live data-wheel turns do not leave a slow audible backlog",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAudio(mpc);
+
+    const auto engineHost = mpc.getEngineHost();
+    const auto controller =
+        mpc.clientEventController->clientHardwareEventController;
+
+    // Hosts can deliver a quick spin as many one-detent events immediately
+    // before an audio block. The audible train should follow the gesture but
+    // must not spend another half second draining a slow event backlog.
+    for (int i = 0; i < 15; ++i)
+    {
+        controller->handleClientHardwareEvent(dataWheelEvent(1));
+    }
+
+    bool heardStart = false;
+    bool heardMiddle = false;
+    bool heardLate = false;
+    for (int block = 0; block <= 25; ++block)
+    {
+        engineHost->prepareProcessBlock(BufferSize);
+        const auto output = renderOutputs(mpc);
+        if (block == 0)
+        {
+            heardStart = hasSound(output.stereoLeft);
+        }
+        else if (block == 10)
+        {
+            heardMiddle = hasSound(output.stereoLeft);
+        }
+        else if (block == 25)
+        {
+            heardLate = hasSound(output.stereoLeft);
+        }
+    }
+
+    REQUIRE(heardStart);
+    REQUIRE(heardMiddle);
+    REQUIRE_FALSE(heardLate);
+}
+
 TEST_CASE("Only actual slider travel renders and its inferred gesture fades",
           "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareAudio(mpc);
 
     const auto engineHost = mpc.getEngineHost();
@@ -207,7 +252,7 @@ TEST_CASE("Slider endpoints add velocity-sensitive arrival impacts",
     const auto renderArrivalPeak = [](const float startY, const float endY)
     {
         Mpc mpc;
-        TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
         prepareAudio(mpc);
         const auto engineHost = mpc.getEngineHost();
         const auto controller =
@@ -250,7 +295,7 @@ TEST_CASE("Accepted pad presses render velocity-layered physical sounds",
     const auto renderPad = [](const float velocity)
     {
         Mpc mpc;
-        TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
         preparePadInput(mpc);
         prepareAudio(mpc);
 
@@ -283,7 +328,7 @@ TEST_CASE("A held pad does not retrigger its physical sound",
           "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     preparePadInput(mpc);
     prepareAudio(mpc);
 
@@ -310,7 +355,7 @@ TEST_CASE("A held pad does not retrigger its physical sound",
 TEST_CASE("Power-off lifecycle voice renders completely", "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareAudio(mpc);
 
     const auto engineHost = mpc.getEngineHost();
@@ -339,7 +384,7 @@ TEST_CASE("Muted physical sounds do not delay power-off",
           "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     const auto engineHost = mpc.getEngineHost();
 
     engineHost->setPhysicalSoundsEnabled(false);
@@ -354,7 +399,7 @@ TEST_CASE("Button press and release transitions render to stereo out",
           "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareAudio(mpc);
 
     const auto engineHost = mpc.getEngineHost();
@@ -399,7 +444,7 @@ TEST_CASE("MAIN VOLUME does not affect physical sounds on stereo out",
     const auto renderAtMainLevel = [](const int mainLevel)
     {
         Mpc mpc;
-        TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
         prepareAudio(mpc);
 
         const auto engineHost = mpc.getEngineHost();
@@ -424,7 +469,7 @@ TEST_CASE("Dedicated physical-sounds mode reaches its own stereo output only",
           "[physical-sounds]")
 {
     Mpc mpc;
-    TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
     prepareAudio(mpc);
 
     const auto engineHost = mpc.getEngineHost();

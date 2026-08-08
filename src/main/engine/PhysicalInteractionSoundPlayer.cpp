@@ -293,6 +293,8 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(const int steps)
 
     const auto direction = steps > 0 ? 1 : -1;
     const auto stepCount = std::abs(steps);
+    const auto continuesAudibleTrain =
+        wheelStepsRemaining > 0 && wheelDirection == direction;
     if (wheelStepsRemaining == 0)
     {
         framesUntilWheelDetent = 0.0;
@@ -306,10 +308,23 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(const int steps)
     }
 
     wheelDirection = direction;
-    wheelStepsRemaining =
-        std::min(12, wheelStepsRemaining + std::min(stepCount, 12));
-    wheelDetentsPerSecond =
-        static_cast<float>(std::clamp(18 + stepCount * 2, 18, 40));
+    if (continuesAudibleTrain && stepCount <= 2)
+    {
+        // Several small host updates can be drained together at the start of
+        // one audio block. Treat that as an ongoing spin, not as a slow queue
+        // that keeps clicking after the user's hand has stopped.
+        constexpr int MaximumLiveSpinBacklog = 6;
+        wheelStepsRemaining = std::min(
+            MaximumLiveSpinBacklog, wheelStepsRemaining + stepCount);
+        wheelDetentsPerSecond = 40.f;
+    }
+    else
+    {
+        wheelStepsRemaining =
+            std::min(12, wheelStepsRemaining + std::min(stepCount, 12));
+        wheelDetentsPerSecond =
+            static_cast<float>(std::clamp(18 + stepCount * 2, 18, 40));
+    }
 }
 
 void PhysicalInteractionSoundPlayer::triggerSlider(
