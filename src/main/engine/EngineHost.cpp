@@ -69,29 +69,62 @@ namespace
     class PhysicalSoundsOutputRouter final : public AudioProcess
     {
     public:
-        PhysicalSoundsOutputRouter(
-            std::shared_ptr<IOAudioProcess> outputToUse,
-            const std::atomic<PhysicalSoundsMixMode> &mixModeToUse)
-            : output(std::move(outputToUse)), mixMode(mixModeToUse)
+        explicit PhysicalSoundsOutputRouter(
+            std::shared_ptr<IOAudioProcess> outputToUse)
+            : output(std::move(outputToUse))
         {
         }
 
         int processAudio(AudioBuffer *buffer, const int nFrames) override
         {
-            if (mixMode.load(std::memory_order_relaxed) ==
-                PhysicalSoundsMixMode::Dedicated)
-            {
-                return output->processAudio(buffer, nFrames);
-            }
-
-            const auto sampleCount = std::min(output->localBuffer.size(),
-                                              static_cast<size_t>(nFrames * 2));
-            std::fill_n(output->localBuffer.begin(), sampleCount, 0.f);
-            return AUDIO_OK;
+            return output->processAudio(buffer, nFrames);
         }
 
     private:
         std::shared_ptr<IOAudioProcess> output;
+    };
+
+    class PhysicalSoundsLiveOutputMixer final : public AudioClient
+    {
+    public:
+        PhysicalSoundsLiveOutputMixer(
+            std::shared_ptr<IOAudioProcess> stereoOutputToUse,
+            std::shared_ptr<IOAudioProcess> physicalOutputToUse,
+            const std::atomic<PhysicalSoundsMixMode> &mixModeToUse)
+            : stereoOutput(std::move(stereoOutputToUse)),
+              physicalOutput(std::move(physicalOutputToUse)),
+              mixMode(mixModeToUse)
+        {
+        }
+
+        void work(const int nFrames) override
+        {
+            if (mixMode.load(std::memory_order_relaxed) ==
+                PhysicalSoundsMixMode::Dedicated)
+            {
+                return;
+            }
+
+            const auto requestedSampleCount = static_cast<size_t>(nFrames * 2);
+            const auto physicalSampleCount =
+                std::min(physicalOutput->localBuffer.size(),
+                         requestedSampleCount);
+            const auto mixedSampleCount =
+                std::min(stereoOutput->localBuffer.size(),
+                         physicalSampleCount);
+
+            for (size_t i = 0; i < mixedSampleCount; ++i)
+            {
+                stereoOutput->localBuffer[i] +=
+                    physicalOutput->localBuffer[i];
+            }
+            std::fill_n(physicalOutput->localBuffer.begin(),
+                        physicalSampleCount, 0.f);
+        }
+
+    private:
+        std::shared_ptr<IOAudioProcess> stereoOutput;
+        std::shared_ptr<IOAudioProcess> physicalOutput;
         const std::atomic<PhysicalSoundsMixMode> &mixMode;
     };
 } // namespace
@@ -141,10 +174,14 @@ void EngineHost::start()
     initializeDiskRecorders();
 
     physicalSoundsOutputRouter = std::make_shared<PhysicalSoundsOutputRouter>(
-        outputProcesses.back(), physicalSoundsMixMode);
+        outputProcesses.back());
+    physicalSoundsLiveOutputMixer =
+        std::make_shared<PhysicalSoundsLiveOutputMixer>(
+            outputProcesses.front(), outputProcesses.back(),
+            physicalSoundsMixMode);
     mixer->getStrip(PhysicalSoundsStrip)
         ->setDirectOutputProcess(physicalSoundsOutputRouter);
-    applyPhysicalSoundsMixMode();
+    isolatePhysicalSoundsFromMainMix();
 
     mixer->getStrip(std::string(SoundRecorderInputStrip))->setDirectOutputProcess(soundRecorder);
     mixer->getStrip(std::string(QuickPreviewStrip))->setInputProcess(soundPlayer);
@@ -211,6 +248,7 @@ void EngineHost::start()
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
     compoundAudioClient->add(sequencerPlaybackEngine.get());
     compoundAudioClient->add(mixer.get());
+    compoundAudioClient->add(physicalSoundsLiveOutputMixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 
@@ -457,7 +495,6 @@ bool EngineHost::arePhysicalSoundsEnabled() const
 void EngineHost::setPhysicalSoundsMixMode(const PhysicalSoundsMixMode mode)
 {
     physicalSoundsMixMode.store(mode, std::memory_order_relaxed);
-    applyPhysicalSoundsMixMode();
 }
 
 PhysicalSoundsMixMode EngineHost::getPhysicalSoundsMixMode() const
@@ -480,7 +517,7 @@ int EngineHost::getPhysicalSoundsLevel() const
                : 100;
 }
 
-void EngineHost::applyPhysicalSoundsMixMode() const
+void EngineHost::isolatePhysicalSoundsFromMainMix() const
 {
     if (!mixer)
     {
@@ -505,10 +542,7 @@ void EngineHost::applyPhysicalSoundsMixMode() const
         std::dynamic_pointer_cast<FaderControl>(mainMixControls->find("Level"));
     if (fader)
     {
-        fader->setValue(getPhysicalSoundsMixMode() ==
-                                PhysicalSoundsMixMode::StereoOut
-                            ? 100.f
-                            : 0.f);
+        fader->setValue(0.f);
     }
 }
 

@@ -149,6 +149,7 @@ void VmpcSettingsScreen::selectSetting(const int settingIndex)
         nextRowOffset = settingIndex - VisibleRowCount + 1;
     }
 
+    const auto viewportMoved = nextRowOffset != rowOffset;
     const auto nextField = findField(settingNames[settingIndex]);
     nextField->Hide(false);
     ls.lock()->setFocus(settingNames[settingIndex]);
@@ -156,6 +157,14 @@ void VmpcSettingsScreen::selectSetting(const int settingIndex)
     rowOffset = nextRowOffset;
     row = settingIndex - rowOffset;
     displayRows();
+
+    if (viewportMoved)
+    {
+        // A newly revealed row may move out of the area occupied by the
+        // function keys. Redraw the whole screen after clearing its old
+        // rectangle so those static controls are restored as well.
+        SetDirty();
+    }
 }
 
 void VmpcSettingsScreen::setInitialPadMapping(const int i)

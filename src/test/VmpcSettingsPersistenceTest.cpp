@@ -7,6 +7,7 @@
 #include "hardware/ComponentId.hpp"
 #include "input/keyboard/KeyboardBindingsReader.hpp"
 #include "input/keyboard/VmpcKeyCode.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 #include "lcdgui/screens/window/VmpcResetKeyboardScreen.hpp"
@@ -93,6 +94,43 @@ TEST_CASE("VmpcSettings persists physical sound controls",
     REQUIRE(mpc.getEngineHost()->getPhysicalSoundsMixMode() ==
             engine::PhysicalSoundsMixMode::Dedicated);
     REQUIRE(mpc.getEngineHost()->getPhysicalSoundsLevel() == 77);
+}
+
+TEST_CASE("VmpcSettings first scroll preserves the function key strip",
+          "[vmpc-settings]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+
+    const auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::VmpcSettingsScreen);
+    layeredScreen->Draw();
+
+    const auto controls = mpc.getScreen();
+    for (int i = 0; i < 4; ++i)
+    {
+        controls->down();
+        layeredScreen->Draw();
+    }
+
+    const auto functionKeyPixels = [&]
+    {
+        std::vector<bool> result;
+        for (int x = 0; x < 248; ++x)
+        {
+            for (int y = 51; y < 60; ++y)
+            {
+                result.push_back((*layeredScreen->getPixels())[x][y]);
+            }
+        }
+        return result;
+    };
+
+    const auto beforeScroll = functionKeyPixels();
+    controls->down();
+    layeredScreen->Draw();
+
+    REQUIRE(functionKeyPixels() == beforeScroll);
 }
 
 TEST_CASE("VmpcKeyboard reset stays dirty until saved", "[vmpc-keyboard]")

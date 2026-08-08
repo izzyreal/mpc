@@ -30,6 +30,7 @@ namespace mpc::engine::audio::core
 namespace mpc::engine::audio::server
 {
     class CompoundAudioClient;
+    struct AudioClient;
     class NonRealTimeAudioServer;
     class RealTimeAudioServer;
     class AudioServer;
@@ -179,11 +180,13 @@ namespace mpc::engine
         std::atomic<PhysicalSoundsMixMode> physicalSoundsMixMode{
             PhysicalSoundsMixMode::StereoOut};
         std::shared_ptr<AudioProcess> physicalSoundsOutputRouter;
+        std::shared_ptr<audio::server::AudioClient>
+            physicalSoundsLiveOutputMixer;
 
         void setupMixer();
         void setAssignableMixOutLevels() const;
         void createSynth();
         void setMonitorLevel(int8_t) const;
-        void applyPhysicalSoundsMixMode() const;
+        void isolatePhysicalSoundsFromMainMix() const;
     };
 } // namespace mpc::engine
