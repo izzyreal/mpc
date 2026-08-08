@@ -493,6 +493,38 @@ void EngineHost::triggerPhysicalPadSound(const float normalizedVelocity)
         }));
 }
 
+void EngineHost::triggerPhysicalDataWheelSound(const int steps)
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->isEnabled() || steps == 0)
+    {
+        return;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer, steps]
+        {
+            player->triggerDataWheel(steps);
+        }));
+}
+
+void EngineHost::triggerPhysicalSliderSound(const float normalizedDelta,
+                                            const float normalizedPosition)
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->isEnabled() || normalizedDelta == 0.f)
+    {
+        return;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer, normalizedDelta,
+         normalizedPosition]
+        {
+            player->triggerSlider(normalizedDelta, normalizedPosition);
+        }));
+}
+
 void EngineHost::triggerPhysicalPowerOnSound()
 {
     if (!physicalInteractionSoundPlayer ||

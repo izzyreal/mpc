@@ -5,6 +5,7 @@
 #include "engine/audio/core/AudioBuffer.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 
 using namespace mpc;
@@ -48,6 +49,7 @@ PhysicalInteractionSoundPlayer::PhysicalInteractionSoundPlayer()
     loadButtonSamples();
     loadPadSamples();
     loadPowerSamples();
+    loadMotionSamples();
 }
 
 void PhysicalInteractionSoundPlayer::loadButtonSamples()
@@ -124,6 +126,54 @@ void PhysicalInteractionSoundPlayer::loadPowerSamples()
         {
             MLOG("Unable to load physical interaction sound '" + paths[i] +
                  "'");
+        }
+    }
+}
+
+void PhysicalInteractionSoundPlayer::loadMotionSamples()
+{
+    const auto loadNumberedSamples =
+        [this](auto &destination, const std::string &prefix, int &categoryCount)
+    {
+        for (size_t i = 0; i < destination.size(); ++i)
+        {
+            const auto number = (i < 9 ? "0" : "") + std::to_string(i + 1);
+            const auto path =
+                "audio/physical-motion/" + prefix + number + ".wav";
+            if (loadWavResource(path, destination[i]))
+            {
+                ++loadedSampleCount;
+                ++categoryCount;
+            }
+            else
+            {
+                MLOG("Unable to load physical interaction sound '" + path +
+                     "'");
+            }
+        }
+    };
+
+    loadNumberedSamples(dataWheelSamples, "data-wheel-detent-",
+                        loadedDataWheelSampleCount);
+    loadNumberedSamples(sliderContactSamples, "slider-contact-",
+                        loadedSliderSampleCount);
+    loadNumberedSamples(sliderRubSamples, "slider-rub-",
+                        loadedSliderSampleCount);
+
+    const std::array<std::string, SliderEndpointSampleCount> endpointPaths{
+        "audio/physical-motion/slider-endpoint-a.wav",
+        "audio/physical-motion/slider-endpoint-b.wav"};
+    for (size_t i = 0; i < endpointPaths.size(); ++i)
+    {
+        if (loadWavResource(endpointPaths[i], sliderEndpointSamples[i]))
+        {
+            ++loadedSampleCount;
+            ++loadedSliderSampleCount;
+        }
+        else
+        {
+            MLOG("Unable to load physical interaction sound '" +
+                 endpointPaths[i] + "'");
         }
     }
 }
@@ -231,6 +281,82 @@ void PhysicalInteractionSoundPlayer::triggerPad(const float normalizedVelocity)
     addTransientVoice(sample);
 }
 
+void PhysicalInteractionSoundPlayer::triggerDataWheel(const int steps)
+{
+    if (!enabled.load(std::memory_order_relaxed) || steps == 0 ||
+        powerOffState.load(std::memory_order_relaxed) ==
+            PowerOffState::Pending ||
+        powerOffState.load(std::memory_order_relaxed) == PowerOffState::Playing)
+    {
+        return;
+    }
+
+    const auto direction = steps > 0 ? 1 : -1;
+    const auto stepCount = std::abs(steps);
+    if (wheelStepsRemaining == 0)
+    {
+        framesUntilWheelDetent = 0.0;
+    }
+    else if (wheelDirection != direction)
+    {
+        // A reversal invalidates detents that represented motion in the old
+        // direction but have not yet become audible.
+        wheelStepsRemaining = 0;
+        framesUntilWheelDetent = 0.0;
+    }
+
+    wheelDirection = direction;
+    wheelStepsRemaining =
+        std::min(12, wheelStepsRemaining + std::min(stepCount, 12));
+    wheelDetentsPerSecond =
+        static_cast<float>(std::clamp(18 + stepCount * 2, 18, 40));
+}
+
+void PhysicalInteractionSoundPlayer::triggerSlider(
+    const float normalizedDelta, const float normalizedPosition)
+{
+    if (!enabled.load(std::memory_order_relaxed) ||
+        powerOffState.load(std::memory_order_relaxed) ==
+            PowerOffState::Pending ||
+        powerOffState.load(std::memory_order_relaxed) == PowerOffState::Playing)
+    {
+        return;
+    }
+
+    const auto distance = std::abs(normalizedDelta);
+    if (distance <= 0.f)
+    {
+        return;
+    }
+
+    if (hasReceivedSliderInput && renderedFrameCount != lastSliderInputFrame)
+    {
+        pendingSliderElapsedFrames += renderedFrameCount - lastSliderInputFrame;
+    }
+    else if (!hasReceivedSliderInput)
+    {
+        // A tenth of a second gives a useful velocity estimate for the first
+        // update after an idle period without making large jumps sound slow.
+        pendingSliderElapsedFrames =
+            static_cast<uint64_t>(currentOutputSampleRate * 0.1);
+        hasReceivedSliderInput = true;
+    }
+    lastSliderInputFrame = renderedFrameCount;
+    pendingSliderDistance += distance;
+
+    constexpr float EndpointTolerance = 1.0e-4f;
+    if (normalizedDelta < 0.f && normalizedPosition <= EndpointTolerance)
+    {
+        // The audition's provisional A/B ordering is mapped A=top, B=bottom.
+        pendingSliderEndpoint = 0;
+    }
+    else if (normalizedDelta > 0.f &&
+             normalizedPosition >= 1.f - EndpointTolerance)
+    {
+        pendingSliderEndpoint = 1;
+    }
+}
+
 void PhysicalInteractionSoundPlayer::triggerPowerOn()
 {
     if (!enabled.load(std::memory_order_relaxed) ||
@@ -297,7 +423,10 @@ double PhysicalInteractionSoundPlayer::getPowerOffDurationSeconds() const
                                  : 0.0;
 }
 
-void PhysicalInteractionSoundPlayer::addTransientVoice(const Sample &sample)
+void PhysicalInteractionSoundPlayer::addTransientVoice(
+    const Sample &sample, const int startDelayFrames, const float voiceGain,
+    const bool isSliderRub, const int fadeInSourceFrames,
+    const int fadeOutSourceFrames)
 {
     if (sample.frames.empty() ||
         powerOffState.load(std::memory_order_relaxed) ==
@@ -311,7 +440,204 @@ void PhysicalInteractionSoundPlayer::addTransientVoice(const Sample &sample)
     {
         voices.erase(voices.begin());
     }
-    voices.push_back(Voice{&sample, 0.0});
+    Voice voice;
+    voice.sample = &sample;
+    voice.gain = voiceGain;
+    voice.startDelayFrames = std::max(0, startDelayFrames);
+    voice.fadeInSourceFrames = std::max(0, fadeInSourceFrames);
+    voice.fadeOutSourceFrames = std::max(0, fadeOutSourceFrames);
+    voice.sliderRub = isSliderRub;
+    voices.push_back(std::move(voice));
+}
+
+float PhysicalInteractionSoundPlayer::nextMotionRandomFloat()
+{
+    motionRandomState = motionRandomState * 1664525U + 1013904223U;
+    return static_cast<float>((motionRandomState >> 8U) & 0x00ffffffU) /
+           static_cast<float>(0x01000000U);
+}
+
+void PhysicalInteractionSoundPlayer::scheduleDataWheel(
+    const int outputFrameCount, const double outputSampleRate)
+{
+    if (wheelStepsRemaining <= 0 || loadedDataWheelSampleCount == 0)
+    {
+        return;
+    }
+
+    while (wheelStepsRemaining > 0 && framesUntilWheelDetent < outputFrameCount)
+    {
+        const auto &sample = dataWheelSamples[nextWheelDetent];
+        nextWheelDetent =
+            static_cast<uint8_t>((nextWheelDetent + 5) % DataWheelSampleCount);
+        addTransientVoice(sample, static_cast<int>(framesUntilWheelDetent));
+        --wheelStepsRemaining;
+        if (wheelStepsRemaining > 0)
+        {
+            framesUntilWheelDetent +=
+                outputSampleRate / std::max(4.f, wheelDetentsPerSecond);
+        }
+    }
+
+    if (wheelStepsRemaining > 0)
+    {
+        framesUntilWheelDetent -= outputFrameCount;
+    }
+    else
+    {
+        framesUntilWheelDetent = 0.0;
+        wheelDirection = 0;
+    }
+}
+
+bool PhysicalInteractionSoundPlayer::scheduleSlider(
+    const int outputFrameCount, const double outputSampleRate)
+{
+    if (pendingSliderDistance > 0.f)
+    {
+        const auto maximumElapsedFrames =
+            static_cast<uint64_t>(outputSampleRate * 0.1);
+        const auto elapsedFrames = std::max<uint64_t>(
+            1, std::min(pendingSliderElapsedFrames > 0
+                            ? pendingSliderElapsedFrames
+                            : static_cast<uint64_t>(outputFrameCount),
+                        maximumElapsedFrames));
+        const auto instantaneousSpeed =
+            static_cast<float>(pendingSliderDistance * outputSampleRate /
+                               static_cast<double>(elapsedFrames));
+        sliderSpeed = sliderMotionFramesRemaining > 0.0
+                          ? sliderSpeed * 0.55f + instantaneousSpeed * 0.45f
+                          : instantaneousSpeed;
+
+        const auto blendPosition =
+            std::clamp((sliderSpeed - 0.8f) / (2.4f - 0.8f), 0.f, 1.f);
+        sliderHighSpeedBlendTarget =
+            blendPosition * blendPosition * (3.f - 2.f * blendPosition);
+        sliderIntensity =
+            0.62f + 0.38f * std::clamp(sliderSpeed / 3.3f, 0.f, 1.f);
+
+        const auto motionSeconds = std::clamp(
+            pendingSliderDistance / std::max(sliderSpeed, 0.35f), 0.06f, 0.30f);
+        sliderMotionFramesRemaining = std::max(
+            sliderMotionFramesRemaining, motionSeconds * outputSampleRate);
+
+        if (pendingSliderEndpoint &&
+            *pendingSliderEndpoint < sliderEndpointSamples.size())
+        {
+            const auto endpointGain =
+                0.35f + 0.65f * std::clamp(sliderSpeed / 3.3f, 0.f, 1.f);
+            addTransientVoice(sliderEndpointSamples[*pendingSliderEndpoint], 0,
+                              endpointGain);
+        }
+
+        pendingSliderDistance = 0.f;
+        pendingSliderElapsedFrames = 0;
+        pendingSliderEndpoint.reset();
+    }
+
+    if (sliderMotionFramesRemaining <= 0.0)
+    {
+        sliderHighSpeedBlend = 0.f;
+        sliderHighSpeedBlendTarget = 0.f;
+        return false;
+    }
+
+    const auto blendAlpha = static_cast<float>(
+        1.0 - std::exp(-static_cast<double>(outputFrameCount) /
+                       std::max(1.0, outputSampleRate * 0.05)));
+    sliderHighSpeedBlend +=
+        (sliderHighSpeedBlendTarget - sliderHighSpeedBlend) * blendAlpha;
+
+    const auto activeFrameCount = static_cast<int>(
+        std::min<double>(outputFrameCount, sliderMotionFramesRemaining));
+
+    while (framesUntilSliderRub < activeFrameCount &&
+           loadedSliderSampleCount > 0)
+    {
+        const auto &sample = sliderRubSamples[nextSliderRub];
+        nextSliderRub = static_cast<uint8_t>(
+            (nextSliderRub + 1 +
+             static_cast<int>(nextMotionRandomFloat() *
+                              (SliderRubSampleCount - 1))) %
+            SliderRubSampleCount);
+        const auto fadeFrames = static_cast<int>(sample.sampleRate * 0.060);
+        addTransientVoice(sample, static_cast<int>(framesUntilSliderRub),
+                          sliderIntensity * 0.45f, true, fadeFrames,
+                          fadeFrames);
+        const auto sampleDurationInOutputFrames =
+            static_cast<double>(sample.frames.size()) * outputSampleRate /
+            static_cast<double>(sample.sampleRate);
+        framesUntilSliderRub += std::max(1.0, sampleDurationInOutputFrames -
+                                                  outputSampleRate * 0.060);
+    }
+    framesUntilSliderRub -= outputFrameCount;
+
+    if (sliderHighSpeedBlend > 0.01f)
+    {
+        const auto contactsPerSecond = 24.f + 48.f * sliderHighSpeedBlend;
+        while (framesUntilSliderContact < activeFrameCount)
+        {
+            const auto &sample = sliderContactSamples[nextSliderContact];
+            nextSliderContact = static_cast<uint8_t>(
+                (nextSliderContact + 1 +
+                 static_cast<int>(nextMotionRandomFloat() *
+                                  (SliderContactSampleCount - 1))) %
+                SliderContactSampleCount);
+            const auto gainVariationDb = -1.8f + nextMotionRandomFloat() * 3.6f;
+            const auto gainVariation = std::pow(10.f, gainVariationDb / 20.f);
+            addTransientVoice(
+                sample, static_cast<int>(framesUntilSliderContact),
+                sliderIntensity * 0.67f * sliderHighSpeedBlend * gainVariation);
+            const auto jitter = 0.78f + nextMotionRandomFloat() * 0.44f;
+            framesUntilSliderContact +=
+                outputSampleRate / contactsPerSecond * jitter;
+        }
+        framesUntilSliderContact -= outputFrameCount;
+    }
+    else
+    {
+        framesUntilSliderContact = 0.0;
+    }
+
+    const auto endsInThisBlock =
+        sliderMotionFramesRemaining <= outputFrameCount;
+    sliderMotionFramesRemaining =
+        std::max(0.0, sliderMotionFramesRemaining - outputFrameCount);
+    if (endsInThisBlock)
+    {
+        framesUntilSliderRub = 0.0;
+        framesUntilSliderContact = 0.0;
+        sliderHighSpeedBlendTarget = 0.f;
+    }
+    return endsInThisBlock;
+}
+
+void PhysicalInteractionSoundPlayer::requestSliderRubFade(const int fadeFrames)
+{
+    for (auto &voice : voices)
+    {
+        if (voice.sliderRub && voice.stopFadeFramesRemaining < 0)
+        {
+            voice.stopFadeFramesRemaining = std::max(1, fadeFrames);
+            voice.stopFadeTotalFrames = std::max(1, fadeFrames);
+        }
+    }
+}
+
+void PhysicalInteractionSoundPlayer::resetMotionSchedulers()
+{
+    wheelStepsRemaining = 0;
+    wheelDirection = 0;
+    framesUntilWheelDetent = 0.0;
+    pendingSliderDistance = 0.f;
+    pendingSliderElapsedFrames = 0;
+    pendingSliderEndpoint.reset();
+    sliderMotionFramesRemaining = 0.0;
+    framesUntilSliderContact = 0.0;
+    framesUntilSliderRub = 0.0;
+    sliderSpeed = 0.f;
+    sliderHighSpeedBlend = 0.f;
+    sliderHighSpeedBlendTarget = 0.f;
 }
 
 int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
@@ -319,11 +645,16 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
 {
     buffer->makeSilence();
 
+    const auto outputFrameCount = std::min(nFrames, buffer->getSampleCount());
+    const auto outputSampleRate = static_cast<double>(buffer->getSampleRate());
+    currentOutputSampleRate = outputSampleRate;
+
     if (!enabled.load(std::memory_order_relaxed))
     {
         voices.clear();
         lifecycleVoice.reset();
         lifecycleSound = LifecycleSound::None;
+        resetMotionSchedulers();
         if (powerOffState.load(std::memory_order_relaxed) ==
                 PowerOffState::Pending ||
             powerOffState.load(std::memory_order_relaxed) ==
@@ -332,20 +663,37 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
             powerOffState.store(PowerOffState::Complete,
                                 std::memory_order_relaxed);
         }
+        renderedFrameCount += outputFrameCount;
         return AUDIO_OK;
+    }
+
+    const auto powerState = powerOffState.load(std::memory_order_relaxed);
+    bool sliderStopsInThisBlock = false;
+    if (powerState != PowerOffState::Pending &&
+        powerState != PowerOffState::Playing)
+    {
+        scheduleDataWheel(outputFrameCount, outputSampleRate);
+        sliderStopsInThisBlock =
+            scheduleSlider(outputFrameCount, outputSampleRate);
+    }
+    else
+    {
+        resetMotionSchedulers();
+        requestSliderRubFade(static_cast<int>(outputSampleRate * 0.030));
     }
 
     if (voices.empty() && !lifecycleVoice)
     {
+        renderedFrameCount += outputFrameCount;
         return AUDIO_OK;
     }
 
-    const auto outputFrameCount = std::min(nFrames, buffer->getSampleCount());
-    const auto outputSampleRate = static_cast<double>(buffer->getSampleRate());
     const auto gain =
         static_cast<float>(level.load(std::memory_order_relaxed)) * 0.01f;
     auto &left = buffer->getChannel(0);
     auto &right = buffer->getChannel(1);
+
+    constexpr double HalfPi = 1.57079632679489661923;
 
     for (auto &voice : voices)
     {
@@ -353,7 +701,15 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
         const auto increment =
             static_cast<double>(voice.sample->sampleRate) / outputSampleRate;
 
-        for (int frame = 0; frame < outputFrameCount; ++frame)
+        if (voice.startDelayFrames >= outputFrameCount)
+        {
+            voice.startDelayFrames -= outputFrameCount;
+            continue;
+        }
+        const auto startFrame = voice.startDelayFrames;
+        voice.startDelayFrames = 0;
+
+        for (int frame = startFrame; frame < outputFrameCount; ++frame)
         {
             const auto sourceIndex = static_cast<size_t>(voice.position);
             if (sourceIndex >= source.size())
@@ -367,10 +723,38 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
                 voice.position - static_cast<double>(sourceIndex));
             const auto value =
                 (source[sourceIndex] +
-                 (source[nextSourceIndex] - source[sourceIndex]) * fraction) *
-                gain;
-            left[frame] += value;
-            right[frame] += value;
+                 (source[nextSourceIndex] - source[sourceIndex]) * fraction);
+
+            float envelope = 1.f;
+            if (voice.fadeInSourceFrames > 0 &&
+                voice.position < voice.fadeInSourceFrames)
+            {
+                envelope *= static_cast<float>(std::sin(
+                    HalfPi * voice.position / voice.fadeInSourceFrames));
+            }
+            const auto remainingSourceFrames =
+                static_cast<double>(source.size()) - voice.position;
+            if (voice.fadeOutSourceFrames > 0 &&
+                remainingSourceFrames < voice.fadeOutSourceFrames)
+            {
+                envelope *=
+                    static_cast<float>(std::sin(HalfPi * remainingSourceFrames /
+                                                voice.fadeOutSourceFrames));
+            }
+            if (voice.stopFadeFramesRemaining >= 0)
+            {
+                if (voice.stopFadeFramesRemaining == 0)
+                {
+                    break;
+                }
+                envelope *= static_cast<float>(voice.stopFadeFramesRemaining) /
+                            static_cast<float>(voice.stopFadeTotalFrames);
+                --voice.stopFadeFramesRemaining;
+            }
+
+            const auto outputValue = value * gain * voice.gain * envelope;
+            left[frame] += outputValue;
+            right[frame] += outputValue;
             voice.position += increment;
         }
     }
@@ -379,7 +763,8 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
                                 [](const Voice &voice)
                                 {
                                     return voice.position >=
-                                           voice.sample->frames.size();
+                                               voice.sample->frames.size() ||
+                                           voice.stopFadeFramesRemaining == 0;
                                 }),
                  voices.end());
 
@@ -422,6 +807,12 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
             }
         }
     }
+
+    if (sliderStopsInThisBlock)
+    {
+        requestSliderRubFade(static_cast<int>(outputSampleRate * 0.030));
+    }
+    renderedFrameCount += outputFrameCount;
     return AUDIO_OK;
 }
 
@@ -458,4 +849,14 @@ int PhysicalInteractionSoundPlayer::getLoadedPadSampleCount() const
 int PhysicalInteractionSoundPlayer::getLoadedPowerSampleCount() const
 {
     return loadedPowerSampleCount;
+}
+
+int PhysicalInteractionSoundPlayer::getLoadedDataWheelSampleCount() const
+{
+    return loadedDataWheelSampleCount;
+}
+
+int PhysicalInteractionSoundPlayer::getLoadedSliderSampleCount() const
+{
+    return loadedSliderSampleCount;
 }

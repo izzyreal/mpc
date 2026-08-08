@@ -119,6 +119,9 @@ namespace mpc::engine
         void triggerPhysicalButtonSound(hardware::ComponentId componentId,
                                         bool isPress);
         void triggerPhysicalPadSound(float normalizedVelocity);
+        void triggerPhysicalDataWheelSound(int steps);
+        void triggerPhysicalSliderSound(float normalizedDelta,
+                                        float normalizedPosition);
         void triggerPhysicalPowerOnSound();
         bool beginPhysicalPowerOffSound();
         bool isPhysicalPowerOffSoundComplete() const;

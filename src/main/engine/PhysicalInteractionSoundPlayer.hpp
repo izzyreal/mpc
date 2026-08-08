@@ -26,6 +26,8 @@ namespace mpc::engine
 
         void triggerButton(hardware::ComponentId componentId, bool isPress);
         void triggerPad(float normalizedVelocity);
+        void triggerDataWheel(int steps);
+        void triggerSlider(float normalizedDelta, float normalizedPosition);
         void triggerPowerOn();
         bool beginPowerOffRequest();
         void triggerPowerOff();
@@ -42,6 +44,8 @@ namespace mpc::engine
         int getLoadedSampleCount() const;
         int getLoadedPadSampleCount() const;
         int getLoadedPowerSampleCount() const;
+        int getLoadedDataWheelSampleCount() const;
+        int getLoadedSliderSampleCount() const;
 
     private:
         struct Sample
@@ -54,6 +58,13 @@ namespace mpc::engine
         {
             const Sample *sample = nullptr;
             double position = 0.0;
+            float gain = 1.f;
+            int startDelayFrames = 0;
+            int fadeInSourceFrames = 0;
+            int fadeOutSourceFrames = 0;
+            bool sliderRub = false;
+            int stopFadeFramesRemaining = -1;
+            int stopFadeTotalFrames = 0;
         };
 
         static constexpr size_t ActionCount = 2;
@@ -61,6 +72,10 @@ namespace mpc::engine
         static constexpr size_t PadVelocityLayerCount = 8;
         static constexpr size_t PadTakeCount = 6;
         static constexpr size_t PowerSampleCount = 2;
+        static constexpr size_t DataWheelSampleCount = 6;
+        static constexpr size_t SliderContactSampleCount = 19;
+        static constexpr size_t SliderRubSampleCount = 5;
+        static constexpr size_t SliderEndpointSampleCount = 2;
         static constexpr size_t MaxVoiceCount = 32;
 
         using Takes = std::array<Sample, TakeCount>;
@@ -74,6 +89,10 @@ namespace mpc::engine
             padSamples;
         std::array<uint8_t, PadVelocityLayerCount> nextPadTakes{};
         std::array<Sample, PowerSampleCount> powerSamples;
+        std::array<Sample, DataWheelSampleCount> dataWheelSamples;
+        std::array<Sample, SliderContactSampleCount> sliderContactSamples;
+        std::array<Sample, SliderRubSampleCount> sliderRubSamples;
+        std::array<Sample, SliderEndpointSampleCount> sliderEndpointSamples;
         std::vector<Voice> voices;
         std::optional<Voice> lifecycleVoice;
 
@@ -99,11 +118,46 @@ namespace mpc::engine
         int loadedSampleCount = 0;
         int loadedPadSampleCount = 0;
         int loadedPowerSampleCount = 0;
+        int loadedDataWheelSampleCount = 0;
+        int loadedSliderSampleCount = 0;
+
+        int wheelStepsRemaining = 0;
+        int wheelDirection = 0;
+        float wheelDetentsPerSecond = 40.f;
+        double framesUntilWheelDetent = 0.0;
+        uint8_t nextWheelDetent = 0;
+
+        float pendingSliderDistance = 0.f;
+        std::optional<size_t> pendingSliderEndpoint;
+        uint64_t renderedFrameCount = 0;
+        uint64_t lastSliderInputFrame = 0;
+        uint64_t pendingSliderElapsedFrames = 0;
+        bool hasReceivedSliderInput = false;
+        double currentOutputSampleRate = 48000.0;
+        double sliderMotionFramesRemaining = 0.0;
+        double framesUntilSliderContact = 0.0;
+        double framesUntilSliderRub = 0.0;
+        float sliderSpeed = 0.f;
+        float sliderHighSpeedBlend = 0.f;
+        float sliderHighSpeedBlendTarget = 0.f;
+        float sliderIntensity = 0.62f;
+        uint8_t nextSliderContact = 0;
+        uint8_t nextSliderRub = 0;
+        uint32_t motionRandomState = 0x4d504332U;
 
         void loadButtonSamples();
         void loadPadSamples();
         void loadPowerSamples();
-        void addTransientVoice(const Sample &sample);
+        void loadMotionSamples();
+        void addTransientVoice(const Sample &sample, int startDelayFrames = 0,
+                               float voiceGain = 1.f, bool sliderRub = false,
+                               int fadeInSourceFrames = 0,
+                               int fadeOutSourceFrames = 0);
+        void scheduleDataWheel(int outputFrameCount, double outputSampleRate);
+        bool scheduleSlider(int outputFrameCount, double outputSampleRate);
+        void requestSliderRubFade(int fadeFrames);
+        void resetMotionSchedulers();
+        float nextMotionRandomFloat();
         static bool loadWavResource(const std::string &path, Sample &sample);
     };
 } // namespace mpc::engine

@@ -61,6 +61,26 @@ namespace
         return event;
     }
 
+    ClientHardwareEvent dataWheelEvent(const int steps)
+    {
+        ClientHardwareEvent event;
+        event.source = ClientHardwareEvent::Source::HostInputKeyboard;
+        event.type = ClientHardwareEvent::Type::DataWheelTurn;
+        event.componentId = DATA_WHEEL;
+        event.deltaValue = static_cast<float>(steps);
+        return event;
+    }
+
+    ClientHardwareEvent sliderEvent(const float normalizedY)
+    {
+        ClientHardwareEvent event;
+        event.source = ClientHardwareEvent::Source::HostInputGesture;
+        event.type = ClientHardwareEvent::Type::SliderMove;
+        event.componentId = SLIDER;
+        event.value = normalizedY;
+        return event;
+    }
+
     void prepareAudio(Mpc &mpc)
     {
         const auto server = mpc.getEngineHost()->getAudioServer();
@@ -107,9 +127,121 @@ TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
 
     const auto player =
         mpc.getEngineHost()->getPhysicalInteractionSoundPlayer();
-    REQUIRE(player->getLoadedSampleCount() == 234);
+    REQUIRE(player->getLoadedSampleCount() == 266);
     REQUIRE(player->getLoadedPadSampleCount() == 48);
     REQUIRE(player->getLoadedPowerSampleCount() == 2);
+    REQUIRE(player->getLoadedDataWheelSampleCount() == 6);
+    REQUIRE(player->getLoadedSliderSampleCount() == 26);
+}
+
+TEST_CASE(
+    "Data-wheel steps render detents and large jumps become a bounded "
+    "train",
+    "[physical-sounds]")
+{
+    const auto isAudibleAtBlock = [](const int steps, const int targetBlock)
+    {
+        Mpc mpc;
+        TestMpc::initializeTestMpc(mpc);
+        prepareAudio(mpc);
+        const auto engineHost = mpc.getEngineHost();
+        mpc.clientEventController->clientHardwareEventController
+            ->handleClientHardwareEvent(dataWheelEvent(steps));
+
+        bool audible = false;
+        for (int block = 0; block <= targetBlock; ++block)
+        {
+            engineHost->prepareProcessBlock(BufferSize);
+            const auto output = renderOutputs(mpc);
+            if (block == targetBlock)
+            {
+                audible = hasSound(output.stereoLeft);
+            }
+        }
+        return audible;
+    };
+
+    REQUIRE(isAudibleAtBlock(1, 0));
+    REQUIRE_FALSE(isAudibleAtBlock(1, 15));
+    REQUIRE(isAudibleAtBlock(1000, 15));
+    REQUIRE_FALSE(isAudibleAtBlock(1000, 60));
+}
+
+TEST_CASE("Only actual slider travel renders and its inferred gesture fades",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    prepareAudio(mpc);
+
+    const auto engineHost = mpc.getEngineHost();
+    const auto controller =
+        mpc.clientEventController->clientHardwareEventController;
+
+    // The default UpIncreases slider starts at normalized Y=1, so this event
+    // is clamped to its existing position and must remain silent.
+    controller->handleClientHardwareEvent(sliderEvent(1.f));
+    engineHost->prepareProcessBlock(BufferSize);
+    REQUIRE_FALSE(hasSound(renderOutputs(mpc).stereoLeft));
+
+    controller->handleClientHardwareEvent(sliderEvent(0.95f));
+    engineHost->prepareProcessBlock(BufferSize);
+    REQUIRE(hasSound(renderOutputs(mpc).stereoLeft));
+
+    bool heardLateSound = false;
+    for (int block = 0; block < 30; ++block)
+    {
+        engineHost->prepareProcessBlock(BufferSize);
+        const auto output = renderOutputs(mpc);
+        if (block == 29)
+        {
+            heardLateSound = hasSound(output.stereoLeft);
+        }
+    }
+    REQUIRE_FALSE(heardLateSound);
+}
+
+TEST_CASE("Slider endpoints add velocity-sensitive arrival impacts",
+          "[physical-sounds]")
+{
+    const auto renderArrivalPeak = [](const float startY, const float endY)
+    {
+        Mpc mpc;
+        TestMpc::initializeTestMpc(mpc);
+        prepareAudio(mpc);
+        const auto engineHost = mpc.getEngineHost();
+        const auto controller =
+            mpc.clientEventController->clientHardwareEventController;
+
+        controller->handleClientHardwareEvent(sliderEvent(startY));
+        engineHost->prepareProcessBlock(BufferSize);
+        renderOutputs(mpc);
+        for (int block = 0; block < 30; ++block)
+        {
+            engineHost->prepareProcessBlock(BufferSize);
+            renderOutputs(mpc);
+        }
+
+        controller->handleClientHardwareEvent(sliderEvent(endY));
+        float peak = 0.f;
+        for (int block = 0; block < 4; ++block)
+        {
+            engineHost->prepareProcessBlock(BufferSize);
+            const auto output = renderOutputs(mpc);
+            for (const auto sample : output.stereoLeft)
+            {
+                peak = std::max(peak, std::abs(sample));
+            }
+        }
+        return peak;
+    };
+
+    const auto softArrival = renderArrivalPeak(0.05f, 0.f);
+    const auto hardArrival = renderArrivalPeak(0.8f, 0.f);
+    const auto bottomArrival = renderArrivalPeak(0.8f, 1.f);
+    REQUIRE(softArrival > 0.f);
+    REQUIRE(hardArrival > softArrival);
+    REQUIRE(bottomArrival > 0.f);
 }
 
 TEST_CASE("Accepted pad presses render velocity-layered physical sounds",

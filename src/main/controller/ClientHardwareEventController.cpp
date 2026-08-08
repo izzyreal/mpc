@@ -714,6 +714,7 @@ void ClientHardwareEventController::handleDataWheel(
     }
 
     mpc.getHardware()->getDataWheel()->turn(steps);
+    mpc.getEngineHost()->triggerPhysicalDataWheelSound(steps);
 
     const auto screen = mpc.getScreen();
 
@@ -745,6 +746,16 @@ void ClientHardwareEventController::handleSlider(
     const ClientHardwareEvent &event) const
 {
     const auto slider = mpc.getHardware()->getSlider();
+    const auto getNormalizedY = [&]
+    {
+        const auto normalizedValue =
+            std::clamp(slider->getValue() / 127.f, 0.f, 1.f);
+        return slider->getDirection() ==
+                       mpc::hardware::Slider::Direction::UpIncreases
+                   ? 1.f - normalizedValue
+                   : normalizedValue;
+    };
+    const auto before = getNormalizedY();
 
     if (event.value)
     {
@@ -755,6 +766,13 @@ void ClientHardwareEventController::handleSlider(
     {
         slider->setValue(slider->getValue() + *event.deltaValue);
         mpc.getScreen()->setSlider(std::round(slider->getValue()));
+    }
+
+    const auto after = getNormalizedY();
+    const auto normalizedDelta = after - before;
+    if (normalizedDelta != 0.f)
+    {
+        mpc.getEngineHost()->triggerPhysicalSliderSound(normalizedDelta, after);
     }
 }
 
