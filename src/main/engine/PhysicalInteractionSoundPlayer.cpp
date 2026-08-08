@@ -46,6 +46,8 @@ PhysicalInteractionSoundPlayer::PhysicalInteractionSoundPlayer()
 {
     voices.reserve(MaxVoiceCount);
     loadButtonSamples();
+    loadPadSamples();
+    loadPowerSamples();
 }
 
 void PhysicalInteractionSoundPlayer::loadButtonSamples()
@@ -78,6 +80,50 @@ void PhysicalInteractionSoundPlayer::loadButtonSamples()
                          "'");
                 }
             }
+        }
+    }
+}
+
+void PhysicalInteractionSoundPlayer::loadPadSamples()
+{
+    for (size_t layer = 0; layer < PadVelocityLayerCount; ++layer)
+    {
+        for (size_t take = 0; take < PadTakeCount; ++take)
+        {
+            const auto path =
+                std::string("audio/physical-pads/pad_velocity_") +
+                (layer < 9 ? "0" : "") + std::to_string(layer + 1) + "_take_" +
+                (take < 9 ? "0" : "") + std::to_string(take + 1) + ".wav";
+            if (loadWavResource(path, padSamples[layer][take]))
+            {
+                ++loadedSampleCount;
+                ++loadedPadSampleCount;
+            }
+            else
+            {
+                MLOG("Unable to load physical interaction sound '" + path +
+                     "'");
+            }
+        }
+    }
+}
+
+void PhysicalInteractionSoundPlayer::loadPowerSamples()
+{
+    const std::array<std::string, PowerSampleCount> paths{
+        "audio/physical-power/power_on.wav",
+        "audio/physical-power/power_off.wav"};
+    for (size_t i = 0; i < paths.size(); ++i)
+    {
+        if (loadWavResource(paths[i], powerSamples[i]))
+        {
+            ++loadedSampleCount;
+            ++loadedPowerSampleCount;
+        }
+        else
+        {
+            MLOG("Unable to load physical interaction sound '" + paths[i] +
+                 "'");
         }
     }
 }
@@ -162,6 +208,105 @@ void PhysicalInteractionSoundPlayer::triggerButton(
         return;
     }
 
+    addTransientVoice(sample);
+}
+
+void PhysicalInteractionSoundPlayer::triggerPad(const float normalizedVelocity)
+{
+    if (!enabled.load(std::memory_order_relaxed) ||
+        powerOffState.load(std::memory_order_relaxed) ==
+            PowerOffState::Pending ||
+        powerOffState.load(std::memory_order_relaxed) == PowerOffState::Playing)
+    {
+        return;
+    }
+
+    const auto velocity = std::clamp(normalizedVelocity, 0.f, 1.f);
+    const auto layer =
+        std::min(static_cast<size_t>(velocity * PadVelocityLayerCount),
+                 PadVelocityLayerCount - 1);
+    auto &nextTake = nextPadTakes[layer];
+    const auto &sample = padSamples[layer][nextTake];
+    nextTake = static_cast<uint8_t>((nextTake + 1) % PadTakeCount);
+    addTransientVoice(sample);
+}
+
+void PhysicalInteractionSoundPlayer::triggerPowerOn()
+{
+    if (!enabled.load(std::memory_order_relaxed) ||
+        powerSamples[0].frames.empty())
+    {
+        return;
+    }
+
+    lifecycleVoice = Voice{&powerSamples[0], 0.0};
+    lifecycleSound = LifecycleSound::PowerOn;
+}
+
+bool PhysicalInteractionSoundPlayer::beginPowerOffRequest()
+{
+    if (!enabled.load(std::memory_order_relaxed) ||
+        level.load(std::memory_order_relaxed) == 0 ||
+        powerSamples[1].frames.empty())
+    {
+        return false;
+    }
+
+    auto expected = PowerOffState::Idle;
+    if (powerOffState.compare_exchange_strong(expected, PowerOffState::Pending,
+                                              std::memory_order_relaxed))
+    {
+        return true;
+    }
+
+    return expected == PowerOffState::Pending ||
+           expected == PowerOffState::Playing;
+}
+
+void PhysicalInteractionSoundPlayer::triggerPowerOff()
+{
+    if (powerOffState.load(std::memory_order_relaxed) != PowerOffState::Pending)
+    {
+        return;
+    }
+
+    if (!enabled.load(std::memory_order_relaxed) ||
+        level.load(std::memory_order_relaxed) == 0 ||
+        powerSamples[1].frames.empty())
+    {
+        powerOffState.store(PowerOffState::Complete, std::memory_order_relaxed);
+        return;
+    }
+
+    lifecycleVoice = Voice{&powerSamples[1], 0.0};
+    lifecycleSound = LifecycleSound::PowerOff;
+    powerOffState.store(PowerOffState::Playing, std::memory_order_relaxed);
+}
+
+bool PhysicalInteractionSoundPlayer::isPowerOffComplete() const
+{
+    return powerOffState.load(std::memory_order_relaxed) ==
+           PowerOffState::Complete;
+}
+
+double PhysicalInteractionSoundPlayer::getPowerOffDurationSeconds() const
+{
+    const auto &sample = powerSamples[1];
+    return sample.sampleRate > 0 ? static_cast<double>(sample.frames.size()) /
+                                       static_cast<double>(sample.sampleRate)
+                                 : 0.0;
+}
+
+void PhysicalInteractionSoundPlayer::addTransientVoice(const Sample &sample)
+{
+    if (sample.frames.empty() ||
+        powerOffState.load(std::memory_order_relaxed) ==
+            PowerOffState::Pending ||
+        powerOffState.load(std::memory_order_relaxed) == PowerOffState::Playing)
+    {
+        return;
+    }
+
     if (voices.size() == MaxVoiceCount)
     {
         voices.erase(voices.begin());
@@ -174,12 +319,24 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
 {
     buffer->makeSilence();
 
-    if (!enabled.load(std::memory_order_relaxed) || voices.empty())
+    if (!enabled.load(std::memory_order_relaxed))
     {
-        if (!enabled.load(std::memory_order_relaxed))
+        voices.clear();
+        lifecycleVoice.reset();
+        lifecycleSound = LifecycleSound::None;
+        if (powerOffState.load(std::memory_order_relaxed) ==
+                PowerOffState::Pending ||
+            powerOffState.load(std::memory_order_relaxed) ==
+                PowerOffState::Playing)
         {
-            voices.clear();
+            powerOffState.store(PowerOffState::Complete,
+                                std::memory_order_relaxed);
         }
+        return AUDIO_OK;
+    }
+
+    if (voices.empty() && !lifecycleVoice)
+    {
         return AUDIO_OK;
     }
 
@@ -225,6 +382,46 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
                                            voice.sample->frames.size();
                                 }),
                  voices.end());
+
+    if (lifecycleVoice)
+    {
+        auto &voice = *lifecycleVoice;
+        const auto &source = voice.sample->frames;
+        const auto increment =
+            static_cast<double>(voice.sample->sampleRate) / outputSampleRate;
+
+        for (int frame = 0; frame < outputFrameCount; ++frame)
+        {
+            const auto sourceIndex = static_cast<size_t>(voice.position);
+            if (sourceIndex >= source.size())
+            {
+                break;
+            }
+            const auto nextSourceIndex =
+                std::min(sourceIndex + 1, source.size() - 1);
+            const auto fraction = static_cast<float>(
+                voice.position - static_cast<double>(sourceIndex));
+            const auto value =
+                (source[sourceIndex] +
+                 (source[nextSourceIndex] - source[sourceIndex]) * fraction) *
+                gain;
+            left[frame] += value;
+            right[frame] += value;
+            voice.position += increment;
+        }
+
+        if (voice.position >= source.size())
+        {
+            const auto completedSound = lifecycleSound;
+            lifecycleVoice.reset();
+            lifecycleSound = LifecycleSound::None;
+            if (completedSound == LifecycleSound::PowerOff)
+            {
+                powerOffState.store(PowerOffState::Complete,
+                                    std::memory_order_relaxed);
+            }
+        }
+    }
     return AUDIO_OK;
 }
 
@@ -251,4 +448,14 @@ int PhysicalInteractionSoundPlayer::getLevel() const
 int PhysicalInteractionSoundPlayer::getLoadedSampleCount() const
 {
     return loadedSampleCount;
+}
+
+int PhysicalInteractionSoundPlayer::getLoadedPadSampleCount() const
+{
+    return loadedPadSampleCount;
+}
+
+int PhysicalInteractionSoundPlayer::getLoadedPowerSampleCount() const
+{
+    return loadedPowerSampleCount;
 }

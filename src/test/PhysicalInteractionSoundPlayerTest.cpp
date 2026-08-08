@@ -11,6 +11,12 @@
 #include "engine/audio/mixer/AudioMixerBus.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "hardware/ComponentId.hpp"
+#include "performance/PerformanceManager.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #include <algorithm>
 #include <array>
@@ -43,11 +49,32 @@ namespace
         return event;
     }
 
+    ClientHardwareEvent padEvent(const ClientHardwareEvent::Type type,
+                                 const float velocity = 1.f)
+    {
+        ClientHardwareEvent event;
+        event.source = ClientHardwareEvent::Source::Internal;
+        event.type = type;
+        event.componentId = PAD_1_OR_AB;
+        event.index = 0;
+        event.value = velocity;
+        return event;
+    }
+
     void prepareAudio(Mpc &mpc)
     {
         const auto server = mpc.getEngineHost()->getAudioServer();
         server->setSampleRate(48000);
         server->resizeBuffers(BufferSize);
+    }
+
+    void preparePadInput(Mpc &mpc)
+    {
+        mpc.getSampler()->getProgram(0)->setUsed();
+        mpc.getSampler()->getProgram(0)->initPadAssign();
+        mpc.getSequencer()->getSelectedSequence()->init(1);
+        mpc.getSequencer()->getStateManager()->drainQueue();
+        mpc.getPerformanceManager().lock()->drainQueue();
     }
 
     RenderedOutputs renderOutputs(Mpc &mpc)
@@ -73,15 +100,122 @@ namespace
     }
 } // namespace
 
-TEST_CASE("All first-iteration physical button sounds are bundled",
-          "[physical-sounds]")
+TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
 {
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    REQUIRE(mpc.getEngineHost()
-                ->getPhysicalInteractionSoundPlayer()
-                ->getLoadedSampleCount() == 184);
+    const auto player =
+        mpc.getEngineHost()->getPhysicalInteractionSoundPlayer();
+    REQUIRE(player->getLoadedSampleCount() == 234);
+    REQUIRE(player->getLoadedPadSampleCount() == 48);
+    REQUIRE(player->getLoadedPowerSampleCount() == 2);
+}
+
+TEST_CASE("Accepted pad presses render velocity-layered physical sounds",
+          "[physical-sounds]")
+{
+    const auto renderPad = [](const float velocity)
+    {
+        Mpc mpc;
+        TestMpc::initializeTestMpc(mpc);
+        preparePadInput(mpc);
+        prepareAudio(mpc);
+
+        const auto engineHost = mpc.getEngineHost();
+        engineHost->setPhysicalSoundsMixMode(
+            PhysicalSoundsMixMode::StereoOut);
+        mpc.clientEventController->clientHardwareEventController
+            ->handleClientHardwareEvent(
+                padEvent(ClientHardwareEvent::Type::PadPress, velocity));
+        float peak = 0.f;
+        for (int i = 0; i < 20; ++i)
+        {
+            engineHost->prepareProcessBlock(BufferSize);
+            const auto output = renderOutputs(mpc);
+            for (const auto sample : output.stereoLeft)
+            {
+                peak = std::max(peak, std::abs(sample));
+            }
+        }
+        return peak;
+    };
+
+    const auto soft = renderPad(0.f);
+    const auto hard = renderPad(1.f);
+    REQUIRE(soft > 0.f);
+    REQUIRE(hard > soft);
+}
+
+TEST_CASE("A held pad does not retrigger its physical sound",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    preparePadInput(mpc);
+    prepareAudio(mpc);
+
+    const auto engineHost = mpc.getEngineHost();
+    const auto controller =
+        mpc.clientEventController->clientHardwareEventController;
+    controller->handleClientHardwareEvent(
+        padEvent(ClientHardwareEvent::Type::PadPress, 0.5f));
+
+    for (int i = 0; i < 24; ++i)
+    {
+        engineHost->prepareProcessBlock(BufferSize);
+        renderOutputs(mpc);
+    }
+
+    controller->handleClientHardwareEvent(
+        padEvent(ClientHardwareEvent::Type::PadPress, 0.5f));
+    engineHost->prepareProcessBlock(BufferSize);
+    const auto output = renderOutputs(mpc);
+    REQUIRE_FALSE(hasSound(output.stereoLeft));
+    REQUIRE_FALSE(hasSound(output.physicalLeft));
+}
+
+TEST_CASE("Power-off lifecycle voice renders completely", "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    prepareAudio(mpc);
+
+    const auto engineHost = mpc.getEngineHost();
+    REQUIRE(engineHost->beginPhysicalPowerOffSound());
+    const auto expectedBlockCount = static_cast<int>(std::ceil(
+        engineHost->getPhysicalPowerOffSoundDurationSeconds() * 48000.0 /
+        static_cast<double>(BufferSize)));
+
+    bool heardSound = false;
+    int renderedBlocks = 0;
+    while (!engineHost->isPhysicalPowerOffSoundComplete() &&
+           renderedBlocks < expectedBlockCount + 2)
+    {
+        engineHost->prepareProcessBlock(BufferSize);
+        const auto output = renderOutputs(mpc);
+        heardSound = heardSound || hasSound(output.stereoLeft);
+        ++renderedBlocks;
+    }
+
+    REQUIRE(heardSound);
+    REQUIRE(engineHost->isPhysicalPowerOffSoundComplete());
+    REQUIRE(renderedBlocks == expectedBlockCount);
+}
+
+TEST_CASE("Muted physical sounds do not delay power-off",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpc(mpc);
+    const auto engineHost = mpc.getEngineHost();
+
+    engineHost->setPhysicalSoundsEnabled(false);
+    REQUIRE_FALSE(engineHost->beginPhysicalPowerOffSound());
+
+    engineHost->setPhysicalSoundsEnabled(true);
+    engineHost->setPhysicalSoundsLevel(0);
+    REQUIRE_FALSE(engineHost->beginPhysicalPowerOffSound());
 }
 
 TEST_CASE("Button press and release transitions render to stereo out",
@@ -138,8 +272,7 @@ TEST_CASE("MAIN VOLUME does not affect physical sounds on stereo out",
 
         const auto engineHost = mpc.getEngineHost();
         engineHost->setMainLevel(mainLevel);
-        engineHost->setPhysicalSoundsMixMode(
-            PhysicalSoundsMixMode::StereoOut);
+        engineHost->setPhysicalSoundsMixMode(PhysicalSoundsMixMode::StereoOut);
         mpc.clientEventController->clientHardwareEventController
             ->handleClientHardwareEvent(
                 buttonEvent(F3, ClientHardwareEvent::Type::MpcButtonPress));

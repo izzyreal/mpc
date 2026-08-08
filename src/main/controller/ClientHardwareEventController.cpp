@@ -246,6 +246,9 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
+    mpc.getEngineHost()->triggerPhysicalPadSound(
+        std::clamp(*event.value, 0.f, 1.f));
+
     updateMostRecentPhysicalPadPressVelocity(Velocity(clampedVelocity));
 
     const auto track = mpc.getSequencer()->getSelectedTrack();

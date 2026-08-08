@@ -478,6 +478,65 @@ void EngineHost::triggerPhysicalButtonSound(
         }));
 }
 
+void EngineHost::triggerPhysicalPadSound(const float normalizedVelocity)
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->isEnabled())
+    {
+        return;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer, normalizedVelocity]
+        {
+            player->triggerPad(normalizedVelocity);
+        }));
+}
+
+void EngineHost::triggerPhysicalPowerOnSound()
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->isEnabled())
+    {
+        return;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer]
+        {
+            player->triggerPowerOn();
+        }));
+}
+
+bool EngineHost::beginPhysicalPowerOffSound()
+{
+    if (!physicalInteractionSoundPlayer ||
+        !physicalInteractionSoundPlayer->beginPowerOffRequest())
+    {
+        return false;
+    }
+
+    postToAudioThread(utils::Task(
+        [player = physicalInteractionSoundPlayer]
+        {
+            player->triggerPowerOff();
+        }));
+    return true;
+}
+
+bool EngineHost::isPhysicalPowerOffSoundComplete() const
+{
+    return physicalInteractionSoundPlayer &&
+           physicalInteractionSoundPlayer->isPowerOffComplete();
+}
+
+double EngineHost::getPhysicalPowerOffSoundDurationSeconds() const
+{
+    return physicalInteractionSoundPlayer
+               ? physicalInteractionSoundPlayer->getPowerOffDurationSeconds()
+               : 0.0;
+}
+
 void EngineHost::setPhysicalSoundsEnabled(const bool enabled)
 {
     if (physicalInteractionSoundPlayer)

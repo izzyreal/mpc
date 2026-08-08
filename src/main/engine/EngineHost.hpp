@@ -118,6 +118,11 @@ namespace mpc::engine
 
         void triggerPhysicalButtonSound(hardware::ComponentId componentId,
                                         bool isPress);
+        void triggerPhysicalPadSound(float normalizedVelocity);
+        void triggerPhysicalPowerOnSound();
+        bool beginPhysicalPowerOffSound();
+        bool isPhysicalPowerOffSoundComplete() const;
+        double getPhysicalPowerOffSoundDurationSeconds() const;
         void setPhysicalSoundsEnabled(bool enabled);
         bool arePhysicalSoundsEnabled() const;
         void setPhysicalSoundsMixMode(PhysicalSoundsMixMode mode);
