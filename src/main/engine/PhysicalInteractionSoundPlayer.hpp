@@ -26,7 +26,7 @@ namespace mpc::engine
 
         void triggerButton(hardware::ComponentId componentId, bool isPress);
         void triggerPad(float normalizedVelocity);
-        void triggerDataWheel(int steps);
+        void triggerDataWheel(int steps, double inputTimeSeconds);
         void triggerSlider(float normalizedDelta, float normalizedPosition);
         void triggerPowerOn();
         bool beginPowerOffRequest();
@@ -63,6 +63,7 @@ namespace mpc::engine
             int fadeInSourceFrames = 0;
             int fadeOutSourceFrames = 0;
             bool sliderRub = false;
+            bool dataWheelPhrase = false;
             int stopFadeFramesRemaining = -1;
             int stopFadeTotalFrames = 0;
         };
@@ -72,7 +73,9 @@ namespace mpc::engine
         static constexpr size_t PadVelocityLayerCount = 8;
         static constexpr size_t PadTakeCount = 6;
         static constexpr size_t PowerSampleCount = 2;
-        static constexpr size_t DataWheelSampleCount = 6;
+        static constexpr size_t DataWheelDetentBankCount = 2;
+        static constexpr size_t DataWheelTakeCount = 6;
+        static constexpr size_t DataWheelFastPhraseCount = 6;
         static constexpr size_t SliderContactSampleCount = 19;
         static constexpr size_t SliderRubSampleCount = 5;
         static constexpr size_t SliderEndpointSampleCount = 2;
@@ -89,7 +92,10 @@ namespace mpc::engine
             padSamples;
         std::array<uint8_t, PadVelocityLayerCount> nextPadTakes{};
         std::array<Sample, PowerSampleCount> powerSamples;
-        std::array<Sample, DataWheelSampleCount> dataWheelSamples;
+        std::array<std::array<Sample, DataWheelTakeCount>,
+                   DataWheelDetentBankCount>
+            dataWheelDetentSamples;
+        std::array<Sample, DataWheelFastPhraseCount> dataWheelFastPhraseSamples;
         std::array<Sample, SliderContactSampleCount> sliderContactSamples;
         std::array<Sample, SliderRubSampleCount> sliderRubSamples;
         std::array<Sample, SliderEndpointSampleCount> sliderEndpointSamples;
@@ -123,9 +129,14 @@ namespace mpc::engine
 
         int wheelStepsRemaining = 0;
         int wheelDirection = 0;
-        float wheelDetentsPerSecond = 40.f;
+        float wheelGestureRate = 8.f;
         double framesUntilWheelDetent = 0.0;
-        uint8_t nextWheelDetent = 0;
+        std::array<uint8_t, DataWheelDetentBankCount> nextWheelDetents{};
+        bool hasReceivedWheelInput = false;
+        double lastWheelInputTimeSeconds = 0.0;
+        double wheelFastMotionFramesRemaining = 0.0;
+        double framesUntilWheelPhrase = 0.0;
+        uint8_t nextWheelPhrase = 0;
 
         float pendingSliderDistance = 0.f;
         std::optional<size_t> pendingSliderEndpoint;
@@ -152,9 +163,11 @@ namespace mpc::engine
         void addTransientVoice(const Sample &sample, int startDelayFrames = 0,
                                float voiceGain = 1.f, bool sliderRub = false,
                                int fadeInSourceFrames = 0,
-                               int fadeOutSourceFrames = 0);
+                               int fadeOutSourceFrames = 0,
+                               bool dataWheelPhrase = false);
         void scheduleDataWheel(int outputFrameCount, double outputSampleRate);
         bool scheduleSlider(int outputFrameCount, double outputSampleRate);
+        void requestDataWheelPhraseFade(int fadeFrames);
         void requestSliderRubFade(int fadeFrames);
         void resetMotionSchedulers();
         float nextMotionRandomFloat();

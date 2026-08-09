@@ -127,10 +127,10 @@ TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
 
     const auto player =
         mpc.getEngineHost()->getPhysicalInteractionSoundPlayer();
-    REQUIRE(player->getLoadedSampleCount() == 266);
+    REQUIRE(player->getLoadedSampleCount() == 278);
     REQUIRE(player->getLoadedPadSampleCount() == 48);
     REQUIRE(player->getLoadedPowerSampleCount() == 2);
-    REQUIRE(player->getLoadedDataWheelSampleCount() == 6);
+    REQUIRE(player->getLoadedDataWheelSampleCount() == 18);
     REQUIRE(player->getLoadedSliderSampleCount() == 26);
 }
 
@@ -209,6 +209,46 @@ TEST_CASE("Batched live data-wheel turns do not leave a slow audible backlog",
 
     REQUIRE(heardStart);
     REQUIRE(heardMiddle);
+    REQUIRE_FALSE(heardLate);
+}
+
+TEST_CASE("Timestamped rapid data-wheel input renders one bounded phrase",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAudio(mpc);
+
+    const auto engineHost = mpc.getEngineHost();
+    const auto player = engineHost->getPhysicalInteractionSoundPlayer();
+    for (int i = 0; i < 12; ++i)
+    {
+        player->triggerDataWheel(1, 1.0 + i * 0.025);
+    }
+
+    bool heardStart = false;
+    bool heardPhraseBody = false;
+    bool heardLate = false;
+    for (int block = 0; block <= 25; ++block)
+    {
+        engineHost->prepareProcessBlock(BufferSize);
+        const auto output = renderOutputs(mpc);
+        if (block == 0)
+        {
+            heardStart = hasSound(output.stereoLeft);
+        }
+        else if (block == 10)
+        {
+            heardPhraseBody = hasSound(output.stereoLeft);
+        }
+        else if (block == 25)
+        {
+            heardLate = hasSound(output.stereoLeft);
+        }
+    }
+
+    REQUIRE(heardStart);
+    REQUIRE(heardPhraseBody);
     REQUIRE_FALSE(heardLate);
 }
 

@@ -46,8 +46,9 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 
-#include <string>
 #include <algorithm>
+#include <chrono>
+#include <string>
 
 using namespace mpc;
 using namespace mpc::audiomidi;
@@ -501,10 +502,14 @@ void EngineHost::triggerPhysicalDataWheelSound(const int steps)
         return;
     }
 
+    const auto inputTimeSeconds =
+        std::chrono::duration<double>(
+            std::chrono::steady_clock::now().time_since_epoch())
+            .count();
     postToAudioThread(utils::Task(
-        [player = physicalInteractionSoundPlayer, steps]
+        [player = physicalInteractionSoundPlayer, steps, inputTimeSeconds]
         {
-            player->triggerDataWheel(steps);
+            player->triggerDataWheel(steps, inputTimeSeconds);
         }));
 }
 
