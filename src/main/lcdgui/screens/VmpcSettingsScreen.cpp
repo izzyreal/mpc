@@ -28,13 +28,12 @@ void VmpcSettingsScreen::open()
 
     if (const auto focusedFieldName = getFocusedFieldName())
     {
-        const auto focused =
-            std::find(settingNames.begin(), settingNames.end(),
-                      *focusedFieldName);
+        const auto focused = std::find(settingNames.begin(), settingNames.end(),
+                                       *focusedFieldName);
         if (focused != settingNames.end())
         {
-            const auto selected = static_cast<int>(
-                std::distance(settingNames.begin(), focused));
+            const auto selected =
+                static_cast<int>(std::distance(settingNames.begin(), focused));
             rowOffset = std::clamp(selected - VisibleRowCount + 1, 0,
                                    SettingCount - VisibleRowCount);
             row = selected - rowOffset;
@@ -84,6 +83,17 @@ void VmpcSettingsScreen::function(const int i)
             break;
         default:;
     }
+}
+
+void VmpcSettingsScreen::openWindow()
+{
+    const auto selectedSetting = row + rowOffset;
+    if (selectedSetting >= 5 && selectedSetting <= 7)
+    {
+        openScreenById(ScreenId::VmpcPhysicalSoundsScreen);
+        return;
+    }
+    ScreenComponent::openWindow();
 }
 
 void VmpcSettingsScreen::turnWheel(const int i)
@@ -176,7 +186,8 @@ void VmpcSettingsScreen::setInitialPadMapping(const int i)
 
     initialPadMapping = i;
     // Future PROGRAM/MASTER init-pad-assign operations copy from this cache.
-    *mpc.getSampler()->getInitMasterPadAssign() = sampler::Pad::getPadNotes(mpc);
+    *mpc.getSampler()->getInitMasterPadAssign() =
+        sampler::Pad::getPadNotes(mpc);
 
     displayInitialPadMapping();
 }
@@ -233,7 +244,8 @@ void VmpcSettingsScreen::setBigTimeShift(const bool shouldBeEnabled)
 {
     bigTimeShiftEnabled = shouldBeEnabled;
     displayBigTimeShift();
-    mpc.screens->get<ScreenId::TimingCorrectScreen>()->reClampAmountToCurrentMode();
+    mpc.screens->get<ScreenId::TimingCorrectScreen>()
+        ->reClampAmountToCurrentMode();
 }
 
 bool VmpcSettingsScreen::isBigTimeShiftEnabled() const

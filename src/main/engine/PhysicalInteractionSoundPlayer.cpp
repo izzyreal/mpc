@@ -55,6 +55,10 @@ namespace
 
 PhysicalInteractionSoundPlayer::PhysicalInteractionSoundPlayer()
 {
+    for (auto &groupLevel : groupLevels)
+    {
+        groupLevel.store(100, std::memory_order_relaxed);
+    }
     voices.reserve(MaxVoiceCount);
     loadButtonSamples();
     loadPadSamples();
@@ -190,8 +194,7 @@ void PhysicalInteractionSoundPlayer::loadMotionSamples()
                         loadedDataWheelSampleCount);
     loadNumberedSamples(dataWheelDetentSamples[1], "data-wheel-medium-",
                         loadedDataWheelSampleCount);
-    loadNumberedSamples(dataWheelFastPhraseSamples,
-                        "data-wheel-fast-phrase-",
+    loadNumberedSamples(dataWheelFastPhraseSamples, "data-wheel-fast-phrase-",
                         loadedDataWheelSampleCount);
     loadNumberedSamples(sliderContactSamples, "slider-contact-",
                         loadedSliderSampleCount);
@@ -296,7 +299,8 @@ void PhysicalInteractionSoundPlayer::triggerButton(
     auto &bag = isPress ? group.pressBag : group.releaseBag;
     if (!samples.empty())
     {
-        addTransientVoice(samples[drawButtonSampleIndex(bag, samples.size())]);
+        addTransientVoice(samples[drawButtonSampleIndex(bag, samples.size())],
+                          PhysicalSoundGroup::Buttons);
     }
 }
 
@@ -406,7 +410,7 @@ void PhysicalInteractionSoundPlayer::triggerPad(const float normalizedVelocity)
     auto &nextTake = nextPadTakes[layer];
     const auto &sample = padSamples[layer][nextTake];
     nextTake = static_cast<uint8_t>((nextTake + 1) % PadTakeCount);
-    addTransientVoice(sample);
+    addTransientVoice(sample, PhysicalSoundGroup::Pads);
 }
 
 void PhysicalInteractionSoundPlayer::triggerDataWheel(
@@ -422,7 +426,8 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(
 
     const auto direction = steps > 0 ? 1 : -1;
     const auto stepCount = std::abs(steps);
-    const auto elapsedInputSeconds = inputTimeSeconds - lastWheelInputTimeSeconds;
+    const auto elapsedInputSeconds =
+        inputTimeSeconds - lastWheelInputTimeSeconds;
     const auto continuesGesture =
         hasReceivedWheelInput && wheelDirection == direction &&
         elapsedInputSeconds > 0.0 &&
@@ -434,15 +439,14 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(
     {
         const auto measuredRate = static_cast<float>(std::clamp(
             static_cast<double>(stepCount) / elapsedInputSeconds, 4.0, 40.0));
-        const auto aggregateRate = stepCount > 1
-                                       ? static_cast<float>(std::clamp(
-                                             18 + stepCount * 2, 18, 40))
-                                       : measuredRate;
+        const auto aggregateRate =
+            stepCount > 1
+                ? static_cast<float>(std::clamp(18 + stepCount * 2, 18, 40))
+                : measuredRate;
         targetGestureRate = std::max(measuredRate, aggregateRate);
         const auto smoothing =
             targetGestureRate > wheelGestureRate ? 0.65f : 0.35f;
-        wheelGestureRate +=
-            (targetGestureRate - wheelGestureRate) * smoothing;
+        wheelGestureRate += (targetGestureRate - wheelGestureRate) * smoothing;
     }
     else
     {
@@ -474,10 +478,10 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(
     {
         wheelStepsRemaining = 0;
         framesUntilWheelDetent = 0.0;
-        const auto eventMotionSeconds = std::clamp(
-            static_cast<double>(stepCount) / wheelGestureRate,
-            DataWheelFastMinimumMotionSeconds,
-            DataWheelFastMaximumMotionSeconds);
+        const auto eventMotionSeconds =
+            std::clamp(static_cast<double>(stepCount) / wheelGestureRate,
+                       DataWheelFastMinimumMotionSeconds,
+                       DataWheelFastMaximumMotionSeconds);
         const auto eventMotionFrames =
             eventMotionSeconds * currentOutputSampleRate;
         if (stepCount <= 2 && wheelFastMotionFramesRemaining > 0.0)
@@ -512,8 +516,8 @@ void PhysicalInteractionSoundPlayer::triggerDataWheel(
         // one audio block. Treat that as an ongoing spin, not as a slow queue
         // that keeps clicking after the user's hand has stopped.
         constexpr int MaximumLiveSpinBacklog = 6;
-        wheelStepsRemaining = std::min(
-            MaximumLiveSpinBacklog, wheelStepsRemaining + stepCount);
+        wheelStepsRemaining =
+            std::min(MaximumLiveSpinBacklog, wheelStepsRemaining + stepCount);
     }
     else
     {
@@ -575,7 +579,9 @@ void PhysicalInteractionSoundPlayer::triggerPowerOn()
         return;
     }
 
-    lifecycleVoice = Voice{&powerSamples[0], 0.0};
+    lifecycleVoice = Voice{};
+    lifecycleVoice->sample = &powerSamples[0];
+    lifecycleVoice->group = PhysicalSoundGroup::Power;
     lifecycleSound = LifecycleSound::PowerOn;
 }
 
@@ -583,6 +589,7 @@ bool PhysicalInteractionSoundPlayer::beginPowerOffRequest()
 {
     if (!enabled.load(std::memory_order_relaxed) ||
         level.load(std::memory_order_relaxed) == 0 ||
+        getGroupLevel(PhysicalSoundGroup::Power) == 0 ||
         powerSamples[1].frames.empty())
     {
         return false;
@@ -608,13 +615,16 @@ void PhysicalInteractionSoundPlayer::triggerPowerOff()
 
     if (!enabled.load(std::memory_order_relaxed) ||
         level.load(std::memory_order_relaxed) == 0 ||
+        getGroupLevel(PhysicalSoundGroup::Power) == 0 ||
         powerSamples[1].frames.empty())
     {
         powerOffState.store(PowerOffState::Complete, std::memory_order_relaxed);
         return;
     }
 
-    lifecycleVoice = Voice{&powerSamples[1], 0.0};
+    lifecycleVoice = Voice{};
+    lifecycleVoice->sample = &powerSamples[1];
+    lifecycleVoice->group = PhysicalSoundGroup::Power;
     lifecycleSound = LifecycleSound::PowerOff;
     powerOffState.store(PowerOffState::Playing, std::memory_order_relaxed);
 }
@@ -634,9 +644,10 @@ double PhysicalInteractionSoundPlayer::getPowerOffDurationSeconds() const
 }
 
 void PhysicalInteractionSoundPlayer::addTransientVoice(
-    const Sample &sample, const int startDelayFrames, const float voiceGain,
-    const bool isSliderRub, const int fadeInSourceFrames,
-    const int fadeOutSourceFrames, const bool isDataWheelPhrase)
+    const Sample &sample, const PhysicalSoundGroup group,
+    const int startDelayFrames, const float voiceGain, const bool isSliderRub,
+    const int fadeInSourceFrames, const int fadeOutSourceFrames,
+    const bool isDataWheelPhrase)
 {
     if (sample.frames.empty() ||
         powerOffState.load(std::memory_order_relaxed) ==
@@ -658,6 +669,7 @@ void PhysicalInteractionSoundPlayer::addTransientVoice(
     voice.fadeOutSourceFrames = std::max(0, fadeOutSourceFrames);
     voice.sliderRub = isSliderRub;
     voice.dataWheelPhrase = isDataWheelPhrase;
+    voice.group = group;
     voices.push_back(std::move(voice));
 }
 
@@ -678,14 +690,14 @@ void PhysicalInteractionSoundPlayer::scheduleDataWheel(
 
     if (wheelFastMotionFramesRemaining > 0.0)
     {
-        const auto activeFrameCount = static_cast<int>(std::min<double>(
-            outputFrameCount, wheelFastMotionFramesRemaining));
+        const auto activeFrameCount = static_cast<int>(
+            std::min<double>(outputFrameCount, wheelFastMotionFramesRemaining));
         while (framesUntilWheelPhrase < activeFrameCount)
         {
             const auto &sample = dataWheelFastPhraseSamples[nextWheelPhrase];
-            nextWheelPhrase = static_cast<uint8_t>(
-                (nextWheelPhrase + 5) % DataWheelFastPhraseCount);
-            addTransientVoice(sample,
+            nextWheelPhrase = static_cast<uint8_t>((nextWheelPhrase + 5) %
+                                                   DataWheelFastPhraseCount);
+            addTransientVoice(sample, PhysicalSoundGroup::DataWheel,
                               static_cast<int>(framesUntilWheelPhrase), 1.f,
                               false, 0, 0, true);
             const auto sampleDurationInOutputFrames =
@@ -698,8 +710,8 @@ void PhysicalInteractionSoundPlayer::scheduleDataWheel(
 
         const auto endsInThisBlock =
             wheelFastMotionFramesRemaining <= outputFrameCount;
-        wheelFastMotionFramesRemaining = std::max(
-            0.0, wheelFastMotionFramesRemaining - outputFrameCount);
+        wheelFastMotionFramesRemaining =
+            std::max(0.0, wheelFastMotionFramesRemaining - outputFrameCount);
         if (endsInThisBlock)
         {
             framesUntilWheelPhrase = 0.0;
@@ -720,17 +732,18 @@ void PhysicalInteractionSoundPlayer::scheduleDataWheel(
 
     while (wheelStepsRemaining > 0 && framesUntilWheelDetent < outputFrameCount)
     {
-        const auto mediumProbability = std::clamp(
-            (wheelGestureRate - DataWheelSlowAnchor) /
-                (DataWheelMediumAnchor - DataWheelSlowAnchor),
-            0.f, 1.f);
+        const auto mediumProbability =
+            std::clamp((wheelGestureRate - DataWheelSlowAnchor) /
+                           (DataWheelMediumAnchor - DataWheelSlowAnchor),
+                       0.f, 1.f);
         const size_t bank =
             nextMotionRandomFloat() < mediumProbability ? 1U : 0U;
         const auto take = nextWheelDetents[bank];
         const auto &sample = dataWheelDetentSamples[bank][take];
-        nextWheelDetents[bank] = static_cast<uint8_t>(
-            (take + 5) % DataWheelTakeCount);
-        addTransientVoice(sample, static_cast<int>(framesUntilWheelDetent));
+        nextWheelDetents[bank] =
+            static_cast<uint8_t>((take + 5) % DataWheelTakeCount);
+        addTransientVoice(sample, PhysicalSoundGroup::DataWheel,
+                          static_cast<int>(framesUntilWheelDetent));
         --wheelStepsRemaining;
         if (wheelStepsRemaining > 0)
         {
@@ -738,8 +751,7 @@ void PhysicalInteractionSoundPlayer::scheduleDataWheel(
                 wheelStepsRemaining / DataWheelFastLiveBacklogSeconds);
             const auto playbackRate = std::clamp(
                 std::max(wheelGestureRate, backlogDrainRate), 4.f, 40.f);
-            framesUntilWheelDetent +=
-                outputSampleRate / playbackRate;
+            framesUntilWheelDetent += outputSampleRate / playbackRate;
         }
     }
 
@@ -789,8 +801,8 @@ bool PhysicalInteractionSoundPlayer::scheduleSlider(
         {
             const auto endpointGain =
                 0.35f + 0.65f * std::clamp(sliderSpeed / 3.3f, 0.f, 1.f);
-            addTransientVoice(sliderEndpointSamples[*pendingSliderEndpoint], 0,
-                              endpointGain);
+            addTransientVoice(sliderEndpointSamples[*pendingSliderEndpoint],
+                              PhysicalSoundGroup::Slider, 0, endpointGain);
         }
 
         pendingSliderDistance = 0.f;
@@ -824,7 +836,8 @@ bool PhysicalInteractionSoundPlayer::scheduleSlider(
                               (SliderRubSampleCount - 1))) %
             SliderRubSampleCount);
         const auto fadeFrames = static_cast<int>(sample.sampleRate * 0.060);
-        addTransientVoice(sample, static_cast<int>(framesUntilSliderRub),
+        addTransientVoice(sample, PhysicalSoundGroup::Slider,
+                          static_cast<int>(framesUntilSliderRub),
                           sliderIntensity * 0.45f, true, fadeFrames,
                           fadeFrames);
         const auto sampleDurationInOutputFrames =
@@ -848,9 +861,10 @@ bool PhysicalInteractionSoundPlayer::scheduleSlider(
                 SliderContactSampleCount);
             const auto gainVariationDb = -1.8f + nextMotionRandomFloat() * 3.6f;
             const auto gainVariation = std::pow(10.f, gainVariationDb / 20.f);
-            addTransientVoice(
-                sample, static_cast<int>(framesUntilSliderContact),
-                sliderIntensity * 0.67f * sliderHighSpeedBlend * gainVariation);
+            addTransientVoice(sample, PhysicalSoundGroup::Slider,
+                              static_cast<int>(framesUntilSliderContact),
+                              sliderIntensity * 0.67f * sliderHighSpeedBlend *
+                                  gainVariation);
             const auto jitter = 0.78f + nextMotionRandomFloat() * 0.44f;
             framesUntilSliderContact +=
                 outputSampleRate / contactsPerSecond * jitter;
@@ -960,8 +974,8 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
     else
     {
         resetMotionSchedulers();
-        requestDataWheelPhraseFade(static_cast<int>(
-            outputSampleRate * DataWheelFastStopFadeSeconds));
+        requestDataWheelPhraseFade(
+            static_cast<int>(outputSampleRate * DataWheelFastStopFadeSeconds));
         requestSliderRubFade(static_cast<int>(outputSampleRate * 0.030));
     }
 
@@ -971,7 +985,7 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
         return AUDIO_OK;
     }
 
-    const auto gain =
+    const auto globalGain =
         static_cast<float>(level.load(std::memory_order_relaxed)) * 0.01f;
     auto &left = buffer->getChannel(0);
     auto &right = buffer->getChannel(1);
@@ -980,6 +994,8 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
 
     for (auto &voice : voices)
     {
+        const auto groupGain =
+            static_cast<float>(getGroupLevel(voice.group)) * 0.01f;
         const auto &source = voice.sample->frames;
         const auto increment =
             static_cast<double>(voice.sample->sampleRate) / outputSampleRate;
@@ -1035,7 +1051,8 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
                 --voice.stopFadeFramesRemaining;
             }
 
-            const auto outputValue = value * gain * voice.gain * envelope;
+            const auto outputValue =
+                value * globalGain * groupGain * voice.gain * envelope;
             left[frame] += outputValue;
             right[frame] += outputValue;
             voice.position += increment;
@@ -1054,6 +1071,8 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
     if (lifecycleVoice)
     {
         auto &voice = *lifecycleVoice;
+        const auto groupGain =
+            static_cast<float>(getGroupLevel(voice.group)) * 0.01f;
         const auto &source = voice.sample->frames;
         const auto increment =
             static_cast<double>(voice.sample->sampleRate) / outputSampleRate;
@@ -1072,7 +1091,7 @@ int PhysicalInteractionSoundPlayer::processAudio(AudioBuffer *buffer,
             const auto value =
                 (source[sourceIndex] +
                  (source[nextSourceIndex] - source[sourceIndex]) * fraction) *
-                gain;
+                globalGain * groupGain;
             left[frame] += value;
             right[frame] += value;
             voice.position += increment;
@@ -1117,6 +1136,27 @@ void PhysicalInteractionSoundPlayer::setLevel(const int levelToUse)
 int PhysicalInteractionSoundPlayer::getLevel() const
 {
     return level.load(std::memory_order_relaxed);
+}
+
+void PhysicalInteractionSoundPlayer::setGroupLevel(
+    const PhysicalSoundGroup group, const int levelToUse)
+{
+    const auto groupIndex = static_cast<size_t>(group);
+    if (groupIndex >= groupLevels.size())
+    {
+        return;
+    }
+    groupLevels[groupIndex].store(std::clamp(levelToUse, 0, 100),
+                                  std::memory_order_relaxed);
+}
+
+int PhysicalInteractionSoundPlayer::getGroupLevel(
+    const PhysicalSoundGroup group) const
+{
+    const auto groupIndex = static_cast<size_t>(group);
+    return groupIndex < groupLevels.size()
+               ? groupLevels[groupIndex].load(std::memory_order_relaxed)
+               : 100;
 }
 
 int PhysicalInteractionSoundPlayer::getLoadedSampleCount() const

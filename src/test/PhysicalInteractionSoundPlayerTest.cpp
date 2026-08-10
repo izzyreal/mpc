@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
 #include "Mpc.hpp"
 #include "TestMpc.hpp"
@@ -85,6 +86,16 @@ namespace
 
     void prepareAudio(Mpc &mpc)
     {
+        const auto engineHost = mpc.getEngineHost();
+        engineHost->setPhysicalSoundsEnabled(true);
+        engineHost->setPhysicalSoundsLevel(100);
+        for (const auto group :
+             {PhysicalSoundGroup::Buttons, PhysicalSoundGroup::Pads,
+              PhysicalSoundGroup::Slider, PhysicalSoundGroup::DataWheel,
+              PhysicalSoundGroup::Power})
+        {
+            engineHost->setPhysicalSoundGroupLevel(group, 100);
+        }
         const auto server = mpc.getEngineHost()->getAudioServer();
         server->setSampleRate(48000);
         server->resizeBuffers(BufferSize);
@@ -102,10 +113,9 @@ namespace
     RenderedOutputs renderOutputs(Mpc &mpc)
     {
         RenderedOutputs result;
-        std::array<float *, 4> output{result.stereoLeft.data(),
-                                     result.stereoRight.data(),
-                                     result.physicalLeft.data(),
-                                     result.physicalRight.data()};
+        std::array<float *, 4> output{
+            result.stereoLeft.data(), result.stereoRight.data(),
+            result.physicalLeft.data(), result.physicalRight.data()};
         mpc.getEngineHost()->getAudioServer()->work(
             nullptr, output.data(), BufferSize, {}, {0, 1, 10, 11}, {},
             {0, 1, 2, 3});
@@ -406,8 +416,7 @@ TEST_CASE("Accepted pad presses render velocity-layered physical sounds",
         prepareAudio(mpc);
 
         const auto engineHost = mpc.getEngineHost();
-        engineHost->setPhysicalSoundsMixMode(
-            PhysicalSoundsMixMode::StereoOut);
+        engineHost->setPhysicalSoundsMixMode(PhysicalSoundsMixMode::StereoOut);
         mpc.clientEventController->clientHardwareEventController
             ->handleClientHardwareEvent(
                 padEvent(ClientHardwareEvent::Type::PadPress, velocity));
@@ -466,9 +475,9 @@ TEST_CASE("Power-off lifecycle voice renders completely", "[physical-sounds]")
 
     const auto engineHost = mpc.getEngineHost();
     REQUIRE(engineHost->beginPhysicalPowerOffSound());
-    const auto expectedBlockCount = static_cast<int>(std::ceil(
-        engineHost->getPhysicalPowerOffSoundDurationSeconds() * 48000.0 /
-        static_cast<double>(BufferSize)));
+    const auto expectedBlockCount = static_cast<int>(
+        std::ceil(engineHost->getPhysicalPowerOffSoundDurationSeconds() *
+                  48000.0 / static_cast<double>(BufferSize)));
 
     bool heardSound = false;
     int renderedBlocks = 0;
@@ -486,8 +495,7 @@ TEST_CASE("Power-off lifecycle voice renders completely", "[physical-sounds]")
     REQUIRE(renderedBlocks == expectedBlockCount);
 }
 
-TEST_CASE("Muted physical sounds do not delay power-off",
-          "[physical-sounds]")
+TEST_CASE("Muted physical sounds do not delay power-off", "[physical-sounds]")
 {
     Mpc mpc;
     TestMpc::initializeTestMpcWithoutMidiServices(mpc);
@@ -499,6 +507,89 @@ TEST_CASE("Muted physical sounds do not delay power-off",
     engineHost->setPhysicalSoundsEnabled(true);
     engineHost->setPhysicalSoundsLevel(0);
     REQUIRE_FALSE(engineHost->beginPhysicalPowerOffSound());
+
+    engineHost->setPhysicalSoundsLevel(100);
+    engineHost->setPhysicalSoundGroupLevel(PhysicalSoundGroup::Power, 0);
+    REQUIRE_FALSE(engineHost->beginPhysicalPowerOffSound());
+}
+
+TEST_CASE("Global and group physical sound levels multiply",
+          "[physical-sounds]")
+{
+    const auto renderButtonPeak =
+        [](const int globalLevel, const int buttonLevel)
+    {
+        Mpc mpc;
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+        prepareAudio(mpc);
+        const auto engineHost = mpc.getEngineHost();
+        engineHost->setPhysicalSoundsLevel(globalLevel);
+        engineHost->setPhysicalSoundGroupLevel(PhysicalSoundGroup::Buttons,
+                                               buttonLevel);
+        engineHost->getPhysicalInteractionSoundPlayer()->triggerButton(F1,
+                                                                       true);
+        engineHost->prepareProcessBlock(BufferSize);
+        const auto output = renderOutputs(mpc);
+        float peak = 0.f;
+        for (const auto sample : output.stereoLeft)
+        {
+            peak = std::max(peak, std::abs(sample));
+        }
+        return peak;
+    };
+
+    const auto full = renderButtonPeak(100, 100);
+    const auto globalHalf = renderButtonPeak(50, 100);
+    const auto groupHalf = renderButtonPeak(100, 50);
+    const auto bothHalf = renderButtonPeak(50, 50);
+
+    REQUIRE(full > 0.f);
+    REQUIRE(globalHalf == Catch::Approx(full * 0.5f));
+    REQUIRE(groupHalf == Catch::Approx(full * 0.5f));
+    REQUIRE(bothHalf == Catch::Approx(full * 0.25f));
+}
+
+TEST_CASE("Every physical sound source uses its assigned group level",
+          "[physical-sounds]")
+{
+    const auto isSilentWithMutedGroup =
+        [](const PhysicalSoundGroup group, const auto &trigger)
+    {
+        Mpc mpc;
+        TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+        prepareAudio(mpc);
+        const auto engineHost = mpc.getEngineHost();
+        engineHost->setPhysicalSoundGroupLevel(group, 0);
+        trigger(engineHost->getPhysicalInteractionSoundPlayer());
+        engineHost->prepareProcessBlock(BufferSize);
+        return !hasSound(renderOutputs(mpc).stereoLeft);
+    };
+
+    REQUIRE(isSilentWithMutedGroup(PhysicalSoundGroup::Buttons,
+                                   [](const auto &player)
+                                   {
+                                       player->triggerButton(F1, true);
+                                   }));
+    REQUIRE(isSilentWithMutedGroup(PhysicalSoundGroup::Pads,
+                                   [](const auto &player)
+                                   {
+                                       player->triggerPad(1.f);
+                                   }));
+    REQUIRE(isSilentWithMutedGroup(PhysicalSoundGroup::Slider,
+                                   [](const auto &player)
+                                   {
+                                       player->triggerSlider(0.2f, 0.5f);
+                                   }));
+    REQUIRE(isSilentWithMutedGroup(PhysicalSoundGroup::DataWheel,
+                                   [](const auto &player)
+                                   {
+                                       player->triggerDataWheel(1, 1.0);
+                                   }));
+    REQUIRE(isSilentWithMutedGroup(PhysicalSoundGroup::Power,
+                                   [](const auto &player)
+                                   {
+                                       player->triggerPowerOn();
+                                   }));
 }
 
 TEST_CASE("Button press and release transitions render to stereo out",

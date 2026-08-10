@@ -43,6 +43,7 @@ namespace mpc::lcdgui::screens
         void open() override;
         void close() override;
         void function(int) override;
+        void openWindow() override;
         void up() override;
         void down() override;
 
@@ -64,9 +65,9 @@ namespace mpc::lcdgui::screens
             "Big time shift      :", "Physical sounds     :",
             "Physical mix mode   :", "Physical level      :"};
         const std::vector<std::string> settingNames{
-            "initial-pad-mapping", "16-levels-erase-mode",
-            "auto-convert-wavs", "name-typing-with-keyboard",
-            "big-time-shift", "physical-sounds-enabled",
+            "initial-pad-mapping",      "16-levels-erase-mode",
+            "auto-convert-wavs",        "name-typing-with-keyboard",
+            "big-time-shift",           "physical-sounds-enabled",
             "physical-sounds-mix-mode", "physical-sounds-level"};
 
         static constexpr int VisibleRowCount = 5;
@@ -77,9 +78,9 @@ namespace mpc::lcdgui::screens
         int autoConvertWavs = 1;
         bool nameTypingWithKeyboardEnabled = true;
         bool bigTimeShiftEnabled = false;
-        bool physicalSoundsEnabled = true;
+        bool physicalSoundsEnabled = false;
         int physicalSoundsMixMode = 0;
-        int physicalSoundsLevel = 100;
+        int physicalSoundsLevel = 15;
         int row = 0;
         int rowOffset = 0;
 

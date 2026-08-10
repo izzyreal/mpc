@@ -228,6 +228,22 @@
  "fblabels" : [ null, null, null, null, null, null ],
  "fbtypes" : [ null, null, null, null, null, null ]
 },
+ "vmpc-physical-sounds":
+ {
+  "labels" : [ "Buttons:", "Pads:", "Slider:", "Data wheel:", "Power:" ],
+  "x" : [ 30, 156, 36, 120, 42 ],
+  "y" : [ 15, 15, 28, 28, 41 ],
+  "tfsize" : [ 18, 18, 18, 18, 18 ],
+  "parameters" : [
+   "buttons", [ "_", "pads", "_", "slider" ],
+   "pads", [ "buttons", "_", "_", "data-wheel" ],
+   "slider", [ "_", "data-wheel", "buttons", "power" ],
+   "data-wheel", [ "slider", "_", "pads", "power" ],
+   "power", [ "slider", "data-wheel", "slider", "_" ]
+  ],
+  "fblabels" : [ null, null, null, "CLOSE", null, null ],
+  "fbtypes" : [ null, null, null, 0, null, null ]
+ },
  "step-edit-options":
  {
   "labels" : [ "Auto step increment:", "", "" ],

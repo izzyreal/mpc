@@ -132,6 +132,8 @@ namespace mpc::engine
         PhysicalSoundsMixMode getPhysicalSoundsMixMode() const;
         void setPhysicalSoundsLevel(int level);
         int getPhysicalSoundsLevel() const;
+        void setPhysicalSoundGroupLevel(PhysicalSoundGroup group, int level);
+        int getPhysicalSoundGroupLevel(PhysicalSoundGroup group) const;
 
     private:
         Mpc &mpc;

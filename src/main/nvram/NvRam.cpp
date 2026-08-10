@@ -17,6 +17,8 @@
 
 #include "file/all/Defaults.hpp"
 
+#include <array>
+
 using namespace mpc::nvram;
 using namespace mpc::file_io;
 using namespace mpc::lcdgui;
@@ -39,9 +41,9 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
         return;
     }
 
-    const auto sizeValue = value(
-        mpc_fs::file_size(path), FailurePolicy::Recoverable,
-        "load user screen values size check for '" + path.string() + "'");
+    const auto sizeValue =
+        value(mpc_fs::file_size(path), FailurePolicy::Recoverable,
+              "load user screen values size check for '" + path.string() + "'");
     if (!sizeValue)
     {
         return;
@@ -73,9 +75,8 @@ void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
     const auto path = mpc.paths->configPath() / "nvram.vmp";
-    (void) success(set_file_data(path, dp.getBytes()),
-                   FailurePolicy::BestEffort,
-                   "save user screen values for '" + path.string() + "'");
+    (void)success(set_file_data(path, dp.getBytes()), FailurePolicy::BestEffort,
+                  "save user screen values for '" + path.string() + "'");
 }
 
 void NvRam::saveVmpcSettings(Mpc &mpc)
@@ -106,10 +107,20 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(vmpcSettingsScreen->bigTimeShiftEnabled),
         static_cast<char>(vmpcSettingsScreen->physicalSoundsEnabled),
         static_cast<char>(vmpcSettingsScreen->physicalSoundsMixMode),
-        static_cast<char>(vmpcSettingsScreen->physicalSoundsLevel)};
+        static_cast<char>(vmpcSettingsScreen->physicalSoundsLevel),
+        static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
+            engine::PhysicalSoundGroup::Buttons)),
+        static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
+            engine::PhysicalSoundGroup::Pads)),
+        static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
+            engine::PhysicalSoundGroup::Slider)),
+        static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
+            engine::PhysicalSoundGroup::DataWheel)),
+        static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
+            engine::PhysicalSoundGroup::Power))};
 
-    (void) success(set_file_data(path, bytes), FailurePolicy::BestEffort,
-                   "save VMPC settings for '" + path.string() + "'");
+    (void)success(set_file_data(path, bytes), FailurePolicy::BestEffort,
+                  "save VMPC settings for '" + path.string() + "'");
 }
 
 void NvRam::loadVmpcSettings(Mpc &mpc)
@@ -118,9 +129,9 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
 
     const auto path = mpc.paths->vmpcSpecificConfigPath();
 
-    const auto existsValue = value(
-        mpc_fs::exists(path), FailurePolicy::Recoverable,
-        "load VMPC settings existence check for '" + path.string() + "'");
+    const auto existsValue =
+        value(mpc_fs::exists(path), FailurePolicy::Recoverable,
+              "load VMPC settings existence check for '" + path.string() + "'");
 
     if (!existsValue || !*existsValue)
     {
@@ -137,9 +148,9 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    const auto bytesValue = value(get_file_data(path), FailurePolicy::Recoverable,
-                                  "load VMPC settings read for '" +
-                                      path.string() + "'");
+    const auto bytesValue =
+        value(get_file_data(path), FailurePolicy::Recoverable,
+              "load VMPC settings read for '" + path.string() + "'");
     if (!bytesValue)
     {
         return;
@@ -221,5 +232,19 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
     {
         vmpcSettingsScreen->setPhysicalSoundsLevel(
             static_cast<unsigned char>(bytes[15]));
+    }
+    const std::array groupSettings{engine::PhysicalSoundGroup::Buttons,
+                                   engine::PhysicalSoundGroup::Pads,
+                                   engine::PhysicalSoundGroup::Slider,
+                                   engine::PhysicalSoundGroup::DataWheel,
+                                   engine::PhysicalSoundGroup::Power};
+    for (size_t i = 0; i < groupSettings.size(); ++i)
+    {
+        const auto byteIndex = 16 + i;
+        if (bytes.size() > byteIndex)
+        {
+            engineHost->setPhysicalSoundGroupLevel(
+                groupSettings[i], static_cast<unsigned char>(bytes[byteIndex]));
+        }
     }
 }

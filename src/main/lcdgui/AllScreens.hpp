@@ -122,6 +122,7 @@
 #include "lcdgui/screens/window/VmpcResetKeyboardScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "lcdgui/screens/window/VmpcMidiPresetsScreen.hpp"
+#include "lcdgui/screens/window/VmpcPhysicalSoundsScreen.hpp"
 
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiInputMonitorScreen.hpp"

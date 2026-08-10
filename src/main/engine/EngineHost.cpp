@@ -116,8 +116,7 @@ namespace
 
             for (size_t i = 0; i < mixedSampleCount; ++i)
             {
-                stereoOutput->localBuffer[i] +=
-                    physicalOutput->localBuffer[i];
+                stereoOutput->localBuffer[i] += physicalOutput->localBuffer[i];
             }
             std::fill_n(physicalOutput->localBuffer.begin(),
                         physicalSampleCount, 0.f);
@@ -174,25 +173,29 @@ void EngineHost::start()
 
     initializeDiskRecorders();
 
-    physicalSoundsOutputRouter = std::make_shared<PhysicalSoundsOutputRouter>(
-        outputProcesses.back());
+    physicalSoundsOutputRouter =
+        std::make_shared<PhysicalSoundsOutputRouter>(outputProcesses.back());
     physicalSoundsLiveOutputMixer =
-        std::make_shared<PhysicalSoundsLiveOutputMixer>(
-            outputProcesses.front(), outputProcesses.back(),
-            physicalSoundsMixMode);
+        std::make_shared<PhysicalSoundsLiveOutputMixer>(outputProcesses.front(),
+                                                        outputProcesses.back(),
+                                                        physicalSoundsMixMode);
     mixer->getStrip(PhysicalSoundsStrip)
         ->setDirectOutputProcess(physicalSoundsOutputRouter);
     isolatePhysicalSoundsFromMainMix();
 
-    mixer->getStrip(std::string(SoundRecorderInputStrip))->setDirectOutputProcess(soundRecorder);
-    mixer->getStrip(std::string(QuickPreviewStrip))->setInputProcess(soundPlayer);
-    const auto sc = mixer->getMixerControls()->getStripControls(QuickPreviewStrip);
+    mixer->getStrip(std::string(SoundRecorderInputStrip))
+        ->setDirectOutputProcess(soundRecorder);
+    mixer->getStrip(std::string(QuickPreviewStrip))
+        ->setInputProcess(soundPlayer);
+    const auto sc =
+        mixer->getMixerControls()->getStripControls(QuickPreviewStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(100));
 
-    mixer->getStrip(SoundRecorderInputStrip)->setInputProcess(monitorInputAdapter);
+    mixer->getStrip(SoundRecorderInputStrip)
+        ->setInputProcess(monitorInputAdapter);
 
     noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
         mpc.getEventHandler().get(), mpc.getSequencer(), mpc.getSampler(),
@@ -283,7 +286,8 @@ void EngineHost::drainAudioThreadStateQueues()
 
 void EngineHost::setMonitorLevel(const int8_t level) const
 {
-    const auto sc = mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
+    const auto sc =
+        mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
@@ -292,7 +296,8 @@ void EngineHost::setMonitorLevel(const int8_t level) const
 
 void EngineHost::muteMonitor(const bool mute) const
 {
-    const auto sc = mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
+    const auto sc =
+        mixer->getMixerControls()->getStripControls(SoundRecorderInputStrip);
     const auto mmc =
         std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     const auto mc =
@@ -337,7 +342,8 @@ void EngineHost::setupMixer()
      * quick previews, strip 35, a metronome strip, 36, and one locally mixed
      * physical-interaction-sounds strip, 37.
      */
-    MixerControlsFactory::createChannelStrips(mixerControls, TotalMixerStripCount);
+    MixerControlsFactory::createChannelStrips(mixerControls,
+                                              TotalMixerStripCount);
     mixer = std::make_shared<AudioMixer>(mixerControls, nonRealTimeAudioServer);
     muteMonitor(true);
     setAssignableMixOutLevels();
@@ -407,7 +413,8 @@ EngineHost::getPhysicalInteractionSoundPlayer() const
 
 void EngineHost::createSynth()
 {
-    previewSoundPlayerVoice = std::make_shared<Voice>(PreviewSoundPlayerStripIndex, true);
+    previewSoundPlayerVoice =
+        std::make_shared<Voice>(PreviewSoundPlayerStripIndex, true);
     metronomeVoice = std::make_shared<Voice>(MetronomeStripIndex, true);
 
     for (int i = 0; i < 32; i++)
@@ -610,6 +617,22 @@ int EngineHost::getPhysicalSoundsLevel() const
 {
     return physicalInteractionSoundPlayer
                ? physicalInteractionSoundPlayer->getLevel()
+               : 15;
+}
+
+void EngineHost::setPhysicalSoundGroupLevel(const PhysicalSoundGroup group,
+                                            const int level)
+{
+    if (physicalInteractionSoundPlayer)
+    {
+        physicalInteractionSoundPlayer->setGroupLevel(group, level);
+    }
+}
+
+int EngineHost::getPhysicalSoundGroupLevel(const PhysicalSoundGroup group) const
+{
+    return physicalInteractionSoundPlayer
+               ? physicalInteractionSoundPlayer->getGroupLevel(group)
                : 100;
 }
 
@@ -665,7 +688,8 @@ bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
     const auto destinationDirectory =
         mpc.paths->getDocuments()->recordingsPath() / settings->recordingName;
 
-    const auto createDirectoryRes = mpc_fs::create_directory(destinationDirectory);
+    const auto createDirectoryRes =
+        mpc_fs::create_directory(destinationDirectory);
     if (!success(createDirectoryRes, FailurePolicy::Required,
                  "start direct-to-disk bounce directory create for '" +
                      destinationDirectory.string() + "'"))

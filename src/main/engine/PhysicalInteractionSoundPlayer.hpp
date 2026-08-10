@@ -18,6 +18,16 @@ namespace mpc::engine
         Dedicated = 1
     };
 
+    enum class PhysicalSoundGroup : uint8_t
+    {
+        Buttons = 0,
+        Pads,
+        Slider,
+        DataWheel,
+        Power,
+        Count
+    };
+
     class PhysicalInteractionSoundPlayer final
         : public audio::core::AudioProcess
     {
@@ -40,6 +50,8 @@ namespace mpc::engine
         bool isEnabled() const;
         void setLevel(int levelToUse);
         int getLevel() const;
+        void setGroupLevel(PhysicalSoundGroup group, int levelToUse);
+        int getGroupLevel(PhysicalSoundGroup group) const;
 
         int getLoadedSampleCount() const;
         int getLoadedPadSampleCount() const;
@@ -64,6 +76,7 @@ namespace mpc::engine
             int fadeOutSourceFrames = 0;
             bool sliderRub = false;
             bool dataWheelPhrase = false;
+            PhysicalSoundGroup group = PhysicalSoundGroup::Buttons;
             int stopFadeFramesRemaining = -1;
             int stopFadeTotalFrames = 0;
         };
@@ -109,6 +122,8 @@ namespace mpc::engine
         static constexpr size_t SliderRubSampleCount = 5;
         static constexpr size_t SliderEndpointSampleCount = 2;
         static constexpr size_t MaxVoiceCount = 32;
+        static constexpr size_t PhysicalSoundGroupCount =
+            static_cast<size_t>(PhysicalSoundGroup::Count);
 
         std::array<ButtonGroupSamples, ButtonSoundGroupCount> buttonGroups;
         std::array<std::array<Sample, PadTakeCount>, PadVelocityLayerCount>
@@ -142,8 +157,9 @@ namespace mpc::engine
 
         LifecycleSound lifecycleSound = LifecycleSound::None;
         std::atomic<PowerOffState> powerOffState{PowerOffState::Idle};
-        std::atomic<bool> enabled{true};
-        std::atomic<int> level{100};
+        std::atomic<bool> enabled{false};
+        std::atomic<int> level{15};
+        std::array<std::atomic<int>, PhysicalSoundGroupCount> groupLevels{};
         int loadedSampleCount = 0;
         int loadedPadSampleCount = 0;
         int loadedPowerSampleCount = 0;
@@ -184,8 +200,9 @@ namespace mpc::engine
         void loadPadSamples();
         void loadPowerSamples();
         void loadMotionSamples();
-        void addTransientVoice(const Sample &sample, int startDelayFrames = 0,
-                               float voiceGain = 1.f, bool sliderRub = false,
+        void addTransientVoice(const Sample &sample, PhysicalSoundGroup group,
+                               int startDelayFrames = 0, float voiceGain = 1.f,
+                               bool sliderRub = false,
                                int fadeInSourceFrames = 0,
                                int fadeOutSourceFrames = 0,
                                bool dataWheelPhrase = false);

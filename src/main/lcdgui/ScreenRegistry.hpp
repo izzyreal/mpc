@@ -122,6 +122,7 @@
     X(screens::window, NameScreen, "name")                                     \
     X(screens, VmpcDisksScreen, "vmpc-disks")                                  \
     X(screens, VmpcSettingsScreen, "vmpc-settings")                            \
+    X(screens::window, VmpcPhysicalSoundsScreen, "vmpc-physical-sounds")       \
     X(screens::window, VmpcDirectToDiskRecorderScreen,                         \
       "vmpc-direct-to-disk-recorder")                                          \
     X(screens::dialog, VmpcRecordJamScreen, "vmpc-record-jam")                 \
