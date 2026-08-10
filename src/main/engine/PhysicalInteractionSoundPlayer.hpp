@@ -68,8 +68,37 @@ namespace mpc::engine
             int stopFadeTotalFrames = 0;
         };
 
-        static constexpr size_t ActionCount = 2;
-        static constexpr size_t TakeCount = 2;
+        enum class ButtonSoundGroup : uint8_t
+        {
+            Cursor = 0,
+            Function,
+            ModeBank,
+            Locate,
+            Screen,
+            NoteTap,
+            Numpad,
+            Transport,
+            UndoErase,
+            Count
+        };
+
+        struct ShuffleBag
+        {
+            std::vector<size_t> order;
+            size_t position = 0;
+            std::optional<size_t> previous;
+        };
+
+        struct ButtonGroupSamples
+        {
+            std::vector<Sample> presses;
+            std::vector<Sample> releases;
+            ShuffleBag pressBag;
+            ShuffleBag releaseBag;
+        };
+
+        static constexpr size_t ButtonSoundGroupCount =
+            static_cast<size_t>(ButtonSoundGroup::Count);
         static constexpr size_t PadVelocityLayerCount = 8;
         static constexpr size_t PadTakeCount = 6;
         static constexpr size_t PowerSampleCount = 2;
@@ -81,13 +110,7 @@ namespace mpc::engine
         static constexpr size_t SliderEndpointSampleCount = 2;
         static constexpr size_t MaxVoiceCount = 32;
 
-        using Takes = std::array<Sample, TakeCount>;
-        using Actions = std::array<Takes, ActionCount>;
-
-        std::array<Actions, hardware::COMPONENT_ID_COUNT> samples;
-        std::array<std::array<uint8_t, ActionCount>,
-                   hardware::COMPONENT_ID_COUNT>
-            nextTakes{};
+        std::array<ButtonGroupSamples, ButtonSoundGroupCount> buttonGroups;
         std::array<std::array<Sample, PadTakeCount>, PadVelocityLayerCount>
             padSamples;
         std::array<uint8_t, PadVelocityLayerCount> nextPadTakes{};
@@ -154,6 +177,7 @@ namespace mpc::engine
         float sliderIntensity = 0.62f;
         uint8_t nextSliderContact = 0;
         uint8_t nextSliderRub = 0;
+        uint32_t buttonRandomState = 0x42544e32U;
         uint32_t motionRandomState = 0x4d504332U;
 
         void loadButtonSamples();
@@ -170,6 +194,10 @@ namespace mpc::engine
         void requestDataWheelPhraseFade(int fadeFrames);
         void requestSliderRubFade(int fadeFrames);
         void resetMotionSchedulers();
+        static std::optional<ButtonSoundGroup>
+        buttonSoundGroupFor(hardware::ComponentId componentId);
+        size_t drawButtonSampleIndex(ShuffleBag &bag, size_t sampleCount);
+        uint32_t nextButtonRandom();
         float nextMotionRandomFloat();
         static bool loadWavResource(const std::string &path, Sample &sample);
     };

@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <set>
+#include <vector>
 
 using namespace mpc;
 using namespace mpc::client::event;
@@ -118,6 +120,29 @@ namespace
                                return std::abs(sample) > 0.f;
                            });
     }
+
+    std::vector<float> renderButtonSound(Mpc &mpc,
+                                         const ComponentId componentId,
+                                         const bool isPress)
+    {
+        const auto engineHost = mpc.getEngineHost();
+        engineHost->getPhysicalInteractionSoundPlayer()->triggerButton(
+            componentId, isPress);
+
+        std::vector<float> result;
+        for (int block = 0; block < 64; ++block)
+        {
+            engineHost->prepareProcessBlock(BufferSize);
+            const auto output = renderOutputs(mpc);
+            if (!hasSound(output.stereoLeft))
+            {
+                break;
+            }
+            result.insert(result.end(), output.stereoLeft.begin(),
+                          output.stereoLeft.end());
+        }
+        return result;
+    }
 } // namespace
 
 TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
@@ -127,11 +152,52 @@ TEST_CASE("All physical interaction sounds are bundled", "[physical-sounds]")
 
     const auto player =
         mpc.getEngineHost()->getPhysicalInteractionSoundPlayer();
-    REQUIRE(player->getLoadedSampleCount() == 278);
+    REQUIRE(player->getLoadedSampleCount() == 190);
     REQUIRE(player->getLoadedPadSampleCount() == 48);
     REQUIRE(player->getLoadedPowerSampleCount() == 2);
     REQUIRE(player->getLoadedDataWheelSampleCount() == 18);
     REQUIRE(player->getLoadedSliderSampleCount() == 26);
+}
+
+TEST_CASE("Every button maps to an audible group press and release",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAudio(mpc);
+
+    for (int component = CURSOR_LEFT_OR_DIGIT; component <= NUM_9_OR_MIDI_SYNC;
+         ++component)
+    {
+        const auto componentId = static_cast<ComponentId>(component);
+        REQUIRE_FALSE(renderButtonSound(mpc, componentId, true).empty());
+        REQUIRE_FALSE(renderButtonSound(mpc, componentId, false).empty());
+    }
+}
+
+TEST_CASE("Button groups shuffle every variant without boundary repeats",
+          "[physical-sounds]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    prepareAudio(mpc);
+
+    std::set<std::vector<float>> pressSounds;
+    std::set<std::vector<float>> releaseSounds;
+    std::vector<float> lastPress;
+    std::vector<float> lastRelease;
+    for (int i = 0; i < 6; ++i)
+    {
+        lastPress = renderButtonSound(mpc, F1, true);
+        lastRelease = renderButtonSound(mpc, F1, false);
+        pressSounds.insert(lastPress);
+        releaseSounds.insert(lastRelease);
+    }
+
+    REQUIRE(pressSounds.size() == 6);
+    REQUIRE(releaseSounds.size() == 6);
+    REQUIRE(renderButtonSound(mpc, F1, true) != lastPress);
+    REQUIRE(renderButtonSound(mpc, F1, false) != lastRelease);
 }
 
 TEST_CASE(

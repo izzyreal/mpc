@@ -64,26 +64,43 @@ PhysicalInteractionSoundPlayer::PhysicalInteractionSoundPlayer()
 
 void PhysicalInteractionSoundPlayer::loadButtonSamples()
 {
-    for (int component = CURSOR_LEFT_OR_DIGIT; component <= NUM_9_OR_MIDI_SYNC;
-         ++component)
+    struct GroupDefinition
     {
-        const auto componentId = static_cast<ComponentId>(component);
-        const auto label = componentIdToLabel.find(componentId);
-        if (label == componentIdToLabel.end())
-        {
-            continue;
-        }
+        const char *name;
+        size_t sampleCount;
+    };
+    const std::array<GroupDefinition, ButtonSoundGroupCount> definitions{{
+        {"cursor", 4},
+        {"function", 6},
+        {"mode-bank", 8},
+        {"locate", 6},
+        {"screen", 2},
+        {"note-tap", 2},
+        {"numpad", 12},
+        {"transport", 6},
+        {"undo-erase", 2},
+    }};
 
-        for (size_t action = 0; action < ActionCount; ++action)
+    for (size_t groupIndex = 0; groupIndex < definitions.size(); ++groupIndex)
+    {
+        const auto &definition = definitions[groupIndex];
+        auto &group = buttonGroups[groupIndex];
+        const auto loadAction =
+            [this, &definition](std::vector<Sample> &samples,
+                                const char *action)
         {
-            const std::string actionName = action == 0 ? "press" : "release";
-            for (size_t take = 0; take < TakeCount; ++take)
+            samples.reserve(definition.sampleCount);
+            for (size_t take = 0; take < definition.sampleCount; ++take)
             {
-                const auto takeName = take == 0 ? "01" : "02";
-                const auto path = "audio/physical-buttons/" + label->second +
-                                  "_" + actionName + "_" + takeName + ".wav";
-                if (loadWavResource(path, samples[component][action][take]))
+                const auto takeName =
+                    (take < 9 ? "0" : "") + std::to_string(take + 1);
+                const auto path = std::string("audio/physical-buttons/") +
+                                  definition.name + "_" + action + "_" +
+                                  takeName + ".wav";
+                Sample sample;
+                if (loadWavResource(path, sample))
                 {
+                    samples.push_back(std::move(sample));
                     ++loadedSampleCount;
                 }
                 else
@@ -92,7 +109,13 @@ void PhysicalInteractionSoundPlayer::loadButtonSamples()
                          "'");
                 }
             }
-        }
+        };
+        loadAction(group.presses, "press");
+        loadAction(group.releases, "release");
+        group.pressBag.order.resize(group.presses.size());
+        group.pressBag.position = group.pressBag.order.size();
+        group.releaseBag.order.resize(group.releases.size());
+        group.releaseBag.position = group.releaseBag.order.size();
     }
 }
 
@@ -262,18 +285,108 @@ void PhysicalInteractionSoundPlayer::triggerButton(
         return;
     }
 
-    const auto component = static_cast<size_t>(componentId);
-    const auto action = static_cast<size_t>(isPress ? 0 : 1);
-    auto &nextTake = nextTakes[component][action];
-    const auto &sample = samples[component][action][nextTake];
-    nextTake = static_cast<uint8_t>((nextTake + 1) % TakeCount);
-
-    if (sample.frames.empty())
+    const auto groupId = buttonSoundGroupFor(componentId);
+    if (!groupId)
     {
         return;
     }
 
-    addTransientVoice(sample);
+    auto &group = buttonGroups[static_cast<size_t>(*groupId)];
+    auto &samples = isPress ? group.presses : group.releases;
+    auto &bag = isPress ? group.pressBag : group.releaseBag;
+    if (!samples.empty())
+    {
+        addTransientVoice(samples[drawButtonSampleIndex(bag, samples.size())]);
+    }
+}
+
+std::optional<PhysicalInteractionSoundPlayer::ButtonSoundGroup>
+PhysicalInteractionSoundPlayer::buttonSoundGroupFor(
+    const ComponentId componentId)
+{
+    if (componentId >= CURSOR_LEFT_OR_DIGIT && componentId <= CURSOR_DOWN)
+    {
+        return ButtonSoundGroup::Cursor;
+    }
+    if (componentId >= REC && componentId <= PLAY_START)
+    {
+        return ButtonSoundGroup::Transport;
+    }
+    if (componentId == MAIN_SCREEN || componentId == OPEN_WINDOW)
+    {
+        return ButtonSoundGroup::Screen;
+    }
+    if (componentId >= PREV_STEP_OR_EVENT && componentId <= NEXT_BAR_OR_END)
+    {
+        return ButtonSoundGroup::Locate;
+    }
+    if (componentId == TAP_TEMPO_OR_NOTE_REPEAT ||
+        componentId == AFTER_OR_ASSIGN)
+    {
+        return ButtonSoundGroup::NoteTap;
+    }
+    if (componentId == NEXT_SEQ || componentId == TRACK_MUTE ||
+        componentId == FULL_LEVEL_OR_CASE_SWITCH ||
+        componentId == SIXTEEN_LEVELS_OR_SPACE ||
+        (componentId >= BANK_A && componentId <= BANK_D))
+    {
+        return ButtonSoundGroup::ModeBank;
+    }
+    if (componentId >= F1 && componentId <= F6)
+    {
+        return ButtonSoundGroup::Function;
+    }
+    if (componentId == SHIFT || componentId == ENTER_OR_SAVE ||
+        (componentId >= NUM_0_OR_VMPC && componentId <= NUM_9_OR_MIDI_SYNC))
+    {
+        return ButtonSoundGroup::Numpad;
+    }
+    if (componentId == UNDO_SEQ || componentId == ERASE)
+    {
+        return ButtonSoundGroup::UndoErase;
+    }
+    return std::nullopt;
+}
+
+size_t
+PhysicalInteractionSoundPlayer::drawButtonSampleIndex(ShuffleBag &bag,
+                                                      const size_t sampleCount)
+{
+    if (bag.order.size() != sampleCount)
+    {
+        bag.order.resize(sampleCount);
+        bag.position = sampleCount;
+        bag.previous.reset();
+    }
+
+    if (bag.position >= sampleCount)
+    {
+        for (size_t i = 0; i < sampleCount; ++i)
+        {
+            bag.order[i] = i;
+        }
+        for (size_t i = sampleCount; i > 1; --i)
+        {
+            const auto other = static_cast<size_t>(nextButtonRandom()) % i;
+            std::swap(bag.order[i - 1], bag.order[other]);
+        }
+        if (sampleCount > 1 && bag.previous &&
+            bag.order.front() == *bag.previous)
+        {
+            std::swap(bag.order.front(), bag.order[1]);
+        }
+        bag.position = 0;
+    }
+
+    const auto result = bag.order[bag.position++];
+    bag.previous = result;
+    return result;
+}
+
+uint32_t PhysicalInteractionSoundPlayer::nextButtonRandom()
+{
+    buttonRandomState = buttonRandomState * 1664525U + 1013904223U;
+    return buttonRandomState;
 }
 
 void PhysicalInteractionSoundPlayer::triggerPad(const float normalizedVelocity)
