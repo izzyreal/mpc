@@ -11,7 +11,6 @@
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 #include "lcdgui/screens/window/VmpcResetKeyboardScreen.hpp"
-#include "lcdgui/screens/window/VmpcPhysicalSoundsScreen.hpp"
 #include "nvram/NvRam.hpp"
 #include "mpc_fs.hpp"
 
