@@ -80,7 +80,7 @@ namespace mpc::lcdgui::screens
         bool bigTimeShiftEnabled = false;
         bool physicalSoundsEnabled = false;
         int physicalSoundsMixMode = 0;
-        int physicalSoundsLevel = 15;
+        int physicalSoundsLevel = 20;
         int row = 0;
         int rowOffset = 0;
 
