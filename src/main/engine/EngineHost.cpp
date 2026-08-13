@@ -161,7 +161,7 @@ void EngineHost::start()
                                                "ASSIGNABLE MIX OUT 3/4",
                                                "ASSIGNABLE MIX OUT 5/6",
                                                "ASSIGNABLE MIX OUT 7/8",
-                                               "PHYSICAL SOUNDS"};
+                                               "Physical Sounds"};
 
     for (const auto &outputName : outputNames)
     {
