@@ -57,11 +57,11 @@ TEST_CASE("VmpcSettings persists physical sound controls",
     auto settings = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
     REQUIRE_FALSE(settings->arePhysicalSoundsEnabled());
     REQUIRE(settings->getPhysicalSoundsMixMode() == 0);
-    REQUIRE(settings->getPhysicalSoundsLevel() == 15);
+    REQUIRE(settings->getPhysicalSoundsLevel() == 20);
     REQUIRE_FALSE(mpc.getEngineHost()->arePhysicalSoundsEnabled());
     REQUIRE(mpc.getEngineHost()->getPhysicalSoundsMixMode() ==
             engine::PhysicalSoundsMixMode::StereoOut);
-    REQUIRE(mpc.getEngineHost()->getPhysicalSoundsLevel() == 15);
+    REQUIRE(mpc.getEngineHost()->getPhysicalSoundsLevel() == 20);
     for (const auto group :
          {engine::PhysicalSoundGroup::Buttons, engine::PhysicalSoundGroup::Pads,
           engine::PhysicalSoundGroup::Slider,
@@ -98,7 +98,7 @@ TEST_CASE("VmpcSettings persists physical sound controls",
 
     REQUIRE(settings->arePhysicalSoundsEnabled());
     REQUIRE(settings->getPhysicalSoundsMixMode() == 1);
-    REQUIRE(settings->getPhysicalSoundsLevel() == 77);
+    REQUIRE(settings->getPhysicalSoundsLevel() == 82);
 
     nvram::NvRam::saveVmpcSettings(mpc);
 
@@ -116,11 +116,11 @@ TEST_CASE("VmpcSettings persists physical sound controls",
 
     REQUIRE(settings->arePhysicalSoundsEnabled());
     REQUIRE(settings->getPhysicalSoundsMixMode() == 1);
-    REQUIRE(settings->getPhysicalSoundsLevel() == 77);
+    REQUIRE(settings->getPhysicalSoundsLevel() == 82);
     REQUIRE(mpc.getEngineHost()->arePhysicalSoundsEnabled());
     REQUIRE(mpc.getEngineHost()->getPhysicalSoundsMixMode() ==
             engine::PhysicalSoundsMixMode::Dedicated);
-    REQUIRE(mpc.getEngineHost()->getPhysicalSoundsLevel() == 77);
+    REQUIRE(mpc.getEngineHost()->getPhysicalSoundsLevel() == 82);
     for (size_t i = 0; i < groups.size(); ++i)
     {
         REQUIRE(mpc.getEngineHost()->getPhysicalSoundGroupLevel(groups[i]) ==

@@ -158,7 +158,7 @@ namespace mpc::engine
         LifecycleSound lifecycleSound = LifecycleSound::None;
         std::atomic<PowerOffState> powerOffState{PowerOffState::Idle};
         std::atomic<bool> enabled{false};
-        std::atomic<int> level{15};
+        std::atomic<int> level{20};
         std::array<std::atomic<int>, PhysicalSoundGroupCount> groupLevels{};
         int loadedSampleCount = 0;
         int loadedPadSampleCount = 0;

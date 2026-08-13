@@ -130,9 +130,9 @@ namespace mpc::engine
         bool arePhysicalSoundsEnabled() const;
         void setPhysicalSoundsMixMode(PhysicalSoundsMixMode mode);
         PhysicalSoundsMixMode getPhysicalSoundsMixMode() const;
-        void setPhysicalSoundsLevel(int level);
+        void setPhysicalSoundsLevel(int level) const;
         int getPhysicalSoundsLevel() const;
-        void setPhysicalSoundGroupLevel(PhysicalSoundGroup group, int level);
+        void setPhysicalSoundGroupLevel(PhysicalSoundGroup group, int level) const;
         int getPhysicalSoundGroupLevel(PhysicalSoundGroup group) const;
 
     private:

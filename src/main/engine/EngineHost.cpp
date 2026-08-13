@@ -605,7 +605,7 @@ PhysicalSoundsMixMode EngineHost::getPhysicalSoundsMixMode() const
     return physicalSoundsMixMode.load(std::memory_order_relaxed);
 }
 
-void EngineHost::setPhysicalSoundsLevel(const int level)
+void EngineHost::setPhysicalSoundsLevel(const int level) const
 {
     if (physicalInteractionSoundPlayer)
     {
@@ -617,11 +617,11 @@ int EngineHost::getPhysicalSoundsLevel() const
 {
     return physicalInteractionSoundPlayer
                ? physicalInteractionSoundPlayer->getLevel()
-               : 15;
+               : 20;
 }
 
 void EngineHost::setPhysicalSoundGroupLevel(const PhysicalSoundGroup group,
-                                            const int level)
+                                            const int level) const
 {
     if (physicalInteractionSoundPlayer)
     {
