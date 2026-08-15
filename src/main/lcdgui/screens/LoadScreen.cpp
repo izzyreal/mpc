@@ -32,12 +32,20 @@ LoadScreen::LoadScreen(Mpc &mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
-    mpc.getDisk()->initFiles();
+    const auto diskController = mpc.getDiskController();
+    const auto activeDisk = diskController->getActiveDisk();
+    const auto &disks = diskController->getDisks();
+    const auto cachedDeviceIsUnavailable =
+        device < 0 || device >= disks.size() ||
+        disks[device]->getVolume().mode == DISABLED;
 
-    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}) ||
+        cachedDeviceIsUnavailable)
     {
-        device = mpc.getDiskController()->getActiveDiskIndex();
+        device = diskController->getActiveDiskIndex();
     }
+
+    activeDisk->initFiles();
 
     findField("directory")->setLocation(200, 0);
     displayView();
@@ -102,11 +110,7 @@ void LoadScreen::function(const int i)
                     return;
                 }
 
-                const auto oldIndex =
-                    mpc.getDiskController()->getActiveDiskIndex();
-
-                mpc.getDiskController()->setActiveDiskIndex(device);
-                const auto newDisk = mpc.getDisk();
+                const auto newDisk = mpc.getDisks()[device];
 
                 fileLoad = 0;
 
@@ -116,7 +120,6 @@ void LoadScreen::function(const int i)
 
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
-                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
                         ls.lock()->showPopupForMs(
                             "Error! Device seems in use",
                             static_cast<int>(mpc.getFileOperationTimings()
@@ -124,6 +127,8 @@ void LoadScreen::function(const int i)
                         return;
                     }
                 }
+
+                mpc.getDiskController()->setActiveDiskIndex(device);
 
                 setFunctionKeysArrangement(0);
 

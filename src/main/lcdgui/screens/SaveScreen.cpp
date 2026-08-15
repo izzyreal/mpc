@@ -38,12 +38,20 @@ SaveScreen::SaveScreen(Mpc &mpc, const int layerIndex)
 
 void SaveScreen::open()
 {
-    mpc.getDisk()->initFiles();
+    const auto diskController = mpc.getDiskController();
+    const auto activeDisk = diskController->getActiveDisk();
+    const auto &disks = diskController->getDisks();
+    const auto cachedDeviceIsUnavailable =
+        device < 0 || device >= disks.size() ||
+        disks[device]->getVolume().mode == disk::MountMode::DISABLED;
 
-    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}))
+    if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}) ||
+        cachedDeviceIsUnavailable)
     {
-        device = mpc.getDiskController()->getActiveDiskIndex();
+        device = diskController->getActiveDiskIndex();
     }
+
+    activeDisk->initFiles();
 
     for (int i = 0; i < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; i++)
     {
@@ -123,11 +131,7 @@ void SaveScreen::function(const int i)
                     return;
                 }
 
-                const auto oldIndex =
-                    mpc.getDiskController()->getActiveDiskIndex();
-
-                mpc.getDiskController()->setActiveDiskIndex(device);
-                const auto newDisk = mpc.getDisk();
+                const auto newDisk = mpc.getDisks()[device];
 
                 if (newDisk->getVolume().type == disk::VolumeType::USB_VOLUME)
                 {
@@ -136,7 +140,6 @@ void SaveScreen::function(const int i)
 
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
-                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
                         ls.lock()->showPopupForMs(
                             "Error! Device seems in use",
                             static_cast<int>(mpc.getFileOperationTimings()
@@ -144,6 +147,8 @@ void SaveScreen::function(const int i)
                         return;
                     }
                 }
+
+                mpc.getDiskController()->setActiveDiskIndex(device);
 
                 setFunctionKeysArrangement(0);
 

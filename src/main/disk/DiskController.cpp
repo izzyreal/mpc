@@ -11,6 +11,7 @@
 
 #include "Logger.hpp"
 
+#include <algorithm>
 #include <mutex>
 
 using namespace mpc::disk;
@@ -61,7 +62,7 @@ void DiskController::initDisks()
 
         if (uuid == persistedActiveUUID)
         {
-            activeDiskIndex = i;
+            setActiveDiskIndex(i);
             break;
         }
     }
@@ -80,6 +81,7 @@ void DiskController::initDisks()
         if (!activeDisk->getVolume().volumeStream.is_open())
         {
             activeDiskIndex = 0;
+            activeDiskHistory.clear();
         }
     }
     else
@@ -115,6 +117,28 @@ int DiskController::getActiveDiskIndex() const
 
 void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 {
+    if (newActiveDiskIndex == activeDiskIndex)
+    {
+        return;
+    }
+
+    if (activeDiskIndex >= 0 && activeDiskIndex < disks.size() &&
+        newActiveDiskIndex >= 0 && newActiveDiskIndex < disks.size())
+    {
+        const auto &previousUuid =
+            disks[activeDiskIndex]->getVolume().volumeUUID;
+        const auto &newUuid = disks[newActiveDiskIndex]->getVolume().volumeUUID;
+
+        activeDiskHistory.erase(std::remove(activeDiskHistory.begin(),
+                                            activeDiskHistory.end(),
+                                            previousUuid),
+                                activeDiskHistory.end());
+        activeDiskHistory.push_back(previousUuid);
+        activeDiskHistory.erase(std::remove(activeDiskHistory.begin(),
+                                            activeDiskHistory.end(), newUuid),
+                                activeDiskHistory.end());
+    }
+
     activeDiskIndex = newActiveDiskIndex;
 }
 
@@ -125,29 +149,45 @@ bool DiskController::ensureActiveDiskIsEnabled()
         return false;
     }
 
-    if (activeDiskIndex < 0 || activeDiskIndex >= disks.size())
-    {
-        activeDiskIndex = 0;
-        return true;
-    }
+    const auto activeDiskIndexIsValid =
+        activeDiskIndex >= 0 && activeDiskIndex < disks.size();
 
-    auto activeDisk = disks[activeDiskIndex];
-
-    if (activeDisk->getVolume().mode != DISABLED)
+    if (activeDiskIndexIsValid &&
+        disks[activeDiskIndex]->getVolume().mode != DISABLED)
     {
         return false;
     }
 
-    try
+    if (activeDiskIndexIsValid)
     {
-        activeDisk->close();
-    }
-    catch (const std::exception &e)
-    {
-        MLOG("Failed to close disabled active disk: " + std::string(e.what()));
+        try
+        {
+            disks[activeDiskIndex]->close();
+        }
+        catch (const std::exception &e)
+        {
+            MLOG("Failed to close disabled active disk: " +
+                 std::string(e.what()));
+        }
     }
 
-    for (int i = 0; i < disks.size(); i++)
+    while (!activeDiskHistory.empty())
+    {
+        const auto previousUuid = activeDiskHistory.back();
+        activeDiskHistory.pop_back();
+
+        for (int i = 0; i < disks.size(); ++i)
+        {
+            const auto &volume = disks[i]->getVolume();
+            if (volume.volumeUUID == previousUuid && volume.mode != DISABLED)
+            {
+                activeDiskIndex = i;
+                return true;
+            }
+        }
+    }
+
+    for (int i = 0; i < disks.size(); ++i)
     {
         if (disks[i]->getVolume().mode != DISABLED)
         {
@@ -167,6 +207,11 @@ void DiskController::detectRawUsbVolumes()
     {
         return;
     }
+
+    const auto activeDiskUuid =
+        activeDiskIndex >= 0 && activeDiskIndex < disks.size()
+            ? disks[activeDiskIndex]->getVolume().volumeUUID
+            : std::string();
 
     RemovableVolumes removableVolumes;
 
@@ -275,6 +320,17 @@ void DiskController::detectRawUsbVolumes()
         volume.volumeSize = v.mediaSize;
         volume.volumeUUID = v.volumeUUID;
     }
+
+    const auto activeDisk =
+        std::find_if(disks.begin(), disks.end(),
+                     [&activeDiskUuid](const auto &d)
+                     {
+                         return d->getVolume().volumeUUID == activeDiskUuid;
+                     });
+    activeDiskIndex =
+        activeDisk == disks.end()
+            ? -1
+            : static_cast<int>(std::distance(disks.begin(), activeDisk));
 
     ensureActiveDiskIsEnabled();
 

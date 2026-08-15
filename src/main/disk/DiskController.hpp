@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace mpc
@@ -19,6 +20,7 @@ namespace mpc::disk
         Mpc &mpc;
         bool rawUsbVolumeDetectionEnabled;
         std::vector<std::shared_ptr<AbstractDisk>> disks;
+        std::vector<std::string> activeDiskHistory;
         int activeDiskIndex = 0;
 
         void initDisks();
