@@ -22,5 +22,7 @@ namespace mpc::lcdgui
     public:
         Parameter(Mpc &mpc, std::string labelStr, std::string name, int x,
                   int y, int fieldWidth);
+
+        MRECT getInteractionRect() const;
     };
 } // namespace mpc::lcdgui

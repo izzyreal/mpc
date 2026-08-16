@@ -8,6 +8,8 @@
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Layer.hpp"
 #include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/Label.hpp"
+#include "lcdgui/Parameter.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include "hardware/Component.hpp"
@@ -43,6 +45,51 @@ TEST_CASE("LCD coordinates focus visible fields", "[lcd][focus][hit-test]")
     CHECK(layeredScreen->getFocusedFieldName() == "tempo-source");
 }
 
+TEST_CASE("LCD parameter labels target their associated fields",
+          "[lcd][focus][hit-test][parameter]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("sequencer");
+    const auto screen = layeredScreen->getCurrentScreen();
+    const auto parameter = screen->findParameter("sq");
+    const auto label = screen->findLabel("sq");
+    const auto field = screen->findField("sq");
+    REQUIRE(parameter);
+    REQUIRE(label);
+    REQUIRE(field);
+
+    const auto labelPoint = centerOf(label->getRect());
+    const auto fieldPoint = centerOf(field->getRect());
+    const auto labelTarget = layeredScreen->findLcdTargetAt(labelPoint);
+    const auto fieldTarget = layeredScreen->findLcdTargetAt(fieldPoint);
+    REQUIRE(labelTarget);
+    REQUIRE(fieldTarget);
+    REQUIRE(std::holds_alternative<LcdFieldHitTarget>(*labelTarget));
+    REQUIRE(std::holds_alternative<LcdFieldHitTarget>(*fieldTarget));
+    CHECK(std::get<LcdFieldHitTarget>(*labelTarget).fieldName == "sq");
+    CHECK(std::get<LcdFieldHitTarget>(*fieldTarget).fieldName == "sq");
+
+    REQUIRE(layeredScreen->setFocus("tempo-source"));
+    CHECK(layeredScreen->focusFieldAt(labelPoint) ==
+          FieldFocusResult::FocusChanged);
+    CHECK(layeredScreen->getFocusedFieldName() == "sq");
+
+    label->setLocation(140, label->getY());
+    const auto movedLabelPoint = centerOf(label->getRect());
+    const auto movedTarget = layeredScreen->findLcdTargetAt(movedLabelPoint);
+    REQUIRE(movedTarget);
+    CHECK(std::get<LcdFieldHitTarget>(*movedTarget).fieldName == "sq");
+
+    label->Hide(true);
+    const auto hiddenLabelTarget =
+        layeredScreen->findLcdTargetAt(movedLabelPoint);
+    CHECK((!hiddenLabelTarget ||
+           !std::holds_alternative<LcdFieldHitTarget>(*hiddenLabelTarget) ||
+           std::get<LcdFieldHitTarget>(*hiddenLabelTarget).fieldName != "sq"));
+}
+
 TEST_CASE("LCD hit targets support padding without focusing blank space",
           "[lcd][focus][hit-test]")
 {
@@ -57,7 +104,7 @@ TEST_CASE("LCD hit targets support padding without focusing blank space",
 
     REQUIRE(layeredScreen->setFocus("tempo-source"));
     const auto y = static_cast<float>(rect.T + rect.B) * 0.5f;
-    const LcdPoint paddedPoint{static_cast<float>(rect.L) - 1.f, y};
+    const LcdPoint paddedPoint{static_cast<float>(rect.R) + 1.f, y};
     CHECK(layeredScreen->focusFieldAt(paddedPoint) ==
           FieldFocusResult::NoTarget);
     CHECK(layeredScreen->getFocusedFieldName() == "tempo-source");

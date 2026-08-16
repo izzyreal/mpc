@@ -8,6 +8,7 @@
 #include "input/LcdGestureHandler.hpp"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
@@ -83,7 +84,7 @@ TEST_CASE("Core LCD gestures derive the rendered function-key lifecycle",
 
     layeredScreen->openScreen("timing-correct");
     const auto end =
-        handler.handle(lcdGesture(GestureEvent::Type::END, x, y, 3));
+        handler.handle(lcdGesture(GestureEvent::Type::END, 1.25f, -0.25f, 3));
     CHECK(end.inputResult == HostInputResult::Handled);
     REQUIRE(end.derivedGestures.size() == 1);
     CHECK(end.derivedGestures[0].type == GestureEvent::Type::END);
@@ -134,6 +135,56 @@ TEST_CASE("Core LCD field drags derive component-relative wheel gestures",
           Catch::Approx(-100.f * 3.f / LCD_HEIGHT));
 
     const auto end = handler.handle(lcdGesture(GestureEvent::Type::END, x, y));
+    REQUIRE(end.derivedGestures.size() == 1);
+    CHECK(end.derivedGestures[0].type == GestureEvent::Type::END);
+    CHECK(end.derivedGestures[0].componentId ==
+          hardware::ComponentId::DATA_WHEEL);
+}
+
+TEST_CASE("Core LCD field drags continue and reverse beyond display bounds",
+          "[lcd][input][field-drag]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("sequencer");
+    const auto field =
+        layeredScreen->getCurrentScreen()->findField("tempo-source");
+    REQUIRE(field);
+    const auto [x, y] = normalizedCenter(field->getRect());
+
+    LcdGestureHandler handler(layeredScreen);
+    REQUIRE(handler.handle(lcdGesture(GestureEvent::Type::BEGIN, x, y))
+                .inputResult == HostInputResult::Handled);
+
+    const auto firstY = y - 2.f / LCD_HEIGHT;
+    const auto startDrag =
+        handler.handle(lcdGesture(GestureEvent::Type::UPDATE, x, firstY));
+    REQUIRE(startDrag.derivedGestures.size() == 2);
+
+    constexpr float outsideY = -0.25f;
+    const auto outside =
+        handler.handle(lcdGesture(GestureEvent::Type::UPDATE, x, outsideY));
+    REQUIRE(outside.derivedGestures.size() == 1);
+    CHECK(outside.derivedGestures[0].continuousDelta ==
+          Catch::Approx((firstY - outsideY) * 100.f));
+
+    constexpr float fartherOutsideY = -0.5f;
+    const auto fartherOutside = handler.handle(
+        lcdGesture(GestureEvent::Type::UPDATE, x, fartherOutsideY));
+    REQUIRE(fartherOutside.derivedGestures.size() == 1);
+    CHECK(fartherOutside.derivedGestures[0].continuousDelta ==
+          Catch::Approx(25.f));
+
+    constexpr float reversedOutsideY = -0.4f;
+    const auto reversed = handler.handle(
+        lcdGesture(GestureEvent::Type::UPDATE, x, reversedOutsideY));
+    REQUIRE(reversed.derivedGestures.size() == 1);
+    CHECK(reversed.derivedGestures[0].continuousDelta == Catch::Approx(-10.f));
+
+    const auto end =
+        handler.handle(lcdGesture(GestureEvent::Type::END, x, 1.5f));
+    CHECK(end.inputResult == HostInputResult::Handled);
     REQUIRE(end.derivedGestures.size() == 1);
     CHECK(end.derivedGestures[0].type == GestureEvent::Type::END);
     CHECK(end.derivedGestures[0].componentId ==
@@ -212,6 +263,36 @@ TEST_CASE("Core LCD wheel input focuses hovered fields and derives data wheel",
     CHECK(continuedDrag.derivedGestures[0].type == GestureEvent::Type::BEGIN);
 }
 
+TEST_CASE("Core LCD labels support field drags and wheel input",
+          "[lcd][input][parameter]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreen("sequencer");
+    const auto label = layeredScreen->getCurrentScreen()->findLabel("sq");
+    REQUIRE(label);
+    const auto [x, y] = normalizedCenter(label->getRect());
+
+    LcdGestureHandler handler(layeredScreen);
+    const auto wheel = handler.handle(lcdWheelGesture(x, y, 3.f));
+    CHECK(wheel.inputResult == HostInputResult::Handled);
+    CHECK(layeredScreen->getFocusedFieldName() == "sq");
+    REQUIRE(wheel.derivedGestures.size() == 1);
+    CHECK(wheel.derivedGestures[0].componentId ==
+          hardware::ComponentId::DATA_WHEEL);
+
+    REQUIRE(handler.handle(lcdGesture(GestureEvent::Type::BEGIN, x, y))
+                .inputResult == HostInputResult::Handled);
+    const auto drag = handler.handle(
+        lcdGesture(GestureEvent::Type::UPDATE, x, y - 2.f / LCD_HEIGHT));
+    REQUIRE(drag.derivedGestures.size() == 2);
+    CHECK(drag.derivedGestures[0].type == GestureEvent::Type::BEGIN);
+    CHECK(drag.derivedGestures[0].componentId ==
+          hardware::ComponentId::DATA_WHEEL);
+    CHECK(drag.derivedGestures[1].type == GestureEvent::Type::UPDATE);
+}
+
 TEST_CASE("Core LCD wheel input ignores non-field and invalid targets",
           "[lcd][input][wheel]")
 {
@@ -256,6 +337,8 @@ TEST_CASE("Core LCD input reports blank and invalid gestures as ignored",
     CHECK(handler.handle(lcdGesture(GestureEvent::Type::BEGIN, 1.f, 1.f))
               .inputResult == HostInputResult::Ignored);
     CHECK(handler.handle(lcdGesture(GestureEvent::Type::BEGIN, -0.1f, 0.5f))
+              .inputResult == HostInputResult::Ignored);
+    CHECK(handler.handle(lcdGesture(GestureEvent::Type::UPDATE, -0.1f, 1.2f))
               .inputResult == HostInputResult::Ignored);
     CHECK(handler
               .handle(lcdGesture(GestureEvent::Type::BEGIN,

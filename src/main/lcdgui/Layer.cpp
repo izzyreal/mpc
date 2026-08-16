@@ -2,6 +2,7 @@
 #include "Field.hpp"
 
 #include "FunctionKeys.hpp"
+#include "Parameter.hpp"
 #include "ScreenComponent.hpp"
 
 #include <algorithm>
@@ -158,7 +159,13 @@ Layer::findLcdTargetAt(const LcdPoint point,
         {
             continue;
         }
-        consider(LcdFieldHitTarget{field->getName()}, field->getRect(),
+        auto interactionRect = field->getRect();
+        if (const auto *parameter =
+                dynamic_cast<const Parameter *>(field->getParent()))
+        {
+            interactionRect = parameter->getInteractionRect();
+        }
+        consider(LcdFieldHitTarget{field->getName()}, interactionRect,
                  field->getName() == focus);
     }
 

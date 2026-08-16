@@ -22,3 +22,21 @@ Parameter::Parameter(Mpc &mpc, std::string labelStr, std::string name, int x,
     addChild(
         std::make_shared<Field>(mpc, name, x + labelWidth, y, fieldWidth + 1));
 }
+
+MRECT Parameter::getInteractionRect() const
+{
+    const auto field = findField(getName());
+    if (!field)
+    {
+        return {};
+    }
+
+    auto result = field->getRect();
+    const auto label = findLabel(getName());
+    if (label && !label->IsHidden())
+    {
+        auto labelRect = label->getRect();
+        result = result.Union(&labelRect);
+    }
+    return result;
+}

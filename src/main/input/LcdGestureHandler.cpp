@@ -3,7 +3,6 @@
 #include "lcdgui/LcdGeometry.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <utility>
 
@@ -72,10 +71,6 @@ namespace mpc::input
             return result;
         }
 
-        auto normalizedGesture = gesture;
-        normalizedGesture.normX = std::clamp(normalizedGesture.normX, 0.f, 1.f);
-        normalizedGesture.normY = std::clamp(normalizedGesture.normY, 0.f, 1.f);
-
         if (gesture.type == GestureEvent::Type::BEGIN)
         {
             if (gesture.normX < 0.f || gesture.normX > 1.f ||
@@ -93,9 +88,8 @@ namespace mpc::input
             }
 
             const lcdgui::LcdPoint point{
-                normalizedGesture.normX * static_cast<float>(lcdgui::LCD_WIDTH),
-                normalizedGesture.normY *
-                    static_cast<float>(lcdgui::LCD_HEIGHT)};
+                gesture.normX * static_cast<float>(lcdgui::LCD_WIDTH),
+                gesture.normY * static_cast<float>(lcdgui::LCD_HEIGHT)};
             const auto target = layeredScreen->findLcdTargetAt(
                 point, hitTestOptionsFor(gesture.inputDeviceType));
             if (!target)
@@ -104,10 +98,10 @@ namespace mpc::input
             }
 
             ActiveInteraction interaction{*target,
-                                          normalizedGesture,
-                                          normalizedGesture.normX,
-                                          normalizedGesture.normY,
-                                          normalizedGesture.normY,
+                                          gesture,
+                                          gesture.normX,
+                                          gesture.normY,
+                                          gesture.normY,
                                           layeredScreen->getFocusedLayerIndex(),
                                           layeredScreen->getCurrentScreen()};
 
@@ -132,7 +126,7 @@ namespace mpc::input
                     return result;
                 }
                 result.derivedGestures.push_back(deriveGesture(
-                    normalizedGesture, GestureEvent::Type::BEGIN, *componentId,
+                    gesture, GestureEvent::Type::BEGIN, *componentId,
                     GestureEvent::Movement::NoMovement));
             }
 
@@ -150,7 +144,7 @@ namespace mpc::input
 
         result.inputResult = HostInputResult::Handled;
         auto &interaction = found->second;
-        interaction.lastGesture = normalizedGesture;
+        interaction.lastGesture = gesture;
 
         if (gesture.type == GestureEvent::Type::END)
         {
@@ -174,10 +168,10 @@ namespace mpc::input
         }
 
         const auto totalVerticalDelta =
-            (interaction.startNormY - normalizedGesture.normY) *
+            (interaction.startNormY - gesture.normY) *
             static_cast<float>(lcdgui::LCD_HEIGHT);
         const auto totalHorizontalDelta =
-            (interaction.startNormX - normalizedGesture.normX) *
+            (interaction.startNormX - gesture.normX) *
             static_cast<float>(lcdgui::LCD_WIDTH);
 
         if (!interaction.wheelGestureStarted)
@@ -194,20 +188,20 @@ namespace mpc::input
 
             interaction.wheelGestureStarted = true;
             result.derivedGestures.push_back(
-                deriveGesture(normalizedGesture, GestureEvent::Type::BEGIN,
+                deriveGesture(gesture, GestureEvent::Type::BEGIN,
                               hardware::ComponentId::DATA_WHEEL,
                               GestureEvent::Movement::NoMovement));
         }
 
         const auto normalizedDelta =
             interaction.previousNormY == interaction.startNormY
-                ? interaction.startNormY - normalizedGesture.normY
-                : interaction.previousNormY - normalizedGesture.normY;
-        interaction.previousNormY = normalizedGesture.normY;
+                ? interaction.startNormY - gesture.normY
+                : interaction.previousNormY - gesture.normY;
+        interaction.previousNormY = gesture.normY;
         if (normalizedDelta != 0.f)
         {
             result.derivedGestures.push_back(
-                deriveGesture(normalizedGesture, GestureEvent::Type::UPDATE,
+                deriveGesture(gesture, GestureEvent::Type::UPDATE,
                               hardware::ComponentId::DATA_WHEEL,
                               GestureEvent::Movement::Relative,
                               normalizedDelta * wheelDeltaPerLcdHeight));

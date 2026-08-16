@@ -68,8 +68,9 @@ namespace mpc::input
         // Specifies whether this event represents absolute or relative motion.
         Movement movement = Movement::NoMovement;
 
-        // Normalized pointer position in [0, 1] relative to the component's
-        // bounds.
+        // Component-relative pointer position, normalized to the component's
+        // bounds. BEGIN is in [0, 1]. Captured absolute UPDATE and END events
+        // may be outside that range when the pointer leaves the component.
         float normX = 0.0f;
         float normY = 0.0f;
 
