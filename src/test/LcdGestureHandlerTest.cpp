@@ -406,6 +406,16 @@ TEST_CASE("Dispatched LCD gestures use hardware input and focus cancellation",
         layeredScreen->getCurrentScreen()->findField("tempo-source");
     REQUIRE(field);
     const auto [fieldX, fieldY] = normalizedCenter(field->getRect());
+
+    REQUIRE(mpc.dispatchHostInput(HostInputEvent(
+                lcdGesture(GestureEvent::Type::BEGIN, fieldX, fieldY, 3))) ==
+            HostInputResult::Handled);
+    CHECK(mpc.dispatchHostInput(HostInputEvent(
+              FocusEvent{FocusEvent::Type::Lost})) == HostInputResult::Handled);
+    CHECK(mpc.dispatchHostInput(HostInputEvent(lcdGesture(
+              GestureEvent::Type::UPDATE, fieldX, fieldY - 3.f / LCD_HEIGHT,
+              3))) == HostInputResult::Ignored);
+
     const auto previousWheelAngle =
         mpc.getHardware()->getDataWheel()->getAngle();
     REQUIRE(mpc.dispatchHostInput(HostInputEvent(

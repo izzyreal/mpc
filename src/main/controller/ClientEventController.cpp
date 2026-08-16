@@ -98,6 +98,7 @@ ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
         std::get<FocusEvent>(hostEvent.payload).type == FocusEvent::Type::Lost)
     {
         dispatchDerivedGestures(lcdGestureHandler.cancelAll());
+        return HostInputResult::Handled;
     }
 
     if (hostEvent.getSource() == HostInputEvent::Source::KEYBOARD &&
