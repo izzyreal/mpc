@@ -6,6 +6,7 @@
 #include <map>
 #include <deque>
 #include <functional>
+#include <optional>
 
 #include "concurrency/TaskQueue.hpp"
 #include "lcdgui/ScreenId.hpp"
