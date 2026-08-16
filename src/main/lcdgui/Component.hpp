@@ -12,6 +12,7 @@ namespace mpc::lcdgui
 {
     class Label;
     class Field;
+    class FunctionKey;
     class Parameter;
     class Background;
 } // namespace mpc::lcdgui
@@ -107,6 +108,7 @@ namespace mpc::lcdgui
         std::shared_ptr<Parameter> findParameter(const std::string &name) const;
         std::vector<std::shared_ptr<Label>> findLabels() const;
         std::vector<std::shared_ptr<Field>> findFields() const;
+        std::vector<std::shared_ptr<FunctionKey>> findFunctionKeys() const;
         std::vector<std::shared_ptr<Parameter>> findParameters() const;
         std::shared_ptr<Background> findBackground();
         MRECT getRect() const;

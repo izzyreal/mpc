@@ -347,9 +347,10 @@ std::shared_ptr<Hardware> Mpc::getHardware()
     return hardware;
 }
 
-void Mpc::dispatchHostInput(const input::HostInputEvent &hostEvent) const
+input::HostInputResult
+Mpc::dispatchHostInput(const input::HostInputEvent &hostEvent) const
 {
-    clientEventController->dispatchHostInput(hostEvent);
+    return clientEventController->dispatchHostInput(hostEvent);
 }
 
 std::shared_ptr<Sequencer> Mpc::getSequencer()

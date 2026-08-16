@@ -27,7 +27,9 @@
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
 
+#include <algorithm>
 #include <memory>
+#include <cmath>
 #include <stdexcept>
 
 #if __linux__
@@ -899,6 +901,63 @@ std::string LayeredScreen::getFocusedFieldName()
 bool LayeredScreen::setFocus(const std::string &focus)
 {
     return getFocusedLayer()->setFocus(focus);
+}
+
+FieldFocusResult LayeredScreen::focusFieldAt(const LcdPoint point,
+                                             const LcdHitTestOptions &options)
+{
+    const auto target = findLcdTargetAt(point, options);
+    if (!target)
+    {
+        return FieldFocusResult::NoTarget;
+    }
+
+    return focusField(*target);
+}
+
+std::optional<LcdHitTarget>
+LayeredScreen::findLcdTargetAt(const LcdPoint point,
+                               const LcdHitTestOptions &options) const
+{
+    const auto focusedLayerIndex = getFocusedLayerIndex();
+    if (focusedLayerIndex < 0 ||
+        focusedLayerIndex >= static_cast<int>(layers.size()))
+    {
+        return std::nullopt;
+    }
+
+    const auto layer = layers[static_cast<size_t>(focusedLayerIndex)];
+    return layer->findLcdTargetAt(point, options);
+}
+
+FieldFocusResult LayeredScreen::focusField(const LcdHitTarget &target)
+{
+    const auto fieldTarget = std::get_if<LcdFieldHitTarget>(&target);
+    if (!fieldTarget)
+    {
+        return FieldFocusResult::NoTarget;
+    }
+
+    const auto focusedLayerIndex = getFocusedLayerIndex();
+    if (focusedLayerIndex < 0 ||
+        focusedLayerIndex >= static_cast<int>(layers.size()))
+    {
+        return FieldFocusResult::NoTarget;
+    }
+
+    const auto layer = layers[static_cast<size_t>(focusedLayerIndex)];
+    const auto field = layer->findField(fieldTarget->fieldName);
+    if (!field || field->IsHidden() || !field->isFocusable())
+    {
+        return FieldFocusResult::NoTarget;
+    }
+    if (fieldTarget->fieldName == layer->getFocus())
+    {
+        return FieldFocusResult::AlreadyFocused;
+    }
+    return layer->setFocus(fieldTarget->fieldName)
+               ? FieldFocusResult::FocusChanged
+               : FieldFocusResult::NoTarget;
 }
 
 std::shared_ptr<Field> LayeredScreen::getFocusedField()

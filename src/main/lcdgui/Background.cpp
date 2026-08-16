@@ -1,6 +1,7 @@
 #include "Background.hpp"
 
 #include "MpcResourceUtil.hpp"
+#include "lcdgui/LcdGeometry.hpp"
 
 #include "lodepng.h"
 
@@ -10,8 +11,8 @@ Background::Background() : Component("background")
 {
     x = 0;
     y = 0;
-    w = 248;
-    h = 60;
+    w = LCD_WIDTH;
+    h = LCD_HEIGHT;
 }
 
 void Background::repaintUnobtrusive(MRECT rect)
@@ -37,8 +38,8 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
     {
         const std::string fileName = "screens/bg/" + backgroundName + ".png";
 
-        unsigned int width = 248;
-        unsigned int height = 60;
+        unsigned int width = LCD_WIDTH;
+        unsigned int height = LCD_HEIGHT;
 
         if (backgroundName == "jd")
         {
@@ -55,7 +56,7 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
 
         if (backgroundName == "jd")
         {
-            height = 60;
+            height = LCD_HEIGHT;
         }
 
         const bool unobtrusive = !unobtrusiveRect.Empty();
@@ -95,7 +96,7 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
         // clear bottom in case height != full LCD height
         if (backgroundName != "popup")
         {
-            for (int y = height; y < 60; y++)
+            for (int y = static_cast<int>(height); y < LCD_HEIGHT; y++)
             {
                 for (int x = 0; x < width; x++)
                 {

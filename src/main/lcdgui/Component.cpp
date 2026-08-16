@@ -7,6 +7,7 @@
 #include "lcdgui/EventRow.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Knob.hpp"
+#include "lcdgui/LcdGeometry.hpp"
 #include "lcdgui/PunchRect.hpp"
 #include "lcdgui/Rectangle.hpp"
 #include "lcdgui/Underline.hpp"
@@ -200,6 +201,28 @@ std::vector<std::shared_ptr<Field>> Component::findFields() const
         for (auto &field : c->findFields())
         {
             result.push_back(field);
+        }
+    }
+
+    return result;
+}
+
+std::vector<std::shared_ptr<FunctionKey>> Component::findFunctionKeys() const
+{
+    std::vector<std::shared_ptr<FunctionKey>> result;
+
+    for (const auto &child : children)
+    {
+        if (const auto candidate =
+                std::dynamic_pointer_cast<FunctionKey>(child);
+            candidate)
+        {
+            result.push_back(candidate);
+        }
+
+        for (const auto &functionKey : child->findFunctionKeys())
+        {
+            result.push_back(functionKey);
         }
     }
 
@@ -445,9 +468,9 @@ bool Component::IsDirty() const
 MRECT Component::getRect() const
 {
     const auto x1 = std::max(0, x);
-    const auto x2 = std::min(248, x + w);
+    const auto x2 = std::min(LCD_WIDTH, x + w);
     const auto y1 = std::max(0, y);
-    const auto y2 = std::min(60, y + h);
+    const auto y2 = std::min(LCD_HEIGHT, y + h);
     return MRECT(x1, y1, x2, y2);
 }
 

@@ -14,11 +14,13 @@ namespace mpc::lcdgui
 {
     class FunctionKey : public Component
     {
+        const int index;
 
     public:
-        FunctionKey(Mpc &mpc, const std::string &name, int xPos);
+        FunctionKey(Mpc &mpc, const std::string &name, int index, int xPos);
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         int type = -1;
+        int getIndex() const;
         void setText(const std::string &text);
         void setType(int newType);
     };

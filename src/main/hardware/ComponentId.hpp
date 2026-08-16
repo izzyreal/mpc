@@ -91,6 +91,9 @@ namespace mpc::hardware
         OVERDUB_LED,
         PLAY_LED,
 
+        // Gesture-only surface. Appended to preserve all existing numeric IDs.
+        LCD,
+
         COMPONENT_ID_COUNT
     };
 
@@ -188,7 +191,9 @@ namespace mpc::hardware
             {UNDO_SEQ_LED, "undo-seq-led"},
             {REC_LED, "rec-led"},
             {OVERDUB_LED, "overdub-led"},
-            {PLAY_LED, "play-led"}};
+            {PLAY_LED, "play-led"},
+
+            {LCD, "lcd"}};
 
     static const std::unordered_map<std::string, ComponentId>
         componentLabelToId = []

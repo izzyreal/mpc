@@ -46,7 +46,8 @@ ClientEventController::ClientEventController(Mpc &mpcToUse)
                                        MaxProgramPadIndex);
               notifyObservers(std::string("pad"));
           }),
-      mpc(mpcToUse), keyboardBindings(std::make_shared<KeyboardBindings>()),
+      mpc(mpcToUse), lcdGestureHandler(mpc.getLayeredScreen()),
+      keyboardBindings(std::make_shared<KeyboardBindings>()),
       screens(mpc.screens), layeredScreen(mpc.getLayeredScreen()),
       hardware(mpc.getHardware())
 {
@@ -71,8 +72,34 @@ void ClientEventController::init()
     restoreKeyboardBindings();
 }
 
-void ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
+HostInputResult
+ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
 {
+    const auto dispatchDerivedGestures = [this](const auto &derivedGestures)
+    {
+        for (const auto &gesture : derivedGestures)
+        {
+            dispatchHostInput(HostInputEvent(gesture));
+        }
+    };
+
+    if (hostEvent.getSource() == HostInputEvent::Source::GESTURE)
+    {
+        const auto &gesture = std::get<GestureEvent>(hostEvent.payload);
+        if (gesture.componentId == LCD)
+        {
+            const auto result = lcdGestureHandler.handle(gesture);
+            dispatchDerivedGestures(result.derivedGestures);
+            return result.inputResult;
+        }
+    }
+
+    if (hostEvent.getSource() == HostInputEvent::Source::FOCUS &&
+        std::get<FocusEvent>(hostEvent.payload).type == FocusEvent::Type::Lost)
+    {
+        dispatchDerivedGestures(lcdGestureHandler.cancelAll());
+    }
+
     if (hostEvent.getSource() == HostInputEvent::Source::KEYBOARD &&
         mpc.getLayeredScreen()->isCurrentScreen({ScreenId::VmpcKeyboardScreen}))
     {
@@ -84,7 +111,7 @@ void ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
                 keyEvent.keyDown)
             {
                 vmpcKeyboardScreen->setLearnCandidate(keyEvent.platformKeyCode);
-                return;
+                return HostInputResult::Handled;
             }
         }
     }
@@ -94,10 +121,11 @@ void ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
 
     if (!clientEvent.has_value())
     {
-        return;
+        return HostInputResult::Ignored;
     }
 
     handleClientEvent(*clientEvent);
+    return HostInputResult::Handled;
 }
 
 void ClientEventController::handleClientEvent(const ClientEvent &e) const

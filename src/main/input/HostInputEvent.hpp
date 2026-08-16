@@ -9,6 +9,12 @@
 
 namespace mpc::input
 {
+    enum class HostInputResult
+    {
+        Ignored,
+        Handled
+    };
+
     struct FocusEvent
     {
         enum class Type
@@ -63,7 +69,8 @@ namespace mpc::input
         Movement movement = Movement::NoMovement;
 
         // Normalized pointer position in [0, 1] relative to the component's
-        // bounds
+        // bounds.
+        float normX = 0.0f;
         float normY = 0.0f;
 
         // Only valid for UPDATE events with movement == Relative

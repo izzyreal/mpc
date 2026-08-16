@@ -7,8 +7,9 @@
 
 using namespace mpc::lcdgui;
 
-FunctionKey::FunctionKey(Mpc &mpc, const std::string &name, const int xPos)
-    : Component(name)
+FunctionKey::FunctionKey(Mpc &mpc, const std::string &name,
+                         const int indexToUse, const int xPos)
+    : Component(name), index(indexToUse)
 {
     Component::setSize(39, 9);
     setLocation(xPos, 51);
@@ -19,6 +20,11 @@ FunctionKey::FunctionKey(Mpc &mpc, const std::string &name, const int xPos)
     label->preDrawClearRect.Clear();
     Component::Hide(true);
     preDrawClearRect.Clear();
+}
+
+int FunctionKey::getIndex() const
+{
+    return index;
 }
 
 void FunctionKey::Draw(std::vector<std::vector<bool>> *pixels)
@@ -135,7 +141,7 @@ FunctionKeys::FunctionKeys(
         for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
         {
             addChild(std::make_shared<FunctionKey>(
-                mpc, "fk" + std::to_string(i), xPoses[i]));
+                mpc, "fk" + std::to_string(i), i, xPoses[i]));
         }
     }
 

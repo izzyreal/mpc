@@ -8,6 +8,11 @@ using namespace mpc::hardware;
 
 int getRequiredBindingCountForComponentId(const ComponentId id)
 {
+    if (id == LCD)
+    {
+        return 0;
+    }
+
     if (id >= FULL_LEVEL_OR_CASE_SWITCH_LED && id <= PLAY_LED)
     {
         return 0;

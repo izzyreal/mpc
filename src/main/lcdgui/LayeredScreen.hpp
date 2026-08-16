@@ -11,6 +11,7 @@
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/BasicStructs.hpp"
 #include "lcdgui/BMFStructs.hpp"
+#include "lcdgui/LcdInteraction.hpp"
 
 namespace mpc
 {
@@ -35,7 +36,7 @@ namespace mpc::lcdgui
         concurrency::TaskQueue uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
-            std::vector(248, std::vector<bool>(60));
+            std::vector(LCD_WIDTH, std::vector<bool>(LCD_HEIGHT));
         std::deque<std::shared_ptr<ScreenComponent>> history;
         std::atomic<ScreenId> currentScreenId = ScreenId::NoScreenId;
         std::atomic<ScreenId> previousScreenId = ScreenId::NoScreenId;
@@ -127,6 +128,12 @@ namespace mpc::lcdgui
         std::string getFocusedFieldName();
         std::shared_ptr<Field> getFocusedField();
         bool setFocus(const std::string &focus);
+        std::optional<LcdHitTarget>
+        findLcdTargetAt(LcdPoint point,
+                        const LcdHitTestOptions &options = {}) const;
+        FieldFocusResult focusField(const LcdHitTarget &target);
+        FieldFocusResult focusFieldAt(LcdPoint point,
+                                      const LcdHitTestOptions &options = {});
 
         explicit LayeredScreen(Mpc &mpc);
     };

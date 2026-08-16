@@ -3,6 +3,7 @@
 #include "client/event/ClientEvent.hpp"
 
 #include "input/HostToClientTranslator.hpp"
+#include "input/LcdGestureHandler.hpp"
 #include "input/keyboard/KeyboardBindings.hpp"
 
 #include "sequencer/RecordingMode.hpp"
@@ -56,7 +57,8 @@ namespace mpc::controller
 
         void init();
 
-        void dispatchHostInput(const input::HostInputEvent &hostEvent);
+        input::HostInputResult
+        dispatchHostInput(const input::HostInputEvent &hostEvent);
 
         void handleClientEvent(const client::event::ClientEvent &) const;
 
@@ -97,6 +99,7 @@ namespace mpc::controller
     private:
         Mpc &mpc;
         input::HostToClientTranslator hostToClientTranslator;
+        input::LcdGestureHandler lcdGestureHandler;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
         std::shared_ptr<input::keyboard::KeyboardBindings> keyboardBindings;
 

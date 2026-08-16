@@ -31,6 +31,7 @@ namespace mpc::controller
 
 namespace mpc::input
 {
+    enum class HostInputResult;
     struct HostInputEvent;
     class PadAndButtonKeyboard;
 } // namespace mpc::input
@@ -136,7 +137,8 @@ namespace mpc
         std::shared_ptr<controller::ClientEventController>
             clientEventController;
 
-        void dispatchHostInput(const input::HostInputEvent &hostEvent) const;
+        input::HostInputResult
+        dispatchHostInput(const input::HostInputEvent &hostEvent) const;
 
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<lcdgui::ScreenComponent> getScreen() const;
