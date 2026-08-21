@@ -11,7 +11,7 @@
 #endif
 #elif defined(_WIN32)
 #include <windows.h>
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
 #endif
@@ -267,7 +267,7 @@ namespace mpc::input::keyboard
             result.insert(specialCharacters.begin(), specialCharacters.end());
 
             return result;
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
             std::map<const int, const KeyCodeInfo> result;
             Display *display = XOpenDisplay(nullptr);
             if (display)

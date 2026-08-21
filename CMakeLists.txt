@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.24)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/MpcResourceBundling.cmake)
@@ -13,6 +13,10 @@ FetchContent_Declare(akaifat
   GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
+
+if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/editables/akaifat")
+  set(FETCHCONTENT_SOURCE_DIR_AKAIFAT "${CMAKE_SOURCE_DIR}/editables/akaifat")
+endif()
 
 set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 
@@ -41,6 +45,12 @@ set(RTMIDI_BUILD_STATIC_LIBS ON)
 set(BUILD_SHARED_LIBS OFF)
 set(RTMIDI_BUILD_TESTING OFF)
 set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall")
+if(ANDROID)
+  # RtMidi's native AMidi backend requires API 29. VMPC's Android standalone
+  # uses JUCE for MIDI I/O, so retain RtMidi only as a no-device detector on
+  # the API 24 baseline.
+  set(RTMIDI_API_AMIDI OFF CACHE BOOL "Compile RtMidi with Android AMidi support" FORCE)
+endif()
 
 FetchContent_Declare(rtmidi
     GIT_REPOSITORY https://github.com/thestk/rtmidi.git
@@ -112,8 +122,15 @@ set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 if(WIN32)
     set(STRING_ENCODING_TYPE "WIN32API" CACHE STRING "Kaitai runtime string encoding backend" FORCE)
+elseif(ANDROID)
+    # Bionic's iconv API starts at API 28. MPC's formats use byte-compatible
+    # identifiers, so avoid an unavailable conversion backend on API 24-27.
+    set(STRING_ENCODING_TYPE "NONE" CACHE STRING "Kaitai runtime string encoding backend" FORCE)
 endif()
 FetchContent_MakeAvailable(kaitai_runtime)
+if(ANDROID)
+    target_compile_options(kaitai_struct_cpp_stl_runtime PRIVATE -Wno-unused-parameter)
+endif()
 unset(BUILD_TESTS CACHE)
 
 if(NOT TARGET nlohmann_json::nlohmann_json)
@@ -248,7 +265,7 @@ if (UNIX)
     target_link_libraries(mpc-tests Threads::Threads)
 endif (UNIX)
 
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE AND NOT ANDROID)
     include(FindPkgConfig)
     pkg_search_module(udisks2 REQUIRED udisks2)
     target_include_directories(mpc SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
