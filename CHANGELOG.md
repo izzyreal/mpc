@@ -1,3 +1,15 @@
+## v0.9.17 (21-8-2026)
+* Experimental iPhone version. The big challenge on iPhone is the small screen. It doesn't make a lot of sense to show the full user interface on such a small screen, because most of it becomes illegible, and too small to interact with via touch. So I've finally started working on an iPhone-specific GUI in which only some of the virtual hardware is shown. There are currently 5 arrangements to choose from, depending on what you want to do. Some arrangements are suitable for recording sequences, some for recording and naming samples, others for live performance, and so on. The current iPhone version and the arrangements it presents should be seen as work in progress. It would be great to hear from you what kind of arrangement you would like to have. If you have iPhone-specific features in mind that would make working with VMPC2000XL on small screens easier, also reach out.
+* New feature: "physical sounds". When enabled, you hear the mechanical, physical sounds of pressing the power switch, pressing and relasing buttons, moving the slider, turning the DATA wheel, and hitting the pads. The global volume level of these sounds can be adjusted, as well as the level per category. The sounds can optionally be routed to a separate bus instead of your main stereo output. By default, physical sounds are disabled, because I suspect it might suprise and confuse users. Also see the updated manual: https://vmpcdocs.izmar.nl/vmpc_specific.html#physical-interaction-sounds.
+* New feature: click/tap/drag/mouse-wheel in the LCD to change focus or modify a value.
+* The auxiliary LCD now has to be opened/closed via the 'LCD' menu item. Double-clicking in the LCD itself doesn't work anymore for this action.
+* Allow audio input to be disabled on iOS.
+* Fix slider cap shadow.
+* Removed annoying resonance from RESIST demo beat.
+* Ensure disabled raw USB volumes don't remain active in LOAD/SAVE screen.
+
+For those who are looking to minimize latency when fingerdrumming, and you're using the standalone desktop version, I'd like to mention that you might want to disable the audio input device in the Audio/MIDI Settings. In quite a few configurations, having audio input enabled increases latency.
+
 ## v0.9.16 (28-7-2026)
 * Support for loading MPC60 SET files, confirmed to be produced by firmwares 2.05, 2.12, 2.14.
 * Support for loading MPC60 SND files, confirmed to be produced by firmwares 2.05, 2.12, 2.14, and MPC3000 firmwares 3.10 and 3.11.
