@@ -30,7 +30,7 @@ namespace
 {
     RtMidiIn createMidiInForDeviceDetection()
     {
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
         std::vector<RtMidi::Api> compiledApis;
         RtMidi::getCompiledApi(compiledApis);
 

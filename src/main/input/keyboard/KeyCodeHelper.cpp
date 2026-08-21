@@ -12,7 +12,7 @@
 #elif defined _WIN32
 #include <windows.h>
 #include <WinUser.h>
-#elif defined __linux__
+#elif defined(__linux__) && !defined(__ANDROID__)
 #include <X11/keysym.h>
 #endif
 
@@ -457,7 +457,7 @@ const std::map<const int, const VmpcKeyCode>
         {VK_NEXT, VmpcKeyCode::VMPC_KEY_PageDown},
         {VK_BACK, VmpcKeyCode::VMPC_KEY_Backspace}
 
-#elif defined __linux__
+#elif defined(__linux__) && !defined(__ANDROID__)
 
         {XK_F1, VmpcKeyCode::VMPC_KEY_F1},
         {XK_F2, VmpcKeyCode::VMPC_KEY_F2},

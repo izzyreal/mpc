@@ -40,6 +40,12 @@ mpc_fs::path Paths::appDocumentsPath() const
 
 mpc_fs::path Paths::appConfigHome() const
 {
+    if (const char *configHome = std::getenv("VMPC2000XL_CONFIG_HOME");
+        configHome != nullptr && *configHome != '\0')
+    {
+        return mpc_fs::path(configHome);
+    }
+
     auto path = mpc_fs::path(sago::getConfigHome()) / "VMPC2000XL";
     return path;
 }
