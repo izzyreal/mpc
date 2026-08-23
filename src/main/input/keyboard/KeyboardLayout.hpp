@@ -11,6 +11,8 @@
 #endif
 #elif defined(_WIN32)
 #include <windows.h>
+#elif defined(__ANDROID__)
+#include <android/keycodes.h>
 #elif defined(__linux__) && !defined(__ANDROID__)
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
@@ -266,6 +268,66 @@ namespace mpc::input::keyboard
             result.insert(keypad.begin(), keypad.end());
             result.insert(specialCharacters.begin(), specialCharacters.end());
 
+            return result;
+#elif defined(__ANDROID__)
+            std::map<const int, const KeyCodeInfo> letters{
+                {AKEYCODE_A, {"a", "A"}}, {AKEYCODE_B, {"b", "B"}},
+                {AKEYCODE_C, {"c", "C"}}, {AKEYCODE_D, {"d", "D"}},
+                {AKEYCODE_E, {"e", "E"}}, {AKEYCODE_F, {"f", "F"}},
+                {AKEYCODE_G, {"g", "G"}}, {AKEYCODE_H, {"h", "H"}},
+                {AKEYCODE_I, {"i", "I"}}, {AKEYCODE_J, {"j", "J"}},
+                {AKEYCODE_K, {"k", "K"}}, {AKEYCODE_L, {"l", "L"}},
+                {AKEYCODE_M, {"m", "M"}}, {AKEYCODE_N, {"n", "N"}},
+                {AKEYCODE_O, {"o", "O"}}, {AKEYCODE_P, {"p", "P"}},
+                {AKEYCODE_Q, {"q", "Q"}}, {AKEYCODE_R, {"r", "R"}},
+                {AKEYCODE_S, {"s", "S"}}, {AKEYCODE_T, {"t", "T"}},
+                {AKEYCODE_U, {"u", "U"}}, {AKEYCODE_V, {"v", "V"}},
+                {AKEYCODE_W, {"w", "W"}}, {AKEYCODE_X, {"x", "X"}},
+                {AKEYCODE_Y, {"y", "Y"}}, {AKEYCODE_Z, {"z", "Z"}}};
+
+            std::map<const int, const KeyCodeInfo> numbers{
+                {AKEYCODE_1, {"1", "!"}}, {AKEYCODE_2, {"2", "@"}},
+                {AKEYCODE_3, {"3", "#"}}, {AKEYCODE_4, {"4", "$"}},
+                {AKEYCODE_5, {"5", "%"}}, {AKEYCODE_6, {"6", "^"}},
+                {AKEYCODE_7, {"7", "&"}}, {AKEYCODE_8, {"8", "*"}},
+                {AKEYCODE_9, {"9", "("}}, {AKEYCODE_0, {"0", ")"}}};
+
+            std::map<const int, const KeyCodeInfo> specialCharacters{
+                {AKEYCODE_GRAVE, {"`", "~"}},
+                {AKEYCODE_MINUS, {"-", "_"}},
+                {AKEYCODE_EQUALS, {"=", "+"}},
+                {AKEYCODE_LEFT_BRACKET, {"[", "{"}},
+                {AKEYCODE_RIGHT_BRACKET, {"]", "}"}},
+                {AKEYCODE_BACKSLASH, {"\\", "|"}},
+                {AKEYCODE_SEMICOLON, {";", ":"}},
+                {AKEYCODE_APOSTROPHE, {"'", "\""}},
+                {AKEYCODE_COMMA, {",", "<"}},
+                {AKEYCODE_PERIOD, {".", ">"}},
+                {AKEYCODE_SLASH, {"/", "?"}}};
+
+            std::map<const int, const KeyCodeInfo> keypad{
+                {AKEYCODE_NUMPAD_0, {"0", "0"}},
+                {AKEYCODE_NUMPAD_1, {"1", "1"}},
+                {AKEYCODE_NUMPAD_2, {"2", "2"}},
+                {AKEYCODE_NUMPAD_3, {"3", "3"}},
+                {AKEYCODE_NUMPAD_4, {"4", "4"}},
+                {AKEYCODE_NUMPAD_5, {"5", "5"}},
+                {AKEYCODE_NUMPAD_6, {"6", "6"}},
+                {AKEYCODE_NUMPAD_7, {"7", "7"}},
+                {AKEYCODE_NUMPAD_8, {"8", "8"}},
+                {AKEYCODE_NUMPAD_9, {"9", "9"}},
+                {AKEYCODE_NUMPAD_MULTIPLY, {"*", "*"}},
+                {AKEYCODE_NUMPAD_ADD, {"+", "+"}},
+                {AKEYCODE_NUMPAD_EQUALS, {"=", "="}},
+                {AKEYCODE_NUMPAD_SUBTRACT, {"-", "-"}},
+                {AKEYCODE_NUMPAD_DIVIDE, {"/", "/"}},
+                {AKEYCODE_NUMPAD_DOT, {".", "."}},
+                {AKEYCODE_NUMPAD_COMMA, {",", ","}}};
+
+            std::map<const int, const KeyCodeInfo> result = letters;
+            result.insert(numbers.begin(), numbers.end());
+            result.insert(keypad.begin(), keypad.end());
+            result.insert(specialCharacters.begin(), specialCharacters.end());
             return result;
 #elif defined(__linux__) && !defined(__ANDROID__)
             std::map<const int, const KeyCodeInfo> result;
