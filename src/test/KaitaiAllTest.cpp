@@ -2,6 +2,8 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "TestMpc.hpp"
+#include "nvram/NvRam.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
@@ -1159,3 +1161,31 @@ TEST_CASE("Kaitai MPC2000 ALL preserves minimum and maximum pitch bend through p
     REQUIRE(loadedMax->getAmount() == 8191);
 }
 
+TEST_CASE("User defaults restore unsigned program and velocity values",
+          "[defaults][byte-decode]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+    const auto user = mpc.screens->get<mpc::lcdgui::ScreenId::UserScreen>();
+    const auto screen = mpc.getLayeredScreen();
+    screen->openScreen("user");
+    for (const auto program : {127, 128})
+    {
+        for (const auto velocity : {127, 128, 200})
+        {
+            CAPTURE(program, velocity);
+            REQUIRE(screen->setFocus("pgm"));
+            user->turnWheel(program - user->getPgm());
+            REQUIRE(screen->setFocus("velo"));
+            user->turnWheel(velocity - user->getVelo());
+            mpc::nvram::NvRam::saveUserScreenValues(mpc);
+            REQUIRE(screen->setFocus("pgm"));
+            user->turnWheel(-user->getPgm());
+            REQUIRE(screen->setFocus("velo"));
+            user->turnWheel(1 - user->getVelo());
+            mpc::nvram::NvRam::loadUserScreenValues(mpc);
+            REQUIRE(user->getPgm() == program);
+            REQUIRE(user->getVelo() == velocity);
+        }
+    }
+}

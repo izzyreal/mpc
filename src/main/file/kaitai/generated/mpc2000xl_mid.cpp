@@ -196,7 +196,7 @@ int32_t mpc2000xl_mid_t::denominator() {
     if (f_denominator)
         return m_denominator;
     f_denominator = true;
-    m_denominator = 1 << meta_events()->at(4)->meta_event_body()->body().at(1);
+    m_denominator = 1 << static_cast<uint8_t>(meta_events()->at(4)->meta_event_body()->body().at(1));
     return m_denominator;
 }
 
@@ -228,7 +228,7 @@ uint8_t mpc2000xl_mid_t::numerator() {
     if (f_numerator)
         return m_numerator;
     f_numerator = true;
-    m_numerator = meta_events()->at(4)->meta_event_body()->body().at(0);
+    m_numerator = static_cast<uint8_t>(meta_events()->at(4)->meta_event_body()->body().at(0));
     return m_numerator;
 }
 
@@ -282,6 +282,6 @@ double mpc2000xl_mid_t::tempo_bpm() {
     if (f_tempo_bpm)
         return m_tempo_bpm;
     f_tempo_bpm = true;
-    m_tempo_bpm = 60000000.0 / (((meta_events()->at(2)->meta_event_body()->body().at(0) << 16) + (meta_events()->at(2)->meta_event_body()->body().at(1) << 8)) + meta_events()->at(2)->meta_event_body()->body().at(2));
+    m_tempo_bpm = 60000000.0 / (((static_cast<uint8_t>(meta_events()->at(2)->meta_event_body()->body().at(0)) << 16) + (static_cast<uint8_t>(meta_events()->at(2)->meta_event_body()->body().at(1)) << 8)) + static_cast<uint8_t>(meta_events()->at(2)->meta_event_body()->body().at(2)));
     return m_tempo_bpm;
 }

@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "file/kaitai/generated/mpc2000xl_mid.h"
 
 #include "disk/AllLoader.hpp"
 #include "disk/AbstractDisk.hpp"
@@ -1520,4 +1521,33 @@ TEST_CASE("Kaitai standard MIDI loads real 2KXL SEQ through production seam", "[
         {37, 19, 161, mpc::NoteVariationTypeTune},
     };
     REQUIRE(parsedNotes == expected);
+}
+
+TEST_CASE(
+    "Generated MPC MIDI tempo accessor treats all three bytes as unsigned",
+    "[kaitai-mid][byte-decode]")
+{
+    for (const uint32_t mpqn : {500000u, 0x010080u, 0x800001u})
+    {
+        CAPTURE(mpqn);
+        std::string track("\x00\xff\x01\x00\x00\xff\x01\x00\x00\xff\x51\x03",
+                          12);
+        for (int shift : {16, 8, 0})
+        {
+            track.push_back(static_cast<char>((mpqn >> shift) & 255));
+        }
+        track.append("\x00\xff\x2f\x00", 4);
+        std::string bytes("MThd\x00\x00\x00\x06\x00\x00\x00\x01\x00\x60MTrk",
+                          18);
+        for (int shift : {24, 16, 8, 0})
+        {
+            bytes.push_back(static_cast<char>((track.size() >> shift) & 255));
+        }
+        bytes += track;
+        std::istringstream input(bytes);
+        kaitai::kstream stream(&input);
+        mpc2000xl_mid_t parsed(&stream);
+        parsed._read();
+        REQUIRE(std::fabs(parsed.tempo_bpm() - 60000000.0 / mpqn) < 0.000001);
+    }
 }

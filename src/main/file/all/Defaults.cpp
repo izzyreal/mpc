@@ -102,8 +102,8 @@ Defaults::Defaults(Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
     const auto tempoBytes = std::vector{loadBytes[TEMPO_BYTE1_OFFSET],
                                         loadBytes[TEMPO_BYTE2_OFFSET]};
     tempo = ByteUtil::bytes2ushort(tempoBytes);
-    timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
-    timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
+    timeSigNum = static_cast<unsigned char>(loadBytes[TIMESIG_NUM_OFFSET]);
+    timeSigDen = static_cast<unsigned char>(loadBytes[TIMESIG_DEN_OFFSET]);
 
     const auto barCountBytes = std::vector{loadBytes[BAR_COUNT_BYTE1_OFFSET],
                                            loadBytes[BAR_COUNT_BYTE2_OFFSET]};
@@ -113,11 +113,11 @@ Defaults::Defaults(Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
 
     for (int i = 0; i < 64; i++)
     {
-        devices[i] = loadBytes[DEVICES_OFFSET + i];
-        busses[i] = loadBytes[BUSSES_OFFSET + i];
-        pgms[i] = loadBytes[PGMS_OFFSET + i];
-        trVelos[i] = loadBytes[TR_VELOS_OFFSET + i];
-        status[i] = loadBytes[TR_STATUS_OFFSET + i];
+        devices[i] = static_cast<unsigned char>(loadBytes[DEVICES_OFFSET + i]);
+        busses[i] = static_cast<unsigned char>(loadBytes[BUSSES_OFFSET + i]);
+        pgms[i] = static_cast<unsigned char>(loadBytes[PGMS_OFFSET + i]);
+        trVelos[i] = static_cast<unsigned char>(loadBytes[TR_VELOS_OFFSET + i]);
+        status[i] = static_cast<unsigned char>(loadBytes[TR_STATUS_OFFSET + i]);
     }
 }
 

@@ -304,6 +304,13 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
                     mpc_io_error_msg{"Valid bits in header over 64"});
             }
 
+            if (result->sampleEncoding == WavSampleEncoding::PCM &&
+                result->validBits > 32)
+            {
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"PCM WAV over 32 bits unsupported"});
+            }
+
             if (result->sampleEncoding == WavSampleEncoding::IEEE_FLOAT &&
                 result->validBits != 32)
             {
@@ -438,7 +445,7 @@ void WavFile::writeSample(int val)
 
 int WavFile::readSample()
 {
-    int val = 0;
+    uint32_t bits = 0;
     for (auto b = 0; b < bytesPerSample; b++)
     {
         if (bufferPointer == bytesRead)
@@ -454,16 +461,21 @@ int WavFile::readSample()
             bytesRead = read;
             bufferPointer = 0;
         }
-        int v = buffer[bufferPointer];
-        if (b < bytesPerSample - 1 || bytesPerSample == 1)
-        {
-            v &= 255;
-        }
-        val += v << (b * 8);
+        bits |= static_cast<uint32_t>(
+                    static_cast<unsigned char>(buffer[bufferPointer]))
+                << (b * 8);
         bufferPointer++;
     }
 
-    return val;
+    // WAV PCM is unsigned for one-byte samples and signed otherwise.
+    // Decode the sign explicitly: plain char is unsigned on Android ARM64.
+    const auto sampleBits = bytesPerSample * 8;
+    if (bytesPerSample > 1 && (bits & (uint32_t{1} << (sampleBits - 1))))
+    {
+        return static_cast<int>(static_cast<int64_t>(bits) -
+                                (int64_t{1} << sampleBits));
+    }
+    return static_cast<int>(bits);
 }
 
 float WavFile::readFloatSample()

@@ -5,6 +5,7 @@
 #include "audiomidi/SoundPlayer.hpp"
 #include "audiomidi/WavInputFileStream.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
+#include "engine/audio/core/FloatSampleTools.hpp"
 #include "file/wav/WavFile.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -59,10 +60,12 @@ namespace
     {
         std::string bytes;
         const auto bytesPerSample = bitsPerSample / 8;
-        const auto frameCount =
+        const auto sampleCount =
             pcmFrames.empty() ? floatFrames.size() : pcmFrames.size();
+        REQUIRE(numChannels > 0);
+        REQUIRE(sampleCount % numChannels == 0);
         const auto dataChunkSize =
-            static_cast<uint32_t>(frameCount * bytesPerSample * numChannels);
+            static_cast<uint32_t>(sampleCount * bytesPerSample);
         const auto riffChunkSize = 36 + dataChunkSize;
 
         bytes.reserve(riffChunkSize + 8);
@@ -100,6 +103,72 @@ namespace
             std::ios::in | std::ios::out | std::ios::binary);
     }
 } // namespace
+
+TEST_CASE("PCM WAV loading decodes signed samples across buffer boundaries",
+          "[wav][pcm]")
+{
+    for (const auto bitDepth : {16, 24, 32})
+    {
+        CAPTURE(bitDepth);
+        const auto halfRange = int64_t{1} << (bitDepth - 1);
+        const std::vector<int64_t> values{
+            0, -1, halfRange - 1, -halfRange, halfRange / 2, -halfRange / 2};
+        std::vector<uint32_t> samples;
+        for (int i = 0; i < 2400; ++i)
+        {
+            samples.push_back(static_cast<uint32_t>(values[i % values.size()]));
+        }
+
+        for (const auto channels : {1, 2})
+        {
+            CAPTURE(channels);
+            auto stream = makeWavStream(1, channels, 44100, bitDepth, samples);
+            auto result = WavFile::readWavStream(stream);
+            REQUIRE(result.has_value());
+            const auto wav = result.value();
+            REQUIRE(wav->getNumChannels() == channels);
+            REQUIRE(wav->getNumFrames() == samples.size() / channels);
+            std::vector<float> decoded;
+            REQUIRE(wav->readFrames(decoded, wav->getNumFrames()) ==
+                    wav->getNumFrames());
+            REQUIRE(decoded.size() == samples.size());
+            for (size_t i = 0; i < decoded.size(); ++i)
+            {
+                CAPTURE(i);
+                const auto expected = static_cast<float>(
+                    static_cast<double>(values[i % values.size()]) / halfRange);
+                REQUIRE(decoded[i] == expected);
+            }
+        }
+    }
+}
+
+TEST_CASE("8-bit PCM WAV loading preserves unsigned normalization",
+          "[wav][pcm]")
+{
+    auto stream = makeWavStream(1, 1, 44100, 8, {0, 64, 127, 128, 192, 255});
+    auto result = WavFile::readWavStream(stream);
+    REQUIRE(result.has_value());
+    std::vector<float> decoded;
+    REQUIRE(result.value()->readFrames(decoded, 6) == 6);
+    const std::vector<uint32_t> samples{0, 64, 127, 128, 192, 255};
+    for (size_t i = 0; i < samples.size(); ++i)
+    {
+        REQUIRE(decoded[i] == static_cast<float>(-1.0 + samples[i] / 127.5));
+    }
+}
+
+TEST_CASE("PCM WAV loading rejects samples wider than 32 bits", "[wav][pcm]")
+{
+    for (const auto bitDepth : {40, 48, 56, 64})
+    {
+        CAPTURE(bitDepth);
+        auto stream = makeWavStream(1, 1, 44100, bitDepth, {});
+        auto result = WavFile::readWavStream(stream);
+        REQUIRE_FALSE(result.has_value());
+        REQUIRE(result.error() == "PCM WAV over 32 bits unsupported");
+    }
+}
 
 TEST_CASE("32-bit float WAV files are accepted and decoded", "[wav]")
 {
@@ -236,4 +305,56 @@ TEST_CASE("MPC60 SND preview honors decoding policy", "[snd][preview][mpc60]")
         REQUIRE_FALSE(
             soundPlayer.start(stream, SoundPlayerFileFormat::SND, 40000));
     }
+}
+
+TEST_CASE(
+    "Generic PCM decoding preserves signed values and interleaved strides",
+    "[pcm-conversion][byte-decode]")
+{
+    for (const auto width : {1, 2, 3, 4})
+    {
+        for (const bool bigEndian : {false, true})
+        {
+            CAPTURE(width, bigEndian);
+            const auto halfRange = int64_t{1} << (width * 8 - 1);
+            const std::vector<int64_t> samples{
+                -halfRange, halfRange - 1,  -1,
+                0,          -halfRange / 2, halfRange / 2};
+            std::vector<char> bytes(1 + samples.size() * width * 2, char{0x55});
+            for (size_t i = 0; i < samples.size(); ++i)
+            {
+                const auto bits = static_cast<uint32_t>(samples[i]);
+                for (int b = 0; b < width; ++b)
+                {
+                    const auto shift = (bigEndian ? width - 1 - b : b) * 8;
+                    bytes[1 + i * width * 2 + b] =
+                        static_cast<char>((bits >> shift) & 255);
+                }
+            }
+            std::vector<float> decoded(samples.size() + 2, 42.0f);
+            FloatSampleTools::byte2floatGeneric(
+                bytes, 1, width * 2, decoded, 1, samples.size(),
+                FloatSampleTools::getFormatType(width * 8, true, bigEndian));
+            REQUIRE(decoded.front() == 42.0f);
+            REQUIRE(decoded.back() == 42.0f);
+            for (size_t i = 0; i < samples.size(); ++i)
+            {
+                REQUIRE(decoded[i + 1] ==
+                        static_cast<float>(static_cast<double>(samples[i]) /
+                                           halfRange));
+            }
+        }
+    }
+}
+
+TEST_CASE("Generic unsigned 8-bit PCM decoding remains centered at 128",
+          "[pcm-conversion][byte-decode]")
+{
+    const std::vector<char> bytes{0, 64, 127, static_cast<char>(128),
+                                  static_cast<char>(255)};
+    std::vector<float> decoded(bytes.size());
+    FloatSampleTools::byte2floatGeneric(bytes, 0, 1, decoded, 0, bytes.size(),
+                                        FloatSampleTools::CT_8U);
+    REQUIRE(decoded ==
+            std::vector<float>{-1.0f, -0.5f, -1.0f / 128, 0, 127.0f / 128});
 }

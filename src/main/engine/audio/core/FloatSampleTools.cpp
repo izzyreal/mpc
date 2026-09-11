@@ -8,6 +8,27 @@
 
 using namespace mpc::engine::audio::core;
 
+namespace
+{
+    int32_t readSignedPcm(const std::vector<char> &input, int offset,
+                          int byteCount, bool bigEndian)
+    {
+        uint32_t bits = 0;
+        for (int i = 0; i < byteCount; ++i)
+        {
+            const auto byteIndex =
+                bigEndian ? offset + i : offset + byteCount - 1 - i;
+            bits = (bits << 8) | static_cast<unsigned char>(input[byteIndex]);
+        }
+        const auto width = byteCount * 8;
+        const auto value =
+            (bits & (uint32_t{1} << (width - 1)))
+                ? static_cast<int64_t>(bits) - (int64_t{1} << width)
+                : static_cast<int64_t>(bits);
+        return static_cast<int32_t>(value);
+    }
+} // namespace
+
 void FloatSampleTools::checkSupportedSampleSize(int ssib, int channels,
                                                 int frameSize)
 {
@@ -191,48 +212,37 @@ void FloatSampleTools::byte2floatGeneric(const std::vector<char> &input,
     {
         switch (formatType)
         {
-            case CT_8S:
-                output[outIndex] = input[inIndex] * invTwoPower7;
-                break;
             case CT_8U:
                 output[outIndex] =
                     ((input[inIndex] & 255) - 128) * invTwoPower7;
                 break;
+            case CT_8S:
+                output[outIndex] =
+                    readSignedPcm(input, inIndex, 1, false) * invTwoPower7;
+                break;
             case CT_16SB:
                 output[outIndex] =
-                    (input[inIndex] << 8 | input[inIndex + 1] & 255) *
-                    invTwoPower15;
+                    readSignedPcm(input, inIndex, 2, true) * invTwoPower15;
                 break;
             case CT_16SL:
                 output[outIndex] =
-                    (input[inIndex + 1] << 8 | input[inIndex] & 255) *
-                    invTwoPower15;
+                    readSignedPcm(input, inIndex, 2, false) * invTwoPower15;
                 break;
             case CT_24SB:
                 output[outIndex] =
-                    (input[inIndex] << 16 | (input[inIndex + 1] & 255) << 8 |
-                     input[inIndex + 2] & 255) *
-                    invTwoPower23;
+                    readSignedPcm(input, inIndex, 3, true) * invTwoPower23;
                 break;
             case CT_24SL:
                 output[outIndex] =
-                    (input[inIndex + 2] << 16 |
-                     (input[inIndex + 1] & 255) << 8 | input[inIndex] & 255) *
-                    invTwoPower23;
+                    readSignedPcm(input, inIndex, 3, false) * invTwoPower23;
                 break;
             case CT_32SB:
                 output[outIndex] =
-                    (input[inIndex] << 24 | (input[inIndex + 1] & 255) << 16 |
-                     (input[inIndex + 2] & 255) << 8 |
-                     input[inIndex + 3] & 255) *
-                    invTwoPower31;
+                    readSignedPcm(input, inIndex, 4, true) * invTwoPower31;
                 break;
             case CT_32SL:
                 output[outIndex] =
-                    (input[inIndex + 3] << 24 |
-                     (input[inIndex + 2] & 255) << 16 |
-                     (input[inIndex + 1] & 255) << 8 | input[inIndex] & 255) *
-                    invTwoPower31;
+                    readSignedPcm(input, inIndex, 4, false) * invTwoPower31;
                 break;
             default:
                 std::string description =
