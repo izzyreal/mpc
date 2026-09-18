@@ -34,6 +34,13 @@ namespace mpc::input
         bool altDown;
     };
 
+    enum class RotaryDragMode
+    {
+        Vertical = 0,
+        Circular = 1,
+        ByPosition = 2
+    };
+
     struct GestureEvent
     {
         enum class Type
@@ -52,8 +59,10 @@ namespace mpc::input
             NoMovement, // No movement data (e.g. BEGIN/END/REPEAT events).
             Absolute,   // Absolute motion in normalized coordinates (e.g. mouse
                         // drag along a slider).
-            Relative // Relative motion in continuous deltas (e.g. mouse wheel
-                     // or encoder turn).
+            Relative,  // Relative motion in continuous deltas (e.g. mouse wheel
+                       // or encoder turn).
+            RotaryDrag // Captured pointer on a rotary control: normX/normY
+                       // are unclamped; continuousDelta is upward pixel motion.
         };
 
         enum class InputDeviceType
@@ -74,7 +83,7 @@ namespace mpc::input
         float normX = 0.0f;
         float normY = 0.0f;
 
-        // Only valid for UPDATE events with movement == Relative
+        // Valid for UPDATE events with movement == Relative or RotaryDrag.
         float continuousDelta = 0.f;
 
         // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.

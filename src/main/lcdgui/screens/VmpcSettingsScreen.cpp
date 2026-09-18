@@ -124,6 +124,9 @@ void VmpcSettingsScreen::turnWheel(const int i)
         case 7:
             setPhysicalSoundsLevel(physicalSoundsLevel + i);
             break;
+        case 8:
+            setRotaryDragMode(static_cast<int>(rotaryDragMode) + i);
+            break;
         default:
             break;
     }
@@ -291,6 +294,17 @@ int VmpcSettingsScreen::getPhysicalSoundsLevel() const
     return physicalSoundsLevel;
 }
 
+void VmpcSettingsScreen::setRotaryDragMode(const int mode)
+{
+    rotaryDragMode = static_cast<input::RotaryDragMode>(std::clamp(mode, 0, 2));
+    displayRows();
+}
+
+mpc::input::RotaryDragMode VmpcSettingsScreen::getRotaryDragMode() const
+{
+    return rotaryDragMode;
+}
+
 std::string VmpcSettingsScreen::getSettingValue(const int settingIndex) const
 {
     switch (settingIndex)
@@ -311,6 +325,17 @@ std::string VmpcSettingsScreen::getSettingValue(const int settingIndex) const
             return physicalSoundsMixMode == 0 ? "STEREO OUT" : "PHYSICAL BUS";
         case 7:
             return std::to_string(physicalSoundsLevel);
+        case 8:
+            switch (rotaryDragMode)
+            {
+                case input::RotaryDragMode::Vertical:
+                    return "VERTICAL";
+                case input::RotaryDragMode::Circular:
+                    return "CIRCULAR";
+                case input::RotaryDragMode::ByPosition:
+                    return "BY POSITION";
+            }
+            return {};
         default:
             return {};
     }

@@ -117,7 +117,8 @@ void NvRam::saveVmpcSettings(Mpc &mpc)
         static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
             engine::PhysicalSoundGroup::DataWheel)),
         static_cast<char>(engineHost->getPhysicalSoundGroupLevel(
-            engine::PhysicalSoundGroup::Power))};
+            engine::PhysicalSoundGroup::Power)),
+        static_cast<char>(vmpcSettingsScreen->getRotaryDragMode())};
 
     (void)success(set_file_data(path, bytes), FailurePolicy::BestEffort,
                   "save VMPC settings for '" + path.string() + "'");
@@ -233,6 +234,13 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         vmpcSettingsScreen->setPhysicalSoundsLevel(
             static_cast<unsigned char>(bytes[15]));
     }
+    // Appended byte preserves the existing settings layout. Missing or invalid
+    // values retain the historical vertical drag behavior.
+    const int rotaryDragMode =
+        bytes.size() > 21 ? static_cast<unsigned char>(bytes[21]) : 0;
+    vmpcSettingsScreen->setRotaryDragMode(rotaryDragMode <= 2 ? rotaryDragMode
+                                                              : 0);
+
     const std::array groupSettings{engine::PhysicalSoundGroup::Buttons,
                                    engine::PhysicalSoundGroup::Pads,
                                    engine::PhysicalSoundGroup::Slider,

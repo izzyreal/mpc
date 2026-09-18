@@ -2,6 +2,7 @@
 
 #include "input/HostInputEvent.hpp"
 #include "input/GestureSourceTracker.hpp"
+#include "input/RotaryGestureHandler.hpp"
 
 #include "client/event/ClientEvent.hpp"
 
@@ -19,12 +20,20 @@ namespace mpc::input
     public:
         HostToClientTranslator();
 
+        void cancelGestures()
+        {
+            rotaryGestureHandler.cancelAll();
+            gestureSourceTracker = GestureSourceTracker{};
+        }
+
         std::optional<client::event::ClientEvent>
         translate(const HostInputEvent &,
-                  std::shared_ptr<keyboard::KeyboardBindings>);
+                  std::shared_ptr<keyboard::KeyboardBindings>,
+                  RotaryDragMode = RotaryDragMode::Vertical);
 
     private:
         GestureSourceTracker gestureSourceTracker;
+        RotaryGestureHandler rotaryGestureHandler;
     };
 
 } // namespace mpc::input

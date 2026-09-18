@@ -8,6 +8,7 @@
 #include "input/keyboard/KeyboardBindingsReader.hpp"
 #include "input/keyboard/VmpcKeyCode.hpp"
 #include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/Field.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 #include "lcdgui/screens/window/VmpcResetKeyboardScreen.hpp"
@@ -21,6 +22,55 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::input::keyboard;
+
+TEST_CASE("VmpcSettings selects and persists rotary drag modes",
+          "[vmpc-settings][rotary]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    auto settings = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Vertical);
+    mpc.getLayeredScreen()->openScreenById(ScreenId::VmpcSettingsScreen);
+    for (int i = 0; i < 8; ++i)
+    {
+        settings->down();
+    }
+    REQUIRE_FALSE(settings->findField("rotary-control-drag")->IsHidden());
+    REQUIRE(settings->findField("rotary-control-drag")->getText() ==
+            "VERTICAL");
+    settings->turnWheel(1);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Circular);
+    REQUIRE(settings->findField("rotary-control-drag")->getText() ==
+            "CIRCULAR");
+    settings->turnWheel(1);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::ByPosition);
+    REQUIRE(settings->findField("rotary-control-drag")->getText() ==
+            "BY POSITION");
+    nvram::NvRam::saveVmpcSettings(mpc);
+    settings->turnWheel(-100);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Vertical);
+    nvram::NvRam::loadVmpcSettings(mpc);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::ByPosition);
+    settings->turnWheel(100);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::ByPosition);
+    settings->turnWheel(-1);
+    nvram::NvRam::saveVmpcSettings(mpc);
+    settings->turnWheel(-1);
+    nvram::NvRam::loadVmpcSettings(mpc);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Circular);
+
+    auto bytes = *get_file_data(mpc.paths->vmpcSpecificConfigPath());
+    REQUIRE(bytes.size() == 22);
+    bytes[21] = static_cast<char>(255);
+    REQUIRE(set_file_data(mpc.paths->vmpcSpecificConfigPath(), bytes));
+    nvram::NvRam::loadVmpcSettings(mpc);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Vertical);
+    settings->turnWheel(1);
+    bytes.resize(21);
+    REQUIRE(set_file_data(mpc.paths->vmpcSpecificConfigPath(), bytes));
+    nvram::NvRam::loadVmpcSettings(mpc);
+    REQUIRE(settings->getRotaryDragMode() == input::RotaryDragMode::Vertical);
+}
 
 TEST_CASE("VmpcSettings persists Big time shift", "[vmpc-settings]")
 {

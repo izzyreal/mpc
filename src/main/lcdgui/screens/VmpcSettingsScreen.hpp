@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include "input/HostInputEvent.hpp"
 
 namespace mpc::audiomidi
 {
@@ -52,6 +53,7 @@ namespace mpc::lcdgui::screens
         bool arePhysicalSoundsEnabled() const;
         int getPhysicalSoundsMixMode() const;
         int getPhysicalSoundsLevel() const;
+        input::RotaryDragMode getRotaryDragMode() const;
 
     private:
         std::shared_ptr<Background> easterEgg;
@@ -63,15 +65,17 @@ namespace mpc::lcdgui::screens
             "Initial pad mapping :", "16 levels erase mode:",
             "Auto-convert WAVs   :", "Name typing w. keybd:",
             "Big time shift      :", "Physical sounds     :",
-            "Physical mix mode   :", "Physical level      :"};
+            "Physical mix mode   :", "Physical level      :",
+            "Rotary control drag :"};
         const std::vector<std::string> settingNames{
             "initial-pad-mapping",      "16-levels-erase-mode",
             "auto-convert-wavs",        "name-typing-with-keyboard",
             "big-time-shift",           "physical-sounds-enabled",
-            "physical-sounds-mix-mode", "physical-sounds-level"};
+            "physical-sounds-mix-mode", "physical-sounds-level",
+            "rotary-control-drag"};
 
         static constexpr int VisibleRowCount = 5;
-        static constexpr int SettingCount = 8;
+        static constexpr int SettingCount = 9;
 
         int initialPadMapping = 0;
         int sixteenLevelsEraseMode = 0;
@@ -81,6 +85,7 @@ namespace mpc::lcdgui::screens
         bool physicalSoundsEnabled = false;
         int physicalSoundsMixMode = 0;
         int physicalSoundsLevel = 20;
+        input::RotaryDragMode rotaryDragMode = input::RotaryDragMode::Vertical;
         int row = 0;
         int rowOffset = 0;
 
@@ -92,6 +97,7 @@ namespace mpc::lcdgui::screens
         void setPhysicalSoundsEnabled(bool);
         void setPhysicalSoundsMixMode(int);
         void setPhysicalSoundsLevel(int);
+        void setRotaryDragMode(int);
 
         void displayInitialPadMapping() const;
         void display16LevelsEraseMode() const;

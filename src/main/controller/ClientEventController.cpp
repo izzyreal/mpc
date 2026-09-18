@@ -13,6 +13,7 @@
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include "hardware/ComponentId.hpp"
 #include "input/keyboard/KeyboardBindingsReader.hpp"
@@ -98,6 +99,7 @@ ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
         std::get<FocusEvent>(hostEvent.payload).type == FocusEvent::Type::Lost)
     {
         dispatchDerivedGestures(lcdGestureHandler.cancelAll());
+        hostToClientTranslator.cancelGestures();
         return HostInputResult::Handled;
     }
 
@@ -117,8 +119,9 @@ ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
         }
     }
 
-    const auto clientEvent =
-        hostToClientTranslator.translate(hostEvent, keyboardBindings);
+    const auto clientEvent = hostToClientTranslator.translate(
+        hostEvent, keyboardBindings,
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>()->getRotaryDragMode());
 
     if (!clientEvent.has_value())
     {

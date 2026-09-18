@@ -18,7 +18,8 @@ HostToClientTranslator::HostToClientTranslator() {}
 
 std::optional<ClientEvent> HostToClientTranslator::translate(
     const HostInputEvent &hostInputEvent,
-    std::shared_ptr<KeyboardBindings> keyboardBindings)
+    std::shared_ptr<KeyboardBindings> keyboardBindings,
+    const RotaryDragMode rotaryDragMode)
 {
     if (hostInputEvent.getSource() == HostInputEvent::Source::MIDI)
     {
@@ -56,8 +57,13 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
         case HostInputEvent::Source::GESTURE:
         {
-            const auto &gesture =
-                std::get<GestureEvent>(hostInputEvent.payload);
+            const auto translatedGesture = rotaryGestureHandler.handle(
+                std::get<GestureEvent>(hostInputEvent.payload), rotaryDragMode);
+            if (!translatedGesture)
+            {
+                return std::nullopt;
+            }
+            const auto &gesture = *translatedGesture;
 
             if (gesture.componentId == NONE)
             {
@@ -151,6 +157,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             {
                 if (gesture.type == GestureEvent::Type::BEGIN)
                 {
+                    gestureSourceTracker.endGesture(gesture.componentId,
+                                                    gesture.sourceIndex);
                     gestureSourceTracker.beginGesture(gesture.componentId,
                                                       gesture.sourceIndex, 1);
                 }
