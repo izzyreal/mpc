@@ -2,6 +2,7 @@
 * Experimental Android version. Send me your Google Play email address if you're interested. See https://izmar.nl/support/contact.
 * Add circular gesture support for DATA wheel, MAIN VOLUME, and REC GAIN knobs. See https://vmpcdocs.izmar.nl/vmpc_specific.html#rotary-control-drag.
 * Fix iOS AUv3 drag and drop of SND/WAV files onto pads.
+* Linux multi-touch (so you can use multiple fingers when you have a touchscreen for your Linux machine).
 
 ## v0.9.17 (21-8-2026)
 * Experimental iPhone version. The big challenge on iPhone is the small screen. It doesn't make a lot of sense to show the full user interface on such a small screen, because most of it becomes illegible, and too small to interact with via touch. So I've finally started working on an iPhone-specific GUI in which only some of the virtual hardware is shown. There are currently 5 arrangements to choose from, depending on what you want to do. Some arrangements are suitable for recording sequences, some for recording and naming samples, others for live performance, and so on. The current iPhone version and the arrangements it presents should be seen as work in progress. It would be great to hear from you what kind of arrangement you would like to have. If you have iPhone-specific features in mind that would make working with VMPC2000XL on small screens easier, also reach out.
