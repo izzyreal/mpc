@@ -2,7 +2,6 @@
 #include "StereoInputProcess.hpp"
 #include "StereoOutputProcess.hpp"
 
-#include <cmath>
 
 using namespace mpc::engine::audio::server;
 
@@ -86,7 +85,7 @@ void RealTimeAudioServer::work(
     for (int i = 0; i < mpcMonoInputChannelIndices.size(); i++)
     {
         const auto mpcStereoInputIndex =
-            static_cast<int>(std::floor(mpcMonoInputChannelIndices[i] / 2.f));
+            mpcMonoInputChannelIndices[i] / 2;
         auto &vmpcInput = activeInputs[mpcStereoInputIndex];
         const auto localBufferFrameOffset = mpcMonoInputChannelIndices[i] % 2;
         const auto &hostBuffer = inputBuffer[hostInputChannelIndices[i]];
@@ -104,7 +103,7 @@ void RealTimeAudioServer::work(
     for (int i = 0; i < mpcMonoOutputChannelIndices.size(); i++)
     {
         const auto mpcStereoOutputIndex =
-            static_cast<int>(std::floor(mpcMonoOutputChannelIndices[i] / 2.f));
+            mpcMonoOutputChannelIndices[i] / 2;
         const auto &vmpcOutput = activeOutputs[mpcStereoOutputIndex];
         const auto localBufferFrameOffset = mpcMonoOutputChannelIndices[i] % 2;
         auto &hostBuffer = outputBuffer[hostOutputChannelIndices[i]];
