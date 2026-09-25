@@ -463,16 +463,32 @@ void EditSoundScreen::function(const int j)
 
 void EditSoundScreen::handleDiscardEdit() const
 {
-    const auto sound = sampler.lock()->getSound();
+    const auto samplerPtr = sampler.lock();
+    const auto sound = samplerPtr->getSound();
     auto [start, end] = getStartEndFromContext();
     const auto newLoopTo = sound->getLoopTo() - start;
 
-    sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), start, end);
+    // The selection indexes the sorted list; trimSample expects a raw index.
+    const auto rawIndex =
+        samplerPtr->getSortedSounds().at(samplerPtr->getSoundIndex()).second;
+    samplerPtr->trimSample(rawIndex, start, end);
 
     sound->setStart(0);
     sound->setEnd(sound->getEnd() - sound->getStart());
     sound->setMono(sound->isMono());
     sound->setLoopTo(newLoopTo);
+
+    // Trimming can change SIZE order. Keep the edited sound selected before
+    // initializing its zones and returning to the sound screen.
+    const auto sortedSounds = samplerPtr->getSortedSounds();
+    for (int i = 0; i < sortedSounds.size(); ++i)
+    {
+        if (sortedSounds[i].first == sound)
+        {
+            samplerPtr->setSoundIndex(i);
+            break;
+        }
+    }
 
     mpc.screens->get<ScreenId::ZoneScreen>()->initZones();
 }
