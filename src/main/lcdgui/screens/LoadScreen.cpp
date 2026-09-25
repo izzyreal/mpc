@@ -145,7 +145,7 @@ void LoadScreen::function(const int i)
                 return;
             }
 
-            if (const auto file = getSelectedFile(); !file->isDirectory())
+            if (const auto file = getSelectedFile(); file && !file->isDirectory())
             {
                 const auto ext =
                     mpc_fs::path(file->getName()).extension().string();

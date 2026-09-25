@@ -228,7 +228,7 @@ void DirectoryScreen::function(const int f)
         {
 
             if (const auto file = loadScreen->getSelectedFile();
-                !file->isDirectory())
+                file && !file->isDirectory())
             {
                 const auto ext = mpc_fs::path(file->getName()).extension().string();
 
