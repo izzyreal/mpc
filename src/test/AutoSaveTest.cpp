@@ -1,14 +1,17 @@
 #include "DirectorySaveTarget.hpp"
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/generators/catch_generators.hpp"
 
 #include "TestMpc.hpp"
 #include "AutoSave.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
+#include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 
 #include <condition_variable>
+#include <future>
 #include <mutex>
 
 using namespace mpc;
@@ -18,6 +21,59 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 constexpr bool isHeadless = true;
+
+TEST_CASE("AutoSave restores keyboard settings on first entry",
+          "[auto-save][startup][vmpc-keyboard]")
+{
+    const bool headless = GENERATE(false, true);
+    CAPTURE(headless);
+
+    Mpc seed;
+    TestMpc::initializeTestMpcWithoutIoServices(seed);
+    seed.getLayeredScreen()->openScreenById(ScreenId::VmpcKeyboardScreen);
+    seed.screens->get<ScreenId::VmpcAutoSaveScreen>()->setAutoSaveOnExit(1);
+
+    const auto saveTarget = std::make_shared<DirectorySaveTarget>(
+        seed.paths->getDocuments()->autoSavePath());
+    AutoSave::storeAutoSavedState(seed, saveTarget);
+    const auto savedScreen = saveTarget->getFileData("screen.txt");
+    REQUIRE(savedScreen);
+    REQUIRE(std::string(savedScreen->begin(), savedScreen->end()) ==
+            "vmpc-keyboard");
+
+    Mpc restored;
+    restored.paths = seed.paths;
+    MpcInitOptions options;
+    options.detectRawUsbVolumes = false;
+    options.installDemoFiles = false;
+    options.startMidiDeviceDetector = false;
+    options.startAudioServer = false;
+    options.fileOperationTimings =
+        FileOperationTimings::uniform(std::chrono::milliseconds(1));
+    restored.init(options);
+    restored.screens->get<ScreenId::VmpcAutoSaveScreen>()->setAutoLoadOnStart(2);
+
+    const auto completion = std::make_shared<std::promise<void>>();
+    auto completed = completion->get_future();
+    restored.getAutoSave()->restoreAutoSavedState(
+        restored, saveTarget, headless,
+        [completion]
+        {
+            completion->set_value();
+        });
+    REQUIRE(completed.wait_for(std::chrono::seconds(3)) ==
+            std::future_status::ready);
+
+    // Non-headless restoration queues loading popups before the saved screen.
+    restored.getLayeredScreen()->timerCallback();
+    REQUIRE(restored.getLayeredScreen()->getCurrentScreenId() ==
+            ScreenId::VmpcKeyboardScreen);
+    const auto keyboardScreen =
+        restored.screens->get<ScreenId::VmpcKeyboardScreen>();
+    REQUIRE_FALSE(keyboardScreen->hasMappingChanged());
+    keyboardScreen->turnWheel(1);
+    REQUIRE(keyboardScreen->hasMappingChanged());
+}
 
 TEST_CASE("Load an empty auto-save state", "[auto-save]")
 {

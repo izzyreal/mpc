@@ -48,9 +48,11 @@ void VmpcKeyboardScreen::turnWheel(const int increment)
 
 void VmpcKeyboardScreen::open()
 {
-    if (!ls.lock()->isPreviousScreen({ScreenId::PopupScreen,
-                                      ScreenId::VmpcDiscardMappingChangesScreen,
-                                      ScreenId::VmpcResetKeyboardScreen}))
+    // Autosave can restore this screen after a loading popup on its first visit.
+    if (!bindings ||
+        !ls.lock()->isPreviousScreen({ScreenId::PopupScreen,
+                                     ScreenId::VmpcDiscardMappingChangesScreen,
+                                     ScreenId::VmpcResetKeyboardScreen}))
     {
         bindings = std::make_unique<KeyboardBindings>(
             mpc.clientEventController->getKeyboardBindings()

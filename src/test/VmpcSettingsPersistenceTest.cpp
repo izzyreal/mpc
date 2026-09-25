@@ -319,6 +319,29 @@ TEST_CASE("VmpcSettings first scroll preserves the function key strip",
     REQUIRE(functionKeyPixels() == beforeScroll);
 }
 
+TEST_CASE("VmpcKeyboard preserves unsaved edits when returning from a popup",
+          "[vmpc-keyboard]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto layeredScreen = mpc.getLayeredScreen();
+    layeredScreen->openScreenById(ScreenId::VmpcKeyboardScreen);
+    const auto keyboardScreen = mpc.screens->get<ScreenId::VmpcKeyboardScreen>();
+    const auto originalText = keyboardScreen->findField("row0")->getText();
+
+    keyboardScreen->turnWheel(1);
+    const auto editedText = keyboardScreen->findField("row0")->getText();
+    REQUIRE(editedText != originalText);
+    REQUIRE(keyboardScreen->hasMappingChanged());
+
+    layeredScreen->showPopup("Keyboard mapping test");
+    layeredScreen->closeCurrentScreen();
+
+    REQUIRE(layeredScreen->getCurrentScreenId() == ScreenId::VmpcKeyboardScreen);
+    REQUIRE(keyboardScreen->findField("row0")->getText() == editedText);
+    REQUIRE(keyboardScreen->hasMappingChanged());
+}
+
 TEST_CASE("VmpcKeyboard reset stays dirty until saved", "[vmpc-keyboard]")
 {
     Mpc mpc;
