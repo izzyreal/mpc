@@ -4,6 +4,7 @@
 
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
+#include "disk/SaveOperation.hpp"
 #include "disk/MpcFile.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
@@ -67,19 +68,11 @@ void SaveApsFileScreen::function(const int i)
             auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             std::string apsFileName = fileName + ".APS";
 
-            auto disk = mpc.getDisk();
-
-            if (disk->checkExists(apsFileName))
+            const auto onExists = [this, apsFileName, nameScreen]
             {
-                auto replaceAction = [disk, apsFileName]
+                auto replaceAction = [this, apsFileName]
                 {
-                    if (disk->deleteFileOrOpenErrorPopup(
-                            disk->getFile(apsFileName)))
-                    {
-                        disk->flush();
-                        disk->initFiles();
-                        disk->writeAps(apsFileName);
-                    }
+                    mpc.getSaveOperation()->startAps(apsFileName, true);
                 };
 
                 const auto initializeNameScreen = [this, nameScreen]
@@ -101,10 +94,9 @@ void SaveApsFileScreen::function(const int i)
                         openScreenById(ScreenId::SaveScreen);
                     });
                 openScreenById(ScreenId::FileExistsScreen);
-                return;
-            }
+            };
 
-            disk->writeAps(apsFileName);
+            mpc.getSaveOperation()->startAps(apsFileName, false, onExists);
             break;
         }
         default:;

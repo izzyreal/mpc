@@ -14,6 +14,7 @@
 #include "input/midi/legacy/LegacyOnDiskPresetConvertor.hpp"
 
 #include "disk/AbstractDisk.hpp"
+#include "disk/SaveOperation.hpp"
 
 #include "engine/EngineHost.hpp"
 #include "audiomidi/EventHandler.hpp"
@@ -335,6 +336,7 @@ void Mpc::init(const MpcInitOptions &options)
     }
 
     autoSave = std::make_unique<AutoSave>();
+    saveOperation = std::make_unique<disk::SaveOperation>(*this);
 }
 
 const FileOperationTimings &Mpc::getFileOperationTimings() const
@@ -420,6 +422,10 @@ disk::DiskController *Mpc::getDiskController() const
 
 Mpc::~Mpc()
 {
+    if (saveOperation)
+    {
+        saveOperation->shutdown();
+    }
     if (autoSave)
     {
         autoSave->interruptRestorationIfStillOngoing();
@@ -491,4 +497,13 @@ std::shared_ptr<input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
 AutoSave *Mpc::getAutoSave() const
 {
     return autoSave.get();
+}
+
+disk::SaveOperation *Mpc::getSaveOperation() const
+{
+    return saveOperation.get();
+}
+bool Mpc::isManagedSaveActive() const
+{
+    return fileOperationGate.isManagedSaveActive();
 }

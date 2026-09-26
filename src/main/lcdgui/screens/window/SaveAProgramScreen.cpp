@@ -9,6 +9,7 @@
 
 #include "Util.hpp"
 #include "disk/AbstractDisk.hpp"
+#include "disk/SaveOperation.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Sampler.hpp"
 
@@ -67,23 +68,14 @@ void SaveAProgramScreen::function(const int i)
             const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
                 Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
-            auto disk = mpc.getDisk();
-
             auto program = getProgramOrThrow();
 
-            if (disk->checkExists(fileName))
+            const auto onExists = [this, fileName, program]
             {
-                auto replaceAction = [disk, fileName, program]
+                auto replaceAction = [this, fileName, program]
                 {
-                    const auto success = disk->deleteFileOrOpenErrorPopup(
-                        disk->getFile(fileName));
-
-                    if (success)
-                    {
-                        disk->flush();
-                        disk->initFiles();
-                        disk->writePgm(program, fileName);
-                    }
+                    mpc.getSaveOperation()->startProgram(program, fileName,
+                                                         true);
                 };
 
                 const auto initializeNameScreen = [this]
@@ -107,10 +99,10 @@ void SaveAProgramScreen::function(const int i)
                         openScreenById(ScreenId::SaveScreen);
                     });
                 openScreenById(ScreenId::FileExistsScreen);
-                break;
-            }
+            };
 
-            disk->writePgm(program, fileName);
+            mpc.getSaveOperation()->startProgram(program, fileName, false,
+                                                 onExists);
             break;
         }
     }

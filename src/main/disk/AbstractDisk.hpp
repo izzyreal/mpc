@@ -1,6 +1,6 @@
 #pragma once
 
-#include "disk/SoundSaver.hpp"
+#include "disk/SaveDestination.hpp"
 #include "disk/AllLoader.hpp"
 
 #include <vector>
@@ -63,9 +63,15 @@ namespace mpc::disk
         std::vector<std::shared_ptr<MpcFile>> allFiles;
         std::vector<std::shared_ptr<MpcFile>> parentFiles;
 
+        bool isSaveBusy() const;
         virtual int getPathDepth() = 0;
 
     public:
+        virtual std::unique_ptr<SaveDestination>
+        captureSaveDestination(int view) = 0;
+        void publishListing(DirectoryListing listing);
+        void prepareListingForNextRefresh(DirectoryListing listing);
+        bool consumePreparedListing();
         virtual std::shared_ptr<MpcFile> newFile(const std::string &name) = 0;
         bool deleteSelectedFile() const;
         bool deleteSelectedFileOrOpenErrorPopup() const;
@@ -128,10 +134,9 @@ namespace mpc::disk
                                    SequenceIndex destIndexInMpcMemory);
 
     private:
-        std::thread programSoundsSaveThread = std::thread([] {});
+        bool preparedListing = false;
         std::thread readApsThread = std::thread([] {});
         std::thread readPgmThread = std::thread([] {});
-        std::unique_ptr<SoundSaver> soundSaver;
         std::unique_ptr<AllLoader> allLoader;
 
         friend class SoundLoader; // Temporary access to readWav2 and readSnd2

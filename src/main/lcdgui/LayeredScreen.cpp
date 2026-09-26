@@ -1,4 +1,5 @@
 #include "lcdgui/LayeredScreen.hpp"
+#include "disk/SaveOperation.hpp"
 #include "sequencer/Transport.hpp"
 
 #include "lcdgui/BMFParser.hpp"
@@ -489,6 +490,10 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 void LayeredScreen::timerCallback()
 {
     uiTasks.drain();
+    if (const auto save = mpc.getSaveOperation())
+    {
+        save->tick();
+    }
 
     if (const auto currentScreen = getCurrentScreen(); currentScreen)
     {

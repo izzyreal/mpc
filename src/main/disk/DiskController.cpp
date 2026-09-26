@@ -117,6 +117,11 @@ int DiskController::getActiveDiskIndex() const
 
 void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return;
+    }
+
     if (newActiveDiskIndex == activeDiskIndex)
     {
         return;
@@ -144,6 +149,11 @@ void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 
 bool DiskController::ensureActiveDiskIsEnabled()
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return false;
+    }
+
     if (disks.empty())
     {
         return false;
@@ -202,6 +212,11 @@ bool DiskController::ensureActiveDiskIsEnabled()
 
 void DiskController::detectRawUsbVolumes()
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return;
+    }
+
 #ifndef VMPC2000XL_WIN7
     if (!rawUsbVolumeDetectionEnabled)
     {

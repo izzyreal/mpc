@@ -12,6 +12,7 @@ namespace mpc::controller
     public:
         void onPress(hardware::ComponentId id);
         void onRelease(hardware::ComponentId id);
+        void consume(hardware::ComponentId id);
         void addConsumptionRule(hardware::ComponentId watchedId,
                                 hardware::ComponentId consumerId);
         bool isConsumed(hardware::ComponentId watchedId) const;

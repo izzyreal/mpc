@@ -96,14 +96,24 @@ void DeleteFolderScreen::function(const int i)
     switch (i)
     {
         case 4:
+        {
+            auto operationLease = mpc.fileOperationGate.tryAcquire();
+            if (!operationLease)
+            {
+                return;
+            }
             if (deleteFolderThread.joinable())
             {
                 deleteFolderThread.join();
             }
 
-            deleteFolderThread =
-                std::thread(&DeleteFolderScreen::static_deleteFolder, this);
+            deleteFolderThread = std::thread(
+                [this, operationLease]
+                {
+                    deleteFolder();
+                });
             break;
+        }
     }
 }
 

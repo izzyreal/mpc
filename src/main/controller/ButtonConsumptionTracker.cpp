@@ -2,6 +2,11 @@
 
 using namespace mpc::controller;
 
+void ButtonConsumptionTracker::consume(const hardware::ComponentId id)
+{
+    sessions[id].consumed = true;
+}
+
 void ButtonConsumptionTracker::addConsumptionRule(
     const hardware::ComponentId watchedId,
     const hardware::ComponentId consumerId)

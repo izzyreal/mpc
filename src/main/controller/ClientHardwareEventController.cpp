@@ -185,6 +185,11 @@ bool ClientHardwareEventController::
 void ClientHardwareEventController::handlePadPress(
     const ClientHardwareEvent &event)
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return;
+    }
+
     if (!event.index || !event.value)
     {
         return;
@@ -689,6 +694,11 @@ void ClientHardwareEventController::handlePadAftertouch(
 void ClientHardwareEventController::handleDataWheel(
     const ClientHardwareEvent &event)
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return;
+    }
+
     if (!event.deltaValue)
     {
         return;
@@ -830,6 +840,11 @@ void ClientHardwareEventController::handleButtonPress(
     }
 
     buttonConsumptionTracker.onPress(event.componentId);
+    if (mpc.isManagedSaveActive())
+    {
+        buttonConsumptionTracker.consume(event.componentId);
+        return;
+    }
 
     const auto screen = mpc.getScreen();
 
@@ -1192,6 +1207,11 @@ void ClientHardwareEventController::handleButtonRelease(
 void ClientHardwareEventController::handleButtonDoublePress(
     const ClientHardwareEvent &event)
 {
+    if (mpc.isManagedSaveActive())
+    {
+        return;
+    }
+
     const auto button = mpc.getHardware()->getButton(event.componentId);
 
     if (event.componentId == REC || event.componentId == OVERDUB)

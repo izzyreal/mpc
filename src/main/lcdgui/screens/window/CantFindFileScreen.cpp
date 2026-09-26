@@ -12,6 +12,17 @@ void CantFindFileScreen::open()
     findField("file")->setText(fileName);
 }
 
+void CantFindFileScreen::setFileName(const std::string &name)
+{
+    fileName = name;
+    findField("file")->setText(fileName);
+}
+
+const std::string &CantFindFileScreen::getFileName() const
+{
+    return fileName;
+}
+
 void CantFindFileScreen::function(const int i)
 {
 

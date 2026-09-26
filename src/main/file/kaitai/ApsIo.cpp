@@ -303,14 +303,16 @@ void handleSoundNotFound(mpc::Mpc& mpc, const std::string& soundFileName)
     const auto cantFindFileScreen =
         mpc.screens->get<mpc::lcdgui::ScreenId::CantFindFileScreen>();
 
-    if (const auto skipAll = cantFindFileScreen->skipAll; !skipAll)
+    if (!cantFindFileScreen->skipAll.load())
     {
+        // Arm the wait before posting: the UI may not process the task until
+        // after this worker reaches the loop below.
+        cantFindFileScreen->waitingForUser = true;
         const auto ls = mpc.getLayeredScreen();
         ls->postToUiThread(mpc::utils::Task(
             [ls, cantFindFileScreen, soundFileName]
             {
-                cantFindFileScreen->waitingForUser = true;
-                cantFindFileScreen->fileName = soundFileName;
+                cantFindFileScreen->setFileName(soundFileName);
                 ls->openScreenById(mpc::lcdgui::ScreenId::CantFindFileScreen);
             }));
 
@@ -808,6 +810,12 @@ void ApsIo::loadBytes(mpc::Mpc& mpc,
     if (bytes.size() < 2)
     {
         throw std::runtime_error("Invalid APS header");
+    }
+
+    if (!headless && !withoutSounds)
+    {
+        mpc.screens->get<mpc::lcdgui::ScreenId::CantFindFileScreen>()->skipAll =
+            false;
     }
 
     if (static_cast<uint8_t>(bytes[0]) == 0x0A &&

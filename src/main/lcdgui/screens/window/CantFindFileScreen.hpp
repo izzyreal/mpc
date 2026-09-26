@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include <atomic>
 
 namespace mpc::lcdgui::screens::window
 {
@@ -11,8 +12,15 @@ namespace mpc::lcdgui::screens::window
 
         CantFindFileScreen(Mpc &mpc, int layerIndex);
 
-        bool skipAll = false;
-        bool waitingForUser = false;
+        // Called on the UI thread, including when the dialog is already open.
+        void setFileName(const std::string &name);
+        const std::string &getFileName() const;
+
+        // The load worker waits; the UI thread supplies the decision.
+        std::atomic<bool> skipAll{false};
+        std::atomic<bool> waitingForUser{false};
+
+    private:
         std::string fileName;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -1,6 +1,8 @@
 #include "AbstractDisk.hpp"
 
 #include "Mpc.hpp"
+#include "disk/SaveOperation.hpp"
+#include <utility>
 #include "Util.hpp"
 
 #include "disk/MpcFile.hpp"
@@ -46,13 +48,13 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 
 AbstractDisk::AbstractDisk(Mpc &_mpc) : mpc(_mpc) {}
+bool AbstractDisk::isSaveBusy() const
+{
+    return mpc.isManagedSaveActive();
+}
 
 AbstractDisk::~AbstractDisk()
 {
-    if (programSoundsSaveThread.joinable())
-    {
-        programSoundsSaveThread.join();
-    }
     if (readApsThread.joinable())
     {
         readApsThread.join();
@@ -317,122 +319,33 @@ bool AbstractDisk::deleteRecursive(const std::weak_ptr<MpcFile> _toDelete)
     return deleteFileOrOpenErrorPopup(toDelete);
 }
 
-void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
+void AbstractDisk::writePgm(const std::shared_ptr<Program> &program,
                             const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
-    {
-        auto f = newFile(fileName);
-        auto bytes = file::kaitai::PgmIo::saveProgram(*p, mpc.getSampler());
-        f->setFileData(bytes);
-
-        const std::string popupMsg = "Saving " + fileName;
-
-        const auto saveAProgramScreen =
-            mpc.screens->get<ScreenId::SaveAProgramScreen>();
-
-        if (saveAProgramScreen->save != 0)
-        {
-            std::vector<std::shared_ptr<Sound>> sounds;
-
-            for (const auto &n : p->getNotesParameters())
-            {
-                if (const auto soundIndex = n->getSoundIndex();
-                    soundIndex != -1)
-                {
-                    sounds.push_back(mpc.getSampler()->getSound(soundIndex));
-                }
-            }
-
-            if (!sounds.empty())
-            {
-                if (programSoundsSaveThread.joinable())
-                {
-                    programSoundsSaveThread.join();
-                }
-
-                programSoundsSaveThread = std::thread(
-                    [this, isWav = saveAProgramScreen->save == 2, sounds]
-                    {
-                        std::this_thread::sleep_for(
-                            mpc.getFileOperationTimings().saveTransition);
-                        soundSaver =
-                            std::make_unique<SoundSaver>(mpc, sounds, isWav);
-                    });
-            }
-            else
-            {
-                mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-                    popupMsg,
-                    static_cast<int>(
-                        mpc.getFileOperationTimings().saveTransition.count()),
-                    0);
-            }
-        }
-        else
-        {
-            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-                popupMsg,
-                static_cast<int>(
-                    mpc.getFileOperationTimings().saveTransition.count()),
-                0);
-        }
-
-        flush();
-        initFiles();
-        return f;
-    };
-
-    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
+    mpc.getSaveOperation()->startProgram(program, fileName);
 }
 
 void AbstractDisk::writeAps(const std::string &fileName)
 {
-    const std::function<file_or_error()> writeFunc = [&]() -> file_or_error
-    {
-        auto f = newFile(fileName);
-        const auto apsName = f->getNameWithoutExtension();
-        auto bytes = file::kaitai::ApsIo::save(mpc, apsName);
-        f->setFileData(bytes);
+    mpc.getSaveOperation()->startAps(fileName);
+}
 
-        auto saveAProgramScreen =
-            mpc.screens->get<ScreenId::SaveAProgramScreen>();
+void AbstractDisk::publishListing(DirectoryListing listing)
+{
+    files = std::move(listing.files);
+    allFiles = std::move(listing.allFiles);
+    parentFiles = std::move(listing.parentFiles);
+}
 
-        if (saveAProgramScreen->save != 0 &&
-            mpc.getSampler()->getSoundCount() > 0)
-        {
-            if (programSoundsSaveThread.joinable())
-            {
-                programSoundsSaveThread.join();
-            }
+void AbstractDisk::prepareListingForNextRefresh(DirectoryListing listing)
+{
+    publishListing(std::move(listing));
+    preparedListing = true;
+}
 
-            programSoundsSaveThread = std::thread(
-                [this, saveAProgramScreen]
-                {
-                    std::this_thread::sleep_for(
-                        mpc.getFileOperationTimings().saveTransition);
-                    soundSaver = std::make_unique<SoundSaver>(
-                        mpc, mpc.getSampler()->getSounds(),
-                        saveAProgramScreen->save == 2);
-                });
-        }
-        else
-        {
-            const std::string popupMsg = "Saving " + fileName;
-            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(
-                popupMsg,
-                static_cast<int>(
-                    mpc.getFileOperationTimings().saveTransition.count()),
-                0);
-        }
-
-        flush();
-        initFiles();
-
-        return f;
-    };
-
-    performRequiredIoOrOpenErrorPopupNonReturning(writeFunc);
+bool AbstractDisk::consumePreparedListing()
+{
+    return std::exchange(preparedListing, false);
 }
 
 void AbstractDisk::writeAll(const std::string &fileName)
@@ -599,12 +512,18 @@ sequence_or_error AbstractDisk::readSeq2(std::shared_ptr<MpcFile> f)
 void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
                             std::shared_ptr<Program> p, int programIndex)
 {
+    auto operationLease = mpc.fileOperationGate.tryAcquire();
+    if (!operationLease)
+    {
+        return;
+    }
+
     if (readPgmThread.joinable())
     {
         readPgmThread.join();
     }
     readPgmThread = std::thread(
-        [this, f, p, programIndex]
+        [this, f, p, programIndex, operationLease]
         {
             const std::function<tl::expected<bool, mpc_io_error_msg>()>
                 readFunc = [this, f, p, programIndex]
@@ -620,12 +539,18 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
 void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f,
                             std::function<void()> onSuccess, bool headless)
 {
+    auto operationLease = mpc.fileOperationGate.tryAcquire();
+    if (!operationLease)
+    {
+        return;
+    }
+
     if (readApsThread.joinable())
     {
         readApsThread.join();
     }
     readApsThread = std::thread(
-        [this, f, onSuccess, headless]
+        [this, f, onSuccess, headless, operationLease]
         {
             const std::function<tl::expected<bool, mpc_io_error_msg>()>
                 readFunc = [this, f, onSuccess, headless]

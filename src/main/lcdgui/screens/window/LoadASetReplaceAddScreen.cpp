@@ -67,6 +67,11 @@ void LoadASetReplaceAddScreen::function(const int i)
                 break;
             }
 
+            auto operationLease = mpc.fileOperationGate.tryAcquire();
+            if (!operationLease)
+            {
+                return;
+            }
             const bool clearExisting = i == 2;
             auto previewCopy = std::make_shared<file::kaitai::Mpc60SetPreview>(*preview);
             auto conversionTableCopy =
@@ -80,7 +85,7 @@ void LoadASetReplaceAddScreen::function(const int i)
 
             loadThread = std::thread(
                 [this, file, previewCopy, conversionTableCopy, clearExisting,
-                 layeredScreen]
+                 layeredScreen, operationLease]
                 {
                     const auto loaded =
                         file::kaitai::Mpc60SetProgramLoader::load(

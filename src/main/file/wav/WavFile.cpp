@@ -583,3 +583,26 @@ void WavFile::close() const
         ofStream->close();
     }
 }
+
+void WavFile::finishWriteChecked()
+{
+    if (!oStream)
+    {
+        throw std::runtime_error("No WAV output stream");
+    }
+    if (bufferPointer > 0)
+    {
+        oStream->write(buffer.data(), bufferPointer);
+        bufferPointer = 0;
+    }
+    if (wordAlignAdjust)
+    {
+        oStream->put(0);
+        wordAlignAdjust = false;
+    }
+    oStream->flush();
+    if (!*oStream)
+    {
+        throw std::runtime_error("Unable to finish WAV output");
+    }
+}

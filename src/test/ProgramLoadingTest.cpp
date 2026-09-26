@@ -193,6 +193,7 @@ void doTestWithMissingSound(Mpc &mpc, const bool clear,
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        mpc.getLayeredScreen()->timerCallback();
         counter += 10;
 
         if (counter > 1000)

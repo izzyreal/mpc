@@ -1,6 +1,8 @@
 #include "disk/MpcFile.hpp"
 
 #include "FileIoPolicy.hpp"
+#include "StrUtil.hpp"
+#include <stdexcept>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
@@ -32,6 +34,24 @@ MpcFile::MpcFile(
 
 std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
 {
+    return listFilesImpl(false);
+}
+
+std::vector<std::shared_ptr<MpcFile>> MpcFile::listFilesChecked()
+{
+    return listFilesImpl(true);
+}
+
+std::vector<std::shared_ptr<MpcFile>> MpcFile::listFilesImpl(bool checked)
+{
+    if (checked && !raw)
+    {
+        const auto result = mpc_fs::is_directory(fs_path);
+        if (!result || !*result)
+        {
+            throw std::runtime_error("Unable to scan " + fs_path.string());
+        }
+    }
     if (!isDirectory())
     {
         return {};
@@ -46,6 +66,10 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
 
         for (auto &kv : dir->akaiNameIndex)
         {
+            if (checked && (kv.first.empty() || kv.first[0] == '.'))
+            {
+                continue;
+            }
             result.emplace_back(std::make_shared<MpcFile>(kv.second));
         }
     }
@@ -54,6 +78,10 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         const auto pathIteratorRes = mpc_fs::make_directory_iterator(fs_path);
         if (!pathIteratorRes)
         {
+            if (checked)
+            {
+                throw std::runtime_error("Unable to scan " + fs_path.string());
+            }
             MLOG("MpcFile::listFiles failed for '" + fs_path.string() + "': " +
                  pathIteratorRes.error().message);
             return result;
@@ -66,6 +94,10 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         {
             if (ec)
             {
+                if (checked)
+                {
+                    throw std::runtime_error(ec.message());
+                }
                 MLOG("MpcFile::listFiles iteration failed for '" +
                      fs_path.string() + "': " + ec.message());
                 break;
@@ -80,6 +112,10 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
             }
 
             result.emplace_back(std::make_shared<MpcFile>(path));
+        }
+        if (checked && ec)
+        {
+            throw std::runtime_error(ec.message());
         }
     }
 
@@ -334,4 +370,51 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
 mpc_fs::path MpcFile::getPath()
 {
     return fs_path;
+}
+
+std::shared_ptr<MpcFile>
+MpcFile::createChildFileChecked(const std::string &name)
+{
+    auto normalized =
+        mpc::StrUtil::toUpper(mpc::StrUtil::replaceAll(name, ' ', "_"));
+    if (raw)
+    {
+        const auto dir = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
+            rawEntry->getDirectory());
+        const auto entry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(
+            dir->addFile(normalized));
+        if (!entry)
+        {
+            throw std::runtime_error("Unable to create " + normalized);
+        }
+        return std::make_shared<MpcFile>(entry);
+    }
+    auto file = std::make_shared<MpcFile>(fs_path / normalized);
+    return file;
+}
+
+void MpcFile::setFileDataChecked(std::vector<char> &data)
+{
+    if (raw)
+    {
+        setFileData(data); // Raw backend propagates write/flush exceptions.
+        return;
+    }
+    std::ofstream stream(fs_path, std::ios::out | std::ios::binary);
+    if (!stream.is_open())
+    {
+        throw std::runtime_error("Unable to open " + fs_path.string());
+    }
+    if (!data.empty())
+    {
+        stream.write(data.data(), static_cast<std::streamsize>(data.size()));
+    }
+    // close() flushes buffered bytes too; its errors must not be swallowed by
+    // the stream destructor after this operation has reported success.
+    stream.close();
+    if (!stream)
+    {
+        throw std::runtime_error("Unable to finish writing " +
+                                 fs_path.string());
+    }
 }

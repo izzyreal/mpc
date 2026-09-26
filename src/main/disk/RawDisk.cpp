@@ -36,65 +36,20 @@ RawDisk::~RawDisk()
 
 void RawDisk::initFiles()
 {
-    files.clear();
-    allFiles.clear();
-
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-
-    auto view = loadScreen->view;
-    auto dirList = getDir()->akaiNameIndex;
-
-    for (auto &f : dirList)
-    {
-        if ((f.first.length() > 0 && f.first[0] == '.') || f.first == ".." ||
-            f.first == "")
-        {
-            continue;
-        }
-
-        auto mpcFile = std::make_shared<MpcFile>(f.second);
-        allFiles.push_back(mpcFile);
-
-        if (view != 0 && mpcFile->isFile())
-        {
-            std::string name = mpcFile->getName();
-
-            if (mpcFile->isFile() && name.find(".") != std::string::npos &&
-                name.substr(name.length() - 3).compare(extensions[view]) == 0)
-            {
-                files.push_back(mpcFile);
-            }
-        }
-        else
-        {
-            files.push_back(mpcFile);
-        }
-    }
-
-    initParentFiles();
-}
-
-void RawDisk::initParentFiles()
-{
-    parentFiles.clear();
-    if (path.size() == 0)
+    if (mpc.isManagedSaveActive() || consumePreparedListing())
     {
         return;
     }
-
-    auto parent = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
-        path[path.size() - 1]->getParent());
-
-    for (auto &kv : parent->akaiNameIndex)
+    auto destination =
+        captureSaveDestination(mpc.screens->get<ScreenId::LoadScreen>()->view);
+    try
     {
-        if (kv.first == "." || kv.first == ".." || kv.first.size() == 0)
-        {
-            continue;
-        }
-        if (kv.second->isValid() && kv.second->isDirectory())
-        {
-            parentFiles.emplace_back(std::make_shared<MpcFile>(kv.second));
-        }
+        publishListing(destination->scan());
+    }
+    catch (const std::exception &e)
+    {
+        MLOG(std::string("Directory refresh failed: ") + e.what());
+        publishListing({});
     }
 }
 
@@ -109,6 +64,11 @@ std::string RawDisk::getDirectoryName()
 
 bool RawDisk::moveBack()
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     if (path.size() == 0)
     {
         return false;
@@ -120,6 +80,11 @@ bool RawDisk::moveBack()
 
 bool RawDisk::moveForward(const std::string &directoryName)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     std::string dirNameCopy = directoryName;
     std::shared_ptr<AkaiFatLfnDirectoryEntry> entry =
         std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(
@@ -152,6 +117,11 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getDir()
 
 bool RawDisk::deleteAllFiles(int extension)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     std::vector<std::shared_ptr<MpcFile>> filesToDelete;
 
     for (auto &key_value : getDir()->akaiNameIndex)
@@ -183,6 +153,11 @@ bool RawDisk::deleteAllFiles(int extension)
 
 bool RawDisk::newFolder(const std::string &newDirName)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     try
     {
         std::string copy = newDirName;
@@ -197,6 +172,11 @@ bool RawDisk::newFolder(const std::string &newDirName)
 
 std::shared_ptr<MpcFile> RawDisk::newFile(const std::string &newFileName)
 {
+    if (isSaveBusy())
+    {
+        throw std::runtime_error("Disk operation already active");
+    }
+
     std::string copy =
         StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
     auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(
@@ -218,6 +198,11 @@ std::string RawDisk::getAbsolutePath()
 
 void RawDisk::close()
 {
+    if (isSaveBusy())
+    {
+        return;
+    }
+
     const bool shouldUnmount = root != nullptr;
 
     if (volume.volumeStream.is_open())
@@ -265,4 +250,23 @@ uint64_t RawDisk::getTotalSize()
 std::string RawDisk::getVolumeLabel()
 {
     return volume.label;
+}
+
+std::unique_ptr<SaveDestination> RawDisk::captureSaveDestination(int view)
+{
+    const auto directory = getDir();
+    const auto parent = path.empty()
+                            ? std::shared_ptr<AkaiFatLfnDirectory>{}
+                            : std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
+                                  path.back()->getParent());
+    return SaveDestination::fromRaw(
+        directory, parent, volume.mode == READ_WRITE, view,
+        [this]
+        {
+            flush();
+            if (!volume.volumeStream)
+            {
+                throw std::runtime_error("Unable to flush save volume");
+            }
+        });
 }

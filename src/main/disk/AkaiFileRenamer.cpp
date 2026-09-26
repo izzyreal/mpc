@@ -4,7 +4,7 @@
 #include "Mpc.hpp"
 #include "Logger.hpp"
 
-#include <cassert>
+#include <stdexcept>
 
 #include "ShortNameGenerator.hpp"
 #include "ShortName.hpp"
@@ -16,28 +16,39 @@ using namespace mpc::file;
 
 void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
 {
+    try
+    {
+        renameFilesInDirectory(p, mpc.paths->getDocuments()->tempPath());
+    }
+    catch (const std::exception &e)
+    {
+        MLOG(e.what());
+    }
+}
+
+void AkaiFileRenamer::renameFilesInDirectory(const mpc_fs::path &p,
+                                             const mpc_fs::path &tempRoot)
+{
     const auto isDirectoryRes = mpc_fs::is_directory(p);
-    assert(isDirectoryRes && *isDirectoryRes);
     if (!isDirectoryRes)
     {
         MLOG("AkaiFileRenamer: failed to inspect '" + p.string() + "': " +
              isDirectoryRes.error().message);
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
     if (!*isDirectoryRes)
     {
         MLOG("AkaiFileRenamer: path is not a directory: '" + p.string() + "'");
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
 
-    auto tempRoot = mpc.paths->getDocuments()->tempPath();
 
     const auto tempRootExistsValue = value(
         mpc_fs::exists(tempRoot), FailurePolicy::Required,
         "Akai rename temp root existence check for '" + tempRoot.string() + "'");
     if (!tempRootExistsValue)
     {
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
 
     if (*tempRootExistsValue)
@@ -47,7 +58,8 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
             "Akai rename temp root cleanup for '" + tempRoot.string() + "'");
         if (!removeAllValue)
         {
-            return;
+            throw std::runtime_error("Unable to normalize directory " +
+                                     p.string());
         }
     }
 
@@ -58,7 +70,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
                    "Akai rename temp root create for '" + tempRoot.string() +
                        "'",
                    tempRootCreateRes.error());
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
 
     std::vector<std::string> existingNames;
@@ -66,7 +78,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
     auto dirItRes = mpc_fs::make_directory_iterator(p);
     if (!dirItRes)
     {
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
 
     for (auto e = *dirItRes; e != mpc_fs::directory_end(); ++e)
@@ -83,7 +95,8 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
         {
             MLOG("AkaiFileRenamer: failed to inspect entry '" +
                  e->path().string() + "': " + entryIsDirectoryRes.error().message);
-            return;
+            throw std::runtime_error("Unable to normalize directory " +
+                                     p.string());
         }
 
         if (*entryIsDirectoryRes)
@@ -107,7 +120,8 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
                          "Akai rename move to temp root from '" +
                              e->path().string() + "'"))
             {
-                return;
+                throw std::runtime_error("Unable to normalize directory " +
+                                         p.string());
             }
         }
         else
@@ -119,7 +133,7 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
     auto tempDirItRes = mpc_fs::make_directory_iterator(tempRoot);
     if (!tempDirItRes)
     {
-        return;
+        throw std::runtime_error("Unable to normalize directory " + p.string());
     }
 
     for (auto e = *tempDirItRes; e != mpc_fs::directory_end(); ++e)
@@ -129,7 +143,8 @@ void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const mpc_fs::path &p)
                      "Akai rename restore from temp root for '" +
                          e->path().string() + "'"))
         {
-            return;
+            throw std::runtime_error("Unable to normalize directory " +
+                                     p.string());
         }
     }
 }

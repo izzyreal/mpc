@@ -21,13 +21,14 @@ namespace mpc::disk
         std::shared_ptr<MpcFile> root;
         Volume volume;
         std::vector<std::string> path;
-        void initParentFiles();
         std::shared_ptr<MpcFile> getParentDir();
 
     public:
         std::shared_ptr<MpcFile>
         newFile(const std::string &newFileName) override;
         void initFiles() override;
+        std::unique_ptr<SaveDestination>
+        captureSaveDestination(int view) override;
         std::string getDirectoryName() override;
         bool moveBack() override;
         bool moveForward(const std::string &directoryName) override;
@@ -47,6 +48,10 @@ namespace mpc::disk
         }
         void initRoot() override
         {
+            if (isSaveBusy())
+            {
+                return;
+            }
             root = volume.getRoot();
         }
 

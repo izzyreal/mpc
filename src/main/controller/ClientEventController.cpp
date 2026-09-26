@@ -89,6 +89,11 @@ ClientEventController::dispatchHostInput(const HostInputEvent &hostEvent)
         const auto &gesture = std::get<GestureEvent>(hostEvent.payload);
         if (gesture.componentId == LCD)
         {
+            if (mpc.isManagedSaveActive())
+            {
+                dispatchDerivedGestures(lcdGestureHandler.cancelAll());
+                return HostInputResult::Handled;
+            }
             const auto result = lcdGestureHandler.handle(gesture);
             dispatchDerivedGestures(result.derivedGestures);
             return result.inputResult;

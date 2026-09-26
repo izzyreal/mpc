@@ -31,6 +31,7 @@ namespace mpc::disk
     class MpcFile
     {
 
+        std::vector<std::shared_ptr<MpcFile>> listFilesImpl(bool checked);
         bool raw = false;
         std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
         mpc_fs::path fs_path;
@@ -51,6 +52,10 @@ namespace mpc::disk
         bool del() const;
         std::vector<char> getBytes();
         std::vector<std::shared_ptr<MpcFile>> listFiles();
+        std::vector<std::shared_ptr<MpcFile>> listFilesChecked();
+        std::shared_ptr<MpcFile>
+        createChildFileChecked(const std::string &name);
+        void setFileDataChecked(std::vector<char> &data);
         std::string getNameWithoutExtension() const;
         std::string getExtension() const;
         std::shared_ptr<std::istream> getInputStream();

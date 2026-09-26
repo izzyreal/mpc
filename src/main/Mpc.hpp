@@ -5,6 +5,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 
 #include "disk/DiskController.hpp"
+#include "disk/FileOperationGate.hpp"
 
 #include "AutoSave.hpp"
 #include "Paths.hpp"
@@ -39,6 +40,7 @@ namespace mpc::input
 namespace mpc::disk
 {
     class AbstractDisk;
+    class SaveOperation;
 }
 
 namespace mpc::lcdgui
@@ -115,6 +117,7 @@ namespace mpc
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::unique_ptr<AutoSave> autoSave;
         FileOperationTimings fileOperationTimings;
+        std::unique_ptr<disk::SaveOperation> saveOperation;
 
     public:
         std::shared_ptr<lcdgui::Screens> screens;
@@ -124,6 +127,9 @@ namespace mpc
         std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
 
     public:
+        disk::FileOperationGate fileOperationGate;
+        disk::SaveOperation *getSaveOperation() const;
+        bool isManagedSaveActive() const;
         void init(const MpcInitOptions &options = {});
         void startMidiDeviceDetector();
         void panic() const;

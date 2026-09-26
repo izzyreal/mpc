@@ -101,5 +101,6 @@ namespace mpc::file::wav
         int writeFrames(const std::vector<float> &sampleBuffer,
                         unsigned long numFramesToWrite);
         void close() const;
+        void finishWriteChecked();
     };
 } // namespace mpc::file::wav

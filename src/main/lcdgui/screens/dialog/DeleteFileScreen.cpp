@@ -31,12 +31,17 @@ void DeleteFileScreen::function(const int i)
 
         case 4:
         {
+            auto operationLease = mpc.fileOperationGate.tryAcquire();
+            if (!operationLease)
+            {
+                return;
+            }
             const auto directoryScreen =
                 mpc.screens->get<ScreenId::DirectoryScreen>();
             ls.lock()->showPopupAndAwaitInteraction(
                 "Delete: " + directoryScreen->getSelectedFile()->getName());
             std::thread(
-                [this]
+                [this, operationLease]
                 {
                     deleteFile();
                 })

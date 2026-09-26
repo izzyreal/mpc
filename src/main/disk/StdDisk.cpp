@@ -12,6 +12,7 @@
 #include "lcdgui/screens/LoadScreen.hpp"
 
 #include "StrUtil.hpp"
+#include <Logger.hpp>
 
 using namespace mpc::disk;
 using namespace mpc::file;
@@ -23,6 +24,11 @@ StdDisk::StdDisk(Mpc &mpc) : AbstractDisk(mpc) {}
 
 void StdDisk::close()
 {
+    if (isSaveBusy())
+    {
+        return;
+    }
+
     volume.close();
 }
 
@@ -33,75 +39,20 @@ void StdDisk::flush()
 
 void StdDisk::initFiles()
 {
-    files.clear();
-    allFiles.clear();
-
-    AkaiFileRenamer::renameFilesInDirectory(mpc, getDir()->fs_path);
-
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-
-    auto view = loadScreen->view;
-    auto dirList = getDir()->listFiles();
-
-    for (auto &f : dirList)
-    {
-        allFiles.push_back(f);
-
-        if (view != 0 && f->isFile())
-        {
-            std::string name = f->getName();
-
-            if (f->isFile() && name.find('.') != std::string::npos &&
-                name.substr(name.length() - 3) == extensions[view])
-            {
-                files.push_back(f);
-            }
-        }
-        else
-        {
-            files.push_back(f);
-        }
-    }
-
-    std::sort(files.begin(), files.end(),
-              [](const std::shared_ptr<MpcFile> &f1,
-                 const std::shared_ptr<MpcFile> &f2)
-              {
-                  return f1->getName() < f2->getName();
-              });
-
-    std::stable_partition(files.begin(), files.end(),
-                          [](const std::shared_ptr<MpcFile> &f)
-                          {
-                              return f->isDirectory();
-                          });
-
-    initParentFiles();
-
-    std::sort(parentFiles.begin(), parentFiles.end(),
-              [](const std::shared_ptr<MpcFile> &f1,
-                 const std::shared_ptr<MpcFile> &f2)
-              {
-                  return f1->getName() < f2->getName();
-              });
-}
-
-void StdDisk::initParentFiles()
-{
-    parentFiles.clear();
-    if (path.empty())
+    if (mpc.isManagedSaveActive() || consumePreparedListing())
     {
         return;
     }
-
-    auto temp = getParentDir()->listFiles();
-
-    for (auto &f : temp)
+    auto destination =
+        captureSaveDestination(mpc.screens->get<ScreenId::LoadScreen>()->view);
+    try
     {
-        if (f->isDirectory())
-        {
-            parentFiles.push_back(f);
-        }
+        publishListing(destination->scan());
+    }
+    catch (const std::exception &e)
+    {
+        MLOG(std::string("Directory refresh failed: ") + e.what());
+        publishListing({});
     }
 }
 
@@ -117,6 +68,11 @@ std::string StdDisk::getDirectoryName()
 
 bool StdDisk::moveBack()
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     if (path.empty())
     {
         return false;
@@ -130,6 +86,11 @@ bool StdDisk::moveBack()
 
 bool StdDisk::moveForward(const std::string &directoryName)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     bool success = false;
     for (auto &f : files)
     {
@@ -222,6 +183,11 @@ std::shared_ptr<MpcFile> StdDisk::getParentDir()
 
 bool StdDisk::deleteAllFiles(int extensionIndex)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     auto dir = getDir();
 
     if (!dir)
@@ -262,6 +228,11 @@ bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> f)
 
 bool StdDisk::newFolder(const std::string &newDirName)
 {
+    if (isSaveBusy())
+    {
+        return false;
+    }
+
     std::string copy =
         StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
     auto new_path = getDir()->fs_path;
@@ -272,6 +243,11 @@ bool StdDisk::newFolder(const std::string &newDirName)
 
 std::shared_ptr<MpcFile> StdDisk::newFile(const std::string &newFileName)
 {
+    if (isSaveBusy())
+    {
+        throw std::runtime_error("Disk operation already active");
+    }
+
     std::string copy =
         StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
     auto new_path = getDir()->fs_path;
@@ -304,4 +280,44 @@ uint64_t StdDisk::getTotalSize()
 std::string StdDisk::getVolumeLabel()
 {
     return volume.label;
+}
+
+std::unique_ptr<SaveDestination> StdDisk::captureSaveDestination(int view)
+{
+    if (!root)
+    {
+        throw std::runtime_error("No save destination");
+    }
+    // Capture names only. getDir() walks the filesystem and can loop forever
+    // when a previously selected directory has disappeared.
+    auto location = root->getPath();
+    for (const auto &component : path)
+    {
+        location /= component;
+    }
+    const auto directory = std::make_shared<MpcFile>(location);
+    const auto parent = path.empty()
+                            ? std::shared_ptr<MpcFile>{}
+                            : std::make_shared<MpcFile>(location.parent_path());
+    const auto tempRoot = mpc.paths->getDocuments()->tempPath();
+    return std::make_unique<SaveDestination>(
+        [directory]
+        {
+            return directory->listFilesChecked();
+        },
+        [parent]
+        {
+            return parent ? parent->listFilesChecked()
+                          : std::vector<std::shared_ptr<MpcFile>>{};
+        },
+        [directory](const std::string &name)
+        {
+            return directory->createChildFileChecked(name);
+        },
+        true, volume.mode == READ_WRITE, view,
+        [location, tempRoot]
+        {
+            AkaiFileRenamer::renameFilesInDirectory(location, tempRoot);
+        },
+        [] {});
 }

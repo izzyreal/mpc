@@ -224,13 +224,17 @@ void ProgramLoader::notFound(Mpc &mpc, const std::string &soundFileName)
     const auto cantFindFileScreen =
         mpc.screens->get<ScreenId::CantFindFileScreen>();
 
-    if (const auto skipAll = cantFindFileScreen->skipAll; !skipAll)
+    if (!cantFindFileScreen->skipAll.load())
     {
         cantFindFileScreen->waitingForUser = true;
 
-        cantFindFileScreen->fileName = soundFileName;
-
-        mpc.getLayeredScreen()->openScreenById(ScreenId::CantFindFileScreen);
+        const auto ls = mpc.getLayeredScreen();
+        ls->postToUiThread(utils::Task(
+            [ls, cantFindFileScreen, soundFileName]
+            {
+                cantFindFileScreen->setFileName(soundFileName);
+                ls->openScreenById(ScreenId::CantFindFileScreen);
+            }));
 
         while (cantFindFileScreen->waitingForUser)
         {
