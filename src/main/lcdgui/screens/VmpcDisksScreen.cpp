@@ -106,7 +106,7 @@ void VmpcDisksScreen::function(const int i)
 
 void VmpcDisksScreen::turnWheel(const int i)
 {
-    const auto &volume = mpc.getDisks()[row]->getVolume();
+    const auto &volume = mpc.getDisks()[row + rowOffset]->getVolume();
 
     if (volume.volumeUUID == "default_volume")
     {
@@ -137,7 +137,8 @@ void VmpcDisksScreen::displayRows()
 
         mode->setInverted(i == row);
 
-        if (i >= disks.size())
+        const auto diskIndex = i + rowOffset;
+        if (diskIndex >= disks.size())
         {
             volume->setText("");
             type->setText("");
@@ -146,7 +147,7 @@ void VmpcDisksScreen::displayRows()
             continue;
         }
 
-        const auto disk = disks[i];
+        const auto disk = disks[diskIndex];
 
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
