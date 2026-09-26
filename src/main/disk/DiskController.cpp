@@ -20,10 +20,8 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(Mpc &_mpc,
-                               bool _rawUsbVolumeDetectionEnabled)
-    : mpc(_mpc),
-      rawUsbVolumeDetectionEnabled(_rawUsbVolumeDetectionEnabled)
+DiskController::DiskController(Mpc &_mpc, bool _rawUsbVolumeDetectionEnabled)
+    : mpc(_mpc), rawUsbVolumeDetectionEnabled(_rawUsbVolumeDetectionEnabled)
 {
 }
 
@@ -76,12 +74,22 @@ void DiskController::initDisks()
 
     if (std::dynamic_pointer_cast<RawDisk>(activeDisk))
     {
-        activeDisk->initRoot();
-
-        if (!activeDisk->getVolume().volumeStream.is_open())
+        try
         {
+            activeDisk->initRoot();
+        }
+        catch (...)
+        {
+            try
+            {
+                activeDisk->close();
+            }
+            catch (...)
+            {
+            }
             activeDiskIndex = 0;
             activeDiskHistory.clear();
+            MLOG("Unable to restore active disk; using DEFAULT");
         }
     }
     else
@@ -147,6 +155,65 @@ void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
     activeDiskIndex = newActiveDiskIndex;
 }
 
+std::string DiskController::activateDisk(int index)
+{
+    auto lease = mpc.fileOperationGate.tryAcquire();
+    if (!lease)
+    {
+        return "Disk operation already active";
+    }
+    if (index < 0 || index >= disks.size())
+    {
+        return "Device is unavailable";
+    }
+    if (disks[index]->getVolume().mode == DISABLED)
+    {
+        return "Device is disabled in DISKS";
+    }
+    if (index == activeDiskIndex)
+    {
+        return {};
+    }
+
+    const auto candidate = disks[index];
+    const auto previous = activeDiskIndex >= 0 && activeDiskIndex < disks.size()
+                              ? disks[activeDiskIndex]
+                              : nullptr;
+    try
+    {
+        candidate->initRoot();
+        if (previous)
+        {
+            previous->close();
+        }
+    }
+    catch (const std::exception &e)
+    {
+        try
+        {
+            candidate->close();
+        }
+        catch (...)
+        {
+            MLOG("Failed to release candidate disk after activation failure");
+        }
+        return e.what();
+    }
+    catch (...)
+    {
+        try
+        {
+            candidate->close();
+        }
+        catch (...)
+        {
+        }
+        return "Unable to activate device";
+    }
+    setActiveDiskIndex(index);
+    return {};
+}
+
 bool DiskController::ensureActiveDiskIsEnabled()
 {
     if (mpc.isManagedSaveActive())
@@ -168,19 +235,6 @@ bool DiskController::ensureActiveDiskIsEnabled()
         return false;
     }
 
-    if (activeDiskIndexIsValid)
-    {
-        try
-        {
-            disks[activeDiskIndex]->close();
-        }
-        catch (const std::exception &e)
-        {
-            MLOG("Failed to close disabled active disk: " +
-                 std::string(e.what()));
-        }
-    }
-
     while (!activeDiskHistory.empty())
     {
         const auto previousUuid = activeDiskHistory.back();
@@ -191,8 +245,10 @@ bool DiskController::ensureActiveDiskIsEnabled()
             const auto &volume = disks[i]->getVolume();
             if (volume.volumeUUID == previousUuid && volume.mode != DISABLED)
             {
-                activeDiskIndex = i;
-                return true;
+                if (activateDisk(i).empty())
+                {
+                    return true;
+                }
             }
         }
     }
@@ -201,13 +257,14 @@ bool DiskController::ensureActiveDiskIsEnabled()
     {
         if (disks[i]->getVolume().mode != DISABLED)
         {
-            activeDiskIndex = i;
-            return true;
+            if (activateDisk(i).empty())
+            {
+                return true;
+            }
         }
     }
 
-    activeDiskIndex = 0;
-    return true;
+    return false;
 }
 
 void DiskController::detectRawUsbVolumes()

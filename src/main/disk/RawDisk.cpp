@@ -20,17 +20,13 @@ RawDisk::RawDisk(Mpc &_mpc) : AbstractDisk(_mpc) {}
 
 RawDisk::~RawDisk()
 {
-    if (root)
+    try
     {
-        try
-        {
-            VolumeMounter::unmount(volume.volumePath);
-        }
-        catch (const std::exception &)
-        {
-            MLOG("Failed to unmount " + volume.volumePath +
-                 " from VMPC2000XL and mount it back to the host OS!");
-        }
+        closeResources();
+    }
+    catch (...)
+    {
+        MLOG("Failed to close raw disk at shutdown");
     }
 }
 
@@ -203,13 +199,23 @@ void RawDisk::close()
         return;
     }
 
-    const bool shouldUnmount = root != nullptr;
+    closeResources();
+}
+
+void RawDisk::closeResources()
+{
+    const bool shouldUnmount = root != nullptr || volume.volumeStream.is_open();
 
     if (volume.volumeStream.is_open())
     {
-        volume.close();
-        volume.volumeFs = nullptr;
-        volume.volumeDevice = {};
+        if (volume.volumeFs)
+        {
+            volume.close();
+        }
+        else
+        {
+            volume.volumeStream.close();
+        }
     }
 
     if (shouldUnmount)

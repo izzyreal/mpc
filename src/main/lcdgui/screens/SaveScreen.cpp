@@ -114,41 +114,16 @@ void SaveScreen::function(const int i)
 
             if (focusedFieldName == "device")
             {
-                if (mpc.getDiskController()->getActiveDiskIndex() == device)
-                {
-                    return;
-                }
-
-                const auto &candidateVolume =
-                    mpc.getDisks()[device]->getVolume();
-
-                if (candidateVolume.mode == disk::MountMode::DISABLED)
+                if (const auto error =
+                        mpc.getDiskController()->activateDisk(device);
+                    !error.empty())
                 {
                     ls.lock()->showPopupForMs(
-                        "Device is disabled in DISKS",
-                        static_cast<int>(mpc.getFileOperationTimings()
-                                             .ioErrorFeedback.count()));
+                        error, static_cast<int>(mpc.getFileOperationTimings()
+                                                    .ioErrorFeedback.count()));
                     return;
                 }
-
-                const auto newDisk = mpc.getDisks()[device];
-
-                if (newDisk->getVolume().type == disk::VolumeType::USB_VOLUME)
-                {
-
-                    newDisk->initRoot();
-
-                    if (!newDisk->getVolume().volumeStream.is_open())
-                    {
-                        ls.lock()->showPopupForMs(
-                            "Error! Device seems in use",
-                            static_cast<int>(mpc.getFileOperationTimings()
-                                                 .busyDeviceFeedback.count()));
-                        return;
-                    }
-                }
-
-                mpc.getDiskController()->setActiveDiskIndex(device);
+                const auto newDisk = mpc.getDisk();
 
                 setFunctionKeysArrangement(0);
 
@@ -428,7 +403,8 @@ void SaveScreen::displaySize() const
 
 void SaveScreen::displayFree() const
 {
-    const auto spaceRes = mpc_fs::space(mpc.paths->getDocuments()->storesPath());
+    const auto spaceRes =
+        mpc_fs::space(mpc.paths->getDocuments()->storesPath());
     if (!spaceRes)
     {
         findLabel("free")->setText("N/A");

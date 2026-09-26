@@ -26,11 +26,14 @@ namespace mpc::disk
         void initDisks();
 
     public:
-        explicit DiskController(Mpc &, bool rawUsbVolumeDetectionEnabled = true);
+        explicit DiskController(Mpc &,
+                                bool rawUsbVolumeDetectionEnabled = true);
         std::vector<std::shared_ptr<AbstractDisk>> &getDisks();
         std::shared_ptr<AbstractDisk> getActiveDisk();
         int getActiveDiskIndex() const;
         void setActiveDiskIndex(int newActiveDiskIndex);
+        // Empty on success; otherwise the current selection is retained.
+        std::string activateDisk(int index);
         bool ensureActiveDiskIsEnabled();
 
         void detectRawUsbVolumes();

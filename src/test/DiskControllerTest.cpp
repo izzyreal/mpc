@@ -18,10 +18,17 @@ using namespace mpc::lcdgui::screens;
 
 namespace
 {
+    class TestUsbDisk : public RawDisk
+    {
+    public:
+        explicit TestUsbDisk(Mpc &mpc) : RawDisk(mpc) {}
+        void initRoot() override {}
+    };
+
     std::shared_ptr<RawDisk> makeUsbDisk(Mpc &mpc, const std::string &uuid,
                                          const std::string &label)
     {
-        auto disk = std::make_shared<RawDisk>(mpc);
+        auto disk = std::make_shared<TestUsbDisk>(mpc);
         auto &volume = disk->getVolume();
         volume.type = USB_VOLUME;
         volume.mode = READ_WRITE;
@@ -56,7 +63,7 @@ TEST_CASE("Disabling the active disk restores the previous enabled disk",
     TestMpc::initializeTestMpcWithoutIoServices(mpc);
 
     auto diskController = mpc.getDiskController();
-    (void) diskController->getActiveDisk();
+    (void)diskController->getActiveDisk();
 
     auto &disks = diskController->getDisks();
     auto usbB = makeUsbDisk(mpc, "test-usb-b", "USB B");
@@ -88,7 +95,7 @@ TEST_CASE("Disk fallback skips a removed previous disk", "[disk]")
     TestMpc::initializeTestMpcWithoutIoServices(mpc);
 
     auto diskController = mpc.getDiskController();
-    (void) diskController->getActiveDisk();
+    (void)diskController->getActiveDisk();
 
     auto &disks = diskController->getDisks();
     auto usbB = makeUsbDisk(mpc, "test-usb-b", "USB B");
@@ -113,7 +120,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     TestMpc::initializeTestMpcWithoutIoServices(mpc);
 
     auto diskController = mpc.getDiskController();
-    (void) diskController->getActiveDisk();
+    (void)diskController->getActiveDisk();
 
     auto &disks = diskController->getDisks();
     auto diskB = makeLocalDisk(mpc, "test-local-b", "DISK B");
@@ -159,4 +166,124 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
 
     layeredScreen->openScreenById(ScreenId::SaveScreen);
     REQUIRE(saveScreen->findField("device")->getText() == "DISK B");
+}
+
+namespace
+{
+    class LifecycleDisk : public StdDisk
+    {
+    public:
+        explicit LifecycleDisk(Mpc &mpc) : StdDisk(mpc) {}
+        void initFiles() override {}
+        int opens = 0, closes = 0;
+        bool failOpen = false, failClose = false;
+        void initRoot() override
+        {
+            ++opens;
+            if (failOpen)
+            {
+                throw std::runtime_error("Mount failed");
+            }
+        }
+        void close() override
+        {
+            if (failClose)
+            {
+                throw std::runtime_error("Flush failed");
+            }
+            ++closes;
+        }
+    };
+} // namespace
+
+TEST_CASE("Device activation owns the mount lifecycle", "[disk][mount]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    auto controller = mpc.getDiskController();
+    (void)controller->getActiveDisk();
+    auto a = std::make_shared<LifecycleDisk>(mpc);
+    auto b = std::make_shared<LifecycleDisk>(mpc);
+    a->getVolume().mode = b->getVolume().mode = READ_WRITE;
+    a->getVolume().volumeUUID = "lifecycle-a";
+    b->getVolume().volumeUUID = "lifecycle-b";
+    controller->getDisks().push_back(a);
+    controller->getDisks().push_back(b);
+    REQUIRE(controller->activateDisk(1).empty());
+    REQUIRE(a->opens == 1);
+
+    SECTION("LOAD routes selection through the lifecycle")
+    {
+        auto screen = mpc.screens->get<ScreenId::LoadScreen>();
+        mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
+        mpc.getLayeredScreen()->setFocus("device");
+        screen->turnWheel(1);
+        screen->function(4);
+        REQUIRE(controller->getActiveDisk() == b);
+        REQUIRE(a->closes == 1);
+        REQUIRE(b->opens == 1);
+    }
+    SECTION("SAVE routes selection through the lifecycle")
+    {
+        auto screen = mpc.screens->get<ScreenId::SaveScreen>();
+        mpc.getLayeredScreen()->openScreenById(ScreenId::SaveScreen);
+        mpc.getLayeredScreen()->setFocus("device");
+        screen->turnWheel(1);
+        screen->function(4);
+        REQUIRE(controller->getActiveDisk() == b);
+        REQUIRE(a->closes == 1);
+        REQUIRE(b->opens == 1);
+    }
+    SECTION("Switch and reselect")
+    {
+        REQUIRE(controller->activateDisk(2).empty());
+        REQUIRE(a->closes == 1);
+        REQUIRE(b->opens == 1);
+        REQUIRE(controller->activateDisk(2).empty());
+        REQUIRE(b->opens == 1);
+        REQUIRE(b->closes == 0);
+        REQUIRE(controller->activateDisk(0).empty());
+        REQUIRE(b->closes == 1);
+    }
+    SECTION("Failed mount retains current device")
+    {
+        b->failOpen = true;
+        REQUIRE_FALSE(controller->activateDisk(2).empty());
+        REQUIRE(controller->getActiveDisk() == a);
+        REQUIRE(a->closes == 0);
+    }
+    SECTION("Failed flush releases candidate and retains current device")
+    {
+        a->failClose = true;
+        REQUIRE_FALSE(controller->activateDisk(2).empty());
+        REQUIRE(controller->getActiveDisk() == a);
+        REQUIRE(a->closes == 0);
+        REQUIRE(b->closes == 1);
+    }
+    SECTION("Disabled and invalid devices are rejected")
+    {
+        b->getVolume().mode = DISABLED;
+        REQUIRE_FALSE(controller->activateDisk(2).empty());
+        REQUIRE_FALSE(controller->activateDisk(-1).empty());
+        REQUIRE_FALSE(controller->activateDisk(3).empty());
+        REQUIRE(b->opens == 0);
+        REQUIRE(a->closes == 0);
+    }
+    SECTION("Legacy I/O prevents switching")
+    {
+        auto lease = mpc.fileOperationGate.tryAcquire();
+        REQUIRE(lease);
+        REQUIRE_FALSE(controller->activateDisk(2).empty());
+        REQUIRE(controller->getActiveDisk() == a);
+        REQUIRE(b->opens == 0);
+        REQUIRE(a->closes == 0);
+    }
+    SECTION("Managed saves prevent switching")
+    {
+        auto lease = mpc.fileOperationGate.tryAcquire(true);
+        REQUIRE(lease);
+        REQUIRE_FALSE(controller->activateDisk(2).empty());
+        REQUIRE(controller->getActiveDisk() == a);
+        REQUIRE(b->opens == 0);
+    }
 }

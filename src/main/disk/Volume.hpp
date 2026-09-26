@@ -56,10 +56,10 @@ namespace mpc::disk
         // Used when type == DISK_IMAGE || USB_VOLUME
         std::string volumeUUID;
         MountMode mode = DISABLED;
-        uint64_t volumeSize;
+        uint64_t volumeSize = 0;
         std::fstream volumeStream;
         std::shared_ptr<ImageBlockDevice> volumeDevice;
-        fat::AkaiFatFileSystem *volumeFs;
+        fat::AkaiFatFileSystem *volumeFs = nullptr;
 
         std::string typeShortName() const
         {
@@ -100,7 +100,8 @@ namespace mpc::disk
         {
             if (type == LOCAL_DIRECTORY)
             {
-                return std::make_shared<MpcFile>(mpc_fs::path(localDirectoryPath));
+                return std::make_shared<MpcFile>(
+                    mpc_fs::path(localDirectoryPath));
             }
             return {};
         }
@@ -143,6 +144,8 @@ namespace mpc::disk
             volumeDevice->close();
             volumeStream.close();
             delete volumeFs;
+            volumeFs = nullptr;
+            volumeDevice.reset();
         }
 
         void flush()
@@ -156,8 +159,16 @@ namespace mpc::disk
             {
                 throw std::runtime_error("Volume is not open");
             }
+            if (volumeFs->isReadOnly())
+            {
+                return;
+            }
             volumeFs->flush();
             volumeStream.flush();
+            if (!volumeStream)
+            {
+                throw std::runtime_error("Unable to flush device");
+            }
         }
     };
 } // namespace mpc::disk

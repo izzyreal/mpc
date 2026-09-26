@@ -94,41 +94,17 @@ void LoadScreen::function(const int i)
         {
             if (focusedFieldName == "device")
             {
-                if (mpc.getDiskController()->getActiveDiskIndex() == device)
-                {
-                    return;
-                }
-
-                if (const auto &candidateVolume =
-                        mpc.getDisks()[device]->getVolume();
-                    candidateVolume.mode == DISABLED)
+                if (const auto error =
+                        mpc.getDiskController()->activateDisk(device);
+                    !error.empty())
                 {
                     ls.lock()->showPopupForMs(
-                        "Device is disabled in DISKS",
-                        static_cast<int>(mpc.getFileOperationTimings()
-                                             .ioErrorFeedback.count()));
+                        error, static_cast<int>(mpc.getFileOperationTimings()
+                                                    .ioErrorFeedback.count()));
                     return;
                 }
-
-                const auto newDisk = mpc.getDisks()[device];
-
+                const auto newDisk = mpc.getDisk();
                 fileLoad = 0;
-
-                if (newDisk->getVolume().type == USB_VOLUME)
-                {
-                    newDisk->initRoot();
-
-                    if (!newDisk->getVolume().volumeStream.is_open())
-                    {
-                        ls.lock()->showPopupForMs(
-                            "Error! Device seems in use",
-                            static_cast<int>(mpc.getFileOperationTimings()
-                                                 .busyDeviceFeedback.count()));
-                        return;
-                    }
-                }
-
-                mpc.getDiskController()->setActiveDiskIndex(device);
 
                 setFunctionKeysArrangement(0);
 
@@ -145,7 +121,8 @@ void LoadScreen::function(const int i)
                 return;
             }
 
-            if (const auto file = getSelectedFile(); file && !file->isDirectory())
+            if (const auto file = getSelectedFile();
+                file && !file->isDirectory())
             {
                 const auto ext =
                     mpc_fs::path(file->getName()).extension().string();

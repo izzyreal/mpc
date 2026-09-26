@@ -21,6 +21,7 @@ namespace mpc::disk
         ~RawDisk();
 
     private:
+        void closeResources();
         Volume volume;
         std::vector<std::shared_ptr<fat::AkaiFatLfnDirectoryEntry>> path;
         std::shared_ptr<fat::AkaiFatLfnDirectory> root;
@@ -59,6 +60,10 @@ namespace mpc::disk
                 return;
             }
             root = volume.getRawRoot();
+            if (!root)
+            {
+                throw std::runtime_error("Unable to mount device");
+            }
         }
 
     protected:
