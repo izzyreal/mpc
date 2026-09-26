@@ -5,6 +5,8 @@
 #include <thread>
 #include <atomic>
 #include <memory>
+#include <functional>
+#include <mutex>
 
 namespace mpc
 {
@@ -21,6 +23,10 @@ namespace mpc::audiomidi
         ~MidiDeviceDetector();
 
     private:
+        friend struct MidiDeviceDetectorTestAccess;
+        // A private worker seam lets lifecycle tests avoid OS MIDI services.
+        void startWorker(std::function<void()> work);
+        std::mutex lifecycleMutex;
         std::atomic<bool> running{false};
         std::unique_ptr<std::thread> pollThread;
         std::set<std::string> deviceNames;
