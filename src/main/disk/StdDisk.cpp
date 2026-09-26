@@ -29,12 +29,12 @@ void StdDisk::close()
         return;
     }
 
-    volume.close();
+    // Local directory bindings have no mounted resources.
 }
 
 void StdDisk::flush()
 {
-    volume.flush();
+    // Local writes own and flush their streams.
 }
 
 void StdDisk::initFiles()

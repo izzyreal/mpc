@@ -751,7 +751,7 @@ TEST_CASE("A save keeps its captured nested destination until publication",
     CHECK_FALSE(f.disk->moveBack());
     CHECK_FALSE(f.disk->moveForward("MISSING"));
     const auto diskIndex = f.mpc.getDiskController()->getActiveDiskIndex();
-    f.mpc.getDiskController()->setActiveDiskIndex(diskIndex + 1);
+    f.mpc.getDiskController()->activateDisk(diskIndex + 1);
     CHECK(f.mpc.getDiskController()->getActiveDiskIndex() == diskIndex);
     f.disk->trace->unblock();
     f.finish();

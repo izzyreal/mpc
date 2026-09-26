@@ -1,16 +1,6 @@
 #pragma once
 
-#include <disk/MpcFile.hpp>
-
-#include "mpc_fs.hpp"
-
-#include <ImageBlockDevice.hpp>
-#include <FileSystemFactory.hpp>
-#include <fat/AkaiFatFileSystem.hpp>
-#include <fat/AkaiFatLfnDirectory.hpp>
-
-#include <util/VolumeMounter.h>
-
+#include <cstdint>
 #include <string>
 
 namespace mpc::disk
@@ -57,10 +47,6 @@ namespace mpc::disk
         std::string volumeUUID;
         MountMode mode = DISABLED;
         uint64_t volumeSize = 0;
-        std::fstream volumeStream;
-        std::shared_ptr<ImageBlockDevice> volumeDevice;
-        fat::AkaiFatFileSystem *volumeFs = nullptr;
-
         std::string typeShortName() const
         {
             switch (type)
@@ -94,81 +80,6 @@ namespace mpc::disk
         std::string modeShortName() const
         {
             return modeShortName(mode);
-        }
-
-        std::shared_ptr<MpcFile> getRoot() const
-        {
-            if (type == LOCAL_DIRECTORY)
-            {
-                return std::make_shared<MpcFile>(
-                    mpc_fs::path(localDirectoryPath));
-            }
-            return {};
-        }
-
-        std::shared_ptr<fat::AkaiFatLfnDirectory> getRawRoot()
-        {
-            if (type == USB_VOLUME && mode != DISABLED)
-            {
-                volumeStream =
-                    util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
-
-                if (volumeStream.is_open())
-                {
-                    volumeDevice = std::make_shared<ImageBlockDevice>(
-                        volumeStream, volumeSize);
-                    volumeFs = dynamic_cast<fat::AkaiFatFileSystem *>(
-                        FileSystemFactory::createAkai(volumeDevice,
-                                                      mode == READ_ONLY));
-
-                    return std::dynamic_pointer_cast<fat::AkaiFatLfnDirectory>(
-                        volumeFs->getRoot());
-                }
-            }
-            return {};
-        }
-
-        void close()
-        {
-            if (type == LOCAL_DIRECTORY)
-            {
-                return;
-            }
-
-            if (!volumeStream.is_open() || volumeFs == nullptr)
-            {
-                throw std::runtime_error("Volume is not open");
-            }
-            flush();
-            volumeFs->close();
-            volumeDevice->close();
-            volumeStream.close();
-            delete volumeFs;
-            volumeFs = nullptr;
-            volumeDevice.reset();
-        }
-
-        void flush()
-        {
-            if (type == LOCAL_DIRECTORY)
-            {
-                return;
-            }
-
-            if (!volumeStream.is_open() || volumeFs == nullptr)
-            {
-                throw std::runtime_error("Volume is not open");
-            }
-            if (volumeFs->isReadOnly())
-            {
-                return;
-            }
-            volumeFs->flush();
-            volumeStream.flush();
-            if (!volumeStream)
-            {
-                throw std::runtime_error("Unable to flush device");
-            }
         }
     };
 } // namespace mpc::disk

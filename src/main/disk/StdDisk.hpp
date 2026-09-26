@@ -52,7 +52,8 @@ namespace mpc::disk
             {
                 return;
             }
-            root = volume.getRoot();
+            root = std::make_shared<MpcFile>(
+                mpc_fs::path(volume.localDirectoryPath));
         }
 
     protected:

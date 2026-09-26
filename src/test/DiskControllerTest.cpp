@@ -1,6 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include <ImageBlockDevice.hpp>
+#include <fat/AkaiFatFileSystem.hpp>
+#include <util/SuperFloppyFormatter.hpp>
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
 #include "disk/DiskController.hpp"
 #include "disk/RawDisk.hpp"
 #include "disk/StdDisk.hpp"
@@ -71,8 +75,8 @@ TEST_CASE("Disabling the active disk restores the previous enabled disk",
     disks.push_back(usbB);
     disks.push_back(usbC);
 
-    diskController->setActiveDiskIndex(1);
-    diskController->setActiveDiskIndex(2);
+    diskController->activateDisk(1);
+    diskController->activateDisk(2);
     REQUIRE(diskController->getActiveDisk() == usbC);
 
     usbC->getVolume().mode = DISABLED;
@@ -103,8 +107,8 @@ TEST_CASE("Disk fallback skips a removed previous disk", "[disk]")
     disks.push_back(usbB);
     disks.push_back(usbC);
 
-    diskController->setActiveDiskIndex(1);
-    diskController->setActiveDiskIndex(2);
+    diskController->activateDisk(1);
+    diskController->activateDisk(2);
     disks.erase(disks.begin() + 1);
 
     REQUIRE(diskController->ensureActiveDiskIsEnabled());
@@ -128,8 +132,8 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     disks.push_back(diskB);
     disks.push_back(diskC);
 
-    diskController->setActiveDiskIndex(1);
-    diskController->setActiveDiskIndex(2);
+    diskController->activateDisk(1);
+    diskController->activateDisk(2);
 
     const auto layeredScreen = mpc.getLayeredScreen();
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
@@ -150,7 +154,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     REQUIRE(loadScreen->findField("device")->getText() == "DISK B");
 
     diskC->getVolume().mode = READ_WRITE;
-    diskController->setActiveDiskIndex(2);
+    diskController->activateDisk(2);
     nvram::VolumesPersistence::save(mpc);
 
     const auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
@@ -285,5 +289,121 @@ TEST_CASE("Device activation owns the mount lifecycle", "[disk][mount]")
         REQUIRE_FALSE(controller->activateDisk(2).empty());
         REQUIRE(controller->getActiveDisk() == a);
         REQUIRE(b->opens == 0);
+    }
+}
+
+TEST_CASE("Mounted sessions release access and preserve FAT data",
+          "[disk][mount-session]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    auto path = mpc_fs::path(mpc.getDisk()->getAbsolutePath()) / "session.img";
+    constexpr int size = 5 * 1024 * 1024;
+    {
+        std::ofstream initialize(path.string(), std::ios::binary);
+        initialize.seekp(size - 1);
+        initialize.put(0);
+    }
+    {
+        std::fstream stream(path.string(),
+                            std::ios::in | std::ios::out | std::ios::binary);
+        auto device = std::make_shared<akaifat::ImageBlockDevice>(stream, size);
+        akaifat::SuperFloppyFormatter formatter(device);
+        std::unique_ptr<akaifat::fat::AkaiFatFileSystem> fs(formatter.format());
+        fs->close();
+    }
+    Volume volume;
+    volume.type = USB_VOLUME;
+    volume.mode = READ_WRITE;
+    volume.volumePath = path.string();
+    volume.volumeSize = size;
+    int opens = 0, releases = 0;
+    const auto open = [&](const std::string &source, bool readOnly)
+    {
+        ++opens;
+        return std::fstream(
+            source, std::ios::binary | std::ios::in |
+                        (readOnly ? std::ios::openmode{} : std::ios::out));
+    };
+    const auto release = [&](const std::string &source)
+    {
+        CHECK(source == path.string());
+        ++releases;
+    };
+    SECTION("Writes survive closing and reopening")
+    {
+        {
+            MountedVolumeSession session(volume, open, release);
+            std::string name = "SAVED.SND";
+            auto entry = std::dynamic_pointer_cast<
+                akaifat::fat::AkaiFatLfnDirectoryEntry>(
+                session.getRoot()->addFile(name));
+            MpcFile file(entry);
+            std::vector<char> bytes{'M', 'P', 'C'};
+            file.setFileDataChecked(bytes);
+            session.close();
+            session.close();
+            CHECK(releases == 1);
+        }
+        CHECK(releases == 1);
+        volume.mode = READ_ONLY;
+        const auto before = MpcFile(path).getBytes();
+        {
+            MountedVolumeSession session(volume, open, release);
+            std::string name = "SAVED.SND";
+            auto entry = std::dynamic_pointer_cast<
+                akaifat::fat::AkaiFatLfnDirectoryEntry>(
+                session.getRoot()->getEntry(name));
+            REQUIRE(entry);
+            CHECK(MpcFile(entry).getBytes() ==
+                  std::vector<char>{'M', 'P', 'C'});
+            session.flush();
+        }
+        CHECK(MpcFile(path).getBytes() == before);
+        CHECK(opens == 2);
+        CHECK(releases == 2);
+    }
+    SECTION("Failed open releases platform access")
+    {
+        REQUIRE_THROWS(MountedVolumeSession(
+            volume,
+            [](const std::string &, bool)
+            {
+                return std::fstream{};
+            },
+            release));
+        CHECK(releases == 1);
+    }
+    SECTION("Invalid filesystem releases platform access")
+    {
+        {
+            std::fstream corrupt(path.string(), std::ios::in | std::ios::out |
+                                                    std::ios::binary);
+            corrupt.seekp(510);
+            corrupt.put(0);
+        }
+        REQUIRE_THROWS(MountedVolumeSession(volume, open, release));
+        CHECK(opens == 1);
+        CHECK(releases == 1);
+    }
+    SECTION("Captured destination retains session ownership")
+    {
+        auto session =
+            std::make_shared<MountedVolumeSession>(volume, open, release);
+        auto destination =
+            SaveDestination::fromRaw(session->getRoot(), {}, true, 0,
+                                     [session]
+                                     {
+                                         session->flush();
+                                     });
+        session.reset();
+        CHECK(releases == 0);
+        destination->prepare();
+        auto file = destination->create("HELD.SND", false);
+        std::vector<char> bytes{'A'};
+        file->setFileDataChecked(bytes);
+        destination->flush();
+        destination.reset();
+        CHECK(releases == 1);
     }
 }

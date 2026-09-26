@@ -24,6 +24,7 @@ namespace mpc::disk
         int activeDiskIndex = 0;
 
         void initDisks();
+        void commitActiveDiskIndex(int);
 
     public:
         explicit DiskController(Mpc &,
@@ -31,7 +32,6 @@ namespace mpc::disk
         std::vector<std::shared_ptr<AbstractDisk>> &getDisks();
         std::shared_ptr<AbstractDisk> getActiveDisk();
         int getActiveDiskIndex() const;
-        void setActiveDiskIndex(int newActiveDiskIndex);
         // Empty on success; otherwise the current selection is retained.
         std::string activateDisk(int index);
         bool ensureActiveDiskIsEnabled();

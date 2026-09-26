@@ -16,19 +16,14 @@ using namespace akaifat::util;
 using namespace akaifat::fat;
 using namespace mpc::lcdgui;
 
-RawDisk::RawDisk(Mpc &_mpc) : AbstractDisk(_mpc) {}
-
-RawDisk::~RawDisk()
+RawDisk::RawDisk(Mpc &_mpc, Mount mount) : AbstractDisk(_mpc),
+    mount(mount ? std::move(mount) : [](const Volume &v) {
+        return std::make_shared<MountedVolumeSession>(v);
+    })
 {
-    try
-    {
-        closeResources();
-    }
-    catch (...)
-    {
-        MLOG("Failed to close raw disk at shutdown");
-    }
 }
+
+RawDisk::~RawDisk() = default;
 
 void RawDisk::initFiles()
 {
@@ -199,37 +194,11 @@ void RawDisk::close()
         return;
     }
 
-    closeResources();
-}
-
-void RawDisk::closeResources()
-{
-    const bool shouldUnmount = root != nullptr || volume.volumeStream.is_open();
-
-    if (volume.volumeStream.is_open())
+    if (session)
     {
-        if (volume.volumeFs)
-        {
-            volume.close();
-        }
-        else
-        {
-            volume.volumeStream.close();
-        }
+        session->close();
     }
-
-    if (shouldUnmount)
-    {
-        try
-        {
-            VolumeMounter::unmount(volume.volumePath);
-        }
-        catch (const std::exception &)
-        {
-            MLOG("Failed to unmount " + volume.volumePath +
-                 " from VMPC2000XL and mount it back to the host OS!");
-        }
-    }
+    session.reset();
 
     root = {};
     path.clear();
@@ -240,7 +209,11 @@ void RawDisk::closeResources()
 
 void RawDisk::flush()
 {
-    volume.flush();
+    if (!session)
+    {
+        throw std::runtime_error("Device is not mounted");
+    }
+    session->flush();
 }
 
 std::string RawDisk::getTypeShortName()
@@ -266,13 +239,13 @@ std::unique_ptr<SaveDestination> RawDisk::captureSaveDestination(int view)
                             : std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
                                   path.back()->getParent());
     return SaveDestination::fromRaw(
-        directory, parent, volume.mode == READ_WRITE, view,
-        [this]
+        directory, parent, session && !session->isReadOnly(), view,
+        [session = session]
         {
-            flush();
-            if (!volume.volumeStream)
+            if (!session)
             {
-                throw std::runtime_error("Unable to flush save volume");
+                throw std::runtime_error("Device is not mounted");
             }
+            session->flush();
         });
 }

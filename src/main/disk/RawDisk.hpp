@@ -1,6 +1,7 @@
 #pragma once
 #include <disk/AbstractDisk.hpp>
 #include <disk/Volume.hpp>
+#include <disk/MountedVolumeSession.hpp>
 
 #include <fat/AkaiFatLfnDirectory.hpp>
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
@@ -17,11 +18,14 @@ namespace mpc::disk
     class RawDisk : public AbstractDisk
     {
     public:
-        RawDisk(Mpc &);
+        using Mount = std::function<std::shared_ptr<MountedVolumeSession>(
+            const Volume &)>;
+        explicit RawDisk(Mpc &, Mount = {});
         ~RawDisk();
 
     private:
-        void closeResources();
+        Mount mount;
+        std::shared_ptr<MountedVolumeSession> session;
         Volume volume;
         std::vector<std::shared_ptr<fat::AkaiFatLfnDirectoryEntry>> path;
         std::shared_ptr<fat::AkaiFatLfnDirectory> root;
@@ -59,7 +63,8 @@ namespace mpc::disk
             {
                 return;
             }
-            root = volume.getRawRoot();
+            session = mount(volume);
+            root = session->getRoot();
             if (!root)
             {
                 throw std::runtime_error("Unable to mount device");

@@ -60,7 +60,7 @@ void DiskController::initDisks()
 
         if (uuid == persistedActiveUUID)
         {
-            setActiveDiskIndex(i);
+            commitActiveDiskIndex(i);
             break;
         }
     }
@@ -123,7 +123,7 @@ int DiskController::getActiveDiskIndex() const
     return activeDiskIndex;
 }
 
-void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
+void DiskController::commitActiveDiskIndex(int newActiveDiskIndex)
 {
     if (mpc.isManagedSaveActive())
     {
@@ -210,7 +210,7 @@ std::string DiskController::activateDisk(int index)
         }
         return "Unable to activate device";
     }
-    setActiveDiskIndex(index);
+    commitActiveDiskIndex(index);
     return {};
 }
 
