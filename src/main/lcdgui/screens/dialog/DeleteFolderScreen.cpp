@@ -38,50 +38,52 @@ void DeleteFolderScreen::deleteFolder()
     const auto disk = mpc.getDisk();
     auto parentFileNames = disk->getParentFileNames();
 
-    if (disk->deleteRecursive(file))
+    if (!disk->deleteRecursive(file))
     {
-        auto currentIndex = directoryScreen->yPos0 + directoryScreen->yOffset0;
+        return;
+    }
 
-        disk->flush();
-        disk->moveBack();
-        disk->initFiles();
+    auto currentIndex = directoryScreen->yPos0 + directoryScreen->yOffset0;
 
-        for (int i = 0; i < parentFileNames.size(); i++)
+    disk->flush();
+    disk->moveBack();
+    disk->initFiles();
+
+    for (int i = 0; i < parentFileNames.size(); i++)
+    {
+        if (parentFileNames[i] == fileName)
         {
-            if (parentFileNames[i] == fileName)
-            {
-                parentFileNames.erase(begin(parentFileNames) + i);
-                break;
-            }
+            parentFileNames.erase(begin(parentFileNames) + i);
+            break;
         }
+    }
 
-        if (currentIndex >= parentFileNames.size() && currentIndex != 0)
+    if (currentIndex >= parentFileNames.size() && currentIndex != 0)
+    {
+        currentIndex--;
+
+        if (directoryScreen->yPos0 == 0)
         {
-            currentIndex--;
-
-            if (directoryScreen->yPos0 == 0)
-            {
-                directoryScreen->yOffset0 -= 1;
-            }
-            else
-            {
-                directoryScreen->yPos0 -= 1;
-            }
-        }
-
-        if (parentFileNames.size() == 0)
-        {
-            directoryScreen->yPos0 = 0;
-            directoryScreen->yOffset0 = 0;
-            disk->moveBack();
-            disk->initFiles();
+            directoryScreen->yOffset0 -= 1;
         }
         else
         {
-            const auto nextDir = parentFileNames[currentIndex];
-            disk->moveForward(nextDir);
-            disk->initFiles();
+            directoryScreen->yPos0 -= 1;
         }
+    }
+
+    if (parentFileNames.size() == 0)
+    {
+        directoryScreen->yPos0 = 0;
+        directoryScreen->yOffset0 = 0;
+        disk->moveBack();
+        disk->initFiles();
+    }
+    else
+    {
+        const auto nextDir = parentFileNames[currentIndex];
+        disk->moveForward(nextDir);
+        disk->initFiles();
     }
 
     std::this_thread::sleep_for(
@@ -97,6 +99,10 @@ void DeleteFolderScreen::function(const int i)
     {
         case 4:
         {
+            if (mpc.getDisk()->rejectReadOnlyDeletion())
+            {
+                return;
+            }
             auto operationLease = mpc.fileOperationGate.tryAcquire();
             if (!operationLease)
             {

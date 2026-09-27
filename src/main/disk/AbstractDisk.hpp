@@ -74,6 +74,7 @@ namespace mpc::disk
         bool consumePreparedListing();
         virtual std::shared_ptr<MpcFile> newFile(const std::string &name) = 0;
         bool deleteSelectedFile() const;
+        bool rejectReadOnlyDeletion() const;
         bool deleteSelectedFileOrOpenErrorPopup() const;
         bool deleteFileOrOpenErrorPopup(const std::shared_ptr<MpcFile> &) const;
 
@@ -152,12 +153,14 @@ namespace mpc::disk
             std::function<tl::expected<return_type, mpc_io_error_msg>()>
                 ioFunc);
 
+    protected:
         template <typename return_type>
         tl::expected<return_type, mpc_io_error_msg>
         performRequiredIoOrOpenErrorPopup(
             std::function<tl::expected<return_type, mpc_io_error_msg>()>
                 ioFunc);
 
+    private:
         template <typename return_type>
         void performIoOrOpenErrorPopupNonReturning(
             std::function<tl::expected<return_type, mpc_io_error_msg>()>

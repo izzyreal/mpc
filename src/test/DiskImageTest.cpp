@@ -11,6 +11,11 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/VmpcDisksScreen.hpp"
+#include "lcdgui/screens/dialog/DeleteFileScreen.hpp"
+#include "lcdgui/screens/dialog/DeleteFolderScreen.hpp"
+#include "lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
+#include "Logger.hpp"
 #include <fat/AkaiFatFileSystem.hpp>
 #include <util/SuperFloppyFormatter.hpp>
 #include <nlohmann/json.hpp>
@@ -135,6 +140,143 @@ TEST_CASE(
     REQUIRE_NOTHROW(ImageFileDevice::open(f.path.string(), false));
     REQUIRE(f.controller().activateDisk(1).empty());
     REQUIRE_THROWS(f.mpc.getDisk()->newFile("NO.SND"));
+}
+
+TEST_CASE("Read-only deletion explains the restriction and preserves the image",
+          "[disk][image][delete]")
+{
+    ImageFixture f;
+    f.volume.mode = READ_WRITE;
+    f.bind();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    auto disk = f.mpc.getDisk();
+    REQUIRE(disk->newFile("ROOT.SND"));
+    REQUIRE(disk->newFolder("EMPTY"));
+    REQUIRE(disk->newFolder("SONGS"));
+    REQUIRE(disk->moveForward("SONGS"));
+    REQUIRE(disk->newFile("CHILD.SND"));
+    REQUIRE(
+        f.controller().setVolumeMode(f.volume.volumeUUID, READ_ONLY).empty());
+    const auto original = MpcFile(f.path).getBytes();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    disk->initFiles();
+    auto ls = f.mpc.getLayeredScreen();
+    ls->openScreenById(lcdgui::ScreenId::LoadScreen);
+    ls->openScreenById(lcdgui::ScreenId::DirectoryScreen);
+    const auto names = disk->getFileNames();
+
+    SECTION("File")
+    {
+        REQUIRE_FALSE(
+            disk->deleteFileOrOpenErrorPopup(disk->getFile("ROOT.SND")));
+    }
+    SECTION("Empty folder")
+    {
+        REQUIRE_FALSE(disk->deleteRecursive(disk->getFile("EMPTY")));
+    }
+    SECTION("Populated folder")
+    {
+        REQUIRE_FALSE(disk->deleteRecursive(disk->getFile("SONGS")));
+    }
+    SECTION("Bulk")
+    {
+        REQUIRE_FALSE(disk->deleteAllFiles(0));
+    }
+    SECTION("File confirmation")
+    {
+        f.mpc.screens->get<lcdgui::ScreenId::DeleteFileScreen>()->function(4);
+    }
+    SECTION("Folder confirmation")
+    {
+        f.mpc.screens->get<lcdgui::ScreenId::DeleteFolderScreen>()->function(4);
+    }
+    SECTION("Bulk confirmation")
+    {
+        f.mpc.screens->get<lcdgui::ScreenId::DeleteAllFilesScreen>()->function(
+            4);
+    }
+
+    ls->timerCallback();
+    REQUIRE(ls->isCurrentScreen({lcdgui::ScreenId::PopupScreen}));
+    CHECK(f.mpc.screens->get<lcdgui::ScreenId::PopupScreen>()
+              ->findChild<lcdgui::Label>("popup")
+              ->getText() == "Disk is read-only!");
+    ls->timerCallback();
+    CHECK(ls->isCurrentScreen({lcdgui::ScreenId::PopupScreen}));
+    CHECK(disk->getFileNames() == names);
+    CHECK(disk->isRoot());
+    REQUIRE(f.controller().activateDisk(0).empty());
+    CHECK(MpcFile(f.path).getBytes() == original);
+}
+
+TEST_CASE("Writable image file and folder deletion survives remounting",
+          "[disk][image][delete]")
+{
+    ImageFixture f;
+    f.volume.mode = READ_WRITE;
+    f.bind();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    auto disk = f.mpc.getDisk();
+    REQUIRE(disk->newFolder("SONGS"));
+    REQUIRE(disk->moveForward("SONGS"));
+    REQUIRE(disk->newFile("CHILD.SND"));
+    REQUIRE(disk->moveBack());
+    REQUIRE(disk->newFile("ROOT.SND"));
+    disk->initFiles();
+    REQUIRE(disk->deleteFileOrOpenErrorPopup(disk->getFile("ROOT.SND")));
+    REQUIRE(disk->deleteRecursive(disk->getFile("SONGS")));
+    REQUIRE(f.controller().activateDisk(0).empty());
+    REQUIRE(f.controller().activateDisk(1).empty());
+    disk->initFiles();
+    CHECK_FALSE(disk->getFile("ROOT.SND"));
+    CHECK_FALSE(disk->getFile("SONGS"));
+}
+
+TEST_CASE("Recursive deletion stops and logs the first unexpected FAT failure",
+          "[disk][image][delete]")
+{
+    ImageFixture f;
+    f.volume.mode = READ_WRITE;
+    f.bind();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    auto disk = f.mpc.getDisk();
+    REQUIRE(disk->newFolder("SONGS"));
+    REQUIRE(disk->moveForward("SONGS"));
+    REQUIRE(disk->newFile("FIRST.SND"));
+    REQUIRE(disk->newFile("SECOND.SND"));
+    REQUIRE(
+        f.controller().setVolumeMode(f.volume.volumeUUID, READ_ONLY).empty());
+    REQUIRE(f.controller().activateDisk(1).empty());
+    disk->initFiles();
+    // Bypass the preflight check to exercise an actual FAT-layer rejection.
+    disk->getVolume().mode = READ_WRITE;
+    struct RestoreLogger
+    {
+        Logger original = Logger::l;
+        ~RestoreLogger()
+        {
+            Logger::l = original;
+        }
+    } restoreLogger;
+    const auto logPath = f.path.string() + ".log";
+    Logger::l.setPath(logPath);
+    REQUIRE_FALSE(disk->deleteRecursive(disk->getFile("SONGS")));
+    f.mpc.getLayeredScreen()->timerCallback();
+    CHECK(f.mpc.screens->get<lcdgui::ScreenId::PopupScreen>()
+              ->findChild<lcdgui::Label>("popup")
+              ->getText() == "I/O error! See logs for info");
+    const auto logBytes = MpcFile(mpc_fs::path(logPath)).getBytes();
+    const std::string log(logBytes.begin(), logBytes.end());
+    CHECK(log.find("Failed to delete FAT entry '") != std::string::npos);
+    CHECK(log.find(".SND': ") != std::string::npos);
+    CHECK(log.find("Failed to delete FAT entry '",
+                   log.find("Failed to delete FAT entry '") + 1) ==
+          std::string::npos);
+    CHECK(disk->getFile("SONGS"));
+    REQUIRE(disk->moveForward("SONGS"));
+    disk->initFiles();
+    CHECK(disk->getFile("FIRST.SND"));
+    CHECK(disk->getFile("SECOND.SND"));
 }
 
 TEST_CASE("Missing or locked image activation preserves the current disk",

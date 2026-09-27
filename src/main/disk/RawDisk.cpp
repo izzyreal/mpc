@@ -108,7 +108,7 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getDir()
 
 bool RawDisk::deleteAllFiles(int extension)
 {
-    if (isSaveBusy())
+    if (isSaveBusy() || rejectReadOnlyDeletion())
     {
         return false;
     }
@@ -133,10 +133,11 @@ bool RawDisk::deleteAllFiles(int extension)
 
     for (auto &f : filesToDelete)
     {
-        if (f->del())
+        if (!deleteFileOrOpenErrorPopup(f))
         {
-            success = true;
+            return false;
         }
+        success = true;
     }
 
     return success;

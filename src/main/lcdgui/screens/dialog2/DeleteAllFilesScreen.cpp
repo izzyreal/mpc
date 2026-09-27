@@ -45,6 +45,10 @@ void DeleteAllFilesScreen::function(int i)
             break;
         case 4:
         {
+            if (mpc.getDisk()->rejectReadOnlyDeletion())
+            {
+                return;
+            }
             const auto success = mpc.getDisk()->deleteAllFiles(delete_);
 
             if (success)

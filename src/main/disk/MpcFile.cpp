@@ -281,8 +281,10 @@ bool MpcFile::del() const
             rawEntry->getParent()->remove(rawEntry->getName());
             return true;
         }
-        catch (const std::exception &)
+        catch (const std::exception &e)
         {
+            MLOG("Failed to delete FAT entry '" + rawEntry->getName() +
+                 "': " + e.what());
             return false;
         }
     }

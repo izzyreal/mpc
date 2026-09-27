@@ -183,7 +183,7 @@ std::shared_ptr<MpcFile> StdDisk::getParentDir()
 
 bool StdDisk::deleteAllFiles(int extensionIndex)
 {
-    if (isSaveBusy())
+    if (isSaveBusy() || rejectReadOnlyDeletion())
     {
         return false;
     }
@@ -205,7 +205,11 @@ bool StdDisk::deleteAllFiles(int extensionIndex)
             if (extensionIndex == 0 ||
                 StrUtil::hasEnding(f->getName(), extensions[extensionIndex]))
             {
-                success = f->del();
+                if (!deleteFileOrOpenErrorPopup(f))
+                {
+                    return false;
+                }
+                success = true;
             }
         }
     }
@@ -214,16 +218,33 @@ bool StdDisk::deleteAllFiles(int extensionIndex)
 
 bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> f)
 {
+    if (rejectReadOnlyDeletion())
+    {
+        return false;
+    }
     const auto locked = f.lock();
     if (!locked)
     {
         return false;
     }
 
-    const auto removedCount =
-        value(mpc_fs::remove_all(locked->fs_path), FailurePolicy::Required,
-              "recursive folder deletion");
-    return removedCount && *removedCount != 0;
+    const std::function<tl::expected<bool, mpc_io_error_msg>()> ioFunc =
+        [locked]() -> tl::expected<bool, mpc_io_error_msg>
+    {
+        const auto removedCount =
+            value(mpc_fs::remove_all(locked->fs_path), FailurePolicy::Required,
+                  "recursive folder deletion");
+        if (removedCount && *removedCount != 0)
+        {
+            return true;
+        }
+        MLOG("Recursive folder deletion failed for '" +
+             locked->fs_path.string() + "'");
+        return tl::make_unexpected(
+            mpc_io_error_msg{"I/O error! See logs for info"});
+    };
+    const auto result = performRequiredIoOrOpenErrorPopup(ioFunc);
+    return result && *result;
 }
 
 bool StdDisk::newFolder(const std::string &newDirName)

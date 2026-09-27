@@ -106,14 +106,41 @@ std::vector<std::string> AbstractDisk::getParentFileNames() const
 
 bool AbstractDisk::deleteSelectedFile() const
 {
+    if (rejectReadOnlyDeletion())
+    {
+        return false;
+    }
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     return files[loadScreen->fileLoad]->del();
+}
+
+bool AbstractDisk::rejectReadOnlyDeletion() const
+{
+    if (const_cast<AbstractDisk *>(this)->getVolume().mode != READ_ONLY)
+    {
+        return false;
+    }
+    auto ls = mpc.getLayeredScreen();
+    const auto delayMs =
+        static_cast<int>(mpc.getFileOperationTimings().ioErrorFeedback.count());
+    ls->postToUiThread(utils::Task(
+        [ls, delayMs]
+        {
+            ls->showPopupAndThenOpen(ScreenId::DirectoryScreen,
+                                     "Disk is read-only!", delayMs);
+        }));
+    return true;
 }
 
 bool AbstractDisk::deleteFileOrOpenErrorPopup(
     const std::shared_ptr<MpcFile> &file) const
 {
     if (!file)
+    {
+        return false;
+    }
+
+    if (rejectReadOnlyDeletion())
     {
         return false;
     }
@@ -126,6 +153,7 @@ bool AbstractDisk::deleteFileOrOpenErrorPopup(
             return true;
         }
 
+        MLOG("Deletion failed for '" + file->getName() + "'");
         return tl::make_unexpected(
             mpc_io_error_msg{"I/O error! See logs for info"});
     };
@@ -302,6 +330,11 @@ bool AbstractDisk::deleteRecursive(const std::weak_ptr<MpcFile> _toDelete)
         return false;
     }
 
+    if (rejectReadOnlyDeletion())
+    {
+        return false;
+    }
+
     if (toDelete->isDirectory())
     {
         for (auto &f : toDelete->listFiles())
@@ -312,7 +345,10 @@ bool AbstractDisk::deleteRecursive(const std::weak_ptr<MpcFile> _toDelete)
                 continue;
             }
 
-            deleteRecursive(f);
+            if (!deleteRecursive(f))
+            {
+                return false;
+            }
         }
     }
 

@@ -31,6 +31,10 @@ void DeleteFileScreen::function(const int i)
 
         case 4:
         {
+            if (mpc.getDisk()->rejectReadOnlyDeletion())
+            {
+                return;
+            }
             auto operationLease = mpc.fileOperationGate.tryAcquire();
             if (!operationLease)
             {
@@ -58,18 +62,19 @@ void DeleteFileScreen::deleteFile()
 
     const auto disk = mpc.getDisk();
 
-    if (disk->deleteSelectedFileOrOpenErrorPopup())
+    if (!disk->deleteSelectedFileOrOpenErrorPopup())
     {
-        disk->flush();
-        disk->initFiles();
-
-        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-        loadScreen->setFileLoad(loadScreen->getFileLoad() - 1);
-
-        const auto directoryScreen =
-            mpc.screens->get<ScreenId::DirectoryScreen>();
-        directoryScreen->setYOffset1(directoryScreen->getYOffset1() - 1);
+        return;
     }
+
+    disk->flush();
+    disk->initFiles();
+
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    loadScreen->setFileLoad(loadScreen->getFileLoad() - 1);
+
+    const auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
+    directoryScreen->setYOffset1(directoryScreen->getYOffset1() - 1);
 
     openScreenById(ScreenId::DirectoryScreen);
 }
