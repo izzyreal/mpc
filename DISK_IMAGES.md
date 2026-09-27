@@ -2,8 +2,8 @@
 
 DISKS can bind an existing image to a virtual device. The first iteration uses
 exactly the Akai FAT filesystem implementation used for raw USB volumes. It
-accepts a single FAT16/Akai FAT16 volume starting at byte zero with 512-byte
-sectors. FAT12, FAT32, partition tables, ISO9660, compressed images, and other
+accepts a single Akai FAT12 or FAT16 volume starting at byte zero with 512-byte
+sectors. FAT32, partition tables, ISO9660, compressed images, and other
 container formats are not supported. File extensions do not determine support.
 
 In DISKS, press **IMAGES** (F4), or WINDOW, for ADD, REPLACE, CHECK, REMOVE, and
@@ -93,3 +93,14 @@ read-only byte preservation, access conflicts, unavailable images, geometry and
 allocation-chain validation, persistence, startup restoration without a UI
 context, and DISKS scrolling. Native presentation needs platform UI smoke tests
 in addition to these hardware-independent tests.
+
+MPC60 800 KiB FAT12 images are supported, including their legacy boot sectors
+without a PC boot signature and Akai filename extensions. Existing MPC60 SET
+import handles their sounds/programs; older unsupported ALL formats remain
+unsupported. Incomplete captures (such as nine sectors captured from a ten-sector
+track) are rejected rather than padded or repaired.
+
+For the external MPC60 corpus test, set `VMPC_MPC60_IMAGE_CORPUS` to the directory
+containing the images and run `mpc-tests '[mpc60-corpus]'`. Originals are opened
+read-only; write/reopen tests use disposable copies under the test data root.
+Factory sound libraries are not included in the repository.

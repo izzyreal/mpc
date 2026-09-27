@@ -149,7 +149,7 @@ void MountedVolumeSession::releaseResources()
 namespace
 {
     void
-    validateFat16Geometry(const std::shared_ptr<akaifat::BlockDevice> &device)
+    validateFatGeometry(const std::shared_ptr<akaifat::BlockDevice> &device)
     {
         akaifat::ByteBuffer boot(512);
         device->read(0, boot);
@@ -170,29 +170,32 @@ namespace
         const uint64_t sectors = u16(19) ? u16(19) : u32(32);
         const uint64_t reserved = u16(14), fats = u8(16), fatSectors = u16(22);
         const uint64_t rootEntries = u16(17), clusterSectors = u8(13);
-        if (u16(510) != 0xaa55 || u16(11) != 512 || !reserved || fats < 1 ||
-            fats > 2 || !fatSectors || !rootEntries || rootEntries % 16 ||
+        if (u16(11) != 512 || !reserved || fats < 1 || fats > 2 ||
+            !fatSectors || !rootEntries || rootEntries % 16 ||
             !clusterSectors || clusterSectors > 128 ||
             (clusterSectors & (clusterSectors - 1)))
         {
-            throw std::runtime_error("Unsupported or invalid FAT16 image");
+            throw std::runtime_error("Unsupported or invalid FAT12/16 image");
         }
         const uint64_t metadata =
             reserved + fats * fatSectors + rootEntries / 16;
         if (sectors <= metadata ||
             sectors > static_cast<uint64_t>(device->getSize()) / 512)
         {
-            throw std::runtime_error("Truncated or invalid FAT16 image");
+            throw std::runtime_error("Truncated or invalid FAT12/16 image");
         }
         const auto clusters = (sectors - metadata) / clusterSectors;
-        const bool explicitFat16 =
-            std::string(bytes.data() + 54, 8) == "FAT16   ";
-        if ((!explicitFat16 && clusters < 4085) || !clusters ||
-            clusters > 65524 || (clusters + 2) * 2 > fatSectors * 512)
+        const auto parsedBoot = akaifat::fat::BootSector::read(device);
+        auto *fatType = parsedBoot->getFatType();
+        const bool fat12 = fatType->getBitMask() == 0xfff;
+        const auto requiredFatBytes =
+            fat12 ? ((clusters + 2) * 3 + 1) / 2 : (clusters + 2) * 2;
+        if (!clusters || clusters > 65524 ||
+            requiredFatBytes > fatSectors * 512)
         {
-            throw std::runtime_error(
-                "Only FAT16 images supported by the Akai layer are accepted");
+            throw std::runtime_error("Invalid FAT12/16 allocation table size");
         }
+        const auto badCluster = fat12 ? 0xff7 : 0xfff7;
         // The existing FAT layer assumes acyclic, in-range chains. Check the
         // allocation graph before handing an externally supplied image to it.
         akaifat::ByteBuffer table(static_cast<int>(fatSectors * 512));
@@ -200,14 +203,13 @@ namespace
         std::vector<uint16_t> next(clusters + 2);
         for (size_t i = 0; i < next.size(); ++i)
         {
-            const auto &data = table.getBuffer();
-            next[i] = static_cast<unsigned char>(data[i * 2]) |
-                      (static_cast<unsigned char>(data[i * 2 + 1]) << 8);
+            next[i] =
+                static_cast<uint16_t>(fatType->readEntry(table.getBuffer(), i));
         }
         std::vector<uint8_t> visited(next.size(), 0);
         for (size_t start = 2; start < next.size(); ++start)
         {
-            if (visited[start] || next[start] == 0 || next[start] == 0xfff7)
+            if (visited[start] || next[start] == 0 || next[start] == badCluster)
             {
                 continue;
             }
@@ -217,9 +219,9 @@ namespace
             {
                 if (current < 2 || current >= next.size() ||
                     visited[current] == 1 || next[current] == 0 ||
-                    next[current] == 0xfff7)
+                    next[current] == badCluster)
                 {
-                    throw std::runtime_error("Invalid FAT16 allocation chain");
+                    throw std::runtime_error("Invalid FAT allocation chain");
                 }
                 if (visited[current] == 2)
                 {
@@ -228,7 +230,7 @@ namespace
                 visited[current] = 1;
                 chain.push_back(current);
                 const auto target = next[current];
-                if (target >= 0xfff8)
+                if (fatType->isEofCluster(target))
                 {
                     break;
                 }
@@ -268,7 +270,7 @@ MountedVolumeSession::MountedVolumeSession(
     std::shared_ptr<akaifat::BlockDevice> image, bool readOnly)
     : accessAcquired(true), device(std::move(image))
 {
-    validateFat16Geometry(device);
+    validateFatGeometry(device);
     filesystem.reset(akaifat::fat::AkaiFatFileSystem::read(device, readOnly));
     if (!getRoot())
     {

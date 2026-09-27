@@ -46,7 +46,7 @@ void mpc::platform::showNativeFilePicker(std::shared_ptr<PickerRequest> request,
             FileSelection selection;
             if (SUCCEEDED(result))
             {
-                dialog->SetTitle(L"Select a FAT16 disk image");
+                dialog->SetTitle(L"Select a FAT disk image");
                 dialog->SetOptions(FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST |
                                    FOS_FORCEFILESYSTEM | FOS_NOCHANGEDIR);
                 activeDialog = dialog;

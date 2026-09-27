@@ -129,7 +129,7 @@ void mpc::platform::showNativeFilePicker(std::shared_ptr<PickerRequest> request,
                     "/org/freedesktop/portal/desktop",
                     "org.freedesktop.portal.FileChooser", "OpenFile",
                     g_variant_new("(ss@a{sv})", parent.c_str(),
-                                  "Select a FAT16 disk image",
+                                  "Select a FAT disk image",
                                   g_variant_builder_end(&options)),
                     G_VARIANT_TYPE("(o)"), G_DBUS_CALL_FLAGS_NONE, 10000,
                     cancel, &error);

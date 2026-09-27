@@ -119,7 +119,7 @@ void mpc::platform::showNativeFilePicker(std::shared_ptr<PickerRequest> request,
         panel.canChooseDirectories = NO;
         panel.canChooseFiles = YES;
         panel.allowsMultipleSelection = NO;
-        panel.title = @"Select a FAT16 disk image";
+        panel.title = @"Select a FAT disk image";
         [panel retain];
         auto keepPanel = std::shared_ptr<void>((void *)panel, [](void *p){ [(id)p release]; });
         request->setDismiss([keepPanel] {
