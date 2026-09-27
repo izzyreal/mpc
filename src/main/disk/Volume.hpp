@@ -36,6 +36,8 @@ namespace mpc::disk
          that contains a single FAT16 volume.
          */
         std::string diskImagePath;
+        // Opaque platform bookmark/permission data; never a cached image copy.
+        std::string diskImageAccessToken;
 
         /*
          Used when type == USB_VOLUME. For example /dev/sdb on Linux,

@@ -657,11 +657,13 @@
  "infox" : [ 240, 240 ],
  "infoy" : [ 10, 38 ],
  "fblabels" : [
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", "SAVE" ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ]],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "IMAGES", "MIDI", "SAVE" ],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "IMAGES", "MIDI", null ],
+  [ "ADD", "REPLAC", "CHECK", "REMOVE", "BACK", null ]],
 "fbtypes" : [
-  [ 0, 0, 0, 2, 0, 1 ],
-  [ 0, 0, 0, 2, 0, null ]]
+  [ 0, 0, 0, 1, 0, 1 ],
+  [ 0, 0, 0, 1, 0, null ],
+  [ 1, 1, 1, 1, 1, null ]]
 },
 "vmpc-midi":
 {

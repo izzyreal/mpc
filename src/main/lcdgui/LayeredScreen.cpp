@@ -1,3 +1,4 @@
+#include "disk/DiskController.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "disk/SaveOperation.hpp"
 #include "sequencer/Transport.hpp"
@@ -490,6 +491,7 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 void LayeredScreen::timerCallback()
 {
     uiTasks.drain();
+    mpc.getDiskController()->pollFilePicker();
     if (const auto save = mpc.getSaveOperation())
     {
         save->tick();

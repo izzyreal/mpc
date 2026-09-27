@@ -216,6 +216,20 @@ target_include_directories(mpc PUBLIC
 
 target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator lodepng kaitai_struct_cpp_stl_runtime)
 
+if(APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        target_link_libraries(mpc "-framework UIKit" "-framework Foundation")
+    else()
+        target_link_libraries(mpc "-framework AppKit" "-framework Foundation")
+    endif()
+elseif(WIN32)
+    target_link_libraries(mpc ole32 shell32 uuid)
+elseif(UNIX AND NOT ANDROID)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(MPC_GIO REQUIRED IMPORTED_TARGET gio-2.0)
+    target_link_libraries(mpc PkgConfig::MPC_GIO)
+endif()
+
 if(MSVC)
   target_compile_options(mpc PRIVATE "/MP")
 endif()

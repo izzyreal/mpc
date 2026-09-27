@@ -201,7 +201,7 @@ void Mpc::init(const MpcInitOptions &options)
 
     diskController = std::make_unique<disk::DiskController>(
         *this,
-        options.detectRawUsbVolumes);
+        options.detectRawUsbVolumes, options.imageOpen);
 
     hardware = std::make_shared<Hardware>();
 

@@ -6,6 +6,7 @@
 
 #include "disk/DiskController.hpp"
 #include "disk/FileOperationGate.hpp"
+#include "disk/MountedVolumeSession.hpp"
 
 #include "AutoSave.hpp"
 #include "Paths.hpp"
@@ -99,6 +100,7 @@ namespace mpc
         bool detectRawUsbVolumes = true;
         bool installDemoFiles = true;
         FileOperationTimings fileOperationTimings;
+        disk::MountedVolumeSession::ImageOpen imageOpen;
     };
 
     class Mpc

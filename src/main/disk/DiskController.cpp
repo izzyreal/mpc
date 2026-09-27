@@ -1,3 +1,5 @@
+#include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/screens/VmpcDisksScreen.hpp"
 #include "DiskController.hpp"
 
 #include "Mpc.hpp"
@@ -20,8 +22,10 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(Mpc &_mpc, bool _rawUsbVolumeDetectionEnabled)
-    : mpc(_mpc), rawUsbVolumeDetectionEnabled(_rawUsbVolumeDetectionEnabled)
+DiskController::DiskController(Mpc &_mpc, bool _rawUsbVolumeDetectionEnabled,
+                               MountedVolumeSession::ImageOpen imageOpen)
+    : mpc(_mpc), rawUsbVolumeDetectionEnabled(_rawUsbVolumeDetectionEnabled),
+      imageOpen(std::move(imageOpen))
 {
 }
 
@@ -44,6 +48,18 @@ void DiskController::initDisks()
     if (rawUsbVolumeDetectionEnabled)
     {
         detectRawUsbVolumes();
+    }
+
+    for (const auto &volume : VolumesPersistence::getPersistedImages(mpc))
+    {
+        auto disk = std::make_shared<RawDisk>(
+            mpc,
+            [open = imageOpen](const Volume &v)
+            {
+                return MountedVolumeSession::openImage(v, open);
+            });
+        disk->getVolume() = volume;
+        disks.push_back(disk);
     }
 
     auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID(mpc);
@@ -407,4 +423,294 @@ void DiskController::detectRawUsbVolumes()
     ensureActiveDiskIsEnabled();
 
 #endif
+}
+
+std::string DiskController::bindImage(Volume volume,
+                                      const std::string &replaceUuid)
+{
+    // Consumers may bind directly before any LOAD/SAVE screen initializes disks.
+    (void)getActiveDisk();
+    auto lease = mpc.fileOperationGate.tryAcquire();
+    if (!lease)
+    {
+        return "Disk operation already active";
+    }
+    if (volume.mode < DISABLED || volume.mode > READ_WRITE)
+    {
+        return "Invalid image access mode";
+    }
+    if (volume.volumeUUID.empty() || volume.diskImagePath.empty())
+    {
+        return "Invalid image binding";
+    }
+    auto existing =
+        std::find_if(disks.begin(), disks.end(),
+                     [&](const auto &d)
+                     {
+                         return d->getVolume().volumeUUID == replaceUuid;
+                     });
+    if (!replaceUuid.empty() && (existing == disks.end() ||
+                                 (*existing)->getVolume().type != DISK_IMAGE))
+    {
+        return "Image binding is unavailable";
+    }
+    if (existing != disks.end() && *existing == getActiveDisk())
+    {
+        return "Select another device before replacing this image";
+    }
+    for (const auto &d : disks)
+    {
+        const auto &v = d->getVolume();
+        if (v.volumeUUID != replaceUuid &&
+            (v.volumeUUID == volume.volumeUUID ||
+             (v.type == DISK_IMAGE && v.diskImagePath == volume.diskImagePath)))
+        {
+            return "Image is already bound";
+        }
+    }
+    try
+    {
+        volume.type = DISK_IMAGE;
+        auto probe = volume;
+        probe.mode = READ_ONLY;
+        auto session = MountedVolumeSession::openImage(probe, imageOpen);
+        volume.volumeSize = session->getSize();
+        session->close();
+        if (existing != disks.end())
+        {
+            volume.volumeUUID = replaceUuid;
+            const auto previous = (*existing)->getVolume();
+            (*existing)->getVolume() = volume;
+            if (!VolumesPersistence::save(mpc))
+            {
+                (*existing)->getVolume() = previous;
+                return "Unable to save image binding";
+            }
+        }
+        else
+        {
+            auto disk = std::make_shared<RawDisk>(
+                mpc,
+                [open = imageOpen](const Volume &v)
+                {
+                    return MountedVolumeSession::openImage(v, open);
+                });
+            disk->getVolume() = volume;
+            disks.push_back(disk);
+            if (!VolumesPersistence::save(mpc))
+            {
+                disks.pop_back();
+                return "Unable to save image binding";
+            }
+        }
+        return {};
+    }
+    catch (const std::exception &e)
+    {
+        return e.what();
+    }
+    catch (...)
+    {
+        return "Invalid or unsupported image";
+    }
+}
+
+std::string DiskController::removeImage(const std::string &uuid)
+{
+    auto lease = mpc.fileOperationGate.tryAcquire();
+    if (!lease)
+    {
+        return "Disk operation already active";
+    }
+    const auto it = std::find_if(disks.begin(), disks.end(),
+                                 [&](const auto &d)
+                                 {
+                                     return d->getVolume().volumeUUID == uuid &&
+                                            d->getVolume().type == DISK_IMAGE;
+                                 });
+    if (it == disks.end())
+    {
+        return "Image binding is unavailable";
+    }
+    if (*it == getActiveDisk())
+    {
+        return "Select another device before removing this binding";
+    }
+    auto active = getActiveDisk();
+    const auto index = std::distance(disks.begin(), it);
+    auto removed = *it;
+    disks.erase(it);
+    activeDiskIndex = std::distance(
+        disks.begin(), std::find(disks.begin(), disks.end(), active));
+    if (!VolumesPersistence::save(mpc))
+    {
+        disks.insert(disks.begin() + index, removed);
+        activeDiskIndex = std::distance(
+            disks.begin(), std::find(disks.begin(), disks.end(), active));
+        return "Unable to save image bindings";
+    }
+    return {};
+}
+
+std::string DiskController::validateImage(const std::string &uuid)
+{
+    auto lease = mpc.fileOperationGate.tryAcquire();
+    if (!lease)
+    {
+        return "Disk operation already active";
+    }
+    for (const auto &d : disks)
+    {
+        if (d->getVolume().volumeUUID != uuid ||
+            d->getVolume().type != DISK_IMAGE)
+        {
+            continue;
+        }
+        try
+        {
+            if (d == getActiveDisk())
+            {
+                d->initRoot();
+                d->captureSaveDestination(0)->scan();
+            }
+            else
+            {
+                auto probe = d->getVolume();
+                probe.mode = READ_ONLY;
+                auto session =
+                    MountedVolumeSession::openImage(probe, imageOpen);
+                d->getVolume().volumeSize = session->getSize();
+                session->close();
+            }
+            return {};
+        }
+        catch (const std::exception &e)
+        {
+            return e.what();
+        }
+        catch (...)
+        {
+            return "Invalid or unsupported image";
+        }
+    }
+    return "Image binding is unavailable";
+}
+
+std::string DiskController::setVolumeMode(const std::string &uuid,
+                                          MountMode mode)
+{
+    if (mode < DISABLED || mode > READ_WRITE)
+    {
+        return "Invalid access mode";
+    }
+    for (const auto &d : disks)
+    {
+        auto &volume = d->getVolume();
+        if (volume.volumeUUID != uuid)
+        {
+            continue;
+        }
+        if (uuid == "default_volume" || volume.mode == mode)
+        {
+            return {};
+        }
+        if (d == getActiveDisk())
+        {
+            // Release the old access before changing its policy. The user can
+            // explicitly reselect it with the new mode; never retain writable
+            // handles after selecting read-only or disabled.
+            int fallback = 0;
+            for (auto history = activeDiskHistory.rbegin();
+                 history != activeDiskHistory.rend(); ++history)
+            {
+                const auto found = std::find_if(
+                    disks.begin(), disks.end(),
+                    [&](const auto &candidate)
+                    {
+                        return candidate != d &&
+                               candidate->getVolume().volumeUUID == *history &&
+                               candidate->getVolume().mode != DISABLED;
+                    });
+                if (found != disks.end())
+                {
+                    fallback = std::distance(disks.begin(), found);
+                    break;
+                }
+            }
+            const auto error = activateDisk(fallback);
+            if (!error.empty())
+            {
+                return error;
+            }
+        }
+        auto lease = mpc.fileOperationGate.tryAcquire();
+        if (!lease)
+        {
+            return "Disk operation already active";
+        }
+        volume.mode = mode;
+        return {};
+    }
+    return "Device is unavailable";
+}
+
+void DiskController::setFilePickerParent(void *parent, std::string portalParent)
+{
+    filePicker.setParent(parent, std::move(portalParent));
+}
+bool DiskController::isFilePickerPending() const
+{
+    return filePicker.pending();
+}
+void DiskController::cancelFilePicker()
+{
+    filePicker.cancel();
+}
+std::string DiskController::pickImage(const std::string &replaceUuid)
+{
+    auto lease = mpc.fileOperationGate.tryAcquire();
+    if (!lease)
+    {
+        return "Disk operation already active";
+    }
+    if (!filePicker.request())
+    {
+        return "File picker already open";
+    }
+    pickerReplaceUuid = replaceUuid;
+    return {};
+}
+void DiskController::pollFilePicker()
+{
+    auto result = filePicker.poll();
+    if (!result)
+    {
+        return;
+    }
+    std::string error = result->error;
+    if (result->image)
+    {
+        if (!pickerReplaceUuid.empty())
+        {
+            for (const auto &disk : disks)
+            {
+                if (disk->getVolume().volumeUUID == pickerReplaceUuid)
+                {
+                    result->image->mode = disk->getVolume().mode;
+                }
+            }
+        }
+        error = bindImage(std::move(*result->image), pickerReplaceUuid);
+    }
+    pickerReplaceUuid.clear();
+    if (result->image && error.empty())
+    {
+        mpc.screens->get<ScreenId::VmpcDisksScreen>()->refreshConfig();
+        mpc.getLayeredScreen()->showPopupForMs("Image binding saved", 1500);
+    }
+    else if (!error.empty())
+    {
+        MLOG("Image selection failed: " + error);
+        mpc.getLayeredScreen()->showPopupForMs(error, 2500);
+    }
 }

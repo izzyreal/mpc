@@ -52,6 +52,61 @@ void VmpcDisksScreen::open()
 
 void VmpcDisksScreen::function(const int i)
 {
+    if (imageActions)
+    {
+        auto controller = mpc.getDiskController();
+        if (i == 4)
+        {
+            controller->cancelFilePicker();
+            imageActions = false;
+            displayFunctionKeys();
+            return;
+        }
+        if (controller->isFilePickerPending())
+        {
+            return;
+        }
+        const auto disks = mpc.getDisks();
+        const auto index = row + rowOffset;
+        const bool image = index < disks.size() &&
+                           disks[index]->getVolume().type == DISK_IMAGE;
+        const auto uuid =
+            image ? disks[index]->getVolume().volumeUUID : std::string{};
+        std::string error;
+        if (i == 0)
+        {
+            error = controller->pickImage();
+        }
+        else if (i >= 1 && i <= 3 && !image)
+        {
+            error = "Select an image binding";
+        }
+        else if (i == 1)
+        {
+            error = controller->pickImage(uuid);
+        }
+        else if (i == 2)
+        {
+            error = controller->validateImage(uuid);
+            if (error.empty())
+            {
+                ls.lock()->showPopupForMs("Image is valid", 1500);
+            }
+        }
+        else if (i == 3)
+        {
+            error = controller->removeImage(uuid);
+            if (error.empty())
+            {
+                refreshConfig();
+            }
+        }
+        if (!error.empty())
+        {
+            ls.lock()->showPopupForMs(error, 2500);
+        }
+        return;
+    }
     switch (i)
     {
         case 0:
@@ -62,6 +117,9 @@ void VmpcDisksScreen::function(const int i)
             break;
         case 2:
             openScreenById(ScreenId::VmpcAutoSaveScreen);
+            break;
+        case 3:
+            openWindow();
             break;
         case 4:
         {
@@ -76,20 +134,22 @@ void VmpcDisksScreen::function(const int i)
 
             if (hasConfigChanged())
             {
-                for (const auto &kv : config)
+                for (const auto &[uuid, mode] : config)
                 {
-                    auto uuid = kv.first;
-                    for (const auto &d : mpc.getDisks())
+                    const auto error =
+                        mpc.getDiskController()->setVolumeMode(uuid, mode);
+                    if (!error.empty())
                     {
-                        if (d->getVolume().volumeUUID == uuid)
-                        {
-                            d->getVolume().mode = kv.second;
-                        }
+                        ls.lock()->showPopupForMs(error, 2000);
+                        return;
                     }
                 }
-
-                mpc.getDiskController()->ensureActiveDiskIsEnabled();
-                VolumesPersistence::save(mpc);
+                if (!VolumesPersistence::save(mpc))
+                {
+                    ls.lock()->showPopupForMs("Unable to save volume settings",
+                                              2000);
+                    return;
+                }
                 popupMsg = "Volume configurations saved";
             }
             else
@@ -106,6 +166,10 @@ void VmpcDisksScreen::function(const int i)
 
 void VmpcDisksScreen::turnWheel(const int i)
 {
+    if (imageActions || mpc.getDiskController()->isFilePickerPending())
+    {
+        return;
+    }
     const auto &volume = mpc.getDisks()[row + rowOffset]->getVolume();
 
     if (volume.volumeUUID == "default_volume")
@@ -215,7 +279,7 @@ bool VmpcDisksScreen::hasConfigChanged() const
 
 void VmpcDisksScreen::displayFunctionKeys() const
 {
-    const auto newArrangement = hasConfigChanged() ? 0 : 1;
+    const auto newArrangement = imageActions ? 2 : (hasConfigChanged() ? 0 : 1);
     setFunctionKeysArrangement(newArrangement);
 }
 
@@ -242,5 +306,20 @@ void VmpcDisksScreen::refreshConfig()
     }
 
     displayRows();
+    displayFunctionKeys();
+}
+
+void VmpcDisksScreen::openWindow()
+{
+    for (const auto &disk : mpc.getDisks())
+    {
+        const auto &volume = disk->getVolume();
+        if (config[volume.volumeUUID] != volume.mode)
+        {
+            ls.lock()->showPopupForMs("Save mode changes first", 1500);
+            return;
+        }
+    }
+    imageActions = !imageActions;
     displayFunctionKeys();
 }

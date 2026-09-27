@@ -16,9 +16,11 @@ namespace mpc::lcdgui::screens
         void down() override;
 
         void refreshConfig();
+        void openWindow() override;
 
     private:
         std::map<std::string, disk::MountMode> config;
+        bool imageActions = false;
         int row = 0;
         int rowOffset = 0;
 

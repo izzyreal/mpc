@@ -65,6 +65,7 @@ namespace mpc::disk
             }
             session = mount(volume);
             root = session->getRoot();
+            volume.volumeSize = session->getSize();
             if (!root)
             {
                 throw std::runtime_error("Unable to mount device");
