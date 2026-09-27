@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include <optional>
 
 namespace mpc
 {
@@ -38,15 +39,14 @@ namespace mpc::lcdgui::screens
                                              ".APS",      ".MID", ".ALL",
                                              ".WAV",      ".SEQ", ".SET"};
 
-        int device = 0;
+        std::optional<int> pendingDevice;
+        int getDeviceIndex() const;
 
         void displayView() const;
         void displayDirectory() const;
         void displayFreeSnd() const;
         void displayFile() const;
         void displaySize() const;
-        void displayDevice();
-        void displayDeviceType();
 
         void setView(int i);
         std::string getSelectedFileName() const;

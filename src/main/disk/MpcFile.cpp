@@ -278,12 +278,16 @@ bool MpcFile::del() const
     {
         try
         {
-            rawEntry->getParent()->remove(rawEntry->getName());
-            return true;
+            const auto parent = rawEntry->getParent();
+            auto name = rawEntry->getAkaiName();
+            parent->remove(name);
+            // Directory lookup uses Akai names, even for entries with a VFAT
+            // long name. Do not report success if removal was a no-op.
+            return !parent->getEntry(name);
         }
         catch (const std::exception &e)
         {
-            MLOG("Failed to delete FAT entry '" + rawEntry->getName() +
+            MLOG("Failed to delete FAT entry '" + rawEntry->getAkaiName() +
                  "': " + e.what());
             return false;
         }

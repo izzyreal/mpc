@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include <tuple>
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
@@ -22,6 +23,26 @@ using namespace mpc::lcdgui::screens::dialog2;
 SaveScreen::SaveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save", layerIndex)
 {
+    addReactiveBinding(
+        {[this]
+         {
+             const auto index = getDeviceIndex();
+             const auto &volume = this->mpc.getDisks()[index]->getVolume();
+             return std::make_tuple(
+                 index, this->mpc.getDiskController()->getActiveDiskIndex(),
+                 volume.label, volume.typeShortName());
+         },
+         [this](const auto &state)
+         {
+             const auto &[index, active, label, type] = state;
+             findField("device")->setText(StrUtil::truncateUtf8(label, 11));
+             findLabel("device-type")->setText(type);
+             if (getFocusedFieldNameOrThrow() == "device")
+             {
+                 setFunctionKeysArrangement(index == active ? 0 : 1);
+             }
+         }});
+
     addReactiveBinding({[&]
                         {
                             return sequencer.lock()->getSelectedSequenceIndex();
@@ -36,19 +57,29 @@ SaveScreen::SaveScreen(Mpc &mpc, const int layerIndex)
                         }});
 }
 
+int SaveScreen::getDeviceIndex() const
+{
+    const auto active = mpc.getDiskController()->getActiveDiskIndex();
+    return pendingDevice && *pendingDevice >= 0 &&
+                   *pendingDevice < mpc.getDisks().size()
+               ? *pendingDevice
+               : active;
+}
+
 void SaveScreen::open()
 {
     const auto diskController = mpc.getDiskController();
     const auto activeDisk = diskController->getActiveDisk();
     const auto &disks = diskController->getDisks();
-    const auto cachedDeviceIsUnavailable =
-        device < 0 || device >= disks.size() ||
-        disks[device]->getVolume().mode == disk::MountMode::DISABLED;
+    const auto pendingDeviceIsUnavailable =
+        pendingDevice &&
+        (*pendingDevice < 0 || *pendingDevice >= disks.size() ||
+         disks[*pendingDevice]->getVolume().mode == disk::MountMode::DISABLED);
 
     if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}) ||
-        cachedDeviceIsUnavailable)
+        pendingDeviceIsUnavailable)
     {
-        device = diskController->getActiveDiskIndex();
+        pendingDevice.reset();
     }
 
     activeDisk->initFiles();
@@ -69,14 +100,14 @@ void SaveScreen::open()
     displayFile();
     displayFree();
     displayDirectory();
-    displayDevice();
-    displayDeviceType();
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
         setFunctionKeysArrangement(
-            device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+            getDeviceIndex() == mpc.getDiskController()->getActiveDiskIndex()
+                ? 0
+                : 1);
     }
     else
     {
@@ -115,7 +146,7 @@ void SaveScreen::function(const int i)
             if (focusedFieldName == "device")
             {
                 if (const auto error =
-                        mpc.getDiskController()->activateDisk(device);
+                        mpc.getDiskController()->activateDisk(getDeviceIndex());
                     !error.empty())
                 {
                     ls.lock()->showPopupForMs(
@@ -123,6 +154,7 @@ void SaveScreen::function(const int i)
                                                     .ioErrorFeedback.count()));
                     return;
                 }
+                pendingDevice.reset();
                 const auto newDisk = mpc.getDisk();
 
                 setFunctionKeysArrangement(0);
@@ -132,8 +164,6 @@ void SaveScreen::function(const int i)
                 displayFile();
                 displaySize();
                 displayDirectory();
-                displayDevice();
-                displayDeviceType();
 
                 nvram::VolumesPersistence::save(mpc);
 
@@ -268,16 +298,21 @@ void SaveScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "device")
     {
-        if (device + i < 0 || device + i >= mpc.getDisks().size())
+        const auto nextDevice = getDeviceIndex() + i;
+        if (nextDevice < 0 || nextDevice >= mpc.getDisks().size())
         {
             return;
         }
 
-        device += i;
-        displayDevice();
-        displayDeviceType();
+        pendingDevice =
+            nextDevice == mpc.getDiskController()->getActiveDiskIndex()
+                ? std::nullopt
+                : std::optional<int>{nextDevice};
+
         setFunctionKeysArrangement(
-            mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
+            mpc.getDiskController()->getActiveDiskIndex() == getDeviceIndex()
+                ? 0
+                : 1);
     }
 }
 
@@ -420,27 +455,13 @@ void SaveScreen::displayDirectory() const
     findField("directory")->setText(mpc.getDisk()->getDirectoryName());
 }
 
-void SaveScreen::displayDevice()
-{
-    const auto dev = findChild<Field>("device");
-    dev->setText(StrUtil::truncateUtf8(
-        mpc.getDisks()[device]->getVolume().label, 11));
-}
-
-void SaveScreen::displayDeviceType()
-{
-    const auto deviceTypeLabel = findChild<Label>("device-type");
-    deviceTypeLabel->setText(
-        mpc.getDisks()[device]->getVolume().typeShortName());
-}
-
 void SaveScreen::up()
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
-        device = mpc.getDiskController()->getActiveDiskIndex();
-        displayDevice();
+        pendingDevice.reset();
+
         setFunctionKeysArrangement(0);
     }
 

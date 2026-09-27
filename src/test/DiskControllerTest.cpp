@@ -1,4 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include "lcdgui/Label.hpp"
 
 #include "TestMpc.hpp"
 #include <ImageBlockDevice.hpp>
@@ -138,6 +140,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     const auto layeredScreen = mpc.getLayeredScreen();
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     layeredScreen->openScreenById(ScreenId::LoadScreen);
+    layeredScreen->timerCallback();
     REQUIRE(loadScreen->findField("device")->getText() == "DISK C");
 
     const auto disksScreen = mpc.screens->get<ScreenId::VmpcDisksScreen>();
@@ -151,6 +154,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     REQUIRE(diskController->getActiveDisk() == diskB);
 
     layeredScreen->openScreenById(ScreenId::LoadScreen);
+    layeredScreen->timerCallback();
     REQUIRE(loadScreen->findField("device")->getText() == "DISK B");
 
     diskC->getVolume().mode = READ_WRITE;
@@ -159,6 +163,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
 
     const auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
     layeredScreen->openScreenById(ScreenId::SaveScreen);
+    layeredScreen->timerCallback();
     REQUIRE(saveScreen->findField("device")->getText() == "DISK C");
 
     layeredScreen->openScreenById(ScreenId::VmpcDisksScreen);
@@ -169,6 +174,7 @@ TEST_CASE("LOAD and SAVE discard a cached disabled disk after a popup",
     REQUIRE(diskController->getActiveDisk() == diskB);
 
     layeredScreen->openScreenById(ScreenId::SaveScreen);
+    layeredScreen->timerCallback();
     REQUIRE(saveScreen->findField("device")->getText() == "DISK B");
 }
 
@@ -290,6 +296,58 @@ TEST_CASE("Device activation owns the mount lifecycle", "[disk][mount]")
         REQUIRE(controller->getActiveDisk() == a);
         REQUIRE(b->opens == 0);
     }
+    SECTION("Permission changes remount without changing selection")
+    {
+        REQUIRE(controller->setVolumeMode("lifecycle-a", READ_ONLY).empty());
+        CHECK(controller->getActiveDisk() == a);
+        CHECK(a->opens == 2);
+        CHECK(a->closes == 1);
+        CHECK(a->getVolume().mode == READ_ONLY);
+        REQUIRE(controller->setVolumeMode("lifecycle-a", READ_WRITE).empty());
+        CHECK(controller->getActiveDisk() == a);
+        CHECK(a->opens == 3);
+        CHECK(a->closes == 2);
+    }
+    SECTION("Failed remount leaves the fallback active with the requested mode")
+    {
+        a->failOpen = true;
+        CHECK_FALSE(controller->setVolumeMode("lifecycle-a", READ_ONLY).empty());
+        CHECK(controller->getActiveDiskIndex() == 0);
+        CHECK(a->getVolume().mode == READ_ONLY);
+        CHECK(a->closes >= 1);
+    }
+    SECTION("Failed close retains the active volume and its original mode")
+    {
+        a->failClose = true;
+        CHECK_FALSE(controller->setVolumeMode("lifecycle-a", READ_ONLY).empty());
+        CHECK(controller->getActiveDisk() == a);
+        CHECK(a->getVolume().mode == READ_WRITE);
+        CHECK(a->opens == 1);
+    }
+    SECTION("Busy operations prevent changing the active mode")
+    {
+        auto lease = mpc.fileOperationGate.tryAcquire();
+        REQUIRE(lease);
+        CHECK_FALSE(controller->setVolumeMode("lifecycle-a", READ_ONLY).empty());
+        CHECK(controller->getActiveDisk() == a);
+        CHECK(a->getVolume().mode == READ_WRITE);
+        CHECK(a->closes == 0);
+    }
+    SECTION("Inactive mode changes do not mount the volume")
+    {
+        REQUIRE(controller->setVolumeMode("lifecycle-b", READ_ONLY).empty());
+        CHECK(controller->getActiveDisk() == a);
+        CHECK(b->opens == 0);
+        CHECK(b->getVolume().mode == READ_ONLY);
+    }
+    SECTION("Disabling after a remount still restores the previous selection")
+    {
+        REQUIRE(controller->activateDisk(2).empty());
+        REQUIRE(controller->activateDisk(1).empty());
+        REQUIRE(controller->setVolumeMode("lifecycle-a", READ_ONLY).empty());
+        REQUIRE(controller->setVolumeMode("lifecycle-a", DISABLED).empty());
+        CHECK(controller->getActiveDisk() == b);
+    }
 }
 
 TEST_CASE("Mounted sessions release access and preserve FAT data",
@@ -405,5 +463,77 @@ TEST_CASE("Mounted sessions release access and preserve FAT data",
         destination->flush();
         destination.reset();
         CHECK(releases == 1);
+    }
+}
+
+TEST_CASE("Reactive device fields preserve pending choices across popups",
+          "[disk][ui]")
+{
+    const auto id = GENERATE(ScreenId::LoadScreen, ScreenId::SaveScreen);
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto controller = mpc.getDiskController();
+    (void)controller->getActiveDisk();
+    auto a = std::make_shared<LifecycleDisk>(mpc);
+    auto b = std::make_shared<LifecycleDisk>(mpc);
+    a->getVolume().mode = b->getVolume().mode = READ_WRITE;
+    a->getVolume().volumeUUID = "reactive-a";
+    b->getVolume().volumeUUID = "reactive-b";
+    a->getVolume().label = "ACTIVE A";
+    b->getVolume().label = "PENDING B";
+    b->getVolume().type = DISK_IMAGE;
+    controller->getDisks().push_back(a);
+    controller->getDisks().push_back(b);
+    REQUIRE(controller->activateDisk(1).empty());
+    const auto ls = mpc.getLayeredScreen();
+    ls->openScreenById(id);
+    ls->setFocus("device");
+    const auto screen = ls->getCurrentScreen();
+    ls->timerCallback();
+    CHECK(screen->findField("device")->getText() == "ACTIVE A");
+    CHECK(screen->findLabel("device-type")->getText() == "DIR");
+
+    screen->turnWheel(1);
+    ls->timerCallback();
+    CHECK(screen->findField("device")->getText() == "PENDING B");
+    CHECK(screen->findLabel("device-type")->getText() == "IMG");
+    CHECK(controller->getActiveDisk() == a);
+    // Reopening resets binding snapshots, but must retain the user's choice.
+    ls->showPopupForMs("Notice", 1000);
+    ls->openScreenById(id);
+    ls->timerCallback();
+    CHECK(screen->findField("device")->getText() == "PENDING B");
+    CHECK(controller->getActiveDisk() == a);
+
+    SECTION("Failed activation retains the pending choice")
+    {
+        b->failOpen = true;
+        screen->function(4);
+        REQUIRE(ls->isCurrentScreen({ScreenId::PopupScreen}));
+        ls->openScreenById(id);
+        ls->timerCallback();
+        CHECK(screen->findField("device")->getText() == "PENDING B");
+        CHECK(controller->getActiveDisk() == a);
+    }
+    SECTION("Confirmation clears the pending choice and follows the active device")
+    {
+        screen->function(4);
+        CHECK(controller->getActiveDisk() == b);
+        ls->timerCallback();
+        CHECK(screen->findField("device")->getText() == "PENDING B");
+        REQUIRE(controller->activateDisk(1).empty());
+        ls->timerCallback();
+        CHECK(screen->findField("device")->getText() == "ACTIVE A");
+        CHECK(screen->findLabel("device-type")->getText() == "DIR");
+        a->getVolume().label = "RENAMED ACTIVE VOLUME";
+        ls->timerCallback();
+        CHECK(screen->findField("device")->getText() == "RENAMED ACT");
+    }
+    SECTION("Leaving the device field cancels the pending choice")
+    {
+        screen->up();
+        ls->timerCallback();
+        CHECK(screen->findField("device")->getText() == "ACTIVE A");
+        CHECK(screen->findLabel("device-type")->getText() == "DIR");
     }
 }

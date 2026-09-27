@@ -4,12 +4,20 @@
 #include <cstdlib>
 #include <catch2/catch_test_macros.hpp>
 #include "TestMpc.hpp"
+#include "AutoSave.hpp"
+#include "DirectorySaveTarget.hpp"
+#include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
+#include <catch2/generators/catch_generators.hpp>
+#include <future>
 #include "disk/DiskController.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/ImageFileDevice.hpp"
 #include "nvram/VolumesPersistence.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Label.hpp"
+#include "lcdgui/Field.hpp"
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/SaveScreen.hpp"
 #include "lcdgui/screens/VmpcDisksScreen.hpp"
 #include "lcdgui/screens/dialog/DeleteFileScreen.hpp"
 #include "lcdgui/screens/dialog/DeleteFolderScreen.hpp"
@@ -136,10 +144,36 @@ TEST_CASE(
     REQUIRE(f.controller().activateDisk(1).empty());
     REQUIRE(
         f.controller().setVolumeMode(f.volume.volumeUUID, READ_ONLY).empty());
-    REQUIRE(f.controller().getActiveDiskIndex() == 0);
-    REQUIRE_NOTHROW(ImageFileDevice::open(f.path.string(), false));
-    REQUIRE(f.controller().activateDisk(1).empty());
+    REQUIRE(f.controller().getActiveDiskIndex() == 1);
     REQUIRE_THROWS(f.mpc.getDisk()->newFile("NO.SND"));
+    REQUIRE(
+        f.controller().setVolumeMode(f.volume.volumeUUID, READ_WRITE).empty());
+    REQUIRE(f.controller().getActiveDiskIndex() == 1);
+    const auto disk = f.mpc.getDisk();
+    auto file = disk->newFile("YES.SND");
+    REQUIRE(file);
+    std::vector<char> bytes{'s', 'a', 'v', 'e', 'd'};
+    file->setFileDataChecked(bytes);
+    REQUIRE(
+        f.controller().setVolumeMode(f.volume.volumeUUID, READ_ONLY).empty());
+    REQUIRE(f.controller().getActiveDiskIndex() == 1);
+    disk->initFiles();
+    REQUIRE(disk->getFile("YES.SND"));
+    CHECK(disk->getFile("YES.SND")->getBytes() == bytes);
+    REQUIRE_THROWS(disk->newFile("NO.SND"));
+
+    auto ls = f.mpc.getLayeredScreen();
+    ls->openScreenById(lcdgui::ScreenId::LoadScreen);
+    ls->timerCallback();
+    CHECK(f.mpc.screens->get<lcdgui::ScreenId::LoadScreen>()
+              ->findField("device")->getText() == f.volume.label.substr(0, 11));
+    ls->openScreenById(lcdgui::ScreenId::SaveScreen);
+    ls->timerCallback();
+    CHECK(f.mpc.screens->get<lcdgui::ScreenId::SaveScreen>()
+              ->findField("device")->getText() == f.volume.label.substr(0, 11));
+    REQUIRE(f.controller().setVolumeMode(f.volume.volumeUUID, DISABLED).empty());
+    CHECK(f.controller().getActiveDiskIndex() == 0);
+    REQUIRE_NOTHROW(ImageFileDevice::open(f.path.string(), false));
 }
 
 TEST_CASE("Read-only deletion explains the restriction and preserves the image",
@@ -491,6 +525,102 @@ namespace
         return b;
     }
 } // namespace
+
+TEST_CASE("FAT12 directories with Windows names are actually deleted",
+          "[disk][image][fat12][delete]")
+{
+    ImageFixture f;
+    REQUIRE(set_file_data(f.path, emptyMpc60Image()));
+    f.volume.mode = READ_WRITE;
+    f.bind();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    auto disk = f.mpc.getDisk();
+    REQUIRE(disk->newFolder("LONGFO~1"));
+    REQUIRE(disk->moveForward("LONGFO~1"));
+    REQUIRE(disk->newFile("CHILD.SND"));
+    REQUIRE(f.controller().activateDisk(0).empty());
+
+    auto bytes = MpcFile(f.path).getBytes();
+    const size_t root = 3584;
+    REQUIRE(std::string(bytes.data() + root, 11) == "LONGFO~1   ");
+    // Add a VFAT name and ordinary directory timestamps, as found in the
+    // Studio Set image. VMPC indexes the directory using its short name.
+    std::copy_n(bytes.begin() + root, 32, bytes.begin() + root + 32);
+    std::fill_n(bytes.begin() + root, 32, char(0xff));
+    bytes[root] = 0x41;
+    bytes[root + 11] = 0x0f;
+    bytes[root + 12] = 0;
+    bytes[root + 26] = bytes[root + 27] = 0;
+    unsigned char checksum = 0;
+    for (int i = 0; i < 11; ++i)
+    {
+        checksum = ((checksum & 1) << 7) + (checksum >> 1) +
+                   static_cast<unsigned char>(bytes[root + 32 + i]);
+    }
+    bytes[root + 13] = checksum;
+    const std::string longName = "Long Folder";
+    const int offsets[] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
+    for (size_t i = 0; i <= longName.size(); ++i)
+    {
+        bytes[root + offsets[i]] = i < longName.size() ? longName[i] : 0;
+        bytes[root + offsets[i] + 1] = 0;
+    }
+    bytes[root + 32 + 14] = 0x4e;
+    bytes[root + 32 + 15] = char(0xaa);
+    bytes[root + 32 + 16] = char(0xe5);
+    bytes[root + 32 + 17] = 0x5c;
+    REQUIRE(set_file_data(f.path, bytes));
+    REQUIRE(f.controller().activateDisk(1).empty());
+    disk->initFiles();
+    auto folder = disk->getFile("LONGFO~1");
+    REQUIRE(folder);
+    REQUIRE(disk->deleteRecursive(folder));
+    disk->flush();
+    disk->initFiles();
+    CHECK_FALSE(disk->getFile("LONGFO~1"));
+    REQUIRE(f.controller().activateDisk(0).empty());
+    REQUIRE(f.controller().activateDisk(1).empty());
+    disk->initFiles();
+    CHECK_FALSE(disk->getFile("LONGFO~1"));
+}
+
+TEST_CASE("Auto-save restoration displays the active image on first disk screen entry",
+          "[disk][image][auto-save][startup]")
+{
+    const auto screen = GENERATE(lcdgui::ScreenId::LoadScreen,
+                                 lcdgui::ScreenId::SaveScreen);
+    ImageFixture f;
+    f.bind();
+    REQUIRE(f.controller().activateDisk(1).empty());
+    f.mpc.getLayeredScreen()->openScreenById(screen);
+    f.mpc.screens->get<lcdgui::ScreenId::VmpcAutoSaveScreen>()->setAutoSaveOnExit(1);
+    const auto target = std::make_shared<DirectorySaveTarget>(
+        f.mpc.paths->getDocuments()->autoSavePath());
+    AutoSave::storeAutoSavedState(f.mpc, target);
+    REQUIRE(nvram::VolumesPersistence::save(f.mpc));
+    REQUIRE(f.controller().activateDisk(0).empty());
+
+    Mpc restored;
+    restored.paths = f.mpc.paths;
+    MpcInitOptions options;
+    options.detectRawUsbVolumes = options.installDemoFiles =
+        options.startMidiDeviceDetector = options.startAudioServer = false;
+    restored.init(options);
+    restored.screens->get<lcdgui::ScreenId::VmpcAutoSaveScreen>()->setAutoLoadOnStart(2);
+    const auto completion = std::make_shared<std::promise<void>>();
+    auto completed = completion->get_future();
+    restored.getAutoSave()->restoreAutoSavedState(
+        restored, target, false, [completion] { completion->set_value(); });
+    REQUIRE(completed.wait_for(std::chrono::seconds(5)) == std::future_status::ready);
+    auto ls = restored.getLayeredScreen();
+    ls->timerCallback();
+    REQUIRE(ls->getCurrentScreenId() == screen);
+    REQUIRE(restored.getDisk()->getVolume().volumeUUID == f.volume.volumeUUID);
+    const auto device = screen == lcdgui::ScreenId::LoadScreen
+        ? restored.screens->get<lcdgui::ScreenId::LoadScreen>()->findField("device")
+        : restored.screens->get<lcdgui::ScreenId::SaveScreen>()->findField("device");
+    CHECK(device->getText() == f.volume.label.substr(0, 11));
+}
 
 TEST_CASE(
     "MPC60 FAT12 images retain Akai names and packed allocation on writes",

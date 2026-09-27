@@ -178,6 +178,11 @@ std::string DiskController::activateDisk(int index)
     {
         return "Disk operation already active";
     }
+    return activateDiskUnderLease(index);
+}
+
+std::string DiskController::activateDiskUnderLease(int index)
+{
     if (index < 0 || index >= disks.size())
     {
         return "Device is unavailable";
@@ -614,11 +619,18 @@ std::string DiskController::setVolumeMode(const std::string &uuid,
         {
             return {};
         }
-        if (d == getActiveDisk())
+        auto lease = mpc.fileOperationGate.tryAcquire();
+        if (!lease)
         {
-            // Release the old access before changing its policy. The user can
-            // explicitly reselect it with the new mode; never retain writable
-            // handles after selecting read-only or disabled.
+            return "Disk operation already active";
+        }
+        const bool wasActive = d == getActiveDisk();
+        const int previousIndex = activeDiskIndex;
+        const auto previousHistory = activeDiskHistory;
+        if (wasActive)
+        {
+            // Release the old access before reopening with the new policy.
+            // Keep a usable fallback active if reopening fails.
             int fallback = 0;
             for (auto history = activeDiskHistory.rbegin();
                  history != activeDiskHistory.rend(); ++history)
@@ -637,18 +649,23 @@ std::string DiskController::setVolumeMode(const std::string &uuid,
                     break;
                 }
             }
-            const auto error = activateDisk(fallback);
+            const auto error = activateDiskUnderLease(fallback);
             if (!error.empty())
             {
                 return error;
             }
         }
-        auto lease = mpc.fileOperationGate.tryAcquire();
-        if (!lease)
-        {
-            return "Disk operation already active";
-        }
         volume.mode = mode;
+        if (wasActive && mode != DISABLED)
+        {
+            const auto error = activateDiskUnderLease(previousIndex);
+            if (!error.empty())
+            {
+                return error;
+            }
+            // A permission change is not a user selection change.
+            activeDiskHistory = previousHistory;
+        }
         return {};
     }
     return "Device is unavailable";

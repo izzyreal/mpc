@@ -30,6 +30,7 @@ namespace mpc::disk
 
         void initDisks();
         void commitActiveDiskIndex(int);
+        std::string activateDiskUnderLease(int index);
 
     public:
         explicit DiskController(Mpc &, bool rawUsbVolumeDetectionEnabled = true,

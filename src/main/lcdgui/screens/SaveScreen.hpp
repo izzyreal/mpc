@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include <optional>
 
 namespace mpc::lcdgui::screens
 {
@@ -25,7 +26,8 @@ namespace mpc::lcdgui::screens
             "Save a Sound"};
 
         int type = 0;
-        int device = 0;
+        std::optional<int> pendingDevice;
+        int getDeviceIndex() const;
         unsigned char programIndex = 0;
         void setType(int i);
 
@@ -34,7 +36,5 @@ namespace mpc::lcdgui::screens
         void displaySize() const;
         void displayFree() const;
         void displayDirectory() const;
-        void displayDevice();
-        void displayDeviceType();
     };
 } // namespace mpc::lcdgui::screens

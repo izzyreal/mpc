@@ -2,6 +2,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include <tuple>
 #include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -28,6 +29,34 @@ using namespace mpc::sampler;
 LoadScreen::LoadScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load", layerIndex)
 {
+    addReactiveBinding(
+        {[this]
+         {
+             const auto index = getDeviceIndex();
+             const auto &volume = this->mpc.getDisks()[index]->getVolume();
+             return std::make_tuple(
+                 index, this->mpc.getDiskController()->getActiveDiskIndex(),
+                 volume.label, volume.typeShortName());
+         },
+         [this](const auto &state)
+         {
+             const auto &[index, active, label, type] = state;
+             findField("device")->setText(StrUtil::truncateUtf8(label, 11));
+             findLabel("device-type")->setText(type);
+             if (getFocusedFieldNameOrThrow() == "device")
+             {
+                 setFunctionKeysArrangement(index == active ? 0 : 2);
+             }
+         }});
+}
+
+int LoadScreen::getDeviceIndex() const
+{
+    const auto active = mpc.getDiskController()->getActiveDiskIndex();
+    return pendingDevice && *pendingDevice >= 0 &&
+                   *pendingDevice < mpc.getDisks().size()
+               ? *pendingDevice
+               : active;
 }
 
 void LoadScreen::open()
@@ -35,14 +64,15 @@ void LoadScreen::open()
     const auto diskController = mpc.getDiskController();
     const auto activeDisk = diskController->getActiveDisk();
     const auto &disks = diskController->getDisks();
-    const auto cachedDeviceIsUnavailable =
-        device < 0 || device >= disks.size() ||
-        disks[device]->getVolume().mode == DISABLED;
+    const auto pendingDeviceIsUnavailable =
+        pendingDevice &&
+        (*pendingDevice < 0 || *pendingDevice >= disks.size() ||
+         disks[*pendingDevice]->getVolume().mode == disk::MountMode::DISABLED);
 
     if (ls.lock()->isPreviousScreenNot({ScreenId::PopupScreen}) ||
-        cachedDeviceIsUnavailable)
+        pendingDeviceIsUnavailable)
     {
-        device = diskController->getActiveDiskIndex();
+        pendingDevice.reset();
     }
 
     activeDisk->initFiles();
@@ -53,8 +83,6 @@ void LoadScreen::open()
     displayDirectory();
     displayFile();
     displaySize();
-    displayDevice();
-    displayDeviceType();
 
     displayFreeSnd();
     findLabel("freeseq")->setText("  2640K");
@@ -67,7 +95,9 @@ void LoadScreen::open()
         focusedFieldName == "device")
     {
         setFunctionKeysArrangement(
-            device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 2);
+            getDeviceIndex() == mpc.getDiskController()->getActiveDiskIndex()
+                ? 0
+                : 2);
     }
     else
     {
@@ -95,7 +125,7 @@ void LoadScreen::function(const int i)
             if (focusedFieldName == "device")
             {
                 if (const auto error =
-                        mpc.getDiskController()->activateDisk(device);
+                        mpc.getDiskController()->activateDisk(getDeviceIndex());
                     !error.empty())
                 {
                     ls.lock()->showPopupForMs(
@@ -103,6 +133,7 @@ void LoadScreen::function(const int i)
                                                     .ioErrorFeedback.count()));
                     return;
                 }
+                pendingDevice.reset();
                 const auto newDisk = mpc.getDisk();
                 fileLoad = 0;
 
@@ -113,8 +144,6 @@ void LoadScreen::function(const int i)
                 displayFile();
                 displaySize();
                 displayDirectory();
-                displayDevice();
-                displayDeviceType();
 
                 nvram::VolumesPersistence::save(mpc);
 
@@ -328,16 +357,21 @@ void LoadScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "device")
     {
-        if (device + i < 0 || device + i >= mpc.getDisks().size())
+        const auto nextDevice = getDeviceIndex() + i;
+        if (nextDevice < 0 || nextDevice >= mpc.getDisks().size())
         {
             return;
         }
 
-        device += i;
-        displayDevice();
-        displayDeviceType();
+        pendingDevice =
+            nextDevice == mpc.getDiskController()->getActiveDiskIndex()
+                ? std::nullopt
+                : std::optional<int>{nextDevice};
+
         setFunctionKeysArrangement(
-            mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 2);
+            mpc.getDiskController()->getActiveDiskIndex() == getDeviceIndex()
+                ? 0
+                : 2);
         return;
     }
 
@@ -562,27 +596,14 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     }
 }
 
-void LoadScreen::displayDevice()
-{
-    const auto dev = findChild<Field>("device");
-    dev->setText(StrUtil::truncateUtf8(
-        mpc.getDisks()[device]->getVolume().label, 11));
-}
-
-void LoadScreen::displayDeviceType()
-{
-    const auto type = findChild<Label>("device-type");
-    type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
-}
-
 void LoadScreen::up()
 {
 
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "device")
     {
-        device = mpc.getDiskController()->getActiveDiskIndex();
-        displayDevice();
+        pendingDevice.reset();
+
         const auto ext =
             mpc_fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||

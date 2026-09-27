@@ -13,8 +13,10 @@ mode and SAVE commits it. Save pending mode edits before entering IMAGES.
 
 Selecting the device in LOAD/SAVE opens its filesystem. Switching away flushes
 and releases it. Changing the active device's access mode also releases its
-existing access and selects an enabled fallback device; reselect it to use the
-new mode. The last active image is reopened when disks initialize on the next
+existing access and remounts the same device with the new permissions. Disabling
+the device selects an enabled fallback instead. If remounting fails, an error
+is shown and the fallback remains active.
+The last active image is reopened when disks initialize on the next
 launch. If it cannot be opened, DEFAULT is used and the binding is retained.
 
 CHECK opens inactive images temporarily in read-only mode. For an active image,
