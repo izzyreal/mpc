@@ -8,6 +8,21 @@
 
 using namespace mpc;
 
+std::string StrUtil::truncateUtf8(const std::string &str,
+                                const std::size_t maxCharacters)
+{
+    std::size_t characterCount = 0;
+    for (std::size_t i = 0; i < str.size(); ++i)
+    {
+        if ((static_cast<unsigned char>(str[i]) & 0xc0) != 0x80 &&
+            ++characterCount > maxCharacters)
+        {
+            return str.substr(0, i);
+        }
+    }
+    return str;
+}
+
 std::string StrUtil::replaceAll(const std::string &str, char c,
                                 const std::string &replacement)
 {

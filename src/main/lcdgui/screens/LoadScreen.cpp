@@ -565,7 +565,8 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 void LoadScreen::displayDevice()
 {
     const auto dev = findChild<Field>("device");
-    dev->setText(mpc.getDisks()[device]->getVolume().label);
+    dev->setText(StrUtil::truncateUtf8(
+        mpc.getDisks()[device]->getVolume().label, 11));
 }
 
 void LoadScreen::displayDeviceType()

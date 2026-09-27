@@ -7,6 +7,8 @@ namespace mpc
     class StrUtil
     {
     public:
+        static std::string truncateUtf8(const std::string &str,
+                                        std::size_t maxCharacters);
         static std::string padLeft(std::string str, const std::string &pad,
                                    int size);
         static std::string padRight(std::string str, const std::string &pad,

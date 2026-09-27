@@ -1,5 +1,6 @@
 #include "VmpcDisksScreen.hpp"
 #include "Mpc.hpp"
+#include "StrUtil.hpp"
 #include "VmpcSettingsScreen.hpp"
 
 #include "lcdgui/Parameter.hpp"
@@ -24,13 +25,13 @@ VmpcDisksScreen::VmpcDisksScreen(Mpc &mpc, const int layerIndex)
     {
         const int y = 11 + i * 9;
         auto volumeLabel = std::make_shared<Label>(
-            mpc, "volume" + std::to_string(i), "", 2, y, 11 * 6);
+            mpc, "volume" + std::to_string(i), "", 2, y, 19 * 6);
         auto typeLabel = std::make_shared<Label>(
-            mpc, "type" + std::to_string(i), "", 74, y, 3 * 6);
+            mpc, "type" + std::to_string(i), "", 122, y, 3 * 6);
         auto sizeLabel = std::make_shared<Label>(
-            mpc, "size" + std::to_string(i), "", 104, y, 4 * 6);
+            mpc, "size" + std::to_string(i), "", 152, y, 4 * 6);
         auto modeParam = std::make_shared<Parameter>(
-            mpc, "", "mode" + std::to_string(i), 131, y + 1, 10 * 6);
+            mpc, "", "mode" + std::to_string(i), 179, y + 1, 10 * 6);
 
         addChild(volumeLabel);
         addChild(typeLabel);
@@ -213,7 +214,8 @@ void VmpcDisksScreen::displayRows()
 
         const auto disk = disks[diskIndex];
 
-        volume->setText(disk->getVolumeLabel());
+        // Leave one character blank before Type, without splitting UTF-8.
+        volume->setText(StrUtil::truncateUtf8(disk->getVolumeLabel(), 19));
         type->setText(disk->getTypeShortName());
         size->setText(byte_count_to_short_string(
             disk->getTotalSize(), /*one_letter_suffix = */ true));
