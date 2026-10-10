@@ -216,6 +216,8 @@ namespace mpc::input::midi
 
         int getMidiChannelIndex() const;
 
+        bool matchesMidiChannel(int channel) const;
+
         bool isEnabled() const;
 
         BindingEncoderMode getEncoderMode() const;
@@ -266,7 +268,7 @@ namespace mpc::input::midi
 
         Binding &getBindingByIndex(int);
 
-        bool hasBindingForNote(int) const;
+        bool hasBindingForNote(int noteNumber, int channel) const;
     };
 
     void to_json(json &j, const MidiControlPresetV3 &p);

@@ -141,14 +141,14 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     {
         case MessageType::NOTE_ON:
             if (!extendedController->getActivePreset()->hasBindingForNote(
-                    e.getNoteNumber()))
+                    e.getNoteNumber(), e.getChannel()))
             {
                 handleNoteOn(e);
             }
             break;
         case MessageType::NOTE_OFF:
             if (!extendedController->getActivePreset()->hasBindingForNote(
-                    e.getNoteNumber()))
+                    e.getNoteNumber(), e.getChannel()))
             {
                 handleNoteOff(e);
             }

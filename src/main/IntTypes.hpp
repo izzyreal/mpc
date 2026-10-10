@@ -34,6 +34,7 @@ namespace mpc
 
     using MidiChannel = ConstrainedInt<int8_t, -1, 15>;
     constexpr MidiChannel NoMidiChannel{-1};
+    constexpr MidiChannel AllMidiChannels{-1};
 
     /////////
 

@@ -77,6 +77,11 @@ int Binding::getMidiChannelIndex() const
     return midiChannelIndex;
 }
 
+bool Binding::matchesMidiChannel(const int channel) const
+{
+    return midiChannelIndex == AllMidiChannels || midiChannelIndex == channel;
+}
+
 bool Binding::isEnabled() const
 {
     return midiNumber != NoMidiNumber;
@@ -393,11 +398,13 @@ Binding &MidiControlPresetV3::getBindingByIndex(const int idx)
     return bindings[idx];
 }
 
-bool MidiControlPresetV3::hasBindingForNote(const int noteNumber) const
+bool MidiControlPresetV3::hasBindingForNote(const int noteNumber,
+                                          const int channel) const
 {
-    for (auto &b : bindings)
+    for (const auto &b : bindings)
     {
-        if (b.isNote() && b.getMidiNumber() == noteNumber)
+        if (b.isEnabled() && b.isNote() && b.getMidiNumber() == noteNumber &&
+            b.matchesMidiChannel(channel))
         {
             return true;
         }

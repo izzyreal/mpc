@@ -50,7 +50,7 @@ void ClientExtendedMidiController::handleEvent(const ClientMidiEvent &e)
 
     for (auto &b : bindings)
     {
-        if (!b.isEnabled())
+        if (!b.isEnabled() || !b.matchesMidiChannel(e.getChannel()))
         {
             continue;
         }
