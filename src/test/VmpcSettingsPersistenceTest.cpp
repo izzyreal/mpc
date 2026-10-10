@@ -327,10 +327,14 @@ TEST_CASE("VmpcKeyboard preserves unsaved edits when returning from a popup",
     const auto layeredScreen = mpc.getLayeredScreen();
     layeredScreen->openScreenById(ScreenId::VmpcKeyboardScreen);
     const auto keyboardScreen = mpc.screens->get<ScreenId::VmpcKeyboardScreen>();
-    const auto originalText = keyboardScreen->findField("row0")->getText();
+    // Arrow-key labels do not require a graphical keyboard layout.
+    keyboardScreen->down();
+    keyboardScreen->down();
+    const auto originalText = keyboardScreen->findField("row2")->getText();
+    REQUIRE(originalText == "Left arrow");
 
     keyboardScreen->turnWheel(1);
-    const auto editedText = keyboardScreen->findField("row0")->getText();
+    const auto editedText = keyboardScreen->findField("row2")->getText();
     REQUIRE(editedText != originalText);
     REQUIRE(keyboardScreen->hasMappingChanged());
 
@@ -338,7 +342,7 @@ TEST_CASE("VmpcKeyboard preserves unsaved edits when returning from a popup",
     layeredScreen->closeCurrentScreen();
 
     REQUIRE(layeredScreen->getCurrentScreenId() == ScreenId::VmpcKeyboardScreen);
-    REQUIRE(keyboardScreen->findField("row0")->getText() == editedText);
+    REQUIRE(keyboardScreen->findField("row2")->getText() == editedText);
     REQUIRE(keyboardScreen->hasMappingChanged());
 }
 

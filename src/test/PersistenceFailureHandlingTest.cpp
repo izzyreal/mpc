@@ -23,6 +23,15 @@ void prepareTestPaths(Mpc &mpc)
 }
 }
 
+TEST_CASE("Reading a directory returns a file error", "[persistence]")
+{
+    Mpc mpc;
+    prepareTestPaths(mpc);
+    const auto result = get_file_data(mpc.paths->configPath());
+    REQUIRE_FALSE(result);
+    CHECK(result.error().ec == std::errc::is_a_directory);
+}
+
 TEST_CASE("Corrupt keyboard bindings file returns a safe error",
           "[persistence]")
 {

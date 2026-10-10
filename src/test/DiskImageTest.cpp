@@ -472,6 +472,30 @@ TEST_CASE("Failed binding persistence leaves the device list unchanged",
     CHECK(mpc_fs::exists(f.path).value());
 }
 
+TEST_CASE("Binding serialization failure leaves the device list unchanged",
+          "[disk][image]")
+{
+    ImageFixture f;
+    const bool replace = GENERATE(false, true);
+    if (replace)
+    {
+        f.bind();
+    }
+    const auto originalCount = f.controller().getDisks().size();
+    auto volume = f.volume;
+    // Invalid UTF-8 makes JSON serialization throw after the binding changes.
+    volume.label = std::string(1, static_cast<char>(0xff));
+    CHECK_FALSE(f.controller()
+                    .bindImage(volume, replace ? volume.volumeUUID : "")
+                    .empty());
+    REQUIRE(f.controller().getDisks().size() == originalCount);
+    if (replace)
+    {
+        CHECK(f.controller().getDisks().back()->getVolume().label ==
+              f.volume.label);
+    }
+}
+
 TEST_CASE(
     "Picker completion and cancellation are safe without a host registration",
     "[disk][image]")

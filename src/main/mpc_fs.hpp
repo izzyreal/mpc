@@ -341,6 +341,17 @@ inline recursive_directory_iterator recursive_directory_end()
 [[nodiscard]] inline mpc_fs::result<std::vector<char>>
 get_file_data(const mpc_fs::path &p)
 {
+    const auto directory = mpc_fs::is_directory(p);
+    if (!directory)
+    {
+        return tl::unexpected(directory.error());
+    }
+    if (*directory)
+    {
+        return tl::unexpected(mpc_fs::make_error(
+            "get_file_data", p, std::make_error_code(std::errc::is_a_directory)));
+    }
+
     std::ifstream ifs(p, std::ios::in | std::ios::binary | std::ios::ate);
 
     if (!ifs.is_open())

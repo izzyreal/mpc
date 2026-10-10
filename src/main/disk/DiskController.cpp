@@ -484,13 +484,20 @@ std::string DiskController::bindImage(Volume volume,
         if (existing != disks.end())
         {
             volume.volumeUUID = replaceUuid;
-            const auto previous = (*existing)->getVolume();
-            (*existing)->getVolume() = volume;
-            if (!VolumesPersistence::save(mpc))
+            std::swap((*existing)->getVolume(), volume);
+            try
             {
-                (*existing)->getVolume() = previous;
-                return "Unable to save image binding";
+                if (VolumesPersistence::save(mpc))
+                {
+                    return {};
+                }
             }
+            catch (...)
+            {
+                std::swap((*existing)->getVolume(), volume);
+                throw;
+            }
+            std::swap((*existing)->getVolume(), volume);
         }
         else
         {
@@ -502,13 +509,21 @@ std::string DiskController::bindImage(Volume volume,
                 });
             disk->getVolume() = volume;
             disks.push_back(disk);
-            if (!VolumesPersistence::save(mpc))
+            try
+            {
+                if (VolumesPersistence::save(mpc))
+                {
+                    return {};
+                }
+            }
+            catch (...)
             {
                 disks.pop_back();
-                return "Unable to save image binding";
+                throw;
             }
+            disks.pop_back();
         }
-        return {};
+        return "Unable to save image binding";
     }
     catch (const std::exception &e)
     {
