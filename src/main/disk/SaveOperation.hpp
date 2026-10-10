@@ -23,12 +23,7 @@ namespace mpc::disk
     public:
         using Clock = std::chrono::steady_clock;
         using Now = std::function<Clock::time_point()>;
-        explicit SaveOperation(
-            Mpc &, Now =
-                       []
-                   {
-                       return Clock::now();
-                   });
+        explicit SaveOperation(Mpc &, Now = std::chrono::steady_clock::now);
         ~SaveOperation();
         bool startProgram(const std::shared_ptr<sampler::Program> &,
                           const std::string &, bool replace = false,
