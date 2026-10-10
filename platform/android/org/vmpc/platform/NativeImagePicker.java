@@ -94,7 +94,9 @@ public final class NativeImagePicker {
             if (result != Activity.RESULT_OK || data == null || data.getData() == null) { finish(null, null, null); return; }
             final Uri uri = data.getData();
             try {
-                int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                final int permissionMask = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                final int flags = data.getFlags() & permissionMask;
                 context.getContentResolver().takePersistableUriPermission(uri, flags);
                 String label = uri.getLastPathSegment();
                 try (Cursor cursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
