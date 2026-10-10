@@ -54,8 +54,7 @@ endif()
 
 FetchContent_Declare(rtmidi
     GIT_REPOSITORY https://github.com/izzyreal/rtmidi.git
-    # CoreMIDI client creation errors must propagate instead of terminating.
-    GIT_TAG        ee48d115f689d8f92f218bcacb33e13e64d384ef
+    GIT_TAG        vmpc
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
