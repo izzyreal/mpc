@@ -137,6 +137,11 @@ void TransportStateHandler::applyMessage(TransportState &state,
                  },
                  [&](const SetOverdubbingEnabled &m)
                  {
+                     if (m.overdubbing && state.sequencerRunning &&
+                         !state.overdubbingEnabled && !state.recordingEnabled)
+                     {
+                         sequencer->copySelectedSequenceToUndoSequence();
+                     }
                      state.overdubbingEnabled = m.overdubbing;
                  },
                  [&](const SwitchRecordToOverdub &)

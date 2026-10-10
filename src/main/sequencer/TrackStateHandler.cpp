@@ -1,6 +1,7 @@
 #include "sequencer/TrackStateHandler.hpp"
 
 #include "SequencerState.hpp"
+#include "TrackStateView.hpp"
 #include "SequencerStateManager.hpp"
 #include "utils/VariantUtils.hpp"
 
@@ -103,6 +104,26 @@ void TrackStateHandler::applyMessage(SequencerState &state,
                 return;
             }
             updateEvent(m.handle, m.snapshot);
+            lock.release();
+        },
+        [&](const UpdateNoteVariation &m)
+        {
+            auto &lock = manager->trackLocks[m.sequence][m.track];
+            if (!lock.try_acquire())
+            {
+                manager->enqueue(m);
+                return;
+            }
+
+            const TrackStateView track(
+                state.sequences[m.sequence].tracks[m.track]);
+            if (auto *event = track.getEvent(m.handle);
+                event && event->type == EventType::NoteOn &&
+                !event->beingRecorded)
+            {
+                event->noteVariationType = m.type;
+                event->noteVariationValue = m.value;
+            }
             lock.release();
         },
         [&](const InsertAcquiredEvent &m)

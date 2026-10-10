@@ -46,7 +46,41 @@ using namespace mpc::client::event;
 
 EventHandler::EventHandler(Mpc &mpc) : mpc(mpc) {}
 
-EventHandler::~EventHandler() {}
+std::optional<EventHandler::NoteVariation>
+EventHandler::getAfterNoteVariation(const EventData &event,
+                                    const BusType busType) const
+{
+    if (!mpc.clientEventController->isAfterEnabled() ||
+        event.type != EventType::NoteOn || event.beingRecorded ||
+        !isDrumBusType(busType) || !isDrumNote(event.noteNumber))
+    {
+        return std::nullopt;
+    }
+
+    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(busType);
+    const auto program =
+        mpc.getSampler()->getProgram(drumBus->getProgramIndex());
+    if (!program || program->getSlider()->getNote() != event.noteNumber)
+    {
+        return std::nullopt;
+    }
+
+    const auto slider = program->getSlider();
+    const Util::SliderNoteVariationContext context{
+        mpc.getHardware()->getSlider()->getValueAs<int>(),
+        slider->getParameter(),
+        slider->getTuneLowRange(),
+        slider->getTuneHighRange(),
+        slider->getDecayLowRange(),
+        slider->getDecayHighRange(),
+        slider->getAttackLowRange(),
+        slider->getAttackHighRange(),
+        slider->getFilterLowRange(),
+        slider->getFilterHighRange()};
+    const auto [type, value] =
+        Util::getSliderNoteVariationTypeAndValue(context);
+    return NoteVariation{type, NoteVariationValue(value)};
+}
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
     const EventData &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
@@ -73,36 +107,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
                                       ? VoiceOverlapMode::NOTE_OFF
                                       : noteParameters->getVoiceOverlapMode();
 
-    const bool isSliderNote =
-        program && program->getSlider()->getNote() == note;
-
-    NoteVariationType noteVariationType = noteOnEvent.noteVariationType;
-    NoteVariationValue noteVariationValue = noteOnEvent.noteVariationValue;
-
-    if (mpc.clientEventController->isAfterEnabled() && isSliderNote &&
-        mpc.getSequencer()->getTransport()->isOverdubbing())
-    {
-        const auto programSlider = program->getSlider();
-
-        const Util::SliderNoteVariationContext sliderNoteVariationContext{
-            mpc.getHardware()->getSlider()->getValueAs<int>(),
-            programSlider->getParameter(),
-            programSlider->getTuneLowRange(),
-            programSlider->getTuneHighRange(),
-            programSlider->getDecayLowRange(),
-            programSlider->getDecayHighRange(),
-            programSlider->getAttackLowRange(),
-            programSlider->getAttackHighRange(),
-            programSlider->getFilterLowRange(),
-            programSlider->getFilterHighRange()};
-
-        auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
-            sliderNoteVariationContext);
-
-        noteVariationType = type;
-        noteVariationValue = NoteVariationValue(value);
-    }
-
     const auto engineHost = mpc.getEngineHost();
     const auto sequencerPlaybackEngine =
         engineHost->getSequencerPlaybackEngine();
@@ -123,8 +127,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
         &mpc.getEngineHost()->getVoices(), note, velocityToUse,
-        noteVariationType, noteVariationValue, eventFrameOffsetInBuffer, true,
-        noteOnEvent.tick,
+        noteOnEvent.noteVariationType, noteOnEvent.noteVariationValue,
+        eventFrameOffsetInBuffer, true, noteOnEvent.tick,
         voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
 
     DrumNoteEventHandler::noteOn(ctx);

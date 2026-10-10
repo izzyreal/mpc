@@ -26,7 +26,7 @@ namespace mpc::audiomidi
     {
     public:
         explicit EventHandler(Mpc &mpc);
-        ~EventHandler() override;
+        ~EventHandler() override = default;
 
     private:
         std::atomic<uint64_t> noteEventId = 1;
@@ -41,6 +41,16 @@ namespace mpc::audiomidi
         std::optional<ProgramNoteAudition> activeProgramNoteAudition;
 
     public:
+        struct NoteVariation
+        {
+            NoteVariationType type;
+            NoteVariationValue value;
+        };
+
+        std::optional<NoteVariation>
+        getAfterNoteVariation(const sequencer::EventData &,
+                              sequencer::BusType) const;
+
         void handleFinalizedEvent(const sequencer::EventData &,
                                   TrackIndex trackIndex, int trackVelocityRatio,
                                   sequencer::BusType, int trackDeviceIndex);

@@ -47,6 +47,15 @@ namespace mpc::sequencer
         EventData snapshot;
     };
 
+    struct UpdateNoteVariation
+    {
+        SequenceIndex sequence;
+        TrackIndex track;
+        EventData *handle;
+        NoteVariationType type;
+        NoteVariationValue value;
+    };
+
     struct SetTrackUsed
     {
         SequenceIndex sequence;
@@ -110,10 +119,12 @@ namespace mpc::sequencer
         char name[Mpc2000XlSpecs::MAX_TRACK_NAME_LENGTH + 1];
     };
 
-    using TrackMessage = std::variant<
-        InsertAcquiredEvent, RemoveEvents, RemoveEvent, UpdateEventTick,
-        RemoveDoubles, UpdateEvent, FinalizeNoteEventNonLive, SetTrackUsed,
-        SetTrackOn, SetPlayEventIndex, SetTrackVelocityRatio,
-        SetTrackProgramChange, SetTrackBusType, SetTrackDeviceIndex,
-        SetTrackTransmitProgramChangesEnabled, SetTrackName>;
+    using TrackMessage =
+        std::variant<InsertAcquiredEvent, RemoveEvents, RemoveEvent,
+                     UpdateEventTick, RemoveDoubles, UpdateEvent,
+                     UpdateNoteVariation, FinalizeNoteEventNonLive,
+                     SetTrackUsed, SetTrackOn, SetPlayEventIndex,
+                     SetTrackVelocityRatio, SetTrackProgramChange,
+                     SetTrackBusType, SetTrackDeviceIndex,
+                     SetTrackTransmitProgramChangesEnabled, SetTrackName>;
 } // namespace mpc::sequencer

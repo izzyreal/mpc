@@ -124,6 +124,8 @@ namespace mpc::sequencer
                               bool allowPlaybackMutation) const;
 
         int getNextTick() const;
+        bool shouldRecordAfterVariation() const;
+
         bool shouldRemovePlayIndexEventDueToRecording() const;
         bool shouldRemovePlayIndexEventDueToErasePressed() const;
         void playNext() const;

@@ -426,12 +426,54 @@ bool Track::playEventAtIndex(const EventIndex eventIndex,
 
     if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
-        eventHandler->handleFinalizedEvent(*event, getIndex(),
+        auto playbackEvent = *event;
+        if (const auto variation = eventHandler->getAfterNoteVariation(
+                playbackEvent, getBusType()))
+        {
+            playbackEvent.noteVariationType = variation->type;
+            playbackEvent.noteVariationValue = variation->value;
+            if (allowPlaybackMutation && shouldRecordAfterVariation())
+            {
+                dispatch(UpdateNoteVariation{getSequenceIndex(), getIndex(),
+                                             event, variation->type,
+                                             variation->value});
+            }
+        }
+        eventHandler->handleFinalizedEvent(playbackEvent, getIndex(),
                                            getVelocityRatio(), getBusType(),
                                            getDeviceIndex());
     }
 
     return true;
+}
+
+bool Track::shouldRecordAfterVariation() const
+{
+    const auto transport = manager->getSnapshot().getTransportStateView();
+    if (!transport.isSequencerRunning() || !transport.isOverdubbing() ||
+        transport.isCountingIn() ||
+        (!isRecordingModeMulti() && trackIndex != getActiveTrackIndex()))
+    {
+        return false;
+    }
+
+    if (!isPunchEnabled())
+    {
+        return true;
+    }
+
+    const auto position = getTickPosition();
+    switch (getAutoPunchMode())
+    {
+        case 0:
+            return position >= getPunchInTime();
+        case 1:
+            return position < getPunchOutTime();
+        case 2:
+            return position >= getPunchInTime() && position < getPunchOutTime();
+        default:
+            return false;
+    }
 }
 
 int Track::getNextTick() const
