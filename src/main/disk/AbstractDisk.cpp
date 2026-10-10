@@ -706,3 +706,8 @@ AbstractDisk::performRequiredIoOrOpenErrorPopup(
 {
     return performIoOrOpenErrorPopup(ioFunc);
 }
+
+// StdDisk calls this specialization from a separate translation unit.
+template tl::expected<bool, mpc_io_error_msg>
+AbstractDisk::performRequiredIoOrOpenErrorPopup<bool>(
+    std::function<tl::expected<bool, mpc_io_error_msg>()> ioFunc);
