@@ -608,49 +608,19 @@ mpc::Tick
 SequencerStateManager::getCorrectedTickPos(const Tick currentPositionTicks,
                                            const SequenceStateView &seq) const
 {
-    const auto pos = currentPositionTicks;
-    auto correctedTickPos = NoTick;
-
     const auto timingCorrectScreen =
         sequencer->getScreens()->get<lcdgui::ScreenId::TimingCorrectScreen>();
+    const auto stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
+    const auto shiftAmount = timingCorrectScreen->getAmount();
 
-    const auto swingPercentage = timingCorrectScreen->getSwing();
-    const auto noteValueLengthInTicks =
-        timingCorrectScreen->getNoteValueLengthInTicks();
-
-    if (noteValueLengthInTicks > 1)
+    if (stepLength <= 1 && shiftAmount == 0)
     {
-        correctedTickPos =
-            Track::timingCorrectTick(seq, 0, seq.getLastBarIndex(), pos,
-                                     noteValueLengthInTicks, swingPercentage);
+        return NoTick;
     }
 
-    if (timingCorrectScreen->getAmount() != 0)
-    {
-        auto shiftedTick = correctedTickPos != NoTick ? correctedTickPos : pos;
-        auto amount = timingCorrectScreen->getAmount();
-
-        if (!timingCorrectScreen->isShiftTimingLater())
-        {
-            amount *= -1;
-        }
-
-        shiftedTick += amount;
-
-        if (shiftedTick < 0)
-        {
-            shiftedTick = 0;
-        }
-
-        if (const auto lastTick = seq.getLastTick(); shiftedTick > lastTick)
-        {
-            shiftedTick = lastTick;
-        }
-
-        correctedTickPos = shiftedTick;
-    }
-
-    return correctedTickPos;
+    return Track::timingCorrectAndShiftTick(
+        seq, currentPositionTicks, stepLength, timingCorrectScreen->getSwing(),
+        timingCorrectScreen->isShiftTimingLater(), shiftAmount);
 }
 
 void SequencerStateManager::applyCopyTrack(const CopyTrack &m)

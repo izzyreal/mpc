@@ -2,55 +2,34 @@
 #include "sequencer/Track.hpp"
 
 #include "sequencer/Sequence.hpp"
-#include "sequencer/TrackStateView.hpp"
+#include "sequencer/EventRef.hpp"
+
+#include <algorithm>
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 
 void Track::correctTimeRange(const int startPos, const int endPos,
                              const int stepLength, const int swingPercentage,
-                             const int lowestNote, const int highestNote) const
+                             const int lowestNote, const int highestNote,
+                             const bool shiftLater, const int shiftAmount) const
 {
-    const auto seq = getActiveSequence();
-    int accumBarLengths = 0;
-    auto fromBar = 0;
-    auto toBar = 0;
+    const auto seq = parent->getSnapshot(parent->getSequenceIndex());
 
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
+    // Capture the original selection and ticks before any queued updates can
+    // move notes into or out of the range.
+    const auto events = getEventRange(startPos, endPos);
+    for (const auto &event : events)
     {
-        accumBarLengths += seq->getBarLength(i);
-
-        if (accumBarLengths >= startPos)
+        const auto &original = event->snapshot;
+        if (original.type == EventType::NoteOn &&
+            original.noteNumber >= lowestNote &&
+            original.noteNumber <= highestNote)
         {
-            fromBar = i;
-            break;
-        }
-    }
-
-    for (int i = 0; i < Mpc2000XlSpecs::MAX_BAR_COUNT; i++)
-    {
-        accumBarLengths += seq->getBarLength(i);
-
-        if (accumBarLengths > endPos)
-        {
-            toBar = i;
-            break;
-        }
-    }
-
-    for (const auto &event : getSnapshot(getIndex()).getNoteEvents())
-    {
-        if (event->tick >= endPos)
-        {
-            break;
-        }
-
-        if (event->tick >= startPos && event->tick < endPos &&
-            event->noteNumber >= lowestNote && event->noteNumber <= highestNote)
-        {
-            timingCorrect(parent->getSnapshot(parent->getSequenceIndex()),
-                          fromBar, toBar, event, event->tick, stepLength,
-                          swingPercentage);
+            updateEventTick(event->handle,
+                            timingCorrectAndShiftTick(
+                                seq, original.tick, stepLength, swingPercentage,
+                                shiftLater, shiftAmount));
         }
     }
 
@@ -152,26 +131,18 @@ int Track::timingCorrectTick(const SequenceStateView &seq, const int fromBar,
     return tick;
 }
 
-void Track::shiftTiming(EventData *e, const Tick eventTick, const bool later,
-                        const int amount, const int lastTick) const
+mpc::Tick Track::timingCorrectAndShiftTick(const SequenceStateView &seq,
+                                           Tick tick, const int stepLength,
+                                           const int swingPercentage,
+                                           const bool shiftLater,
+                                           const int shiftAmount)
 {
-    int amountToUse = amount;
-
-    if (!later)
+    if (stepLength > 1)
     {
-        amountToUse *= -1;
+        tick = timingCorrectTick(seq, 0, seq.getLastBarIndex(), tick,
+                                 stepLength, swingPercentage);
     }
 
-    int newEventTick = eventTick + amountToUse;
-
-    if (newEventTick < 0)
-    {
-        newEventTick = 0;
-    }
-    else if (newEventTick > lastTick)
-    {
-        newEventTick = lastTick;
-    }
-
-    updateEventTick(e, newEventTick);
+    tick += shiftLater ? shiftAmount : -shiftAmount;
+    return std::clamp<Tick>(tick, 0, seq.getLastTick());
 }

@@ -13,7 +13,6 @@
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
-#include "sequencer/NoteOnEvent.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -76,27 +75,9 @@ void TimingCorrectScreen::function(const int i)
                 }
             }
 
-            const auto eventRange = track->getEventRange(time0, time1);
-
-            const auto sequence = sequencer.lock()->getSelectedSequence();
-
-            for (auto &e : eventRange)
-            {
-                if (const auto noteEvent =
-                        std::dynamic_pointer_cast<NoteOnEvent>(e))
-                {
-                    if (noteEvent->getNote() >= noteRange[0] &&
-                        noteEvent->getNote() <= noteRange[1])
-                    {
-                        track->shiftTiming(e->handle, e->getTick(),
-                                           shiftTimingLater, amount,
-                                           sequence->getLastTick());
-                    }
-                }
-            }
-
             track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(),
-                                    swing, noteRange[0], noteRange[1]);
+                                    swing, noteRange[0], noteRange[1],
+                                    shiftTimingLater, amount);
 
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -210,7 +191,8 @@ void TimingCorrectScreen::displayTime()
 
 void TimingCorrectScreen::setAmount(const int i)
 {
-    const auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    const auto vmpcSettingsScreen =
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
     if (vmpcSettingsScreen->isBigTimeShiftEnabled())
     {

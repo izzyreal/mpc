@@ -85,8 +85,11 @@ namespace mpc::sequencer
                                      int toBar, int tick, int stepLength,
                                      int swingPercentage);
 
-        void shiftTiming(EventData *, Tick eventTick, bool later, int amount,
-                         int lastTick) const;
+        // Quantize and swing, then shift and clamp to the sequence bounds.
+        static Tick timingCorrectAndShiftTick(const SequenceStateView &, Tick,
+                                              int stepLength,
+                                              int swingPercentage,
+                                              bool shiftLater, int shiftAmount);
 
         void setTrackIndex(TrackIndex i);
         TrackIndex getIndex() const;
@@ -141,7 +144,8 @@ namespace mpc::sequencer
         // Do not call from audio thread
         void correctTimeRange(int startPos, int endPos, int stepLength,
                               int swingPercentage, int lowestNote,
-                              int highestNote) const;
+                              int highestNote, bool shiftLater,
+                              int shiftAmount) const;
 
         // Do not call from audio thread
         void removeDoubles() const;
