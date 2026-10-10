@@ -6,6 +6,7 @@
 #include "engine/audio/server/AudioServer.hpp"
 #include "engine/audio/server/IOAudioProcess.hpp"
 #include "engine/audio/server/RealTimeAudioServer.hpp"
+#include <algorithm>
 #include <utility>
 
 using namespace mpc::engine::audio::server;
@@ -133,6 +134,9 @@ void NonRealTimeAudioServer::work(
     const std::vector<int8_t> &hostInputChannelIndices,
     const std::vector<int8_t> &hostOutputChannelIndices) const
 {
+    // The UI-thread switch to offline processing may still be pending. Capture
+    // the mute before rendering, since this block can also finish the bounce.
+    const bool muteLiveOutput = engineHost->isBouncingOffline();
     const auto realTimeAudioServer =
         std::dynamic_pointer_cast<RealTimeAudioServer>(server);
 
@@ -140,6 +144,16 @@ void NonRealTimeAudioServer::work(
         inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices,
         mpcMonoOutputChannelIndices, hostInputChannelIndices,
         hostOutputChannelIndices);
+
+    // Disk recorders have already received the rendered audio. Silence only
+    // the host outputs, leaving the recording and its timing untouched.
+    if (muteLiveOutput)
+    {
+        for (const auto channel : hostOutputChannelIndices)
+        {
+            std::fill_n(outputBuffer[channel], nFrames, 0.f);
+        }
+    }
 }
 
 void NonRealTimeAudioServer::work(const int nFrames)

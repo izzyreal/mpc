@@ -138,6 +138,7 @@ namespace mpc::engine
     private:
         Mpc &mpc;
         std::atomic<bool> bouncing{false};
+        std::atomic<bool> offlineBounce{false};
         std::atomic<bool> recordingSound{false};
         std::shared_ptr<AudioProcess> monitorInputAdapter;
         concurrency::TaskQueue audioTasks;
@@ -145,6 +146,7 @@ namespace mpc::engine
 
     public:
         bool isBouncing() const;
+        bool isBouncingOffline() const;
         bool isRecordingSound() const;
         void stopBouncing();
         void stopBouncingEarly();

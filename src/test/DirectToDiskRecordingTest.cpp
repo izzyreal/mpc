@@ -4,6 +4,7 @@
 
 #include "TestMpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Clock.hpp"
 #include "sequencer/Sequence.hpp"
@@ -15,9 +16,141 @@
 
 #include <thread>
 #include <chrono>
+#include <algorithm>
+#include <array>
+#include <cmath>
 
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
+
+TEST_CASE("Offline recording starts without leaking audio to live output",
+          "[direct-to-disk-recording][issue-355]")
+{
+    constexpr int BUFFER_SIZE = 512;
+    constexpr int SAMPLE_RATE = 44100;
+    constexpr int SOUND_FRAME_COUNT = 4410;
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutMidiServices(mpc);
+
+    const auto sound = mpc.getSampler()->addSound();
+    REQUIRE(sound != nullptr);
+    sound->setMono(true);
+    for (int i = 0; i < SOUND_FRAME_COUNT; ++i)
+    {
+        sound->insertFrame({1.f}, i);
+    }
+    sound->setStart(0);
+    sound->setEnd(SOUND_FRAME_COUNT);
+    mpc.getSampler()
+        ->getProgram(0)
+        ->getNoteParameters(mpc::MinDrumNoteNumber)
+        ->setSoundIndex(0);
+
+    const auto sequencer = mpc.getSequencer();
+    const auto stateManager = sequencer->getStateManager();
+    const auto seq = sequencer->getSelectedSequence();
+    seq->init(1);
+    stateManager->drainQueue();
+    seq->setInitialTempo(300);
+
+    EventData eventData;
+    eventData.type = EventType::NoteOn;
+    eventData.tick = 0;
+    eventData.noteNumber = mpc::MinDrumNoteNumber;
+    eventData.velocity = mpc::MaxVelocity;
+    eventData.duration = mpc::Duration(1);
+    seq->getTrack(0)->acquireAndInsertEvent(eventData);
+    stateManager->drainQueue();
+
+    const auto engineHost = mpc.getEngineHost();
+    const auto audioServer = engineHost->getAudioServer();
+    audioServer->setSampleRate(SAMPLE_RATE);
+    audioServer->resizeBuffers(BUFFER_SIZE);
+    audioServer->start();
+
+    std::array<std::array<float, BUFFER_SIZE>, 2> input{};
+    std::array<std::array<float, BUFFER_SIZE>, 2> output{};
+    const float *inputBuffer[] = {input[0].data(), input[1].data()};
+    float *outputBuffer[] = {output[0].data(), output[1].data()};
+
+    const auto ls = mpc.getLayeredScreen();
+    ls->openScreenById(ScreenId::VmpcDirectToDiskRecorderScreen);
+    ls->timerCallback();
+    REQUIRE(ls->setFocus("offline"));
+    mpc.getScreen()->turnWheel(1);
+    REQUIRE(mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>()
+                ->isOffline());
+    mpc.getScreen()->function(4);
+    REQUIRE(engineHost->isBouncing());
+
+    // Reproduce #355: the audio callback runs before the UI thread services
+    // the offline switch queued by changeBounceStateIfRequired().
+    engineHost->changeBounceStateIfRequired();
+    engineHost->prepareProcessBlock(BUFFER_SIZE);
+    mpc.getClock()->processBufferInternal(
+        sequencer->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+    audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {},
+                      {0, 1});
+
+    for (size_t channel = 0; channel < output.size(); ++channel)
+    {
+        float peak = 0.f;
+        for (const float sample : output[channel])
+        {
+            peak = std::max(peak, std::abs(sample));
+        }
+        CAPTURE(channel);
+        CHECK(peak == 0.f);
+    }
+
+    // Keep cleanup reachable after the nonfatal output checks: service the
+    // pending switch, let the offline bounce finish, then join its worker.
+    ls->timerCallback();
+    for (int attempt = 0; attempt < 400 && engineHost->isBouncing(); ++attempt)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    CHECK_FALSE(engineHost->isBouncing());
+    audioServer->setRealTime(true);
+    engineHost->changeBounceStateIfRequired();
+    ls->timerCallback();
+
+    // Disk writers finish asynchronously. Wait for the stereo files to settle
+    // and the silent individual-output files to be removed before teardown.
+    const auto recordingsRoot = mpc.paths->getDocuments()->recordingsPath();
+    std::uintmax_t lastSize = 0;
+    int stable = 0;
+    for (int attempt = 0; attempt < 400 && stable < 5; ++attempt)
+    {
+        int fileCount = 0;
+        std::uintmax_t totalSize = 0;
+        if (const auto it =
+                mpc_fs::make_recursive_directory_iterator(recordingsRoot))
+        {
+            for (auto entry = *it; entry != mpc_fs::recursive_directory_end();
+                 ++entry)
+            {
+                if (entry->is_regular_file())
+                {
+                    ++fileCount;
+                    totalSize += mpc_fs::file_size(entry->path()).value_or(0);
+                }
+            }
+        }
+        if (fileCount == 2 && totalSize > 2 * 44 && totalSize == lastSize)
+        {
+            ++stable;
+        }
+        else
+        {
+            stable = 0;
+        }
+        lastSize = totalSize;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    CHECK(stable >= 5);
+}
 
 TEST_CASE("Direct to disk recording does not start with silence",
           "[direct-to-disk-recording]")

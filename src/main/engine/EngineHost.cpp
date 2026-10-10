@@ -715,6 +715,9 @@ bool EngineHost::startBouncing(const DirectToDiskSettings *settings)
         }
     }
 
+    const auto directToDiskRecorderScreen =
+        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
+    offlineBounce.store(directToDiskRecorderScreen->isOffline());
     bouncing.store(true);
 
     return true;
@@ -800,6 +803,11 @@ void EngineHost::finishPreviewSoundPlayerVoice() const
 bool EngineHost::isBouncing() const
 {
     return bouncing.load();
+}
+
+bool EngineHost::isBouncingOffline() const
+{
+    return isBouncing() && offlineBounce.load();
 }
 
 bool EngineHost::isRecordingSound() const
