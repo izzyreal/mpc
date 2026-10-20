@@ -1,3 +1,11 @@
+## v0.9.19 (17-10-2026)
+* Fix short audible burst at start of offline rendering.
+* Fix applying 'Shift timing' after recording.
+* Fix AFTER (using the slider to change recorded notes).
+* Fix MIDI control channel matching. Previously, configured channels were ignored, so any mapping would match against any channel.
+* Fix audio click when changing individual output assignments.
+* Fix various bugs.
+
 ## v0.9.18 (19-9-2026)
 * Experimental Android version. Send me your Google Play email address if you're interested. See https://izmar.nl/support/contact.
 * Add circular gesture support for DATA wheel, MAIN VOLUME, and REC GAIN knobs. See https://vmpcdocs.izmar.nl/vmpc_specific.html#rotary-control-drag.
