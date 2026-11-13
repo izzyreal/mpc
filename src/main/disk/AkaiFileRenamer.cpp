@@ -4,6 +4,7 @@
 #include "Mpc.hpp"
 #include "Logger.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 
 #include "ShortNameGenerator.hpp"
@@ -74,6 +75,24 @@ void AkaiFileRenamer::renameFilesInDirectory(const mpc_fs::path &p,
     }
 
     std::vector<std::string> existingNames;
+    struct EntryToRename
+    {
+        mpc_fs::path path;
+        bool isDirectory;
+    };
+    std::vector<EntryToRename> entriesToRename;
+    const auto generateName = [](const mpc_fs::path &path, bool isDirectory,
+                                 const std::vector<std::string> &usedNames)
+    {
+        const auto name = path.filename().string();
+        if (isDirectory)
+        {
+            ShortNameGenerator generator(usedNames);
+            return generator.generateShortName(
+                ShortNameGenerator::tidyString(name)).asSimpleString();
+        }
+        return AkaiName::generate(name, usedNames);
+    };
 
     auto dirItRes = mpc_fs::make_directory_iterator(p);
     if (!dirItRes)
@@ -83,8 +102,6 @@ void AkaiFileRenamer::renameFilesInDirectory(const mpc_fs::path &p,
 
     for (auto e = *dirItRes; e != mpc_fs::directory_end(); ++e)
     {
-        std::string akaiName;
-
         if (e->path().filename() == ".DS_Store")
         {
             continue;
@@ -99,34 +116,38 @@ void AkaiFileRenamer::renameFilesInDirectory(const mpc_fs::path &p,
                                      p.string());
         }
 
-        if (*entryIsDirectoryRes)
-        {
-            const auto tidyString =
-                ShortNameGenerator::tidyString(e->path().filename().string());
-            ShortNameGenerator generator(existingNames);
-            akaiName = generator.generateShortName(tidyString).asSimpleString();
-        }
-        else
-        {
-            akaiName =
-                AkaiName::generate(e->path().filename().string(), existingNames);
-        }
-
-        if (akaiName != e->path().filename().string())
-        {
-            existingNames.push_back(akaiName);
-            if (!success(mpc_fs::rename(e->path(), tempRoot / akaiName),
-                         FailurePolicy::Required,
-                         "Akai rename move to temp root from '" +
-                             e->path().string() + "'"))
-            {
-                throw std::runtime_error("Unable to normalize directory " +
-                                         p.string());
-            }
-        }
-        else
+        // Reserve every name that can stay as-is before allocating any new
+        // names, including existing ~n suffixes. Otherwise iteration order can
+        // let an imported file steal a name already referenced by a program.
+        if (generateName(e->path(), *entryIsDirectoryRes, {}) ==
+            e->path().filename().string())
         {
             existingNames.push_back(e->path().filename().string());
+        }
+        else
+        {
+            entriesToRename.push_back({e->path(), *entryIsDirectoryRes});
+        }
+    }
+
+    // Keep suffix allocation deterministic for files that all need renaming.
+    std::sort(entriesToRename.begin(), entriesToRename.end(),
+              [](const auto &a, const auto &b)
+              {
+                  return a.path.filename().string() < b.path.filename().string();
+              });
+    for (const auto &entry : entriesToRename)
+    {
+        const auto akaiName =
+            generateName(entry.path, entry.isDirectory, existingNames);
+        existingNames.push_back(akaiName);
+        if (!success(mpc_fs::rename(entry.path, tempRoot / akaiName),
+                     FailurePolicy::Required,
+                     "Akai rename move to temp root from '" +
+                         entry.path.string() + "'"))
+        {
+            throw std::runtime_error("Unable to normalize directory " +
+                                     p.string());
         }
     }
 

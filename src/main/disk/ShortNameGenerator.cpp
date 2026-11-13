@@ -1,6 +1,7 @@
 #include "ShortNameGenerator.hpp"
 
 #include "ShortName.hpp"
+#include "file/AkaiName.hpp"
 
 #include "StrUtil.hpp"
 
@@ -16,20 +17,7 @@ ShortNameGenerator::ShortNameGenerator(const vector<string> &usedNames)
 
 bool ShortNameGenerator::validChar(char toTest)
 {
-    if (toTest >= 'A' && toTest <= 'Z')
-    {
-        return true;
-    }
-
-    if (toTest >= '0' && toTest <= '9')
-    {
-        return true;
-    }
-
-    return toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' ||
-           toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
-           toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
-           toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`';
+    return mpc::file::AkaiName::isValidChar(toTest);
 }
 
 bool ShortNameGenerator::isSkipChar(char c)

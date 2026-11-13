@@ -6,6 +6,8 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
+#include "lcdgui/screens/window/SoundScreen.hpp"
 using namespace mpc;
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;
@@ -100,4 +102,56 @@ TEST_CASE("DISCARD sorted range exceeds the unrelated sound",
     const auto sortMode = GENERATE(0, 1, 2);
     const auto mono = GENERATE(true, false);
     checkDiscard(sortMode, mono, true);
+}
+
+TEST_CASE("Sound name submission follows MPC2000XL character mapping",
+          "[edit-sound][name-screen]")
+{
+    // Confirmed on MPC2000XL firmware: selectable punctuation is preserved;
+    // leading/interior spaces become underscores and trailing spaces vanish.
+    const auto [entered, expected] = GENERATE(table<std::string, std::string>(
+        {{"!#$%&'()-@_{}", "!#$%&'()-@_{}"},
+         {"AbCd0123456789", "AbCd0123456789"},
+         {"  LEADING", "__LEADING"},
+         {"A  B C", "A__B_C"},
+         {"TRAILING   ", "TRAILING"},
+         {" A' B  ", "_A'_B"},
+         {"1234567890123456", "1234567890123456"},
+         {"123456789012345 ", "123456789012345"}}));
+    const bool pressEnter = GENERATE(false, true);
+    CAPTURE(entered, expected, pressEnter);
+
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sound = addDiscardTestSound(mpc, "ORIGINAL", 32, true);
+    mpc.getSampler()->setSoundIndex(0);
+    const auto ls = mpc.getLayeredScreen();
+    ls->openScreenById(ScreenId::TrimScreen);
+    ls->setFocus("snd");
+    mpc.screens->get<ScreenId::TrimScreen>()->openWindow();
+    REQUIRE(ls->getCurrentScreenId() == ScreenId::SoundScreen);
+    ls->setFocus("soundname");
+    mpc.screens->get<ScreenId::SoundScreen>()->openNameScreen();
+    REQUIRE(ls->getCurrentScreenId() == ScreenId::NameScreen);
+
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    auto text = entered;
+    text.resize(16, ' '); // Overwrite the entire previous name in the editor.
+    for (const auto c : text)
+    {
+        nameScreen->typeCharacter(c);
+    }
+    REQUIRE(sound->getName() == "ORIGINAL");
+
+    if (pressEnter)
+    {
+        nameScreen->pressEnter();
+    }
+    else
+    {
+        nameScreen->function(4); // F5: ENTER
+    }
+    CHECK(ls->getCurrentScreenId() == ScreenId::SoundScreen);
+    CHECK(mpc.getSampler()->getSound() == sound);
+    CHECK(sound->getName() == expected);
 }

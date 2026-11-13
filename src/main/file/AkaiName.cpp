@@ -12,9 +12,9 @@ bool AkaiName::isAkaiName(const std::string &name)
     return name == generate(name);
 }
 
+// MPC name-entry punctuation, plus '~' for generated collision suffixes.
 std::vector<char> AkaiName::allowedSpecialCharacters = {
-    '_', '^', '$', '~', '!', '#', '%',  '&',
-    '-', '{', '}', '(', ')', '@', '\\', '`'};
+    '!', '#', '$', '%', '&', '\'', '(', ')', '-', '@', '_', '{', '}', '~'};
 
 bool AkaiName::isValidChar(const char &c)
 {

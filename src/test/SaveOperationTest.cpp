@@ -8,6 +8,8 @@
 #include "hardware/Component.hpp"
 #include "lcdgui/Field.hpp"
 #include "disk/AkaiFileRenamer.hpp"
+#include "disk/ShortNameGenerator.hpp"
+#include "file/AkaiName.hpp"
 #include "disk/SaveOperation.hpp"
 #include "disk/StdDisk.hpp"
 #include "disk/MpcFile.hpp"
@@ -19,6 +21,8 @@
 #include "file/kaitai/ApsIo.hpp"
 #include "file/kaitai/PgmIo.hpp"
 #include "file/kaitai/SndIo.hpp"
+#include "file/kaitai/generated/mpc2000snd.h"
+#include "file/kaitai/generated/mpc2000xl_pgm.h"
 #include "file/wav/WavFile.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/SaveScreen.hpp"
@@ -33,6 +37,8 @@
 #include <fat/AkaiFatLfnDirectory.hpp>
 #include <util/SuperFloppyFormatter.hpp>
 #include <fstream>
+#include <algorithm>
+#include <kaitai/kaitaistream.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -719,6 +725,217 @@ TEST_CASE("Checked directory normalization propagates setup failures",
     f.file("BLOCKED")->setFileDataChecked(bytes);
     CHECK_THROWS(AkaiFileRenamer::renameFilesInDirectory(
         location, location / "BLOCKED" / "TEMP"));
+}
+
+TEST_CASE("Saving sounds preserves verified MPC names in filenames and headers",
+          "[save-operation][akai-names]")
+{
+    const bool wav = GENERATE(false, true);
+    const bool saveWithProgram = GENERATE(false, true);
+    CAPTURE(wav, saveWithProgram);
+    Fixture f;
+    const auto sampler = f.mpc.getSampler();
+    const auto program = sampler->getProgram(0);
+    program->setUsed();
+    // Use uppercase to avoid prescribing unverified filename case conversion.
+    // The first two names differ only in their sixteenth character.
+    std::vector<std::string> names{
+        "ABCDEFGHIJKLMNOP", "ABCDEFGHIJKLMNOQ", "A!#$%&'()-@_{}0Z",
+        "_LEADING", "A__B"};
+    for (const auto c : std::string("!#$%&'()-@_{}"))
+    {
+        names.push_back(std::string("A") + c + "B");
+    }
+    for (int i = 0; i < names.size(); ++i)
+    {
+        f.sound(names[i], true, 32 + i);
+        program->getNoteParameters(35 + i)->setSoundIndex(i);
+    }
+    f.mpc.getEngineHost()->prepareProcessBlock(512);
+
+    if (saveWithProgram)
+    {
+        f.mpc.screens->get<ScreenId::SaveAProgramScreen>()->save = wav ? 2 : 1;
+        REQUIRE(f.operation->startProgram(program, "NAMES.PGM"));
+        f.finish();
+        REQUIRE(f.mpc.getLayeredScreen()->getCurrentScreenId() ==
+                ScreenId::SaveScreen);
+
+        auto stream = f.file("NAMES.PGM")->getInputStream();
+        REQUIRE(stream);
+        ::kaitai::kstream io(stream.get());
+        mpc2000xl_pgm_t parsed(&io);
+        parsed._read();
+        REQUIRE(parsed.sound_names()->size() == names.size());
+        for (int i = 0; i < names.size(); ++i)
+        {
+            auto expectedField = names[i];
+            expectedField.resize(16, ' ');
+            expectedField.push_back('\0');
+            CAPTURE(names[i]);
+            CHECK(parsed.sound_names()->at(i) == expectedField);
+            CHECK(parsed.note_parameters()->at(i)->sound_index() == i);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < names.size(); ++i)
+        {
+            if (wav)
+            {
+                f.disk->writeWav(sampler->getSound(i), "");
+            }
+            else
+            {
+                f.disk->writeSnd(sampler->getSound(i), "");
+            }
+        }
+    }
+
+    f.disk->initFiles();
+    for (int i = 0; i < names.size(); ++i)
+    {
+        const auto filename = names[i] + (wav ? ".WAV" : ".SND");
+        CAPTURE(filename);
+        const auto saved = f.disk->getFile(filename);
+        REQUIRE(saved);
+        CHECK(saved->getName() == filename);
+        CHECK(sampler->getSound(i)->getName() == names[i]);
+        auto stream = saved->getInputStream();
+        REQUIRE(stream);
+        if (wav)
+        {
+            auto parsed = file::wav::WavFile::readWavStream(stream);
+            REQUIRE(parsed);
+            CHECK((*parsed)->getNumFrames() == 32 + i);
+        }
+        else
+        {
+            ::kaitai::kstream io(stream.get());
+            mpc2000snd_t parsed(&io);
+            parsed._read();
+            auto expectedField = names[i];
+            expectedField.resize(16, ' ');
+            expectedField.push_back('\0');
+            CHECK(parsed.name() == expectedField);
+            CHECK(parsed.frame_count() == 32 + i);
+        }
+    }
+}
+
+TEST_CASE("Directory normalization preserves all selectable punctuation",
+          "[akai-names]")
+{
+    const bool directories = GENERATE(false, true);
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto location = mpc_fs::path(mpc.getDisk()->getAbsolutePath());
+    const std::string punctuation = "!#$%&'()-@_{}";
+    for (const auto c : punctuation)
+    {
+        const auto name = std::string("A") + c + "B";
+        auto path = location / (name + (directories ? "" : ".SND"));
+        if (directories)
+        {
+            REQUIRE(mpc_fs::create_directory(path));
+            path /= "MARKER";
+        }
+        auto bytes = std::vector<char>{c};
+        MpcFile(path).setFileDataChecked(bytes);
+    }
+
+    for (int scan = 0; scan < 2; ++scan)
+    {
+        AkaiFileRenamer::renameFilesInDirectory(
+            location, mpc.paths->getDocuments()->tempPath());
+        for (const auto c : punctuation)
+        {
+            const auto name = std::string("A") + c + "B";
+            auto path = location / (name + (directories ? "" : ".SND"));
+            if (directories)
+            {
+                path /= "MARKER";
+            }
+            CAPTURE(scan, name, directories);
+            MpcFile file(path);
+            REQUIRE(file.exists());
+            CHECK(file.getBytes() == std::vector<char>{c});
+        }
+    }
+}
+
+TEST_CASE("Filename punctuation matches name entry plus collision suffixes",
+          "[akai-names]")
+{
+    for (char c = '!'; c <= '~'; ++c)
+    {
+        // Lowercase is converted before validation by both generators.
+        if (c >= 'a' && c <= 'z')
+        {
+            continue;
+        }
+        const bool selectable =
+            std::find(Mpc::akaiAsciiChar.begin(), Mpc::akaiAsciiChar.end(), c) !=
+            Mpc::akaiAsciiChar.end();
+        CAPTURE(c);
+        CHECK(file::AkaiName::isValidChar(c) == (selectable || c == '~'));
+        CHECK(ShortNameGenerator::validChar(c) == (selectable || c == '~'));
+    }
+
+    for (const auto c : std::string("^\\`"))
+    {
+        const auto name = std::string("A") + c + "B";
+        CAPTURE(name);
+        CHECK(file::AkaiName::generate(name + ".SND") == "A_B.SND");
+        CHECK(ShortNameGenerator::tidyString(name) == "A_B");
+    }
+}
+
+TEST_CASE("Directory normalization reserves existing names and suffixes",
+          "[akai-names]")
+{
+    const bool reverseCreationOrder = GENERATE(false, true);
+    const bool directories = GENERATE(false, true);
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto location = mpc_fs::path(mpc.getDisk()->getAbsolutePath());
+    const std::string extension = directories ? "" : ".SND";
+    std::vector<std::string> names{"KICK 1", "KICK1", "KICK1~1"};
+    if (reverseCreationOrder)
+    {
+        std::reverse(names.begin(), names.end());
+    }
+    for (const auto &name : names)
+    {
+        auto path = location / (name + extension);
+        if (directories)
+        {
+            REQUIRE(mpc_fs::create_directory(path));
+            path /= "MARKER";
+        }
+        auto bytes = std::vector<char>(name.begin(), name.end());
+        MpcFile(path).setFileDataChecked(bytes);
+    }
+
+    for (int scan = 0; scan < 2; ++scan)
+    {
+        AkaiFileRenamer::renameFilesInDirectory(
+            location, mpc.paths->getDocuments()->tempPath());
+        for (const auto &original : names)
+        {
+            const auto normalized = original == "KICK 1" ? "KICK1~2" : original;
+            auto path = location / (normalized + extension);
+            if (directories)
+            {
+                path /= "MARKER";
+            }
+            CAPTURE(scan, original, normalized, directories, reverseCreationOrder);
+            MpcFile file(path);
+            REQUIRE(file.exists());
+            CHECK(file.getBytes() ==
+                  std::vector<char>(original.begin(), original.end()));
+        }
+    }
 }
 
 TEST_CASE(

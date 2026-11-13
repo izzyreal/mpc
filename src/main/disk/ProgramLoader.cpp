@@ -161,7 +161,8 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                         // In all cases where the sampler already has a sound
                         // with a program file's sound name, we want the loaded
                         // program to refer to the sound that already existed.
-                        if (pgmFileSoundName == samplerEntry.second)
+                        if (StrUtil::eqIgnoreCase(pgmFileSoundName,
+                                                  samplerEntry.second))
                         {
                             convertedEntry.first = samplerEntry.first;
                             wasFoundInGlobalTable = true;
@@ -177,8 +178,9 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                              sampleIndex < mpc.getSampler()->getSoundCount();
                              sampleIndex++)
                         {
-                            if (mpc.getSampler()->getSoundName(sampleIndex) ==
-                                pgmFileSoundName)
+                            if (StrUtil::eqIgnoreCase(
+                                    mpc.getSampler()->getSoundName(sampleIndex),
+                                    pgmFileSoundName))
                             {
                                 convertedEntry.first = sampleIndex;
                                 break;
