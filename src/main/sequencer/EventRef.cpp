@@ -6,12 +6,21 @@ using namespace mpc::sequencer;
 
 EventRef::EventRef(EventData *const ptr, const EventData &snapshot,
                    const std::function<void(TrackMessage &&)> &dispatch)
-    : handle(ptr), snapshot(snapshot), dispatch(dispatch)
+    : payloadSnapshot(snapshot.sysExPayload),
+      handle(ptr), snapshot(
+                       [&]
+                       {
+                           auto value = snapshot;
+                           value.sysExPayload = payloadSnapshot.get();
+                           value.sysExStored = false;
+                           return value;
+                       }()),
+      dispatch(dispatch)
 {
 }
 
 EventRef::EventRef(const EventRef &event)
-    : handle(event.handle), snapshot(event.snapshot), dispatch(event.dispatch)
+    : EventRef(event.handle, event.snapshot, event.dispatch)
 {
 }
 

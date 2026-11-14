@@ -8,7 +8,7 @@
 #include <functional>
 #include <optional>
 
-#include "concurrency/TaskQueue.hpp"
+#include "concurrency/UiTaskQueue.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/BasicStructs.hpp"
 #include "lcdgui/BMFStructs.hpp"
@@ -34,7 +34,7 @@ namespace mpc::lcdgui
     class LayeredScreen
     {
         Mpc &mpc;
-        concurrency::TaskQueue uiTasks;
+        concurrency::UiTaskQueue uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
             std::vector(LCD_WIDTH, std::vector<bool>(LCD_HEIGHT));
@@ -56,6 +56,10 @@ namespace mpc::lcdgui
 
     public:
         utils::PostToUiThreadFn postToUiThread;
+        void logSysExRamFull()
+        {
+            uiTasks.post(concurrency::LogSysExRamFullTask{});
+        }
         void transferLeft();
         void transferRight();
         void transferUp();

@@ -186,7 +186,7 @@ void SequencerStateManager::flushNoteCache()
     alignas(EventData) unsigned char buf[sizeof(EventData)];
     const auto ev = reinterpret_cast<EventData *>(buf);
 
-    while (liveNoteOffEventRecordingQueue.dequeue(*ev))
+    while (liveNoteOffEventRecordingQueue.dequeueUninitialized(ev))
     {
         ev->~EventData();
     }

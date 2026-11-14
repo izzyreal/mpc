@@ -31,6 +31,9 @@
 
 #include <cassert>
 #include <memory>
+#include <cmath>
+#include "sequencer/Track.hpp"
+#include "sequencer/Sequence.hpp"
 
 #include "engine/StereoMixer.hpp"
 #include "performance/PerformanceManager.hpp"
@@ -45,6 +48,37 @@ using namespace mpc::engine;
 using namespace mpc::client::event;
 
 EventHandler::EventHandler(Mpc &mpc) : mpc(mpc) {}
+
+void EventHandler::recordSystemExclusive(const ClientMidiEvent &input)
+{
+    const auto sequencer = mpc.getSequencer();
+    const auto transport = sequencer->getTransport();
+    if (!transport->isPlaying() || !transport->isRecordingOrOverdubbing() ||
+        transport->isCountingIn())
+    {
+        return;
+    }
+    const auto *payload = input.getSysExPayload();
+    if (!payload)
+    {
+        return;
+    }
+    const auto sequence = sequencer->getCurrentlyPlayingSequence();
+    const auto track = sequence->getTrack(sequencer->getSelectedTrackIndex());
+    EventData event;
+    event.type = EventType::SystemExclusive;
+    const auto offset = SeqUtil::framesToTicks(
+        std::max(0.0, input.getBufferOffset()), transport->getTempo(),
+        mpc.getEngineHost()->getAudioServer()->getSampleRate());
+    event.tick = transport->getTickPosition() +
+                 static_cast<int64_t>(std::llround(offset));
+    if (event.tick >= sequence->getLastTick())
+    {
+        return;
+    }
+    event.sysExPayload = payload;
+    track->acquireAndInsertEvent(event);
+}
 
 std::optional<EventHandler::NoteVariation>
 EventHandler::getAfterNoteVariation(const EventData &event,
@@ -262,6 +296,25 @@ void EventHandler::handleFinalizedEvent(const EventData &event,
             audioServer->getSampleRate());
 
         mpc.getEngineHost()->postSamplePreciseTaskToAudioThread(task);
+    }
+    else if (event.type == EventType::SystemExclusive)
+    {
+        if (trackDeviceIndex == 0 || !event.sysExPayload ||
+            !mpc.getEngineHost()->getAudioServer()->isRealTime())
+        {
+            return;
+        }
+        ClientMidiEvent output;
+        output.setSysExPayload(
+            SysExPayloadOwner(event.sysExPayload));
+        if (output.getMessageType() == ClientMidiEvent::INVALID)
+        {
+            return;
+        }
+        output.setBufferOffset(mpc.getEngineHost()
+                                   ->getSequencerPlaybackEngine()
+                                   ->getEventFrameOffset());
+        mpc.getMidiOutput()->enqueueEvent(std::move(output));
     }
     else if (event.type == EventType::Mixer)
     {

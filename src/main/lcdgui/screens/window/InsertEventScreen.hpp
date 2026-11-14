@@ -21,6 +21,7 @@ namespace mpc::lcdgui::screens::window
             "NOTE",        "PITCH BEND",    "CONTROL CHANGE", "PROGRAM CHANGE",
             "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE",      "MIXER"};
         int insertEventType = 0;
+        int sysExByteCount = 2;
         void setInsertEventType(int i);
         void displayInsertEventType() const;
 

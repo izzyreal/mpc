@@ -1,4 +1,5 @@
 #pragma once
+#include "sequencer/SysExPayload.hpp"
 
 #define NOMINMAX
 
@@ -122,6 +123,7 @@ namespace mpc
         std::unique_ptr<disk::SaveOperation> saveOperation;
 
     public:
+        std::shared_ptr<sequencer::SysExPool> sysExPool;
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<Paths> paths;
 

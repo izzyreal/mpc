@@ -278,11 +278,14 @@ LegacyParsedSequenceView makeLegacyParsedSequenceView(
 void addLegacyImportedEvent(
     mpc::sequencer::SequenceTrackEventsSnapshot &events,
     mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
-    const mpc::TrackIndex trackIndex,
-    const mpc::sequencer::EventData &event,
+    const mpc::TrackIndex trackIndex, mpc::sequencer::OwnedEventSnapshot event,
     const std::string &defaultTrackName)
 {
-    events[trackIndex].push_back(event);
+    if (!event.usable())
+    {
+        return;
+    }
+    events[trackIndex].push_back(std::move(event));
 
     auto &trackState = trackStates[trackIndex];
     trackState.used = true;
@@ -377,7 +380,7 @@ void loadLegacyEventsFromParsedObjects(
         }
 
         const auto trackIndex = resolveLegacyTrackIndex(event.track_number());
-        mpc::sequencer::EventData e;
+        mpc::sequencer::OwnedEventSnapshot e;
         e.tick = absoluteTick;
 
         switch (status)
@@ -443,11 +446,16 @@ void loadLegacyEventsFromParsedObjects(
                          !event.system_exclusive_body()->empty())
                 {
                     e.type = mpc::sequencer::EventType::SystemExclusive;
-                    e.sysExByteA = event.system_exclusive_body()->at(0);
-                    e.sysExByteB =
-                        event.system_exclusive_body()->size() > 1
-                            ? event.system_exclusive_body()->at(1)
-                            : 0;
+                    e.setMidiSysExBytes(
+                        *sequencer.getStateManager()->sysExPool,
+                        event.system_exclusive_body()->data(),
+                        event.system_exclusive_body()->size() -
+                            (event.system_exclusive_body()->back() > 0x7F &&
+                                     event.system_exclusive_body()->back() !=
+                                         0xF7
+                                 ? 1
+                                 : 0),
+                        true);
                 }
                 break;
             case 0x90:
@@ -474,9 +482,9 @@ void loadLegacyEventsFromParsedObjects(
 
         if (e.type != mpc::sequencer::EventType::Unknown)
         {
-            addLegacyImportedEvent(
-                events, trackStates, trackIndex, e,
-                sequencer.getDefaultTrackName(trackIndex));
+            addLegacyImportedEvent(events, trackStates, trackIndex,
+                                   std::move(e),
+                                   sequencer.getDefaultTrackName(trackIndex));
         }
     }
 }
@@ -539,52 +547,52 @@ void loadLegacyEventsFromRawBytes(
             case 0xA0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::PolyPressure;
                 e.tick = absoluteTick;
                 e.noteNumber =
                     mpc::NoteNumber(static_cast<unsigned char>(bytes.at(pos++)));
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xB0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ControlChange;
                 e.tick = absoluteTick;
                 e.controllerNumber = static_cast<unsigned char>(bytes.at(pos++));
                 e.controllerValue = static_cast<unsigned char>(bytes.at(pos++));
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xC0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ProgramChange;
                 e.tick = absoluteTick;
                 e.programChangeProgramIndex =
                     mpc::ProgramIndex(static_cast<unsigned char>(bytes.at(pos++)));
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xD0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ChannelPressure;
                 e.tick = absoluteTick;
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
@@ -593,12 +601,12 @@ void loadLegacyEventsFromRawBytes(
                 const auto trackIndex = readTrack();
                 const auto bits1 = static_cast<unsigned char>(bytes.at(pos++));
                 const auto bits2 = static_cast<unsigned char>(bytes.at(pos++));
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::PitchBend;
                 e.tick = absoluteTick;
                 e.amount = static_cast<int16_t>((bits1 + (bits2 << 7)) - 8192);
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
@@ -606,7 +614,7 @@ void loadLegacyEventsFromRawBytes(
             {
                 const auto trackIndex = readTrack();
                 const auto payload = payloadWithoutLookahead(bytes, pos);
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.tick = absoluteTick;
 
                 if (isLegacyMixerSysex(payload))
@@ -619,14 +627,14 @@ void loadLegacyEventsFromRawBytes(
                 else if (!payload.empty())
                 {
                     e.type = mpc::sequencer::EventType::SystemExclusive;
-                    e.sysExByteA = payload[0];
-                    e.sysExByteB = payload.size() > 1 ? payload[1] : 0;
+                    e.setMidiSysExBytes(*sequencer.getStateManager()->sysExPool,
+                                        payload.data(), payload.size(), true);
                 }
 
                 if (e.type != mpc::sequencer::EventType::Unknown)
                 {
                     addLegacyImportedEvent(
-                        events, trackStates, trackIndex, e,
+                        events, trackStates, trackIndex, std::move(e),
                         sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
@@ -638,7 +646,7 @@ void loadLegacyEventsFromRawBytes(
             case 0x98:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::NoteOn;
                 e.tick = absoluteTick;
                 e.noteNumber =
@@ -656,7 +664,7 @@ void loadLegacyEventsFromRawBytes(
                         ? mpc::NoteVariationTypeTune
                         : mpc::NoteVariationType(status - 0x98);
                 addLegacyImportedEvent(
-                    events, trackStates, trackIndex, e,
+                    events, trackStates, trackIndex, std::move(e),
                     sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
@@ -812,10 +820,11 @@ void loadLegacyMpc60AllSequenceIntoSlot(
         *sequencer->getStateManager());
 }
 
-mpc::sequencer::EventData
-parsedEventToEventData(const mpc2000xl_all_t::event_t& parsedEvent)
+mpc::sequencer::OwnedEventSnapshot
+parsedEventToEventData(const mpc2000xl_all_t::event_t &parsedEvent,
+                       mpc::sequencer::SysExPool &pool)
 {
-    mpc::sequencer::EventData e;
+    mpc::sequencer::OwnedEventSnapshot e;
     e.tick = parsedEvent.tick();
     e.trackIndex = mpc::TrackIndex(parsedEvent.track());
 
@@ -905,12 +914,9 @@ parsedEventToEventData(const mpc2000xl_all_t::event_t& parsedEvent)
         else
         {
             e.type = mpc::sequencer::EventType::SystemExclusive;
-            e.sysExByteA = bytes.size() > 0
-                ? static_cast<uint8_t>(bytes[0])
-                : 0;
-            e.sysExByteB = bytes.size() > 1
-                ? static_cast<uint8_t>(bytes[1])
-                : 0;
+            e.setSysExBytes(pool,
+                            reinterpret_cast<const uint8_t *>(bytes.data()),
+                            bytes.size());
         }
     }
 
@@ -923,6 +929,7 @@ void applyParsedSequenceToInMemorySequence(
     const std::shared_ptr<mpc::sequencer::Sequence>& inMemorySequence,
     mpc::sequencer::SequencerStateManager* const manager)
 {
+    mpc::sequencer::SysExReportBatch reportBatch;
     auto& parsedSequence = *parsed.sequences()->at(sourceIndex);
     auto* body = parsedSequence.body();
     if (body == nullptr)
@@ -985,13 +992,14 @@ void applyParsedSequenceToInMemorySequence(
             continue;
         }
 
-        auto e = parsedEventToEventData(*parsedEvent);
-        if (e.type == mpc::sequencer::EventType::Unknown)
+        auto e = parsedEventToEventData(*parsedEvent, *manager->sysExPool);
+        if (e.type == mpc::sequencer::EventType::Unknown || !e.usable())
         {
             continue;
         }
 
-        (*updateSequenceEvents.trackSnapshots)[e.trackIndex].push_back(e);
+        (*updateSequenceEvents.trackSnapshots)[e.trackIndex].push_back(
+            std::move(e));
     }
 
     manager->enqueue(updateSequenceEvents);
@@ -1346,6 +1354,7 @@ void AllLoader::loadEverythingFromFile(Mpc &mpc, MpcFile *f)
 
 void AllLoader::loadEverythingFromBytes(Mpc &mpc, const std::vector<char> &bytes)
 {
+    mpc::sequencer::SysExReportBatch reportBatch;
     switch (detectAllVariant(bytes))
     {
         case all_variant_t::mpc2000xl:

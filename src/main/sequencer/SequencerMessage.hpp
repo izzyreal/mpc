@@ -68,6 +68,11 @@ namespace mpc::sequencer
         int destinationBarCount;
     };
 
+    // Resumes event insertions from a bar copy after track-lock contention.
+    struct FlushCopyBarInserts
+    {
+    };
+
     struct DeleteSequence
     {
         SequenceIndex sequenceIndex;
@@ -103,7 +108,8 @@ namespace mpc::sequencer
     using SequencerMessage =
         std::variant<TransportMessage, SequenceMessage, SongMessage, CopyEvents,
                      SwitchToNextSequenceSudden, SetSelectedSequenceIndex,
-                     PreviewSequenceFromStart, CopyBars, SetSelectedSongIndex,
+                     PreviewSequenceFromStart, CopyBars, FlushCopyBarInserts,
+                     SetSelectedSongIndex,
                      SetSelectedSongStepIndex, DeleteSequence, CopySequence,
                      UndoSequence, CopyTrack, SetUndoSequenceAvailable,
                      DeleteAllSequences,

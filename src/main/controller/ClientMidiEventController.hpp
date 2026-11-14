@@ -154,7 +154,6 @@ namespace mpc::controller
         void handleControlChange(const ClientMidiEvent &e);
         void handleProgramChange(const ClientMidiEvent &e) const;
 
-        // System Exclusive (Manufacturer ID: 0x45)
         void handleSystemExclusive(const ClientMidiEvent &e) const;
 
         // System Common

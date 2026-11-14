@@ -243,6 +243,7 @@ void StepEditorScreen::close()
 
 void StepEditorScreen::function(int i)
 {
+    SysExReportBatch reportBatch;
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     switch (i)
@@ -253,13 +254,21 @@ void StepEditorScreen::function(int i)
         case 1:
             if (selectionStartIndex != -1)
             {
-                // CopySelectedNotes
-                setSelectedEvents();
+                const auto events = computeEventsAtCurrentTick();
+                const auto track = sequencer.lock()->getSelectedTrack();
                 placeHolder.clear();
-                placeHolder.reserve(selectedEvents.size());
-                for (const auto &event : selectedEvents)
+                const auto first =
+                    std::min(selectionStartIndex, selectionEndIndex);
+                const auto last =
+                    std::max(selectionStartIndex, selectionEndIndex);
+                for (int index = first; index <= last && index < events.size();
+                     ++index)
                 {
-                    placeHolder.push_back(event->snapshot);
+                    auto copy = track->copyEventState(events[index]->handle);
+                    if (copy.type != EventType::Unknown && copy.usable())
+                    {
+                        placeHolder.push_back(std::move(copy));
+                    }
                 }
                 clearSelection();
             }
@@ -276,7 +285,14 @@ void StepEditorScreen::function(int i)
 
                 if (!maybeEmptyEvent)
                 {
-                    placeHolder = {visibleEvents[eventIndex]->snapshot};
+                    placeHolder.clear();
+                    auto copy =
+                        sequencer.lock()->getSelectedTrack()->copyEventState(
+                            visibleEvents[eventIndex]->handle);
+                    if (copy.type != EventType::Unknown && copy.usable())
+                    {
+                        placeHolder.push_back(std::move(copy));
+                    }
                 }
             }
             break;
@@ -611,14 +627,9 @@ void StepEditorScreen::turnWheel(const int increment)
         if (const auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(
                 visibleEvents[eventNumber]))
         {
-            if (paramIsLetter("a"))
-            {
-                sysEx->setByteA(sysEx->getByteA() + increment);
-            }
-            else if (paramIsLetter("b"))
-            {
-                sysEx->setByteB(sysEx->getByteB() + increment);
-            }
+            const auto index =
+                sysExOffsets[eventNumber] + getActiveColumn()[0] - 'a';
+            sysEx->setByte(index, sysEx->getByte(index) + increment);
         }
         else if (const auto channelPressure =
                      std::dynamic_pointer_cast<ChannelPressureEvent>(
@@ -829,8 +840,58 @@ void StepEditorScreen::nextBarEnd()
         });
 }
 
+bool StepEditorScreen::moveSysExCursor(int direction)
+{
+    const auto focus = getFocusedFieldNameOrThrow();
+    if (focus.size() != 2)
+    {
+        return false;
+    }
+    const auto row = getActiveRow();
+    const auto events = computeVisibleEvents();
+    const auto event =
+        std::dynamic_pointer_cast<SystemExclusiveEvent>(events[row]);
+    if (!event)
+    {
+        return false;
+    }
+    auto &offset = sysExOffsets[row];
+    const auto column = focus[0] - 'a';
+    const auto index = offset + column;
+    if (direction < 0)
+    {
+        if (column > 0)
+        {
+            ls.lock()->setFocus(std::string(1, focus[0] - 1) + focus[1]);
+        }
+        else if (offset > 0)
+        {
+            --offset;
+        }
+    }
+    else if (index + 1 < event->getByteCount())
+    {
+        if (column < 11)
+        {
+            ls.lock()->setFocus(std::string(1, focus[0] + 1) + focus[1]);
+        }
+        else
+        {
+            ++offset;
+        }
+    }
+    refreshEventRows();
+    checkSelection();
+    refreshSelection();
+    return true;
+}
+
 void StepEditorScreen::left()
 {
+    if (moveSysExCursor(-1))
+    {
+        return;
+    }
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName.length() == 2 && getActiveColumn() == "a")
     {
@@ -848,6 +909,10 @@ void StepEditorScreen::left()
 
 void StepEditorScreen::right()
 {
+    if (moveSysExCursor(1))
+    {
+        return;
+    }
     ScreenComponent::right();
     checkSelection();
     refreshSelection();
@@ -1059,124 +1124,61 @@ void StepEditorScreen::refreshSelection()
 }
 
 std::vector<std::shared_ptr<EventRef>> StepEditorScreen::computeVisibleEvents(
-    const std::vector<std::shared_ptr<EventRef>> &eventsAtCurrentTick) const
+    const std::vector<std::shared_ptr<EventRef>> &) const
 {
-    std::vector<std::shared_ptr<EventRef>> result(4);
-    const int firstVisibleEventIndex = yOffset;
-    int visibleEventCounter = 0;
-
-    std::optional<std::vector<std::shared_ptr<EventRef>>> ownedEvents;
-
-    const std::vector<std::shared_ptr<EventRef>> &eventsAtCurrentTickToUse =
-        eventsAtCurrentTick.empty()
-            ? (ownedEvents = computeEventsAtCurrentTick(), *ownedEvents)
-            : eventsAtCurrentTick;
-
-    for (int i = 0; i < EVENT_ROW_COUNT; i++)
-    {
-        result[visibleEventCounter] =
-            eventsAtCurrentTickToUse[i + firstVisibleEventIndex];
-        visibleEventCounter++;
-
-        if (visibleEventCounter > 3 ||
-            visibleEventCounter > eventsAtCurrentTickToUse.size() - 1)
-        {
-            break;
-        }
-    }
-
+    auto result = computeEventsAtCurrentTick(true, yOffset, EVENT_ROW_COUNT);
+    result.resize(EVENT_ROW_COUNT);
     return result;
 }
 
 std::vector<std::shared_ptr<EventRef>>
-StepEditorScreen::computeEventsAtCurrentTick() const
+StepEditorScreen::computeEventsAtCurrentTick(bool includePayloads,
+                                             size_t offset, size_t limit) const
 {
-    std::vector<std::shared_ptr<EventRef>> result;
-
     const auto track = sequencer.lock()->getSelectedTrack();
-    const auto trackEvents = track->getEvents();
-    const auto positionTicks =
-        sequencer.lock()->getTransport()->getTickPosition();
-
-    for (auto &event : track->getEvents())
+    const auto tick = sequencer.lock()->getTransport()->getTickPosition();
+    const auto matches = [&](const EventData &event)
     {
-        if (event->getTick() == positionTicks)
+        if (event.tick != tick)
         {
-            if ((view == 0 || view == 1) &&
-                std::dynamic_pointer_cast<NoteOnEvent>(event))
-            {
-                auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-                if (isMidiBusType(track->getBusType()))
-                {
-                    if (fromNote == NoDrumNoteAssigned || view == 0)
-                    {
-                        result.push_back(ne);
-                    }
-                    else if (/*fromNote != NoDrumNoteAssigned &&*/ fromNote ==
-                             ne->getNote())
-                    {
-                        result.push_back(ne);
-                    }
-                }
-                else
-                {
-                    if ((ne->getNote() >= noteA && ne->getNote() <= noteB) ||
-                        view == 0)
-                    {
-                        result.push_back(ne);
-                    }
-                }
-            }
-
-            if ((view == 0 || view == 2) &&
-                std::dynamic_pointer_cast<PitchBendEvent>(event))
-            {
-                result.push_back(event);
-            }
-
-            if ((view == 0 || view == 3) &&
-                std::dynamic_pointer_cast<ControlChangeEvent>(event))
-            {
-                if (control == -1)
-                {
-                    result.push_back(event);
-                }
-                if (control ==
-                    std::dynamic_pointer_cast<ControlChangeEvent>(event)
-                        ->getController())
-                {
-                    result.push_back(event);
-                }
-            }
-            if ((view == 0 || view == 4) &&
-                std::dynamic_pointer_cast<ProgramChangeEvent>(event))
-            {
-                result.push_back(event);
-            }
-
-            if ((view == 0 || view == 5) &&
-                std::dynamic_pointer_cast<ChannelPressureEvent>(event))
-            {
-                result.push_back(event);
-            }
-
-            if ((view == 0 || view == 6) &&
-                std::dynamic_pointer_cast<PolyPressureEvent>(event))
-            {
-                result.push_back(event);
-            }
-
-            if ((view == 0 || view == 7) &&
-                (std::dynamic_pointer_cast<SystemExclusiveEvent>(event) ||
-                 std::dynamic_pointer_cast<MixerEvent>(event)))
-            {
-                result.push_back(event);
-            }
+            return false;
         }
+        if (view == 0)
+        {
+            return true;
+        }
+        switch (event.type)
+        {
+            case EventType::NoteOn:
+                return view == 1 && (isMidiBusType(track->getBusType())
+                                         ? (fromNote == NoDrumNoteAssigned ||
+                                            event.noteNumber == fromNote)
+                                         : (event.noteNumber >= noteA &&
+                                            event.noteNumber <= noteB));
+            case EventType::PitchBend:
+                return view == 2;
+            case EventType::ControlChange:
+                return view == 3 &&
+                       (control == -1 || control == event.controllerNumber);
+            case EventType::ProgramChange:
+                return view == 4;
+            case EventType::ChannelPressure:
+                return view == 5;
+            case EventType::PolyPressure:
+                return view == 6;
+            case EventType::SystemExclusive:
+            case EventType::Mixer:
+                return view == 7;
+            default:
+                return false;
+        }
+    };
+    auto result =
+        track->getEventsMatching(matches, offset, limit, includePayloads);
+    if (result.size() < limit)
+    {
+        result.push_back(emptyEvent);
     }
-
-    result.push_back(emptyEvent);
     return result;
 }
 
@@ -1201,6 +1203,19 @@ void StepEditorScreen::refreshEventRows()
             eventRow->Hide(true);
         }
 
+        if (const auto sysex =
+                std::dynamic_pointer_cast<SystemExclusiveEvent>(event))
+        {
+            sysExOffsets[i] =
+                std::min(sysExOffsets[i], sysex->getByteCount() > 12
+                                              ? sysex->getByteCount() - 12
+                                              : size_t{0});
+        }
+        else
+        {
+            sysExOffsets[i] = 0;
+        }
+        eventRow->setSysExOffset(sysExOffsets[i]);
         eventRow->setEvent(event);
         eventRow->init();
     }
@@ -1410,7 +1425,7 @@ void StepEditorScreen::setSelectedEvents()
         lastEventIndex = selectionStartIndex;
     }
 
-    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick(true);
 
     for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
     {
@@ -1507,7 +1522,7 @@ std::shared_ptr<EventRef> StepEditorScreen::getSelectedEvent()
     return selectedEvent;
 }
 
-std::vector<EventData> &StepEditorScreen::getPlaceHolder()
+std::vector<OwnedEventSnapshot> &StepEditorScreen::getPlaceHolder()
 {
     return placeHolder;
 }

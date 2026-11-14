@@ -89,11 +89,82 @@ void SequencerStateManager::applyCopyBars(const CopyBars &m) noexcept
                 }
 
                 const auto eventCopy = acquireEvent();
-                *eventCopy = *event;
+                if (!eventCopy)
+                {
+                    break;
+                }
+                if (!cloneEventTo(*eventCopy, *event))
+                {
+                    returnEventToPool(eventCopy);
+                    continue;
+                }
                 eventCopy->sequenceIndex = SequenceIndex(m.toSeqIndex);
                 eventCopy->tick = tick;
-                applyMessage(InsertAcquiredEvent{eventCopy});
+                auto &lock = trackLocks[eventCopy->sequenceIndex]
+                                       [eventCopy->trackIndex];
+                if (lock.try_acquire())
+                {
+                    auto &track = activeState.sequences[eventCopy->sequenceIndex]
+                                      .tracks[eventCopy->trackIndex];
+                    insertAcquiredEvent(track, eventCopy);
+                    lock.release();
+                }
+                else
+                {
+                    eventCopy->next = nullptr;
+                    eventCopy->prev = nullptr;
+                    if (pendingCopyBarInsertTail)
+                        pendingCopyBarInsertTail->next = eventCopy;
+                    else
+                        pendingCopyBarInsertHead = eventCopy;
+                    pendingCopyBarInsertTail = eventCopy;
+                }
             }
         }
     }
+    if (pendingCopyBarInsertHead) defer(FlushCopyBarInserts{});
+}
+
+void SequencerStateManager::flushCopyBarInserts() noexcept
+{
+    // Bar signatures were queued before the insertions. Keep that order even
+    // if a contended signature was retried behind this marker.
+    if (hasDeferredMessages())
+    {
+        defer(FlushCopyBarInserts{});
+        return;
+    }
+
+    while (pendingCopyBarInsertHead)
+    {
+        auto *event = pendingCopyBarInsertHead;
+        auto &lock = trackLocks[event->sequenceIndex][event->trackIndex];
+        if (!lock.try_acquire())
+        {
+            defer(FlushCopyBarInserts{});
+            return;
+        }
+
+        pendingCopyBarInsertHead = event->next;
+        if (!pendingCopyBarInsertHead) pendingCopyBarInsertTail = nullptr;
+        event->next = nullptr;
+        auto &track = activeState.sequences[event->sequenceIndex]
+                          .tracks[event->trackIndex];
+        insertAcquiredEvent(track, event);
+        lock.release();
+    }
+}
+
+void SequencerStateManager::discardPendingCopyBarInserts(
+    const bool reportOverflow) noexcept
+{
+    while (pendingCopyBarInsertHead)
+    {
+        auto *event = pendingCopyBarInsertHead;
+        pendingCopyBarInsertHead = event->next;
+        if (reportOverflow && event->sysExPayload)
+            event->sysExPayload->pool->reportFull();
+        returnEventToPool(event);
+    }
+    pendingCopyBarInsertTail = nullptr;
 }

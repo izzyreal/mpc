@@ -34,6 +34,7 @@ void PasteEventScreen::function(const int i)
         return;
     }
 
+    sequencer::SysExReportBatch reportBatch;
     for (int eventIndex = 0;
          eventIndex < stepEditorScreen->getPlaceHolder().size(); ++eventIndex)
     {

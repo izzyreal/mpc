@@ -165,7 +165,7 @@ EventRow::EventRow(Mpc &mpc, const int rowIndex)
     : Component("event-row-" + std::to_string(rowIndex)), mpc(mpc),
       rowIndex(rowIndex)
 {
-    int w1 = 194;
+    int w1 = 248;
     int h1 = 9;
     int x1 = 0;
     int y1 = 11 + rowIndex * 9;
@@ -173,18 +173,20 @@ EventRow::EventRow(Mpc &mpc, const int rowIndex)
     auto parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
     parameters = addChildT<EventRowParameters>(parametersRect);
 
-    for (int i = 4; i >= 0; i--)
+    for (int i = 11; i >= 0; i--)
     {
         auto label = parameters->addChild(std::make_shared<Label>(
-            mpc, letters[i] + std::to_string(rowIndex), drumNoteEventLabels[i],
-            drumNoteEventXPos[i] + 1, rowIndex * 9 + 12,
-            drumNoteEventLabels[i].length() * 6 + 1));
+            mpc, letters[i] + std::to_string(rowIndex),
+            (i < 5 ? drumNoteEventLabels[i] : ""),
+            (i < 5 ? drumNoteEventXPos[i] : 0) + 1, rowIndex * 9 + 12,
+            (i < 5 ? drumNoteEventLabels[i] : "").length() * 6 + 1));
         labels.insert(begin(labels), std::dynamic_pointer_cast<Label>(label));
 
         auto tf = parameters->addChild(std::make_shared<Field>(
             mpc, letters[i] + std::to_string(rowIndex),
-            drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1,
-            rowIndex * 9 + 12, drumNoteEventSizes[i]));
+            (i < 5 ? drumNoteEventXPos[i] : 0) + 1 +
+                (i < 5 ? drumNoteEventLabels[i] : "").length() * 6 + 1,
+            rowIndex * 9 + 12, (i < 5 ? drumNoteEventSizes[i] : 2)));
 
         fields.insert(begin(fields), std::dynamic_pointer_cast<Field>(tf));
     }
@@ -214,6 +216,11 @@ bool EventRow::isEmptyEvent() const
 
 void EventRow::init() const
 {
+    for (size_t i = 5; i < fields.size(); ++i)
+    {
+        fields[i]->Hide(true);
+        labels[i]->Hide(true);
+    }
     if (std::dynamic_pointer_cast<NoteOnEvent>(event.lock()))
     {
         if (isDrumBusType(busType))
@@ -269,8 +276,6 @@ void EventRow::init() const
     }
     else if (std::dynamic_pointer_cast<SystemExclusiveEvent>(event.lock()))
     {
-        setLabelTexts(sysexEventLabels);
-        setSizesAndLocations(sysexEventXPos, sysexEventSizes);
         setSystemExclusiveEventValues();
     }
     else if (std::dynamic_pointer_cast<MixerEvent>(event.lock()))
@@ -299,34 +304,34 @@ void EventRow::setEmptyEventValues() const
 
 void EventRow::setSystemExclusiveEventValues() const
 {
-    if (!event.lock())
+    const auto see =
+        std::dynamic_pointer_cast<SystemExclusiveEvent>(event.lock());
+    if (!see)
     {
         return;
     }
-
-    const auto see =
-        std::dynamic_pointer_cast<SystemExclusiveEvent>(event.lock());
-
-    for (int i = 0; i < 2; i++)
-    {
-        fields[i]->Hide(false);
-        labels[i]->Hide(false);
-    }
-
-    char byteA[3];
-    std::snprintf(byteA, sizeof(byteA), "%02X", see->getByteA());
-    fields[0]->setText(StrUtil::padLeft(std::string(byteA), "0", 2));
-
-    char byteB[3];
-    std::snprintf(byteB, sizeof(byteB), "%02X", see->getByteB());
-    fields[1]->setText(StrUtil::padLeft(std::string(byteB), "0", 2));
-
     horizontalBar->Hide(true);
-
-    for (int i = 2; i < 5; i++)
+    for (size_t i = 0; i < fields.size(); ++i)
     {
-        fields[i]->Hide(true);
-        labels[i]->Hide(true);
+        labels[i]->Hide(i != 0);
+        if (i == 0)
+        {
+            labels[i]->setText(">Exclusive:");
+            labels[i]->setSize(66, 9);
+            labels[i]->setLocation(0, 11 + rowIndex * 9);
+        }
+        const bool visible = sysExOffset + i < see->getByteCount();
+        fields[i]->Hide(!visible);
+        fields[i]->setLocation(66 + static_cast<int>(i) * 15,
+                               11 + rowIndex * 9);
+        fields[i]->setSize(13, 9);
+        if (visible)
+        {
+            char byte[3];
+            std::snprintf(byte, sizeof(byte), "%02X",
+                          see->getByte(sysExOffset + i));
+            fields[i]->setText(byte);
+        }
     }
 }
 
@@ -704,7 +709,7 @@ void EventRow::setColors() const
 {
     parameters->setColor(isSelected() && !isEmptyEvent());
 
-    for (int i = 0; i < 5; i++)
+    for (size_t i = 0; i < fields.size(); i++)
     {
         if (isEmptyEvent())
         {

@@ -427,8 +427,10 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports verified event fixture",
     const auto systemExclusive =
         eventAs<mpc::sequencer::SystemExclusiveEvent>(events[2]);
     REQUIRE(systemExclusive->getTick() == 48);
-    REQUIRE(systemExclusive->getByteA() == 0x00);
+    REQUIRE(systemExclusive->getByteCount() == 3);
+    REQUIRE(systemExclusive->getByteA() == 0xF0);
     REQUIRE(systemExclusive->getByteB() == 0x00);
+    REQUIRE(systemExclusive->getByte(2) == 0xF7);
 
     const auto mixerLevel = eventAs<mpc::sequencer::MixerEvent>(events[3]);
     REQUIRE(mixerLevel->getTick() == 72);

@@ -97,6 +97,8 @@ namespace mpc::sequencer
 
         void acquireAndInsertEvent(const EventData &,
                                    utils::SimpleAction &&onComplete = {}) const;
+        void acquireAndInsertEvent(OwnedEventSnapshot &&,
+                                   utils::SimpleAction &&onComplete = {}) const;
 
         EventData *recordNoteEventNonLive(int tick, NoteNumber, Velocity,
                                           int64_t metronomeOnlyTick = 0) const;
@@ -118,7 +120,13 @@ namespace mpc::sequencer
         void setName(const std::string &s) const;
         std::string getName() const;
         std::vector<std::shared_ptr<EventRef>> getEvents() const;
-        std::vector<EventData> getEventStates() const;
+        std::vector<OwnedEventSnapshot> getEventStates() const;
+        OwnedEventSnapshot copyEventState(const EventData *handle) const;
+        void
+        visitEventStates(const std::function<void(const EventData &)> &) const;
+        std::vector<std::shared_ptr<EventRef>> getEventsMatching(
+            const std::function<bool(const EventData &)> &predicate,
+            size_t offset, size_t limit, bool includePayloads = true) const;
         std::vector<EventData *> getEventHandles() const;
 
         EventIndex findPlayEventIndexAtTick(Tick tick) const;

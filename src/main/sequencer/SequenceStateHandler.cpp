@@ -105,7 +105,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -116,7 +116,7 @@ void SequenceStateHandler::applyMessage(
                     acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -155,7 +155,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -169,7 +169,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -183,7 +183,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -197,7 +197,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -215,7 +215,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -235,7 +235,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -248,7 +248,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -259,7 +259,7 @@ void SequenceStateHandler::applyMessage(
                     acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -314,7 +314,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -327,7 +327,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -362,7 +362,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -373,7 +373,7 @@ void SequenceStateHandler::applyMessage(
                     acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -387,7 +387,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -430,7 +430,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->trackLocks[m.sequenceIndex][m.trackIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -443,7 +443,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -453,7 +453,7 @@ void SequenceStateHandler::applyMessage(
                     TrackIndex(Mpc2000XlSpecs::TRACK_COUNT - 1), acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -473,7 +473,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -494,7 +494,7 @@ void SequenceStateHandler::applyMessage(
                     manager, m.sequenceIndex, targetTracks, acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -508,7 +508,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -536,7 +536,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -550,7 +550,7 @@ void SequenceStateHandler::applyMessage(
                     acquired))
             {
                 lock.release();
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -564,7 +564,7 @@ void SequenceStateHandler::applyMessage(
             auto &lock = manager->sequenceLocks[m.sequenceIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -586,10 +586,22 @@ void SequenceStateHandler::applyUpdateSequenceEvents(
 
         auto &track = state.sequences[m.sequenceIndex].tracks[trackIndex];
 
-        for (const auto &src : events)
+        for (auto &src : events)
         {
+            if (!src.usable())
+            {
+                continue;
+            }
             EventData *e = manager->acquireEvent();
-            std::memcpy(e, &src, sizeof(EventData));
+            if (!e)
+            {
+                continue;
+            }
+            if (!manager->cloneEventTo(*e, src))
+            {
+                manager->returnEventToPool(e);
+                continue;
+            }
             e->sequenceIndex = m.sequenceIndex;
             e->trackIndex = TrackIndex(trackIndex);
             e->prev = nullptr;

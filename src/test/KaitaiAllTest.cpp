@@ -345,11 +345,11 @@ TEST_CASE("ALL short SysEx and mixer serialization retain legacy bytes",
     mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
     const auto sequence = mpc.getSequencer()->getSequence(0);
     sequence->init(0);
-    mpc::sequencer::EventData sysEx;
+    mpc::sequencer::OwnedEventSnapshot sysEx;
     sysEx.type = mpc::sequencer::EventType::SystemExclusive;
     sysEx.tick = 12;
-    sysEx.sysExByteA = 0x12;
-    sysEx.sysExByteB = 0x34;
+    const uint8_t sysExBytes[] = {0x12, 0x34};
+    sysEx.setSysExBytes(*mpc.sysExPool, sysExBytes, 2);
     sequence->getTrack(0)->acquireAndInsertEvent(sysEx);
     mpc::sequencer::EventData mixer;
     mixer.type = mpc::sequencer::EventType::Mixer;
@@ -385,11 +385,11 @@ TEST_CASE("ALL ordinary Akai SysEx is not treated as a mixer event",
     mpc::TestMpc::initializeTestMpcWithoutIoServices(source);
     const auto sequence = source.getSequencer()->getSequence(0);
     sequence->init(0);
-    mpc::sequencer::EventData data;
+    mpc::sequencer::OwnedEventSnapshot data;
     data.type = mpc::sequencer::EventType::SystemExclusive;
     data.tick = 12;
-    data.sysExByteA = 0xF0;
-    data.sysExByteB = 0x47;
+    const uint8_t dataBytes[] = {0xF0, 0x47};
+    data.setSysExBytes(*source.sysExPool, dataBytes, 2);
     sequence->getTrack(0)->acquireAndInsertEvent(data);
     source.getSequencer()->getStateManager()->drainQueue();
     auto bytes = mpc::file::kaitai::AllIo::save(source);
@@ -1123,11 +1123,12 @@ TEST_CASE("AllLoader loads representative ALL sequence event types through produ
     channelPressure.amount = 55;
     sourceTrack->acquireAndInsertEvent(channelPressure);
 
-    mpc::sequencer::EventData systemExclusive;
+    mpc::sequencer::OwnedEventSnapshot systemExclusive;
     systemExclusive.type = mpc::sequencer::EventType::SystemExclusive;
     systemExclusive.tick = 216;
-    systemExclusive.sysExByteA = 0x12;
-    systemExclusive.sysExByteB = 0x34;
+    const uint8_t systemExclusiveBytes[] = {0x12, 0x34};
+    systemExclusive.setSysExBytes(*sourceMpc.sysExPool, systemExclusiveBytes,
+                                  2);
     sourceTrack->acquireAndInsertEvent(systemExclusive);
 
     mpc::sequencer::EventData mixer;

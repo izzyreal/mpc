@@ -7,6 +7,7 @@
 #include <sequencer/EmptyEvent.hpp>
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <map>
 #include <functional>
@@ -27,7 +28,9 @@ namespace mpc::lcdgui::screens
         void adhocPlayNoteEventsAtCurrentPosition() const;
 
         std::vector<std::shared_ptr<sequencer::EventRef>>
-        computeEventsAtCurrentTick() const;
+        computeEventsAtCurrentTick(bool includePayloads = false,
+                                   size_t offset = 0,
+                                   size_t limit = SIZE_MAX) const;
 
     public:
         StepEditorScreen(Mpc &mpc, int layerIndex);
@@ -77,11 +80,13 @@ namespace mpc::lcdgui::screens
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
         const std::shared_ptr<sequencer::EmptyEvent> emptyEvent =
             std::make_shared<sequencer::EmptyEvent>();
-        std::vector<sequencer::EventData> placeHolder;
+        std::vector<sequencer::OwnedEventSnapshot> placeHolder;
         std::shared_ptr<sequencer::EventRef> selectedEvent;
         std::vector<std::shared_ptr<sequencer::EventRef>> selectedEvents;
         std::map<std::string, std::string> lastColumn;
         int lastRow = 0;
+        std::array<size_t, 4> sysExOffsets{};
+        bool moveSysExCursor(int direction);
 
         int view = 0;
         NoteNumber noteA{MinNoteNumber};
@@ -114,6 +119,6 @@ namespace mpc::lcdgui::screens
         std::string getSelectedParameterLetter();
         void clearSelection();
         int getYOffset() const;
-        std::vector<sequencer::EventData> &getPlaceHolder();
+        std::vector<sequencer::OwnedEventSnapshot> &getPlaceHolder();
     };
 } // namespace mpc::lcdgui::screens

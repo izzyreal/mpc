@@ -29,6 +29,13 @@ namespace mpc::concurrency
 
         ~BoundedMpmcQueue()
         {
+            // No producers or consumers may remain during destruction.
+            alignas(T) unsigned char storage[sizeof(T)];
+            auto *value = reinterpret_cast<T *>(storage);
+            while (dequeueUninitialized(value))
+            {
+                value->~T();
+            }
             delete[] buffer_;
         }
 
@@ -78,6 +85,19 @@ namespace mpc::concurrency
 
         bool dequeue(T &out)
         {
+            alignas(T) unsigned char storage[sizeof(T)];
+            auto *value = reinterpret_cast<T *>(storage);
+            if (!dequeueUninitialized(value))
+            {
+                return false;
+            }
+            out = std::move(*value);
+            value->~T();
+            return true;
+        }
+
+        bool dequeueUninitialized(T *out)
+        {
             cell_t *cell;
             size_t pos = dequeue_pos_.load(std::memory_order_relaxed);
 
@@ -106,7 +126,7 @@ namespace mpc::concurrency
             }
 
             T *p = cell->ptr();
-            new (&out) T(std::move(*p)); // construct out in-place
+            new (out) T(std::move(*p));
             p->~T();                     // destroy queue copy
 
             cell->sequence_.store(pos + buffer_mask_ + 1,
@@ -149,7 +169,7 @@ namespace mpc::concurrency
                 }
 
                 T *p = cell->ptr();
-                new (dst) T(std::move(*p));
+                *dst = std::move(*p);
                 p->~T();
                 cell->sequence_.store(pos + buffer_mask_ + 1,
                                       std::memory_order_release);

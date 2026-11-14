@@ -22,6 +22,15 @@ namespace mpc::concurrency
             flag.store(false, std::memory_order_release);
         }
 
+        void lock()
+        {
+            acquire();
+        }
+        void unlock()
+        {
+            release();
+        }
+
         void acquire()
         {
             for (;;)

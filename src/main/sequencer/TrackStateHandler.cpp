@@ -15,12 +15,29 @@ TrackStateHandler::TrackStateHandler(SequencerStateManager *manager,
 
 TrackStateHandler::~TrackStateHandler() {}
 
-void updateEvent(EventData *const e, const EventData &replacement)
+void updateEvent(EventData *const e, const OwnedEventSnapshot &replacement)
 {
+    if (!replacement.usable())
+    {
+        return;
+    }
     auto *prev = e->prev;
     auto *next = e->next;
 
+    const auto *oldPayload = e->sysExPayload;
+    const auto *newPayload = replacement.sysExPayload;
+    auto *pool = oldPayload ? oldPayload->pool
+                            : newPayload ? newPayload->pool : nullptr;
+    if (newPayload) newPayload->pool->retain(newPayload);
+    if (pool && !pool->replaceStored(oldPayload, newPayload))
+    {
+        if (newPayload) newPayload->pool->release(newPayload);
+        return;
+    }
     *e = replacement;
+    e->sysExPayload = newPayload;
+    e->sysExStored = newPayload != nullptr;
+    if (oldPayload) oldPayload->pool->release(oldPayload);
 
     e->prev = prev;
     e->next = next;
@@ -73,7 +90,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
 
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -100,7 +117,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
                     ->trackLocks[m.handle->sequenceIndex][m.handle->trackIndex];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
             updateEvent(m.handle, m.snapshot);
@@ -111,7 +128,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
             auto &lock = manager->trackLocks[m.sequence][m.track];
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 
@@ -134,7 +151,7 @@ void TrackStateHandler::applyMessage(SequencerState &state,
 
             if (!lock.try_acquire())
             {
-                manager->enqueue(m);
+                manager->defer(m);
                 return;
             }
 

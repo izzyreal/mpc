@@ -4,6 +4,7 @@
 
 #include "FloatTypes.hpp"
 #include "IntTypes.hpp"
+#include "SysExPayload.hpp"
 
 #include <cassert>
 
@@ -32,6 +33,8 @@ namespace mpc::sequencer
         // considered for any operations apart from finalization. Currently, the
         // only event type that can be in this state, is NoteOn.
         bool beingRecorded;
+        // True only while this pool-backed event owns a stored reference.
+        bool sysExStored;
 
         // Not strictly necessary over here. Should be moved to local state in
         // `Track::processRealtimeQueuedEvents`.
@@ -62,8 +65,17 @@ namespace mpc::sequencer
         int8_t mixerParameter;
         int8_t mixerPad;
         int8_t mixerValue;
-        uint8_t sysExByteA;
-        uint8_t sysExByteB;
+        const SysExPayload *sysExPayload;
+        uint8_t getSysExByte(size_t i) const
+        {
+            return sysExPayload && i < sysExPayload->byteCount
+                       ? sysExPayload->data()[i]
+                       : 0;
+        }
+        size_t getSysExByteCount() const
+        {
+            return sysExPayload ? sysExPayload->byteCount : 0;
+        }
 
         EventData()
         {
@@ -94,8 +106,8 @@ namespace mpc::sequencer
             mixerParameter = 0;
             mixerPad = 0;
             mixerValue = 0;
-            sysExByteA = 0;
-            sysExByteB = 0;
+            sysExPayload = nullptr;
+            sysExStored = false;
         }
 
         bool operator==(EventData const &other) const
@@ -118,8 +130,11 @@ namespace mpc::sequencer
                    mixerParameter == other.mixerParameter &&
                    mixerPad == other.mixerPad &&
                    mixerValue == other.mixerValue &&
-                   sysExByteA == other.sysExByteA &&
-                   sysExByteB == other.sysExByteB;
+                   getSysExByteCount() == other.getSysExByteCount() &&
+                   (!getSysExByteCount() ||
+                    std::memcmp(sysExPayload->data(),
+                                other.sysExPayload->data(),
+                                getSysExByteCount()) == 0);
         }
 
         bool operator!=(EventData const &other) const

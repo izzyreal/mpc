@@ -88,11 +88,11 @@ TEST_CASE("ALL file save does not crash with sysex event", "[allfile]")
     seq->init(1);
     stateManager->drainQueue();
 
-    EventData eventData;
+    mpc::sequencer::OwnedEventSnapshot eventData;
     eventData.type = EventType::SystemExclusive;
     eventData.tick = 0;
-    eventData.sysExByteA = 0x12;
-    eventData.sysExByteB = 0x34;
+    const uint8_t bytes[] = {0x12, 0x34};
+    eventData.setSysExBytes(*mpc.sysExPool, bytes, 2);
 
     seq->getTrack(0)->acquireAndInsertEvent(eventData);
     stateManager->drainQueue();

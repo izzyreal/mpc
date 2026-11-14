@@ -91,11 +91,81 @@ SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
     tempLiveNoteOffRecordingEvents.resize(LIVE_NOTE_EVENT_RECORDING_CAPACITY);
 }
 
-SequencerStateManager::~SequencerStateManager() {}
+SequencerStateManager::~SequencerStateManager()
+{
+    discardQueuedMessages(
+        [this](const SequencerMessage &message)
+        {
+            if (const auto *sequence = std::get_if<SequenceMessage>(&message))
+            {
+                if (const auto *track = std::get_if<TrackMessage>(sequence))
+                {
+                    if (const auto *insert =
+                            std::get_if<InsertAcquiredEvent>(track))
+                    {
+                        returnEventToPool(insert->handle);
+                    }
+                }
+            }
+        });
+    discardPendingCopyBarInserts();
+    for (auto &sequence : activeState.sequences)
+    {
+        for (auto &track : sequence.tracks)
+        {
+            for (auto *e = track.eventsHead; e; e = e->next)
+            {
+                if (e->sysExPayload)
+                    e->sysExPayload->pool->releaseStored(e->sysExPayload);
+            }
+        }
+    }
+}
+
+void SequencerStateManager::onDeferredOverflow(
+    const SequencerMessage &message) noexcept
+{
+    if (const auto *sequence = std::get_if<SequenceMessage>(&message))
+    {
+        if (const auto *track = std::get_if<TrackMessage>(sequence))
+        {
+            if (const auto *insert = std::get_if<InsertAcquiredEvent>(track))
+            {
+                if (insert->handle->sysExPayload)
+                    insert->handle->sysExPayload->pool->reportFull();
+                returnEventToPool(insert->handle);
+            }
+        }
+    }
+    else if (std::holds_alternative<FlushCopyBarInserts>(message))
+    {
+        discardPendingCopyBarInserts(true);
+    }
+}
+
+bool SequencerStateManager::cloneEventTo(EventData &dest,
+                                         const EventData &src) const
+{
+    if (src.type == EventType::SystemExclusive && !src.sysExPayload)
+    {
+        return false;
+    }
+    dest = src;
+    dest.sysExStored = false;
+    if (dest.sysExPayload) dest.sysExPayload->pool->retain(dest.sysExPayload);
+    return true;
+}
 
 void SequencerStateManager::returnEventToPool(EventData *e) const
 {
     // Reset object to default "clean" state before returning it.
+    if (e->sysExPayload)
+    {
+        if (e->sysExStored)
+            e->sysExPayload->pool->releaseStored(e->sysExPayload);
+        else
+            e->sysExPayload->pool->release(e->sysExPayload);
+    }
     e->resetToDefaultValues();
 
     // Return pointer to freelist
@@ -116,6 +186,7 @@ EventData *SequencerStateManager::acquireEvent() const
 
 void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 {
+    SysExReportBatch reportBatch;
     auto visitor = Overload{
         [&](const TransportMessage &m)
         {
@@ -149,7 +220,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             if (m.setPositionTo0)
             {
                 activeState.transport.positionQuarterNotes = 0;
-                applyMessageImmediate(
+                applyMessage(
                     SyncTrackEventIndices{activeState.selectedSequenceIndex});
             }
         },
@@ -203,6 +274,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         {
             applyCopyBars(m);
         },
+        [&](const FlushCopyBarInserts &)
+        {
+            flushCopyBarInserts();
+        },
         [&](const CopyEvents &m)
         {
             applyCopyEvents(m);
@@ -213,7 +288,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             if (!tryAcquireTrackLocks(
                     this, allTrackLockTargets(m.sequenceIndex), acquired))
             {
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -244,7 +319,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             std::vector<std::pair<SequenceIndex, TrackIndex>> acquired;
             if (!tryAcquireTrackLocks(this, targets, acquired))
             {
-                enqueue(DeleteAllSequences{});
+                defer(DeleteAllSequences{});
                 return;
             }
 
@@ -271,14 +346,14 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 
             if (!seqLock1.try_acquire())
             {
-                enqueue(m);
+                defer(m);
                 return;
             }
 
             if (!seqLock2.try_acquire())
             {
                 seqLock1.release();
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -290,7 +365,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 seqLock1.release();
                 seqLock2.release();
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -331,7 +406,16 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 while (it)
                 {
                     EventData *e = acquireEvent();
-                    std::memcpy(e, it, sizeof(EventData));
+                    if (!e)
+                    {
+                        break;
+                    }
+                    if (!cloneEventTo(*e, *it))
+                    {
+                        returnEventToPool(e);
+                        it = it->next;
+                        continue;
+                    }
                     e->sequenceIndex = m.destIndex;
                     e->prev = nullptr;
                     e->next = nullptr;
@@ -424,14 +508,14 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 
             if (!trackLock1.try_acquire())
             {
-                enqueue(m);
+                defer(m);
                 return;
             }
 
             if (!trackLock2.try_acquire())
             {
                 trackLock1.release();
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -447,14 +531,14 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 
             if (!seqLock1.try_acquire())
             {
-                enqueue(m);
+                defer(m);
                 return;
             }
 
             if (!seqLock2.try_acquire())
             {
                 seqLock1.release();
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -466,7 +550,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 seqLock1.release();
                 seqLock2.release();
-                enqueue(m);
+                defer(m);
                 return;
             }
 
@@ -494,6 +578,16 @@ void SequencerStateManager::insertAcquiredEvent(TrackState &track,
                                                 EventData *e) const
 {
     assert(e);
+
+    if (e->sysExPayload && !e->sysExStored)
+    {
+        if (!e->sysExPayload->pool->replaceStored(nullptr, e->sysExPayload))
+        {
+            returnEventToPool(e);
+            return;
+        }
+        e->sysExStored = true;
+    }
 
     e->prev = nullptr;
     e->next = nullptr;
@@ -646,7 +740,16 @@ void SequencerStateManager::applyCopyTrack(const CopyTrack &m)
     while (it)
     {
         EventData *e = acquireEvent();
-        std::memcpy(e, it, sizeof(EventData));
+        if (!e)
+        {
+            break;
+        }
+        if (!cloneEventTo(*e, *it))
+        {
+            returnEventToPool(e);
+            it = it->next;
+            continue;
+        }
         e->sequenceIndex = m.destSequenceIndex;
         e->trackIndex = m.destTrackIndex;
         e->prev = nullptr;

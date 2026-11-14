@@ -870,7 +870,8 @@ TEST_CASE("Kaitai standard MIDI loads HWIF6-0V2 with expected semantics", "[kait
     const auto track0 = sequence->getTrack(0);
     REQUIRE(track0->isUsed());
     REQUIRE(track0->getName() == "HWIF6-0v2");
-    REQUIRE(track0->getEvents().size() == 204);
+    // Three 20674-byte SysEx messages exceed the runtime payload limit.
+    REQUIRE(track0->getEvents().size() == 201);
     requireDetailedNote(track0, 0, 0, 67, 114, 24);
     requireDetailedNote(track0, 52, 1536, 67, 83, 24);
     requireDetailedNote(track0, 104, 3072, 67, 18, 24);

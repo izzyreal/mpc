@@ -22,7 +22,7 @@ namespace mpc::audiomidi
         MidiEventQueue queue;
 
     public:
-        void enqueueEvent(const MidiEvent &);
+        bool enqueueEvent(MidiEvent);
         int dequeue(std::vector<MidiEvent> &);
         void panic() const;
     };

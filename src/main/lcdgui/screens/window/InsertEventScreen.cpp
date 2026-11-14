@@ -1,3 +1,4 @@
+#include "lcdgui/Label.hpp"
 #include "InsertEventScreen.hpp"
 
 #include "Mpc.hpp"
@@ -26,6 +27,9 @@ void InsertEventScreen::open()
 void InsertEventScreen::displayInsertEventType() const
 {
     findField("eventtype")->setText(eventTypeNames[insertEventType]);
+    findField("bytes")->Hide(insertEventType != 6);
+    findLabel("bytes")->Hide(insertEventType != 6);
+    findField("bytes")->setTextPadded(sysExByteCount);
 }
 
 void InsertEventScreen::function(const int i)
@@ -44,7 +48,7 @@ void InsertEventScreen::function(const int i)
 
 void InsertEventScreen::insertEvent() const
 {
-    EventData e;
+    OwnedEventSnapshot e;
     e.tick = sequencer.lock()->getTransport()->getTickPosition();
 
     if (insertEventType == 0)
@@ -88,7 +92,13 @@ void InsertEventScreen::insertEvent() const
     }
     else if (insertEventType == 6)
     {
-        e.type = EventType::SystemExclusive;
+        uint8_t bytes[128]{};
+        bytes[0] = 0xF0;
+        bytes[sysExByteCount - 1] = 0xF7;
+        if (!e.setSysExBytes(*mpc.sysExPool, bytes, sysExByteCount))
+        {
+            return;
+        }
     }
     else if (insertEventType == 7)
     {
@@ -109,7 +119,7 @@ void InsertEventScreen::insertEvent() const
         });
 
     sequencer.lock()->getSelectedTrack()->acquireAndInsertEvent(
-        e, std::move(onComplete));
+        std::move(e), std::move(onComplete));
 }
 
 void InsertEventScreen::turnWheel(const int i)
@@ -118,6 +128,11 @@ void InsertEventScreen::turnWheel(const int i)
         focusedFieldName == "eventtype")
     {
         setInsertEventType(insertEventType + i);
+    }
+    else if (focusedFieldName == "bytes")
+    {
+        sysExByteCount = std::clamp(sysExByteCount + i, 2, 128);
+        displayInsertEventType();
     }
 }
 

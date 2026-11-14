@@ -9,6 +9,8 @@ namespace mpc::sequencer
 {
     class EventRef
     {
+        SysExPayloadOwner payloadSnapshot;
+
     public:
         explicit EventRef(EventData *ptr, const EventData &snapshot,
                           const std::function<void(TrackMessage &&)> &dispatch);

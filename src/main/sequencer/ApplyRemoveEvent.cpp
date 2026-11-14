@@ -61,7 +61,7 @@ void TrackStateHandler::applyRemoveEvent(const RemoveEvent &m,
 
     if (!lock.try_acquire())
     {
-        manager->enqueue(m);
+        manager->defer(m);
         return;
     }
 

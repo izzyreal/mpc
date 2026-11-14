@@ -41,7 +41,8 @@ namespace mpc::lcdgui
         std::vector<std::shared_ptr<Field>> fields;
         std::vector<std::shared_ptr<Label>> labels;
 
-        const std::vector<std::string> letters{"a", "b", "c", "d", "e"};
+        const std::vector<std::string> letters{"a", "b", "c", "d", "e", "f",
+                                               "g", "h", "i", "j", "k", "l"};
         const std::vector<std::string> noteVarParamNames{"Tun", "Dcy", "Atk",
                                                          "Flt"};
         const std::vector<std::string> drumNoteEventLabels{">N: ", "", ":",
@@ -82,11 +83,16 @@ namespace mpc::lcdgui
         bool selected = false;
         sequencer::BusType busType = sequencer::BusType::DRUM1;
         int rowIndex = 0;
+        size_t sysExOffset = 0;
 
         bool isEmptyEvent() const;
 
     public:
         void setBus(sequencer::BusType);
+        void setSysExOffset(size_t offset)
+        {
+            sysExOffset = offset;
+        }
         void init() const;
         void setEmptyEventValues() const;
         void setSystemExclusiveEventValues() const;

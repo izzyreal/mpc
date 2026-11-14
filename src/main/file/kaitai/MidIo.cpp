@@ -415,142 +415,123 @@ std::vector<char> buildSequenceTrack(const std::shared_ptr<mpc::sequencer::Seque
     std::vector<TimedMidiEvent> noteOnEvents;
     std::vector<TimedMidiEvent> miscEvents;
 
-    for (const auto& event : track->getEventStates())
-    {
-        if (event.tick >= sequence->getLastTick())
+    track->visitEventStates(
+        [&](const mpc::sequencer::EventData &event)
         {
-            continue;
-        }
-
-        switch (event.type)
-        {
-            case mpc::sequencer::EventType::NoteOn:
+            if (event.tick >= sequence->getLastTick())
             {
-                const auto noteOffTick = static_cast<int>(event.tick + event.duration);
-                for (auto& noteOffEvent : noteOffEvents)
+                return;
+            }
+
+            switch (event.type)
+            {
+                case mpc::sequencer::EventType::NoteOn:
                 {
-                    if (noteOffEvent.tick > event.tick &&
-                        noteOffEvent.bytes.size() >= 3 &&
-                        static_cast<unsigned char>(noteOffEvent.bytes[1]) ==
-                            static_cast<unsigned char>(event.noteNumber))
+                    const auto noteOffTick =
+                        static_cast<int>(event.tick + event.duration);
+                    for (auto &noteOffEvent : noteOffEvents)
                     {
-                        noteOffEvent.tick = event.tick;
+                        if (noteOffEvent.tick > event.tick &&
+                            noteOffEvent.bytes.size() >= 3 &&
+                            static_cast<unsigned char>(noteOffEvent.bytes[1]) ==
+                                static_cast<unsigned char>(event.noteNumber))
+                        {
+                            noteOffEvent.tick = event.tick;
+                        }
                     }
-                }
 
-                if (!isDefaultNoteVariation(event))
-                {
-                    noteVariationEvents.push_back(TimedMidiEvent{
-                        static_cast<int>(event.tick),
-                        1,
+                    if (!isDefaultNoteVariation(event))
+                    {
+                        noteVariationEvents.push_back(TimedMidiEvent{
+                            static_cast<int>(event.tick), 1,
+                            channelEventBytes(
+                                0x80,
+                                static_cast<uint8_t>(
+                                    event.noteVariationType.get()),
+                                static_cast<uint8_t>(
+                                    event.noteVariationValue.get()))});
+                    }
+
+                    noteOnEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 2,
                         channelEventBytes(
-                            0x80,
-                            static_cast<uint8_t>(event.noteVariationType.get()),
-                            static_cast<uint8_t>(event.noteVariationValue.get()))
-                    });
+                            0x90, static_cast<uint8_t>(event.noteNumber.get()),
+                            static_cast<uint8_t>(event.velocity.get()))});
+
+                    if (noteOffTick < sequence->getLastTick())
+                    {
+                        noteOffEvents.push_back(TimedMidiEvent{
+                            noteOffTick, 0,
+                            channelEventBytes(
+                                0x90,
+                                static_cast<uint8_t>(event.noteNumber.get()),
+                                0)});
+                    }
+                    break;
                 }
-
-                noteOnEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    2,
-                    channelEventBytes(
-                        0x90,
-                        static_cast<uint8_t>(event.noteNumber.get()),
-                        static_cast<uint8_t>(event.velocity.get()))
-                });
-
-                if (noteOffTick < sequence->getLastTick())
-                {
-                    noteOffEvents.push_back(TimedMidiEvent{
-                        noteOffTick,
-                        0,
+                case mpc::sequencer::EventType::PolyPressure:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
                         channelEventBytes(
-                            0x90,
-                            static_cast<uint8_t>(event.noteNumber.get()),
-                            0)
-                    });
+                            0xA0, static_cast<uint8_t>(event.noteNumber.get()),
+                            static_cast<uint8_t>(event.amount & 0x7F))});
+                    break;
+                case mpc::sequencer::EventType::ControlChange:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        channelEventBytes(
+                            0xB0,
+                            static_cast<uint8_t>(event.controllerNumber & 0x7F),
+                            static_cast<uint8_t>(event.controllerValue &
+                                                 0x7F))});
+                    break;
+                case mpc::sequencer::EventType::ProgramChange:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        channelEventBytes(
+                            0xC0, static_cast<uint8_t>(
+                                      event.programChangeProgramIndex.get()))});
+                    break;
+                case mpc::sequencer::EventType::ChannelPressure:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        channelEventBytes(
+                            0xD0, static_cast<uint8_t>(event.amount & 0x7F))});
+                    break;
+                case mpc::sequencer::EventType::PitchBend:
+                {
+                    const auto bendValue =
+                        std::clamp<int>(event.amount + 8192, 0, 16383);
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        channelEventBytes(
+                            0xE0, static_cast<uint8_t>(bendValue & 0x7F),
+                            static_cast<uint8_t>((bendValue >> 7) & 0x7F))});
+                    break;
                 }
-                break;
+                case mpc::sequencer::EventType::Mixer:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        sysexEventBytes(std::vector<char>{
+                            71, 0, 68, 69,
+                            static_cast<char>(event.mixerParameter + 1),
+                            static_cast<char>(event.mixerPad),
+                            static_cast<char>(event.mixerValue),
+                            static_cast<char>(0xF7)})});
+                    break;
+                case mpc::sequencer::EventType::SystemExclusive:
+                    miscEvents.push_back(TimedMidiEvent{
+                        static_cast<int>(event.tick), 3,
+                        sysexEventBytes(std::vector<char>(
+                            event.sysExPayload->data() +
+                                (event.getSysExByte(0) == 0xF0 ? 1 : 0),
+                            event.sysExPayload->data() +
+                                event.getSysExByteCount()))});
+                    break;
+                default:
+                    break;
             }
-            case mpc::sequencer::EventType::PolyPressure:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    channelEventBytes(
-                        0xA0,
-                        static_cast<uint8_t>(event.noteNumber.get()),
-                        static_cast<uint8_t>(event.amount & 0x7F))
-                });
-                break;
-            case mpc::sequencer::EventType::ControlChange:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    channelEventBytes(
-                        0xB0,
-                        static_cast<uint8_t>(event.controllerNumber & 0x7F),
-                        static_cast<uint8_t>(event.controllerValue & 0x7F))
-                });
-                break;
-            case mpc::sequencer::EventType::ProgramChange:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    channelEventBytes(
-                        0xC0,
-                        static_cast<uint8_t>(event.programChangeProgramIndex.get()))
-                });
-                break;
-            case mpc::sequencer::EventType::ChannelPressure:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    channelEventBytes(
-                        0xD0,
-                        static_cast<uint8_t>(event.amount & 0x7F))
-                });
-                break;
-            case mpc::sequencer::EventType::PitchBend:
-            {
-                const auto bendValue = std::clamp<int>(event.amount + 8192, 0, 16383);
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    channelEventBytes(
-                        0xE0,
-                        static_cast<uint8_t>(bendValue & 0x7F),
-                        static_cast<uint8_t>((bendValue >> 7) & 0x7F))
-                });
-                break;
-            }
-            case mpc::sequencer::EventType::Mixer:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    sysexEventBytes(std::vector<char>{
-                        71,
-                        0,
-                        68,
-                        69,
-                        static_cast<char>(event.mixerParameter + 1),
-                        static_cast<char>(event.mixerPad),
-                        static_cast<char>(event.mixerValue),
-                        static_cast<char>(0xF7)})
-                });
-                break;
-            case mpc::sequencer::EventType::SystemExclusive:
-                miscEvents.push_back(TimedMidiEvent{
-                    static_cast<int>(event.tick),
-                    3,
-                    sysexEventBytes(std::vector<char>{
-                        static_cast<char>(event.sysExByteA),
-                        static_cast<char>(event.sysExByteB)})
-                });
-                break;
-            default:
-                break;
-        }
-    }
+        });
 
     events.insert(events.end(), noteOffEvents.begin(), noteOffEvents.end());
     events.insert(events.end(), noteVariationEvents.begin(), noteVariationEvents.end());
@@ -828,7 +809,8 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(noteAftertouch->note());
                     e.amount = noteAftertouch->pressure();
-                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -845,7 +827,8 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.controllerNumber = controller->controller();
                     e.controllerValue = controller->value();
-                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -861,7 +844,8 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::ProgramChange;
                     e.tick = absoluteTick;
                     e.programChangeProgramIndex = mpc::ProgramIndex(programChange->program());
-                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -877,7 +861,8 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::ChannelPressure;
                     e.tick = absoluteTick;
                     e.amount = channelPressure->pressure();
-                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -893,7 +878,8 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::PitchBend;
                     e.tick = absoluteTick;
                     e.amount = pitchBend->bend_value();
-                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -918,14 +904,24 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                         e.mixerParameter = static_cast<unsigned char>(data[4]) - 1;
                         e.mixerPad = static_cast<unsigned char>(data[5]);
                         e.mixerValue = static_cast<unsigned char>(data[6]);
-                        (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                        (*updateSequenceEvents
+                              .trackSnapshots)[resolvedTrackIndex]
+                            .push_back(std::move(e));
                     }
                     else
                     {
-                        mpc::sequencer::EventData e;
-                        e.type = mpc::sequencer::EventType::SystemExclusive;
+                        mpc::sequencer::OwnedEventSnapshot e;
                         e.tick = absoluteTick;
-                        (*updateSequenceEvents.trackSnapshots)[resolvedTrackIndex].push_back(e);
+                        if (!e.setMidiSysExBytes(
+                                *mpc.sysExPool,
+                                reinterpret_cast<const uint8_t *>(data.data()),
+                                data.size()))
+                        {
+                            break;
+                        }
+                        (*updateSequenceEvents
+                              .trackSnapshots)[resolvedTrackIndex]
+                            .push_back(std::move(e));
                     }
                     hasImportedEvents = true;
                     break;
@@ -1356,7 +1352,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(noteAftertouch->note());
                     e.amount = noteAftertouch->pressure();
-                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -1373,7 +1370,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.controllerNumber = controller->controller();
                     e.controllerValue = controller->value();
-                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -1390,7 +1388,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.tick = absoluteTick;
                     e.programChangeProgramIndex =
                         mpc::ProgramIndex(programChange->program());
-                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -1406,7 +1405,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::ChannelPressure;
                     e.tick = absoluteTick;
                     e.amount = channelPressure->pressure();
-                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -1422,7 +1422,8 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                     e.type = mpc::sequencer::EventType::PitchBend;
                     e.tick = absoluteTick;
                     e.amount = pitchBend->bend_value();
-                    (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                    (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                        .push_back(std::move(e));
                     hasImportedEvents = true;
                     break;
                 }
@@ -1447,16 +1448,22 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                         e.mixerParameter = static_cast<unsigned char>(data[4]) - 1;
                         e.mixerPad = static_cast<unsigned char>(data[5]);
                         e.mixerValue = static_cast<unsigned char>(data[6]);
-                        (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                        (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                            .push_back(std::move(e));
                     }
-                    else if (data.size() >= 2)
+                    else
                     {
-                        mpc::sequencer::EventData e;
-                        e.type = mpc::sequencer::EventType::SystemExclusive;
+                        mpc::sequencer::OwnedEventSnapshot e;
                         e.tick = absoluteTick;
-                        e.sysExByteA = static_cast<unsigned char>(data[0]);
-                        e.sysExByteB = static_cast<unsigned char>(data[1]);
-                        (*updateSequenceEvents.trackSnapshots)[trackIndex].push_back(e);
+                        if (!e.setMidiSysExBytes(
+                                *mpc.sysExPool,
+                                reinterpret_cast<const uint8_t *>(data.data()),
+                                data.size()))
+                        {
+                            break;
+                        }
+                        (*updateSequenceEvents.trackSnapshots)[trackIndex]
+                            .push_back(std::move(e));
                     }
                     hasImportedEvents = true;
                     break;
@@ -1505,6 +1512,7 @@ sequence_or_error MidIo::loadBytes(mpc::Mpc &mpc,
     midi_t parsed(&kaitaiIo);
     parsed._read();
 
+    mpc::sequencer::SysExReportBatch reportBatch;
     if (!tryLoadMpc2000xl(mpc, parsed, newSeq))
     {
         loadGenericStandardMidi(mpc, parsed, newSeq);

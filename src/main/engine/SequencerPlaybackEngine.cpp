@@ -593,6 +593,7 @@ void SequencerPlaybackEngine::stopSequencer() const
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
+    SysExReportBatch reportBatch;
     // printf("BUFFER\n");
     const auto manager = sequencer->getStateManager();
     manager->drainQueue();

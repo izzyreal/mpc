@@ -41,7 +41,7 @@ namespace mpc::concurrency
             SamplePreciseTask temp[Capacity];
             size_t reinsertIndex = 0;
 
-            while (queue.dequeue(*task))
+            while (queue.dequeueUninitialized(task))
             {
                 if (task->noteOff)
                 {
@@ -68,7 +68,7 @@ namespace mpc::concurrency
                 SamplePreciseTask) unsigned char buf[sizeof(SamplePreciseTask)];
             auto *task = reinterpret_cast<SamplePreciseTask *>(buf);
 
-            while (queue.dequeue(*task))
+            while (queue.dequeueUninitialized(task))
             {
                 auto remaining = task->nFrames - task->frameCounter;
 

@@ -1,3 +1,4 @@
+#include <mutex>
 #include "sequencer/Track.hpp"
 
 #include "EventDataToEventMapper.hpp"
@@ -236,15 +237,17 @@ int Track::getDeviceIndex() const
 
 std::shared_ptr<EventRef> Track::getEvent(const int i) const
 {
-    const auto eventHandle =
-        getSnapshot(getIndex()).getEventByIndex(EventIndex(i));
-    auto &lock =
-        manager
-            ->trackLocks[eventHandle->sequenceIndex][eventHandle->trackIndex];
-    lock.acquire();
-    const auto eventSnapshot = *eventHandle;
-    lock.release();
-    return mapEventDataToEvent(eventHandle, eventSnapshot, dispatch, parent);
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
+    std::lock_guard<concurrency::SpinLock> guard(lock);
+    const TrackStateView state(
+        manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex()));
+    const auto *event = state.getEventByIndex(EventIndex(i));
+    if (!event)
+    {
+        return nullptr;
+    }
+    return mapEventDataToEvent(const_cast<EventData *>(event), *event, dispatch,
+                               parent);
 }
 
 void Track::setName(const std::string &s) const
@@ -259,14 +262,46 @@ std::string Track::getName() const
     return std::string(getSnapshot(getIndex()).getName());
 }
 
-std::vector<EventData> Track::getEventStates() const
+void Track::visitEventStates(
+    const std::function<void(const EventData &)> &visit) const
 {
-    std::vector<EventData> result;
-    for (const auto e : getSnapshot(getIndex()).getEvents())
+    const auto events = getEventStates();
+    for (const auto &event : events)
+    {
+        visit(event);
+    }
+}
+
+std::vector<OwnedEventSnapshot> Track::getEventStates() const
+{
+    std::vector<OwnedEventSnapshot> result;
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
+    std::lock_guard<concurrency::SpinLock> guard(lock);
+    const auto &track = manager->getActiveTrackUnderLock(
+        getSequenceIndex(), getIndex());
+    result.reserve(TrackStateView(track).getEventCount());
+    for (auto *e = track.eventsHead; e; e = e->next)
     {
         result.push_back(*e);
     }
     return result;
+}
+
+OwnedEventSnapshot Track::copyEventState(const EventData *handle) const
+{
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
+    std::lock_guard<concurrency::SpinLock> guard(lock);
+    for (auto *event =
+             manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex())
+                 .eventsHead;
+         event; event = event->next)
+    {
+        if (event == handle)
+        {
+            return OwnedEventSnapshot(*event);
+        }
+    }
+    return {};
 }
 
 std::vector<EventData *> Track::getEventHandles() const
@@ -278,9 +313,10 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
 {
     std::vector<std::shared_ptr<EventRef>> result;
     auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
-    lock.acquire();
+    std::lock_guard<concurrency::SpinLock> guard(lock);
 
-    const auto snapshot = getSnapshot(getIndex());
+    const auto snapshot = TrackStateView(
+        manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex()));
 
     const int eventCount = snapshot.getEventCount();
 
@@ -296,30 +332,73 @@ std::vector<std::shared_ptr<EventRef>> Track::getEvents() const
         }
     }
 
-    lock.release();
 
+    return result;
+}
+
+std::vector<std::shared_ptr<EventRef>> Track::getEventsMatching(
+    const std::function<bool(const EventData &)> &predicate, size_t offset,
+    size_t limit, bool includePayloads) const
+{
+    std::vector<std::shared_ptr<EventRef>> result;
+    auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
+    std::lock_guard<concurrency::SpinLock> guard(lock);
+    for (auto *handle : TrackStateView(manager->getActiveTrackUnderLock(
+                                           getSequenceIndex(), getIndex()))
+                            .getEvents())
+    {
+        if (!predicate(*handle))
+        {
+            continue;
+        }
+        if (offset)
+        {
+            --offset;
+            continue;
+        }
+        if (result.size() == limit)
+        {
+            break;
+        }
+        auto data = *handle;
+        if (!includePayloads)
+        {
+            data.sysExPayload = nullptr;
+        }
+        auto event = mapEventDataToEvent(handle, data, dispatch, parent);
+        if (event)
+        {
+            result.push_back(std::move(event));
+        }
+    }
     return result;
 }
 
 bool Track::isOn() const
 {
-    return getSnapshot(getIndex()).isOn();
+    return TrackStateView(
+               manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex()))
+        .isOn();
 }
 
 bool Track::isUsed() const
 {
-    return getSnapshot(getIndex()).isUsed();
+    return TrackStateView(
+               manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex()))
+        .isUsed();
 }
 
 std::vector<std::shared_ptr<EventRef>>
 Track::getEventRange(const int startTick, const int endTick) const
 {
     auto &lock = manager->trackLocks[getSequenceIndex()][getIndex()];
-    lock.acquire();
+    std::lock_guard<concurrency::SpinLock> guard(lock);
 
     std::vector<std::shared_ptr<EventRef>> result;
     for (const auto &eventHandle :
-         getSnapshot(getIndex()).getEventRange(startTick, endTick))
+         TrackStateView(
+             manager->getActiveTrackUnderLock(getSequenceIndex(), getIndex()))
+             .getEventRange(startTick, endTick))
     {
         const auto eventSnapshot = *eventHandle;
         auto event =
@@ -330,7 +409,6 @@ Track::getEventRange(const int startTick, const int endTick) const
         }
     }
 
-    lock.release();
     return result;
 }
 
@@ -502,7 +580,15 @@ void Track::insertAcquiredEvent(EventData *event,
 {
     event->sequenceIndex = getSequenceIndex();
     event->trackIndex = trackIndex;
-    dispatch(InsertAcquiredEvent{event});
+    if (!manager->enqueue(TrackMessage{InsertAcquiredEvent{event}}))
+    {
+        if (event->sysExPayload)
+        {
+            event->sysExPayload->pool->reportFull();
+        }
+        manager->returnEventToPool(event);
+        return;
+    }
     manager->enqueueCallback(std::move(onComplete));
     setUsedIfCurrentlyUnused();
 }
@@ -511,8 +597,36 @@ void Track::acquireAndInsertEvent(const EventData &eventState,
                                   utils::SimpleAction &&onComplete) const
 {
     const auto e = manager->acquireEvent();
-    *e = eventState;
+    if (!e)
+    {
+        return;
+    }
+    if (!manager->cloneEventTo(*e, eventState))
+    {
+        manager->returnEventToPool(e);
+        return;
+    }
     insertAcquiredEvent(e, std::move(onComplete));
+}
+
+void Track::acquireAndInsertEvent(OwnedEventSnapshot &&eventState,
+                                  utils::SimpleAction &&onComplete) const
+{
+    if (!eventState.usable())
+    {
+        return;
+    }
+    auto *event = manager->acquireEvent();
+    if (!event)
+    {
+        return;
+    }
+    if (!manager->cloneEventTo(*event, eventState))
+    {
+        manager->returnEventToPool(event);
+        return;
+    }
+    insertAcquiredEvent(event, std::move(onComplete));
 }
 
 EventData *Track::recordNoteEventNonLive(const int tick, const NoteNumber note,

@@ -1,4 +1,5 @@
 #include "controller/ClientMidiEventController.hpp"
+#include "audiomidi/EventHandler.hpp"
 
 #include "ClientHardwareEventController.hpp"
 #include "sequencer/Transport.hpp"
@@ -93,6 +94,18 @@ ClientMidiEventController::ClientMidiEventController(
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
+    if (e.getMessageType() == MessageType::INVALID)
+    {
+        return;
+    }
+    if (e.getMessageType() == MessageType::SYSTEM_EXCLUSIVE)
+    {
+        if (shouldProcessEvent(e))
+        {
+            handleSystemExclusive(e);
+        }
+        return;
+    }
     if (clientEventController.lock()->getLayeredScreen()->isCurrentScreen(
             {ScreenId::MidiInputMonitorScreen}))
     {
@@ -639,7 +652,7 @@ void ClientMidiEventController::handleProgramChange(
 void ClientMidiEventController::handleSystemExclusive(
     const ClientMidiEvent &e) const
 {
-    // SysEx recognized only if ID == 0x45
+    eventHandler.lock()->recordSystemExclusive(e);
 }
 
 void ClientMidiEventController::handleSongPositionPointer(
@@ -832,6 +845,8 @@ bool ClientMidiEventController::shouldProcessEvent(
 
     switch (e.getMessageType())
     {
+        case MessageType::SYSTEM_EXCLUSIVE:
+            return midiInputScreen.lock()->isExclusivePassEnabled();
         case MessageType::NOTE_ON:
         case MessageType::NOTE_OFF:
             return midiInputScreen.lock()->isNotePassEnabled();

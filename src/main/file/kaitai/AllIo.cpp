@@ -501,21 +501,22 @@ int countSequenceMetaSegments(mpc::sequencer::Sequence& seq)
             break;
         }
 
-        for (const auto& event : track->getEvents())
-        {
-            switch (event->handle->type)
+        track->visitEventStates(
+            [&](const mpc::sequencer::EventData &event)
             {
-                case mpc::sequencer::EventType::SystemExclusive:
-                    segmentCount += 2;
-                    break;
-                case mpc::sequencer::EventType::Mixer:
-                    segmentCount += 2;
-                    break;
-                default:
-                    segmentCount += 1;
-                    break;
-            }
-        }
+                switch (event.type)
+                {
+                    case mpc::sequencer::EventType::SystemExclusive:
+                        segmentCount += 2;
+                        break;
+                    case mpc::sequencer::EventType::Mixer:
+                        segmentCount += 2;
+                        break;
+                    default:
+                        segmentCount += 1;
+                        break;
+                }
+            });
     }
     return segmentCount;
 }
@@ -530,21 +531,22 @@ int countSequenceBodySegments(mpc::sequencer::Sequence& seq)
             break;
         }
 
-        for (const auto& event : track->getEvents())
-        {
-            switch (event->handle->type)
+        track->visitEventStates(
+            [&](const mpc::sequencer::EventData &event)
             {
-                case mpc::sequencer::EventType::SystemExclusive:
-                    segmentCount += 3;
-                    break;
-                case mpc::sequencer::EventType::Mixer:
-                    segmentCount += 4;
-                    break;
-                default:
-                    segmentCount += 1;
-                    break;
-            }
-        }
+                switch (event.type)
+                {
+                    case mpc::sequencer::EventType::SystemExclusive:
+                        segmentCount += 2 + (event.getSysExByteCount() + 7) / 8;
+                        break;
+                    case mpc::sequencer::EventType::Mixer:
+                        segmentCount += 4;
+                        break;
+                    default:
+                        segmentCount += 1;
+                        break;
+                }
+            });
     }
     return segmentCount;
 }
@@ -772,7 +774,9 @@ std::unique_ptr<all_t::event_t> makeExclusiveEvent(const mpc::sequencer::EventDa
     }
     else
     {
-        exclusive->set_bytes(std::string({static_cast<char>(state.sysExByteA), static_cast<char>(state.sysExByteB)}));
+        exclusive->set_bytes(std::string(
+            reinterpret_cast<const char *>(state.sysExPayload->data()),
+            state.getSysExByteCount()));
     }
 
     const auto length = exclusive->bytes().size();
@@ -812,28 +816,39 @@ std::unique_ptr<all_t::event_t> makeSequenceEvent(const mpc::sequencer::EventDat
 
 std::vector<char> makeSequenceEventChunk(mpc::sequencer::Sequence& seq)
 {
-    std::vector<char> chunk;
-    for (int tick = 0; tick < seq.getLastTick(); ++tick)
+    struct SerializedEvent
     {
-        for (const auto& track : seq.getTracks())
+        mpc::Tick tick;
+        std::vector<char> bytes;
+    };
+    std::vector<SerializedEvent> events;
+    for (const auto &track : seq.getTracks())
+    {
+        if (track->getIndex() > 63)
         {
-            if (track->getIndex() > 63)
-            {
-                break;
-            }
-
-            for (const auto& event : track->getEvents())
-            {
-                if (event->getTick() != tick)
-                {
-                    continue;
-                }
-
-                auto kaitaiEvent = makeSequenceEvent(*event->handle, static_cast<uint8_t>(track->getIndex()));
-                auto eventBytes = writeStruct(*kaitaiEvent);
-                chunk.insert(chunk.end(), eventBytes.begin(), eventBytes.end());
-            }
+            break;
         }
+        track->visitEventStates(
+            [&](const mpc::sequencer::EventData &event)
+            {
+                if (event.tick >= seq.getLastTick())
+                {
+                    return;
+                }
+                auto parsed = makeSequenceEvent(
+                    event, static_cast<uint8_t>(track->getIndex()));
+                events.push_back({event.tick, writeStruct(*parsed)});
+            });
+    }
+    std::stable_sort(events.begin(), events.end(),
+                     [](const auto &a, const auto &b)
+                     {
+                         return a.tick < b.tick;
+                     });
+    std::vector<char> chunk;
+    for (const auto &event : events)
+    {
+        chunk.insert(chunk.end(), event.bytes.begin(), event.bytes.end());
     }
 
     auto terminator = makeTerminatorEvent();

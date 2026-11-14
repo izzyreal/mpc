@@ -174,7 +174,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     if (!tryAcquireCopyEventLocks(
             this, {{sourceSequenceIndexToUse, m.sourceTrackIndex}}, acquired))
     {
-        enqueue(m);
+        defer(m);
         return;
     }
 
@@ -188,7 +188,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
     const auto &sourceSeq = activeState.sequences[sourceSequenceIndexToUse];
     auto &destSeq = activeState.sequences[m.destSequenceIndex];
 
-    std::vector<EventData> sourceEvents;
+    std::vector<OwnedEventSnapshot> sourceEvents;
     const EventData *src = sourceSeq.tracks[m.sourceTrackIndex].eventsHead;
     while (src)
     {
@@ -220,7 +220,7 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
 
         if (!tryAcquireCopyEventLocks(this, std::move(initTargets), acquired))
         {
-            enqueue(m);
+            defer(m);
             return;
         }
 
@@ -329,7 +329,11 @@ void SequencerStateManager::applyCopyEvents(const CopyEvents &m) noexcept
             {
                 continue;
             }
-            *ev = sourceEvent;
+            if (!sourceEvent.usable() || !cloneEventTo(*ev, sourceEvent))
+            {
+                returnEventToPool(ev);
+                continue;
+            }
 
             ev->sequenceIndex = m.destSequenceIndex;
             ev->trackIndex = m.destTrackIndex;

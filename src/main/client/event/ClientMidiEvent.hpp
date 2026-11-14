@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "sequencer/SysExPayload.hpp"
 
 namespace mpc::client::event
 {
@@ -18,11 +19,14 @@ namespace mpc::client::event
             MIDI_STOP,
             MIDI_CONTINUE,
             PROGRAM_CHANGE,
-            PITCH_WHEEL
+            PITCH_WHEEL,
+            SYSTEM_EXCLUSIVE,
+            INVALID
         };
 
     private:
-        MessageType messageType{};
+        MessageType messageType{INVALID};
+        sequencer::SysExPayloadOwner sysExPayload;
         uint8_t channel{};
         uint8_t data1{};
         uint8_t data2{};
@@ -39,7 +43,24 @@ namespace mpc::client::event
 
         MessageType getMessageType() const noexcept
         {
+            if (messageType == SYSTEM_EXCLUSIVE && !sysExPayload.get())
+            {
+                return INVALID;
+            }
             return messageType;
+        }
+        void setSysExPayload(sequencer::SysExPayloadOwner payload)
+        {
+            sysExPayload = std::move(payload);
+            messageType = SYSTEM_EXCLUSIVE;
+        }
+        const sequencer::SysExPayload *getSysExPayload() const
+        {
+            return sysExPayload.get();
+        }
+        void releaseSysExPayload()
+        {
+            sysExPayload = {};
         }
         void setMessageType(const MessageType type) noexcept
         {

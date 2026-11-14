@@ -253,14 +253,17 @@ ParsedSequenceView makeParsedSequenceView(const mpc60_seq_v2_t &parsed)
     return makeParsedSequenceView(*sequence);
 }
 
-void addImportedEvent(
-    mpc::sequencer::SequenceTrackEventsSnapshot &events,
-    mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
-    const mpc::TrackIndex trackIndex,
-    const mpc::sequencer::EventData &event,
-    const std::string &defaultTrackName)
+void addImportedEvent(mpc::sequencer::SequenceTrackEventsSnapshot &events,
+                      mpc::sequencer::SequenceTrackStatesSnapshot &trackStates,
+                      const mpc::TrackIndex trackIndex,
+                      mpc::sequencer::OwnedEventSnapshot event,
+                      const std::string &defaultTrackName)
 {
-    events[trackIndex].push_back(event);
+    if (!event.usable())
+    {
+        return;
+    }
+    events[trackIndex].push_back(std::move(event));
 
     auto &trackState = trackStates[trackIndex];
     trackState.used = true;
@@ -318,14 +321,14 @@ void loadEventsFromParsedObjects(
                 if (polyPressure != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::PolyPressure;
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(polyPressure->note());
                     e.amount = polyPressure->pressure();
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -337,15 +340,15 @@ void loadEventsFromParsedObjects(
                 if (controlChange != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::ControlChange;
                     e.tick = absoluteTick;
                     e.controllerNumber =
                         static_cast<uint8_t>(controlChange->controller());
                     e.controllerValue = controlChange->value();
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -357,14 +360,14 @@ void loadEventsFromParsedObjects(
                 if (programChange != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::ProgramChange;
                     e.tick = absoluteTick;
                     e.programChangeProgramIndex =
                         mpc::ProgramIndex(programChange->program());
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -376,13 +379,13 @@ void loadEventsFromParsedObjects(
                 if (chPressure != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::ChannelPressure;
                     e.tick = absoluteTick;
                     e.amount = chPressure->pressure();
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -394,13 +397,13 @@ void loadEventsFromParsedObjects(
                 if (pitchBend != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::PitchBend;
                     e.tick = absoluteTick;
                     e.amount = pitchBend->corrected_pitch_bend_amount();
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -410,31 +413,36 @@ void loadEventsFromParsedObjects(
 
                 if (event.mixer_event() != nullptr)
                 {
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::Mixer;
                     e.tick = absoluteTick;
                     e.mixerParameter =
                         static_cast<int8_t>(event.mixer_event()->param() - 1);
                     e.mixerPad = event.mixer_event()->pad_index();
                     e.mixerValue = event.mixer_event()->value();
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 else if (event.system_exclusive_body() != nullptr &&
                          !event.system_exclusive_body()->empty())
                 {
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::SystemExclusive;
                     e.tick = absoluteTick;
-                    e.sysExByteA = event.system_exclusive_body()->at(0);
-                    e.sysExByteB =
-                        event.system_exclusive_body()->size() > 1
-                            ? event.system_exclusive_body()->at(1)
-                            : 0;
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    e.setMidiSysExBytes(
+                        *sequencer.getStateManager()->sysExPool,
+                        event.system_exclusive_body()->data(),
+                        event.system_exclusive_body()->size() -
+                            (event.system_exclusive_body()->back() > 0x7F &&
+                                     event.system_exclusive_body()->back() !=
+                                         0xF7
+                                 ? 1
+                                 : 0),
+                        true);
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -449,7 +457,7 @@ void loadEventsFromParsedObjects(
                 if (noteEvent != nullptr)
                 {
                     const auto trackIndex = resolveTrackIndex(event.track_number());
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::NoteOn;
                     e.tick = absoluteTick;
                     e.noteNumber = mpc::NoteNumber(noteEvent->note_number());
@@ -461,9 +469,9 @@ void loadEventsFromParsedObjects(
                         status == 0x90
                             ? mpc::NoteVariationTypeTune
                             : mpc::NoteVariationType(status - 0x98);
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -536,53 +544,49 @@ void loadEventsFromRawBytes(
             case 0xA0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::PolyPressure;
                 e.tick = absoluteTick;
                 e.noteNumber =
                     mpc::NoteNumber(static_cast<unsigned char>(bytes.at(pos++)));
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xB0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ControlChange;
                 e.tick = absoluteTick;
                 e.controllerNumber = static_cast<unsigned char>(bytes.at(pos++));
                 e.controllerValue = static_cast<unsigned char>(bytes.at(pos++));
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xC0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ProgramChange;
                 e.tick = absoluteTick;
                 e.programChangeProgramIndex =
                     mpc::ProgramIndex(static_cast<unsigned char>(bytes.at(pos++)));
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xD0:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::ChannelPressure;
                 e.tick = absoluteTick;
                 e.amount = static_cast<unsigned char>(bytes.at(pos++));
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xE0:
@@ -590,13 +594,12 @@ void loadEventsFromRawBytes(
                 const auto trackIndex = readTrack();
                 const auto bits1 = static_cast<unsigned char>(bytes.at(pos++));
                 const auto bits2 = static_cast<unsigned char>(bytes.at(pos++));
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::PitchBend;
                 e.tick = absoluteTick;
                 e.amount = static_cast<int16_t>((bits1 + (bits2 << 7)) - 8192);
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             case 0xF0:
@@ -606,26 +609,26 @@ void loadEventsFromRawBytes(
 
                 if (isMixerSysex(payload))
                 {
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::Mixer;
                     e.tick = absoluteTick;
                     e.mixerParameter = static_cast<int8_t>(payload.at(4) - 1);
                     e.mixerPad = payload.at(5);
                     e.mixerValue = payload.at(6);
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 else if (!payload.empty())
                 {
-                    mpc::sequencer::EventData e;
+                    mpc::sequencer::OwnedEventSnapshot e;
                     e.type = mpc::sequencer::EventType::SystemExclusive;
                     e.tick = absoluteTick;
-                    e.sysExByteA = payload[0];
-                    e.sysExByteB = payload.size() > 1 ? payload[1] : 0;
-                    addImportedEvent(
-                        events, trackStates, trackIndex, e,
-                        sequencer.getDefaultTrackName(trackIndex));
+                    e.setMidiSysExBytes(*sequencer.getStateManager()->sysExPool,
+                                        payload.data(), payload.size(), true);
+                    addImportedEvent(events, trackStates, trackIndex,
+                                     std::move(e),
+                                     sequencer.getDefaultTrackName(trackIndex));
                 }
                 break;
             }
@@ -636,7 +639,7 @@ void loadEventsFromRawBytes(
             case 0x98:
             {
                 const auto trackIndex = readTrack();
-                mpc::sequencer::EventData e;
+                mpc::sequencer::OwnedEventSnapshot e;
                 e.type = mpc::sequencer::EventType::NoteOn;
                 e.tick = absoluteTick;
                 e.noteNumber =
@@ -653,9 +656,8 @@ void loadEventsFromRawBytes(
                     status == 0x90
                         ? mpc::NoteVariationTypeTune
                         : mpc::NoteVariationType(status - 0x98);
-                addImportedEvent(
-                    events, trackStates, trackIndex, e,
-                    sequencer.getDefaultTrackName(trackIndex));
+                addImportedEvent(events, trackStates, trackIndex, std::move(e),
+                                 sequencer.getDefaultTrackName(trackIndex));
                 break;
             }
             default:
@@ -831,6 +833,7 @@ sequence_or_error Mpc3000SeqIo::loadBytes(
     const std::vector<char> &bytes,
     const std::string &fileNameWithoutExtension)
 {
+    mpc::sequencer::SysExReportBatch reportBatch;
     if (bytes.size() < 2)
     {
         return tl::make_unexpected("SEQ file is too short");

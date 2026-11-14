@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sequencer/EventData.hpp"
+#include "sequencer/OwnedEventSnapshot.hpp"
 #include "sequencer/BusType.hpp"
 
 #include <variant>
@@ -44,7 +45,7 @@ namespace mpc::sequencer
     struct UpdateEvent
     {
         EventData *handle;
-        EventData snapshot;
+        OwnedEventSnapshot snapshot;
     };
 
     struct UpdateNoteVariation

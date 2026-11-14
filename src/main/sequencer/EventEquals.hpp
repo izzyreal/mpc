@@ -91,8 +91,7 @@ namespace mpc::sequencer
     {
         return static_cast<const EventRef &>(a) ==
                    static_cast<const EventRef &>(b) &&
-               a.getByteA() == b.getByteA() &&
-               a.getByteB() == b.getByteB();
+               a.snapshot == b.snapshot;
     }
 
     inline bool eventsEqual(const std::shared_ptr<EventRef> &a,
@@ -226,8 +225,8 @@ namespace mpc::sequencer
         return true;
     }
 
-    inline bool eventsEqual(const std::vector<EventData> &a,
-                            const std::vector<EventData> &b)
+    template <class A, class B>
+    inline bool eventsEqual(const std::vector<A> &a, const std::vector<B> &b)
     {
         if (a.size() != b.size())
         {

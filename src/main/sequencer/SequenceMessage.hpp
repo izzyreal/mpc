@@ -15,7 +15,7 @@
 namespace mpc::sequencer
 {
     using SequenceTrackEventsSnapshot =
-        std::unordered_map<uint8_t, std::vector<EventData>>;
+        std::unordered_map<uint8_t, std::vector<OwnedEventSnapshot>>;
     using SequenceTrackStatesSnapshot =
         std::array<TrackState, Mpc2000XlSpecs::TRACK_COUNT>;
 

@@ -21,9 +21,12 @@ namespace mpc::sequencer
     class SongStateHandler;
     class SequenceStateView;
 
+    // CopyEvents can defer two updates for each of the 999 bars; bulk event
+    // insertions from CopyBars use their pool-backed linked list instead.
     class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
-              SequencerState, SequencerStateView, SequencerMessage>
+              SequencerState, SequencerStateView, SequencerMessage, 3, 512,
+              2048>
     {
     public:
         explicit SequencerStateManager(Sequencer *);
@@ -34,12 +37,21 @@ namespace mpc::sequencer
                                   Mpc2000XlSpecs::GLOBAL_EVENT_CAPACITY>;
 
         std::shared_ptr<EventPool> eventPool;
+        std::shared_ptr<SysExPool> sysExPool;
 
         void returnEventToPool(EventData *) const;
 
         void insertAcquiredEvent(TrackState &, EventData *) const;
 
         EventData *acquireEvent() const;
+        bool cloneEventTo(EventData &, const EventData &) const;
+
+        // The caller must hold this track's lock while reading linked events.
+        const TrackState &getActiveTrackUnderLock(SequenceIndex sequence,
+                                                  TrackIndex track) const
+        {
+            return activeState.sequences[sequence].tracks[track];
+        }
 
         std::array<std::array<concurrency::SpinLock,
                               Mpc2000XlSpecs::TOTAL_TRACK_COUNT>,
@@ -50,6 +62,7 @@ namespace mpc::sequencer
             sequenceLocks;
 
         void applyCopyBars(const CopyBars &) noexcept;
+        void flushCopyBarInserts() noexcept;
 
         EventData *recordNoteEventLive(SequenceIndex, TrackIndex, NoteNumber,
                                        Velocity);
@@ -81,11 +94,17 @@ namespace mpc::sequencer
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;
+        void onDeferredOverflow(const SequencerMessage &msg) noexcept override;
 
     private:
         static constexpr uint8_t LIVE_NOTE_EVENT_RECORDING_CAPACITY = 128;
 
         Sequencer *sequencer;
+        // Pending copies are already owned by the event pool; next links them
+        // without allocating a second queue on the audio thread.
+        EventData *pendingCopyBarInsertHead = nullptr;
+        EventData *pendingCopyBarInsertTail = nullptr;
+        void discardPendingCopyBarInserts(bool reportOverflow = false) noexcept;
         std::unique_ptr<TransportStateHandler> transportStateHandler;
         std::unique_ptr<SequenceStateHandler> sequenceStateHandler;
         std::unique_ptr<TrackStateHandler> trackStateHandler;

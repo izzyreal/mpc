@@ -8,9 +8,9 @@ namespace mpc::concurrency
     class TaskQueue
     {
     public:
-        void post(utils::Task &task)
+        bool post(utils::Task &task)
         {
-            queue.enqueue(std::move(task));
+            return queue.enqueue(std::move(task));
         }
 
         void drain()
@@ -18,7 +18,7 @@ namespace mpc::concurrency
             alignas(utils::Task) unsigned char buf[sizeof(utils::Task)];
             auto *task = reinterpret_cast<utils::Task *>(buf);
 
-            while (queue.dequeue(*task))
+            while (queue.dequeueUninitialized(task))
             {
                 (*task)();
                 task->~SmallFn();

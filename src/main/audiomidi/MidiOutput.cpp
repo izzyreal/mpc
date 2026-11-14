@@ -6,9 +6,17 @@ MidiOutput::MidiOutput() {}
 
 void MidiOutput::panic() const {}
 
-void MidiOutput::enqueueEvent(const MidiEvent &e)
+bool MidiOutput::enqueueEvent(MidiEvent e)
 {
-    queue.enqueue(e);
+    if (queue.enqueue(std::move(e)))
+    {
+        return true;
+    }
+    if (const auto *payload = e.getSysExPayload())
+    {
+        payload->pool->reportFull();
+    }
+    return false;
 }
 
 int MidiOutput::dequeue(std::vector<MidiEvent> &buf)
@@ -16,9 +24,9 @@ int MidiOutput::dequeue(std::vector<MidiEvent> &buf)
     MidiEvent e;
     size_t idx = 0;
 
-    while (queue.dequeue(e) && idx < buf.size())
+    while (idx < buf.size() && queue.dequeue(e))
     {
-        buf[idx++] = e;
+        buf[idx++] = std::move(e);
     }
 
     return idx;

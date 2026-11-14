@@ -13,7 +13,7 @@ void TrackStateHandler::applyRemoveDoubles(const RemoveDoubles &m,
 
     if (!lock.try_acquire())
     {
-        manager->enqueue(m);
+        manager->defer(m);
         return;
     }
 

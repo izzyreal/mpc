@@ -1,3 +1,4 @@
+#include "sequencer/SequencerStateManager.hpp"
 #include "Mpc.hpp"
 
 #include <mpc_fs.hpp>
@@ -208,6 +209,14 @@ void Mpc::init(const MpcInitOptions &options)
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
 
     layeredScreen = std::make_shared<LayeredScreen>(*this);
+    sysExPool = std::make_shared<sequencer::SysExPool>(
+        [screen = std::weak_ptr<LayeredScreen>(layeredScreen)]
+        {
+            if (const auto ui = screen.lock())
+            {
+                ui->logSysExRamFull();
+            }
+        });
 
     performanceManager = std::make_shared<performance::PerformanceManager>(
         layeredScreen->postToUiThread);
@@ -273,6 +282,7 @@ void Mpc::init(const MpcInitOptions &options)
             return clientEventController->isSixteenLevelsEnabled();
         });
     MLOG("Sequencer created");
+    sequencer->getStateManager()->sysExPool = sysExPool;
 
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
     // avoiding memory allocations and I/O on the audio thread.

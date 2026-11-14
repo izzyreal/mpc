@@ -15,6 +15,11 @@ namespace mpc
     class Mpc;
 }
 
+namespace mpc::client::event
+{
+    struct ClientMidiEvent;
+}
+
 namespace mpc::sequencer
 {
     class DrumBus;
@@ -54,6 +59,7 @@ namespace mpc::audiomidi
         void handleFinalizedEvent(const sequencer::EventData &,
                                   TrackIndex trackIndex, int trackVelocityRatio,
                                   sequencer::BusType, int trackDeviceIndex);
+        void recordSystemExclusive(const client::event::ClientMidiEvent &);
 
         void
         handleUnfinalizedNoteOn(const sequencer::EventData &,
