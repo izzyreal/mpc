@@ -880,23 +880,31 @@ parsedEventToEventData(const mpc2000xl_all_t::event_t& parsedEvent)
 
     if (parsedEvent.exclusive() != nullptr)
     {
-        if (parsedEvent.exclusive()->mixer() != nullptr)
+        const auto& bytes = parsedEvent.exclusive()->bytes();
+        // Other Akai SysEx messages also start with F0 47. Only this complete
+        // signature and length identify an ALL mixer message.
+        if (bytes.size() == 9 &&
+            bytes.compare(0, 5, std::string("\xF0\x47\x00\x44\x45", 5)) == 0 &&
+            static_cast<unsigned char>(bytes[8]) == 0xF7)
         {
+            std::istringstream stream(bytes, std::ios::binary);
+            kaitai::kstream io(&stream);
+            mpc2000xl_all_t::mixer_event_t mixer(&io);
+            mixer._read();
             e.type = mpc::sequencer::EventType::Mixer;
             auto mixerParameter =
-                static_cast<int>(parsedEvent.exclusive()->mixer()->param()) - 1;
+                static_cast<int>(mixer.param()) - 1;
             if (mixerParameter == 4)
             {
                 mixerParameter = 3;
             }
             e.mixerParameter = mixerParameter;
-            e.mixerPad = parsedEvent.exclusive()->mixer()->pad_index();
-            e.mixerValue = parsedEvent.exclusive()->mixer()->value();
+            e.mixerPad = mixer.pad_index();
+            e.mixerValue = mixer.value();
         }
         else
         {
             e.type = mpc::sequencer::EventType::SystemExclusive;
-            const auto& bytes = parsedEvent.exclusive()->bytes();
             e.sysExByteA = bytes.size() > 0
                 ? static_cast<uint8_t>(bytes[0])
                 : 0;

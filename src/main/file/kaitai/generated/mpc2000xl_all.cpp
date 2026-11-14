@@ -1670,59 +1670,33 @@ mpc2000xl_all_t::exclusive_event_t::exclusive_event_t(kaitai::kstream* p__io, mp
 }
 
 void mpc2000xl_all_t::exclusive_event_t::_read() {
-    m__unnamed0 = m__io->read_bytes(3);
-    m_bytes = m__io->read_bytes(2);
-    if (bytes() == std::string("\xF0\x47", 2)) {
-        m_mixer = std::unique_ptr<mixer_event_t>(new mixer_event_t(m__io, this, m__root));
-        m_mixer->_read();
-    }
-    m__unnamed3 = m__io->read_bytes(14);
+    m_payload_length = m__io->read_bits_int_le(24);
+    m_bytes = m__io->read_bytes(payload_length());
+    m_padding = m__io->read_bytes(kaitai::kstream::mod(8 - kaitai::kstream::mod(payload_length(), 8), 8));
+    m_closing_segment = m__io->read_bytes(8);
     m__dirty = false;
 }
 
 void mpc2000xl_all_t::exclusive_event_t::_fetch_instances() {
-    if (bytes() == std::string("\xF0\x47", 2)) {
-        m_mixer.get()->_fetch_instances();
-    }
 }
 
 void mpc2000xl_all_t::exclusive_event_t::_write() {
-    m__io->write_bytes(m__unnamed0);
+    m__io->write_bits_int_le(24, m_payload_length);
     m__io->write_bytes(m_bytes);
-    if (bytes() == std::string("\xF0\x47", 2)) {
-        if (m_mixer.get() == nullptr) {
-            throw std::runtime_error("/types/exclusive_event/seq/2: nested object is not set");
-        }
-        m_mixer.get()->_set_io(m__io);
-        m_mixer.get()->_write();
-    }
-    m__io->write_bytes(m__unnamed3);
+    m__io->write_bytes(m_padding);
+    m__io->write_bytes(m_closing_segment);
     _fetch_instances();
     m__dirty = false;
 }
 
 void mpc2000xl_all_t::exclusive_event_t::_check() {
-    if (m__unnamed0.size() != static_cast<std::string::size_type>(3)) {
-        throw std::runtime_error("/types/exclusive_event/seq/0: size mismatch");
-    }
-    if (m_bytes.size() != static_cast<std::string::size_type>(2)) {
+    if (m_bytes.size() != static_cast<std::string::size_type>(payload_length())) {
         throw std::runtime_error("/types/exclusive_event/seq/1: size mismatch");
     }
-    if (bytes() == std::string("\xF0\x47", 2)) {
-        if (!(m_mixer.get() != nullptr)) {
-            throw std::runtime_error("/types/exclusive_event/seq/2: conditional field is not set");
-        }
-        if (m_mixer.get() == nullptr) {
-            throw std::runtime_error("/types/exclusive_event/seq/2: nested object is not set");
-        }
-        m_mixer.get()->_set_io(m__io);
-        m_mixer.get()->_check();
-    } else {
-        if (m_mixer.get() != nullptr) {
-            throw std::runtime_error("/types/exclusive_event/seq/2: conditional field should be absent");
-        }
+    if (m_padding.size() != static_cast<std::string::size_type>(kaitai::kstream::mod(8 - kaitai::kstream::mod(payload_length(), 8), 8))) {
+        throw std::runtime_error("/types/exclusive_event/seq/2: size mismatch");
     }
-    if (m__unnamed3.size() != static_cast<std::string::size_type>(14)) {
+    if (m_closing_segment.size() != static_cast<std::string::size_type>(8)) {
         throw std::runtime_error("/types/exclusive_event/seq/3: size mismatch");
     }
     m__dirty = false;
@@ -2047,14 +2021,17 @@ void mpc2000xl_all_t::misc_t::_check() {
 
 mpc2000xl_all_t::misc_t::~misc_t() {}
 
-mpc2000xl_all_t::mixer_event_t::mixer_event_t(kaitai::kstream* p__io, mpc2000xl_all_t::exclusive_event_t* p__parent, mpc2000xl_all_t* p__root) : kaitai::kstruct(p__io) {
+mpc2000xl_all_t::mixer_event_t::mixer_event_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent, mpc2000xl_all_t* p__root) : kaitai::kstruct(p__io) {
     m__parent = p__parent;
     m__root = p__root;
     m__dirty = false;
 }
 
 void mpc2000xl_all_t::mixer_event_t::_read() {
-    m__unnamed0 = m__io->read_bytes(3);
+    m__unnamed0 = m__io->read_bytes(5);
+    if (!(m__unnamed0 == std::string("\xF0\x47\x00\x44\x45", 5))) {
+        throw kaitai::validation_not_equal_error<std::string>(std::string("\xF0\x47\x00\x44\x45", 5), m__unnamed0, m__io, std::string("/types/mixer_event/seq/0"));
+    }
     m_param = static_cast<mpc2000xl_all_t::mixer_event_param_t>(m__io->read_u1());
     m_pad_index = m__io->read_u1();
     m_value = m__io->read_u1();
@@ -2064,7 +2041,10 @@ void mpc2000xl_all_t::mixer_event_t::_read() {
     if (!(m_value <= 100)) {
         throw kaitai::validation_greater_than_error<uint8_t>(100, m_value, m__io, std::string("/types/mixer_event/seq/3"));
     }
-    m__unnamed4 = m__io->read_bytes(2);
+    m__unnamed4 = m__io->read_bytes(1);
+    if (!(m__unnamed4 == std::string("\xF7", 1))) {
+        throw kaitai::validation_not_equal_error<std::string>(std::string("\xF7", 1), m__unnamed4, m__io, std::string("/types/mixer_event/seq/4"));
+    }
     m__dirty = false;
 }
 
@@ -2082,8 +2062,11 @@ void mpc2000xl_all_t::mixer_event_t::_write() {
 }
 
 void mpc2000xl_all_t::mixer_event_t::_check() {
-    if (m__unnamed0.size() != static_cast<std::string::size_type>(3)) {
+    if (m__unnamed0.size() != static_cast<std::string::size_type>(5)) {
         throw std::runtime_error("/types/mixer_event/seq/0: size mismatch");
+    }
+    if (!(m__unnamed0 == std::string("\xF0\x47\x00\x44\x45", 5))) {
+        throw kaitai::validation_not_equal_error<std::string>(std::string("\xF0\x47\x00\x44\x45", 5), m__unnamed0, m__io, std::string("/types/mixer_event/seq/0"));
     }
     if (!(m_value >= 0)) {
         throw kaitai::validation_less_than_error<uint8_t>(0, m_value, m__io, std::string("/types/mixer_event/seq/3"));
@@ -2091,8 +2074,11 @@ void mpc2000xl_all_t::mixer_event_t::_check() {
     if (!(m_value <= 100)) {
         throw kaitai::validation_greater_than_error<uint8_t>(100, m_value, m__io, std::string("/types/mixer_event/seq/3"));
     }
-    if (m__unnamed4.size() != static_cast<std::string::size_type>(2)) {
+    if (m__unnamed4.size() != static_cast<std::string::size_type>(1)) {
         throw std::runtime_error("/types/mixer_event/seq/4: size mismatch");
+    }
+    if (!(m__unnamed4 == std::string("\xF7", 1))) {
+        throw kaitai::validation_not_equal_error<std::string>(std::string("\xF7", 1), m__unnamed4, m__io, std::string("/types/mixer_event/seq/4"));
     }
     m__dirty = false;
 }

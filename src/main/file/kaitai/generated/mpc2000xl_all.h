@@ -1045,29 +1045,24 @@ public:
         void _write();
         void _check();
         ~exclusive_event_t();
-        std::string _unnamed0() const { return m__unnamed0; }
-        void set__unnamed0(std::string _v) { m__dirty = true; m__unnamed0 = std::move(_v); }
+        uint64_t payload_length() const { return m_payload_length; }
+        void set_payload_length(uint64_t _v) { m__dirty = true; m_payload_length = std::move(_v); }
         std::string bytes() const { return m_bytes; }
         void set_bytes(std::string _v) { m__dirty = true; m_bytes = std::move(_v); }
-        mixer_event_t* mixer() const { return m_mixer.get(); }
-        void set_mixer(std::unique_ptr<mixer_event_t> _v) { m__dirty = true; m_mixer = std::move(_v); }
-        std::string _unnamed3() const { return m__unnamed3; }
-        void set__unnamed3(std::string _v) { m__dirty = true; m__unnamed3 = std::move(_v); }
+        std::string padding() const { return m_padding; }
+        void set_padding(std::string _v) { m__dirty = true; m_padding = std::move(_v); }
+        std::string closing_segment() const { return m_closing_segment; }
+        void set_closing_segment(std::string _v) { m__dirty = true; m_closing_segment = std::move(_v); }
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
         void set__parent(mpc2000xl_all_t::event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
-        std::string m__unnamed0;
+        uint64_t m_payload_length;
         std::string m_bytes;
-        std::unique_ptr<mixer_event_t> m_mixer;
-
-    public:
-        bool _is_null_mixer() { return !mixer(); };
-
-    private:
-        std::string m__unnamed3;
+        std::string m_padding;
+        std::string m_closing_segment;
         mpc2000xl_all_t* m__root;
         mpc2000xl_all_t::event_t* m__parent;
     };
@@ -1356,7 +1351,7 @@ public:
 
     public:
 
-        mixer_event_t(kaitai::kstream* p__io, mpc2000xl_all_t::exclusive_event_t* p__parent = nullptr, mpc2000xl_all_t* p__root = nullptr);
+        mixer_event_t(kaitai::kstream* p__io, kaitai::kstruct* p__parent = nullptr, mpc2000xl_all_t* p__root = nullptr);
         void _read();
         void _fetch_instances();
         void _write();
@@ -1375,7 +1370,7 @@ public:
         mpc2000xl_all_t* _root() const { return m__root; }
         void set__root(mpc2000xl_all_t* _v) { m__dirty = true; m__root = std::move(_v); }
         kaitai::kstruct* _parent() const { return m__parent; }
-        void set__parent(mpc2000xl_all_t::exclusive_event_t* _v) { m__dirty = true; m__parent = std::move(_v); }
+        void set__parent(kaitai::kstruct* _v) { m__dirty = true; m__parent = std::move(_v); }
 
     private:
         std::string m__unnamed0;
@@ -1384,7 +1379,7 @@ public:
         uint8_t m_value;
         std::string m__unnamed4;
         mpc2000xl_all_t* m__root;
-        mpc2000xl_all_t::exclusive_event_t* m__parent;
+        kaitai::kstruct* m__parent;
     };
 
     class note_event_t : public kaitai::kstruct {

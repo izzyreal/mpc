@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "TestMpc.hpp"
@@ -43,6 +44,32 @@
 CMRC_DECLARE(mpctest);
 
 namespace {
+
+std::string exclusiveRecord(const std::string& payload)
+{
+    // Tick 12, track 3, event ID F0; length completes the first 8-byte segment.
+    std::string bytes("\x0c\x00\x00\x03\xf0", 5);
+    for (int shift : {0, 8, 16})
+    {
+        bytes.push_back(static_cast<char>((payload.size() >> shift) & 0xFF));
+    }
+    bytes += payload;
+    // Nonzero padding and closing bytes must survive, not be regenerated.
+    bytes += std::string((8 - payload.size() % 8) % 8, char{0x55});
+    bytes += std::string("\x0c\x00\x00\x03\xf8\x12\x34\x56", 8);
+    return bytes;
+}
+
+template <typename T>
+std::string rewriteParsedAllRecord(T& parsed)
+{
+    std::stringstream output(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream io(&output);
+    parsed._set_io(&io);
+    parsed._check();
+    parsed._write();
+    return output.str();
+}
 
 void prepareAllResources(mpc::Mpc& mpc)
 {
@@ -232,6 +259,166 @@ std::vector<char> buildBroadMutatedAllBytes()
     return std::vector<char>(rewritten.begin(), rewritten.end());
 }
 
+}
+
+TEST_CASE("ALL SysEx lengths preserve payload framing and following events",
+          "[kaitai-all][all-sysex]")
+{
+    const int length = GENERATE(0, 1, 2, 7, 8, 9, 15, 16, 17, 267);
+    CAPTURE(length);
+    std::string payload;
+    for (int i = 0; i < length; ++i)
+    {
+        payload.push_back(static_cast<char>(i % 128));
+    }
+    const auto original = exclusiveRecord(payload);
+    // A normal note event follows immediately after the closing segment.
+    const std::string note("\x60\x00\x00\x02\x3c\x0c\x64\x40", 8);
+    std::istringstream input(original + note, std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_all_t::event_t event(&io);
+    event._read();
+    REQUIRE(event.exclusive());
+    CHECK(event.exclusive()->payload_length() == length);
+    CHECK(event.exclusive()->bytes() == payload);
+    CHECK(io.pos() == original.size());
+    mpc2000xl_all_t::event_t next(&io);
+    next._read();
+    REQUIRE(next.note_event());
+    CHECK(next.tick() == 96);
+    CHECK(next.track() == 2);
+    CHECK(next.id() == 60);
+    CHECK(io.is_eof());
+    CHECK(rewriteParsedAllRecord(event) == original);
+    CHECK(rewriteParsedAllRecord(next) == note);
+}
+
+TEST_CASE("ALL truncated SysEx framing fails cleanly", "[kaitai-all][all-sysex]")
+{
+    const auto original = exclusiveRecord(std::string(17, 'A'));
+    // Truncation inside the payload, padding, or closing segment.
+    const int cut = GENERATE(8 + 16, 8 + 17 + 6, 8 + 17 + 7 + 7);
+    CAPTURE(cut);
+    std::istringstream input(original.substr(0, cut), std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_all_t::event_t event(&io);
+    CHECK_THROWS(event._read());
+}
+
+TEST_CASE("ALL long SysEx leaves the next sequence aligned",
+          "[kaitai-all][all-sysex]")
+{
+    auto fs = cmrc::mpctest::get_filesystem();
+    const auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
+    // Reuse a real 10240-byte sequence header; only event framing is varied.
+    const std::string header(file.begin() + 14406, file.begin() + 14406 + 10240);
+    const std::string note("\x60\x00\x00\x02\x3c\x0c\x64\x40", 8);
+    const std::string terminator(8, static_cast<char>(0xFF));
+    const auto first = header + exclusiveRecord(std::string(267, 'A')) +
+                       note + terminator;
+    auto nextHeader = header;
+    nextHeader.replace(0, 16, "AFTER_SYSEX     ");
+    nextHeader[18] = 2;
+    const auto second = nextHeader + note + terminator;
+    std::istringstream input(first + second, std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_all_t::sequence_t sequence(&io);
+    sequence._read();
+    CHECK(io.pos() == first.size());
+    REQUIRE(sequence.body()->events()->size() == 3);
+    CHECK(sequence.body()->events()->at(0)->exclusive()->bytes() ==
+          std::string(267, 'A'));
+    CHECK(sequence.body()->events()->at(1)->id() == 60);
+    mpc2000xl_all_t::sequence_t next(&io);
+    next._read();
+    CHECK(next.name() == "AFTER_SYSEX     ");
+    CHECK(next.body()->index() == 2);
+    CHECK(io.is_eof());
+    CHECK(rewriteParsedAllRecord(sequence) == first);
+    CHECK(rewriteParsedAllRecord(next) == second);
+}
+
+TEST_CASE("ALL short SysEx and mixer serialization retain legacy bytes",
+          "[kaitai-all][all-sysex]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sequence = mpc.getSequencer()->getSequence(0);
+    sequence->init(0);
+    mpc::sequencer::EventData sysEx;
+    sysEx.type = mpc::sequencer::EventType::SystemExclusive;
+    sysEx.tick = 12;
+    sysEx.sysExByteA = 0x12;
+    sysEx.sysExByteB = 0x34;
+    sequence->getTrack(0)->acquireAndInsertEvent(sysEx);
+    mpc::sequencer::EventData mixer;
+    mixer.type = mpc::sequencer::EventType::Mixer;
+    mixer.tick = 24;
+    mixer.mixerParameter = 3;
+    mixer.mixerPad = 9;
+    mixer.mixerValue = 87;
+    sequence->getTrack(0)->acquireAndInsertEvent(mixer);
+    mpc.getSequencer()->getStateManager()->drainQueue();
+    const auto bytes = mpc::file::kaitai::AllIo::save(mpc);
+    std::istringstream input(std::string(bytes.begin(), bytes.end()), std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_all_t parsed(&io);
+    parsed._read();
+    const auto& events = *parsed.sequences()->at(0)->body()->events();
+    REQUIRE(events.size() == 3);
+    const std::string closing("\x00\x00\x00\x00\xf8\x00\x00\x00", 8);
+    const auto expectedSysEx =
+        std::string("\x0c\x00\x00\x00\xf0\x02\x00\x00\x12\x34", 10) +
+        std::string(6, '\0') + closing;
+    const auto expectedMixer =
+        std::string("\x18\x00\x00\x00\xf0\x09\x00\x00", 8) +
+        std::string("\xf0\x47\x00\x44\x45\x05\x09\x57\xf7", 9) +
+        std::string(7, '\0') + closing;
+    CHECK(rewriteParsedAllRecord(*events[0]) == expectedSysEx);
+    CHECK(rewriteParsedAllRecord(*events[1]) == expectedMixer);
+}
+
+TEST_CASE("ALL ordinary Akai SysEx is not treated as a mixer event",
+          "[kaitai-all][all-sysex]")
+{
+    mpc::Mpc source;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(source);
+    const auto sequence = source.getSequencer()->getSequence(0);
+    sequence->init(0);
+    mpc::sequencer::EventData data;
+    data.type = mpc::sequencer::EventType::SystemExclusive;
+    data.tick = 12;
+    data.sysExByteA = 0xF0;
+    data.sysExByteB = 0x47;
+    sequence->getTrack(0)->acquireAndInsertEvent(data);
+    source.getSequencer()->getStateManager()->drainQueue();
+    auto bytes = mpc::file::kaitai::AllIo::save(source);
+
+    // Replace the short message by a nine-byte Akai message whose command
+    // differs from the known mixer signature, keeping the existing framing.
+    std::istringstream input(std::string(bytes.begin(), bytes.end()), std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_all_t parsed(&io);
+    parsed._read();
+    auto* exclusive = parsed.sequences()->at(0)->body()->events()->at(0)->exclusive();
+    REQUIRE(exclusive);
+    exclusive->set_bytes(std::string("\xf0\x47\x00\x44\x46\x01\x00\x64\xf7", 9));
+    exclusive->set_payload_length(9);
+    exclusive->set_padding(std::string(7, '\0'));
+    const auto rewritten = rewriteParsedAllRecord(parsed);
+    bytes.assign(rewritten.begin(), rewritten.end());
+
+    mpc::Mpc loaded;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(loaded);
+    const auto allFile = installAllBytes(loaded, bytes, "AKAI.ALL");
+    mpc::disk::AllLoader::loadEverythingFromFile(loaded, allFile.get());
+    loaded.getSequencer()->getStateManager()->drainQueue();
+    const auto events = loaded.getSequencer()->getSequence(0)->getTrack(0)->getEvents();
+    REQUIRE(events.size() == 1);
+    const auto event = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(events[0]);
+    REQUIRE(event);
+    CHECK(event->getByteA() == 0xF0);
+    CHECK(event->getByteB() == 0x47);
 }
 
 TEST_CASE("Kaitai MPC2000 ALL parses and rewrites real 2KXL ALL", "[kaitai-all][real-2kxl]")

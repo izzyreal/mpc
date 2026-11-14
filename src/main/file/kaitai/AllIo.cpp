@@ -756,35 +756,31 @@ std::unique_ptr<all_t::event_t> makeExclusiveEvent(const mpc::sequencer::EventDa
     auto exclusive = std::make_unique<all_t::exclusive_event_t>(nullptr, event.get(), nullptr);
     if (state.type == mpc::sequencer::EventType::Mixer)
     {
-        exclusive->set__unnamed0(std::string({9, 0, 0}));
-        exclusive->set_bytes(std::string({static_cast<char>(0xF0), 0x47}));
-
-        auto mixer = std::make_unique<all_t::mixer_event_t>(nullptr, exclusive.get(), nullptr);
-        mixer->set__unnamed0(std::string({0, 68, 69}));
+        all_t::mixer_event_t mixer(nullptr, nullptr, nullptr);
+        mixer.set__unnamed0(std::string({static_cast<char>(0xF0), 0x47, 0, 68, 69}));
         auto param = state.mixerParameter;
         if (param == 3)
         {
             param = 4;
         }
-        mixer->set_param(static_cast<all_t::mixer_event_param_t>(param + 1));
-        mixer->set_pad_index(state.mixerPad);
-        mixer->set_value(state.mixerValue);
-        mixer->set__unnamed4(std::string({static_cast<char>(0xF7), 0}));
-        exclusive->set_mixer(std::move(mixer));
-
-        auto tail = std::string(14, char{0});
-        tail[10] = static_cast<char>(0xF8);
-        exclusive->set__unnamed3(std::move(tail));
+        mixer.set_param(static_cast<all_t::mixer_event_param_t>(param + 1));
+        mixer.set_pad_index(state.mixerPad);
+        mixer.set_value(state.mixerValue);
+        mixer.set__unnamed4(std::string(1, static_cast<char>(0xF7)));
+        const auto payload = writeStruct(mixer);
+        exclusive->set_bytes(std::string(payload.begin(), payload.end()));
     }
     else
     {
-        exclusive->set__unnamed0(std::string({2, 0, 0}));
         exclusive->set_bytes(std::string({static_cast<char>(state.sysExByteA), static_cast<char>(state.sysExByteB)}));
-
-        auto tail = std::string(14, char{0});
-        tail[10] = static_cast<char>(0xF8);
-        exclusive->set__unnamed3(std::move(tail));
     }
+
+    const auto length = exclusive->bytes().size();
+    exclusive->set_payload_length(length);
+    exclusive->set_padding(std::string((8 - length % 8) % 8, char{0}));
+    auto closingSegment = std::string(8, char{0});
+    closingSegment[4] = static_cast<char>(0xF8);
+    exclusive->set_closing_segment(std::move(closingSegment));
 
     event->set_exclusive(std::move(exclusive));
     return event;
