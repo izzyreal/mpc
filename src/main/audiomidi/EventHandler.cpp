@@ -86,6 +86,13 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const EventData &noteOnEvent, const std::shared_ptr<DrumBus> &drumBus,
     const TrackIndex trackIndex, const int trackVelocityRatio)
 {
+    const auto engineHost = mpc.getEngineHost();
+    // Capture once at playback; queued notifications and the scheduled release
+    // must retain this classification even after the bounce finishes.
+    const auto source =
+        engineHost->isBouncingOffline()
+            ? performance::PerformanceEventSource::SequenceOffline
+            : performance::PerformanceEventSource::Sequence;
     const auto sampler = mpc.getSampler();
     const auto programIndex = drumBus->getProgramIndex();
     const auto program = sampler->getProgram(drumBus->getProgramIndex());
@@ -107,7 +114,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
                                       ? VoiceOverlapMode::NOTE_OFF
                                       : noteParameters->getVoiceOverlapMode();
 
-    const auto engineHost = mpc.getEngineHost();
     const auto sequencerPlaybackEngine =
         engineHost->getSequencerPlaybackEngine();
     const auto eventFrameOffsetInBuffer =
@@ -138,16 +144,14 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     constexpr std::optional<MidiChannel> noMidiInputChannel{std::nullopt};
 
     mpc.getPerformanceManager().lock()->registerNoteOn(
-        performance::PerformanceEventSource::Sequence, NoPhysicalPadIndex,
-        noMidiInputChannel, screenId, trackIndex,
+        source, NoPhysicalPadIndex, noMidiInputChannel, screenId, trackIndex,
         drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), note,
         Velocity(velocityToUse), programIndex);
 
     if (programPadIndex != -1)
     {
         mpc.getPerformanceManager().lock()->registerProgramPadPress(
-            performance::PerformanceEventSource::Sequence, std::nullopt,
-            screenId, trackIndex,
+            source, std::nullopt, screenId, trackIndex,
             drumBusIndexToDrumBusType(ctx.drum.drumBusIndex), programPadIndex,
             Velocity(velocityToUse), programIndex, NoPhysicalPadIndex);
     }
@@ -163,19 +167,17 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     task.f.set(
         [note, programIndex, performanceManager = mpc.getPerformanceManager(),
-         programPadIndex, noteOffCtx](int)
+         programPadIndex, noteOffCtx, source](int)
         {
             constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-            performanceManager.lock()->registerNoteOff(
-                performance::PerformanceEventSource::Sequence, note,
-                noMidiChannel);
+            performanceManager.lock()->registerNoteOff(source, note,
+                                                       noMidiChannel);
 
             if (programPadIndex != -1)
             {
                 performanceManager.lock()->registerProgramPadRelease(
-                    performance::PerformanceEventSource::Sequence,
-                    programPadIndex, programIndex);
+                    source, programPadIndex, programIndex);
             }
 
             DrumNoteEventHandler::noteOff(noteOffCtx);

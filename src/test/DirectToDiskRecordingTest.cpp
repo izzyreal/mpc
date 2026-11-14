@@ -13,15 +13,225 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
 #include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/Bus.hpp"
+#include "audiomidi/DirectToDiskSettings.hpp"
+#include "audiomidi/EventHandler.hpp"
+#include "performance/PerformanceManager.hpp"
 
 #include <thread>
 #include <chrono>
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <memory>
+#include <stdexcept>
+#include <vector>
 
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
+
+TEST_CASE("Sequenced pad feedback retains its playback classification",
+          "[direct-to-disk-recording][pad-feedback]")
+{
+    using namespace mpc;
+    using namespace mpc::performance;
+
+    bool startBounceBeforeNote = true;
+    bool offline = true;
+    SECTION("Offline press is processed after the bounce finishes") {}
+    SECTION("Realtime recording retains pad feedback")
+    {
+        offline = false;
+    }
+    SECTION("Normal playback retains pad feedback")
+    {
+        startBounceBeforeNote = false;
+        offline = false;
+    }
+    SECTION("Normal press is released during an offline bounce")
+    {
+        startBounceBeforeNote = false;
+    }
+
+    // Drive the audio-thread queues explicitly, without an offline worker, so
+    // the ordering at the bounce boundaries is deterministic.
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto engineHost = mpc.getEngineHost();
+    engineHost->getAudioServer()->setSampleRate(44100);
+    // DiskRecorder prepares detached writer threads. Start/stop the recorders
+    // normally and let those workers exit before destroying the test MPC.
+    struct BounceCleanup
+    {
+        std::shared_ptr<engine::EngineHost> host;
+        ~BounceCleanup()
+        {
+            host->stopBouncingEarly();
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        }
+    } bounceCleanup{engineHost};
+    const auto manager = mpc.getPerformanceManager().lock();
+    const auto program = mpc.getSampler()->getProgram(0);
+    program->setUsed();
+    program->initPadAssign();
+    mpc.getSequencer()->getSelectedSequence()->init(1);
+    mpc.getSequencer()
+        ->getDrumBus(DrumBusIndex(0))
+        ->setProgramIndex(ProgramIndex(0));
+    engineHost->drainAudioThreadStateQueues();
+    const auto note = program->getNoteFromPad(ProgramPadIndex(0));
+
+    std::vector<UiCallbackPadEventType> notifications;
+    manager->programPadEventUiCallback = ProgramPadEventUiCallback(
+        [&notifications](ProgramPadIndex, VelocityOrPressure,
+                         const UiCallbackPadEventType type)
+        {
+            notifications.push_back(type);
+        });
+
+    mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>()->offline =
+        offline;
+    const audiomidi::DirectToDiskSettings settings(44100, false, 44100,
+                                                   "pad-feedback");
+    const auto startBounce = [&]
+    {
+        engineHost->onBounceStart = utils::SimpleAction([] {});
+        REQUIRE(engineHost->startBouncing(&settings));
+        engineHost->changeBounceStateIfRequired();
+    };
+    if (startBounceBeforeNote)
+    {
+        startBounce();
+    }
+
+    EventData event;
+    event.type = EventType::NoteOn;
+    event.noteNumber = note;
+    event.velocity = MaxVelocity;
+    event.duration = Duration(96);
+    mpc.getEventHandler()->handleFinalizedEvent(event, TrackIndex(0), 100,
+                                                BusType::DRUM1, 0);
+
+    if (startBounceBeforeNote)
+    {
+        engineHost->stopBouncingEarly();
+        engineHost->changeBounceStateIfRequired();
+    }
+    else if (offline)
+    {
+        startBounce();
+    }
+
+    // The bounce state has changed before the press message is consumed.
+    manager->drainQueue();
+    const bool suppressed = startBounceBeforeNote && offline;
+    const auto source = suppressed ? PerformanceEventSource::SequenceOffline
+                                   : PerformanceEventSource::Sequence;
+    CHECK(manager->getSnapshot()
+              .findNoteOnEvent(source, note, NoMidiChannel)
+              .has_value());
+    CHECK(manager->getSnapshot()
+              .findProgramPadPress(source, ProgramPadIndex(0), ProgramIndex(0))
+              .has_value());
+    mpc.getLayeredScreen()->timerCallback();
+    CHECK(notifications.size() == (suppressed ? 0 : 1));
+
+    // Execute the actual captured release task under the changed bounce state.
+    engineHost->flushNoteOffs();
+    engineHost->prepareProcessBlock(512);
+    mpc.getLayeredScreen()->timerCallback();
+    CHECK(manager->getSnapshot().getTotalNoteOnCount() == 0);
+    CHECK_FALSE(manager->getSnapshot().isProgramPadPressed(ProgramPadIndex(0)));
+    if (suppressed)
+    {
+        CHECK(notifications.empty());
+    }
+    else
+    {
+        REQUIRE(notifications.size() == 2);
+        CHECK(notifications[0] == UiCallbackPadEventType::Press);
+        CHECK(notifications[1] == UiCallbackPadEventType::Release);
+    }
+    engineHost->stopBouncingEarly();
+    engineHost->changeBounceStateIfRequired();
+    engineHost->prepareProcessBlock(512);
+    mpc.getLayeredScreen()->timerCallback();
+}
+
+TEST_CASE("Offline source suppresses only program pad UI notifications",
+          "[direct-to-disk-recording][pad-feedback]")
+{
+    using namespace mpc;
+    using namespace mpc::performance;
+
+    std::vector<utils::Task> uiTasks;
+    const utils::PostToUiThreadFn postToUiThread(
+        [&uiTasks](utils::Task &&task)
+        {
+            uiTasks.push_back(std::move(task));
+        });
+    auto manager = std::make_unique<PerformanceManager>(postToUiThread);
+    std::vector<UiCallbackPadEventType> notifications;
+    manager->programPadEventUiCallback = ProgramPadEventUiCallback(
+        [&notifications](ProgramPadIndex, VelocityOrPressure,
+                         const UiCallbackPadEventType type)
+        {
+            notifications.push_back(type);
+        });
+
+    for (const auto source :
+         {PerformanceEventSource::SequenceOffline,
+          PerformanceEventSource::Sequence, PerformanceEventSource::MidiInput,
+          PerformanceEventSource::NoteRepeat,
+          PerformanceEventSource::VirtualMpcHardware})
+    {
+        CAPTURE(static_cast<int>(source));
+        manager->registerProgramPadPress(
+            source, std::nullopt, ScreenId::SequencerScreen, TrackIndex(0),
+            BusType::DRUM1, ProgramPadIndex(0), MaxVelocity, ProgramIndex(0),
+            NoPhysicalPadIndex);
+        manager->drainQueue();
+        CHECK(manager->getSnapshot().isProgramPadPressed(ProgramPadIndex(0)));
+        if (source == PerformanceEventSource::SequenceOffline)
+        {
+            CHECK_THROWS_AS(
+                manager->getSnapshot().getPressedProgramPadAfterTouchOrVelocity(
+                    ProgramPadIndex(0)),
+                std::invalid_argument);
+        }
+        manager->registerProgramPadAftertouch(source, ProgramPadIndex(0),
+                                              ProgramIndex(0), Pressure(64));
+        manager->drainQueue();
+        const auto press = manager->getSnapshot().findProgramPadPress(
+            source, ProgramPadIndex(0), ProgramIndex(0));
+        REQUIRE(press.has_value());
+        CHECK(press->pressure == Pressure(64));
+        manager->registerProgramPadRelease(source, ProgramPadIndex(0),
+                                           ProgramIndex(0));
+        manager->drainQueue();
+        CHECK_FALSE(
+            manager->getSnapshot().isProgramPadPressed(ProgramPadIndex(0)));
+
+        const bool suppressed =
+            source == PerformanceEventSource::SequenceOffline ||
+            source == PerformanceEventSource::VirtualMpcHardware;
+        CHECK(uiTasks.size() == (suppressed ? 0 : 3));
+        CHECK(notifications.empty());
+        for (auto &task : uiTasks)
+        {
+            task();
+        }
+        if (!suppressed)
+        {
+            REQUIRE(notifications.size() == 3);
+            CHECK(notifications[0] == UiCallbackPadEventType::Press);
+            CHECK(notifications[1] == UiCallbackPadEventType::Aftertouch);
+            CHECK(notifications[2] == UiCallbackPadEventType::Release);
+        }
+        uiTasks.clear();
+        notifications.clear();
+    }
+}
 
 TEST_CASE("Offline recording starts without leaking audio to live output",
           "[direct-to-disk-recording][issue-355]")

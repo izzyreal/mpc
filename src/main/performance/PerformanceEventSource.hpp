@@ -7,7 +7,8 @@ namespace mpc::performance
         VirtualMpcHardware,
         Sequence,
         MidiInput,
-        NoteRepeat
+        NoteRepeat,
+        SequenceOffline
     };
 
     /*

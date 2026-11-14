@@ -406,7 +406,8 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
         {
             activeState.programPadEvents.push_back(m);
 
-            if (m.source != PerformanceEventSource::VirtualMpcHardware)
+            if (m.source != PerformanceEventSource::VirtualMpcHardware &&
+                m.source != PerformanceEventSource::SequenceOffline)
             {
                 postToUiThread(utils::Task(
                     [this, padIndex = m.padIndex, velocity = m.velocity]
@@ -426,7 +427,9 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 {
                     e.pressure = m.pressure;
                     shouldUpdateUi =
-                        m.source != PerformanceEventSource::VirtualMpcHardware;
+                        m.source !=
+                            PerformanceEventSource::VirtualMpcHardware &&
+                        m.source != PerformanceEventSource::SequenceOffline;
                 }
             }
 
@@ -457,7 +460,8 @@ void PerformanceManager::applyMessage(const PerformanceMessage &msg) noexcept
                 activeState.programPadEvents.erase(it);
             }
 
-            if (m.source != PerformanceEventSource::VirtualMpcHardware)
+            if (m.source != PerformanceEventSource::VirtualMpcHardware &&
+                m.source != PerformanceEventSource::SequenceOffline)
             {
                 postToUiThread(utils::Task(
                     [this, padIndex = m.padIndex]

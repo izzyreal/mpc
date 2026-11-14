@@ -77,7 +77,8 @@ void NoteRepeatProcessor::process(EngineHost *engineHost,
 
     static constexpr std::initializer_list<PerformanceEventSource>
         sourcesToExclude{PerformanceEventSource::NoteRepeat,
-                         PerformanceEventSource::Sequence};
+                         PerformanceEventSource::Sequence,
+                         PerformanceEventSource::SequenceOffline};
 
     const bool sixteenLevelsIsEnabled = isSixteenLevelsEnabled();
 
