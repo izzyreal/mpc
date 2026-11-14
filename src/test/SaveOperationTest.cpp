@@ -900,7 +900,10 @@ TEST_CASE("Directory normalization reserves existing names and suffixes",
     TestMpc::initializeTestMpcWithoutIoServices(mpc);
     const auto location = mpc_fs::path(mpc.getDisk()->getAbsolutePath());
     const std::string extension = directories ? "" : ".SND";
-    std::vector<std::string> names{"KICK 1", "KICK1", "KICK1~1"};
+    // Keep every fixture name native 8.3-compatible. On Windows, "KICK 1"
+    // can acquire the alias "KICK1~1", so creating that suffix would reopen
+    // the first entry instead of creating a third one. MPC maps '^' to '_'.
+    std::vector<std::string> names{"KICK^1", "KICK_1", "KICK_1~1"};
     if (reverseCreationOrder)
     {
         std::reverse(names.begin(), names.end());
@@ -908,6 +911,8 @@ TEST_CASE("Directory normalization reserves existing names and suffixes",
     for (const auto &name : names)
     {
         auto path = location / (name + extension);
+        CAPTURE(name, directories, reverseCreationOrder);
+        REQUIRE_FALSE(MpcFile(path).exists());
         if (directories)
         {
             REQUIRE(mpc_fs::create_directory(path));
@@ -923,7 +928,7 @@ TEST_CASE("Directory normalization reserves existing names and suffixes",
             location, mpc.paths->getDocuments()->tempPath());
         for (const auto &original : names)
         {
-            const auto normalized = original == "KICK 1" ? "KICK1~2" : original;
+            const auto normalized = original == "KICK^1" ? "KICK_1~2" : original;
             auto path = location / (normalized + extension);
             if (directories)
             {
