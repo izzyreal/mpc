@@ -16,9 +16,11 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 
+#include <algorithm>
 #include <array>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 
 #include <kaitai/kaitaistream.h>
 
@@ -508,7 +510,15 @@ program_or_error PgmIo::loadProgram(mpc::Mpc &mpc,
         soundNames.reserve(parsed.sound_count());
         for (int i = 0; i < parsed.sound_count(); ++i)
         {
-            soundNames.push_back(stripNullTerminatedField(parsed.sound_names()->at(i)));
+            // Bytes after the terminator are opaque, including in empty
+            // sentinel entries. Validate only the meaningful name prefix.
+            auto name = stripNullTerminatedField(parsed.sound_names()->at(i));
+            if (std::any_of(name.begin(), name.end(),
+                            [](unsigned char c) { return c > 0x7F; }))
+            {
+                throw std::runtime_error("Invalid ASCII in PGM sound name");
+            }
+            soundNames.push_back(std::move(name));
         }
 
         const std::string programNameInData = mpc::StrUtil::trim(stripNullTerminatedField(parsed.name()));

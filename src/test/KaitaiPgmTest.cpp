@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "TestMpc.hpp"
 #include "Mpc.hpp"
@@ -6,6 +7,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/ProgramLoader.hpp"
+#include "lcdgui/screens/window/CantFindFileScreen.hpp"
 #include "engine/IndivFxMixer.hpp"
 #include "engine/EngineHost.hpp"
 #include "engine/StereoMixer.hpp"
@@ -24,6 +26,8 @@
 #include <kaitai/kaitaistream.h>
 
 #include <memory>
+#include <atomic>
+#include <thread>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -60,6 +64,30 @@ std::vector<char> rewriteProgram1WithMutations(
 
     const auto rewrittenBytes = writeStream.str();
     return std::vector<char>(rewrittenBytes.begin(), rewrittenBytes.end());
+}
+
+std::vector<char> programWithEmptySoundEntry(int sentinelIndex)
+{
+    return rewriteProgram1WithMutations(
+        [sentinelIndex](mpc2000xl_pgm_t& parsed)
+        {
+            auto names = std::make_unique<std::vector<std::string>>(
+                *parsed.sound_names());
+            // A real name may also have opaque bytes after its terminator.
+            names->at(0)[6] = '\0';
+            names->at(0)[7] = static_cast<char>(0xFE);
+            const std::string sentinel(
+                "\x00\x7f\x2c\x00\xa0\x8b\x2c\x00\x00\x00\x00\x00\x04\x00\x09\x00\x0a",
+                17);
+            names->insert(names->begin() + sentinelIndex, sentinel);
+            parsed.set_sound_names(std::move(names));
+            parsed.set_sound_count(3);
+            parsed.note_parameters()->at(0)->set_sound_index(
+                sentinelIndex == 0 ? 1 : 0);
+            parsed.note_parameters()->at(1)->set_sound_index(
+                sentinelIndex <= 1 ? 2 : 1);
+            parsed.note_parameters()->at(2)->set_sound_index(sentinelIndex);
+        });
 }
 
 std::vector<char> rewriteRealMpc3000ProgramWithMutations(
@@ -468,6 +496,107 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites PROGRAM1", "[kaitai-pgm]")
     parsed._write();
 
     REQUIRE(writeStream.str() == originalBytes);
+}
+
+TEST_CASE("PGM sound fields preserve opaque bytes after NUL",
+          "[kaitai-pgm][pgm-empty-sound]")
+{
+    const int sentinelIndex = GENERATE(0, 1, 2);
+    const auto bytes = programWithEmptySoundEntry(sentinelIndex);
+    const std::string original(bytes.begin(), bytes.end());
+    std::istringstream input(original, std::ios::binary);
+    kaitai::kstream io(&input);
+    mpc2000xl_pgm_t parsed(&io);
+    parsed._read();
+    REQUIRE(parsed.sound_names()->size() == 3);
+    CHECK(parsed.sound_names()->at(sentinelIndex).front() == '\0');
+    CHECK(static_cast<unsigned char>(
+              parsed.sound_names()->at(sentinelIndex).at(4)) == 0xA0);
+    std::stringstream output(std::ios::in | std::ios::out | std::ios::binary);
+    kaitai::kstream writeIo(&output);
+    parsed._set_io(&writeIo);
+    parsed._check();
+    parsed._write();
+    CHECK(output.str() == original);
+}
+
+TEST_CASE("PGM empty sound entries map to OFF without missing file dialogs",
+          "[kaitai-pgm][pgm-empty-sound]")
+{
+    const int sentinelIndex = GENERATE(0, 1, 2);
+    CAPTURE(sentinelIndex);
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto file = loadProgram1FileFromBytes(
+        mpc, programWithEmptySoundEntry(sentinelIndex));
+    const auto sampler = mpc.getSampler();
+    sampler->deleteAllPrograms(false);
+    sampler->deleteAllSamples();
+    const auto program =
+        sampler->createNewProgramAddFirstAvailableSlotAndThen({}).lock();
+    const auto missingScreen =
+        mpc.screens->get<mpc::lcdgui::ScreenId::CantFindFileScreen>();
+    std::atomic<bool> done{false};
+    std::exception_ptr error;
+    bool missingDialog = false;
+    std::thread worker([&]
+    {
+        try
+        {
+            auto result = mpc::disk::ProgramLoader::loadProgram(
+                mpc, file, program, 0);
+            if (!result)
+            {
+                throw std::runtime_error(result.error());
+            }
+        }
+        catch (...)
+        {
+            error = std::current_exception();
+        }
+        done = true;
+    });
+    while (!done)
+    {
+        mpc.getLayeredScreen()->timerCallback();
+        if (missingScreen->waitingForUser)
+        {
+            missingDialog = true;
+            missingScreen->function(1); // Allow a regression to fail, not hang.
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    worker.join();
+    if (error)
+    {
+        std::rethrow_exception(error);
+    }
+    mpc.getPerformanceManager().lock()->drainQueue();
+    CHECK_FALSE(missingDialog);
+    REQUIRE(sampler->getSoundCount() == 2);
+    CHECK(sampler->getSoundName(0) == "sound1");
+    CHECK(sampler->getSoundName(1) == "sound2");
+    CHECK(program->getNoteParameters(35)->getSoundIndex() == 0);
+    CHECK(program->getNoteParameters(36)->getSoundIndex() == 1);
+    CHECK(program->getNoteParameters(37)->getSoundIndex() == -1);
+}
+
+TEST_CASE("PGM nonempty sound names still require ASCII",
+          "[kaitai-pgm][pgm-empty-sound]")
+{
+    const auto bytes = rewriteProgram1WithMutations(
+        [](mpc2000xl_pgm_t& parsed)
+        {
+            auto names = std::make_unique<std::vector<std::string>>(
+                *parsed.sound_names());
+            names->at(0)[0] = static_cast<char>(0x80);
+            parsed.set_sound_names(std::move(names));
+        });
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    std::vector<std::string> names;
+    CHECK_THROWS_AS(loadProgram1ViaPgmIoFromBytes(mpc, bytes, names),
+                    std::runtime_error);
 }
 
 TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-pgm][real-2kxl]")

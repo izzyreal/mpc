@@ -63,7 +63,7 @@ void mpc2000xl_pgm_t::_read() {
     m_sound_names = std::unique_ptr<std::vector<std::string>>(new std::vector<std::string>());
     const int l_sound_names = sound_count();
     for (int i = 0; i < l_sound_names; i++) {
-        m_sound_names->push_back(std::move(kaitai::kstream::bytes_to_str(m__io->read_bytes(17), "ASCII")));
+        m_sound_names->push_back(std::move(m__io->read_bytes(17)));
     }
     m__unnamed3 = m__io->read_bytes(2);
     m_name = kaitai::kstream::bytes_to_str(m__io->read_bytes(17), "ASCII");

@@ -110,6 +110,12 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
 
                 for (auto &localEntry : *pgmFileSoundTable)
                 {
+                    // Keep the table slot so later indices do not shift, but
+                    // an empty name denotes OFF rather than a missing sample.
+                    if (localEntry.second.empty())
+                    {
+                        continue;
+                    }
                     std::string foundExtension;
                     auto soundFile = findSoundFileByFilenameWithoutExtension(
                         mpc, localEntry.second, foundExtension);
@@ -154,6 +160,11 @@ ProgramLoader::loadProgram(Mpc &mpc, const std::shared_ptr<MpcFile> &file,
                 for (auto &convertedEntry : *convertedTable)
                 {
                     const auto pgmFileSoundName = convertedEntry.second;
+                    if (pgmFileSoundName.empty())
+                    {
+                        convertedEntry.first = -1;
+                        continue;
+                    }
                     bool wasFoundInGlobalTable = false;
 
                     for (auto &samplerEntry : samplerSoundTable)
