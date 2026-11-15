@@ -201,9 +201,9 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
     hardware.lock()->getLed(BANK_D_LED)->setEnabled(activeBank == Bank::D);
 
     layeredScreen.lock()->postToUiThread(utils::Task(
-        [this]
+        [this, bank = activeBankToUse]
         {
-            setActiveBankUiCallback(activeBank);
+            setActiveBankUiCallback(bank);
         }));
 }
 
