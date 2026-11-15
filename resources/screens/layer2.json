@@ -260,11 +260,15 @@
  },
 "insert-event":
 {
- "labels" : [ "Type:", "Bytes:" ],
- "x" : [ 55, 55 ],
- "y" : [ 27, 38 ],
+ "labels" : [ "Type:", "" ],
+ "x" : [ 37, 157 ],
+ "y" : [ 27, 27 ],
  "tfsize" : [ 84, 18 ],
  "parameters" : [ "eventtype", "bytes" ],
+ "infowidgets" : [ "byte-unit" ],
+ "infox" : [ 175 ],
+ "infoy" : [ 26 ],
+ "infosize" : [ 24 ],
  "fblabels" : [ null, null, null, "CANCEL", "DO IT", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
 },

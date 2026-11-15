@@ -28,6 +28,30 @@ using namespace mpc;
 using namespace mpc::client::event;
 using namespace mpc::lcdgui;
 
+TEST_CASE("Bank UI callbacks retain each queued bank selection", "[pad-bank]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    std::vector<controller::Bank> banks;
+    mpc.clientEventController->setActiveBankUiCallback =
+        controller::SetActiveBankUiCallback(
+            [&banks](const controller::Bank bank)
+            {
+                banks.push_back(bank);
+            });
+    for (const auto bank :
+         {controller::Bank::B, controller::Bank::C, controller::Bank::A})
+    {
+        mpc.clientEventController->setActiveBank(bank);
+    }
+    CHECK(banks.empty());
+    mpc.getLayeredScreen()->timerCallback();
+    REQUIRE(banks.size() == 3);
+    CHECK(banks[0] == controller::Bank::B);
+    CHECK(banks[1] == controller::Bank::C);
+    CHECK(banks[2] == controller::Bank::A);
+}
+
 namespace
 {
     ClientHardwareEvent makePadEvent(const ClientHardwareEvent::Type type)

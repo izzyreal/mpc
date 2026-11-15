@@ -17,9 +17,14 @@ void SystemExclusiveEvent::setByte(size_t i, int value) const
     {
         return;
     }
+    if ((i == 0 && getByte(i) == 0xF0) ||
+        (i == getByteCount() - 1 && getByte(i) == 0xF7))
+    {
+        return;
+    }
     SysExPayloadOwner edited(snapshot.sysExPayload->pool->acquireEdited(
         snapshot.sysExPayload, i,
-        static_cast<uint8_t>(std::clamp(value, 0, 255))));
+        static_cast<uint8_t>(std::clamp(value, 0, 0x7F))));
     if (!edited.get())
     {
         return;

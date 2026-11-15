@@ -27,9 +27,15 @@ void InsertEventScreen::open()
 void InsertEventScreen::displayInsertEventType() const
 {
     findField("eventtype")->setText(eventTypeNames[insertEventType]);
-    findField("bytes")->Hide(insertEventType != 6);
-    findLabel("bytes")->Hide(insertEventType != 6);
-    findField("bytes")->setTextPadded(sysExByteCount);
+    const bool showBytes = insertEventType == 6;
+    const auto bytesField = findField("bytes");
+    bytesField->Hide(!showBytes);
+    findLabel("bytes")->Hide(!showBytes);
+    bytesField->setTextPadded(sysExByteCount);
+
+    const auto byteUnit = findLabel("byte-unit");
+    byteUnit->Hide(!showBytes);
+    byteUnit->setText("Byte");
 }
 
 void InsertEventScreen::function(const int i)

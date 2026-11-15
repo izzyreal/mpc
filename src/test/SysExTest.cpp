@@ -16,6 +16,7 @@
 #include "file/kaitai/generated/mpc2000xl_all.h"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/Field.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 #include "lcdgui/screens/window/PasteEventScreen.hpp"
@@ -708,8 +709,19 @@ TEST_CASE("Step editor inserts bounded SysEx and scrolls through every byte",
     const auto insert = mpc.screens->get<lcdgui::ScreenId::InsertEventScreen>();
     REQUIRE(screen->setFocus("eventtype"));
     insert->turnWheel(6);
+    const auto bytesField = insert->findField("bytes");
+    const auto byteUnit = insert->findLabel("byte-unit");
+    REQUIRE(bytesField);
+    REQUIRE(byteUnit);
+    CHECK(bytesField->getText() == "  2");
+    const auto bytesRect = bytesField->getRect();
+    const auto unitRect = byteUnit->getRect();
     REQUIRE(screen->setFocus("bytes"));
     insert->turnWheel(1000);
+    CHECK(bytesField->getText() == "128");
+    CHECK(bytesField->getRect().L == bytesRect.L);
+    CHECK(bytesField->getRect().R == bytesRect.R);
+    CHECK(byteUnit->getRect().L == unitRect.L);
     insert->function(4);
     manager->drainQueue();
     screen->timerCallback();
@@ -733,8 +745,22 @@ TEST_CASE("Step editor inserts bounded SysEx and scrolls through every byte",
     step->right(); // At the last byte, stay put.
     step->turnWheel(-1);
     manager->drainQueue();
-    CHECK(track->getEvent(0)->snapshot.getSysExByte(127) == 0xF6);
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(127) == 0xF7);
     CHECK(track->getEvent(0)->snapshot.getSysExByte(126) == 0);
+    step->left();
+    step->turnWheel(1000);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(126) == 0x7F);
+    step->turnWheel(1);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(126) == 0x7F);
+    step->turnWheel(-1000);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(126) == 0);
+    step->turnWheel(1);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(126) == 1);
+    step->right();
     for (int i = 0; i < 127; ++i)
     {
         step->left();
@@ -742,6 +768,9 @@ TEST_CASE("Step editor inserts bounded SysEx and scrolls through every byte",
     CHECK(screen->getFocusedFieldName() == "a0");
     step->left();
     CHECK(screen->getFocusedFieldName() == "a0");
+    step->turnWheel(-1);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(0) == 0xF0);
 }
 
 TEST_CASE("SysEx MIDI output retains its payload until consumed",
@@ -948,8 +977,13 @@ TEST_CASE(
     }
     step->turnWheel(-1);
     manager->drainQueue();
-    CHECK(track->getEvent(0)->snapshot.getSysExByte(511) == 0xF6);
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(511) == 0xF7);
     CHECK(step->getPlaceHolder()[0].getSysExByte(511) == 0xF7);
+    step->left();
+    step->turnWheel(-1);
+    manager->drainQueue();
+    CHECK(track->getEvent(0)->snapshot.getSysExByte(510) == 125);
+    CHECK(step->getPlaceHolder()[0].getSysExByte(510) == 126);
 }
 
 TEST_CASE("Live MIDI recording and playback keep complete SysEx",
