@@ -1,3 +1,8 @@
+## v0.9.20 (15-11-2026)
+* Fix loading of ALL files with SysEx.
+* Fix various PGM and APS sound mapping bugs.
+* Disable pad glows for sequenced events during offline recording.
+
 ## v0.9.19 (17-10-2026)
 * Fix short audible burst at start of offline rendering.
 * Fix applying 'Shift timing' after recording.
