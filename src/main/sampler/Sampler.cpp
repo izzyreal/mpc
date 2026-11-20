@@ -814,7 +814,15 @@ void Sampler::playX()
 
 std::shared_ptr<Sound> Sampler::getPlayXSound()
 {
-    return getSortedSounds()[soundIndex].first;
+    const auto sortedSounds = getSortedSounds();
+
+    if (soundIndex < 0 ||
+        static_cast<std::size_t>(soundIndex) >= sortedSounds.size())
+    {
+        return {};
+    }
+
+    return sortedSounds[soundIndex].first;
 }
 
 int Sampler::getFreeSampleSpace() const

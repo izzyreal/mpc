@@ -435,6 +435,30 @@ TEST_CASE("Assign screen parameter follows assigned note and edits that note", "
     REQUIRE(program->getNoteParameters(42)->getSliderParameterNumber() == mpc::NoteVariationTypeFilter);
 }
 
+TEST_CASE("PLAYX sound lookup handles an empty sampler", "[sampler]")
+{
+    Mpc mpc;
+    TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sampler = mpc.getSampler();
+
+    REQUIRE(sampler->getPlayXSound() == nullptr);
+
+    const auto sound = sampler->addSound();
+    REQUIRE(sampler->getPlayXSound() == sound);
+
+    SECTION("Delete the last sound")
+    {
+        sampler->deleteSound(sound);
+    }
+
+    SECTION("Delete all sounds")
+    {
+        sampler->deleteAllSamples();
+    }
+
+    REQUIRE(sampler->getPlayXSound() == nullptr);
+}
+
 TEST_CASE("Delete sound 1", "[sampler]")
 {
     Mpc mpc;
