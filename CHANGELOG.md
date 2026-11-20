@@ -1,3 +1,7 @@
+## v0.9.21 (20-11-2026)
+* Fix MID file parser. It was reading track numbers and MIDI devices incorrectly in some cases.
+* Fix crash when trying to use PLAYX (or just hitting a pad) while in TRIM/LOOP/ZONE with no sounds.
+
 ## v0.9.20 (15-11-2026)
 * Fix loading of ALL files with SysEx.
 * Fix various PGM and APS sound mapping bugs.
