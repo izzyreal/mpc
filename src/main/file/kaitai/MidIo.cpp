@@ -17,8 +17,11 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <charconv>
 #include <iomanip>
+#include <optional>
 #include <sstream>
+#include <string_view>
 
 using namespace mpc::file::kaitai;
 
@@ -26,6 +29,64 @@ namespace {
 
 using midi_t = standard_midi_file_with_running_status_t;
 using meta_type_t = midi_t::meta_event_body_t::meta_type_enum_t;
+
+struct TrackData
+{
+    int trackIndex;
+    int deviceIndex;
+    mpc::sequencer::BusType busType;
+    bool on;
+};
+
+std::optional<int> readHexByte(const std::string_view text)
+{
+    if (text.size() != 2)
+    {
+        return std::nullopt;
+    }
+    int value = 0;
+    const auto result =
+        std::from_chars(text.data(), text.data() + 2, value, 16);
+    if (result.ec != std::errc{} || result.ptr != text.data() + 2 || value < 0)
+    {
+        return std::nullopt;
+    }
+    return value;
+}
+
+std::optional<TrackData> readTrackData(const std::string_view text)
+{
+    constexpr std::string_view prefix = "TRACK DATA:";
+    if (text.substr(0, prefix.size()) != prefix)
+    {
+        return std::nullopt;
+    }
+    const auto payload = text.substr(prefix.size());
+    if (payload.size() < 4)
+    {
+        return std::nullopt;
+    }
+    const auto track = readHexByte(payload.substr(0, 2));
+    const auto flags = readHexByte(payload.substr(2, 2));
+    if (!track || *track > mpc::Mpc2000XlSpecs::LAST_TRACK_INDEX || !flags)
+    {
+        return std::nullopt;
+    }
+    auto bus = mpc::sequencer::BusType::DRUM1;
+    if (payload.size() >= 16)
+    {
+        const auto index = readHexByte(payload.substr(14, 2));
+        if (!index || *index > mpc::Mpc2000XlSpecs::LAST_BUS_INDEX)
+        {
+            return std::nullopt;
+        }
+        bus = mpc::sequencer::busIndexToBusType(*index);
+    }
+    // The upper bits are flags, not part of the device number. Bit 5
+    // enables MIDI output; the low five bits hold its zero-based device.
+    return TrackData{*track, (*flags & 0x20) ? (*flags & 0x1F) + 1 : 0, bus,
+                     (*flags & 0x80) != 0};
+}
 
 std::string asciiBody(const std::string& body)
 {
@@ -384,26 +445,22 @@ std::vector<char> buildSequenceTrack(const std::shared_ptr<mpc::sequencer::Seque
     });
 
     const auto deviceIndex = track->getDeviceIndex();
-    const auto trackNumber = zeroPad3(track->getIndex()).substr(1, 2);
-    const auto trackDevice =
-        deviceIndex == 0 ? std::string("C0") : hexByte(0xE0 + deviceIndex - 1);
+    const auto trackNumber = hexByte(track->getIndex());
+    const auto trackDevice = hexByte(
+        (track->isOn() ? 0x80 : 0) |
+        (mpc::sequencer::isDrumBusType(track->getBusType()) ? 0x40 : 0) |
+        (deviceIndex == 0 ? 0 : (0x20 | (deviceIndex - 1))));
     const auto deviceNumber = hexByte(deviceIndex);
     const auto busIndex = hexByte(static_cast<int>(mpc::sequencer::busTypeToIndex(track->getBusType())));
+    const auto trackStatus =
+        hexByte((track->isUsed() ? 1 : 0) | (track->isOn() ? 2 : 0) |
+                (track->isTransmitProgramChangesEnabled() ? 4 : 0));
     events.push_back(TimedMidiEvent{
-        0,
-        1,
-        metaEventBytes(
-            0x01,
-            stringPayload(
-                "TRACK DATA:" +
-                trackNumber +
-                trackDevice +
-                "006403  " +
-                deviceNumber +
-                busIndex +
-                deviceNumber +
-                "   "))
-    });
+        0, 1,
+        metaEventBytes(0x01,
+                       stringPayload("TRACK DATA:" + trackNumber + trackDevice +
+                                     "006403  " + deviceNumber + busIndex +
+                                     trackStatus + "   "))});
     events.push_back(TimedMidiEvent{
         0,
         2,
@@ -688,13 +745,12 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
     updateSequenceTracks.trackStates = &stateManager->trackStatesSnapshots[sequenceIndex];
     *updateSequenceTracks.trackStates = mpc::sequencer::SequenceTrackStatesSnapshot();
 
-    const std::string trackDataPrefix = "TRACK DATA:";
-
     for (size_t i = 0; i < parsed.tracks()->size() && i < 64; ++i)
     {
         auto resolvedTrackIndex = static_cast<int>(i);
         auto deviceIndex = 0;
         auto busType = mpc::sequencer::BusType::DRUM1;
+        bool on = true;
 
         for (const auto& eventPtr : *parsed.tracks()->at(i)->events()->event())
         {
@@ -704,26 +760,14 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
                 continue;
             }
 
-            const auto body = asciiBody(meta->body());
-            if (body.rfind(trackDataPrefix, 0) != 0)
+            if (const auto data = readTrackData(meta->body()))
             {
-                continue;
+                resolvedTrackIndex = data->trackIndex;
+                deviceIndex = data->deviceIndex;
+                busType = data->busType;
+                on = data->on;
+                break;
             }
-
-            const auto payload = body.substr(trackDataPrefix.size());
-            resolvedTrackIndex = std::stoi(payload.substr(0, 2));
-
-            const auto deviceIndexStr = payload.substr(2, 2);
-            if (deviceIndexStr != "C0")
-            {
-                deviceIndex = std::stoi(deviceIndexStr, nullptr, 16) - std::stoi(std::string("E0"), nullptr, 16) + 1;
-            }
-
-            if (payload.size() >= 16)
-            {
-                busType = mpc::sequencer::busIndexToBusType(std::stoi(payload.substr(14, 2), nullptr, 16));
-            }
-            break;
         }
 
         if (resolvedTrackIndex < 0 || resolvedTrackIndex > mpc::Mpc2000XlSpecs::LAST_TRACK_INDEX)
@@ -734,6 +778,7 @@ bool loadGenericStandardMidi(mpc::Mpc& mpc,
         auto& trackState = (*updateSequenceTracks.trackStates)[resolvedTrackIndex];
         trackState.busType = busType;
         trackState.deviceIndex = deviceIndex;
+        trackState.on = on;
         std::string pendingTrackName;
         bool hasPendingTrackName = false;
         bool hasImportedEvents = false;
@@ -1138,6 +1183,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
         auto trackIndex = static_cast<int>(trackContainerIndex - 1);
         auto deviceIndex = 0;
         auto busType = mpc::sequencer::BusType::DRUM1;
+        bool on = true;
 
         for (const auto& eventPtr : *midiTrack->events()->event())
         {
@@ -1148,26 +1194,14 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
                 continue;
             }
 
-            const auto body = asciiBody(meta->body());
-            if (body.find("TRACK DATA:") == std::string::npos)
+            if (const auto data = readTrackData(meta->body()))
             {
-                continue;
+                trackIndex = data->trackIndex;
+                deviceIndex = data->deviceIndex;
+                busType = data->busType;
+                on = data->on;
+                break;
             }
-
-            const auto payload = body.substr(std::string("TRACK DATA:").length());
-            trackIndex = std::stoi(payload.substr(0, 2));
-            if (payload.substr(2, 2) != "C0")
-            {
-                deviceIndex =
-                    std::stoi(payload.substr(2, 2), nullptr, 16) -
-                    std::stoi(std::string("E0"), nullptr, 16) + 1;
-            }
-            if (payload.size() >= 16)
-            {
-                busType = mpc::sequencer::busIndexToBusType(
-                    std::stoi(payload.substr(14, 2), nullptr, 16));
-            }
-            break;
         }
 
         if (trackIndex < 0 ||
@@ -1480,6 +1514,7 @@ bool tryLoadMpc2000xl(mpc::Mpc& mpc,
         auto& trackState = (*updateSequenceTracks.trackStates)[trackIndex];
         trackState.busType = busType;
         trackState.deviceIndex = deviceIndex;
+        trackState.on = on;
         trackState.used = hasImportedEvents;
 
         if (hasPendingTrackName)

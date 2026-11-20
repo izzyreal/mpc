@@ -163,6 +163,10 @@ void Sequence::setDeviceName(const int i, const std::string &s)
 
 std::string Sequence::getDeviceName(const int i)
 {
+    if (i < 0 || static_cast<size_t>(i) >= deviceNames.size())
+    {
+        return {};
+    }
     return deviceNames[i];
 }
 

@@ -19,6 +19,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Transport.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <kaitai/kaitaistream.h>
@@ -1551,4 +1552,237 @@ TEST_CASE(
         parsed._read();
         REQUIRE(std::fabs(parsed.tempo_bpm() - 60000000.0 / mpqn) < 0.000001);
     }
+}
+
+namespace
+{
+    struct RoutingFixtureTrack
+    {
+        std::string data;
+        std::string name;
+        int index;
+        int device;
+        mpc::sequencer::BusType bus;
+        bool on;
+    };
+
+    void appendRoutingVlq(std::string &bytes, unsigned value)
+    {
+        uint8_t reversed[4];
+        int count = 0;
+        reversed[count++] = value & 127;
+        while ((value >>= 7))
+        {
+            reversed[count++] = 128 | (value & 127);
+        }
+        while (count)
+        {
+            bytes.push_back(static_cast<char>(reversed[--count]));
+        }
+    }
+
+    void appendRoutingMeta(std::string &track, uint8_t type,
+                           const std::string &body)
+    {
+        track.append("\x00\xff", 2);
+        track.push_back(static_cast<char>(type));
+        appendRoutingVlq(track, body.size());
+        track += body;
+    }
+
+    std::vector<char> routingMidi(const std::vector<RoutingFixtureTrack> &rows,
+                                  bool mpcHeader)
+    {
+        std::vector<std::string> tracks(1);
+        appendRoutingMeta(tracks.front(), 3,
+                          mpcHeader ? "MPC2000XL 1.00  ROUTING         "
+                                    : "GENERIC");
+        tracks.front().append("\x00\xff\x2f\x00", 4);
+        for (const auto &row : rows)
+        {
+            std::string track;
+            appendRoutingMeta(track, 3, row.name);
+            appendRoutingMeta(track, 1, row.data);
+            if (row.name == "VIRUS-ARR")
+            {
+                for (int i = 0; i < 17; ++i)
+                {
+                    appendRoutingVlq(track, i == 0 ? 0 : 19);
+                    track.push_back(char(0xF0));
+                    appendRoutingVlq(track, 266);
+                    std::string payload(266, '\0');
+                    payload.front() = 0x47;
+                    payload.back() = char(0xF7);
+                    track += payload;
+                }
+            }
+            track.append("\x00\x90\x3c\x64\x18\x80", 6);
+            track.push_back(mpcHeader ? 0 : 60);
+            track.push_back(mpcHeader ? 64 : 0);
+            track.append("\x00\xff\x2f\x00", 4);
+            tracks.push_back(std::move(track));
+        }
+        std::string bytes("MThd\x00\x00\x00\x06\x00\x01", 10);
+        bytes.push_back(0);
+        bytes.push_back(static_cast<char>(tracks.size()));
+        bytes.append("\x00\x60", 2);
+        for (const auto &track : tracks)
+        {
+            bytes += "MTrk";
+            for (int shift : {24, 16, 8, 0})
+            {
+                bytes.push_back(
+                    static_cast<char>((track.size() >> shift) & 255));
+            }
+            bytes += track;
+        }
+        return {bytes.begin(), bytes.end()};
+    }
+} // namespace
+
+TEST_CASE("MIDI track routing decodes hexadecimal indices and packed flags",
+          "[kaitai-mid][midi-routing]")
+{
+    using mpc::sequencer::BusType;
+    // The first four records reproduce routing metadata from Max's TRANCEPO.
+    const std::vector<RoutingFixtureTrack> rows{
+        {"TRACK DATA:00C0020D03  000107   ", "909HIHAT", 0, 0, BusType::DRUM1,
+         true},
+        {"TRACK DATA:0140005703  000105   ", "909CLAP", 1, 0, BusType::DRUM1,
+         false},
+        {"TRACK DATA:0A40004103  000105   ", "Tom_hi_3", 10, 0, BusType::DRUM1,
+         false},
+        {"TRACK DATA:0F20006403  010005   ", "VIRUS-ARR", 15, 1, BusType::MIDI,
+         false},
+        {"TRACK DATA:10A0006403  010007   ", "MIDI ON", 16, 1, BusType::MIDI,
+         true},
+        {"TRACK DATA:1FBF006403  200007   ", "16B ON", 31, 32, BusType::MIDI,
+         true},
+        {"TRACK DATA:20C0006403  000207   ", "DRUM2", 32, 0, BusType::DRUM2,
+         true},
+        {"TRACK DATA:3f7F006403  200405   ", "16B OFF", 63, 32, BusType::DRUM4,
+         false},
+    };
+    bool mpcHeader = true;
+    SECTION("MPC2000XL metadata track")
+    {
+        mpcHeader = true;
+    }
+    SECTION("Generic MIDI with MPC track metadata")
+    {
+        mpcHeader = false;
+    }
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sequence =
+        loadSequenceWithMidIo(mpc, routingMidi(rows, mpcHeader), "ROUTING.MID");
+    for (const auto &row : rows)
+    {
+        CAPTURE(row.name, row.index);
+        const auto track = sequence->getTrack(row.index);
+        CHECK(track->getName() == row.name);
+        CHECK(track->getDeviceIndex() == row.device);
+        CHECK(track->getBusType() == row.bus);
+        CHECK(track->isOn() == row.on);
+        CHECK(track->getNoteEvents().size() == 1);
+    }
+    int messages = 0;
+    for (const auto &event : sequence->getTrack(15)->getEvents())
+    {
+        if (const auto sysex =
+                std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(
+                    event))
+        {
+            CHECK(sysex->getByteCount() == 267);
+            ++messages;
+        }
+    }
+    CHECK(messages == 17);
+    const auto saved = saveSequenceWithMidIo(sequence);
+    const std::string encoded(saved.begin(), saved.end());
+    CHECK(encoded.find("TRACK DATA:0F20006403  010005   ") !=
+          std::string::npos);
+    CHECK(encoded.find("TRACK DATA:10A0") != std::string::npos);
+    CHECK(encoded.find("TRACK DATA:1FBF") != std::string::npos);
+    CHECK(encoded.find("TRACK DATA:3F7F") != std::string::npos);
+}
+
+TEST_CASE("MIDI saving preserves all 64 track positions and routing states",
+          "[kaitai-mid][midi-routing]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sequencer = mpc.getSequencer();
+    const auto manager = sequencer->getStateManager();
+    const auto source = sequencer->getSequence(0);
+    source->init(0);
+    manager->drainQueue();
+    for (int i = 0; i < 64; ++i)
+    {
+        const auto track = source->getTrack(i);
+        track->setBusType(mpc::sequencer::busIndexToBusType(i % 5));
+        track->setDeviceIndex(i % 33);
+        track->setOn(i % 2 == 0);
+        insertNote(track, 0, 35 + i % 64, 100, 24, mpc::NoteVariationTypeTune,
+                   64);
+        manager->drainQueue();
+        track->setName("TRACK" + std::to_string(i + 1));
+        manager->drainQueue();
+    }
+    const auto loaded = loadSequenceWithMidIo(
+        mpc, saveSequenceWithMidIo(source), "ROUNDTRIP.MID");
+    for (int i = 0; i < 64; ++i)
+    {
+        CAPTURE(i);
+        const auto track = loaded->getTrack(i);
+        auto expectedName = "TRACK" + std::to_string(i + 1);
+        expectedName.resize(16, ' ');
+        CHECK(track->getName() == expectedName);
+        CHECK(track->getBusType() == mpc::sequencer::busIndexToBusType(i % 5));
+        CHECK(track->getDeviceIndex() == i % 33);
+        CHECK(track->isOn() == (i % 2 == 0));
+        const auto notes = track->getNoteEvents();
+        REQUIRE(notes.size() == 1);
+        CHECK(notes[0]->getNote() == 35 + i % 64);
+    }
+}
+
+TEST_CASE("Malformed MIDI track metadata cannot introduce invalid routing",
+          "[kaitai-mid][midi-routing]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    for (const std::string data :
+         {"TRACK DATA:", "TRACK DATA:0", "TRACK DATA:GG20", "TRACK DATA:0?20",
+          "TRACK DATA:4020", "TRACK DATA:0FGG", "TRACK DATA:-120",
+          "TRACK DATA:0F-1", "TRACK DATA:0F20006403  01FF05   ",
+          "TRACK DATA:0F20006403  01-105   ", "garbageTRACK DATA:0F20"})
+    {
+        CAPTURE(data);
+        const auto sequence = loadSequenceWithMidIo(
+            mpc,
+            routingMidi(
+                {{data, "INVALID", 0, 0, mpc::sequencer::BusType::DRUM1, true}},
+                true),
+            "INVALID.MID");
+        const auto track = sequence->getTrack(0);
+        CHECK(track->getName() == "INVALID");
+        CHECK(track->getDeviceIndex() == 0);
+        CHECK(track->getBusType() == mpc::sequencer::BusType::DRUM1);
+        CHECK(track->isOn());
+        CHECK(track->getNoteEvents().size() == 1);
+    }
+}
+
+TEST_CASE("Invalid device-name indices return an empty name", "[midi-routing]")
+{
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpcWithoutIoServices(mpc);
+    const auto sequence = mpc.getSequencer()->getSequence(0);
+    sequence->setDeviceName(31, "LAST");
+    CHECK(sequence->getDeviceName(31) == "LAST");
+    CHECK(sequence->getDeviceName(-1).empty());
+    CHECK(sequence->getDeviceName(32).empty());
+    CHECK(sequence->getDeviceName(64).empty());
+    CHECK(sequence->getDeviceName(255).empty());
 }
