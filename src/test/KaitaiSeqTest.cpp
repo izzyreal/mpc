@@ -30,7 +30,7 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/Transport.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -41,7 +41,6 @@
 #include <thread>
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 namespace
 {
@@ -71,7 +70,7 @@ std::shared_ptr<mpc::disk::MpcFile> prepareSeqFile(
     const std::string &resourcePath,
     const std::string &fileName)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(resourcePath);
     std::vector<char> data(file.begin(), file.end());
     return prepareSeqFile(mpc, data, fileName);
@@ -568,7 +567,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real duration-mutated note
 TEST_CASE("Kaitai MPC3000 SEQ production load imports loop header state",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KNOTE.SEQ");
     std::vector<char> data(file.begin(), file.end());
     setLoopToBar(data, true, 2);
@@ -598,7 +597,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports loop header state",
 TEST_CASE("Kaitai MPC3000 SEQ production load applies bar time-signature events",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KNOTE.SEQ");
     std::vector<char> data(file.begin(), file.end());
     mutateBarEvent(data, 2, 3, 8);
@@ -664,7 +663,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load applies bar time-signature events"
 TEST_CASE("Kaitai MPC3000 SEQ production load maps MIDI track header fields",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KMIN.SEQ");
     std::vector<char> data(file.begin(), file.end());
     setTrackHeaderFlags(data, 0, true, true, false);
@@ -700,7 +699,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load maps MIDI track header fields",
 TEST_CASE("Kaitai MPC3000 SEQ production load maps sparse additional track headers by user track number",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KMIN.SEQ");
     std::vector<char> data(file.begin(), file.end());
 
@@ -822,7 +821,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real loop-enabled fixture"
 TEST_CASE("Kaitai MPC3000 SEQ production load derives initial tempo from tick-zero tempo change",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KNOTE.SEQ");
     std::vector<char> data(file.begin(), file.end());
 
@@ -858,7 +857,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load derives initial tempo from tick-ze
 TEST_CASE("Kaitai MPC3000 SEQ production load imports additional tempo changes as ratio events",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KNOTE.SEQ");
     std::vector<char> data(file.begin(), file.end());
 
@@ -1027,7 +1026,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load imports real program change fixtur
 TEST_CASE("Kaitai MPC3000 SEQ production load decodes two-byte pitch bend payload",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KPC.SEQ");
     std::vector<char> data(file.begin(), file.end());
     replaceProgramChangeWithPitchBend(data, 0x00, 0x40);
@@ -1064,7 +1063,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load decodes two-byte pitch bend payloa
 TEST_CASE("Kaitai MPC3000 SEQ production load decodes minimum pitch bend payload",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KPC.SEQ");
     std::vector<char> data(file.begin(), file.end());
     replaceProgramChangeWithPitchBend(data, 0x00, 0x00);
@@ -1097,7 +1096,7 @@ TEST_CASE("Kaitai MPC3000 SEQ production load decodes minimum pitch bend payload
 TEST_CASE("Kaitai MPC3000 SEQ production load decodes maximum pitch bend payload",
           "[kaitai-seq]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Seq/M3KPC.SEQ");
     std::vector<char> data(file.begin(), file.end());
     replaceProgramChangeWithPitchBend(data, 0x7f, 0x7f);

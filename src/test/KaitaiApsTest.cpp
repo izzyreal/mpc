@@ -23,7 +23,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
@@ -32,14 +32,13 @@
 #include <string>
 #include <string_view>
 
-CMRC_DECLARE(mpctest);
 
 namespace {
 
 std::vector<char> rewriteAllPgmsApsWithMutations(
     const std::function<void(mpc2000xl_aps_t&)>& mutate)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -158,7 +157,7 @@ void applyBroadApsMutation(mpc2000xl_aps_t& parsed)
 void prepareApsResources(mpc::Mpc& mpc)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
 
     for (auto&& entry : fs.iterate_directory("test/ApsLoading")) {
         auto file = fs.open("test/ApsLoading/" + entry.filename());
@@ -176,7 +175,7 @@ std::shared_ptr<mpc::disk::MpcFile> installApsResourceFile(
     const std::string& fileName)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(resourcePath);
     std::vector<char> data(file.begin(), file.end());
     auto newFile = disk->newFile(fileName);
@@ -218,7 +217,7 @@ void loadAllPgmsApsWithoutRender(mpc::Mpc& mpc, const std::vector<char>& apsByte
 
 TEST_CASE("Kaitai MPC2000 APS parses and rewrites ALL_PGMS", "[kaitai-aps]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -265,7 +264,7 @@ TEST_CASE("Kaitai MPC2000 APS parses and rewrites ALL_PGMS", "[kaitai-aps]")
 
 TEST_CASE("Kaitai MPC3000 APS parses a real hardware ALL_PGMS", "[kaitai-aps][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -337,7 +336,7 @@ TEST_CASE("Kaitai MPC3000 APS parses a real hardware ALL_PGMS", "[kaitai-aps][re
 
 TEST_CASE("Kaitai MPC2000 APS parses and rewrites real 2KXL ALL_PGMS", "[kaitai-aps][real-2kxl]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/Aps/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -574,7 +573,7 @@ TEST_CASE("Kaitai MPC3000 APS loads real hardware ALL_PGMS through production se
 
 TEST_CASE("Kaitai MPC3000 APS maps center pad anchors into 2000XL original key pad", "[kaitai-aps][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -616,7 +615,7 @@ TEST_CASE("Kaitai MPC3000 APS maps center pad anchors into 2000XL original key p
 
 TEST_CASE("Kaitai MPC3000 APS maps active program to all 2000XL drum buses", "[kaitai-aps][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Aps/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -705,7 +704,7 @@ TEST_CASE("Program screens display program 24 correctly at upper bound after rea
 
 TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kaitai-aps]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -739,7 +738,7 @@ TEST_CASE("Kaitai APS rewrite preserves upper-bound MIDI program change", "[kait
 
 TEST_CASE("ApsLoader loads upper-bound MIDI program change", "[kaitai-aps]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -774,7 +773,7 @@ TEST_CASE("ApsLoader loads upper-bound MIDI program change", "[kaitai-aps]")
 
 TEST_CASE("ApsLoader loads mutated note tune", "[kaitai-aps]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ApsLoading/ALL_PGMS.APS");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())

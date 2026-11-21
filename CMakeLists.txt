@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.29)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/MpcResourceBundling.cmake)
@@ -163,6 +163,15 @@ project(mpc)
 
 set(CMAKE_CXX_STANDARD 17)
 
+if(NOT APPLE AND NOT TARGET ResEmbed)
+  FetchContent_Declare(ResEmbed
+    GIT_REPOSITORY https://github.com/eyalamirmusic/ResEmbed.git
+    GIT_TAG aabb5df2113db0c4a0eebf2142252f339e99cc62
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/deps/ResEmbed
+  )
+  FetchContent_MakeAvailable(ResEmbed)
+endif()
+
 if(APPLE)
   if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
     # This is not a typo. See https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -284,12 +293,12 @@ set_target_properties(mpc-tests PROPERTIES
     OBJCXX_STANDARD 20
     OBJCXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
+target_link_libraries(mpc-tests PRIVATE mpc Catch2::Catch2WithMain)
 
 if (UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(mpc-tests Threads::Threads)
+    target_link_libraries(mpc-tests PRIVATE Threads::Threads)
 endif (UNIX)
 
 if (UNIX AND NOT APPLE AND NOT ANDROID)
@@ -297,12 +306,12 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
     pkg_search_module(udisks2 REQUIRED udisks2)
     target_include_directories(mpc SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
     target_include_directories(mpc-tests SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
-    target_link_libraries(mpc-tests ${udisks2_LIBRARIES} X11)
+    target_link_libraries(mpc-tests PRIVATE ${udisks2_LIBRARIES} X11)
     target_link_libraries(mpc ${udisks2_LIBRARIES})
 endif()
 
 if (APPLE)
-target_link_libraries(mpc-tests stdc++  
+target_link_libraries(mpc-tests PRIVATE stdc++
     "-framework Foundation"  
     "-framework Security"  
     "-framework DiskArbitration"  

@@ -11,9 +11,8 @@
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -121,7 +120,7 @@ TEST_CASE("File preview still starts a valid sample", "[file-preview]")
     CAPTURE(directory);
     Mpc mpc;
     preparePreviewDirectory(mpc);
-    const auto fixture = cmrc::mpctest::get_filesystem().open(
+    const auto fixture = mpc_test_resources::get_filesystem().open(
         "test/RealMpc3000/Snd/SOUND017.SND");
     auto file = mpc.getDisk()->newFile("SAMPLE.SND");
     REQUIRE(file);

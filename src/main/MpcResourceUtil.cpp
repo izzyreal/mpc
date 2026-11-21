@@ -45,30 +45,23 @@ bool resource_exists_in_mac_os_bundle(const std::string &path)
 }
 #else
 
-#include <cmrc/cmrc.hpp>
-#include <string_view>
-CMRC_DECLARE(mpc);
+#include <ResEmbed/ResEmbed.h>
 
 std::vector<char>
 get_resource_data_from_in_memory_filesystem(const std::string &path)
 {
-    const auto file = cmrc::mpc::get_filesystem().open(path.c_str());
-    const auto data = std::string_view(file.begin(), file.size()).data();
-    const std::vector<char> data_vec(data, data + file.size());
-    return data_vec;
+    const auto data = ResEmbed::get(path, "mpc");
+    if (!data)
+    {
+        return {};
+    }
+    const auto bytes = data.asCharPointer();
+    return {bytes, bytes + data.size()};
 }
 
 bool resource_exists_in_memory_filesystem(const std::string &path)
 {
-    try
-    {
-        (void) cmrc::mpc::get_filesystem().open(path.c_str());
-        return true;
-    }
-    catch (...)
-    {
-        return false;
-    }
+    return ResEmbed::get(path, "mpc").isValid();
 }
 #endif
 

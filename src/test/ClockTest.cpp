@@ -10,7 +10,7 @@
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "sequencer/Sequence.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <string_view>
 
 #include <vector>
@@ -19,7 +19,6 @@
 #include <iostream>
 #include <iomanip>
 
-CMRC_DECLARE(mpctest);
 
 double bpm = 120.0;
 double sample_rate = 44100.0;
@@ -52,7 +51,7 @@ void parseDoubles(const char *input, std::vector<double> &output)
 void readDoublesFromFile(std::vector<double> &positionsInQuarterNotes,
                          std::string fileName)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/Clock/" + fileName);
     char *data =
         (char *)std::string_view(file.begin(), file.end() - file.begin())

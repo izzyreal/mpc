@@ -1,5 +1,3 @@
-include(cmake/CMakeRC.cmake)
-
 set(_mpc_resources_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(_mpc_test_resources_root ${CMAKE_CURRENT_SOURCE_DIR}/test-resources)
 
@@ -51,13 +49,15 @@ function(_bundle_resources)
     endforeach()
     target_sources(mpc-tests PRIVATE ${MPC_RESOURCES})
   else()
-    cmrc_add_resource_library(
-            mpc_resources
-            ALIAS mpc::rc
-            NAMESPACE mpc
-            WHENCE ${_mpc_resources_root}
-            ${MPC_RESOURCES}
-    )
+    add_library(mpc_resources STATIC)
+    add_library(mpc::rc ALIAS mpc_resources)
+    target_compile_features(mpc_resources PUBLIC cxx_std_20)
+    res_embed_add(mpc_resources
+      FILES ${MPC_RESOURCES}
+      BASE_DIRECTORY "${_mpc_resources_root}"
+      NAMESPACE MpcResources
+      CATEGORY mpc
+      TU_COUNT 1)
 
     target_link_libraries(mpc mpc::rc)
   endif()
@@ -65,14 +65,20 @@ function(_bundle_resources)
   file(GLOB_RECURSE MPC_TEST_RESOURCES CONFIGURE_DEPENDS "${_mpc_test_resources_root}/*")
   list(FILTER MPC_TEST_RESOURCES EXCLUDE REGEX "\\.DS_Store$")
 
-  cmrc_add_resource_library(
-          mpc_test_resources
-          ALIAS mpctest::rc
-          NAMESPACE mpctest
-          WHENCE ${_mpc_test_resources_root}
-          PREFIX test
-          ${MPC_TEST_RESOURCES}
-  )
-
-  target_link_libraries(mpc-tests mpctest::rc)
+  if(APPLE)
+    foreach(resource IN LISTS MPC_TEST_RESOURCES)
+      file(RELATIVE_PATH relative_path "${_mpc_test_resources_root}" "${resource}")
+      get_filename_component(relative_dir "${relative_path}" DIRECTORY)
+      set_source_files_properties("${resource}" PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources/test/${relative_dir}")
+    endforeach()
+    target_sources(mpc-tests PRIVATE ${MPC_TEST_RESOURCES})
+  else()
+    res_embed_add(mpc-tests
+      FILES ${MPC_TEST_RESOURCES}
+      BASE_DIRECTORY "${_mpc_test_resources_root}"
+      NAMESPACE MpcTestResources
+      CATEGORY mpctest
+      TU_COUNT 1)
+  endif()
 endfunction()

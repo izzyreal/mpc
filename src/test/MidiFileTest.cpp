@@ -11,10 +11,9 @@
 #include "sequencer/SequencerStateManager.hpp"
 
 #include <array>
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::sequencer;
@@ -141,7 +140,7 @@ TEST_CASE("MidIo parses FRUTZLE.MID without crashing",
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
     std::vector<char> bytes(file.begin(), file.end());
     auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");
@@ -163,7 +162,7 @@ TEST_CASE("MidIo parses FRUTZLE.MID into temp sequence without crashing",
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
     std::vector<char> bytes(file.begin(), file.end());
     auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");
@@ -192,7 +191,7 @@ TEST_CASE("Cubase MID files load with valid bar count and name lengths",
         Mpc mpc;
         TestMpc::initializeTestMpc(mpc);
 
-        auto fs = cmrc::mpctest::get_filesystem();
+        auto fs = mpc_test_resources::get_filesystem();
         auto file = fs.open("test/MidiFile/" + fileName);
         std::vector<char> bytes(file.begin(), file.end());
         auto sequence = loadSequenceWithMidIo(mpc, bytes, fileName);
@@ -215,7 +214,7 @@ TEST_CASE("HWIF316.MID loads with 16 bars", "[file][midi-file]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     std::vector<char> bytes(file.begin(), file.end());
     auto sequence = loadSequenceWithMidIo(mpc, bytes, "HWIF316.MID");
@@ -229,7 +228,7 @@ TEST_CASE("Real 2KXL SEQ.MID preserves MPC note variation semantics",
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/SEQ.MID");
     std::vector<char> bytes(file.begin(), file.end());
     auto sequence = loadSequenceWithMidIo(mpc, bytes, "SEQ.MID");
@@ -273,7 +272,7 @@ TEST_CASE("FRUTZLE.MID roundtrip keeps non-empty sequence", "[file][midi-file]")
     Mpc mpc;
     TestMpc::initializeTestMpc(mpc);
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
     std::vector<char> bytes(file.begin(), file.end());
     auto sequence = loadSequenceWithMidIo(mpc, bytes, "FRUTZLE.MID");

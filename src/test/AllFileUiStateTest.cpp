@@ -18,11 +18,10 @@
 #include "sequencer/Transport.hpp"
 #include "StrUtil.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <algorithm>
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
@@ -45,7 +44,7 @@ namespace
                          const std::string& fileName)
     {
         auto disk = mpc.getDisk();
-        auto fs = cmrc::mpctest::get_filesystem();
+        auto fs = mpc_test_resources::get_filesystem();
 
         auto file = fs.open(resourcePath);
         std::vector data(file.begin(), file.end());

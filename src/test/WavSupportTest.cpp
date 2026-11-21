@@ -8,7 +8,7 @@
 #include "engine/audio/core/FloatSampleTools.hpp"
 #include "file/wav/WavFile.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 
 #include <chrono>
 #include <cmath>
@@ -25,13 +25,12 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::file::wav;
 using namespace mpc::sampleops;
 
-CMRC_DECLARE(mpctest);
 
 namespace
 {
     std::vector<char> resourceBytes(const std::string &resourcePath)
     {
-        auto fs = cmrc::mpctest::get_filesystem();
+        auto fs = mpc_test_resources::get_filesystem();
         auto file = fs.open(resourcePath);
         return std::vector<char>(file.begin(), file.end());
     }

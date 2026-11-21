@@ -4,11 +4,10 @@
 #include "input/midi/MidiControlPresetUtil.hpp"
 
 #include <nlohmann/json.hpp>
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <set>
 #include <stdexcept>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc::input::midi;
 using nlohmann::json;
