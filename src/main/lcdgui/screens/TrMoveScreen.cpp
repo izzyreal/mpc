@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "TrMoveScreen.hpp"
 
 #include "EventsScreen.hpp"
@@ -263,7 +264,7 @@ void TrMoveScreen::displayTrFields() const
 
         if (tr0Name.length() < 10)
         {
-            tr0Name = StrUtil::padRight(tr0Name, " ", 9) + u8"\u00CD";
+            tr0Name = StrUtil::padRight(tr0Name, " ", 9) + mpc::utf8(u8"\u00CD");
         }
 
         findField("tr")->setText(

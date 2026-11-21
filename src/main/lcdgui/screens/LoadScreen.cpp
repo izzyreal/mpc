@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "LoadScreen.hpp"
 
 #include "Mpc.hpp"
@@ -417,7 +418,7 @@ void LoadScreen::displayFile() const
         selectedFile->isDirectory())
     {
         findField("file")->setText(
-            u8"\u00C3" +
+            mpc::utf8(u8"\u00C3") +
             StrUtil::padRight(mpc_fs::path(selectedFileName).stem().string(),
                               " ", 16));
     }

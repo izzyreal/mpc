@@ -203,6 +203,14 @@ endforeach()
 
 add_library(mpc ${_source_list_main})
 
+set_target_properties(mpc PROPERTIES
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+    OBJCXX_STANDARD 20
+    OBJCXX_STANDARD_REQUIRED ON)
+target_compile_features(mpc PUBLIC cxx_std_20)
+target_compile_definitions(mpc PUBLIC GHC_FILESYSTEM_ENFORCE_CPP17_API)
+
 target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
     ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -269,6 +277,12 @@ if (APPLE)
 else()
     add_executable(mpc-tests ${_source_list_test})
 endif()
+
+set_target_properties(mpc-tests PROPERTIES
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+    OBJCXX_STANDARD 20
+    OBJCXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 

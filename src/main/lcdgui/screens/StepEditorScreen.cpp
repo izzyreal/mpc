@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "StepEditorScreen.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
@@ -1282,10 +1283,10 @@ void StepEditorScreen::setViewNotesText() const
     {
         findField("fromnote")
             ->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" +
-                      Util::noteNames()[noteA] + u8"\u00D4");
+                      Util::noteNames()[noteA] + mpc::utf8(u8"\u00D4"));
         findField("tonote")->setText(
             StrUtil::padLeft(std::to_string(noteB), " ", 3) + "(" +
-            Util::noteNames()[noteB] + u8"\u00D4");
+            Util::noteNames()[noteB] + mpc::utf8(u8"\u00D4"));
     }
     else if (view == 3)
     {

@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "NextSeqScreen.hpp"
 #include "sequencer/Transport.hpp"
 
@@ -265,11 +266,11 @@ void NextSeqScreen::displayTempoLabel() const
 
     if (currentRatio != 1000)
     {
-        findLabel("tempo")->setText(u8"c\u00C0:");
+        findLabel("tempo")->setText(mpc::utf8(u8"c\u00C0:"));
     }
     else
     {
-        findLabel("tempo")->setText(u8" \u00C0:");
+        findLabel("tempo")->setText(mpc::utf8(u8" \u00C0:"));
     }
 }
 

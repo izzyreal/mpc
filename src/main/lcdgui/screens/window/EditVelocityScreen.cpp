@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "EditVelocityScreen.hpp"
 
 #include "sampler/Sampler.hpp"
@@ -142,10 +143,10 @@ void EditVelocityScreen::displayNotes()
         findField("note1")->Hide(false);
         findField("note0")->setText(
             StrUtil::padLeft(std::to_string(midiNote0), " ", 3) + "(" +
-            Util::noteNames()[midiNote0] + u8"\u00D4");
+            Util::noteNames()[midiNote0] + mpc::utf8(u8"\u00D4"));
         findField("note1")->setText(
             StrUtil::padLeft(std::to_string(midiNote1), " ", 3) + "(" +
-            Util::noteNames()[midiNote1] + u8"\u00D4");
+            Util::noteNames()[midiNote1] + mpc::utf8(u8"\u00D4"));
     }
     else
     {

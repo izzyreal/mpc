@@ -1,4 +1,5 @@
 #pragma once
+#include "Utf8.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include <atomic>
@@ -66,12 +67,12 @@ namespace mpc::lcdgui::screens
         int getMonitor() const;
 
     private:
-        const std::string vu_normal = u8"\u00F5";
-        const std::string vu_threshold = u8"\u00F6";
-        const std::string vu_peak = u8"\u00F8";
-        const std::string vu_peak_threshold = u8"\u00F9";
-        const std::string vu_normal_threshold = u8"\u00FA";
-        const std::string vu_peak_threshold_normal = u8"\u00FB";
+        const std::string vu_normal = mpc::utf8(u8"\u00F5");
+        const std::string vu_threshold = mpc::utf8(u8"\u00F6");
+        const std::string vu_peak = mpc::utf8(u8"\u00F8");
+        const std::string vu_peak_threshold = mpc::utf8(u8"\u00F9");
+        const std::string vu_normal_threshold = mpc::utf8(u8"\u00FA");
+        const std::string vu_peak_threshold_normal = mpc::utf8(u8"\u00FB");
 
         std::vector<std::string> inputNames{"ANALOG", "DIGITAL"};
         std::vector<std::string> modeNames{"MONO L", "MONO R", "STEREO"};

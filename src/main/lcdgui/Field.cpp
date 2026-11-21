@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "Field.hpp"
 
 #include "Mpc.hpp"
@@ -306,7 +307,7 @@ void Field::type(int i)
 
         if (textCopy.empty())
         {
-            newText = u8"\u00CB" + std::to_string(i);
+            newText = mpc::utf8(u8"\u00CB") + std::to_string(i);
         }
         else
         {
@@ -334,7 +335,7 @@ void Field::type(int i)
                     textCopy.clear();
                 }
 
-                textCopy.append(u8"\u00CB" + std::to_string(i));
+                textCopy.append(mpc::utf8(u8"\u00CB") + std::to_string(i));
             }
 
             newText = textCopy;

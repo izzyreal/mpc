@@ -1,4 +1,5 @@
 #pragma once
+#include "Utf8.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include <optional>
 
@@ -21,8 +22,8 @@ namespace mpc::lcdgui::screens
 
     private:
         const std::vector<std::string> types{
-            u8"Save All Sequences\u00CE&\u00CESongs", "Save a Sequence",
-            u8"Save All Programs\u00CE&\u00CESounds", "Save a Program & Sounds",
+            mpc::utf8(u8"Save All Sequences\u00CE&\u00CESongs"), "Save a Sequence",
+            mpc::utf8(u8"Save All Programs\u00CE&\u00CESounds"), "Save a Program & Sounds",
             "Save a Sound"};
 
         int type = 0;

@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "MidiOutputMonitorScreen.hpp"
 
 #include "Mpc.hpp"
@@ -63,7 +64,7 @@ void MidiOutputMonitorScreen::update(Observable *o, const Message message)
     }
 
     const auto label = findLabel(std::to_string(deviceNumber));
-    label->setText(u8"\u00CC");
+    label->setText(mpc::utf8(u8"\u00CC"));
     initTimer(label);
 }
 

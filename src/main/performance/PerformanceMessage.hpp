@@ -34,7 +34,6 @@ namespace mpc::performance
         DrumBusIndex drumBusIndex{};
         ProgramIndex programIndex{};
 
-        UpdateDrumProgram() = default;
     };
 
     struct UpdateNoteParameters
@@ -53,7 +52,6 @@ namespace mpc::performance
         DrumNoteNumber drumNoteValue;
         sampler::VoiceOverlapMode voiceOverlapMode;
 
-        UpdateNoteParameters() = default;
     };
 
     struct UpdateNoteParametersBySnapshot
@@ -63,14 +61,12 @@ namespace mpc::performance
 
         NoteParameters snapshot;
 
-        UpdateNoteParametersBySnapshot() = default;
     };
 
     struct UpdateAllNoteParametersBulk
     {
         ProgramIndex programIndex{};
         std::array<NoteParameters, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> snapshot;
-        UpdateAllNoteParametersBulk() = default;
     };
 
     struct UpdateProgramBulk
@@ -78,7 +74,6 @@ namespace mpc::performance
         ProgramIndex programIndex{};
         Program program{};
 
-        UpdateProgramBulk() = default;
     };
 
     struct RepairProgramReferences
@@ -102,7 +97,6 @@ namespace mpc::performance
 
         Value0To100 newValue;
 
-        UpdateStereoMixer() = default;
     };
 
     struct UpdateIndivFxMixer
@@ -124,7 +118,6 @@ namespace mpc::performance
         DrumMixerIndividualFxPath individualFxPath;
         bool followStereo;
 
-        UpdateIndivFxMixer() = default;
     };
 
     struct SetProgramUsed
