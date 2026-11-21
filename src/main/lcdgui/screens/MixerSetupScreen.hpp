@@ -1,4 +1,5 @@
 #pragma once
+#include "Utf8.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
@@ -20,7 +21,7 @@ namespace mpc::lcdgui::screens
         void displayCopyPgmMixToDrum() const;
         void displayRecordMixChanges() const;
 
-        std::vector<std::string> masterLevelNames = {u8"-\u00D9\u00DAdB",
+        std::vector<std::string> masterLevelNames = {mpc::utf8(u8"-\u00D9\u00DAdB"),
                                                      "-72dB",
                                                      "-66dB",
                                                      "-60dB",

@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "DirectoryScreen.hpp"
 
 #include "Mpc.hpp"
@@ -741,13 +742,13 @@ void DirectoryScreen::drawGraphicsLeft() const
     a4->setText(" ");
 
     auto fc = getFirstColumn();
-    std::vector<std::string> currentDirIcons{u8"\u00EF", u8"\u00F1",
-                                             u8"\u00F0"};
-    std::vector<std::string> dirIcons{u8"\u00EA", u8"\u00EB", u8"\u00EC"};
+    std::vector<std::string> currentDirIcons{mpc::utf8(u8"\u00EF"), mpc::utf8(u8"\u00F1"),
+                                             mpc::utf8(u8"\u00F0")};
+    std::vector<std::string> dirIcons{mpc::utf8(u8"\u00EA"), mpc::utf8(u8"\u00EB"), mpc::utf8(u8"\u00EC")};
 
-    std::string notRootDash = u8"\u00ED";
-    std::string onlyDirIcon = u8"\u00F3";
-    std::string rootIcon = u8"\u00EE";
+    std::string notRootDash = mpc::utf8(u8"\u00ED");
+    std::string onlyDirIcon = mpc::utf8(u8"\u00F3");
+    std::string rootIcon = mpc::utf8(u8"\u00EE");
 
     int size = fc.size();
 
@@ -962,8 +963,8 @@ void DirectoryScreen::drawGraphicsRight() const
 
     if (parentNames.size() == 0)
     {
-        a0->setText(padFileName(a0->getText(), u8"\u00DF"));
-        b0->setText(u8"\u00E0");
+        a0->setText(padFileName(a0->getText(), mpc::utf8(u8"\u00DF")));
+        b0->setText(mpc::utf8(u8"\u00E0"));
     }
 
     int size = firstColumn.size();
@@ -976,32 +977,32 @@ void DirectoryScreen::drawGraphicsRight() const
 
     if (size - yOffset0 > 0 && file00->getName() == dirName)
     {
-        a0->setText(padFileName(a0->getText(), u8"\u00DF"));
-        b0->setText(u8"\u00E0");
+        a0->setText(padFileName(a0->getText(), mpc::utf8(u8"\u00DF")));
+        b0->setText(mpc::utf8(u8"\u00E0"));
     }
 
     if (size - yOffset0 > 1 && file01->getName() == dirName)
     {
-        a1->setText(padFileName(a1->getText(), u8"\u00DF"));
-        b1->setText(u8"\u00E0");
+        a1->setText(padFileName(a1->getText(), mpc::utf8(u8"\u00DF")));
+        b1->setText(mpc::utf8(u8"\u00E0"));
     }
 
     if (size - yOffset0 > 2 && file02->getName() == dirName)
     {
-        a2->setText(padFileName(a2->getText(), u8"\u00DF"));
-        b2->setText(u8"\u00E0");
+        a2->setText(padFileName(a2->getText(), mpc::utf8(u8"\u00DF")));
+        b2->setText(mpc::utf8(u8"\u00E0"));
     }
 
     if (size - yOffset0 > 3 && file03->getName() == dirName)
     {
-        a3->setText(padFileName(a3->getText(), u8"\u00DF"));
-        b3->setText(u8"\u00E0");
+        a3->setText(padFileName(a3->getText(), mpc::utf8(u8"\u00DF")));
+        b3->setText(mpc::utf8(u8"\u00E0"));
     }
 
     if (size - yOffset0 > 4 && file04->getName() == dirName)
     {
-        a4->setText(padFileName(a4->getText(), u8"\u00DF"));
-        b4->setText(u8"\u00E0");
+        a4->setText(padFileName(a4->getText(), mpc::utf8(u8"\u00DF")));
+        b4->setText(mpc::utf8(u8"\u00E0"));
     }
 
     auto c0 = findLabel("c0i");
@@ -1015,12 +1016,12 @@ void DirectoryScreen::drawGraphicsRight() const
         if (yOffset1 == 0)
         {
             // Set first folder icon
-            c0->setText(u8"\u00E1");
+            c0->setText(mpc::utf8(u8"\u00E1"));
         }
         else
         {
             // Set not first folder icon
-            c0->setText(u8"\u00E6");
+            c0->setText(mpc::utf8(u8"\u00E6"));
         }
     }
     else
@@ -1028,62 +1029,62 @@ void DirectoryScreen::drawGraphicsRight() const
         if (yOffset1 == 0)
         {
             // Set first file icon
-            c0->setText(u8"\u00E5");
+            c0->setText(mpc::utf8(u8"\u00E5"));
         }
         else
         {
             // Set not first file icon
-            c0->setText(u8"\u00E3");
+            c0->setText(mpc::utf8(u8"\u00E3"));
         }
     }
 
     if (auto file11 = getFileFromGrid(1, 1); file11 && file11->isDirectory())
     {
-        c1->setText(u8"\u00E6");
+        c1->setText(mpc::utf8(u8"\u00E6"));
     }
     else
     {
-        c1->setText(u8"\u00E3");
+        c1->setText(mpc::utf8(u8"\u00E3"));
     }
 
     if (auto file12 = getFileFromGrid(1, 2); file12 && file12->isDirectory())
     {
-        c2->setText(u8"\u00E6");
+        c2->setText(mpc::utf8(u8"\u00E6"));
     }
     else
     {
-        c2->setText(u8"\u00E3");
+        c2->setText(mpc::utf8(u8"\u00E3"));
     }
 
     if (auto file13 = getFileFromGrid(1, 3); file13 && file13->isDirectory())
     {
-        c3->setText(u8"\u00E6");
+        c3->setText(mpc::utf8(u8"\u00E6"));
     }
     else
     {
-        c3->setText(u8"\u00E3");
+        c3->setText(mpc::utf8(u8"\u00E3"));
     }
 
     if (auto file14 = getFileFromGrid(1, 4); file14 && file14->isDirectory())
     {
         if (yOffset1 + 5 == secondColumn.size())
         {
-            c4->setText(u8"\u00E2");
+            c4->setText(mpc::utf8(u8"\u00E2"));
         }
         else
         {
-            c4->setText(u8"\u00E6");
+            c4->setText(mpc::utf8(u8"\u00E6"));
         }
     }
     else
     {
         if (yOffset1 + 5 == secondColumn.size() || secondColumn.size() <= 5)
         {
-            c4->setText(u8"\u00E4");
+            c4->setText(mpc::utf8(u8"\u00E4"));
         }
         else
         {
-            c4->setText(u8"\u00E3");
+            c4->setText(mpc::utf8(u8"\u00E3"));
         }
     }
 }

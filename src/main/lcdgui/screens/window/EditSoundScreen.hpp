@@ -1,4 +1,5 @@
 #pragma once
+#include "Utf8.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
@@ -24,8 +25,8 @@ namespace mpc::lcdgui::screens::window
         const std::vector<std::string> editNames{
             "DISCARD",
             "LOOP FROM ST TO END",
-            u8"SECTION \u00C4 NEW SOUND",
-            u8"INSERT SOUND \u00C4 SECTION START",
+            mpc::utf8(u8"SECTION \u00C4 NEW SOUND"),
+            mpc::utf8(u8"INSERT SOUND \u00C4 SECTION START"),
             "DELETE SECTION",
             "SILENCE SECTION",
             "REVERSE SECTION",

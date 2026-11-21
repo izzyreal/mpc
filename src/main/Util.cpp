@@ -1,3 +1,4 @@
+#include "Utf8.hpp"
 #include "Util.hpp"
 
 #include "Mpc.hpp"
@@ -20,7 +21,7 @@ std::string Util::replaceDotWithSmallSpaceDot(const std::string &s)
     const auto dotindex = static_cast<int>(s.find('.'));
     const auto part1 = s.substr(0, dotindex);
     const auto part2 = s.substr(dotindex + 1);
-    const std::string tempoDot = u8"\u00CB";
+    const std::string tempoDot = mpc::utf8(u8"\u00CB");
     return part1 + tempoDot + part2;
 }
 
@@ -70,12 +71,12 @@ std::string Util::distributeTimeSig(const std::string &s)
 
     if (s0.length() == 1)
     {
-        s0 = u8"\u00CE" + s0 + u8"\u00CE";
+        s0 = mpc::utf8(u8"\u00CE") + s0 + mpc::utf8(u8"\u00CE");
     }
 
     if (s1.length() == 1)
     {
-        s1 = u8"\u00CE" + s1;
+        s1 = mpc::utf8(u8"\u00CE") + s1;
     }
 
     return s0 + "/" + s1;
@@ -131,12 +132,12 @@ std::vector<std::string> &Util::noteNames()
 
             if (octave == -2)
             {
-                octaveString = u8"\u00D2";
+                octaveString = mpc::utf8(u8"\u00D2");
             }
 
             if (octave == -1)
             {
-                octaveString = u8"\u00D3";
+                octaveString = mpc::utf8(u8"\u00D3");
             }
 
             noteNames[j] = someNoteNames[noteCounter] + octaveString;
@@ -182,7 +183,7 @@ int Util::getTextWidthInPixels(const std::string &text)
 
     int halfSpaceCount = 0;
 
-    const std::string halfSpace = u8"\u00CE";
+    const std::string halfSpace = mpc::utf8(u8"\u00CE");
 
     int nPos = text.find(halfSpace, 0);
 
