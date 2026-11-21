@@ -13,12 +13,11 @@
 #include "file/kaitai/PgmIo.hpp"
 #include "performance/PerformanceManager.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <string_view>
 
 #include "engine/EngineHost.hpp"
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
@@ -29,7 +28,7 @@ void prepareResources(Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
 
     for (auto &&entry : fs.iterate_directory("test/ProgramLoading"))
     {

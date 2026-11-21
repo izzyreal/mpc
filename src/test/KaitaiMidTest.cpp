@@ -21,7 +21,7 @@
 #include "sequencer/Transport.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
@@ -32,7 +32,6 @@
 #include <string>
 #include <string_view>
 
-CMRC_DECLARE(mpctest);
 
 namespace {
 
@@ -270,7 +269,7 @@ std::shared_ptr<mpc::disk::MpcFile> installMidiResourceFile(
     const std::string& fileName)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(resourcePath);
     std::vector<char> data(file.begin(), file.end());
     auto newFile = disk->newFile(fileName);
@@ -740,7 +739,7 @@ void requireDetailedNote(
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites FRUTZLE", "[kaitai-mid]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -772,7 +771,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites FRUTZLE", "[kaitai-mid]")
 
 TEST_CASE("Kaitai standard MIDI loads FRUTZLE with expected semantics", "[kaitai-mid]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/FRUTZLE.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -812,7 +811,7 @@ TEST_CASE("Kaitai standard MIDI loads FRUTZLE with expected semantics", "[kaitai
 
 TEST_CASE("Kaitai standard MIDI loads HWIF316 with expected semantics", "[kaitai-mid]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -856,7 +855,7 @@ TEST_CASE("Kaitai standard MIDI loads HWIF316 with expected semantics", "[kaitai
 
 TEST_CASE("Kaitai standard MIDI loads HWIF6-0V2 with expected semantics", "[kaitai-mid]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF6-0V2.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -881,7 +880,7 @@ TEST_CASE("Kaitai standard MIDI loads HWIF6-0V2 with expected semantics", "[kait
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF6-0V2", "[.][kaitai-mid-direct]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF6-0V2.MID");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -908,7 +907,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF6-0V2", "[.][kaitai-mid-
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF316", "[.][kaitai-mid-direct]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -935,7 +934,7 @@ TEST_CASE("Kaitai standard MIDI parses and rewrites HWIF316", "[.][kaitai-mid-di
 
 TEST_CASE("Kaitai raw MIDI timeline exposes expected HWIF316 track 0 events", "[.][kaitai-mid-direct]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -949,7 +948,7 @@ TEST_CASE("Kaitai raw MIDI timeline exposes expected HWIF316 track 0 events", "[
 
 TEST_CASE("Kaitai raw MIDI timeline exposes expected HWIF316 track 3 events", "[.][kaitai-mid-direct]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -966,7 +965,7 @@ TEST_CASE("Kaitai raw MIDI timeline exposes expected HWIF316 track 3 events", "[
 
 TEST_CASE("Kaitai first raw event on HWIF316 track 0 is a meta event", "[.][kaitai-mid-direct]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/MidiFile/HWIF316.MID");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -1409,7 +1408,7 @@ TEST_CASE("Kaitai standard MIDI roundtrips MPC2000XL meta and channel events", "
 
 TEST_CASE("Kaitai standard MIDI parses and rewrites real 2KXL SEQ", "[kaitai-mid][real-2kxl]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/Mid/mpc2000xl_seq_variations.MID");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())

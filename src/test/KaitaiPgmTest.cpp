@@ -22,7 +22,7 @@
 #include "sampler/SoundGenerationMode.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <kaitai/kaitaistream.h>
 
 #include <memory>
@@ -33,14 +33,13 @@
 #include <string_view>
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 namespace {
 
 std::vector<char> rewriteProgram1WithMutations(
     const std::function<void(mpc2000xl_pgm_t&)>& mutate)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -94,7 +93,7 @@ std::vector<char> rewriteRealMpc3000ProgramWithMutations(
     const std::string& resourcePath,
     const std::function<void(mpc3000_pgm_v3_t&)>& mutate)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(resourcePath);
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -238,7 +237,7 @@ void requireBroadMutatedProgramState(
 void prepareProgramLoadingResources(mpc::Mpc& mpc)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
 
     for (auto&& entry : fs.iterate_directory("test/ProgramLoading")) {
         disk->newFolder(entry.filename());
@@ -452,7 +451,7 @@ void requireProgram1LoadedState(mpc::Mpc& mpc,
 
 TEST_CASE("Kaitai MPC2000 PGM parses and rewrites PROGRAM1", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -601,7 +600,7 @@ TEST_CASE("PGM nonempty sound names still require ASCII",
 
 TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-pgm][real-2kxl]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/Pgm/NEWPGM-A.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -642,7 +641,7 @@ TEST_CASE("Kaitai MPC2000 PGM parses and rewrites real 2KXL NEWPGM-A", "[kaitai-
 
 TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM.pgm");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -737,7 +736,7 @@ TEST_CASE("Kaitai MPC3000 PGM parses a real hardware empty PROGRAM.pgm", "[kaita
 
 TEST_CASE("Kaitai MPC3000 PGM decodes a probed SIMULT generator-mode variant", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_01_SIMULT.pgm");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -765,7 +764,7 @@ TEST_CASE("Kaitai MPC3000 PGM decodes a probed SIMULT generator-mode variant", "
 
 TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW generator-mode variant", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_02_VELSW.pgm");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -793,7 +792,7 @@ TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW generator-mode variant", "
 
 TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW threshold and target variant", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_03_VELSW_43.pgm");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -832,7 +831,7 @@ TEST_CASE("Kaitai MPC3000 PGM decodes a probed VEL SW threshold and target varia
 
 TEST_CASE("Kaitai MPC3000 PGM captures raw tune and decay-mode bytes from an Env/Veloc probe", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_04_ENV_PROBE.pgm");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -864,7 +863,7 @@ TEST_CASE("Kaitai MPC3000 PGM captures raw tune and decay-mode bytes from an Env
 
 TEST_CASE("Kaitai MPC3000 PGM loads through the production seam with imported semantics", "[kaitai-pgm][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/Pgm/PROGRAM_04_ENV_PROBE.pgm");
     std::vector<char> bytes(file.begin(), file.end());
 
@@ -1030,7 +1029,7 @@ TEST_CASE("Kaitai MPC2000 PGM loads PROGRAM1 through the production seam with ex
 
 TEST_CASE("Kaitai MPC2000 PGM load uses standalone byte as MIDI program change", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1092,7 +1091,7 @@ TEST_CASE("Kaitai MPC2000 PGM save writes MIDI program change and ignores slider
 
 TEST_CASE("Kaitai MPC2000 PGM load preserves mixer effects send level", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1127,7 +1126,7 @@ TEST_CASE("Kaitai MPC2000 PGM load preserves mixer effects send level", "[kaitai
 
 TEST_CASE("Kaitai MPC2000 PGM direct load handles upper-bound MIDI program change", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1161,7 +1160,7 @@ TEST_CASE("Kaitai MPC2000 PGM direct load handles upper-bound MIDI program chang
 
 TEST_CASE("Kaitai MPC2000 PGM direct parse reads upper-bound MIDI program change byte", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1206,7 +1205,7 @@ TEST_CASE("Kaitai MPC2000 PGM direct load preserves broad mutated program semant
 
 TEST_CASE("Kaitai MPC2000 PGM direct load preserves mutated note tune", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1239,7 +1238,7 @@ TEST_CASE("Kaitai MPC2000 PGM direct load preserves mutated note tune", "[kaitai
 
 TEST_CASE("ProgramLoader loads upper-bound MIDI program change", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -1273,7 +1272,7 @@ TEST_CASE("ProgramLoader loads upper-bound MIDI program change", "[kaitai-pgm]")
 
 TEST_CASE("ProgramLoader loads mutated note tune", "[kaitai-pgm]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/ProgramLoading/program1/PROGRAM1.PGM");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())

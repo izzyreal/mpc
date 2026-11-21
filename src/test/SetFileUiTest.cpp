@@ -17,12 +17,11 @@
 #include "sequencer/Sequencer.hpp"
 #include "StrUtil.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <algorithm>
 #include <chrono>
 #include <thread>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -42,7 +41,7 @@ namespace
 
     void prepareGeneratedSetFile(Mpc &mpc)
     {
-        const auto fs = cmrc::mpctest::get_filesystem();
+        const auto fs = mpc_test_resources::get_filesystem();
         const auto fixture = fs.open("test/GeneratedMpc60/Set/DEMO.SET");
         std::vector<char> data(fixture.begin(), fixture.end());
         auto newFile = mpc.getDisk()->newFile("DEMO.SET");

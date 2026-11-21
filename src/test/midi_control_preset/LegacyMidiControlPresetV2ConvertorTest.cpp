@@ -6,13 +6,12 @@
 #include "TestUtil.hpp"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <string>
 #include <iostream>
 
 #include "iRigPadsUtil.hpp"
 
-CMRC_DECLARE(mpctest);
 
 using nlohmann::json;
 using nlohmann::json_schema::json_validator;

@@ -13,18 +13,17 @@
 
 #include <nlohmann/json.hpp>
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 
 #include <string>
 #include <iostream>
 
-CMRC_DECLARE(mpctest);
 
 using nlohmann::json;
 
 inline std::string load_resource(const std::string &path)
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(path);
     return std::string(file.begin(), file.end());
 }

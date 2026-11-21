@@ -16,10 +16,9 @@
 #include "performance/PerformanceManager.hpp"
 #include "disk/SoundLoader.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <string_view>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
@@ -100,7 +99,7 @@ void prepareSamplerResources(Mpc &mpc)
     disk->initRoot();
     disk->initFiles();
 
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
 
     for (auto &&entry : fs.iterate_directory("test/Sampler"))
     {

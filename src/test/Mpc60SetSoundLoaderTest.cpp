@@ -12,13 +12,12 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 using mpc::test::ScopedMpc60ImportSetting;
 
@@ -26,7 +25,7 @@ namespace
 {
     std::vector<char> resource(const std::string &path)
     {
-        const auto fs = cmrc::mpctest::get_filesystem();
+        const auto fs = mpc_test_resources::get_filesystem();
         const auto file = fs.open(path);
         return {file.begin(), file.end()};
     }

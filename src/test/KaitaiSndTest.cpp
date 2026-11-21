@@ -14,7 +14,7 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <kaitai/kaitaistream.h>
 
 #include <array>
@@ -28,7 +28,6 @@
 #include <string_view>
 #include <vector>
 
-CMRC_DECLARE(mpctest);
 
 using namespace mpc::disk;
 using namespace mpc::file::kaitai;
@@ -62,7 +61,7 @@ namespace
 
     std::vector<char> resourceBytes(const std::string &resourcePath)
     {
-        auto fs = cmrc::mpctest::get_filesystem();
+        auto fs = mpc_test_resources::get_filesystem();
         auto file = fs.open(resourcePath);
         return std::vector<char>(file.begin(), file.end());
     }

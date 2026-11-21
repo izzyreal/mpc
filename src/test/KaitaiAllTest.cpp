@@ -32,7 +32,7 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/Track.hpp"
 
-#include <cmrc/cmrc.hpp>
+#include "TestResourceFs.hpp"
 #include <kaitai/kaitaistream.h>
 
 #include <algorithm>
@@ -41,7 +41,6 @@
 #include <string>
 #include <string_view>
 
-CMRC_DECLARE(mpctest);
 
 namespace {
 
@@ -74,7 +73,7 @@ std::string rewriteParsedAllRecord(T& parsed)
 void prepareAllResources(mpc::Mpc& mpc)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
 
     for (auto&& entry : fs.iterate_directory("test/AllLoading")) {
         auto file = fs.open("test/AllLoading/" + entry.filename());
@@ -92,7 +91,7 @@ std::shared_ptr<mpc::disk::MpcFile> installResourceFile(
     const std::string& fileName)
 {
     auto disk = mpc.getDisk();
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open(resourcePath);
     std::vector<char> data(file.begin(), file.end());
     auto newFile = disk->newFile(fileName);
@@ -185,7 +184,7 @@ std::string describeSequenceBodyIndexes(const std::vector<int>& indexes)
 
 std::vector<char> buildBroadMutatedAllBytes()
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -308,7 +307,7 @@ TEST_CASE("ALL truncated SysEx framing fails cleanly", "[kaitai-all][all-sysex]"
 TEST_CASE("ALL long SysEx leaves the next sequence aligned",
           "[kaitai-all][all-sysex]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     const auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
     // Reuse a real 10240-byte sequence header; only event framing is varied.
     const std::string header(file.begin() + 14406, file.begin() + 14406 + 10240);
@@ -423,7 +422,7 @@ TEST_CASE("ALL ordinary Akai SysEx is not treated as a mixer event",
 
 TEST_CASE("Kaitai MPC2000 ALL parses and rewrites real 2KXL ALL", "[kaitai-all][real-2kxl]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -714,7 +713,7 @@ TEST_CASE("Kaitai MPC2000 ALL loads one real 2KXL sequence with expected default
 
 TEST_CASE("Kaitai MPC3000 ALL parser exposes expected embedded sequence and song structure", "[kaitai-all][real-mpc3000]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc3000/All/M3K_2SEQ1SONG.ALL");
     const std::string bytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -891,7 +890,7 @@ TEST_CASE("Kaitai MPC3000 ALL loads sequences and songs through the production s
 
 TEST_CASE("AllParser reads mutated default tempo and song repeat count", "[kaitai-all]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
@@ -928,7 +927,7 @@ TEST_CASE("AllParser reads mutated default tempo and song repeat count", "[kaita
 
 TEST_CASE("AllLoader loads mutated default tempo and song repeat count", "[kaitai-all]")
 {
-    auto fs = cmrc::mpctest::get_filesystem();
+    auto fs = mpc_test_resources::get_filesystem();
     auto file = fs.open("test/RealMpc2000xl/All/ALL.ALL");
     const std::string originalBytes(
         std::string_view(file.begin(), file.end() - file.begin())
